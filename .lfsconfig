@@ -5,4 +5,4 @@
 # url = https://MidnightGames.lfs.midnight.works/MidnightGames/RacingGame
 
 [lfs]
-    url = https://{org-name}.lfs.midnight.works/{org-name}/{repository-name}
+    url = https://tudorteam.lfs.midnight.works/tudorteam/freehangar
