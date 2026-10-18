@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { margin: 16px; font: 12px Inter, sans-serif; color: #fff; }
+    button { width: 100%; height: 36px; border: 0; border-radius: 6px; color: white; background: #18a0fb; font-weight: 600; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: default; }
+    .progress-header { display: flex; justify-content: space-between; margin-top: 12px; color: #fff; font-weight: 500; }
+    .progress-track { height: 8px; margin-top: 6px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, .16); }
+    #progress-bar { width: 0; height: 100%; border-radius: inherit; background: #18a0fb; transition: width .18s ease; }
+    #progress-bar.done { background: #45c46b; }
+    #progress-bar.error { background: #f24822; }
+    #status { margin: 10px 0 0; color: #fff; line-height: 1.4; white-space: pre-wrap; }
+    .hint { color: #777; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="hint">Unity must be open. Select one or more Frames and import them into the active scene.</div>
+  <button id="import">Import selected Frames</button>
+  <div class="progress-header"><span>Overall progress</span><span id="progress-value">0%</span></div>
+  <div class="progress-track">
+    <div id="progress-bar" role="progressbar" aria-label="Overall import progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+  </div>
+  <div id="status">Ready.</div>
+  <script>
+    const button = document.getElementById('import');
+    const status = document.getElementById('status');
+    const progressBar = document.getElementById('progress-bar');
+    const progressValue = document.getElementById('progress-value');
+
+    function setProgress(value, state) {
+      const percent = Math.max(0, Math.min(100, Math.round(Number(value || 0) * 100)));
+      progressBar.style.width = `${percent}%`;
+      progressBar.setAttribute('aria-valuenow', String(percent));
+      progressBar.className = state === 'done' ? 'done' : state === 'error' ? 'error' : '';
+      progressValue.textContent = `${percent}%`;
+    }
+
+    button.onclick = () => {
+      button.disabled = true;
+      status.textContent = 'Reading and exporting the selected Frames…';
+      setProgress(0, 'active');
+      parent.postMessage({ pluginMessage: { type: 'import' } }, '*');
+    };
+    onmessage = event => {
+      const message = event.data.pluginMessage;
+      if (!message) return;
+      status.textContent = message.message;
+      button.disabled = !!message.busy;
+      if (typeof message.progress === 'number') setProgress(message.progress, message.state);
+    };
+  </script>
+</body>
+</html>

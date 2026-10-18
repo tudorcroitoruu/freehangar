@@ -1,0 +1,13 @@
+{
+  "name": "Stanislaw.FigmaUnityImporter.Editor",
+  "rootNamespace": "Stanislaw.FigmaUnityImporter.Editor",
+  "references": [
+    "Stanislaw.FigmaUnityImporter.Runtime",
+    "Unity.ugui",
+    "Unity.Newtonsoft.Json"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "autoReferenced": true
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Stanislaw.FigmaUnityImporter.Runtime",
+  "rootNamespace": "Stanislaw.FigmaUnityImporter",
+  "references": [
+    "Unity.ugui"
+  ],
+  "autoReferenced": true
+}

@@ -1,0 +1,8 @@
+# Replace {org-name} in both places.
+# Replace {repository-name} with the GitHub repository name.
+#
+# Example:
+# url = https://MidnightGames.lfs.midnight.works/MidnightGames/RacingGame
+
+[lfs]
+    url = https://{org-name}.lfs.midnight.works/{org-name}/{repository-name}

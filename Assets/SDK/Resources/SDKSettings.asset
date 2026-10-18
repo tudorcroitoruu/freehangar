@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af09f059bcb7b45fda5ba9e05a211197, type: 3}
+  m_Name: SDKSettings
+  m_EditorClassIdentifier: Assembly-CSharp::SDKSettings
+  config:
+    schemaVersion: 1
+    app:
+      privacyTrackingDescription: Your data will be used to deliver personalized
+        ads to you.
+    facebook:
+      appId: 977262371828473
+      clientToken: 0703170ac323b6104003c8053e30bb19
+    tenjin:
+      iosApiKey: FKYALGNSYYJXBCMYZ5QZ6MHSPDWMTZ1Z
+    oneSignal:
+      appId: 721858ba-8586-4811-b496-f548788589cb
+    storeLinks:
+      termsUrl: https://igorchetr.us/terms/
+      privacyPolicyUrl: https://igorchetr.us/privacy/
+    gameAnalytics:
+      ios:
+        gameKey: 5a76a269aa906c37b07234cf9294aa32
+        secretKey: 24532a547da14ffe12efb1489d8e081b3ca46b64
+    levelPlay:
+      ios:
+        appKey: 26990c625
+        adMobAppId: ca-app-pub-3375610513747490~7919043141
+        rewardedAdUnitId: xlsuz4hjci3s39qd
+        interstitialAdUnitId: pifypug21drliwie
+        bannerAdUnitId: 5xjrq85hoqpt9i2o
+      networks:
+      - UnityAds
+      - AdMob
+      - AppLovin
+      - Chartboost
+      - Meta
+      - DTExchange
+      - InMobi
+      - LiftoffMonetize
+    iap:
+      products:
+      - id: no.ads
+        type: NonConsumable
+        usdCents: 999
