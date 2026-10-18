@@ -1,0 +1,292 @@
+using System;
+using System.IO;
+using System.IO.Compression;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+using Random = UnityEngine.Random;
+
+public static class SaveSystem
+{
+    public static bool savesLoaded;
+
+    public static PlayerData Data;
+    public static SettingsData settingsData;
+    public static ActivityData activityData;
+
+    static string savePath = "/save";
+
+    static int key = 5;
+    
+    public static void SaveData()
+    {
+        string json = JsonUtility.ToJson(Data); //Global Data
+        string jsonSettings = JsonUtility.ToJson(settingsData); //Settings Data (on new save it willhave same settings)
+        string jsonActivity = JsonUtility.ToJson(activityData); //Activity Data (PS5)
+        
+        PlayerPrefs.SetString(savePath, EncryptDecrypt(json));
+        PlayerPrefs.SetString(savePath +"_Settings", EncryptDecrypt(jsonSettings));
+        PlayerPrefs.SetString("levelsCompleted", EncryptDecrypt(jsonActivity));
+        
+        PlayerPrefs.Save();
+        Debug.Log("Saved Data");
+    }
+
+    /*public static bool LoadData()
+    {
+        playerData = new PlayerData();
+
+        bool newSave = false;
+
+        if (File.Exists(savePath))
+        {
+            try
+            {
+                byte[] source = File.ReadAllBytes(savePath);
+                string json = DecompressString(source);
+                playerData = JsonUtility.FromJson<PlayerData>(EncryptDecrypt(json));
+            }
+            catch
+            {
+                //NEW
+                newSave = true;
+            }
+        }
+        else
+        {
+            newSave = true;
+        }
+
+        if (newSave)
+        {
+            playerData.quality = 2;
+            playerData.fpsLevel = 1;
+            playerData.cash = 1500;
+
+            playerData.playerName = "TRUCKER_" + Random.Range(1000, 10000);
+            SaveData();
+        }
+
+        savesLoaded = true;
+
+        return true;
+    }*/
+    
+    public static async Task<(PlayerData, SettingsData, ActivityData)> LoadData() //for PS
+    {
+        Data = new PlayerData();
+        settingsData = new SettingsData();
+        activityData = new ActivityData();
+        
+        bool newSave = false;
+
+        if (PlayerPrefs.HasKey(savePath))
+        {
+            try
+            {
+             //   byte[] source = File.ReadAllBytes(savePath);
+                string json = PlayerPrefs.GetString(savePath);
+                string jsonSettings = PlayerPrefs.GetString(savePath +"_Settings");
+                string jsonActivity = PlayerPrefs.GetString("levelsCompleted");
+                
+                Data = JsonUtility.FromJson<PlayerData>(EncryptDecrypt(json));
+                settingsData = JsonUtility.FromJson<SettingsData>(EncryptDecrypt(jsonSettings));
+                activityData = JsonUtility.FromJson<ActivityData>(EncryptDecrypt(jsonActivity));
+            }
+            catch
+            {
+                //NEW
+                newSave = true;
+            }
+        }
+        else
+        {
+            newSave = true;
+        }
+
+        if (newSave)
+        {
+            await MakeNewSave();
+            SaveData();
+        }
+
+        if (Data == null)
+        {
+           await MakeNewSave();
+        }
+
+        if (settingsData == null)
+        {
+            settingsData = new SettingsData();
+        }
+
+        if (activityData == null)
+        {
+            activityData = new ActivityData();
+        }
+        
+     //  InitAchievementsList();
+        
+        savesLoaded = true;
+
+        return (Data,settingsData,activityData);
+    }
+
+
+    /*private static void InitAchievementsList()
+    {
+        for (int i = 0; i < Enum.GetValues(typeof(ETrophey)).Length; i++)
+        {
+            if (Data.achievements.Count < i)
+            {
+                Data.achievements.Add(new AchievementStatus((ETrophey) i , 0f));
+            }
+        }
+    }*/
+    public static async Task<PlayerData> MakeNewSave()
+    {
+
+        Data = new PlayerData();
+        Data.playerName = "PLAYER_" + Random.Range(1000,10000);
+
+
+     //   GVC_Main loadedCar = Resources.Load<GVC_Main>("Cars/" + initialCarData.carName);
+        bool gotMainColor = false;
+        bool gotRimColor = false;
+        Color mainColorCar = Color.black;
+        Color mainColorRim = Color.black;
+
+       // List<Renderer> allMeshes = loadedCar.GetComponentsInChildren<Renderer>(true).ToList();
+       
+        //InitAchievementsList();
+
+        SaveData();
+        await GlobalManager.Instance.LoadData();
+        Debug.Log("<color=red>New save</color>");
+        return Data;
+    }
+    private static string EncryptDecrypt(string textToEncrypt)
+    {
+        StringBuilder inSb = new StringBuilder(textToEncrypt);
+        StringBuilder outSb = new StringBuilder(textToEncrypt.Length);
+        char c;
+        for (int i = 0; i < textToEncrypt.Length; i++)
+        {
+            c = inSb[i];
+            c = (char)(c ^ key);
+            outSb.Append(c);
+        }
+        return outSb.ToString();
+    }
+
+    public static byte[] CompressString(string jsonString)
+    {
+        byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonString);
+        using (var memoryStream = new MemoryStream())
+        {
+            using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
+            {
+                gzipStream.Write(jsonBytes, 0, jsonBytes.Length);
+            }
+            return memoryStream.ToArray();
+        }
+    }
+
+    // Decompress byte array back to JSON string
+    public static string DecompressString(byte[] compressedBytes)
+    {
+        using (var memoryStream = new MemoryStream(compressedBytes))
+        {
+            using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+            {
+                using (var outputStream = new MemoryStream())
+                {
+                    gzipStream.CopyTo(outputStream);
+                    byte[] outputBytes = outputStream.ToArray();
+                    return Encoding.UTF8.GetString(outputBytes);
+                }
+            }
+        }
+    }
+}
+
+
+[Serializable]
+public class PlayerData
+{
+    [Header("Data")]
+    public string playerName;
+    public bool tutorialPassed;
+    public bool newGameDone;
+    [Space, Header("Career")]
+    public int cash = 150000;
+    public int currentCarFromOwnedSelected;
+
+    [Space, Header("Settings")]
+    public bool haptics = true;
+    public bool autoGear = true;
+    public bool dlss = false;
+    
+    
+   // [Space, Header("Achievements")] 
+    //public List<AchievementStatus> achievements = new List<AchievementStatus>();
+}
+
+[Serializable]
+public class ActivityData
+{
+    public int progress;
+    #if UNITY_PS5
+    public SerializableDictionary<ActivityType, bool> levelsCompleted = new SerializableDictionary<ActivityType, bool>();
+    [Space] 
+    public bool allActivitiesCompleted;
+    public bool AllActivitiesCompleted()
+    {
+        foreach (var kvp in levelsCompleted)
+        {
+            if (!kvp.Value) return false;
+        }
+
+        allActivitiesCompleted = true;
+        return true;
+    }
+#endif
+
+}
+
+[Serializable]
+public class SettingsData
+{
+    public float musicVolume = 1f;  
+    public float effectsVolume = 1f;
+    public float masterVolume = 1f;
+}
+
+
+[Serializable]
+public class NeonData
+{
+    public bool enabledNeon = true;
+    public SerializableColor color;
+    public bool blinked;
+}
+[Serializable]
+public class WheelTuningCarData
+{
+    public float suspensionDistance = 0.1f;
+    public float camberAngle = 0f;
+    public float widthDistance = 0;
+
+}
+
+[Serializable]
+public class SerializableColor
+{
+    public float r, g, b;
+}
+public enum PaintMaterialType
+{
+    Gloss,
+    Matte,
+    Pearlescent
+}
