@@ -1,8 +1,6 @@
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
@@ -12,9 +10,7 @@ public class LoadingScene : MonoBehaviour
     private const float MinimumLoadingDuration = 1f;
     private static float loadingStartedAt;
 
-    public UniversalRenderPipelineAsset pipelineRef;
 
-    public static UniversalRenderPipelineAsset pipeline;
 
     private static bool clearPreviousScene;
     private static string TargetScene;
@@ -39,8 +35,6 @@ public class LoadingScene : MonoBehaviour
 
         instance = this;
         timeDefault = QualitySettings.asyncUploadTimeSlice;
-        pipeline = pipelineRef;
-        ApplyRenderPipeline();
 
         if (clearPreviousScene)
         {
@@ -176,8 +170,6 @@ public class LoadingScene : MonoBehaviour
         if (instance == null)
             yield break;
 
-        instance.ApplyRenderPipeline();
-
         if (string.IsNullOrEmpty(TargetScene))
         {
             AbortSceneLoad("TargetScene is null or empty. Aborting scene load.");
@@ -264,7 +256,6 @@ public class LoadingScene : MonoBehaviour
             if (instance.loadingText != null)
                 instance.loadingText.text = "100%";
 
-            instance.ApplyRenderPipeline();
         }
 
         loadOperation.allowSceneActivation = true;
@@ -290,19 +281,6 @@ public class LoadingScene : MonoBehaviour
     }
 
 
-
-    private void ApplyRenderPipeline()
-    {
-        if (pipelineRef == null)
-            return;
-
-        RenderPipelineAsset renderPipelineAsset = pipelineRef;
-        if (QualitySettings.renderPipeline != renderPipelineAsset)
-            QualitySettings.renderPipeline = renderPipelineAsset;
-
-        if (GraphicsSettings.defaultRenderPipeline != renderPipelineAsset)
-            GraphicsSettings.defaultRenderPipeline = renderPipelineAsset;
-    }
 
     private static void LoadedScene()
     {
