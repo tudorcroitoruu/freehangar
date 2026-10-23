@@ -1,0 +1,27 @@
+{
+  "collection": "Shovel_Grain | Textured Export",
+  "asset": "Shovel_Grain_Textured",
+  "source_mesh_count": 1,
+  "export_mesh_count": 1,
+  "shape_keys_preserved": false,
+  "shape_keys": {},
+  "armature_count": 0,
+  "animation_clips": [],
+  "fbx": "Shovel_Grain___Textured_Export.fbx",
+  "texture_folder": "textures",
+  "copied_image_textures": [
+    "GrainShovel_BaseColor.png",
+    "GrainShovel_Roughness.png",
+    "GrainShovel_Metallic.png",
+    "GrainShovel_Normal.png"
+  ],
+  "generated_pbr_maps": {
+    "GrainShovel_Cozy_Textured": {
+      "albedo": "GrainShovel_Cozy_Textured_Albedo.png",
+      "normal": "GrainShovel_Cozy_Textured_Normal.png",
+      "ao": "GrainShovel_Cozy_Textured_AO.png"
+    }
+  },
+  "procedural_materials_without_image_files": [],
+  "degenerate_faces_after_validation": 120
+}

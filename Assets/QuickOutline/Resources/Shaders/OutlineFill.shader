@@ -16,6 +16,7 @@ Shader "Custom/Outline Fill" {
 
   SubShader {
     Tags {
+      "RenderPipeline" = "HDRenderPipeline"
       "Queue" = "Transparent+110"
       "RenderType" = "Transparent"
       "DisableBatching" = "True"
@@ -23,6 +24,7 @@ Shader "Custom/Outline Fill" {
 
     Pass {
       Name "Fill"
+      Tags { "LightMode" = "ForwardOnly" }
       Cull Off
       ZTest [_ZTest]
       ZWrite Off
@@ -30,12 +32,17 @@ Shader "Custom/Outline Fill" {
       ColorMask RGB
 
       Stencil {
-        Ref 1
+        Ref 64
+        ReadMask 64
+        WriteMask 0
         Comp NotEqual
       }
 
-      CGPROGRAM
-      #include "UnityCG.cginc"
+      HLSLPROGRAM
+      #pragma target 4.5
+      #pragma multi_compile_instancing
+      #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+      #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
 
       #pragma vertex vert
       #pragma fragment frag
@@ -49,11 +56,11 @@ Shader "Custom/Outline Fill" {
 
       struct v2f {
         float4 position : SV_POSITION;
-        fixed4 color : COLOR;
+        float4 color : COLOR;
         UNITY_VERTEX_OUTPUT_STEREO
       };
 
-      uniform fixed4 _OutlineColor;
+      uniform float4 _OutlineColor;
       uniform float _OutlineWidth;
 
       v2f vert(appdata input) {
@@ -63,19 +70,20 @@ Shader "Custom/Outline Fill" {
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
         float3 normal = any(input.smoothNormal) ? input.smoothNormal : input.normal;
-        float3 viewPosition = UnityObjectToViewPos(input.vertex);
-        float3 viewNormal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV, normal));
+        float3 viewPosition = TransformWorldToView(TransformObjectToWorld(input.vertex.xyz));
+        float3 viewNormal = normalize(mul((float3x3)UNITY_MATRIX_V, TransformObjectToWorldNormal(normal)));
 
-        output.position = UnityViewToClipPos(viewPosition + viewNormal * -viewPosition.z * _OutlineWidth / 1000.0);
+        output.position = mul(UNITY_MATRIX_P, float4(viewPosition + viewNormal * -viewPosition.z * _OutlineWidth / 1000.0, 1));
         output.color = _OutlineColor;
 
         return output;
       }
 
-      fixed4 frag(v2f input) : SV_Target {
+      float4 frag(v2f input) : SV_Target {
+        UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
         return input.color;
       }
-      ENDCG
+      ENDHLSL
     }
   }
 }

@@ -1,0 +1,67 @@
+{
+  "texture_and_uv_assignments_checked": 774,
+  "material_metadata_preserved": 607,
+  "failures": [],
+  "preexisting_missing_texture_references": [
+    {
+      "asset": "Assets/Models/Models/Materials/Fence Horizontal.mat",
+      "property": "_BaseMap",
+      "missing_guid": "5707b507419d2534b8d54a929401c430"
+    },
+    {
+      "asset": "Assets/Models/Models/Materials/Fence.mat",
+      "property": "_BaseMap",
+      "missing_guid": "5707b507419d2534b8d54a929401c430"
+    },
+    {
+      "asset": "Assets/Models/Models/Materials/Grass.mat",
+      "property": "_BaseMap",
+      "missing_guid": "33278939c8dc93e4fb6dccd6ecf22ef9"
+    },
+    {
+      "asset": "Assets/Models/Models/Materials/Grass.mat",
+      "property": "_BumpMap",
+      "missing_guid": "d4706087813739343a5701dfc1e2a686"
+    },
+    {
+      "asset": "Assets/Models/Models/Materials/Ground.mat",
+      "property": "_BaseMap",
+      "missing_guid": "32fc39fdaa478d141843f04647b0b727"
+    },
+    {
+      "asset": "Assets/Models/Models/Materials/Ground.mat",
+      "property": "_BumpMap",
+      "missing_guid": "27a9be660a235b44ba52632808b4cd27"
+    },
+    {
+      "asset": "Assets/Models/Models/Cave/Materials/rocks_01.mat",
+      "property": "_BaseMap",
+      "missing_guid": "c13167e958ff26748ae1c3e3baf0c96d"
+    },
+    {
+      "asset": "Assets/Models/Models/Cave/Materials/rocks_01.mat",
+      "property": "_BumpMap",
+      "missing_guid": "cf6df3b39940d9949a36894c7cdd786b"
+    },
+    {
+      "asset": "Assets/Models/Models/Cave/Materials/rocks_02.mat",
+      "property": "_BaseMap",
+      "missing_guid": "fb3abfab82f250e4e9403623c34cff30"
+    },
+    {
+      "asset": "Assets/Models/Models/Cave/Materials/rocks_02.mat",
+      "property": "_BumpMap",
+      "missing_guid": "a40e2172aa0cf9f4ea24c9c7b67c3b28"
+    },
+    {
+      "asset": "Assets/Imported/BK/PureNature_Oasis/Textures/Fx/Materials/Bubble.mat",
+      "property": "_MainTex",
+      "missing_guid": "eaca7e19a62495744b0c1f40bedca88f"
+    },
+    {
+      "asset": "Assets/Imported/BK/PureNature_Oasis/Textures/Clouds/Materials/Clouds_Cloudy.mat",
+      "property": "_Normal",
+      "missing_guid": "f5ad0df51a8844643bfa98313a9e0809"
+    }
+  ]
+}

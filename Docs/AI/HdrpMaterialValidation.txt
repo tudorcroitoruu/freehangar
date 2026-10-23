@@ -1,0 +1,12 @@
+Missing shaders=0, unsupported shaders=0, HDRP shader compile errors=0
+Graphics pipeline: Assets/HDRPDefaultResources/HDRenderPipelineAsset.asset
+Quality PC: Assets/HDRPDefaultResources/HDRenderPipelineAsset.asset
+328	Freehangar/HDRP/Particles Unlit
+283	HDRP/Lit
+37	Skybox/Cubemap
+17	Freehangar/HDRP/Powerbox Unlit
+8	Mobile/Skybox
+4	Skybox/6 Sided
+2	Skybox/Procedural
+1	Custom/Outline Fill
+1	Custom/Outline Mask
