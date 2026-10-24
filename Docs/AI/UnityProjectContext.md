@@ -31,3 +31,5 @@ Tall hangar revision: active modular hall at 01_Modular_Hangar/Tall timber hall 
 Hangar material refinement: weathered grey plank texture/derived normal, native 1254px, physically scaled UVs on 406 surfaces, directional oak grain, textured red exterior and 72 iron fasteners. Evidence: output/NewMap/HangarMaterials. Geometry/layout/player/lighting unchanged.
 
 Lamp/prop pass: three bell-shaped pendants with warm textured HDRP emission and existing real lights; 14 original farm prefab instances grouped along hangar walls, including ladders, pallets, tools, containers and rear steps/landing. Source assets unchanged. Current evidence and successful clearance/reference checks: output/NewMap/LampsAndProps.
+
+Road bump follow-up: real terrain undulations/crown/shallow wheel depressions, max displacement 0.352m and dense sampled maximum longitudinal grade 14.95%. Earlier 7.83% grade is superseded. Road details and nearby props refitted, centerline CSV heights updated; clearance audit passes. Vehicle dynamics not playtested. Evidence and restoration data: output/NewMap/RoadBumps and terrain backup asset documented in NewMap.md.

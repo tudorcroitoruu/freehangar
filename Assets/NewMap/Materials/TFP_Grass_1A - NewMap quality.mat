@@ -102,7 +102,7 @@ Material:
     - _CameraFadingEnabled: 0
     - _CameraFarFadeDistance: 2
     - _CameraNearFadeDistance: 1
-    - _Color1Level: 0.5
+    - _Color1Level: 0.444
     - _ColorMode: 0
     - _Cull: 2
     - _Cutoff: 0.5

@@ -98,7 +98,7 @@ Material:
     m_Floats:
     - _AlphaCutoff: 0.5
     - _BumpScale: 1
-    - _Color1Level: 0.475
+    - _Color1Level: 0.444
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0

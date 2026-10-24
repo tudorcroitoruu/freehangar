@@ -1,0 +1,1 @@
+Actual terrain undulations and shallow crown/ruts added; maximum terrain displacement 0.352m; densely sampled max longitudinal road grade 14.95%. 45 road detail meshes refitted and 64 roadside props regrounded. Farmyard and village entrances remain flat. Original terrain saved at Assets/NewMap/Terrain/Before road surface undulations.asset. Vehicle dynamics not playtested.
