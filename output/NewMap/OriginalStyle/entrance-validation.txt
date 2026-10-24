@@ -1,0 +1,1 @@
+Doorway capsule clearance from interior aisle (0,0.04,4) through entrance to (0,0.04,21): 0 obstacles: . Read-only physics check; no new Play Mode walk performed.

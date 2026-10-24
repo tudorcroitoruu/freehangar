@@ -1,0 +1,140 @@
+TFP_Yard_Rake_01B root=MAP pos=(47.00, 4.38, -73.83) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Vehicles/Agricultural/TFP_Yard_Rake_01B.prefab
+TFP_Yard_Rake_01B_LOD0 root=MAP pos=(47.00, 4.38, -73.83) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Vehicles/Agricultural/TFP_Yard_Rake_01B.prefab
+TFP_Yard_Rake_01B_LOD1 root=MAP pos=(47.00, 4.38, -73.83) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Vehicles/Agricultural/TFP_Yard_Rake_01B.prefab
+TFP_Yard_Rake_01A root=MAP pos=(113.92, 0.02, -3.30) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Vehicles/Agricultural/TFP_Yard_Rake_01A.prefab
+TFP_Yard_Rake_01A_LOD0 root=MAP pos=(113.92, 0.02, -3.30) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Vehicles/Agricultural/TFP_Yard_Rake_01A.prefab
+TFP_Yard_Rake_01A_LOD1 root=MAP pos=(113.92, 0.02, -3.30) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Vehicles/Agricultural/TFP_Yard_Rake_01A.prefab
+TFP_Ladder_01A root=MAP pos=(-49.99, -6.19, -36.45) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Ladder_01A.prefab
+TFP_Wooden_Pallet_02A root=MAP pos=(121.50, -9.19, 151.60) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Wooden_Pallet_01C (4) root=MAP pos=(-106.69, -9.23, -122.29) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_01B (3) root=MAP pos=(-105.68, -8.82, -124.54) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Wooden_Pallet_01C (5) root=MAP pos=(-106.68, -9.04, -122.29) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_01A (9) root=MAP pos=(-106.73, -8.85, -122.37) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01A (10) root=MAP pos=(-104.66, -8.81, -125.06) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01A (11) root=MAP pos=(-110.49, -9.20, -124.24) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01A (12) root=MAP pos=(-112.41, -9.20, -123.14) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01C (11) root=MAP pos=(-111.45, -9.21, -123.80) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_01C (13) root=MAP pos=(-104.64, -9.20, -133.74) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_01C (14) root=MAP pos=(-109.90, -8.81, -122.06) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_01B (9) root=MAP pos=(-100.41, -9.20, -128.12) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Wooden_Pallet_01A (14) root=MAP pos=(-99.86, -9.18, -129.27) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01B (10) root=MAP pos=(-104.74, -9.01, -133.87) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Wooden_Pallet_01B (4) root=MAP pos=(-108.82, -8.82, -134.02) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Wooden_Pallet_01A (15) root=MAP pos=(-109.84, -8.81, -133.50) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01C (17) root=MAP pos=(-107.73, -8.79, -134.65) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_01A (13) root=MAP pos=(-106.73, -8.80, -123.88) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01A (16) root=MAP pos=(-114.51, -9.20, -128.26) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01C (18) root=MAP pos=(-113.54, -9.20, -128.89) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_01B (5) root=MAP pos=(-102.82, -8.74, -123.63) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Wooden_Pallet_01C (19) root=MAP pos=(-101.73, -8.71, -124.26) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_01A (17) root=MAP pos=(-104.30, -9.19, -122.56) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01A (18) root=MAP pos=(-112.66, -9.14, -136.56) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01A (19) root=MAP pos=(-111.30, -9.14, -137.31) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01C (20) root=MAP pos=(-110.02, -9.14, -137.78) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_01B (11) root=MAP pos=(-125.46, -2.61, -94.49) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Wooden_Pallet_01A (20) root=MAP pos=(-127.39, -2.37, -94.98) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01C (21) root=MAP pos=(-128.72, -2.30, -96.08) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_01C (22) root=MAP pos=(-123.90, -2.68, -93.71) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_01B (6) root=MAP pos=(-137.17, -0.97, -99.58) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Wooden_Pallet_01C (23) root=MAP pos=(-135.57, -1.25, -98.63) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Lamp_03A root=MAP pos=(-28.93, 1.56, -125.71) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A_Light root=MAP pos=(-28.93, 1.56, -125.71) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Gas_Lamp_01A root=MAP pos=(-29.39, -2.19, -124.88) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Gas_Lamp_01A.prefab
+TFP_Gas_Lamp_01A_LOD0 root=MAP pos=(-29.39, -2.19, -124.88) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Gas_Lamp_01A.prefab
+TFP_Gas_Lamp_01A_Light root=MAP pos=(-29.39, -2.19, -124.88) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Gas_Lamp_01A.prefab
+TFP_Gas_Lamp_01A_LOD1 root=MAP pos=(-29.39, -2.19, -124.88) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Gas_Lamp_01A.prefab
+TFP_Lamp_03A (1) root=MAP pos=(-24.69, 1.56, -129.95) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A_Light root=MAP pos=(-24.69, 1.56, -129.95) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A (2) root=MAP pos=(92.34, 7.79, -55.33) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A_Light root=MAP pos=(92.34, 7.79, -55.33) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A (3) root=MAP pos=(-23.50, 1.31, -103.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A_Light root=MAP pos=(-23.50, 1.31, -103.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A (4) root=MAP pos=(-23.50, 1.31, -103.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A_Light root=MAP pos=(-23.50, 1.31, -103.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A (5) root=MAP pos=(-23.50, 1.31, -94.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A_Light root=MAP pos=(-23.50, 1.31, -94.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A (6) root=MAP pos=(-23.50, 1.31, -94.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A_Light root=MAP pos=(-23.50, 1.31, -94.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A (3) root=MAP pos=(-8.00, 1.81, -103.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A_Light root=MAP pos=(-8.00, 1.81, -103.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A (5) root=MAP pos=(-8.00, 1.81, -94.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A_Light root=MAP pos=(-8.00, 1.81, -94.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A (6) root=MAP pos=(-8.00, 1.81, -94.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Lamp_03A_Light root=MAP pos=(-8.00, 1.81, -94.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_03A.prefab
+TFP_Wooden_Pallet_02B (1) root=MAP pos=(113.02, 0.81, 5.04) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02B.prefab
+TFP_Ladder_02A root=MAP pos=(-8.61, -10.89, 124.22) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Ladder_02A.prefab
+TFP_Ladder_02A (1) root=MAP pos=(8.98, -7.44, 60.06) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Ladder_02A.prefab
+TFP_Wooden_Pallet_02B root=MAP pos=(113.02, 0.81, 6.95) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02B.prefab
+TFP_Ladder_02A (4) root=MAP pos=(115.20, 8.91, -85.60) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Ladder_02A.prefab
+TFP_Broom_01A (8) root=MAP pos=(105.52, 6.43, -73.27) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Broom_01A.prefab
+TFP_Wooden_Pallet_01C (34) root=MAP pos=(105.97, 6.80, -77.26) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_02A (23) root=MAP pos=(119.97, 5.79, -81.75) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Wooden_Pallet_02A (24) root=MAP pos=(118.53, 6.69, -84.86) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Wooden_Pallet_02B (16) root=MAP pos=(105.20, 6.53, -91.98) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02B.prefab
+TFP_Wooden_Pallet_02A (27) root=MAP pos=(103.33, 6.49, -73.38) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Wooden_Pallet_02B (15) root=MAP pos=(119.28, 5.79, -83.26) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02B.prefab
+TFP_Wooden_Pallet_02A (25) root=MAP pos=(119.92, 7.12, -81.72) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Gas_Lamp_01B (12) root=MAP pos=(105.26, 6.36, -73.30) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Gas_Lamp_01B.prefab
+TFP_Gas_Lamp_01B_LOD0 root=MAP pos=(105.26, 6.36, -73.30) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Gas_Lamp_01B.prefab
+TFP_Gas_Lamp_01B_Light root=MAP pos=(105.26, 6.36, -73.30) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Gas_Lamp_01B.prefab
+TFP_Gas_Lamp_01B_LOD1 root=MAP pos=(105.26, 6.36, -73.30) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Gas_Lamp_01B.prefab
+TFP_Wooden_Pallet_01C (35) root=MAP pos=(105.67, 6.80, -78.03) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01C.prefab
+TFP_Wooden_Pallet_02A (26) root=MAP pos=(119.16, 7.11, -83.23) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Wooden_Pallet_02C root=MAP pos=(98.17, 0.10, 10.98) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02C.prefab
+TFP_Metal_Ladder_01A root=MAP pos=(110.83, 2.78, -14.30) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Metal_Ladder_01A.prefab
+TFP_Metal_Ladder_01A_Extension root=MAP pos=(110.07, 6.55, -14.30) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Metal_Ladder_01A.prefab
+TFP_Ladder_01A root=MAP pos=(122.24, -11.28, 106.06) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Ladder_01A.prefab
+TFP_Wooden_Pallet_02C root=MAP pos=(-28.97, -6.13, -37.92) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02C.prefab
+TFP_Wooden_Pallet_01B root=MAP pos=(-27.61, -6.15, -42.55) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Wooden_Pallet_01A root=MAP pos=(-50.47, -6.19, -41.82) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01A (1) root=MAP pos=(-50.38, -6.19, -37.67) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_02A root=MAP pos=(-27.51, -5.67, -41.26) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Wooden_Pallet_02A root=MAP pos=(-146.29, -11.19, 16.96) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Wooden_Pallet_01B root=MAP pos=(-146.74, -11.19, 12.79) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Wooden_Pallet_02C (1) root=MAP pos=(-6.99, -4.43, 10.82) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02C.prefab
+TFP_Wooden_Pallet_01B root=MAP pos=(-149.70, -10.92, 6.12) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Wooden_Pallet_02A (1) root=MAP pos=(-150.08, -10.62, 6.99) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Wooden_Pallet_01B (1) root=MAP pos=(-79.99, -7.47, -47.07) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Wooden_Pallet_02C (2) root=MAP pos=(-83.81, -7.58, -48.02) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02C.prefab
+TFP_Ladder_02A (2) root=MAP pos=(34.01, 3.24, -123.48) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Ladder_02A.prefab
+TFP_Rake_01B root=MAP pos=(120.77, -10.11, 100.87) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01B.prefab
+TFP_Rake_01B_LOD0 root=MAP pos=(120.77, -10.11, 100.87) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01B.prefab
+TFP_Rake_01B_LOD1 root=MAP pos=(120.77, -10.11, 100.87) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01B.prefab
+TFP_Wooden_Pallet_01B (2) root=MAP pos=(-146.64, -11.19, 11.24) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01B.prefab
+TFP_Rake_01A (1) root=MAP pos=(-0.29, -8.79, 87.48) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01A.prefab
+TFP_Rake_01A_LOD0 root=MAP pos=(-0.29, -8.79, 87.48) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01A.prefab
+TFP_Rake_01A_LOD1 root=MAP pos=(-0.29, -8.79, 87.48) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01A.prefab
+TFP_Rake_01A root=MAP pos=(1.81, -9.91, 92.97) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01A.prefab
+TFP_Rake_01A_LOD0 root=MAP pos=(1.81, -9.91, 92.97) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01A.prefab
+TFP_Rake_01A_LOD1 root=MAP pos=(1.81, -9.91, 92.97) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01A.prefab
+TFP_Rake_01B (1) root=MAP pos=(2.33, -9.19, 94.95) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01B.prefab
+TFP_Rake_01B_LOD0 root=MAP pos=(2.33, -9.19, 94.95) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01B.prefab
+TFP_Rake_01B_LOD1 root=MAP pos=(2.33, -9.19, 94.95) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01B.prefab
+TFP_Rake_01A (2) root=MAP pos=(-0.63, -9.23, 90.33) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01A.prefab
+TFP_Rake_01A_LOD0 root=MAP pos=(-0.63, -9.23, 90.33) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01A.prefab
+TFP_Rake_01A_LOD1 root=MAP pos=(-0.63, -9.23, 90.33) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01A.prefab
+TFP_Wooden_Pallet_01A (2) root=MAP pos=(13.57, 1.31, -47.39) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Gardening_Rake_01B root=MAP pos=(16.97, 2.09, -45.50) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Gardening_Rake_01B.prefab
+TFP_Gardening_Rake_01A root=MAP pos=(59.25, -10.75, 99.90) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Gardening_Rake_01A.prefab
+TFP_Broom_02A root=MAP pos=(42.73, -7.05, 52.19) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Broom_02A.prefab
+TFP_Broom_02B root=MAP pos=(62.97, -7.44, 50.68) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Broom_02B.prefab
+TFP_Rake_01B (2) root=MAP pos=(18.45, 2.35, -46.69) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01B.prefab
+TFP_Rake_01B_LOD0 root=MAP pos=(18.45, 2.35, -46.69) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01B.prefab
+TFP_Rake_01B_LOD1 root=MAP pos=(18.45, 2.35, -46.69) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Handheld Tools/TFP_Rake_01B.prefab
+TFP_Ladder_01A (2) root=MAP pos=(61.50, -6.15, 31.32) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Ladder_01A.prefab
+TFP_Ladder_01A (1) root=MAP pos=(75.47, 5.64, -113.98) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Ladder_01A.prefab
+TFP_Wooden_Pallet_01A root=MAP pos=(26.40, 2.56, -112.91) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_02B root=MAP pos=(25.49, 2.56, -115.24) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02B.prefab
+TFP_Wooden_Pallet_02B root=MAP pos=(79.61, 5.81, -117.77) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02B.prefab
+TFP_Wooden_Pallet_02C root=MAP pos=(81.54, 5.81, -116.25) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02C.prefab
+TFP_Wooden_Pallet_02A (1) root=MAP pos=(78.89, 5.81, -121.48) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Wooden_Pallet_02A (2) root=MAP pos=(80.33, 5.81, -120.41) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Wooden_Pallet_02A (3) root=MAP pos=(81.75, 5.81, -121.30) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02A.prefab
+TFP_Wooden_Pallet_02B (1) root=MAP pos=(81.35, 5.81, -118.03) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02B.prefab
+TFP_Wooden_Pallet_02C (1) root=MAP pos=(79.83, 5.81, -115.98) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02C.prefab
+TFP_Wooden_Pallet_02C (2) root=MAP pos=(80.26, 5.81, -122.40) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_02C.prefab
+TFP_Wooden_Pallet_01A root=New_Map pos=(-8.85, 2.05, -0.82) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01A root=New_Map pos=(-7.40, 2.05, -0.82) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01A root=New_Map pos=(-8.30, 0.05, 5.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01A root=New_Map pos=(-8.30, 0.05, 6.50) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Wooden_Pallet_01A root=New_Map pos=(-8.30, 0.05, 8.00) asset=Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab

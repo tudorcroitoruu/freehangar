@@ -1,0 +1,19 @@
+Hill and surface revision audit
+Scene: Assets/Scenes/Gameplay.unity
+Missing scripts: 0
+Missing/unsupported materials: 0
+Missing meshes: 0
+Terrain collider valid: True
+Actual sampled road max grade: 7,83%
+Max terrain/road height deviation: 0,061m
+3.3m-wide road clearance obstructions: 0
+
+Enabled cameras: 1
+Player: (-0.80, 0.04, -8.35); camera: (-0.80, 1.74, -8.35); yaw 348,2354; FOV 60
+[Bootstraper] active=False
+EventSystem active=True
+MAP active=False
+New_Map active=True
+Player active=True
+Graphics active=True
+Road 511.5m; estimated 63.9s at 8m/s; designed max grade 7.8%; village ground ~12m.

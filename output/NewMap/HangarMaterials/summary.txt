@@ -1,0 +1,2 @@
+406 wall/roof/timber surfaces mapped at physical metre scale. New generated grey boards albedo 1024x1024, derived normal import, trilinear mipmaps, 16x anisotropic filtering. Directional oak grain follows beams. 72 joint fasteners. Geometry, glazing, player, lighting and map layout preserved.
+Final import preserves native 1254 x 1254 resolution (NPOT scaling disabled). Grey board albedo generated using built-in image generation; normal relief derived by Unity texture importer from that image. No source imported assets changed.

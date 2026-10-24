@@ -1,6 +1,6 @@
 # Gameplay — New_Map
 
-Updated 2026-10-24 after the hill and texture revision.
+Updated 2026-10-24 after the original farm style revision.
 
 ## Open and inspect
 
@@ -15,6 +15,8 @@ The new environment is grouped under New_Map:
 - 06_Road_Route: sampled centerline markers.
 - 07_Reference_Views: interior marker and disabled Exterior Review, Map Overview and Village Review cameras.
 - 08_Surface_Grading: map-only HDRP grading override. Original Graphics profiles remain unchanged.
+- 09_Original_Road_Details: terrain-fitted original curved dirt/rut meshes and rocky shoulders.
+- 10_Power_Line: original wooden poles, connected sagging cable spans and hangar service wires.
 - New Terrain - 384 x 384.
 
 ## Hill and road
@@ -53,3 +55,27 @@ A follow-up vegetation pass adds clustered beech trees on the upper slopes and b
 Grass is combined into spatial cells with two mesh LODs; no grass colliders are added. Existing grass materials, wind shader and tree prefabs are reused. See output/NewMap/Vegetation for current counts, previews and validation. The one-off authoring history is DenseHillsideVegetation.cs; do not rerun over the existing vegetation group.
 
 Final vegetation counts: 150 added trees and 19,297 grass patches in 262 cells. Hillside Review is an additional disabled camera under 07_Reference_Views. The completed recovery/batched authoring history is RecoverDenseVegetation.cs. The scene is saved; temporary capture assets were removed after copying previews to output/NewMap/Vegetation.
+
+## Original farm style revision
+
+The outdoor terrain now uses six map-owned copies of the original farm terrain layers, retaining their original textures. A 1024-resolution blend combines grass, dirt, stony dirt and earth with irregular road shoulders. This supersedes the generated packed-earth terrain appearance; the interior floor and timber still use the earlier materials. Terrain heights and the uphill road alignment are unchanged.
+
+The hangar exterior uses the original red TFP_Barn_04A and two extensions around the furnished modular interior. Map-owned mesh copies fit the existing hall, including separate fitted collision meshes and open entrance doors. Native road meshes follow the bends and terrain, with spaced earthy ruts and small rocks along the shoulders. Another 318 original grass and wildflower prefab patches mix into the dense meadow.
+
+Twenty TFP_Wooden_Electricity_Pole_01A poles follow the road, connected by 19 adapted native cable spans. Three service wires connect the first pole to the hangar. Minimum sampled cable clearance above terrain is 5.24m. Imported source assets remain unchanged.
+
+Current previews and audits are in output/NewMap/OriginalStyle. The final read-only audit found zero missing scripts, meshes or unsupported/missing materials, zero obstructions in the sampled 3.3m road corridor, and a clear capsule path through the hangar doorway from z=4 to z=21. This revision was visually inspected in rendered camera captures; no new Play Mode traversal or performance benchmark was run. Earlier walk results apply to the earlier layout.
+
+Authoring history: OriginalFarmStyle.cs, OriginalRoadsidePlanting.cs and FinishOriginalStyle.cs under output/NewMap/Authoring. These are one-off operations, not safe rebuild commands. OriginalStyleValidation.Audit is read-only. Original MAP remains inactive and all new environment objects remain inside New_Map; the user's root Player, Graphics and current lighting/quality adjustments are preserved.
+
+## Road and field simplification
+The latest pass keeps six separated rut sections instead of 30, with a lighter earth tint. Outdoor dirt blends 60% of the previous packed-earth layer with 30% original dirt, 8% stony dirt and 2% soil. The crop field now has an irregular rounded outline, feathered grass transition, curved fencing and crop patches repositioned within its boundary. New verge grass and fence pieces within 8m of the route are disabled. Terrain elevations, route length, red barn and power line are unchanged. Reference audit and 3.3m route clearance pass; evidence is in output/NewMap/RoadRefinement. SoftenRoadAndFarm.cs is one-off authoring history, not a rerunnable rebuild.
+
+## Tall glazed hangar
+The latest hangar is grouped under 01_Modular_Hangar/Tall timber hall with glazing. Its 20 x 30m footprint is preserved, wall tops raised from 7m to 12m, ridge from 9.45m to 16m, and entrance clearance is 10m wide by 9m tall. Six glazed high windows and four timber-framed skylights have real openings through the wall/roof panels. Grey interior cladding contrasts with exposed oak framing. Red exterior panels and native red side extensions preserve the exterior colour. Prior low interior architecture and the old red central shell are disabled for restoration. Player, truck, shelves and grain remain at their previous scale and positions. Pendant fixtures were raised to suit the taller interior. One-off authoring: TallGlazedHangar.cs; current evidence in output/NewMap/TallHangar.
+
+## Hangar surface detail
+The tall hall now uses generated weathered grey plank albedo and a derived normal map, stored in Assets/NewMap/TallHangar at native 1254 x 1254 resolution with mipmaps and 16x anisotropic filtering. 406 surface meshes have physical-scale UVs; timber grain follows each beam length. Grey walls, roof lining and red exterior have textured materials, and 72 small iron joint fasteners were added. Original material assets, lighting, glazing and layout are preserved. One-off authoring: HangarSurfaceDetail.cs. Current previews and successful reference/route audit: output/NewMap/HangarMaterials.
+
+## Pendant lamps and interior props
+Reference pendant lamps under 01_Modular_Hangar contain three spun bell shades, socket caps, suspension cables and luminous undersides using a saved 256px warm emission texture. Existing actual pendant lights are retained inside the fixtures; prior simple shades/cables are disabled. Wall side farm storage and ladders under 02_Hangar_Props adds 14 original prefab instances: two ladders, pallet stack, sack, broom, buckets, tools, barrel, stairs and crate. Rear steps at (-3.7,0.04,-9.95), yaw zero, meet the 1.84m-high storage landing behind them. Source assets unchanged. Reference/route and entrance capsule checks pass. Evidence in output/NewMap/LampsAndProps; one-off authoring HangarLampsAndProps.cs, with final stair placement corrected after visual inspection.

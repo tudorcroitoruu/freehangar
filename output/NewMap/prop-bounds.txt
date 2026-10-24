@@ -1,0 +1,7 @@
+TFP_Ladder_01A Center: (-0.04, 2.03, 0.01), Extents: (0.09, 2.04, 0.38) Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Ladder_01A.prefab
+TFP_House_Stairs_01A Center: (0.00, 1.50, -1.24), Extents: (1.00, 1.50, 1.51) Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Buildings/House Building Kit/Interior Pieces/TFP_House_Stairs_01A.prefab
+TFP_Wooden_Pallet_01A Center: (0.03, 0.10, 0.00), Extents: (0.41, 0.10, 0.43) Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Exterior Props/TFP_Wooden_Pallet_01A.prefab
+TFP_Tool_Storage_01A Center: (0.00, 0.60, 0.00), Extents: (0.50, 0.60, 1.08) Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Tools/TFP_Tool_Storage_01A.prefab
+TFP_Tool_Rack_01A Center: (0.19, 1.02, 0.00), Extents: (0.11, 1.02, 1.00) Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Tools/TFP_Tool_Rack_01A.prefab
+TFP_Lamp_01A Center: (0.00, 0.28, 0.00), Extents: (0.25, 0.28, 0.25) Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_01A.prefab
+TFP_Lamp_02A Center: (0.32, 2.08, 0.00), Extents: (0.25, 0.62, 0.25) Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Props/Furniture & Interior Props/TFP_Lamp_02A.prefab
