@@ -1,6 +1,5 @@
 ## Default ##
 * text=auto
-
 ## Unity text / YAML ##
 *.cs text diff=csharp
 *.asmdef text
@@ -16,7 +15,6 @@
 *.xml text eol=lf
 *.txt text eol=lf
 *.md text eol=lf
-
 *.unity text merge=unityyamlmerge eol=lf
 *.mat text merge=unityyamlmerge eol=lf
 *.anim text merge=unityyamlmerge eol=lf
@@ -30,7 +28,6 @@
 *.playable text merge=unityyamlmerge eol=lf
 *.mask text merge=unityyamlmerge eol=lf
 *.terrainlayer text merge=unityyamlmerge eol=lf
-
 ## MW LFS - source/art binaries ##
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.psb filter=lfs diff=lfs merge=lfs -text
@@ -41,7 +38,6 @@
 *.max filter=lfs diff=lfs merge=lfs -text
 *.ma filter=lfs diff=lfs merge=lfs -text
 *.mb filter=lfs diff=lfs merge=lfs -text
-
 ## MW LFS - textures/images ##
 *.png filter=lfs diff=lfs merge=lfs -text
 *.jpg filter=lfs diff=lfs merge=lfs -text
@@ -51,7 +47,6 @@
 *.tiff filter=lfs diff=lfs merge=lfs -text
 *.exr filter=lfs diff=lfs merge=lfs -text
 *.hdr filter=lfs diff=lfs merge=lfs -text
-
 ## MW LFS - audio/video ##
 *.wav filter=lfs diff=lfs merge=lfs -text
 *.mp3 filter=lfs diff=lfs merge=lfs -text
@@ -61,7 +56,6 @@
 *.mov filter=lfs diff=lfs merge=lfs -text
 *.avi filter=lfs diff=lfs merge=lfs -text
 *.webm filter=lfs diff=lfs merge=lfs -text
-
 ## MW LFS - packages / archives / binaries ##
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.rar filter=lfs diff=lfs merge=lfs -text
@@ -73,6 +67,7 @@
 *.lib filter=lfs diff=lfs merge=lfs -text
 *.bundle filter=lfs diff=lfs merge=lfs -text
 *.framework filter=lfs diff=lfs merge=lfs -text
-
 ## SDK - regular Git (exclude from LFS) ##
 Assets/SDK/** -filter
+Assets/Imported/Toon[[:space:]]Series/Toon[[:space:]]Farm[[:space:]]Pack/Scenes/Demo_Ranch.unity filter=lfs diff=lfs merge=lfs -text
+Assets/Imported/Toon[[:space:]]Series/Toon[[:space:]]Farm[[:space:]]Pack/Scenes/Demo_Gardens.unity filter=lfs diff=lfs merge=lfs -text
