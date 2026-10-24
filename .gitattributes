@@ -71,3 +71,4 @@
 Assets/SDK/** -filter
 Assets/Imported/Toon[[:space:]]Series/Toon[[:space:]]Farm[[:space:]]Pack/Scenes/Demo_Ranch.unity filter=lfs diff=lfs merge=lfs -text
 Assets/Imported/Toon[[:space:]]Series/Toon[[:space:]]Farm[[:space:]]Pack/Scenes/Demo_Gardens.unity filter=lfs diff=lfs merge=lfs -text
+Assets/Scenes/Gameplay.unity filter=lfs diff=lfs merge=lfs -text
