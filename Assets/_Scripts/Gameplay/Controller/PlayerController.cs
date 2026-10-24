@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     public Camera characterCamera;
     public CharacterController characterController;
     [SerializeField] private Transform heldInstrument;
+    [SerializeField] private ShovelTool shovelTool;
+    [SerializeField] private BagInteraction bagInteraction;
 
     [Header("Movement")]
     [SerializeField, Min(0f)] private float speed = 3f;
@@ -46,6 +48,9 @@ public class PlayerController : MonoBehaviour
     private Quaternion instrumentRestRotation;
     private Vector2 lookInput;
     private float idleTime;
+    private Quaternion previousPresentationCamera;
+    private float turnRoll;
+    public float InstrumentTurnRoll => turnRoll;
     private bool isCrouching;
     private readonly Collider[] crouchHits = new Collider[32];
 
@@ -76,6 +81,7 @@ public class PlayerController : MonoBehaviour
         standingHeight = characterController.height;
         standingCenter = characterController.center;
         cameraRestPosition = characterCamera.transform.localPosition;
+        previousPresentationCamera = characterCamera.transform.rotation;
         if (heldInstrument != null)
         {
             instrumentRestPosition = heldInstrument.localPosition;
@@ -91,6 +97,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnDisable()
     {
+        if (shovelTool != null) shovelTool.CancelAction();
         SetCursorLocked(false);
     }
 
@@ -102,6 +109,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        bool wasLocked = Cursor.lockState == CursorLockMode.Locked;
         if (Input.GetKeyDown(KeyCode.Escape))
             SetCursorLocked(false);
         else if (Input.GetMouseButtonDown(0))
@@ -117,6 +125,18 @@ public class PlayerController : MonoBehaviour
 
         HandleCrouch(acceptInput);
         HandleMovement(acceptInput);
+        bool bagAction = acceptInput && bagInteraction != null && Input.GetKeyDown(KeyCode.E) && bagInteraction.TryInteract();
+        if (shovelTool != null && shovelTool.isActiveAndEnabled && !bagAction)
+        {
+            if (!acceptInput) shovelTool.CancelAction();
+            else
+            {
+                // The first click after Escape only captures the mouse.
+                if (wasLocked && Input.GetMouseButtonDown(0))
+                    shovelTool.TryUse(characterCamera, transform);
+                shovelTool.Tick(Time.deltaTime);
+            }
+        }
     }
 
     private void HandleMovement(bool acceptInput)
@@ -192,15 +212,36 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (heldInstrument == null || Time.deltaTime <= 0f)
+        if (heldInstrument == null || Time.deltaTime <= 0f || (bagInteraction != null && bagInteraction.IsCarrying))
             return;
 
         idleTime += Time.deltaTime * idleFrequency * Mathf.PI * 2f;
         Vector3 idleOffset = new Vector3(Mathf.Sin(idleTime * 0.5f), Mathf.Sin(idleTime), 0f) * idleAmplitude;
         Vector2 sway = Vector2.ClampMagnitude(lookInput, 5f) * instrumentSway;
+        Quaternion cameraDelta = characterCamera.transform.rotation * Quaternion.Inverse(previousPresentationCamera);
+        cameraDelta.ToAngleAxis(out float angle, out Vector3 axis);
+        if (angle > 180f) angle -= 360f;
+        float yawSpeed = Mathf.Abs(angle) < .001f || !float.IsFinite(axis.y) ? 0 : angle * axis.y / Mathf.Max(.001f, Time.deltaTime);
+        previousPresentationCamera = characterCamera.transform.rotation;
+        float rollTarget = Mathf.Clamp(-yawSpeed * .035f, -7f, 7f);
+        turnRoll = Mathf.Lerp(turnRoll, rollTarget, 1f - Mathf.Exp(-10f * Time.deltaTime));
+        if (shovelTool != null && shovelTool.isActiveAndEnabled)
+        {
+            shovelTool.ComposePresentation(Time.deltaTime, sway, turnRoll, idleOffset, out Vector3 offset, out Quaternion pose);
+            heldInstrument.localPosition = instrumentRestPosition + offset;
+            heldInstrument.localRotation = instrumentRestRotation * pose;
+            return;
+        }
         Quaternion rotation = instrumentRestRotation * Quaternion.Euler(sway.y, -sway.x, -sway.x * 0.5f);
         float blend = 1f - Mathf.Exp(-instrumentSmoothness * Time.deltaTime);
-        heldInstrument.localPosition = Vector3.Lerp(heldInstrument.localPosition, instrumentRestPosition + idleOffset, blend);
+        Vector3 actionOffset = shovelTool != null && shovelTool.isActiveAndEnabled ? shovelTool.PositionOffset : Vector3.zero;
+        if (shovelTool != null && shovelTool.IsBusy)
+        {
+            heldInstrument.localPosition = instrumentRestPosition + actionOffset;
+            heldInstrument.localRotation = instrumentRestRotation * shovelTool.RotationOffset;
+            return;
+        }
+        heldInstrument.localPosition = Vector3.Lerp(heldInstrument.localPosition, instrumentRestPosition + idleOffset + actionOffset, blend);
         heldInstrument.localRotation = Quaternion.Slerp(heldInstrument.localRotation, rotation, blend);
     }
 
