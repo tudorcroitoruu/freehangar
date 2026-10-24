@@ -7,10 +7,11 @@ public class PlayerController : MonoBehaviour
     [Header("References")]
     public Camera characterCamera;
     public CharacterController characterController;
+    [SerializeField] private Transform heldInstrument;
 
     [Header("Movement")]
     [SerializeField, Min(0f)] private float speed = 3f;
-    [SerializeField, Min(0f)] private float sprintSpeed = 5f;
+    [SerializeField, Min(0f)] private float sprintSpeed = 10f;
     [SerializeField, Min(0f)] private float jumpForce = 5f;
     [SerializeField, Min(0f)] private float gravity = 9.81f;
 
@@ -18,9 +19,37 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float cameraSensitivity = 2f;
     [SerializeField] private float cameraMinAngle = -70f;
     [SerializeField] private float cameraMaxAngle = 80f;
+    [SerializeField, Min(0.001f)] private float lookSmoothTime = 0.06f;
+
+    [Header("Crouch (hold Ctrl or C)")]
+    [SerializeField, Min(0.1f)] private float crouchHeight = 1.2f;
+    [SerializeField, Min(0f)] private float crouchSpeed = 1.5f;
+    [SerializeField, Min(0.1f)] private float crouchTransitionSpeed = 5f;
+    [SerializeField] private LayerMask crouchObstructionMask = ~0;
+
+    [Header("Held instrument animation")]
+    [SerializeField, Min(0f)] private float instrumentSway = 1.5f;
+    [SerializeField, Min(0f)] private float instrumentSmoothness = 12f;
+    [SerializeField, Min(0f)] private float idleAmplitude = 0.008f;
+    [SerializeField, Min(0f)] private float idleFrequency = 0.8f;
 
     private float verticalVelocity;
     private float cameraRotationX;
+    private float targetYaw;
+    private float yawVelocity;
+    private float pitchVelocity;
+    private float smoothedPitch;
+    private float standingHeight;
+    private Vector3 standingCenter;
+    private Vector3 cameraRestPosition;
+    private Vector3 instrumentRestPosition;
+    private Quaternion instrumentRestRotation;
+    private Vector2 lookInput;
+    private float idleTime;
+    private bool isCrouching;
+    private readonly Collider[] crouchHits = new Collider[32];
+
+    public bool IsCrouching => isCrouching;
 
     private void Reset()
     {
@@ -42,6 +71,16 @@ public class PlayerController : MonoBehaviour
         }
 
         cameraRotationX = Mathf.DeltaAngle(0f, characterCamera.transform.localEulerAngles.x);
+        smoothedPitch = cameraRotationX;
+        targetYaw = transform.eulerAngles.y;
+        standingHeight = characterController.height;
+        standingCenter = characterController.center;
+        cameraRestPosition = characterCamera.transform.localPosition;
+        if (heldInstrument != null)
+        {
+            instrumentRestPosition = heldInstrument.localPosition;
+            instrumentRestRotation = heldInstrument.localRotation;
+        }
     }
 
     private void OnEnable()
@@ -72,9 +111,11 @@ public class PlayerController : MonoBehaviour
             return;
 
         bool acceptInput = Application.isFocused && Cursor.lockState == CursorLockMode.Locked;
+        lookInput = Vector2.zero;
         if (acceptInput)
             HandleCamera();
 
+        HandleCrouch(acceptInput);
         HandleMovement(acceptInput);
     }
 
@@ -84,13 +125,14 @@ public class PlayerController : MonoBehaviour
             ? new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
             : Vector2.zero;
         input = Vector2.ClampMagnitude(input, 1f);
-        float currentSpeed = acceptInput && Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : speed;
+        float currentSpeed = isCrouching ? crouchSpeed :
+            acceptInput && Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : speed;
         Vector3 velocity = (transform.right * input.x + transform.forward * input.y) * currentSpeed;
 
         if (characterController.isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;
 
-        if (acceptInput && characterController.isGrounded && Input.GetKeyDown(KeyCode.Space))
+        if (acceptInput && !isCrouching && characterController.isGrounded && Input.GetKeyDown(KeyCode.Space))
             verticalVelocity = jumpForce;
 
         verticalVelocity -= gravity * Time.deltaTime;
@@ -104,10 +146,62 @@ public class PlayerController : MonoBehaviour
 
     private void HandleCamera()
     {
-        transform.Rotate(Vector3.up, Input.GetAxis("Mouse X") * cameraSensitivity, Space.World);
-        cameraRotationX -= Input.GetAxis("Mouse Y") * cameraSensitivity;
+        lookInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+        targetYaw += lookInput.x * cameraSensitivity;
+        cameraRotationX -= lookInput.y * cameraSensitivity;
         cameraRotationX = Mathf.Clamp(cameraRotationX, cameraMinAngle, cameraMaxAngle);
-        characterCamera.transform.localRotation = Quaternion.Euler(cameraRotationX, 0f, 0f);
+        float yaw = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetYaw, ref yawVelocity, lookSmoothTime);
+        smoothedPitch = Mathf.SmoothDampAngle(smoothedPitch, cameraRotationX, ref pitchVelocity, lookSmoothTime);
+        transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+        characterCamera.transform.localRotation = Quaternion.Euler(smoothedPitch, 0f, 0f);
+    }
+
+    private void HandleCrouch(bool acceptInput)
+    {
+        bool requested = acceptInput && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C));
+        float minimumHeight = Mathf.Min(standingHeight, Mathf.Max(crouchHeight, characterController.radius * 2f));
+        float nextHeight = Mathf.MoveTowards(characterController.height,
+            requested ? minimumHeight : standingHeight, crouchTransitionSpeed * Time.deltaTime);
+        if (nextHeight > characterController.height && !HasStandingClearance())
+            nextHeight = characterController.height;
+
+        isCrouching = requested || nextHeight < standingHeight - 0.001f;
+        float heightOffset = standingHeight - nextHeight;
+        characterController.height = nextHeight;
+        characterController.center = standingCenter - Vector3.up * (heightOffset * 0.5f);
+        characterCamera.transform.localPosition = cameraRestPosition - Vector3.up * heightOffset;
+    }
+
+    private bool HasStandingClearance()
+    {
+        // Query only the head space added when standing; the floor must not block uncrouching.
+        float radius = Mathf.Max(characterController.radius, characterController.skinWidth);
+        Vector3 bottom = standingCenter - Vector3.up * (standingHeight * 0.5f);
+        Vector3 lower = transform.TransformPoint(bottom + Vector3.up * (characterController.height - radius));
+        Vector3 upper = transform.TransformPoint(bottom + Vector3.up * (standingHeight - radius));
+        float worldRadius = radius * Mathf.Max(Mathf.Abs(transform.lossyScale.x), Mathf.Abs(transform.lossyScale.z));
+        int count = Physics.OverlapCapsuleNonAlloc(lower, upper, worldRadius, crouchHits,
+            crouchObstructionMask, QueryTriggerInteraction.Ignore);
+        if (count == crouchHits.Length)
+            return false;
+        for (int i = 0; i < count; i++)
+            if (!crouchHits[i].transform.IsChildOf(transform))
+                return false;
+        return true;
+    }
+
+    private void LateUpdate()
+    {
+        if (heldInstrument == null || Time.deltaTime <= 0f)
+            return;
+
+        idleTime += Time.deltaTime * idleFrequency * Mathf.PI * 2f;
+        Vector3 idleOffset = new Vector3(Mathf.Sin(idleTime * 0.5f), Mathf.Sin(idleTime), 0f) * idleAmplitude;
+        Vector2 sway = Vector2.ClampMagnitude(lookInput, 5f) * instrumentSway;
+        Quaternion rotation = instrumentRestRotation * Quaternion.Euler(sway.y, -sway.x, -sway.x * 0.5f);
+        float blend = 1f - Mathf.Exp(-instrumentSmoothness * Time.deltaTime);
+        heldInstrument.localPosition = Vector3.Lerp(heldInstrument.localPosition, instrumentRestPosition + idleOffset, blend);
+        heldInstrument.localRotation = Quaternion.Slerp(heldInstrument.localRotation, rotation, blend);
     }
 
     private static void SetCursorLocked(bool locked)
