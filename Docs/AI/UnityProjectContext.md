@@ -33,3 +33,5 @@ Hangar material refinement: weathered grey plank texture/derived normal, native 
 Lamp/prop pass: three bell-shaped pendants with warm textured HDRP emission and existing real lights; 14 original farm prefab instances grouped along hangar walls, including ladders, pallets, tools, containers and rear steps/landing. Source assets unchanged. Current evidence and successful clearance/reference checks: output/NewMap/LampsAndProps.
 
 Road bump follow-up: real terrain undulations/crown/shallow wheel depressions, max displacement 0.352m and dense sampled maximum longitudinal grade 14.95%. Earlier 7.83% grade is superseded. Road details and nearby props refitted, centerline CSV heights updated; clearance audit passes. Vehicle dynamics not playtested. Evidence and restoration data: output/NewMap/RoadBumps and terrain backup asset documented in NewMap.md.
+
+Variable road-width pass: 5.2-10m dirt core with asymmetric feathered shoulders, wider bends/passing areas and narrower stretches; 271 verge grass patches, 26 rocks moved outward. Existing heightmap bumps unchanged, route clearance/reference audits pass. Evidence output/NewMap/VariableRoad.
