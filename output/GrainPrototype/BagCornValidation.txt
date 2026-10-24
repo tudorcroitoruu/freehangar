@@ -1,0 +1,12 @@
+2026-10-24 — Unity 6000.3.20f1
+BagCornSurface: 14 checks passed (empty, 5/25/50kg rise, bounds, closed,
+mass retained, scaled alternate sack, disable).
+ValidateBagCornPour: actual ShovelTool action transfers preloaded 6.5kg and
+populates the bag with 3D kernels. Pile placement is not altered for this fixture.
+ValidateBagHandling: 20 finish/take/drop checks passed with empty shovel.
+BagCorn30kg.png and BagCornFull.png visually inspected.
+Both existing sacks configured; original imported material assets unchanged.
+Fixed previous GrainPileEditor scene-handle serializedObject access error;
+recompiled and selected/repainted pile with no new errors after cursor 88827.
+No target-hardware performance benchmark. Surface is instanced visual geometry,
+not independent physics for every stored kernel.

@@ -39,7 +39,10 @@ public sealed class SackController : MonoBehaviour
         set { close = Mathf.Clamp01(value); Apply(); }
     }
 
-    private void OnEnable()
+    private void OnEnable() => RefreshBindings();
+
+    // Authoring tools also bake disabled sacks without activating their GameObjects.
+    public void RefreshBindings()
     {
         CacheRenderers();
         Apply();

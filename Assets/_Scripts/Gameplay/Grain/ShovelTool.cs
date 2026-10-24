@@ -16,7 +16,7 @@ public sealed class ShovelTool : MonoBehaviour
     [SerializeField, Min(.1f)] private float reach = 2.6f;
     [SerializeField, Min(.1f)] private float pourReach = 4f;
     [SerializeField, Range(0f, .75f)] private float bagAimPadding = .35f;
-    [SerializeField, Min(.01f)] private float capacityKg = 5f;
+    [SerializeField, Min(.01f)] private float capacityKg = 6.5f;
     [SerializeField, Min(.05f)] private float scoopRadius = .4f;
     [SerializeField, Min(.01f)] private float scoopDepth = .18f;
     [SerializeField, Min(.1f)] private float actionDuration = 1.25f;
@@ -34,6 +34,7 @@ public sealed class ShovelTool : MonoBehaviour
     private Camera actionCamera;
     private Transform actor;
     public float Kilograms { get; private set; }
+    public float CapacityKg => capacityKg;
     public bool IsBusy { get; private set; }
     public float ActionProgress => IsBusy ? Mathf.Clamp01(elapsed / actionDuration) : 0;
     public Vector3 PositionOffset { get; private set; }
@@ -81,6 +82,7 @@ public sealed class ShovelTool : MonoBehaviour
         }
         elapsed = transferredFraction = 0;
         availableAtStart = pendingContainer != null ? Kilograms : Mathf.Max(0, capacityKg - Kilograms);
+        if (pendingPile != null && grainPhysics != null) grainPhysics.BeginScoop();
         IsBusy = true;
         return true;
     }
@@ -191,7 +193,10 @@ public sealed class ShovelTool : MonoBehaviour
                 Vector2.Distance(new Vector2(hit.point.x, hit.point.z), new Vector2(targetPoint.x, targetPoint.z)) <= scoopRadius)
             {
                 Vector3 point = targetPoint; point.y = pendingPile.SurfaceHeight(point);
-                Kilograms += pendingPile.Scoop(point, scoopRadius, scoopDepth, Mathf.Min(amount, capacityKg - Kilograms));
+                float collected = pendingPile.Scoop(point, scoopRadius, scoopDepth, Mathf.Min(amount, capacityKg - Kilograms));
+                Kilograms += collected;
+                if (collected > 0 && grainPhysics != null)
+                    grainPhysics.EmitScoop(pendingPile, point, scoopRadius, collected / capacityKg);
             }
             else if (pendingContainer != null && hit.collider.GetComponentInParent<GrainContainer>() == pendingContainer)
                 Kilograms -= pendingContainer.Add(Mathf.Min(amount, Kilograms));

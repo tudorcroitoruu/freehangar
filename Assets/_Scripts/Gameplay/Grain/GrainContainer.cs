@@ -20,7 +20,7 @@ public sealed class GrainContainer : MonoBehaviour
     public bool IsFinished => sack != null && sack.Close >= .999f;
     public bool IsClosing { get; private set; }
     public bool IsCarried { get; private set; }
-    public bool CanHandle => sack != null && IsFull && !IsCarried;
+    public bool CanHandle => isActiveAndEnabled && sack != null && IsFull && !IsCarried;
     public Bounds WorldBounds
     {
         get

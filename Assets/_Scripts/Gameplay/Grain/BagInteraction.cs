@@ -118,7 +118,7 @@ public sealed class BagInteraction : MonoBehaviour
         if (forward.sqrMagnitude < .1f) forward = transform.forward;
         Vector3 right = Vector3.Cross(Vector3.up, forward);
         // A conservative upright box supports both imported sack sizes at any yaw.
-        float radius = Mathf.Max(worldExtents.x, worldExtents.z);
+        float radius = new Vector2(worldExtents.x, worldExtents.z).magnitude;
         Vector3 half = new Vector3(radius, worldExtents.y, radius);
         for (int option = 0; option < 3; option++)
         {

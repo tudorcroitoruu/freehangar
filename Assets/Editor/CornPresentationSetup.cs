@@ -161,34 +161,42 @@ public static class CornPresentationSetup
         EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
     }
 
-    private static void FitSackCollider(GrainContainer container)
+    public static void FitSackCollider(GrainContainer container)
     {
         SkinnedMeshRenderer body = null;
-        foreach (var renderer in container.GetComponentsInChildren<SkinnedMeshRenderer>())
+        foreach (var renderer in container.GetComponentsInChildren<SkinnedMeshRenderer>(true))
             if (renderer.name == "Sack_Body") body = renderer;
         if (body == null) return;
         int index = body.sharedMesh.GetBlendShapeIndex("Fill");
         if (index < 0) return;
         var collider = container.GetComponent<BoxCollider>();
         if (collider == null) collider = Undo.AddComponent<BoxCollider>(container.gameObject);
-        float original = body.GetBlendShapeWeight(index);
+        var sack = container.GetComponent<SackController>();
+        if (sack == null) return;
+        float originalFill = sack.Fill, originalClose = sack.Close;
+        sack.RefreshBindings();
         var baked = new Mesh();
         try
         {
-            body.SetBlendShapeWeight(index, 0); body.BakeMesh(baked); baked.RecalculateBounds();
+            sack.Close = 0; sack.Fill = 0; body.BakeMesh(baked); baked.RecalculateBounds();
             Bounds empty = InContainerSpace(baked.bounds, body.transform, container.transform);
-            body.SetBlendShapeWeight(index, 100); body.BakeMesh(baked); baked.RecalculateBounds();
+            sack.Fill = 1; body.BakeMesh(baked); baked.RecalculateBounds();
             Bounds full = InContainerSpace(baked.bounds, body.transform, container.transform);
+            sack.Close = 1; body.BakeMesh(baked); baked.RecalculateBounds();
+            Bounds closed = InContainerSpace(baked.bounds, body.transform, container.transform);
             var data = new SerializedObject(container);
             data.FindProperty("fitFillCollider").boolValue = true;
             data.FindProperty("emptyBounds").boundsValue = empty;
             data.FindProperty("fullBounds").boundsValue = full;
+            data.FindProperty("closedBounds").boundsValue = closed;
             data.ApplyModifiedProperties();
             Undo.RecordObject(collider, "Fit rotated sack collider");
             collider.center = Vector3.Lerp(empty.center, full.center, container.Kilograms / container.CapacityKg);
             collider.size = Vector3.Lerp(empty.size, full.size, container.Kilograms / container.CapacityKg);
+            collider.center = Vector3.Lerp(collider.center, closed.center, originalClose);
+            collider.size = Vector3.Lerp(collider.size, closed.size, originalClose);
         }
-        finally { body.SetBlendShapeWeight(index, original); Object.DestroyImmediate(baked); }
+        finally { sack.Fill = originalFill; sack.Close = originalClose; Object.DestroyImmediate(baked); }
     }
 
     private static Bounds InContainerSpace(Bounds source, Transform renderer, Transform container)

@@ -1,0 +1,14 @@
+2026-10-24 — Unity 6000.3.20f1 — Gameplay scene
+
+Compilation completed with no errors.
+ValidateBagHandling: PASS, 20 checks. Same public handler used by PlayerController's E input.
+Verified partial/full prompts, Finish closure, Take, Drop, repeated E during closure,
+wall obstruction, blocked drop, restored parent/scale/colliders, gravity/floor settling,
+repeat pickup/drop, full bag contents, and 4.999998 kg preserved on hidden shovel.
+ValidateCornMotion: PASS, 30 animated Play Mode assertions.
+Game View screenshots visually inspected: BagFinish.png, BagTake.png, BagHeld.png.
+Exiting Play Mode while holding the bag completed with no new errors.
+Console since cursor 66580: no error entries; groundTruth consoleErrors=0, compilationFailed=false.
+An initial inactive-sack authoring SendMessage error was fixed by explicitly refreshing morph bindings.
+Saved scene restored player/CharacterController enabled, shovel active, initial bag positions and activation.
+No physical keyboard automation, standalone build, or Nintendo Switch benchmark performed.

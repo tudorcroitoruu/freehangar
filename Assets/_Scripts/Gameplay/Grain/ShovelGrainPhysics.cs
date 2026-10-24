@@ -23,10 +23,12 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     private readonly Vector3[] streamVelocity = new Vector3[StreamCapacity];
     private readonly float[] streamLife = new float[StreamCapacity];
     private readonly bool[] cosmeticStream = new bool[StreamCapacity];
+    private readonly bool[] scoopStream = new bool[StreamCapacity];
     private readonly Matrix4x4[] streamMatrices = new Matrix4x4[StreamCapacity];
     private int streamHead, streamCount;
     private float requestedFill;
     private float spawnCredit;
+    private float scoopCredit;
     private Vector3 previousPosition, previousVelocity;
     private Quaternion previousRotation;
     private float displayedFill, shakeCredit;
@@ -41,6 +43,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     public float MaximumBowlViolation { get; private set; }
     public int PackedKernelCount { get; private set; }
     public int CosmeticEmittedCount { get; private set; }
+    public int ScoopEmittedCount { get; private set; }
     public float HighestLoadPoint { get; private set; }
     public bool IsLoadSleeping => loadSleeping;
 
@@ -77,6 +80,29 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     }
 
     private float Random(float min, float max) => Mathf.Lerp(min, max, (float)random.NextDouble());
+
+    public void BeginScoop() => scoopCredit = 0;
+
+    public void EmitScoop(GrainPile pile, Vector3 contact, float radius, float collectedFraction)
+    {
+        if (pile == null || random == null || !(collectedFraction > 0)) return;
+        // Match actual collection, not the click: missed/full/blocked swings emit nothing.
+        // Reuse the world-space stream so the kernels stay on the pile as the tool lifts.
+        scoopCredit = Mathf.Min(96f, scoopCredit + collectedFraction * 96f);
+        Vector3 inward = Vector3.ProjectOnPlane(transform.position - contact, Vector3.up).normalized;
+        while (scoopCredit >= 1f)
+        {
+            float angle = Random(0, Mathf.PI * 2f);
+            Vector3 radial = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+            Vector3 origin = contact + radial * (Mathf.Sqrt(Random(0, 1)) * radius * .65f);
+            if (!pile.IsInsideBoundary(origin, .02f)) { scoopCredit--; continue; }
+            origin.y = pile.SurfaceHeight(origin) + .045f;
+            Vector3 velocity = inward * Random(.3f, .8f) + radial * Random(.2f, .65f)
+                + Vector3.up * Random(1.2f, 2.1f);
+            EmitCosmetic(origin, velocity, true);
+            scoopCredit--;
+        }
+    }
 
     private void LateUpdate()
     {
@@ -147,7 +173,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
             shakeCredit = Mathf.Min(2f, shakeCredit + excitement * dt * 10f);
             int activeCosmetic = 0;
             for (int i = 0; i < StreamCapacity; i++)
-                if (cosmeticStream[i] && streamLife[i] > 0) activeCosmetic++;
+                if (cosmeticStream[i] && !scoopStream[i] && streamLife[i] > 0) activeCosmetic++;
             while (shakeCredit >= 1f)
             {
                 if (activeCosmetic >= 8) { shakeCredit = 0; break; }
@@ -287,6 +313,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     {
         int i = streamHead++ % StreamCapacity;
         cosmeticStream[i] = false;
+        scoopStream[i] = false;
         streamPosition[i] = position;
         float flightTime = Mathf.Clamp(Mathf.Sqrt(2f * Mathf.Max(.04f, position.y - pourDestination.y) / 9.81f), .09f, .4f);
         streamVelocity[i] = (pourDestination - position - Physics.gravity * (.5f * flightTime * flightTime)) / flightTime;
@@ -295,14 +322,16 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         streamLife[i] = 1.5f;
     }
 
-    private void EmitCosmetic(Vector3 position, Vector3 velocity)
+    private void EmitCosmetic(Vector3 position, Vector3 velocity, bool fromScoop = false)
     {
         // Extra visual copies: neither the load population nor gameplay kilograms are removed.
         int i = streamHead++ % StreamCapacity;
         cosmeticStream[i] = true;
+        scoopStream[i] = fromScoop;
         streamPosition[i] = position;
         streamVelocity[i] = velocity;
         streamLife[i] = Random(.8f, 1.3f);
-        CosmeticEmittedCount++;
+        if (fromScoop) ScoopEmittedCount++;
+        else CosmeticEmittedCount++;
     }
 }

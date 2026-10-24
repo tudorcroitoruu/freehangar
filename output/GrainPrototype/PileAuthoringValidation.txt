@@ -1,0 +1,20 @@
+2026-10-24 — Unity 6000.3.20f1 — Gameplay
+
+Compilation: passed, no new Console errors through cursor 66617.
+ValidatePileAuthoring: 20 checks passed. Nonuniform scale/yaw, world kernel dimensions,
+scaled mass, collider agreement, 6.5kg scoops, settling conservation, asymmetric
+mounds, scoopable wall edge and 80,000 candidate sample budget.
+GrainBehaviorValidation.Run: passed model mass/capacity tests.
+ValidateLocalRefill: passed on Uneven Mounds; 1,020 distant vertices unchanged,
+5kg conserved, collider within 1mm; surface 0.8082 -> 0.7793 -> 0.7958m.
+ValidateCornMotion: 38 animated Play Mode assertions passed on Uneven Mounds.
+Saved/reopened Gameplay: generated surface/collider rebuilt; 24,874 visible kernels.
+Inspector shape Undo: passed.
+Visual checks: UnevenMoundsPreview.png, ScoopFeedback.png; WallBankPreview.png
+shows the bank profile before the final wavy-toe refinement.
+Scene ends in Edit Mode, original player/shovel/bag activation restored, pile
+position/scale preserved, Shape set to Uneven Mounds.
+
+Limits: upright positive-scale height fields, Y rotation; wall placement is manual.
+No caves/overhangs or automatic wall clipping. Configure shape/scale in Edit Mode.
+Large piles increase grid/detail cost; no Switch build or hardware benchmark.
