@@ -1,0 +1,19 @@
+New_Map validation - 2026-10-24
+Scene: Assets/Scenes/Gameplay.unity
+Missing scripts: 0
+Missing material/shader references: 0
+Missing meshes: 0
+Unsupported shaders: 0
+Terrain size: (384.00, 80.00, 384.00)
+TerrainCollider: True
+Enabled cameras: 1
+Player FOV: 58
+Player restored to: (-1.20, 0.13, -8.00)
+Route markers: 22
+MAP original active: False
+Graphics original active: False
+Player original active: False
+PASS: CharacterController moved from (-1.20, 0.07, -8.00) via five waypoints through the aisle and 10m doorway to (0.00, 0.04, 19.76). Minimum foot height: 0,03597641. Grounded: True.
+No new Console errors in Play Mode (Pipeline cursor 17 unchanged). Baseline contained an older HierarchyDecorator deserialization exception; current Console ground truth: 0 errors.
+No vehicle controller/timed driving run was added or tested; 470.2m at assumed 8m/s = 58.8 seconds.
+No player build was requested or run.

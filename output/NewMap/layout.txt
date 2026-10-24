@@ -1,0 +1,5 @@
+Terrain: 384 x 384 m
+Road centerline: 470,2 m
+Travel at 8 m/s: 58,8 s
+Camera: 58 vertical FOV; eye height 1.7 m
+Original MAP, Graphics, Player retained inactive.

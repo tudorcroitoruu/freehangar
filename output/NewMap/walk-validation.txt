@@ -1,0 +1,1 @@
+PASS: CharacterController moved from (-1.20, 0.07, -8.00) via five waypoints through the aisle and 10m doorway to (0.00, 0.04, 19.76). Minimum foot height: 0,03597641. Grounded: True.

@@ -1,0 +1,1 @@
+Added 150 uphill trees and 19297 grass patches, batched into 262 spatial cells with two LODs. Total stored mesh vertices (both LODs): 2037364. Road, farmyard, crop field and village footprint excluded; central hangar sightline preserved.

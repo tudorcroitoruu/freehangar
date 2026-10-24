@@ -443,7 +443,7 @@ MonoBehaviour:
         m_Id: With3Levels
     lodBias:
       m_Values:
-      - 1.1
+      - 5
       - 1
       - 1
       m_SchemaId:
