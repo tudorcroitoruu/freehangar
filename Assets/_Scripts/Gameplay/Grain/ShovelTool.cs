@@ -184,7 +184,8 @@ public sealed class ShovelTool : MonoBehaviour
         }
         float phase = Mathf.Clamp01(elapsed / actionDuration);
         UpdatePose(phase);
-        float fraction = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.32f, .67f, phase));
+        float fraction = Mathf.SmoothStep(0, 1, pendingPile != null
+            ? Mathf.InverseLerp(.38f, .56f, phase) : Mathf.InverseLerp(.32f, .67f, phase));
         float amount = (fraction - transferredFraction) * availableAtStart;
         transferredFraction = fraction;
         if (amount > 0 && actionCamera != null && actor != null && FindHit(actionCamera, actor, out RaycastHit hit))
@@ -202,6 +203,8 @@ public sealed class ShovelTool : MonoBehaviour
                 Kilograms -= pendingContainer.Add(Mathf.Min(amount, Kilograms));
             if (grainPhysics != null) grainPhysics.SetFill(Kilograms / capacityKg);
         }
+        if (pendingPile != null && grainPhysics != null)
+            grainPhysics.ReleaseScoopDebris(Mathf.InverseLerp(.58f, .82f, phase));
         if (phase >= 1f)
         {
             bool repeat = queued;
@@ -214,7 +217,7 @@ public sealed class ShovelTool : MonoBehaviour
     {
         Vector3 restTip = restPosition + restRotation * tipInHands;
         Vector3 contact = transform.parent.InverseTransformPoint(targetPoint);
-        if (pendingPile != null) contact += transform.parent.InverseTransformVector(Vector3.down * .065f);
+        if (pendingPile != null) contact += transform.parent.InverseTransformVector(Vector3.down * .10f + actionCamera.transform.forward * .08f);
         Vector3 lifted = contact + transform.parent.InverseTransformVector(Vector3.up * .22f - actionCamera.transform.forward * .13f);
         Vector3 a, b;
         Quaternion ra, rb;
@@ -237,6 +240,12 @@ public sealed class ShovelTool : MonoBehaviour
         { a = restTip; b = restTip + new Vector3(.025f, .055f, -.1f); ra = Quaternion.identity; rb = windup; t = phase / .16f; }
         else if (phase < .38f)
         { a = restTip + new Vector3(.025f, .055f, -.1f); b = contact; ra = windup; rb = insert; t = (phase - .16f) / .22f; }
+        else if (pendingPile != null && phase < .56f)
+        { a = contact; b = contact; ra = insert; rb = insert; t = 0; }
+        else if (pendingPile != null && phase < .78f)
+        { a = contact; b = lifted; ra = insert; rb = lift; t = (phase - .56f) / .22f; }
+        else if (pendingPile != null)
+        { a = lifted; b = restTip; ra = lift; rb = Quaternion.identity; t = (phase - .78f) / .22f; }
         else if (phase < .68f)
         { a = contact; b = pendingContainer != null ? contact : lifted; ra = insert; rb = lift; t = (phase - .38f) / .3f; }
         else

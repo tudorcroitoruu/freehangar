@@ -7,6 +7,8 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
 {
     [SerializeField] private Mesh kernelMesh;
     [SerializeField] private Material kernelMaterial;
+    [Tooltip("Airborne kernels belong to the world, not the held-tool overlay.")]
+    [SerializeField, Range(0, 31)] private int airborneLayer = 0;
     [SerializeField, Range(32, 256)] private int maximumKernels = 192;
     [SerializeField, Range(.055f, .1f)] private float maximumLoadHeight = .075f;
     [SerializeField, HideInInspector] private float[] bowlFloor;
@@ -24,6 +26,13 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     private readonly float[] streamLife = new float[StreamCapacity];
     private readonly bool[] cosmeticStream = new bool[StreamCapacity];
     private readonly bool[] scoopStream = new bool[StreamCapacity];
+    private readonly Vector3[] scoopOrigin = new Vector3[StreamCapacity];
+    private readonly Vector3[] scoopLanding = new Vector3[StreamCapacity];
+    private readonly float[] scoopDuration = new float[StreamCapacity];
+    private readonly GrainPile[] scoopPile = new GrainPile[StreamCapacity];
+    private GrainPile disturbedPile;
+    private Vector3 disturbedContact;
+    private float disturbedRadius, releasedScoopFraction;
     private readonly Matrix4x4[] streamMatrices = new Matrix4x4[StreamCapacity];
     private int streamHead, streamCount;
     private float requestedFill;
@@ -81,26 +90,41 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
 
     private float Random(float min, float max) => Mathf.Lerp(min, max, (float)random.NextDouble());
 
-    public void BeginScoop() => scoopCredit = 0;
+    public void BeginScoop() { scoopCredit = releasedScoopFraction = 0; disturbedPile = null; }
 
     public void EmitScoop(GrainPile pile, Vector3 contact, float radius, float collectedFraction)
     {
         if (pile == null || random == null || !(collectedFraction > 0)) return;
-        // Match actual collection, not the click: missed/full/blocked swings emit nothing.
-        // Reuse the world-space stream so the kernels stay on the pile as the tool lifts.
-        scoopCredit = Mathf.Min(96f, scoopCredit + collectedFraction * 96f);
-        Vector3 inward = Vector3.ProjectOnPlane(transform.position - contact, Vector3.up).normalized;
-        while (scoopCredit >= 1f)
+        // The load grows inside the buried blade. Reserve only a small amount of
+        // cosmetic debris for the exposed lip when the shovel withdraws.
+        scoopCredit = Mathf.Min(48f, scoopCredit + collectedFraction * 48f);
+        disturbedPile = pile; disturbedContact = contact; disturbedRadius = radius;
+    }
+
+    public void ReleaseScoopDebris(float liftFraction)
+    {
+        float next = Mathf.Clamp01(liftFraction);
+        if (disturbedPile == null || next <= releasedScoopFraction) return;
+        int amount = Mathf.FloorToInt(scoopCredit * next) - Mathf.FloorToInt(scoopCredit * releasedScoopFraction);
+        releasedScoopFraction = next;
+        var pile = disturbedPile;
+        for (int grain = 0; grain < amount; grain++)
         {
             float angle = Random(0, Mathf.PI * 2f);
             Vector3 radial = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
-            Vector3 origin = contact + radial * (Mathf.Sqrt(Random(0, 1)) * radius * .65f);
-            if (!pile.IsInsideBoundary(origin, .02f)) { scoopCredit--; continue; }
-            origin.y = pile.SurfaceHeight(origin) + .045f;
-            Vector3 velocity = inward * Random(.3f, .8f) + radial * Random(.2f, .65f)
-                + Vector3.up * Random(1.2f, 2.1f);
-            EmitCosmetic(origin, velocity, true);
-            scoopCredit--;
+            Vector3 origin = disturbedContact + radial * disturbedRadius * Random(.65f, .95f);
+            Vector3 landing = disturbedContact + radial * disturbedRadius * Random(.05f, .3f);
+            if (!pile.IsInsideBoundary(origin, .02f) || !pile.IsInsideBoundary(landing, .02f)) continue;
+            origin.y = pile.SurfaceHeight(origin) + .015f;
+            landing.y = pile.SurfaceHeight(landing) + .01f;
+            // Only a higher lip can fall into this hole; never launch uphill.
+            if (origin.y <= landing.y + .005f) continue;
+            EmitCosmetic(origin, Vector3.zero, true);
+            int index = (streamHead - 1) % StreamCapacity;
+            scoopOrigin[index] = origin;
+            scoopLanding[index] = landing;
+            scoopPile[index] = pile;
+            scoopDuration[index] = streamLife[index] = Random(.24f, .42f);
         }
     }
 
@@ -132,12 +156,12 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         for (int i = 0; i < StreamCapacity; i++)
         {
             if (streamLife[i] <= 0) continue;
-            float scale = Mathf.Clamp01(streamLife[i] * 5f);
+            float scale = Mathf.Clamp01(streamLife[i] * (scoopStream[i] ? 35f : 5f));
             streamMatrices[streamCount++] = Matrix4x4.TRS(streamPosition[i],
                 Quaternion.Euler(streamLife[i] * 170f, i * 71f, streamLife[i] * 90f), new Vector3(.013f, .009f, .017f) * scale);
         }
         if (streamCount > 0) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, streamMatrices, streamCount, null,
-            ShadowCastingMode.Off, true, gameObject.layer, null, LightProbeUsage.Off);
+            ShadowCastingMode.Off, true, airborneLayer, null, LightProbeUsage.Off);
     }
 
     private void Simulate(float dt)
@@ -242,6 +266,15 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         {
             if (streamLife[i] <= 0) continue;
             streamLife[i] -= dt;
+            if (scoopStream[i])
+            {
+                float t = Mathf.Clamp01(1f - streamLife[i] / scoopDuration[i]);
+                Vector3 destination = scoopLanding[i];
+                if (scoopPile[i] != null) destination.y = Mathf.Min(scoopOrigin[i].y, scoopPile[i].SurfaceHeight(destination) + .01f);
+                streamPosition[i] = Vector3.Lerp(scoopOrigin[i], destination, Mathf.SmoothStep(0, 1, t));
+                streamPosition[i].y = Mathf.Lerp(scoopOrigin[i].y, destination.y, t * t);
+                continue;
+            }
             Vector3 old = streamPosition[i];
             streamVelocity[i] += Physics.gravity * dt;
             Vector3 delta = streamVelocity[i] * dt;

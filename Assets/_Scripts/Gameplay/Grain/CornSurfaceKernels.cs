@@ -13,6 +13,8 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     [SerializeField] private Material[] colorVariants;
     [SerializeField, Range(.025f, .12f)] private float spacing = .0315f;
     [SerializeField] private float drawDistance = 22f;
+    [SerializeField, Min(.1f)] private float fullDetailDistance = 1.5f;
+    [SerializeField, Min(.2f)] private float mediumDetailDistance = 4f;
     [Tooltip("Advisory kernel budget. Exceeding this never spreads kernels farther apart; surface coverage is preserved.")]
     [SerializeField, Range(10000, 1000000)] private int maximumSurfaceKernels = 500000;
     public bool ExceedsKernelBudget => KernelCount > maximumSurfaceKernels;
@@ -29,6 +31,14 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private int batchesPerColor, colorCount;
     private int revision = -1;
     private Matrix4x4 lastTransform;
+    private float[] previousHeights;
+    private bool[] dirtyCells;
+    private int[] sampleCells, sampleBatches, sampleSlots;
+    private Bounds[] batchBounds;
+    private readonly Plane[] cameraPlanes = new Plane[6];
+    private Mesh mediumMesh, distantMesh;
+    public int LastUpdatedKernels { get; private set; }
+    public int LastDrawTriangles { get; private set; }
 
     public int KernelCount { get; private set; }
 
@@ -48,6 +58,9 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private void Build()
     {
         if (pile == null || kernelMesh == null || kernelMaterial == null) return;
+        if (Application.isPlaying && samples != null && previousHeights != null &&
+            sampledScale == pile.WorldScale && lastTransform == transform.localToWorldMatrix)
+        { UpdateChangedCells(); return; }
         float actualSpacing = Mathf.Max(.025f, spacing);
         Vector3 worldScale = pile.WorldScale;
         if (worldScale.x <= 0 || worldScale.y <= 0 || worldScale.z <= 0 || Vector3.Dot(pile.transform.up, Vector3.up) < .9999f)
@@ -100,6 +113,73 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         }
         revision = pile.SurfaceRevision;
         lastTransform = transform.localToWorldMatrix;
+        CacheCells();
+    }
+
+    private void CacheCells()
+    {
+        var field = pile.HeightField;
+        previousHeights = (float[])field.Heights.Clone();
+        dirtyCells = new bool[previousHeights.Length];
+        sampleCells = new int[samples.Length]; sampleBatches = new int[samples.Length]; sampleSlots = new int[samples.Length];
+        batchBounds = new Bounds[batches.Length];
+        Array.Clear(paletteCounts, 0, paletteCounts.Length);
+        for (int i = 0; i < samples.Length; i++)
+        {
+            Vector2 p = samples[i];
+            int x = Mathf.Clamp((int)((p.x + field.Size * .5f) / field.Spacing), 0, field.Resolution - 2);
+            int z = Mathf.Clamp((int)((p.y + field.Size * .5f) / field.Spacing), 0, field.Resolution - 2);
+            sampleCells[i] = z * field.Resolution + x;
+            sampleBatches[i] = -1;
+            if (!pile.IsInsideBoundary(pile.transform.TransformPoint(new Vector3(p.x, 0, p.y)), .04f) || field.Sample(p.x, p.y) < .001f) continue;
+            int color = paletteIndices[i], batch = color * batchesPerColor + paletteCounts[color] / 1023, slot = paletteCounts[color]++ % 1023;
+            sampleBatches[i] = batch; sampleSlots[i] = slot;
+            Vector3 position = batches[batch][slot].GetColumn(3);
+            if (slot == 0) batchBounds[batch] = new Bounds(position, Vector3.one * .1f);
+            else batchBounds[batch].Encapsulate(position);
+        }
+        // Bounds retain the initial height envelope as excavation only lowers it.
+        for (int b = 0; b < batchBounds.Length; b++)
+        {
+            Vector3 bottom = batchBounds[b].center; bottom.y = pile.transform.position.y;
+            batchBounds[b].Encapsulate(bottom); batchBounds[b].Expand(.12f);
+        }
+        LastUpdatedKernels = KernelCount;
+    }
+
+    private void UpdateChangedCells()
+    {
+        var field = pile.HeightField;
+        int n = field.Resolution;
+        Array.Clear(dirtyCells, 0, dirtyCells.Length);
+        for (int i = 0; i < previousHeights.Length; i++)
+        {
+            if (previousHeights[i] == field.Heights[i]) continue;
+            previousHeights[i] = field.Heights[i];
+            // Include neighbours used by the surface-normal finite differences.
+            int x = i % n, z = i / n;
+            int reach = Mathf.CeilToInt(.03f / field.Spacing) + 1;
+            for (int dz = Mathf.Max(0, z - reach); dz <= Mathf.Min(n - 1, z + reach); dz++)
+            for (int dx = Mathf.Max(0, x - reach); dx <= Mathf.Min(n - 1, x + reach); dx++) dirtyCells[dz * n + dx] = true;
+        }
+        Matrix4x4 localToWorld = transform.localToWorldMatrix, normalMatrix = transform.worldToLocalMatrix.transpose;
+        Quaternion yaw = Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up);
+        LastUpdatedKernels = 0;
+        for (int i = 0; i < samples.Length; i++)
+        {
+            int batch = sampleBatches[i];
+            if (batch < 0 || !dirtyCells[sampleCells[i]]) continue;
+            Vector2 p = samples[i];
+            float h = field.Sample(p.x, p.y);
+            float dx = field.Sample(p.x + .03f, p.y) - field.Sample(p.x - .03f, p.y);
+            float dz = field.Sample(p.x, p.y + .03f) - field.Sample(p.x, p.y - .03f);
+            Vector3 normal = normalMatrix.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
+            batches[batch][sampleSlots[i]] = Matrix4x4.TRS(localToWorld.MultiplyPoint3x4(new Vector3(p.x, h, p.y)) + Vector3.up * .003f,
+                Quaternion.FromToRotation(Vector3.up, normal) * yaw * rotations[i],
+                new Vector3(.0255f, .014f, .029f) * (h < .001f ? 0 : sizes[i]));
+            LastUpdatedKernels++;
+        }
+        revision = pile.SurfaceRevision;
     }
 
     private void LateUpdate()
@@ -166,12 +246,46 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         if (batches == null || kernelMesh == null || kernelMaterial == null || camera.cameraType == CameraType.Preview) return;
         var renderer = pile.GetComponent<MeshRenderer>();
         if (renderer != null && (renderer.bounds.ClosestPoint(camera.transform.position) - camera.transform.position).sqrMagnitude > drawDistance * drawDistance) return;
+        if (mediumMesh == null) { mediumMesh = CreateLodMesh(8); distantMesh = CreateLodMesh(4); }
+        GeometryUtility.CalculateFrustumPlanes(camera, cameraPlanes);
+        LastDrawTriangles = 0;
         for (int i = 0; i < batches.Length; i++)
-            if (counts[i] > 0)
-                Graphics.DrawMeshInstanced(kernelMesh, 0,
+            if (counts[i] > 0 && GeometryUtility.TestPlanesAABB(cameraPlanes, batchBounds[i]))
+            {
+                float distance = Vector3.Distance(camera.transform.position, batchBounds[i].ClosestPoint(camera.transform.position));
+                if (distance > drawDistance) continue;
+                Mesh lod = distance < fullDetailDistance ? kernelMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
+                LastDrawTriangles += counts[i] * (int)(lod.GetIndexCount(0) / 3);
+                Graphics.DrawMeshInstanced(lod, 0,
                     colorVariants != null && colorVariants.Length == colorCount && colorVariants[i / batchesPerColor] != null
                         ? colorVariants[i / batchesPerColor] : kernelMaterial, batches[i], counts[i], null,
                     ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
+            }
+    }
+
+    private static Mesh CreateLodMesh(int sides)
+    {
+        var vertices = new Vector3[sides + 2]; var normals = new Vector3[sides + 2];
+        var indices = new int[sides * 6];
+        vertices[0] = Vector3.up; vertices[1] = Vector3.down;
+        for (int i = 0; i < sides; i++)
+        {
+            float angle = i * Mathf.PI * 2 / sides;
+            vertices[i + 2] = new Vector3(Mathf.Cos(angle) * .79f, 0, Mathf.Sin(angle) * .95f);
+            int next = (i + 1) % sides + 2, t = i * 6;
+            indices[t] = 0; indices[t + 1] = next; indices[t + 2] = i + 2;
+            indices[t + 3] = 1; indices[t + 4] = i + 2; indices[t + 5] = next;
+        }
+        for (int i = 0; i < vertices.Length; i++) normals[i] = vertices[i].normalized;
+        var mesh = new Mesh { name = "Corn LOD " + sides * 2, hideFlags = HideFlags.HideAndDontSave };
+        mesh.vertices = vertices; mesh.normals = normals; mesh.triangles = indices; mesh.RecalculateBounds();
+        return mesh;
+    }
+
+    private void OnDestroy()
+    {
+        if (mediumMesh != null) { if (Application.isPlaying) Destroy(mediumMesh); else DestroyImmediate(mediumMesh); }
+        if (distantMesh != null) { if (Application.isPlaying) Destroy(distantMesh); else DestroyImmediate(distantMesh); }
     }
 }
 

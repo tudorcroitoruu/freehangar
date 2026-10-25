@@ -17,15 +17,26 @@ public sealed class CornGroundScatter : MonoBehaviour
     private float nextRefresh;
     public int KernelCount { get; private set; }
 
-    private void OnEnable() { revision = -1; RenderPipelineManager.beginCameraRendering += Draw; }
+    private void OnEnable()
+    {
+        // Draw buffers are transient. Recreate them at the mode/enable boundary,
+        // even if gameplay time is paused or still at zero on the first frame.
+        revision = -1;
+        nextRefresh = 0;
+        if (pile == null) pile = GetComponent<GrainPile>();
+        Rebuild();
+        RenderPipelineManager.beginCameraRendering += Draw;
+    }
     private void OnDisable() { RenderPipelineManager.beginCameraRendering -= Draw; KernelCount = 0; }
     private void OnValidate() => revision = -1;
     private void LateUpdate()
     {
         if (pile == null) pile = GetComponent<GrainPile>();
         if (pile == null) return;
-        if ((revision != pile.SurfaceRevision || lastTransform != transform.localToWorldMatrix) &&
-            (!Application.isPlaying || Time.time >= nextRefresh)) Rebuild();
+        // Floor scatter is decoration, so excavating the pile must not rescan the
+        // entire perimeter and raycast the floor on every settling revision.
+        if (((!Application.isPlaying || revision < 0) && revision != pile.SurfaceRevision || lastTransform != transform.localToWorldMatrix) &&
+            (!Application.isPlaying || revision < 0 || Time.time >= nextRefresh)) Rebuild();
     }
     public void Rebuild()
     {

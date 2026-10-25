@@ -81,3 +81,25 @@ The test disables/repositions the player and fills a sack in Play Mode. It advan
 
 Validation: runtime and editor scripts compile; mass/capacity model checks pass; 30 animated Play Mode assertions cover gestures, grip bounds, pickup, pouring, capacity, containment and cancellation. ValidateCarryMotion.cs adds 14 checks for the packed interior, loaded Z leveling, opposite turn roll, translation/rotation spills, unchanged mass, expiry and the empty state. Captures are stored in output/GrainPrototype. No standalone build or hardware performance guarantee.
 
+
+## Pile performance and scoop collection update (2026-10-25)
+
+CornSurfaceKernels now selects the original 64-triangle mesh within 1.5 m, a 16-triangle mesh out to 4 m, and an 8-triangle mesh beyond that, measured against each batch bounds. Distances are configurable. Batches outside the camera frustum or draw distance are skipped. LOD preserves kernel count, world size, placement and color palette. The detailed shovel/bag meshes are unchanged. HDRP can draw geometry in multiple passes, so these per-pass triangle figures are not the total Unity Stats count.
+
+During gameplay a cached height-grid snapshot identifies changed cells and their normal-sampling neighbours. Only their kernel matrices update; untouched matrices and draw arrays are reused. Decorative ground scatter no longer rebuilds/raycasts the whole perimeter on every excavation revision. It remains fixed decorative floor corn while playing. Pile shape/placement editing still rebuilds the authoring preview.
+
+Scoop effects reuse the existing bounded 256-slot pool, emitting at most 96 cosmetic kernels per full scoop. They now follow short arcs from the removed patch to points inside the moving shovel bowl and retire there. These are visual collection trajectories, not additional Rigidbody or grain-mass simulation. Pouring and shake particles retain their ballistic collision behavior.
+
+Measured in the current Editor scene: 26,376 kernels; previous full matrix update 24.44 ms. The local excavation update touched 1,604 kernels in 0.60 ms; unchanged update averaged 0.031 ms. Distant rendering submitted 211,008 kernel triangles per pass, compared with 1,688,064 at full detail (87.5% reduction). The inspected gameplay view submitted 260,112 kernel triangles with mixed LOD. These are targeted CPU/geometry measurements, not whole-frame FPS or Switch benchmarks; authored spacing (0.0512 m), shapes and placements were preserved.
+
+ValidateGrainPerformance.cs passes grain conservation, local update scope, every visible kernel's updated height, distant LOD budget, bounded emissions and landing all scoop particles inside the bowl. ValidateWallRuntime.cs passes 6.5 kg removal, partial local refill, conservation and synchronized collider height. OptimizedPile.png is the inspected preview. No target-device build was run.
+
+### Insert-and-lift scoop revision
+The scoop now holds the blade below the contact surface during phases 0.38–0.56, filling the bowl during that buried phase, then lifts over 0.56–0.78 and returns to rest. Existing grip travel and tilt limits remain enforced. Scoop debris no longer travels onto the shovel: at withdrawal it releases up to 48 pooled decorative kernels from higher edges toward the excavated patch, falling downward without an upward launch. Existing mass-conserving height-field settling partially refills the hole; cosmetic kernels add no mass.
+
+ValidateScoopSequence passes insertion-before-loading, progressive load while the blade holds its cutting pose, full 6.5 kg carried through lift, debris delayed until withdrawal, and completion. Updated ValidateGrainPerformance passes local matrix updates, LOD, downward-only debris, and landing on the pile surface. The asynchronous wall-collider check encountered its existing delayed-cook timing mismatch during this run; collider code was unchanged.
+
+## Held-tool camera and wall clipping
+Added HeldTools layer (slot 8 in ProjectSettings/TagManager.asset) and applied it to the existing held-instrument hierarchy. Main Camera excludes this layer. Its child Held Tool Camera follows its pose/FOV with a 0.01 m near plane. HDRP renders that second camera explicitly through HeldToolPass before post-processing, using a separately cleared depth buffer and LessEqual depth testing; the camera component stays disabled to avoid a second full-scene render. World colour and depth are preserved. Loaded instanced shovel kernels share the tool layer; airborne scoop/pour/shake kernels use world layer 0. Gameplay interaction raycasts remain unchanged.
+
+Tools > Grain > Set up held-tool camera configures the current player through the Editor. The scene setup and layer are saved. Play Mode visual checks with an opaque wall 0.5 m in front of the camera confirm the complete shovel and loaded corn remain visible. Normal pile view also inspected (ToolCameraWall.png and ToolCameraPile.png). Camera masks and airborne layer checks pass; Console has no errors. This change hides visual wall intersections, not physical reach or interaction obstructions. Carried bags retain their existing world rendering.

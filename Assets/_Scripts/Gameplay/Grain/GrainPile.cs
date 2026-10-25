@@ -42,6 +42,7 @@ public sealed class GrainPile : MonoBehaviour
     public int DetectedWallCount => boundary == null ? 0 : boundary.Walls.Count;
     public bool IsInsideBoundary(Vector3 worldPoint, float radius = 0) => boundary == null || boundary.Contains(worldPoint, wallClearance + radius);
     private GrainHeightField field;
+    internal GrainHeightField HeightField => field;
     private Mesh mesh;
     private Mesh collisionMesh;
     private MeshCollider meshCollider;
