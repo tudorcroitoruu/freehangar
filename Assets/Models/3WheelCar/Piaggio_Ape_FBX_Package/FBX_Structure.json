@@ -1,0 +1,197 @@
+{
+  "fbx": "C:\\Users\\Liviu Tataru\\Documents\\Codex\\2026-10-25\\uite-x20\\outputs\\Piaggio_Ape\\Piaggio_Ape_Articulated.fbx",
+  "blend": "C:\\Users\\Liviu Tataru\\Documents\\Codex\\2026-10-25\\uite-x20\\outputs\\Piaggio_Ape\\Piaggio_Ape_Articulated.blend",
+  "source_faces": 116954,
+  "output_faces": 116954,
+  "objects": [
+    {
+      "name": "Body_Static",
+      "parent": "Piaggio_Ape",
+      "faces": 63338,
+      "materials": [
+        "APE | BedPaint",
+        "APE | Plastic",
+        "APE | Chrome",
+        "APE | RedLens",
+        "APE | DarkSteel",
+        "APE | Paint",
+        "APE | SeatVinyl",
+        "APE | Headlight",
+        "APE | AmberLens",
+        "APE | Glass"
+      ],
+      "pivot_meters": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_axis": ""
+    },
+    {
+      "name": "Bed_Tailgate",
+      "parent": "Piaggio_Ape",
+      "faces": 340,
+      "materials": [
+        "APE | BedPaint"
+      ],
+      "pivot_meters": [
+        8.012079177888154e-08,
+        1.8329499959945679,
+        0.8915499448776245
+      ],
+      "rotation_axis": "Local X (transverse hinge)"
+    },
+    {
+      "name": "Bed_Side_Left",
+      "parent": "Piaggio_Ape",
+      "faces": 208,
+      "materials": [
+        "APE | BedPaint"
+      ],
+      "pivot_meters": [
+        0.9151000380516052,
+        0.8109499216079712,
+        0.8915499448776245
+      ],
+      "rotation_axis": "Local Y (longitudinal hinge)"
+    },
+    {
+      "name": "Bed_Side_Right",
+      "parent": "Piaggio_Ape",
+      "faces": 208,
+      "materials": [
+        "APE | BedPaint"
+      ],
+      "pivot_meters": [
+        -0.9148998856544495,
+        0.8109500408172607,
+        0.8915499448776245
+      ],
+      "rotation_axis": "Local Y (longitudinal hinge)"
+    },
+    {
+      "name": "Door_Right",
+      "parent": "Piaggio_Ape",
+      "faces": 4106,
+      "materials": [
+        "APE | Plastic",
+        "APE | Chrome",
+        "APE | Paint",
+        "APE | Glass"
+      ],
+      "pivot_meters": [
+        -0.666100025177002,
+        -0.9820500016212463,
+        0.8915499448776245
+      ],
+      "rotation_axis": "Local Z (vertical hinge)"
+    },
+    {
+      "name": "Door_Left",
+      "parent": "Piaggio_Ape",
+      "faces": 4106,
+      "materials": [
+        "APE | Plastic",
+        "APE | Chrome",
+        "APE | Paint",
+        "APE | Glass"
+      ],
+      "pivot_meters": [
+        0.6660999059677124,
+        -0.9820500016212463,
+        0.8915499448776245
+      ],
+      "rotation_axis": "Local Z (vertical hinge)"
+    },
+    {
+      "name": "Handlebar",
+      "parent": "Steering_Front_Pivot",
+      "faces": 14720,
+      "materials": [
+        "APE | Plastic",
+        "APE | Paint"
+      ],
+      "pivot_meters": [
+        -5.187447982279991e-08,
+        -1.186750054359436,
+        1.138550043106079
+      ],
+      "rotation_axis": ""
+    },
+    {
+      "name": "Wheel_Front",
+      "parent": "Steering_Front_Pivot",
+      "faces": 3004,
+      "materials": [
+        "APE | Steel",
+        "APE | Rubber"
+      ],
+      "pivot_meters": [
+        -9.641815267968923e-06,
+        -1.5856221914291382,
+        0.2858574688434601
+      ],
+      "rotation_axis": "Local X (axle)"
+    },
+    {
+      "name": "Wheel_Rear_Left",
+      "parent": "Piaggio_Ape",
+      "faces": 3004,
+      "materials": [
+        "APE | Steel",
+        "APE | Rubber"
+      ],
+      "pivot_meters": [
+        0.7665491104125977,
+        0.9716875553131104,
+        0.285857230424881
+      ],
+      "rotation_axis": "Local X (axle)"
+    },
+    {
+      "name": "Wheel_Rear_Right",
+      "parent": "Piaggio_Ape",
+      "faces": 3004,
+      "materials": [
+        "APE | Steel",
+        "APE | Rubber"
+      ],
+      "pivot_meters": [
+        -0.7665552496910095,
+        0.9716876745223999,
+        0.2858574092388153
+      ],
+      "rotation_axis": "Local X (axle)"
+    },
+    {
+      "name": "Front_Mudguard",
+      "parent": "Steering_Front_Pivot",
+      "faces": 14336,
+      "materials": [
+        "APE | Paint"
+      ],
+      "pivot_meters": [
+        -6.93240309601606e-08,
+        -1.5859500169754028,
+        0.7163500189781189
+      ],
+      "rotation_axis": ""
+    },
+    {
+      "name": "Front_Fork",
+      "parent": "Steering_Front_Pivot",
+      "faces": 6580,
+      "materials": [
+        "APE | DarkSteel",
+        "APE | Steel",
+        "APE | Chrome"
+      ],
+      "pivot_meters": [
+        -0.18540005385875702,
+        -1.5859498977661133,
+        0.6243499517440796
+      ],
+      "rotation_axis": ""
+    }
+  ]
+}
