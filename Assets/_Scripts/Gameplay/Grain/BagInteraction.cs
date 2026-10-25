@@ -34,11 +34,12 @@ public sealed class BagInteraction : MonoBehaviour
         }
         if (prompt == null) return;
         var bag = carried != null ? carried : target;
-        if (bag == null || (shovel != null && shovel.IsBusy)) { prompt.Hide(); return; }
+        if (bag == null || (bag.IsFull && shovel != null && shovel.IsBusy)) { prompt.Hide(); return; }
         Bounds bounds = bag.WorldBounds;
         Vector3 position = carried != null ? bounds.center : new Vector3(bounds.center.x, bounds.max.y + .12f, bounds.center.z);
         bool blocked = Time.time < blockedUntil;
-        prompt.Show(viewCamera, position, blocked ? "Make room to drop" : PromptAction, !bag.IsClosing && !blocked);
+        prompt.Show(viewCamera, position, blocked ? "Make room to drop" : bag.IsFull ? PromptAction : "",
+            bag.IsFull && !bag.IsClosing && !blocked, bag);
     }
 
     public bool TryInteract()

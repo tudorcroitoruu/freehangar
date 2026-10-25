@@ -31,12 +31,14 @@ public sealed class ShovelTool : MonoBehaviour
     private float carryBlend;
     private float elapsed, transferredFraction, availableAtStart;
     private bool queued;
+    private bool scoopReported;
     private Camera actionCamera;
     private Transform actor;
     public float Kilograms { get; private set; }
     public float CapacityKg => capacityKg;
     public bool IsBusy { get; private set; }
     public bool IsScooping => IsBusy && pendingPile != null;
+    public event System.Action GrainScooped;
     public float ActionProgress => IsBusy ? Mathf.Clamp01(elapsed / actionDuration) : 0;
     public Vector3 PositionOffset { get; private set; }
     public Quaternion RotationOffset { get; private set; } = Quaternion.identity;
@@ -90,6 +92,7 @@ public sealed class ShovelTool : MonoBehaviour
             }
         }
         elapsed = transferredFraction = 0;
+        scoopReported = false;
         availableAtStart = pendingContainer != null ? Kilograms : Mathf.Max(0, capacityKg - Kilograms);
         if (pendingPile != null && grainPhysics != null) grainPhysics.BeginScoop();
         IsBusy = true;
@@ -129,7 +132,7 @@ public sealed class ShovelTool : MonoBehaviour
             closest = hits[i].collider; distance = hits[i].distance;
         }
         var direct = closest != null ? closest.GetComponentInParent<GrainContainer>() : null;
-        if (direct != null && direct.CanHandle) return direct;
+        if (direct != null && direct.isActiveAndEnabled && !direct.IsCarried && direct.GetComponent<SackController>() != null) return direct;
         return null;
     }
 
@@ -156,6 +159,11 @@ public sealed class ShovelTool : MonoBehaviour
                 float collected = pendingPile.Scoop(point, scoopRadius, scoopDepth, Mathf.Min(amount, capacityKg - Kilograms));
                 Kilograms += collected;
                 transferredFraction = fraction;
+                if (collected > 0 && !scoopReported)
+                {
+                    scoopReported = true;
+                    GrainScooped?.Invoke();
+                }
                 if (collected > 0 && grainPhysics != null)
                     grainPhysics.EmitScoop(pendingPile, point, scoopRadius, collected / capacityKg);
             }

@@ -14,6 +14,25 @@ public static class SaveSystem
     public static SettingsData settingsData;
     public static ActivityData activityData;
 
+    public static event Action<int> MoneyChanged;
+    public static int Money => Data != null ? Data.cash : 0;
+
+    public static bool AddMoney(int amount)
+    {
+        if (Data == null || amount <= 0 || Data.cash > int.MaxValue - amount) return false;
+        Data.cash += amount;
+        SaveData();
+        return true;
+    }
+
+    public static bool SpendMoney(int amount)
+    {
+        if (Data == null || amount <= 0 || Data.cash < amount) return false;
+        Data.cash -= amount;
+        SaveData();
+        return true;
+    }
+
     static string savePath = "/save";
 
     static int key = 5;
@@ -29,6 +48,7 @@ public static class SaveSystem
         PlayerPrefs.SetString("levelsCompleted", EncryptDecrypt(jsonActivity));
         
         PlayerPrefs.Save();
+        MoneyChanged?.Invoke(Money);
         Debug.Log("Saved Data");
     }
 
@@ -129,6 +149,7 @@ public static class SaveSystem
         
         savesLoaded = true;
 
+        MoneyChanged?.Invoke(Money);
         return (Data,settingsData,activityData);
     }
 

@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform heldInstrument;
     [SerializeField] private ShovelTool shovelTool;
     [SerializeField] private BagInteraction bagInteraction;
+    [SerializeField] private StaminaManager staminaManager;
 
     [Header("Movement")]
     [SerializeField, Min(0f)] private float speed = 3f;
@@ -65,6 +66,10 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
+        if (staminaManager == null && !TryGetComponent(out staminaManager))
+            staminaManager = FindFirstObjectByType<StaminaManager>();
+        if (staminaManager == null)
+            staminaManager = gameObject.AddComponent<StaminaManager>();
         if (characterCamera == null)
             characterCamera = GetComponentInChildren<Camera>();
 
@@ -92,12 +97,14 @@ public class PlayerController : MonoBehaviour
 
     private void OnEnable()
     {
+        if (shovelTool != null) shovelTool.GrainScooped += HandleGrainScooped;
         verticalVelocity = 0f;
         SetCursorLocked(true);
     }
 
     private void OnDisable()
     {
+        if (shovelTool != null) shovelTool.GrainScooped -= HandleGrainScooped;
         if (shovelTool != null) shovelTool.CancelAction();
         SetCursorLocked(false);
     }
@@ -138,6 +145,14 @@ public class PlayerController : MonoBehaviour
                 shovelTool.Tick(Time.deltaTime);
             }
         }
+        bool isCarrying = bagInteraction != null && bagInteraction.IsCarrying;
+        bool recoveryBlocked = shovelTool != null && (shovelTool.Kilograms > 0f || shovelTool.IsBusy);
+        if (staminaManager != null) staminaManager.Tick(isCarrying, Time.deltaTime, recoveryBlocked);
+    }
+
+    private void HandleGrainScooped()
+    {
+        if (staminaManager != null) staminaManager.ConsumeShovelStamina();
     }
 
     private void HandleMovement(bool acceptInput)

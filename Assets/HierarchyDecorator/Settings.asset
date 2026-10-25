@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Settings
   m_EditorClassIdentifier: Wooshii.HierarchyDecorator.Editor::HierarchyDecorator.Settings
   globalData:
-    showActiveToggles: 0
+    showActiveToggles: 1
     activeToggleType: 0
     activeSwiping: 1
     swipeSameState: 1
@@ -426,19 +426,6 @@ MonoBehaviour:
           m_Image: {fileID: 8779834242249542326, guid: 0000000000000000d000000000000000, type: 0}
           m_Tooltip: CheatCodeController
           m_TextWithWhitespace: "CheatCodeController\u200B"
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: CinemachineUniversalPixelPerfect
-        name: UnityEngine.Rendering.Universal.CinemachineUniversalPixelPerfect, Unity.RenderPipelines.Universal.2D.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: CinemachineUniversalPixelPerfect
-          m_Image: {fileID: 2800000, guid: ec2f01df0bb1bfe459b5562a9e71c8d4, type: 3}
-          m_Tooltip: CinemachineUniversalPixelPerfect
-          m_TextWithWhitespace: "CinemachineUniversalPixelPerfect\u200B"
         shown: 0
         excluded: 0
         isBuiltIn: 1
@@ -953,19 +940,6 @@ MonoBehaviour:
         script: {fileID: 0}
         hasToggle: 1
       - displayName: DecalProjector
-        name: UnityEngine.Rendering.Universal.DecalProjector, Unity.RenderPipelines.Universal.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: DecalProjector
-          m_Image: {fileID: 2800000, guid: 340b2e8f8761e254d8ee52bc663cedbd, type: 2}
-          m_Tooltip: DecalProjector
-          m_TextWithWhitespace: "DecalProjector\u200B"
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: DecalProjector
         name: UnityEngine.Rendering.HighDefinition.DecalProjector, Unity.RenderPipelines.HighDefinition.Runtime,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         content:
@@ -1407,6 +1381,19 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 1
+      - displayName: MethodReloadStatusOverlay
+        name: Unity.Pipeline.MethodReloadStatusOverlay, Unity.Pipeline, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: MethodReloadStatusOverlay
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: MethodReloadStatusOverlay
+          m_TextWithWhitespace: "MethodReloadStatusOverlay\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 1
+        script: {fileID: 0}
+        hasToggle: 1
       - displayName: MonoBehaviourUtil
         name: Purchasing.Utilities.MonoBehaviourUtil, Unity.Purchasing.Utilities,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -1532,19 +1519,6 @@ MonoBehaviour:
           m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
           m_Tooltip: PerformanceTestHelper
           m_TextWithWhitespace: "PerformanceTestHelper\u200B"
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: PixelPerfectCamera
-        name: UnityEngine.Rendering.Universal.PixelPerfectCamera, Unity.RenderPipelines.Universal.2D.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: PixelPerfectCamera
-          m_Image: {fileID: 2800000, guid: 7cba34d70552e144586a4d3ce4a33de5, type: 3}
-          m_Tooltip: PixelPerfectCamera
-          m_TextWithWhitespace: "PixelPerfectCamera\u200B"
         shown: 0
         excluded: 0
         isBuiltIn: 1
@@ -1732,6 +1706,19 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 1
+      - displayName: QuitScheduler
+        name: Unity.Pipeline.Runtime.Commands.RuntimeApplicationCommand+QuitScheduler,
+          Unity.Pipeline, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: QuitScheduler
+          m_Image: {fileID: 8779834242249542326, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: QuitScheduler
+          m_TextWithWhitespace: "QuitScheduler\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 1
+        script: {fileID: 0}
+        hasToggle: 1
       - displayName: RecorderBindings
         name: UnityEngine.Recorder.RecorderBindings, Unity.Recorder, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
@@ -1819,6 +1806,19 @@ MonoBehaviour:
           m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
           m_Tooltip: RemoteTestResultSender
           m_TextWithWhitespace: "RemoteTestResultSender\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 1
+        script: {fileID: 0}
+        hasToggle: 1
+      - displayName: RuntimePipelineDriver
+        name: Unity.Pipeline.RuntimePipelineDriver, Unity.Pipeline, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: RuntimePipelineDriver
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: RuntimePipelineDriver
+          m_TextWithWhitespace: "RuntimePipelineDriver\u200B"
         shown: 0
         excluded: 0
         isBuiltIn: 1
@@ -2695,45 +2695,6 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 1
-      - displayName: UniversalAdditionalCameraData
-        name: UnityEngine.Rendering.Universal.UniversalAdditionalCameraData, Unity.RenderPipelines.Universal.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: UniversalAdditionalCameraData
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: UniversalAdditionalCameraData
-          m_TextWithWhitespace: "UniversalAdditionalCameraData\u200B"
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: UniversalAdditionalLightData
-        name: UnityEngine.Rendering.Universal.UniversalAdditionalLightData, Unity.RenderPipelines.Universal.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: UniversalAdditionalLightData
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: UniversalAdditionalLightData
-          m_TextWithWhitespace: "UniversalAdditionalLightData\u200B"
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: URPCameraBinder
-        name: UnityEngine.VFX.Utility.URPCameraBinder, Unity.RenderPipelines.Universal.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: URPCameraBinder
-          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: URPCameraBinder
-          m_TextWithWhitespace: "URPCameraBinder\u200B"
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
       - displayName: Variables
         name: Unity.VisualScripting.Variables, Unity.VisualScripting.Core, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
@@ -3479,19 +3440,6 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 1
-      - displayName: CompositeShadowCaster2D
-        name: UnityEngine.Rendering.Universal.CompositeShadowCaster2D, Unity.RenderPipelines.Universal.2D.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: CompositeShadowCaster2D
-          m_Image: {fileID: -3014997550705089454, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: CompositeShadowCaster2D
-          m_TextWithWhitespace: "CompositeShadowCaster2D\u200B"
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
       - displayName: ConstantForce2D
         name: UnityEngine.ConstantForce2D, UnityEngine.Physics2DModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
@@ -3604,19 +3552,6 @@ MonoBehaviour:
           m_Image: {fileID: 8779834242249542326, guid: 0000000000000000d000000000000000, type: 0}
           m_Tooltip: Joint2D
           m_TextWithWhitespace: "Joint2D\u200B"
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
-      - displayName: Light2D
-        name: UnityEngine.Rendering.Universal.Light2D, Unity.RenderPipelines.Universal.2D.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: Light2D
-          m_Image: {fileID: 1992151432481503067, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: Light2D
-          m_TextWithWhitespace: "Light2D\u200B"
         shown: 0
         excluded: 0
         isBuiltIn: 1
@@ -3739,19 +3674,6 @@ MonoBehaviour:
         isBuiltIn: 1
         script: {fileID: 0}
         hasToggle: 0
-      - displayName: ShadowCaster2D
-        name: UnityEngine.Rendering.Universal.ShadowCaster2D, Unity.RenderPipelines.Universal.2D.Runtime,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        content:
-          m_Text: ShadowCaster2D
-          m_Image: {fileID: -3014997550705089454, guid: 0000000000000000d000000000000000, type: 0}
-          m_Tooltip: ShadowCaster2D
-          m_TextWithWhitespace: "ShadowCaster2D\u200B"
-        shown: 0
-        excluded: 0
-        isBuiltIn: 1
-        script: {fileID: 0}
-        hasToggle: 1
       - displayName: SliderJoint2D
         name: UnityEngine.SliderJoint2D, UnityEngine.Physics2DModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
@@ -5272,6 +5194,108 @@ MonoBehaviour:
     customGroups: []
     allCustomComponents:
       name: All
-      components: []
+      components:
+      - displayName: GlobalManager
+        name: GlobalManager, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: GlobalManager
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: GlobalManager
+          m_TextWithWhitespace: "GlobalManager\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: fdae0404b55e60f4d958fbe85717d983, type: 3}
+        hasToggle: 1
+      - displayName: SoundManager
+        name: SoundManager, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: SoundManager
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: SoundManager
+          m_TextWithWhitespace: "SoundManager\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: e8c3f17a95f24e14ca8a67d3a5f18dac, type: 3}
+        hasToggle: 1
+      - displayName: PlayerController
+        name: PlayerController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: PlayerController
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: PlayerController
+          m_TextWithWhitespace: "PlayerController\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 234eaf934762fc341b4d567940c1565f, type: 3}
+        hasToggle: 1
+      - displayName: BagInteraction
+        name: BagInteraction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: BagInteraction
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: BagInteraction
+          m_TextWithWhitespace: "BagInteraction\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: da1272bc7e356f842808f03d263e7aa1, type: 3}
+        hasToggle: 1
+      - displayName: SackController
+        name: SackController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: SackController
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: SackController
+          m_TextWithWhitespace: "SackController\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: f0047660c8a37ed4eb9886932203ebc4, type: 3}
+        hasToggle: 1
+      - displayName: GrainContainer
+        name: GrainContainer, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: GrainContainer
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: GrainContainer
+          m_TextWithWhitespace: "GrainContainer\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: b490a70abf7e5db4e850392a1c7ec809, type: 3}
+        hasToggle: 1
+      - displayName: BagCornSurface
+        name: BagCornSurface, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: BagCornSurface
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: BagCornSurface
+          m_TextWithWhitespace: "BagCornSurface\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: ecc42fb442cb07c48ab299c261982a75, type: 3}
+        hasToggle: 1
+      - displayName: BagInteractionPrompt
+        name: BagInteractionPrompt, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: BagInteractionPrompt
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: BagInteractionPrompt
+          m_TextWithWhitespace: "BagInteractionPrompt\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 84c68e83b9ca3ea478caa291b265c5a9, type: 3}
+        hasToggle: 1
     unityVersion: 6000.3.20f1
-    unityCount: 379
+    unityCount: 373
