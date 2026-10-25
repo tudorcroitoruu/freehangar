@@ -15,17 +15,17 @@ public sealed class ShovelTool : MonoBehaviour
     [SerializeField] private ShovelGrainPhysics grainPhysics;
     [SerializeField, Min(.1f)] private float reach = 2.6f;
     [SerializeField, Min(.1f)] private float pourReach = 4f;
-    [SerializeField, Range(0f, .75f)] private float bagAimPadding = .35f;
+    [SerializeField, Range(.16f, .8f)] private float aimedGripTravel = .65f;
     [SerializeField, Min(.01f)] private float capacityKg = 6.5f;
     [SerializeField, Min(.05f)] private float scoopRadius = .4f;
     [SerializeField, Min(.01f)] private float scoopDepth = .18f;
     [SerializeField, Min(.1f)] private float actionDuration = 1.25f;
     [SerializeField] private LayerMask interactionMask = ~0;
     private readonly RaycastHit[] hits = new RaycastHit[32];
-    private readonly RaycastHit[] bagHits = new RaycastHit[32];
     private GrainPile pendingPile;
     private GrainContainer pendingContainer;
     private Vector3 targetPoint, restPosition, tipInHands, gripInHands;
+    private Vector3 scoopDirection, scoopTipInParent;
     private Quaternion restRotation;
     private Quaternion levelCarryRotation;
     private float carryBlend;
@@ -36,6 +36,7 @@ public sealed class ShovelTool : MonoBehaviour
     public float Kilograms { get; private set; }
     public float CapacityKg => capacityKg;
     public bool IsBusy { get; private set; }
+    public bool IsScooping => IsBusy && pendingPile != null;
     public float ActionProgress => IsBusy ? Mathf.Clamp01(elapsed / actionDuration) : 0;
     public Vector3 PositionOffset { get; private set; }
     public Quaternion RotationOffset { get; private set; } = Quaternion.identity;
@@ -72,13 +73,21 @@ public sealed class ShovelTool : MonoBehaviour
             var pile = hit.collider.GetComponentInParent<GrainPile>();
             var container = hit.collider.GetComponentInParent<GrainContainer>();
             if (container != null && container.IsOpen && container.isActiveAndEnabled &&
-                Kilograms > .0001f && container.Kilograms < container.CapacityKg)
+                !container.IsClosing && !container.IsCarried && Kilograms > .0001f)
             {
                 pendingContainer = container;
                 targetPoint = container.PourPoint + Vector3.up * .35f + camera.transform.right * .3f;
                 if (grainPhysics != null) grainPhysics.SetPourTarget(container.PourPoint, container.GetComponent<Collider>());
             }
-            else if (pile != null && pile.isActiveAndEnabled && Kilograms < capacityKg - .0001f) pendingPile = pile;
+            else if (pile != null && pile.isActiveAndEnabled && Kilograms < capacityKg - .0001f &&
+                pile.IsInsideBoundary(hit.point))
+            {
+                pendingPile = pile;
+                targetPoint = hit.point;
+                targetPoint.y = pile.SurfaceHeight(targetPoint);
+                scoopDirection = Vector3.ProjectOnPlane(camera.transform.forward, Vector3.up).normalized;
+                if (scoopDirection.sqrMagnitude < .001f) scoopDirection = player.forward;
+            }
         }
         elapsed = transferredFraction = 0;
         availableAtStart = pendingContainer != null ? Kilograms : Mathf.Max(0, capacityKg - Kilograms);
@@ -91,7 +100,7 @@ public sealed class ShovelTool : MonoBehaviour
     {
         nearest = default;
         float queryReach = Kilograms > .0001f ? Mathf.Max(reach, pourReach) : reach;
-        Ray ray = camera.ViewportPointToRay(new Vector3(.5f, .5f));
+        Ray ray = PlayerAim.CenterRay(camera);
         int count = Physics.RaycastNonAlloc(ray, hits,
             queryReach, interactionMask, QueryTriggerInteraction.Ignore);
         if (count == hits.Length) return false;
@@ -101,13 +110,6 @@ public sealed class ShovelTool : MonoBehaviour
             if (hits[i].transform.IsChildOf(player) || hits[i].distance >= distance) continue;
             nearest = hits[i]; distance = hits[i].distance;
         }
-        // A direct bag hit always wins. Otherwise allow aiming just outside its edges.
-        if (distance < float.PositiveInfinity && nearest.collider.GetComponentInParent<GrainContainer>() != null) return true;
-        if (Kilograms > .0001f && bagAimPadding > 0 && FindNearbyBag(ray, player, out RaycastHit bag))
-        {
-            nearest = bag;
-            return true;
-        }
         if (distance == float.PositiveInfinity) return false;
         // Resolve the nearest obstruction first; the longer range applies only to containers.
         return distance <= reach || nearest.collider.GetComponentInParent<GrainContainer>() != null;
@@ -116,7 +118,7 @@ public sealed class ShovelTool : MonoBehaviour
     public GrainContainer FindBagForHandling(Camera camera, Transform player)
     {
         if (camera == null || player == null) return null;
-        Ray ray = camera.ViewportPointToRay(new Vector3(.5f, .5f));
+        Ray ray = PlayerAim.CenterRay(camera);
         int count = Physics.RaycastNonAlloc(ray, hits, pourReach, interactionMask, QueryTriggerInteraction.Ignore);
         if (count == hits.Length) return null;
         float distance = float.PositiveInfinity;
@@ -128,49 +130,7 @@ public sealed class ShovelTool : MonoBehaviour
         }
         var direct = closest != null ? closest.GetComponentInParent<GrainContainer>() : null;
         if (direct != null && direct.CanHandle) return direct;
-        return FindNearbyBag(ray, player, out RaycastHit assisted, true) ? assisted.collider.GetComponentInParent<GrainContainer>() : null;
-    }
-
-    private bool FindNearbyBag(Ray ray, Transform player, out RaycastHit selected, bool forHandling = false)
-    {
-        selected = default;
-        int count = Physics.SphereCastNonAlloc(ray, bagAimPadding, bagHits, pourReach, interactionMask, QueryTriggerInteraction.Ignore);
-        if (count == bagHits.Length) return false;
-        float best = float.PositiveInfinity;
-        for (int i = 0; i < count; i++)
-        {
-            var collider = bagHits[i].collider;
-            if (collider.transform.IsChildOf(player)) continue;
-            var container = collider.GetComponentInParent<GrainContainer>();
-            if (container == null || !container.isActiveAndEnabled || container.IsCarried) continue;
-            if (forHandling ? !container.CanHandle : !container.IsOpen || container.IsClosing || container.Kilograms >= container.CapacityKg) continue;
-            if (Vector3.Distance(ray.origin, collider.ClosestPoint(ray.origin)) > pourReach) continue;
-            Vector3 center = collider.bounds.center;
-            float along = Vector3.Dot(center - ray.origin, ray.direction);
-            if (along < 0) continue;
-            float score = (collider.ClosestPoint(ray.GetPoint(along)) - ray.GetPoint(along)).sqrMagnitude + along * .0001f;
-            if (score >= best) continue;
-            // Padding is only for aim selection; a real ray must still reach the bag.
-            if (!HasBagSight(ray.origin, center, player, container) && !HasBagSight(ray.origin, container.PourPoint, player, container)) continue;
-            selected = bagHits[i]; best = score;
-        }
-        return best < float.PositiveInfinity;
-    }
-
-    private bool HasBagSight(Vector3 origin, Vector3 point, Transform player, GrainContainer container)
-    {
-        Vector3 direction = point - origin;
-        int count = Physics.RaycastNonAlloc(origin, direction.normalized, hits, direction.magnitude + .02f,
-            interactionMask, QueryTriggerInteraction.Ignore);
-        if (count == hits.Length) return false;
-        float nearest = float.PositiveInfinity;
-        Collider blocker = null;
-        for (int i = 0; i < count; i++)
-        {
-            if (hits[i].transform.IsChildOf(player) || hits[i].distance >= nearest) continue;
-            nearest = hits[i].distance; blocker = hits[i].collider;
-        }
-        return blocker != null && blocker.GetComponentInParent<GrainContainer>() == container;
+        return null;
     }
 
     public void Tick(float deltaTime)
@@ -187,20 +147,29 @@ public sealed class ShovelTool : MonoBehaviour
         float fraction = Mathf.SmoothStep(0, 1, pendingPile != null
             ? Mathf.InverseLerp(.38f, .56f, phase) : Mathf.InverseLerp(.32f, .67f, phase));
         float amount = (fraction - transferredFraction) * availableAtStart;
-        transferredFraction = fraction;
+        if (pendingPile == null) transferredFraction = fraction;
         if (amount > 0 && actionCamera != null && actor != null && FindHit(actionCamera, actor, out RaycastHit hit))
         {
-            if (pendingPile != null && hit.collider.GetComponentInParent<GrainPile>() == pendingPile &&
-                Vector2.Distance(new Vector2(hit.point.x, hit.point.z), new Vector2(targetPoint.x, targetPoint.z)) <= scoopRadius)
+            if (pendingPile != null && phase <= .58f && hit.collider.GetComponentInParent<GrainPile>() == pendingPile && HasScoopContact())
             {
                 Vector3 point = targetPoint; point.y = pendingPile.SurfaceHeight(point);
                 float collected = pendingPile.Scoop(point, scoopRadius, scoopDepth, Mathf.Min(amount, capacityKg - Kilograms));
                 Kilograms += collected;
+                transferredFraction = fraction;
                 if (collected > 0 && grainPhysics != null)
                     grainPhysics.EmitScoop(pendingPile, point, scoopRadius, collected / capacityKg);
             }
-            else if (pendingContainer != null && hit.collider.GetComponentInParent<GrainContainer>() == pendingContainer)
-                Kilograms -= pendingContainer.Add(Mathf.Min(amount, Kilograms));
+            else if (pendingContainer != null && hit.collider.GetComponentInParent<GrainContainer>() == pendingContainer &&
+                pendingContainer.isActiveAndEnabled && pendingContainer.IsOpen &&
+                !pendingContainer.IsClosing && !pendingContainer.IsCarried)
+            {
+                float poured = Mathf.Min(amount, Kilograms);
+                pendingContainer.Add(poured);
+                // Finish emptying the shovel even when the last pour exceeds the bag's
+                // capacity. Excess is discarded; the container remains capped.
+                Kilograms = Mathf.Max(0, Kilograms - poured);
+                if (fraction >= 1f && Kilograms < .001f) Kilograms = 0;
+            }
             if (grainPhysics != null) grainPhysics.SetFill(Kilograms / capacityKg);
         }
         if (pendingPile != null && grainPhysics != null)
@@ -215,9 +184,9 @@ public sealed class ShovelTool : MonoBehaviour
 
     private void UpdatePose(float phase)
     {
+        if (pendingPile != null) { UpdateScoopPose(phase); return; }
         Vector3 restTip = restPosition + restRotation * tipInHands;
         Vector3 contact = transform.parent.InverseTransformPoint(targetPoint);
-        if (pendingPile != null) contact += transform.parent.InverseTransformVector(Vector3.down * .10f + actionCamera.transform.forward * .08f);
         Vector3 lifted = contact + transform.parent.InverseTransformVector(Vector3.up * .22f - actionCamera.transform.forward * .13f);
         Vector3 a, b;
         Quaternion ra, rb;
@@ -240,12 +209,6 @@ public sealed class ShovelTool : MonoBehaviour
         { a = restTip; b = restTip + new Vector3(.025f, .055f, -.1f); ra = Quaternion.identity; rb = windup; t = phase / .16f; }
         else if (phase < .38f)
         { a = restTip + new Vector3(.025f, .055f, -.1f); b = contact; ra = windup; rb = insert; t = (phase - .16f) / .22f; }
-        else if (pendingPile != null && phase < .56f)
-        { a = contact; b = contact; ra = insert; rb = insert; t = 0; }
-        else if (pendingPile != null && phase < .78f)
-        { a = contact; b = lifted; ra = insert; rb = lift; t = (phase - .56f) / .22f; }
-        else if (pendingPile != null)
-        { a = lifted; b = restTip; ra = lift; rb = Quaternion.identity; t = (phase - .78f) / .22f; }
         else if (phase < .68f)
         { a = contact; b = pendingContainer != null ? contact : lifted; ra = insert; rb = lift; t = (phase - .38f) / .3f; }
         else
@@ -262,6 +225,59 @@ public sealed class ShovelTool : MonoBehaviour
         PositionOffset = pivotCorrection + Vector3.ClampMagnitude(gripTravel, maximumGripTravel);
     }
 
+    private bool HasScoopContact()
+    {
+        if (!pendingPile.isActiveAndEnabled || !pendingPile.IsInsideBoundary(bladeTip.position)) return false;
+        Vector3 difference = bladeTip.position - targetPoint;
+        float surface = pendingPile.SurfaceHeight(bladeTip.position);
+        return new Vector2(difference.x, difference.z).sqrMagnitude <= scoopRadius * scoopRadius &&
+            bladeTip.position.y <= surface + .06f && bladeTip.position.y >= surface - scoopDepth - .12f;
+    }
+
+    private void UpdateScoopPose(float phase)
+    {
+        Vector3 restTip = transform.parent.TransformPoint(restPosition + restRotation * tipInHands);
+        Vector3 windup = restTip - scoopDirection * .12f + Vector3.up * .07f;
+        Vector3 entry = targetPoint - scoopDirection * .04f + Vector3.up * .035f;
+        Vector3 buried = targetPoint + scoopDirection * .12f - Vector3.up * Mathf.Min(.18f, scoopDepth);
+        Vector3 lifted = targetPoint - scoopDirection * .13f + Vector3.up * .26f;
+        Vector3 a, b;
+        float t, roll;
+        if (phase < .12f)
+        { a = restTip; b = windup; t = phase / .12f; roll = Mathf.Lerp(0, -4, t); }
+        else if (phase < .34f)
+        { a = windup; b = entry; t = (phase - .12f) / .22f; roll = Mathf.Lerp(-4, 2, t); }
+        else if (phase < .47f)
+        { a = entry; b = buried; t = (phase - .34f) / .13f; roll = Mathf.Lerp(2, -5, t); }
+        else if (phase < .55f)
+        { a = buried; b = buried; t = (phase - .47f) / .08f; roll = Mathf.Lerp(-5, -3, t); }
+        else if (phase < .80f)
+        { a = buried; b = lifted; t = (phase - .55f) / .25f; roll = Mathf.Lerp(-3, 5, t); }
+        else
+        { a = lifted; b = restTip; t = (phase - .80f) / .20f; roll = Mathf.Lerp(5, 0, t); }
+        float eased = Mathf.SmoothStep(0, 1, t);
+        // Accelerate into the pile, then brace briefly before levering the load out.
+        if (phase >= .34f && phase < .47f) eased = t * t;
+        Vector3 tip = Vector3.Lerp(a, b, eased);
+        // A short levering arc gives the filled blade weight on the way out.
+        if (phase >= .55f && phase < .80f) tip += Vector3.up * (Mathf.Sin(t * Mathf.PI) * .045f);
+        scoopTipInParent = transform.parent.InverseTransformPoint(tip);
+        Vector3 restGrip = restPosition + restRotation * gripInHands;
+        Vector3 shaft = tipInHands - gripInHands;
+        RotationOffset = Quaternion.Inverse(restRotation) * Quaternion.FromToRotation(restRotation * shaft,
+            scoopTipInParent - restGrip) * restRotation * Quaternion.AngleAxis(roll, shaft.normalized);
+        PositionOffset = ScoopOffset(RotationOffset);
+    }
+
+    private Vector3 ScoopOffset(Quaternion rotation)
+    {
+        Vector3 pivot = restRotation * (gripInHands - rotation * gripInHands);
+        Vector3 travel = scoopTipInParent - (restPosition + restRotation * rotation * tipInHands) - pivot;
+        travel.x = Mathf.Clamp(travel.x, -aimedGripTravel, aimedGripTravel);
+        travel.y = Mathf.Clamp(travel.y, -.10f, .10f);
+        return pivot + Vector3.ClampMagnitude(travel, aimedGripTravel);
+    }
+
     public void ComposePresentation(float dt, Vector2 sway, float turnRoll, Vector3 idle,
         out Vector3 offset, out Quaternion rotation)
     {
@@ -273,6 +289,13 @@ public sealed class ShovelTool : MonoBehaviour
         Quaternion motion = Quaternion.Euler(sway.y * swayScale, -sway.x * swayScale, turnRoll * swayScale);
         rotation = motion * Quaternion.Slerp(Quaternion.identity, levelCarryRotation, carryBlend) * action;
         rotation = LimitDownwardTilt(rotation);
+        if (IsScooping)
+        {
+            // Solve contact after leveling/tilt limits, so cosmetic carry rotation cannot
+            // pull the blade back out of the grain during the cutting stroke.
+            offset = ScoopOffset(rotation);
+            return;
+        }
         // Compose every cosmetic rotation at the same handle anchor, preserving its reach limit.
         offset = (IsBusy ? PositionOffset : idle) + restRotation * (action * gripInHands - rotation * gripInHands);
     }

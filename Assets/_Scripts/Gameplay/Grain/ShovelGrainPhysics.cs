@@ -14,7 +14,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     [SerializeField, HideInInspector] private float[] bowlFloor;
     private const float Radius = .012f;
     private const int StreamCapacity = 256;
-    private const int PackedCapacity = 432;
+    private const int PackedCapacity = 720;
     private readonly Vector3[] packedPositions = new Vector3[PackedCapacity];
     private readonly Quaternion[] packedRotations = new Quaternion[PackedCapacity];
     private Vector3[] positions, velocities;
@@ -63,7 +63,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         random = new System.Random(213);
         previousPosition = transform.position;
         previousRotation = transform.rotation;
-        for (int layer = 0; layer < 3; layer++)
+        for (int layer = 0; layer < 5; layer++)
         for (int z = 0; z < 12; z++)
         for (int x = 0; x < 12; x++)
         {
@@ -142,7 +142,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         for (int i = 0; i < PackedCapacity; i++)
         {
             Vector3 p = packedPositions[i];
-            float reveal = Mathf.Clamp01((displayedFill * .068f - p.y) / .012f);
+            float reveal = Mathf.Clamp01((displayedFill * LoadDepth(p.z) - p.y) / .012f);
             if (reveal <= 0) continue;
             p.y += SampleFloor(0, p.z);
             if (p.y < Floor(p.x, p.z) + .008f || p.y + .02f > maximumLoadHeight) continue;
@@ -173,8 +173,8 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         {
             // Material enters over the cutting edge, then rolls into the bowl under gravity.
             // It never appears as an already formed heap in the middle of the shovel.
-            positions[count] = new Vector3(Random(-.15f, .15f), displayedFill * .065f + Random(.018f, .04f), .15f);
-            velocities[count] = new Vector3(Random(-.08f, .08f), -.12f, Random(-.65f, -.35f));
+            positions[count] = new Vector3(Random(-.15f, .15f), SampleFloor(0, .15f) + Random(.025f, .045f), .15f);
+            velocities[count] = new Vector3(Random(-.08f, .08f), -.08f, Random(-1.05f, -.75f));
             rotations[count] = Quaternion.Euler(Random(0, 180), Random(0, 360), Random(0, 180));
             count++; spawnCredit--;
         }
@@ -290,6 +290,12 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     }
 
     private static float Width(float z) => Mathf.Lerp(.135f, .197f, Mathf.InverseLerp(-.16f, .17f, z)) - .023f;
+    // Bowl -Z is the handle/base (A); +Z is the cutting edge (B).
+    // A broad rear mound fades into a thin scattering at the lip, even at full load.
+    private static float LoadDepth(float z) => Mathf.Lerp(.11f, .012f,
+        Mathf.SmoothStep(0, 1, Mathf.InverseLerp(-.14f, .16f, z)));
+    private float LoadCeiling(float z) => Mathf.Min(maximumLoadHeight - .018f,
+        SampleFloor(0, z) + .025f + displayedFill * LoadDepth(z));
     private float Floor(float x, float z)
     {
         // A kernel has volume: use the highest floor under its footprint, not just its centre.
@@ -319,7 +325,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         else if (p.x > width) { p.x = width; v.x = Mathf.Min(0, v.x); }
         // A steep side wall is not a platform: move kernels inward instead of raising
         // the ceiling with the floor and allowing a floating stack above the bowl.
-        float ceiling = maximumLoadHeight - .018f;
+        float ceiling = LoadCeiling(p.z);
         if (Floor(p.x, p.z) + .018f > ceiling)
         {
             // Find the nearest valid point along the radial direction instead of
@@ -328,15 +334,16 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
             for (int attempt = 0; attempt < 10; attempt++)
             {
                 float middle = (low + high) * .5f;
-                if (Floor(p.x * middle, p.z * middle) + .018f <= ceiling) low = middle;
+                if (Floor(p.x * middle, p.z * middle) + .018f <= LoadCeiling(p.z * middle)) low = middle;
                 else high = middle;
             }
             Vector3 normal = new Vector3(p.x, 0, p.z).normalized;
             p.x *= low; p.z *= low;
             v -= normal * Mathf.Max(0, Vector3.Dot(v, normal));
+            ceiling = LoadCeiling(p.z);
         }
         float floor = Mathf.Min(ceiling - .018f,
-            Mathf.Max(Floor(p.x, p.z), SampleFloor(0, p.z) + displayedFill * .047f));
+            Mathf.Max(Floor(p.x, p.z), SampleFloor(0, p.z) + displayedFill * LoadDepth(p.z) * .72f));
         if (p.y < floor + .018f) { p.y = floor + .018f; v.y = Mathf.Max(0, v.y); v.x *= .86f; v.z *= .86f; }
         if (p.y > ceiling) { p.y = ceiling; v.y = Mathf.Min(0, v.y); }
         positions[i] = p; velocities[i] = v;

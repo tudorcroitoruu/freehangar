@@ -1,5 +1,7 @@
 # Unity project context
 
+2026-10-25 shovel contact revision: scooping selects the center aim-dot hit point (superseding nearest-blade selection), performs an insertion/lever/extraction gesture with contact-gated grain transfer, and temporarily uses world depth for burial. The load is denser at the handle/base (-Z, A) and thinner at the cutting edge (+Z, B). Tilt limits and mass accounting are preserved; aimed scoops have a separate 0.65 m grip envelope to reach across from the right-hand carry pose. Pouring and bag handling require direct aim-dot hits. `output/GrainPrototype/ValidateContactScoop.cs` validates an isolated runtime rig with cleanup; see the latest section of GrainPrototype.md. Unsaved user scene edits were preserved, and the known corrupt NewMapTerrain asset remains unresolved.
+
 Updated 2026-10-24 at base commit 22163292.
 
 Forgiving bag aim: ShovelTool now has 0.35 m Bag Aim Padding for loaded shovels. Direct bag hits win; near misses use a bounded non-allocating sphere cast and require clear line of sight to the bag. Physical collider size, 4 m pour distance and 2.6 m scoop reach remain unchanged. ValidateBagAim.cs verifies six near-miss/obstruction/full-transfer cases.

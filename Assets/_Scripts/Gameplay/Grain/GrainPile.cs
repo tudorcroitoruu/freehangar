@@ -75,6 +75,32 @@ public sealed class GrainPile : MonoBehaviour
         return transform.TransformPoint(new Vector3(p.x, field.Sample(p.x, p.z), p.z)).y;
     }
 
+    /// <summary>Find a real grain surface near the blade, rather than the distant aim point.</summary>
+    public bool TryNearestSurface(Vector3 worldPoint, float maximumDistance, out Vector3 surface)
+    {
+        Initialize();
+        surface = default;
+        if (field == null || !isActiveAndEnabled) return false;
+        float best = maximumDistance * maximumDistance;
+        bool found = false;
+        Vector3 local = transform.InverseTransformPoint(worldPoint);
+        float heightScale = WorldScale.y;
+        // Include the point directly below the blade, then the height-field vertices.
+        for (int i = -1; i < field.Heights.Length; i++)
+        {
+            float x = i < 0 ? local.x : (i % field.Resolution) * field.Spacing - field.Size * .5f;
+            float z = i < 0 ? local.z : (i / field.Resolution) * field.Spacing - field.Size * .5f;
+            if (Mathf.Abs(x) > field.Size * .5f || Mathf.Abs(z) > field.Size * .5f) continue;
+            float height = i < 0 ? field.Sample(x, z) : field.Heights[i];
+            if (height * heightScale < .025f) continue;
+            Vector3 candidate = transform.TransformPoint(new Vector3(x, height, z));
+            float distance = (candidate - worldPoint).sqrMagnitude;
+            if (distance >= best || !IsInsideBoundary(candidate, .025f)) continue;
+            surface = candidate; best = distance; found = true;
+        }
+        return found;
+    }
+
     private void Awake() => Initialize();
     private void OnEnable() => Initialize();
 

@@ -36,6 +36,7 @@ public sealed class HeldToolPass : CustomPass
     public Camera worldCamera;
     public Camera toolCamera;
     public LayerMask toolLayer;
+    private ShovelTool shovel;
 
     protected override void AggregateCullingParameters(ref ScriptableCullingParameters parameters, HDCamera camera)
     {
@@ -47,16 +48,28 @@ public sealed class HeldToolPass : CustomPass
     protected override void Execute(CustomPassContext ctx)
     {
         if (ctx.hdCamera.camera != worldCamera || toolCamera == null) return;
-        // Screen-space AO describes world geometry behind the overlay, not the tool.
-        // Sampling it here prints the background onto otherwise opaque materials.
+        // Neither draw path populated the world AO buffer with the shovel's geometry.
+        // Apply the same neutral AO during insertion, or the pile is imprinted on the metal.
         Texture worldAO = Shader.GetGlobalTexture(AmbientOcclusionTexture);
         ctx.cmd.SetGlobalTexture(AmbientOcclusionTexture, TextureXR.GetBlackTexture());
-        // Preserve scene colour and scene depth. Only clear the separate tool depth,
-        // so the shovel can occlude its own contents without intersecting world geometry.
-        CustomPassUtils.RenderFromCamera(ctx, toolCamera, ctx.cameraColorBuffer,
-            ctx.customDepthBuffer.Value, ClearFlag.Depth, toolLayer,
-            overrideRenderState: new RenderStateBlock(RenderStateMask.Depth)
-            { depthState = new DepthState(true, CompareFunction.LessEqual) });
+        if (shovel == null) shovel = worldCamera.GetComponentInChildren<ShovelTool>();
+        if (shovel != null && shovel.IsScooping)
+        {
+            // The cutting blade and its load must disappear behind the pile while buried.
+            // Use the world camera's projection with its existing depth for this action.
+            CustomPassUtils.RenderFromCamera(ctx, worldCamera, ctx.cameraColorBuffer,
+                ctx.cameraDepthBuffer, ClearFlag.None, toolLayer,
+                overrideRenderState: new RenderStateBlock(RenderStateMask.Depth)
+                { depthState = new DepthState(true, CompareFunction.LessEqual) });
+        }
+        else
+        {
+            // Only clear the separate tool depth during ordinary carrying/pouring.
+            CustomPassUtils.RenderFromCamera(ctx, toolCamera, ctx.cameraColorBuffer,
+                ctx.customDepthBuffer.Value, ClearFlag.Depth, toolLayer,
+                overrideRenderState: new RenderStateBlock(RenderStateMask.Depth)
+                { depthState = new DepthState(true, CompareFunction.LessEqual) });
+        }
         if (worldAO != null) ctx.cmd.SetGlobalTexture(AmbientOcclusionTexture, worldAO);
     }
 }

@@ -82,6 +82,7 @@ public class PlayerController : MonoBehaviour
         standingCenter = characterController.center;
         cameraRestPosition = characterCamera.transform.localPosition;
         previousPresentationCamera = characterCamera.transform.rotation;
+        if (!TryGetComponent<PlayerAim>(out _)) gameObject.AddComponent<PlayerAim>();
         if (heldInstrument != null)
         {
             instrumentRestPosition = heldInstrument.localPosition;

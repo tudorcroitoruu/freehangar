@@ -105,3 +105,36 @@ Added HeldTools layer (slot 8 in ProjectSettings/TagManager.asset) and applied i
 Tools > Grain > Set up held-tool camera configures the current player through the Editor. The scene setup and layer are saved. Play Mode visual checks with an opaque wall 0.5 m in front of the camera confirm the complete shovel and loaded corn remain visible. Normal pile view also inspected (ToolCameraWall.png and ToolCameraPile.png). Camera masks and airborne layer checks pass; Console has no errors. This change hides visual wall intersections, not physical reach or interaction obstructions. Carried bags retain their existing world rendering.
 
 Held-tool opacity follow-up: the apparent transparency was world screen-space ambient occlusion imprinting the background onto the opaque tool pass. HeldToolPass now temporarily binds neutral black AO while drawing tools, then restores the world AO texture. The original HDRP/Lit material remains in use; no custom shader or global volume change is required. Inspected ToolOpaqueFixed.png in Play Mode with world AO still active; the bowl is solid and the background pattern is gone. Compilation completed successfully. Temporary shader experiments were removed.
+
+## Blade contact and tapered shovel load (2026-10-25)
+
+Aiming selects the pile; the scoop targets its surface nearest the actual blade within 0.8 m. The gesture now anticipates, approaches the surface, pushes down/forward, levers the filled blade upward, and settles back into the carry pose. Pose solving preserves the existing 0.16 m grip travel and 25-degree downward/30-degree upward shaft limits. Corn transfers only during the cutting window with actual blade contact, a valid aimed pile and an unobstructed ray. Step closer or crouch when the blade cannot physically reach the surface; a distant aim no longer produces a remote pickup.
+
+While scooping, HeldToolPass draws the shovel and load against world depth so the pile can occlude the buried cutting edge. Normal carrying and pouring retain the independent tool-depth pass. The load profile is thicker at local -Z, the handle/base side A, and tapers to local +Z, the cutting edge B. The packed interior has up to 720 cached positions (only revealed positions draw) under the existing 192 moving surface kernels. Grain enters at the lip and rolls back into the bowl; the 7.5 cm overall height cap and sleeping behavior remain in place.
+
+Validation uses an isolated temporary runtime player/pile and restores global state in `finally`, without disabling or repositioning the scene's real player. Run in Play Mode:
+
+```powershell
+unity command script run --file output/GrainPrototype/ValidateContactScoop.cs --entry ValidateContactScoop.Main --timeout 60 --json
+```
+
+The final run collected 6.50 kg beginning at phase 0.40, lifted the blade 0.344 m, and kept grip movement within 0.160 m. It verified mass conservation, tilt/containment/sleep, a denser and higher rear load (188 versus 106 visible kernels in the sampled rear/front bands), dry swings, cancellation, solid obstruction, full capacity, partial pouring, queued actions and empty-load cleanup. Unity compilation passed without errors or warnings. Visual captures in `output/GrainPrototype/ContactScoop` show insertion, extraction and an elevated view of the tapered load. These use a temporary cone pile for inspection; they do not replace or rebuild the user's scene pile. The pre-existing damaged NewMapTerrain asset still reports loading errors.
+
+For a single visual capture, pass `--args '[true,36]'` for insertion, `[true,53]` for extraction or `[true,-1]` for the settled overhead load. The older `ValidateScoopSequence` stationary-cut expectation is superseded by the moving insertion stroke. Older interactive preview scripts leave the real player disabled and must not be used as saveable scene authoring tools.
+
+### Stronger insertion and scoop opacity follow-up
+The cutting stroke now accelerates over phases 0.34-0.47 into an 18 cm target depth, braces until 0.55, then levers out. The larger anticipation and shorter thrust make insertion more forceful while preserving the grip and tilt limits. The isolated test now requires at least 6 cm of actual blade penetration; it passes with a full 6.50 kg pickup and a 0.407 m extraction lift.
+
+The scoop world-depth branch now uses the same neutral ambient-occlusion binding as the normal carry branch. This prevents background AO from imprinting on opaque metal during insertion. World depth still correctly hides the buried edge. Inspected insertion/extraction captures; Unity compilation has zero errors/warnings, and the pre-existing terrain load error remains.
+
+## Center aim dot (2026-10-25)
+PlayerController creates a PlayerAim HUD at runtime, so existing scene and prefab instances need no manual wiring. A 6-pixel white dot with dark outline follows the camera viewport center. It does not receive UI raycasts and hides when the controller/camera is disabled, time is paused or the cursor is unlocked.
+
+Shovel scoops lock the center-ray hit position at click time instead of choosing the surface nearest the blade. Animation and excavation share this point. The aimed stroke permits up to 0.65 m of grip travel to reach from the right-hand carry pose; ordinary carrying/pouring retain their existing limits. Actual blade contact, reach and obstacle checks remain required. Bag pouring and handling now require a direct dot hit; previous forgiving bag aim is superseded. PlayerAim.CenterRay is the shared entry point for additional instruments; no other functional instrument was found in the project.
+
+Unity compilation passed without errors/warnings. The isolated scoop validation passed exact aim-position selection, a full 6.50 kg pickup, off-dot bag rejection, centered pouring, obstruction and mass conservation. Runtime HUD checks passed center placement, noninteractive UI, visible gameplay and hidden paused/unlocked states. The existing terrain loading error remains unrelated.
+
+## Empty shovel on final bag pour
+A valid pour into an open bag now empties the entire shovel even if only part fits. The bag stays capped at its capacity; excess is discarded as an intentional gameplay rule. An already-full open bag also accepts the emptying gesture. Closed, closing, carried, disabled and obstructed targets do not drain the shovel. The existing pour animation and fill updates remove both packed and moving corn. This supersedes retaining leftovers after partial-capacity pours.
+
+Compilation passed. Isolated Play Mode checks passed a 6.5 kg pour into 2 kg of available space and a 1 kg pour into an already-full bag, each leaving the shovel at zero and the bag at 50 kg. After settling, both visible kernel counts were zero.
