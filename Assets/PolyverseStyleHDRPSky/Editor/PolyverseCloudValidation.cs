@@ -47,6 +47,9 @@ namespace Liviu.Environment.HDRP.Editor
                 material.SetVector("_CloudsRotationAxis", Vector3.up);
                 material.SetColor("_CloudsLightColor", Color.white);
                 material.SetColor("_CloudsShadowColor", Color.white);
+                material.SetVector("_CloudsSunDirection", new Vector3(-0.6f, 0.7f, 0.35f).normalized);
+                material.SetVector("_CloudsSunTint", Vector3.one);
+                material.SetVector("_CloudsLighting", new Vector4(0.9f, 0.18f, 0.45f, 0.18f));
                 var matrix = Matrix4x4.zero;
                 matrix.m00 = 2f / target.width;
                 matrix.m11 = -1.2f / target.height;
@@ -165,6 +168,17 @@ namespace Liviu.Environment.HDRP.Editor
                 material.SetMatrix("_PixelCoordToViewDirWS", distantMatrix);
                 float distantCoverage = Average(Render(material, target, 0f));
                 material.SetMatrix("_PixelCoordToViewDirWS", matrix);
+                material.SetColor("_CloudsLightColor", new Color(1f, 0.96f, 0.88f));
+                material.SetColor("_CloudsShadowColor", new Color(0.64f, 0.70f, 0.80f));
+                var lit = Render(material, target, 0f, "clouds-lighting-reference");
+                material.SetVector("_CloudsSunDirection", new Vector3(0.6f, -0.7f, -0.35f).normalized);
+                float sunDirectionDifference = Difference(lit, Render(material, target, 0f));
+                material.SetVector("_CloudsSunDirection", new Vector3(-0.6f, 0.7f, 0.35f).normalized);
+                material.SetVector("_CloudsLighting", new Vector4(0f, 0.18f, 0.45f, 0f));
+                float directLightDifference = Difference(lit, Render(material, target, 0f));
+                material.SetVector("_CloudsLighting", new Vector4(0.9f, 0.18f, 0.45f, 0.18f));
+                material.SetColor("_CloudsLightColor", Color.white);
+                material.SetColor("_CloudsShadowColor", Color.white);
                 material.SetVector("_CloudsShape", new Vector4(0, 3f, 0.08f, 0.35f));
                 float clear = Average(Render(material, target, 0f));
                 material.SetVector("_CloudsShape", new Vector4(1, 3f, 0.08f, 0.35f));
@@ -189,6 +203,7 @@ namespace Liviu.Environment.HDRP.Editor
                     bool passed = evolution > 0.005f && wind > 0.005f && frozen < 0.00001f
                                   && opacityError < 0.005f && fadeError < 0.005f
                                   && zeroFade < 0.001f && zeroOpacity < 0.001f
+                                  && sunDirectionDifference > 0.005f && directLightDifference > 0.005f
                                   && rotation > 0.005f && horizonBand > 0.99f
                                   && aboveLimit < 0.001f && limitedZenith < 0.001f && zeroHeight < 0.001f
                                   && zenithCoverage > 0.005f && distantCoverage < 0.001f && breakupDifference > 0.0003f
@@ -197,6 +212,7 @@ namespace Liviu.Environment.HDRP.Editor
                     string report = $"passed={passed}\nevolutionDifference={evolution}\nwindDifference={wind}\nfrozenDifference={frozen}\nmaximumBoundaryJump={boundaryJump}\nzenithCoverage={zenithCoverage}\ndistantCoverage={distantCoverage}\nbreakupDifference={breakupDifference}\nerodedPixels={erodedPixels}\nretainedPixels={retainedPixels}\nclearCoverage={clear}\nfullCoverage={overcast}\nbelowHorizon={belowHorizon}\ncubemapCoverage={cubemap}\n";
                     report += $"rotationDifference={rotation}\nhorizonBand={horizonBand}\naboveHeightLimit={aboveLimit}\nlimitedZenith={limitedZenith}\nzeroHeight={zeroHeight}\n";
                     report += $"opacityError={opacityError}\nfadeError={fadeError}\nzeroFade={zeroFade}\nzeroOpacity={zeroOpacity}\n";
+                    report += $"sunDirectionDifference={sunDirectionDifference}\ndirectLightDifference={directLightDifference}\n";
                     File.WriteAllText("Library/PolyverseCloudValidation.txt", report);
                     if (!passed) throw new InvalidOperationException(report);
                     Debug.Log("[Polyverse Clouds] GPU animation validation passed.\n" + report);

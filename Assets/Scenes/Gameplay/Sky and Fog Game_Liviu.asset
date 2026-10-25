@@ -830,7 +830,7 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: {x: 0, y: 0, z: 1}
   enableMoon:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   moonTexture:
     m_OverrideState: 1
@@ -918,10 +918,25 @@ MonoBehaviour:
     m_Value: 0.35
   cloudsLightColor:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 0.96, b: 0.88, a: 1}
+    m_Value: {r: 1, g: 0.99558234, b: 0.9764151, a: 1}
   cloudsShadowColor:
     m_OverrideState: 1
-    m_Value: {r: 0.55, g: 0.65, b: 0.82, a: 1}
+    m_Value: {r: 0.64, g: 0.7, b: 0.8, a: 1}
+  cloudsFollowSceneSun:
+    m_OverrideState: 1
+    m_Value: 1
+  cloudsDirectLight:
+    m_OverrideState: 1
+    m_Value: 0.9
+  cloudsAmbientFill:
+    m_OverrideState: 1
+    m_Value: 0.18
+  cloudsLightSoftness:
+    m_OverrideState: 1
+    m_Value: 0.45
+  cloudsSilverLining:
+    m_OverrideState: 1
+    m_Value: 0.18
   enableCloudsRotation:
     m_OverrideState: 1
     m_Value: 0

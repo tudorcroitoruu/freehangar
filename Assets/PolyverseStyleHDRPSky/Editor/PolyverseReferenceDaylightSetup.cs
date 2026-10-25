@@ -42,8 +42,13 @@ namespace Liviu.Environment.HDRP.Editor
             sky.cloudsEvolutionSpeed.Override(0.025f);
             sky.cloudsDeformation.Override(0.35f);
             sky.enableCloudsRotation.Override(false);
+            sky.cloudsFollowSceneSun.Override(true);
+            sky.cloudsDirectLight.Override(0.9f);
+            sky.cloudsAmbientFill.Override(0.18f);
+            sky.cloudsLightSoftness.Override(0.45f);
+            sky.cloudsSilverLining.Override(0.18f);
             sky.cloudsLightColor.Override(new Color(1f, 0.96f, 0.88f));
-            sky.cloudsShadowColor.Override(new Color(0.55f, 0.65f, 0.82f));
+            sky.cloudsShadowColor.Override(new Color(0.64f, 0.70f, 0.80f));
             if (profile.TryGet<VolumetricClouds>(out var clouds))
             {
                 Undo.RecordObject(clouds, "Use Polyverse procedural clouds");
@@ -123,8 +128,13 @@ namespace Liviu.Environment.HDRP.Editor
             sky.cloudsWindVelocity.Override(new Vector2(0.003f, 0.001f));
             sky.cloudsEvolutionSpeed.Override(0.025f);
             sky.cloudsDeformation.Override(0.35f);
+            sky.cloudsFollowSceneSun.Override(true);
+            sky.cloudsDirectLight.Override(0.9f);
+            sky.cloudsAmbientFill.Override(0.18f);
+            sky.cloudsLightSoftness.Override(0.45f);
+            sky.cloudsSilverLining.Override(0.18f);
             sky.cloudsLightColor.Override(new Color(1f, 0.96f, 0.88f));
-            sky.cloudsShadowColor.Override(new Color(0.55f, 0.65f, 0.82f));
+            sky.cloudsShadowColor.Override(new Color(0.64f, 0.70f, 0.80f));
             if (profile.TryGet<VolumetricClouds>(out var clouds))
             {
                 Undo.RecordObject(clouds, "Use Polyverse procedural clouds");

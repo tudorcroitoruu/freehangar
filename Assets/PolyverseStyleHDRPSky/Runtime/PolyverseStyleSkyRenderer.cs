@@ -95,6 +95,9 @@ namespace Liviu.Environment.HDRP
         private static readonly int CloudsBreakup = Shader.PropertyToID("_CloudsBreakup");
         private static readonly int CloudsLightColor = Shader.PropertyToID("_CloudsLightColor");
         private static readonly int CloudsShadowColor = Shader.PropertyToID("_CloudsShadowColor");
+        private static readonly int CloudsSunDirection = Shader.PropertyToID("_CloudsSunDirection");
+        private static readonly int CloudsSunTint = Shader.PropertyToID("_CloudsSunTint");
+        private static readonly int CloudsLighting = Shader.PropertyToID("_CloudsLighting");
         private static readonly int EnableCloudsRotation = Shader.PropertyToID("_EnableCloudsRotation");
         private static readonly int CloudsRotation = Shader.PropertyToID("_CloudsRotation");
         private static readonly int CloudsRotationAxis = Shader.PropertyToID("_CloudsRotationAxis");
@@ -254,6 +257,22 @@ namespace Liviu.Environment.HDRP
             properties.SetFloat(CloudsBreakup, sky.cloudsBreakup.value);
             properties.SetColor(CloudsLightColor, sky.cloudsLightColor.value);
             properties.SetColor(CloudsShadowColor, sky.cloudsShadowColor.value);
+            var cloudSun = sky.cloudsFollowSceneSun.value ? builtinParams.sunLight : null;
+            properties.SetVector(CloudsSunDirection, cloudSun != null
+                ? -cloudSun.transform.forward : SafeDirection(sky.sunDirection.value, Vector3.up));
+            Color cloudSunTint = Color.white;
+            if (cloudSun != null)
+            {
+                cloudSunTint = cloudSun.color.linear;
+                if (cloudSun.useColorTemperature)
+                    cloudSunTint *= Mathf.CorrelatedColorTemperatureToRGB(cloudSun.colorTemperature).linear;
+                float maximum = Mathf.Max(cloudSunTint.r, Mathf.Max(cloudSunTint.g, cloudSunTint.b));
+                cloudSunTint /= Mathf.Max(maximum, 0.0001f);
+                cloudSunTint = Color.Lerp(Color.white, cloudSunTint, 0.35f);
+            }
+            properties.SetColor(CloudsSunTint, cloudSunTint);
+            properties.SetVector(CloudsLighting, new Vector4(sky.cloudsDirectLight.value,
+                sky.cloudsAmbientFill.value, sky.cloudsLightSoftness.value, sky.cloudsSilverLining.value));
             properties.SetInt(EnableCloudsRotation, sky.enableCloudsRotation.value ? 1 : 0);
             properties.SetFloat(CloudsRotation, sky.cloudsRotation.value);
             properties.SetVector(CloudsRotationAxis, SafeDirection(sky.cloudsRotationAxis.value, Vector3.up));

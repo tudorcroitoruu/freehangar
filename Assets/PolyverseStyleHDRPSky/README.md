@@ -145,6 +145,17 @@ straight up to check the underside; it does not move gameplay cameras.
 
 ## Cloud rotation and maximum elevation
 
+The `Cloud Lighting` box lights procedural cloud lobes using normals from the
+smooth merged volume, avoiding hard seams between ellipsoids. `Clouds Follow
+Scene Sun` uses HDRP's sun direction and a gentle tint from its colour/temperature;
+without a scene sun it falls back to the sky's `Sun Direction`, independently of
+the sun-disc toggle. Tint is normalized rather than using lux as skybox brightness.
+`Clouds Direct Light` controls directional contrast, `Clouds Ambient Fill` fills
+shadows, `Clouds Light Softness` softens the light/shadow boundary, and
+`Clouds Silver Lining` adds an edge when viewing clouds toward the sun.
+Light and shadow colours remain art controls. Lighting does not change opacity
+or distance fading. Cubemap clouds keep their authored lighting.
+
 `Enable Clouds Rotation` toggles circular motion. Use `Clouds Rotation Axis`
 `(0, 1, 0)` to rotate around the horizon and `Clouds Rotation Speed` for degrees
 per second. Linear X/Z wind remains independent and can run simultaneously.

@@ -172,6 +172,17 @@ namespace Liviu.Environment.HDRP
         public ColorParameter cloudsShadowColor =
             new(new Color(0.498f, 0.745f, 1f), DefaultOverrideState);
 
+        [Tooltip("Uses HDRP's current directional sun orientation and colour. When disabled or unavailable, uses Sun Direction from this sky.")]
+        public BoolParameter cloudsFollowSceneSun = new(true, DefaultOverrideState);
+        [Tooltip("Strength of directional illumination on procedural cloud lobes.")]
+        public ClampedFloatParameter cloudsDirectLight = new(0.9f, 0f, 1f, DefaultOverrideState);
+        [Tooltip("Light filling the shadowed side. Lower values give stronger blue shadows.")]
+        public ClampedFloatParameter cloudsAmbientFill = new(0.18f, 0f, 1f, DefaultOverrideState);
+        [Tooltip("Softness of the stylized light/shadow transition across each cloud lobe.")]
+        public ClampedFloatParameter cloudsLightSoftness = new(0.45f, 0.02f, 1f, DefaultOverrideState);
+        [Tooltip("Soft bright edge when looking toward the sun through a procedural cloud.")]
+        public ClampedFloatParameter cloudsSilverLining = new(0.18f, 0f, 1f, DefaultOverrideState);
+
         [Tooltip("Enables circular motion around Clouds Rotation Axis. Linear wind can run simultaneously; set wind to zero for rotation only.")]
         public BoolParameter enableCloudsRotation = new(false, DefaultOverrideState);
         public ClampedFloatParameter cloudsRotation = new(0f, 0f, 360f, DefaultOverrideState);
@@ -276,6 +287,11 @@ namespace Liviu.Environment.HDRP
             cloudsDeformation.overrideState = true;
             cloudsLightColor.overrideState = true;
             cloudsShadowColor.overrideState = true;
+            cloudsFollowSceneSun.overrideState = true;
+            cloudsDirectLight.overrideState = true;
+            cloudsAmbientFill.overrideState = true;
+            cloudsLightSoftness.overrideState = true;
+            cloudsSilverLining.overrideState = true;
             enableCloudsRotation.overrideState = true;
             cloudsRotation.overrideState = true;
             cloudsRotationAxis.overrideState = true;
@@ -369,6 +385,11 @@ namespace Liviu.Environment.HDRP
                 hash = hash * 23 + cloudsDeformation.GetHashCode();
                 hash = hash * 23 + cloudsLightColor.GetHashCode();
                 hash = hash * 23 + cloudsShadowColor.GetHashCode();
+                hash = hash * 23 + cloudsFollowSceneSun.GetHashCode();
+                hash = hash * 23 + cloudsDirectLight.GetHashCode();
+                hash = hash * 23 + cloudsAmbientFill.GetHashCode();
+                hash = hash * 23 + cloudsLightSoftness.GetHashCode();
+                hash = hash * 23 + cloudsSilverLining.GetHashCode();
                 hash = hash * 23 + enableCloudsRotation.GetHashCode();
                 hash = hash * 23 + cloudsRotation.GetHashCode();
                 hash = hash * 23 + cloudsRotationAxis.GetHashCode();

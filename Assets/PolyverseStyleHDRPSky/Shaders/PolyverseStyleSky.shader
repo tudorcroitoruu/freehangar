@@ -105,6 +105,9 @@ Shader "Hidden/HDRP/Sky/PolyverseStyleSky"
     float _CloudsBreakup;
     float4 _CloudsLightColor;
     float4 _CloudsShadowColor;
+    float3 _CloudsSunDirection;
+    float3 _CloudsSunTint;
+    float4 _CloudsLighting; // direct strength, ambient fill, transition softness, silver lining
     int _EnableCloudsRotation;
     float _CloudsRotation;
     float3 _CloudsRotationAxis;
@@ -190,23 +193,32 @@ Shader "Hidden/HDRP/Sky/PolyverseStyleSky"
         return lerp(lower, upper, blend.z);
     }
 
-    float CloudSmoothUnion(float a, float b)
+    float4 CloudEllipsoid(float3 position, float3 center, float3 radii)
     {
-        // A smooth union removes the visible internal cuts between the old ellipse lobes.
-        const float smoothing = 0.24;
-        float blend = saturate(0.5 + 0.5 * (a - b) / smoothing);
-        return lerp(b, a, blend) + smoothing * blend * (1.0 - blend);
+        float3 scaled = (position - center) / radii;
+        float distance = max(length(scaled), 0.0001);
+        return float4(-scaled / (radii * distance), 1.0 - distance);
     }
 
-    float CloudVolumeDensity(float3 position, float random, float life, float evolution)
+    float4 CloudMergeSurface(float4 a, float4 b)
+    {
+        const float smoothing = 0.24;
+        float blend = saturate(0.5 + 0.5 * (a.w - b.w) / smoothing);
+        return float4(lerp(b.xyz, a.xyz, blend),
+            lerp(b.w, a.w, blend) + smoothing * blend * (1.0 - blend));
+    }
+
+    float CloudVolumeDensity(float3 position, float random, float life, float evolution, out float3 normal)
     {
         float deformation = sin(evolution * 0.7 + random * TWO_PI) * _CloudsAnimation.w * 0.035;
         float variation = (random - 0.5) * _CloudsShape.w * 0.08;
-        float body = 1.0 - length((position - float3(0, -0.035, 0)) / float3(0.29, 0.085, 0.19));
-        body = CloudSmoothUnion(body, 1.0 - length((position - float3(-0.17, 0.015, 0)) / float3(0.15, 0.13, 0.15)));
-        body = CloudSmoothUnion(body, 1.0 - length((position - float3(-0.035 + deformation, 0.07, 0.015)) / float3(0.18, 0.19 + variation, 0.17)));
-        body = CloudSmoothUnion(body, 1.0 - length((position - float3(0.15, 0.025 + deformation, 0.01)) / float3(0.16, 0.15 - variation, 0.15)));
-        body = CloudSmoothUnion(body, 1.0 - length((position - float3(0.28, -0.02, -0.01)) / float3(0.11, 0.095, 0.12)));
+        float4 surface = CloudEllipsoid(position, float3(0, -0.035, 0), float3(0.29, 0.085, 0.19));
+        surface = CloudMergeSurface(surface, CloudEllipsoid(position, float3(-0.17, 0.015, 0), float3(0.15, 0.13, 0.15)));
+        surface = CloudMergeSurface(surface, CloudEllipsoid(position, float3(-0.035 + deformation, 0.07, 0.015), float3(0.18, 0.19 + variation, 0.17)));
+        surface = CloudMergeSurface(surface, CloudEllipsoid(position, float3(0.15, 0.025 + deformation, 0.01), float3(0.16, 0.15 - variation, 0.15)));
+        surface = CloudMergeSurface(surface, CloudEllipsoid(position, float3(0.28, -0.02, -0.01), float3(0.11, 0.095, 0.12)));
+        float body = surface.w;
+        normal = SafeNormalize(-surface.xyz, float3(0, 1, 0));
         float softness = max(0.025, _CloudsShape.z);
         // Empty samples and fully formed clouds do not need the erosion noise evaluations.
         if (body <= -softness) return 0.0;
@@ -236,7 +248,7 @@ Shader "Hidden/HDRP/Sky/PolyverseStyleSky"
         return (fineRank * 4.0 + coarseRank + 0.5) / 16.0;
     }
 
-    float2 CloudVolume(float3 direction, float2 cell, float cellSize, float evolution)
+    float2 CloudVolume(float3 direction, float3 sunDirection, float2 cell, float cellSize, float evolution)
     {
         float2 result = float2(0, 0.7);
         float random = Hash21(cell + 7.31);
@@ -265,6 +277,7 @@ Shader "Hidden/HDRP/Sky/PolyverseStyleSky"
             float angle = Hash21(cell + 9.17) * TWO_PI;
             float3 origin = RotateAroundAxis(-center / size, float3(0, 1, 0), angle);
             float3 ray = RotateAroundAxis(direction, float3(0, 1, 0), angle);
+            float3 lightDirection = RotateAroundAxis(sunDirection, float3(0, 1, 0), angle);
             float3 bounds = float3(0.46, 0.31, 0.31);
             float3 scaledOrigin = origin / bounds;
             float3 scaledRay = ray / bounds;
@@ -289,12 +302,18 @@ Shader "Hidden/HDRP/Sky/PolyverseStyleSky"
                     {
                         float t = nearDistance + (sampleIndex + 0.5) * stepLength;
                         float3 samplePosition = origin + ray * t;
-                        float density = CloudVolumeDensity(samplePosition, random, life, evolution);
+                        float3 normal;
+                        float density = CloudVolumeDensity(samplePosition, random, life, evolution, normal);
                         float sampleOpacity = 1.0 - exp(-density * stepLength * 32.0);
                         float weight = transmittance * sampleOpacity;
-                        // Continuous lighting avoids seams between individual lobes, including from below.
-                        float lighting = saturate(0.68 + samplePosition.y * 1.0
-                            + dot(samplePosition.xz, _SunDirection.xz) * 0.2);
+                        // The gradient of the merged volume lights each lobe without internal seams.
+                        float wrappedDiffuse = dot(normal, lightDirection) * 0.5 + 0.5;
+                        float halfSoftness = max(0.01, _CloudsLighting.z * 0.5);
+                        float diffuse = smoothstep(0.5 - halfSoftness, 0.5 + halfSoftness, wrappedDiffuse);
+                        float rim = pow(1.0 - saturate(dot(normal, -ray)), 3.0)
+                            * pow(saturate(dot(ray, lightDirection)), 4.0) * _CloudsLighting.w;
+                        float lighting = saturate(_CloudsLighting.y
+                            + (1.0 - _CloudsLighting.y) * diffuse * _CloudsLighting.x + rim);
                         litDensity += lighting * weight;
                         opacity += weight;
                         transmittance *= 1.0 - sampleOpacity;
@@ -594,6 +613,7 @@ Shader "Hidden/HDRP/Sky/PolyverseStyleSky"
             : 1.0 - smoothstep(max(0.0, _CloudsMaxHeight - 5.0), max(0.001, _CloudsMaxHeight), elevation);
         if (_CloudsMaxHeight <= 0.0 || heightFade <= 0.0) return skyColor;
         float3 cloudDirection = skyDirection;
+        float3 cloudSunDirection = SafeNormalize(_CloudsSunDirection, float3(0, 1, 0));
 
         if (_EnableCloudsRotation != 0)
         {
@@ -604,6 +624,7 @@ Shader "Hidden/HDRP/Sky/PolyverseStyleSky"
                 cloudDirection,
                 _CloudsRotationAxis,
                 -rotation);
+            cloudSunDirection = RotateAroundAxis(cloudSunDirection, _CloudsRotationAxis, -rotation);
         }
 
         cloudDirection.y -= _CloudsHeight;
@@ -644,7 +665,7 @@ Shader "Hidden/HDRP/Sky/PolyverseStyleSky"
                     [loop]
                     for (int x = -reach; x <= reach; x++)
                     {
-                        float2 cluster = CloudVolume(direction, cell + float2(x, z), cellSize, evolution);
+                        float2 cluster = CloudVolume(direction, cloudSunDirection, cell + float2(x, z), cellSize, evolution);
                         lighting = lerp(lighting, cluster.y, step(strongest + 0.000001, cluster.x));
                         strongest = max(strongest, cluster.x);
                     }
@@ -653,7 +674,7 @@ Shader "Hidden/HDRP/Sky/PolyverseStyleSky"
             float horizon = smoothstep(0.0, _CloudsHorizonFade, skyDirection.y);
             cloudShape = lerp(strongest, 1.0, smoothstep(0.85, 1.0, _CloudsShape.x)) * horizon;
             cloudShape *= step(0.0001, _CloudsShape.x);
-            cloudColor = lerp(_CloudsShadowColor.rgb, _CloudsLightColor.rgb, lerp(0.7, lighting, saturate(strongest * 4.0)));
+            cloudColor = lerp(_CloudsShadowColor.rgb, _CloudsLightColor.rgb * _CloudsSunTint, lighting);
         }
         float cloudsMask = saturate(cloudShape * _CloudsOpacity * _CloudsFade * heightFade);
         return lerp(skyColor, cloudColor, cloudsMask);
