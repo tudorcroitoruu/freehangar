@@ -24,10 +24,17 @@
 *.meta text merge=unityyamlmerge eol=lf
 *.controller text merge=unityyamlmerge eol=lf
 *.overrideController text merge=unityyamlmerge eol=lf
-*.asset text merge=unityyamlmerge eol=lf
+# .asset includes binary TerrainData and lighting data as well as YAML.
+# Forced text normalization removes CR bytes from binary assets on git add.
+*.asset text=auto merge=unityyamlmerge eol=lf
 *.playable text merge=unityyamlmerge eol=lf
 *.mask text merge=unityyamlmerge eol=lf
 *.terrainlayer text merge=unityyamlmerge eol=lf
+# These native Unity assets must also avoid YAML diff/merge handling.
+Assets/**/Terrain/*.asset binary !eol
+Assets/**/Terrains/*.asset binary !eol
+**/LightingData.asset binary !eol
+**/LightmapSnapshot.asset binary !eol
 ## MW LFS - source/art binaries ##
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.psb filter=lfs diff=lfs merge=lfs -text
