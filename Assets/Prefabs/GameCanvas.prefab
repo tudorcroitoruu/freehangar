@@ -1276,7 +1276,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &5681441617593288026
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1978,11 +1978,11 @@ MonoBehaviour:
     goalAmount: 1
     rewardAmount: 2000
   currentGoal:
-    goalId: 
-    goalDescription: 
+    goalId: tutorial_pick_up_sack
+    goalDescription: Pick up an empty sack
     stage: 0
-    hangarId: 0
-    goalType: 0
+    hangarId: 1
+    goalType: 4
     filterByGrainType: 0
     grainType: 0
     upgradeType: 0
