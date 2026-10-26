@@ -1,0 +1,7 @@
+using UnityEngine;using System;using System.IO;
+public static class ValidateBikeCollision {
+ public static string Run(){var source=UnityEngine.Object.FindFirstObjectByType<BicycleController>();GameObject floor=null,wall=null,copy=null;
+ try{floor=GameObject.CreatePrimitive(PrimitiveType.Cube);floor.transform.position=new Vector3(10000,-.5f,10000);floor.transform.localScale=new Vector3(30,1,30);wall=GameObject.CreatePrimitive(PrimitiveType.Cube);wall.transform.position=new Vector3(10000,1,10004);wall.transform.localScale=new Vector3(5,2,.2f);copy=UnityEngine.Object.Instantiate(source.gameObject,new Vector3(10000,.51f,10000),Quaternion.identity);var bike=copy.GetComponent<BicycleController>();Physics.SyncTransforms();bike.SetRidden(true);for(int i=0;i<400;i++){bike.Drive(1,0,false,.02f);Physics.SyncTransforms();}if(bike.transform.position.z>10003.8f)throw new Exception("Bike passed through wall");if(bike.transform.position.z<10002.5f)throw new Exception("Bike failed to reach wall");if(bike.transform.position.y<.4f||bike.transform.position.y>.7f)throw new Exception("Ground support failed");
+ string result="PASS: bicycle reaches wall, stays blocked and remains supported by ground; position="+bike.transform.position;File.WriteAllText("output/Bicycle/collision-validation.txt",result);return result;
+ }finally{if(copy)UnityEngine.Object.DestroyImmediate(copy);if(floor)UnityEngine.Object.DestroyImmediate(floor);if(wall)UnityEngine.Object.DestroyImmediate(wall);}}
+}

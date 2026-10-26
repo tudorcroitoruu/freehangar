@@ -34,13 +34,13 @@ public sealed class StaminaManager : MonoBehaviour
         UpdateStaminaBar();
     }
 
-    public void Tick(bool isWorking, float deltaTime, bool recoveryBlocked = false)
+    public void Tick(bool isWorking, float deltaTime, bool recoveryBlocked = false, float consumptionPerSecond = -1f)
     {
         if (!isActiveAndEnabled || !(deltaTime > 0f) || float.IsInfinity(deltaTime)) return;
         IsWorking = isWorking;
         if (isWorking)
         {
-            CurrentStamina = Mathf.Clamp(CurrentStamina - workConsumptionPerSecond * deltaTime, 0f, maxStamina);
+            CurrentStamina = Mathf.Clamp(CurrentStamina - (consumptionPerSecond >= 0f && float.IsFinite(consumptionPerSecond) ? consumptionPerSecond : workConsumptionPerSecond) * deltaTime, 0f, maxStamina);
             recoveryDelayRemaining = recoveryDelay;
             UpdateStaminaBar();
             return;

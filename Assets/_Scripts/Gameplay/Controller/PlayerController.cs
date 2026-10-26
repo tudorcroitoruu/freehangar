@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float idleAmplitude = 0.008f;
     [SerializeField, Min(0f)] private float idleFrequency = 0.8f;
 
+    private PlayerBicycleInteraction bicycleInteraction;
     private float verticalVelocity;
     private float cameraRotationX;
     private float targetYaw;
@@ -66,6 +67,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
+        bicycleInteraction = GetComponent<PlayerBicycleInteraction>();
         if (staminaManager == null && !TryGetComponent(out staminaManager))
             staminaManager = FindFirstObjectByType<StaminaManager>();
         if (staminaManager == null)
@@ -120,8 +122,11 @@ public class PlayerController : MonoBehaviour
         bool wasLocked = Cursor.lockState == CursorLockMode.Locked;
         if (Input.GetKeyDown(KeyCode.Escape))
             SetCursorLocked(false);
-        else if (Input.GetMouseButtonDown(0))
+        else if (Input.GetMouseButtonDown(0) && (bicycleInteraction == null || !bicycleInteraction.BlocksCursorCapture))
             SetCursorLocked(true);
+
+        bool bicycleInput = Application.isFocused && Time.timeScale > 0 && Cursor.lockState == CursorLockMode.Locked;
+        if (bicycleInteraction != null && bicycleInteraction.Tick(bicycleInput)) return;
 
         if (!characterController.enabled || Time.deltaTime <= 0f)
             return;
@@ -148,6 +153,13 @@ public class PlayerController : MonoBehaviour
         bool isCarrying = bagInteraction != null && bagInteraction.IsCarrying;
         bool recoveryBlocked = shovelTool != null && (shovelTool.Kilograms > 0f || shovelTool.IsBusy);
         if (staminaManager != null) staminaManager.Tick(isCarrying, Time.deltaTime, recoveryBlocked);
+    }
+
+    public void ResetLook()
+    {
+        targetYaw = transform.eulerAngles.y; yawVelocity = pitchVelocity = 0;
+        cameraRotationX = smoothedPitch = Mathf.DeltaAngle(0, characterCamera.transform.localEulerAngles.x);
+        verticalVelocity = 0;
     }
 
     private void HandleGrainScooped()

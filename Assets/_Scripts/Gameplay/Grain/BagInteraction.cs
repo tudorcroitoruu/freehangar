@@ -57,7 +57,7 @@ public sealed class BagInteraction : MonoBehaviour
     {
         if (!bag.CanHandle || !bag.IsFinished) return false;
         carried = bag;
-        originalParent = bag.transform.parent;
+        originalParent = bag.GetComponentInParent<BicycleController>() != null ? null : bag.transform.parent;
         originalScale = bag.transform.localScale;
         originalWorldScale = bag.transform.lossyScale;
         worldExtents = bag.WorldBounds.extents;
@@ -82,6 +82,23 @@ public sealed class BagInteraction : MonoBehaviour
         bag.transform.localRotation = uprightRotation;
         bag.transform.localPosition = -(uprightRotation * Vector3.Scale(localCenter, bag.transform.localScale));
         target = null;
+        return true;
+    }
+
+    public bool TryStow(Transform slot)
+    {
+        if (carried == null || slot == null) return false;
+        var bag = carried;
+        bag.transform.SetParent(slot, true);
+        bag.transform.localScale = new Vector3(originalWorldScale.x / slot.lossyScale.x, originalWorldScale.y / slot.lossyScale.y, originalWorldScale.z / slot.lossyScale.z);
+        bag.transform.rotation = Quaternion.AngleAxis(slot.eulerAngles.y, Vector3.up) * uprightRotation;
+        bag.transform.position += slot.position - bag.WorldBounds.center;
+        for (int i = 0; i < carriedColliders.Length; i++) if (carriedColliders[i] != null) carriedColliders[i].enabled = colliderStates[i];
+        carriedBody.isKinematic = true;
+        bag.SetCarried(false);
+        carried = null; target = null;
+        RestoreShovelIfNeeded();
+        Physics.SyncTransforms();
         return true;
     }
 

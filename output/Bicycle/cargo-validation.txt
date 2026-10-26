@@ -1,0 +1,1 @@
+10 filled-bag cargo checks passed, preserving mass, colliders and unloading ownership.

@@ -1,0 +1,1 @@
+PASS: bicycle reaches wall, stays blocked and remains supported by ground; position=(10000.00, 0.59, 10003.54)
