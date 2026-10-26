@@ -1,0 +1,10 @@
+Assets/NewMap/Terrain/NewMapTerrain.asset: (384.00, 80.00, 384.00), heights=513, range=0,0993713..0,5632973, layers=7, missing layer/diffuse refs=0
+Assets/NewMap/Terrain/Before road surface undulations.asset: (384.00, 80.00, 384.00), heights=513, range=0,0993713..0,5632973, layers=7, missing layer/diffuse refs=0
+Assets/NewMap/Terrain/Before variable road width.asset: (384.00, 80.00, 384.00), heights=513, range=0,0993713..0,5632973, layers=7, missing layer/diffuse refs=0
+Assets/Imported/BK/PureNature_Oasis/Models/Terrains/Oasis Dig 2.asset: (400.00, 300.00, 400.00), heights=2049, range=0,02169932..0,08340963, layers=3, missing layer/diffuse refs=2
+Assets/Imported/BK/PureNature_Oasis/Models/Terrains/Oasis Dig 3.asset: (400.00, 300.00, 400.00), heights=2049, range=0,02169932..0,08371483, layers=8, missing layer/diffuse refs=0
+Assets/Imported/BK/PureNature_Oasis/Models/Terrains/Terrain_Oasis.asset: (4098.00, 311.04, 4098.00), heights=2049, range=0..1, layers=8, missing layer/diffuse refs=0
+Assets/Imported/Toon Series/Toon Farm Pack/Terrain/TFP_Terrain_Data_Gardens.asset: (400.00, 60.00, 400.00), heights=513, range=0..0,397943, layers=10, missing layer/diffuse refs=0
+Assets/Imported/Toon Series/Toon Farm Pack/Terrain/TFP_Terrain_Data_Hay_Fields.asset: (400.00, 60.00, 400.00), heights=257, range=0..0,2246841, layers=4, missing layer/diffuse refs=0
+Assets/Imported/Toon Series/Toon Farm Pack/Terrain/TFP_Terrain_Data_Ranch.asset: (400.00, 60.00, 400.00), heights=257, range=0..0,6041018, layers=9, missing layer/diffuse refs=0
+PASS: nine Git blobs match local bytes and import under fresh GUIDs; dependencies and metas exist in Git.

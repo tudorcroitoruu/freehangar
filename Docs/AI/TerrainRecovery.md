@@ -1,5 +1,51 @@
 # Terrain missing after checkout on another PC
 
+## Recovery on 2026-10-26
+
+Rechecked at base commit `10f447f4` on the PC with the working terrain.
+The previous prevention change was present, but the nine damaged blobs below
+were still in Git. The local files have their full declared sizes and load as
+TerrainData. Git's cached file status reported them clean even though their raw
+bytes differed from HEAD; changing attributes alone had not re-staged them.
+
+Re-staged those nine existing local binaries with `git add --renormalize` under
+the corrected binary attributes. No terrain was regenerated and no GUIDs,
+scenes, layers, textures, or gameplay code were changed. The active terrain is
+now staged at 11,737,792 bytes instead of 11,737,715 bytes. Commit and push the
+staged repair so collaborators receive the intact files.
+
+Validation:
+
+- The committed HEAD fails the serialized-header size check before import.
+- All nine local files load as TerrainData. NewMap has a 513x513 heightmap,
+  size 384x80x384, seven layers with no missing layer/diffuse references, and
+  the active TerrainCollider references the same TerrainData.
+- `git checkout-index` exports of all nine staged files match their local
+  originals byte for byte (SHA-256), including with `core.autocrlf=true`.
+- All nine staged blobs pass fresh Unity imports with new GUIDs; resolved
+  dependencies and their metas are tracked. The final run took 11.2 seconds,
+  with no new Console warnings or errors. Results are saved in
+  `output/NewMap/TerrainRecovery/validation.txt`. This tests new terrain
+  imports in this project, not a full project clone on another machine.
+- `output/NewMap/Authoring/ValidateTerrainGit.cs` provides repeatable checks:
+  `Local` inspects the working assets and scene binding; `Index` imports Git
+  index blobs with fresh temporary GUIDs and checks dependencies; `Head` runs
+  the same check against the latest commit. Temporary imported assets are
+  removed in a `finally` block.
+
+Run the staged-data check in the open Editor in Edit Mode:
+
+```powershell
+unity command script run --file output/NewMap/Authoring/ValidateTerrainGit.cs --entry ValidateTerrainGit.Index --timeout 300
+```
+
+The older imported `Oasis Dig 2.asset` has two missing layer/diffuse references
+in the local baseline. This is separate from its binary corruption and does
+not affect NewMap's seven valid layers. A second-machine gameplay run remains
+the final collaborator-side check after committing, pushing, and pulling.
+
+## Original investigation (historical)
+
 Investigated on 2026-10-25 at commit a4284c8e, Unity 6000.3.20f1.
 
 ## Evidence

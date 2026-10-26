@@ -1,5 +1,12 @@
 # Unity project context
 
+Terrain checkout recovery, 2026-10-26: the nine damaged Git terrain blobs were
+re-staged from intact local sources under the existing binary attributes.
+Fresh-GUID imports and byte-identical checkout exports passed. NewMap's seven
+layers and active collider binding are valid. This supersedes the unresolved
+terrain notes below; see TerrainRecovery.md for evidence and the remaining
+commit/push and second-machine verification steps.
+
 2026-10-25 shovel contact revision: scooping selects the center aim-dot hit point (superseding nearest-blade selection), performs an insertion/lever/extraction gesture with contact-gated grain transfer, and temporarily uses world depth for burial. The load is denser at the handle/base (-Z, A) and thinner at the cutting edge (+Z, B). Tilt limits and mass accounting are preserved; aimed scoops have a separate 0.65 m grip envelope to reach across from the right-hand carry pose. Pouring and bag handling require direct aim-dot hits. `output/GrainPrototype/ValidateContactScoop.cs` validates an isolated runtime rig with cleanup; see the latest section of GrainPrototype.md. Unsaved user scene edits were preserved, and the known corrupt NewMapTerrain asset remains unresolved.
 
 Updated 2026-10-24 at base commit 22163292.
