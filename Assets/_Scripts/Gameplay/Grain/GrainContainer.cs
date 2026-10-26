@@ -59,8 +59,15 @@ public sealed class GrainContainer : MonoBehaviour
     {
         if (!isActiveAndEnabled || IsClosing || IsCarried || !IsOpen || !(amountKg > 0) || float.IsInfinity(amountKg)) return 0;
         float accepted = Mathf.Min(amountKg, Mathf.Max(0, capacityKg - kilograms));
+        bool wasFull = IsFull;
         kilograms += accepted;
         ApplyFill();
+        if (accepted > 0)
+        {
+            GoalContext.ReportProgress(this, GoalType.GrainMoved, accepted);
+            GoalContext.ReportValue(this, GoalType.SackFilled, IsFull ? capacityKg : kilograms);
+            if (!wasFull && IsFull) GoalContext.ReportProgress(this, GoalType.BagsFilled);
+        }
         return accepted;
     }
 
@@ -78,7 +85,11 @@ public sealed class GrainContainer : MonoBehaviour
         if (!IsClosing || sack == null || Time.deltaTime <= 0) return;
         sack.Close = Mathf.MoveTowards(sack.Close, 1f, Time.deltaTime / closeDuration);
         ApplyFill();
-        if (IsFinished) IsClosing = false;
+        if (IsFinished)
+        {
+            IsClosing = false;
+            GoalContext.ReportProgress(this, GoalType.SackClosed);
+        }
     }
 
     private void ApplyFill()

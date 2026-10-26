@@ -804,6 +804,104 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &2474740827845855902
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5897219100534945834}
+  - component: {fileID: 1220458540452623466}
+  - component: {fileID: 7959811235598881321}
+  - component: {fileID: 3179771295629804050}
+  m_Layer: 0
+  m_Name: Title
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &5897219100534945834
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2474740827845855902}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 9197627154868278998}
+  - {fileID: 4655328829837743943}
+  m_Father: {fileID: 5681441617593288026}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 190, y: -27.4}
+  m_SizeDelta: {x: 380, y: 40}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1220458540452623466
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2474740827845855902}
+  m_CullTransparentMesh: 1
+--- !u!114 &7959811235598881321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2474740827845855902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.2, g: 0.17254902, b: 0.14509805, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3179771295629804050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2474740827845855902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 1
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &3473515095690770554
 GameObject:
   m_ObjectHideFlags: 0
@@ -1020,6 +1118,143 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Stamina
+--- !u!1 &3894728517560426044
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4655328829837743943}
+  - component: {fileID: 1123249075443306213}
+  - component: {fileID: 2373750170587352386}
+  m_Layer: 0
+  m_Name: CurrentGoalTitle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &4655328829837743943
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3894728517560426044}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5897219100534945834}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -300.2, y: 0.000030517578}
+  m_SizeDelta: {x: 200, y: 50}
+  m_Pivot: {x: 0, y: 0.5}
+--- !u!222 &1123249075443306213
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3894728517560426044}
+  m_CullTransparentMesh: 1
+--- !u!114 &2373750170587352386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3894728517560426044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: Current Goal
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
+  m_sharedMaterial: {fileID: -1400682523365752988, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4280626227
+  m_fontColor: {r: 0.2, g: 0.17254902, b: 0.14509805, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 26
+  m_fontSizeBase: 26
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &4657142445557162779
 GameObject:
   m_ObjectHideFlags: 0
@@ -1031,6 +1266,10 @@ GameObject:
   - component: {fileID: 5681441617593288026}
   - component: {fileID: 9177764113896427486}
   - component: {fileID: 8900705061378280487}
+  - component: {fileID: 6087155364332289459}
+  - component: {fileID: 4495496357448387448}
+  - component: {fileID: 7600003791489127831}
+  - component: {fileID: 1565413576031007509}
   m_Layer: 0
   m_Name: Goals
   m_TagString: Untagged
@@ -1050,14 +1289,14 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2375384845549103011}
+  - {fileID: 5897219100534945834}
   m_Father: {fileID: 8513946829808345699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -220.87555, y: -89.01407}
-  m_SizeDelta: {x: 379.3772, y: 123.1998}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -220.87555, y: -28.3}
+  m_SizeDelta: {x: 380, y: 125}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &9177764113896427486
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1096,6 +1335,712 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6087155364332289459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4657142445557162779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce5a1c30ca075944bb504e3e384e6312, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoalsManager
+  ownCanvasGroup: {fileID: 1565413576031007509}
+  goalListElementPrefab: {fileID: 9127069809935293017, guid: 3c4689e74f074194a8ec970ce4ef62c9, type: 3}
+  allGoalSettings:
+  - goalId: tutorial_pick_up_sack
+    goalDescription: Pick up an empty sack
+    stage: 0
+    hangarId: 1
+    goalType: 4
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 0
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: tutorial_place_sack
+    goalDescription: Place the sack near the grain
+    stage: 0
+    hangarId: 1
+    goalType: 5
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 0
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: tutorial_equip_shovel
+    goalDescription: Equip your shovel
+    stage: 0
+    hangarId: 1
+    goalType: 6
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: tutorial_fill_corn_sack
+    goalDescription: Fill a sack with 50 kg of grain
+    stage: 0
+    hangarId: 1
+    goalType: 7
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 50
+    rewardAmount: 25
+  - goalId: tutorial_close_sack
+    goalDescription: Close the grain sack
+    stage: 0
+    hangarId: 1
+    goalType: 8
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: tutorial_load_sack
+    goalDescription: Load the grain sack onto the truck
+    stage: 0
+    hangarId: 1
+    goalType: 9
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 1
+    rewardAmount: 25
+  - goalId: tutorial_load_200kg_corn
+    goalDescription: Load 200 kg of grain onto the truck
+    stage: 0
+    hangarId: 1
+    goalType: 10
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 200
+    rewardAmount: 50
+  - goalId: tutorial_reach_buyer
+    goalDescription: Drive to the grain buyer
+    stage: 0
+    hangarId: 1
+    goalType: 11
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: tutorial_sell_corn
+    goalDescription: Sell your first load of grain
+    stage: 0
+    hangarId: 1
+    goalType: 12
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 1
+    rewardAmount: 50
+  - goalId: h1_earn_500
+    goalDescription: Earn $500 from grain sales
+    stage: 1
+    hangarId: 1
+    goalType: 1
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 500
+    rewardAmount: 100
+  - goalId: upgrade_larger_sack
+    goalDescription: Buy a larger sack
+    stage: 3
+    hangarId: 1
+    goalType: 13
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 1
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 100
+  - goalId: h1_deliver_500kg
+    goalDescription: Deliver 500 kg of grain
+    stage: 1
+    hangarId: 1
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 500
+    rewardAmount: 100
+  - goalId: upgrade_wheelbarrow
+    goalDescription: Buy a wheelbarrow
+    stage: 3
+    hangarId: 1
+    goalType: 13
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 2
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 100
+  - goalId: h1_move_1000kg
+    goalDescription: Move 1,000 kg of grain
+    stage: 1
+    hangarId: 1
+    goalType: 15
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 1000
+    rewardAmount: 150
+  - goalId: h1_clear_25
+    goalDescription: Clear 25% of Hangar 1
+    stage: 2
+    hangarId: 1
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 25
+    rewardAmount: 50
+  - goalId: h1_clear_50
+    goalDescription: Clear 50% of Hangar 1
+    stage: 2
+    hangarId: 1
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 50
+    rewardAmount: 100
+  - goalId: h1_clear_75
+    goalDescription: Clear 75% of Hangar 1
+    stage: 2
+    hangarId: 1
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 75
+    rewardAmount: 150
+  - goalId: h1_clear_95
+    goalDescription: Finish clearing Hangar 1
+    stage: 2
+    hangarId: 1
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 95
+    rewardAmount: 300
+  - goalId: h2_collect_key
+    goalDescription: Collect the Hangar 2 key
+    stage: 1
+    hangarId: 2
+    goalType: 17
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 50
+  - goalId: h2_unlock
+    goalDescription: Unlock Hangar 2
+    stage: 2
+    hangarId: 2
+    goalType: 18
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 100
+  - goalId: h2_fill_large_sack
+    goalDescription: Fill a large sack with 100 kg of grain
+    stage: 2
+    hangarId: 2
+    goalType: 7
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 100
+    rewardAmount: 100
+  - goalId: h2_load_1000kg
+    goalDescription: Load 1,000 kg of grain onto the truck
+    stage: 2
+    hangarId: 2
+    goalType: 10
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 1000
+    rewardAmount: 150
+  - goalId: h2_deliver_2500kg
+    goalDescription: Deliver 2,500 kg of grain
+    stage: 2
+    hangarId: 2
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 2500
+    rewardAmount: 250
+  - goalId: upgrade_hand_cart
+    goalDescription: Buy a hand cart
+    stage: 3
+    hangarId: 2
+    goalType: 13
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 3
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 150
+  - goalId: upgrade_larger_truck
+    goalDescription: Buy a larger truck
+    stage: 3
+    hangarId: 2
+    goalType: 13
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 4
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 200
+  - goalId: h2_clear_50
+    goalDescription: Clear 50% of Hangar 2
+    stage: 2
+    hangarId: 2
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 50
+    rewardAmount: 200
+  - goalId: h2_clear_75
+    goalDescription: Clear 75% of Hangar 2
+    stage: 2
+    hangarId: 2
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 75
+    rewardAmount: 250
+  - goalId: h2_clear_95
+    goalDescription: Finish clearing Hangar 2
+    stage: 2
+    hangarId: 2
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 95
+    rewardAmount: 500
+  - goalId: h3_collect_key
+    goalDescription: Collect the Hangar 3 key
+    stage: 1
+    hangarId: 3
+    goalType: 17
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 100
+  - goalId: h3_unlock
+    goalDescription: Unlock Hangar 3
+    stage: 2
+    hangarId: 3
+    goalType: 18
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 150
+  - goalId: h3_move_5000kg
+    goalDescription: Move 5,000 kg of grain
+    stage: 2
+    hangarId: 3
+    goalType: 15
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 5000
+    rewardAmount: 300
+  - goalId: upgrade_pallet_jack
+    goalDescription: Buy a pallet jack
+    stage: 3
+    hangarId: 3
+    goalType: 13
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 5
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 250
+  - goalId: h3_load_2500kg
+    goalDescription: Load 2,500 kg of grain onto the truck
+    stage: 2
+    hangarId: 3
+    goalType: 10
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 2500
+    rewardAmount: 250
+  - goalId: h3_deliver_5000kg
+    goalDescription: Deliver 5,000 kg of grain
+    stage: 2
+    hangarId: 3
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 5000
+    rewardAmount: 400
+  - goalId: h3_clear_50
+    goalDescription: Clear 50% of Hangar 3
+    stage: 2
+    hangarId: 3
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 50
+    rewardAmount: 300
+  - goalId: h3_clear_75
+    goalDescription: Clear 75% of Hangar 3
+    stage: 2
+    hangarId: 3
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 75
+    rewardAmount: 400
+  - goalId: h3_clear_95
+    goalDescription: Finish clearing Hangar 3
+    stage: 2
+    hangarId: 3
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 95
+    rewardAmount: 750
+  - goalId: h4_collect_key
+    goalDescription: Collect the Hangar 4 key
+    stage: 1
+    hangarId: 4
+    goalType: 17
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 150
+  - goalId: h4_unlock
+    goalDescription: Unlock Hangar 4
+    stage: 2
+    hangarId: 4
+    goalType: 18
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 200
+  - goalId: h4_move_10000kg
+    goalDescription: Move 10,000 kg of grain
+    stage: 2
+    hangarId: 4
+    goalType: 15
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 10000
+    rewardAmount: 400
+  - goalId: h4_load_5000kg
+    goalDescription: Load 5,000 kg of grain onto the truck
+    stage: 2
+    hangarId: 4
+    goalType: 10
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 5000
+    rewardAmount: 350
+  - goalId: h4_deliver_10000kg
+    goalDescription: Deliver 10,000 kg of grain
+    stage: 2
+    hangarId: 4
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 10000
+    rewardAmount: 600
+  - goalId: h4_clear_50
+    goalDescription: Clear 50% of Hangar 4
+    stage: 2
+    hangarId: 4
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 50
+    rewardAmount: 400
+  - goalId: h4_clear_75
+    goalDescription: Clear 75% of Hangar 4
+    stage: 2
+    hangarId: 4
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 75
+    rewardAmount: 500
+  - goalId: h4_clear_95
+    goalDescription: Finish clearing Hangar 4
+    stage: 2
+    hangarId: 4
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 95
+    rewardAmount: 1000
+  - goalId: h5_collect_key
+    goalDescription: Collect the final hangar key
+    stage: 1
+    hangarId: 5
+    goalType: 17
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 200
+  - goalId: h5_unlock
+    goalDescription: Unlock Hangar 5
+    stage: 2
+    hangarId: 5
+    goalType: 18
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 250
+  - goalId: h5_move_20000kg
+    goalDescription: Move 20,000 kg of grain
+    stage: 2
+    hangarId: 5
+    goalType: 15
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 20000
+    rewardAmount: 600
+  - goalId: h5_load_10000kg
+    goalDescription: Load 10,000 kg of grain onto the truck
+    stage: 2
+    hangarId: 5
+    goalType: 10
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 10000
+    rewardAmount: 500
+  - goalId: h5_deliver_15000kg
+    goalDescription: Deliver 15,000 kg of grain
+    stage: 2
+    hangarId: 5
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 15000
+    rewardAmount: 750
+  - goalId: h5_clear_25
+    goalDescription: Clear 25% of Hangar 5
+    stage: 4
+    hangarId: 5
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 25
+    rewardAmount: 300
+  - goalId: h5_clear_50
+    goalDescription: Clear 50% of Hangar 5
+    stage: 4
+    hangarId: 5
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 50
+    rewardAmount: 500
+  - goalId: h5_clear_75
+    goalDescription: Clear 75% of Hangar 5
+    stage: 4
+    hangarId: 5
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 75
+    rewardAmount: 750
+  - goalId: h5_clear_95
+    goalDescription: Finish clearing Hangar 5
+    stage: 4
+    hangarId: 5
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 95
+    rewardAmount: 1500
+  - goalId: final_load_shipment
+    goalDescription: Load the final 5,000 kg of grain
+    stage: 4
+    hangarId: 5
+    goalType: 10
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 0
+    goalAmount: 5000
+    rewardAmount: 750
+  - goalId: final_delivery
+    goalDescription: Deliver the final 5,000 kg of grain
+    stage: 4
+    hangarId: 5
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 0
+    goalAmount: 5000
+    rewardAmount: 1000
+  - goalId: final_return_warehouse
+    goalDescription: Return to the warehouse
+    stage: 4
+    hangarId: 5
+    goalType: 19
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 0
+    goalAmount: 1
+    rewardAmount: 2000
+  currentGoal:
+    goalId: 
+    goalDescription: 
+    stage: 0
+    hangarId: 0
+    goalType: 0
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 0
+    goalAmount: 1
+    rewardAmount: 0
+--- !u!114 &4495496357448387448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4657142445557162779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 50
+    m_Bottom: 25
+  m_ChildAlignment: 1
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!114 &7600003791489127831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4657142445557162779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
+--- !u!225 &1565413576031007509
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4657142445557162779}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &4687353117634096047
 GameObject:
   m_ObjectHideFlags: 0
@@ -1485,6 +2430,81 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 37 / 50 kg
+--- !u!1 &6060308959446001380
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9197627154868278998}
+  - component: {fileID: 1055206166274592028}
+  - component: {fileID: 4192681775756348393}
+  m_Layer: 0
+  m_Name: Image
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &9197627154868278998
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6060308959446001380}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5897219100534945834}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -143.6, y: 0}
+  m_SizeDelta: {x: 40, y: 40}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1055206166274592028
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6060308959446001380}
+  m_CullTransparentMesh: 1
+--- !u!114 &4192681775756348393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6060308959446001380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.2, g: 0.17254902, b: 0.14509805, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 9492e65378852ae41a2b2c5fafeb1f0b, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &6260364870016726038
 GameObject:
   m_ObjectHideFlags: 0
@@ -1691,85 +2711,6 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7201830281193024333}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.2, g: 0.17254902, b: 0.14509805, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_FontData:
-    m_Font: {fileID: 12800000, guid: 0af6208ce6e20d841bb81a4604f02765, type: 3}
-    m_FontSize: 55
-    m_FontStyle: 0
-    m_BestFit: 1
-    m_MinSize: 10
-    m_MaxSize: 55
-    m_Alignment: 4
-    m_AlignByGeometry: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: $ 320
---- !u!1 &8758091233024588866
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2375384845549103011}
-  - component: {fileID: 3243994871732720491}
-  - component: {fileID: 7404405010682132900}
-  m_Layer: 0
-  m_Name: MoneyText
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &2375384845549103011
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8758091233024588866}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5681441617593288026}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 160, y: 52}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &3243994871732720491
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8758091233024588866}
-  m_CullTransparentMesh: 1
---- !u!114 &7404405010682132900
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8758091233024588866}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}

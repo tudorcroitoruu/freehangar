@@ -99,6 +99,8 @@ public sealed class ShovelTool : MonoBehaviour
         return true;
     }
 
+    private void OnEnable() => GoalContext.ReportValue(this, GoalType.ShovelEquipped, 1f);
+
     private bool FindHit(Camera camera, Transform player, out RaycastHit nearest)
     {
         nearest = default;
@@ -158,6 +160,7 @@ public sealed class ShovelTool : MonoBehaviour
                 Vector3 point = targetPoint; point.y = pendingPile.SurfaceHeight(point);
                 float collected = pendingPile.Scoop(point, scoopRadius, scoopDepth, Mathf.Min(amount, capacityKg - Kilograms));
                 Kilograms += collected;
+                if (collected > 0) GoalContext.ReportProgress(pendingPile, GoalType.GrainCollected, collected);
                 transferredFraction = fraction;
                 if (collected > 0 && !scoopReported)
                 {
@@ -338,5 +341,9 @@ public sealed class ShovelTool : MonoBehaviour
         RotationOffset = Quaternion.identity;
     }
 
-    private void OnDisable() => CancelAction();
+    private void OnDisable()
+    {
+        GoalContext.ReportValue(this, GoalType.ShovelEquipped, 0f);
+        CancelAction();
+    }
 }

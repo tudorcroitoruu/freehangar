@@ -6541,6 +6541,7 @@ GameObject:
   - component: {fileID: 28963971}
   - component: {fileID: 28963975}
   - component: {fileID: 28963976}
+  - component: {fileID: 28963977}
   m_Layer: 0
   m_Name: Corn pile - scoop with left click
   m_TagString: Untagged
@@ -6721,6 +6722,21 @@ MonoBehaviour:
   kernelMaterial: {fileID: 2100000, guid: 4d12d273e8f7f9147a56a4a5d414afdf, type: 2}
   scatterWidth: 1.4
   perimeterSamples: 128
+--- !u!114 &28963977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 28963969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb8c8fd97f6b7fa45b024eed93702617, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoalContext
+  hangarId: 1
+  hasGrainType: 0
+  grainType: 0
 --- !u!1 &29308484
 GameObject:
   m_ObjectHideFlags: 0
@@ -59750,6 +59766,21 @@ MonoBehaviour:
   kernelMaterial: {fileID: 2100000, guid: 4d12d273e8f7f9147a56a4a5d414afdf, type: 2}
   surfaceUp: {x: 0, y: -0.00000011920929, z: 0.99999994}
   spacing: 0.026
+--- !u!114 &278083025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 278083018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb8c8fd97f6b7fa45b024eed93702617, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoalContext
+  hangarId: 1
+  hasGrainType: 0
+  grainType: 0
 --- !u!1 &278139075
 GameObject:
   m_ObjectHideFlags: 0
@@ -174155,6 +174186,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1647f57f7fa81e64aa728ceb0e0d987d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 278083024}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1647f57f7fa81e64aa728ceb0e0d987d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 278083025}
   m_SourcePrefab: {fileID: 100100000, guid: 1647f57f7fa81e64aa728ceb0e0d987d, type: 3}
 --- !u!1 &779978815
 GameObject:
@@ -207770,6 +207804,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1647f57f7fa81e64aa728ceb0e0d987d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 920742985}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1647f57f7fa81e64aa728ceb0e0d987d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 920742986}
   m_SourcePrefab: {fileID: 100100000, guid: 1647f57f7fa81e64aa728ceb0e0d987d, type: 3}
 --- !u!4 &920742980 stripped
 Transform:
@@ -207860,6 +207897,21 @@ MonoBehaviour:
   kernelMaterial: {fileID: 2100000, guid: 4d12d273e8f7f9147a56a4a5d414afdf, type: 2}
   surfaceUp: {x: 0, y: -0.00000011920929, z: 0.99999994}
   spacing: 0.026
+--- !u!114 &920742986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920742981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb8c8fd97f6b7fa45b024eed93702617, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoalContext
+  hangarId: 1
+  hasGrainType: 0
+  grainType: 0
 --- !u!1 &921138762
 GameObject:
   m_ObjectHideFlags: 0
@@ -451727,7 +451779,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 60
+  field of view: 55
   orthographic: 0
   orthographic size: 5
   m_Depth: 1
@@ -474802,6 +474854,94 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 593234970349521000, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1351083796829755209, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1351083796829755209, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1351083796829755209, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1351083796829755209, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2375384845549103011, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2375384845549103011, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2375384845549103011, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -30.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2375384845549103011, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -28.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4657142445557162779, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4805971030594527388, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: checkerObj
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5681441617593288026, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6087155364332289459, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: currentGoal.goalId
+      value: tutorial_pick_up_sack
+      objectReference: {fileID: 0}
+    - target: {fileID: 6087155364332289459, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: currentGoal.goalType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6087155364332289459, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: currentGoal.hangarId
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6087155364332289459, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: currentGoal.goalDescription
+      value: Pick up an empty sack
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404405010682132900, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_Text
+      value: Current Goal
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404405010682132900, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_FontData.m_BestFit
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404405010682132900, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 26
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404405010682132900, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404405010682132900, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_FontData.m_VerticalOverflow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7404405010682132900, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_FontData.m_HorizontalOverflow
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7869879496375858122, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -474881,6 +475021,10 @@ PrefabInstance:
     - target: {fileID: 7869879496375858122, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8758091233024588866, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
+      propertyPath: m_Name
+      value: Title
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -475000,7 +475144,30 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 209457976680921721, guid: cbe0848666b2e0e4d9c92359a06cb7fb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1328303953}
+    - targetCorrespondingSourceObject: {fileID: 3300803145590336787, guid: cbe0848666b2e0e4d9c92359a06cb7fb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5877819208465033857}
   m_SourcePrefab: {fileID: 100100000, guid: cbe0848666b2e0e4d9c92359a06cb7fb, type: 3}
+--- !u!1 &5877819208465033856 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3300803145590336787, guid: cbe0848666b2e0e4d9c92359a06cb7fb, type: 3}
+  m_PrefabInstance: {fileID: 5877819208465033855}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5877819208465033857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5877819208465033856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb8c8fd97f6b7fa45b024eed93702617, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoalContext
+  hangarId: 1
+  hasGrainType: 0
+  grainType: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

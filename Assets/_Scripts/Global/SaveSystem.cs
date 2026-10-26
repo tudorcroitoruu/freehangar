@@ -243,6 +243,9 @@ public class PlayerData
     public int cash = 150000;
     public int currentCarFromOwnedSelected;
 
+    [Space, Header("Goals")]
+    public GoalSettingsSave[] goals = Array.Empty<GoalSettingsSave>();
+
     [Space, Header("Settings")]
     public bool haptics = true;
     public bool autoGear = true;
