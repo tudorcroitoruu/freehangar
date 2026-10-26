@@ -5,13 +5,13 @@ public class GoalListElement : MonoBehaviour
 {
     [SerializeField] private GameObject checkerObj;
     [SerializeField] private TMP_Text goalText;
-    [SerializeField] private TMP_Text statusText;
+
     public void SetGoal(GoalSettings goal, float progress)
     {
-        if (goalText != null) goalText.text = goal.goalDescription;
         if (checkerObj != null) checkerObj.SetActive(progress >= goal.goalAmount);
-        if (statusText == null) return;
+        if (goalText == null) return;
         string suffix;
+        bool showProgress = true;
         switch (goal.goalType)
         {
             case GoalType.MoneyEarned: suffix = " $"; break;
@@ -21,8 +21,15 @@ public class GoalListElement : MonoBehaviour
             case GoalType.GrainLoaded:
             case GoalType.GrainDelivered:
             case GoalType.GrainMoved: suffix = " kg"; break;
-            default: suffix = ""; break;
+            default:
+                suffix = "";
+                showProgress = goal.goalAmount > 1f;
+                break;
         }
-        statusText.text = $"{progress:0.##} / {goal.goalAmount:0.##}{suffix}";
+        goalText.richText = true;
+        goalText.fontStyle &= ~FontStyles.Bold;
+        goalText.text = $"<b>{goal.goalDescription}</b>";
+        if (showProgress)
+            goalText.text += $"\n{progress:0.##} / {goal.goalAmount:0.##}{suffix}";
     }
 }
