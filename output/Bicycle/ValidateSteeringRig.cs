@@ -12,10 +12,11 @@ public static class ValidateSteeringRig {
   for(int i=0;i<100;i++)bike.Drive(0,turn,true,.02f);
   Check(Quaternion.Angle(frontRest,bike.frontWheel.localRotation)<.01f,"Front wheel must not receive steering twice");
   float gap=Vector3.ProjectOnPlane(fork.transform.TransformPoint(vertices[nearest])-bike.frontWheel.position,bike.frontWheel.right).magnitude;worstGapError=Mathf.Max(worstGapError,Mathf.Abs(gap-restGap));Check(Mathf.Abs(gap-restGap)<.001f,"Fork remains attached to axle at full lock");
-  skin.BakeMesh(baked);var actual=baked.vertices;float movingError=Vector3.Distance(skin.transform.TransformPoint(actual[moving]),bike.steering.TransformPoint(movingLocal));float fixedError=Vector3.Distance(skin.transform.TransformPoint(actual[fixedIndex]),bike.transform.TransformPoint(staticLocal));worstCableError=Mathf.Max(worstCableError,Mathf.Max(movingError,fixedError));Check(movingError<.003f&&fixedError<.003f,"Cable stays attached to moving lever and fixed frame: "+movingError+", "+fixedError);
+  skin.BakeMesh(baked,true);var actual=baked.vertices;float movingError=Vector3.Distance(skin.transform.TransformPoint(actual[moving]),bike.steering.TransformPoint(movingLocal));float fixedError=Vector3.Distance(skin.transform.TransformPoint(actual[fixedIndex]),bike.transform.TransformPoint(staticLocal));worstCableError=Mathf.Max(worstCableError,Mathf.Max(movingError,fixedError));Check(movingError<.003f&&fixedError<.003f,"Cable stays attached to moving lever and fixed frame: "+movingError+", "+fixedError);
  }
  var heading=bike.transform.rotation;for(int i=0;i<100;i++)bike.Drive(1,.5f,false,.02f);Check(Quaternion.Angle(heading,bike.transform.rotation)>5,"Whole bike turns while riding");float lastGap=Vector3.ProjectOnPlane(fork.transform.TransformPoint(vertices[nearest])-bike.frontWheel.position,bike.frontWheel.right).magnitude;Check(Mathf.Abs(lastGap-restGap)<.002f,"Wheel spin does not detach fork");
  string result="PASS: "+checks+" steering hierarchy/axle/skin/full-lock/whole-bike-turn checks. Worst axle gap change="+worstGapError.ToString("F6")+"m, cable anchor error="+worstCableError.ToString("F6")+"m.";File.WriteAllText("output/Bicycle/steering-rig-validation.txt",result);return result;
  }finally{if(copy)UnityEngine.Object.DestroyImmediate(copy);if(floor)UnityEngine.Object.DestroyImmediate(floor);if(baked)UnityEngine.Object.DestroyImmediate(baked);}}
 }
+
 
