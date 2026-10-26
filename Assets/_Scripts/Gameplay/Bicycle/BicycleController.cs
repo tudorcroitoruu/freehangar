@@ -17,7 +17,7 @@ public sealed class BicycleController : MonoBehaviour
     [SerializeField, Range(-35, 35)] private float ridingCameraPitch;
     [Header("Pedaling camera motion")]
     [Tooltip("Subtle pitch in degrees, synchronized with the crank. Set to zero to disable.")]
-    [SerializeField, Range(0f, 2f)] private float pedalingPitchAmplitude = .45f;
+    [SerializeField, Range(0f, 2f)] private float pedalingPitchAmplitude = .3f;
     [SerializeField, Min(.01f)] private float pedalingPitchSmoothTime = .09f;
     public float PedalingCameraPitch { get; private set; }
     public Vector3 RidingCameraOffset => ridingCameraOffset;
@@ -92,7 +92,8 @@ public sealed class BicycleController : MonoBehaviour
         if ((hit & CollisionFlags.Above) != 0) fallSpeed = 0;
         steering.localRotation = steerRest * Quaternion.Euler(0, steer, 0);
         wheelAngle += Speed / .34f * Mathf.Rad2Deg * dt;
-        frontWheel.localRotation = Quaternion.Euler(0,steer,0) * frontRest * Quaternion.Euler(wheelAngle,0,0);
+        // The front wheel is carried by the shared headset pivot; only spin it at its axle.
+        frontWheel.localRotation = frontRest * Quaternion.Euler(wheelAngle,0,0);
         rearWheel.localRotation = rearRest * Quaternion.Euler(wheelAngle,0,0);
         if (Mathf.Abs(throttle) > .01f && !brake) crankAngle += Speed * 100 * dt;
         // Use the actual crank phase, so the rider motion follows the animated feet.

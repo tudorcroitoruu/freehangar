@@ -25,8 +25,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0.001f)] private float lookSmoothTime = 0.06f;
 
     [Header("Sprint camera motion")]
-    [SerializeField, Range(0f, .04f)] private float sprintCameraHeight = .0075f;
-    [SerializeField, Range(0f, 2f)] private float sprintCameraPitch = .28125f;
+    [SerializeField, Range(0f, .04f)] private float sprintCameraHeight = .004166667f;
+    [SerializeField, Range(0f, 2f)] private float sprintCameraPitch = .15625f;
     [SerializeField, Range(1f, 4f)] private float sprintStepFrequency = 2.6f;
     private float sprintCameraPhase, sprintCameraBlend;
 

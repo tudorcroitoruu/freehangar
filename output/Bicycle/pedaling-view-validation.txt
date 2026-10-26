@@ -1,1 +1,1 @@
-PASS: subtle bidirectional crank-driven pitch (-0.305 to 0.303 degrees), fade on coast/brake, reset on dismount.
+PASS: subtle bidirectional crank-driven pitch (-0.203 to 0.202 degrees), fade on coast/brake, reset on dismount.
