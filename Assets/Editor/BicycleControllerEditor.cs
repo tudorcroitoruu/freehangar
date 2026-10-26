@@ -9,9 +9,9 @@ public sealed class BicycleControllerEditor : Editor
     {
         DrawDefaultInspector();
         EditorGUILayout.Space();
-        if (GUILayout.Button("Adjust Riding Position", GUILayout.Height(32)))
+        if (!EditorApplication.isPlaying && GUILayout.Button("Adjust Riding Position", GUILayout.Height(32)))
             BicycleRidingPositionWindow.Open((BicycleController)target);
-        EditorGUILayout.HelpBox("Edit the seated camera with a live Scene view preview. In Play Mode, mount the bike and press V or click Adjust riding position.", MessageType.Info);
+        EditorGUILayout.HelpBox("Edit the seated camera with a live Scene view preview in Edit Mode.", MessageType.Info);
     }
 }
 
@@ -36,6 +36,12 @@ public sealed class BicycleRidingPositionWindow : EditorWindow
     void OnDisable() { SceneView.duringSceneGui -= DrawSeatHandle; RestorePreview(); }
     void OnGUI()
     {
+        if (EditorApplication.isPlaying)
+        {
+            RestorePreview();
+            EditorGUILayout.HelpBox("Stop Play Mode to edit the riding position.", MessageType.Info);
+            return;
+        }
         bicycle = (BicycleController)EditorGUILayout.ObjectField("Bicycle", bicycle, typeof(BicycleController), true);
         if (bicycle == null || bicycle.riderView == null)
         {
@@ -79,8 +85,6 @@ public sealed class BicycleRidingPositionWindow : EditorWindow
                 if (bicycle.gameObject.scene.IsValid()) EditorSceneManager.SaveScene(bicycle.gameObject.scene);
                 else AssetDatabase.SaveAssetIfDirty(bicycle);
             }
-        if (EditorApplication.isPlaying)
-            EditorGUILayout.HelpBox("For a saved in-game preference, mount the bike and use V → Save & ride. Editor play-mode edits otherwise reset when Play Mode stops.", MessageType.Info);
     }
     static void Changed(Object target)
     {

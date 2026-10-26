@@ -15,6 +15,11 @@ public sealed class BicycleController : MonoBehaviour
     [Header("Riding camera (relative to rider view)")]
     [SerializeField] private Vector3 ridingCameraOffset;
     [SerializeField, Range(-35, 35)] private float ridingCameraPitch;
+    [Header("Pedaling camera motion")]
+    [Tooltip("Subtle pitch in degrees, synchronized with the crank. Set to zero to disable.")]
+    [SerializeField, Range(0f, 2f)] private float pedalingPitchAmplitude = .45f;
+    [SerializeField, Min(.01f)] private float pedalingPitchSmoothTime = .09f;
+    public float PedalingCameraPitch { get; private set; }
     public Vector3 RidingCameraOffset => ridingCameraOffset;
     public float RidingCameraPitch => ridingCameraPitch;
     public float CurrentSteeringAngle => currentSteering;
@@ -61,7 +66,7 @@ public sealed class BicycleController : MonoBehaviour
     public void SetRidden(bool value)
     {
         Initialize(); if (IsRidden == value) return;
-        IsRidden = value; Speed = 0; fallSpeed = 0; steeringVelocity = 0;
+        IsRidden = value; Speed = 0; fallSpeed = 0; steeringVelocity = 0; PedalingCameraPitch = 0;
         if(value)
         {
             cargoColliders = GetComponentsInChildren<Collider>(); cargoColliderStates = new bool[cargoColliders.Length];
@@ -90,6 +95,12 @@ public sealed class BicycleController : MonoBehaviour
         frontWheel.localRotation = Quaternion.Euler(0,steer,0) * frontRest * Quaternion.Euler(wheelAngle,0,0);
         rearWheel.localRotation = rearRest * Quaternion.Euler(wheelAngle,0,0);
         if (Mathf.Abs(throttle) > .01f && !brake) crankAngle += Speed * 100 * dt;
+        // Use the actual crank phase, so the rider motion follows the animated feet.
+        bool pedaling = Mathf.Abs(throttle) > .01f && !brake && Mathf.Abs(Speed) > .1f;
+        float pitchTarget = pedaling ? Mathf.Sin(crankAngle * Mathf.Deg2Rad) * pedalingPitchAmplitude *
+            Mathf.Clamp01(Mathf.Abs(Speed) / Mathf.Max(.1f, maximumSpeed)) : 0f;
+        PedalingCameraPitch = Mathf.Lerp(PedalingCameraPitch, pitchTarget,
+            1f - Mathf.Exp(-dt / Mathf.Max(.01f, pedalingPitchSmoothTime)));
         Quaternion rotation = Quaternion.Euler(crankAngle,0,0);
         crank.localRotation = crankRest * rotation;
         leftPedal.position = crank.position + transform.TransformVector(rotation * leftOffset);

@@ -1,0 +1,12 @@
+from pathlib import Path
+p=Path('Assets/_Scripts/Gameplay/Bicycle/PlayerBicycleInteraction.cs');s=p.read_text();a=s.index('    public bool IsAdjustingRidingPosition');b=s.index('    bool riding, instrumentActive;',a);s=s[:a]+s[b:];a=s.index('            if (IsAdjustingRidingPosition)');b=s.index('            if (input && Input.GetKeyDown(KeyCode.E))',a);s=s[:a]+s[b:];s=s.replace(' && !IsAdjustingRidingPosition','');s=s.replace('(IsAdjustingRidingPosition ? 0 : bicycle.PedalingCameraPitch)','bicycle.PedalingCameraPitch');a=s.index('    public bool BeginRidingPositionAdjustment()');b=s.index('    public bool TryUnloadBox',a);s=s[:a]+s[b:];s=s.replace('        if (IsAdjustingRidingPosition) EndRidingPositionAdjustment(false);\n','');a=s.index('    float ViewSlider(');b=s.index('        if(string.IsNullOrEmpty(hint)',a);s=s[:a]+'    void OnGUI()\n    {\n'+s[b:];p.write_text(s)
+p=Path('Assets/_Scripts/Gameplay/Controller/PlayerController.cs');s=p.read_text().replace('Input.GetMouseButtonDown(0) && (bicycleInteraction == null || !bicycleInteraction.BlocksCursorCapture)','Input.GetMouseButtonDown(0)').replace('private float sprintCameraHeight = .012f','private float sprintCameraHeight = .0075f').replace('private float sprintCameraPitch = .45f','private float sprintCameraPitch = .28125f');p.write_text(s)
+p=Path('Assets/Editor/BicycleControllerEditor.cs');s=p.read_text().replace('if (GUILayout.Button("Adjust Riding Position", GUILayout.Height(32)))','if (!EditorApplication.isPlaying && GUILayout.Button("Adjust Riding Position", GUILayout.Height(32)))').replace('Edit the seated camera with a live Scene view preview. In Play Mode, mount the bike, press Escape and click Adjust riding position.','Edit the seated camera with a live Scene view preview in Edit Mode.');s=s.replace('''        bicycle = (BicycleController)EditorGUILayout.ObjectField''','''        if (EditorApplication.isPlaying)
+        {
+            RestorePreview();
+            EditorGUILayout.HelpBox("Stop Play Mode to edit the riding position.", MessageType.Info);
+            return;
+        }
+        bicycle = (BicycleController)EditorGUILayout.ObjectField''',1);s=s.replace('''        if (EditorApplication.isPlaying)
+            EditorGUILayout.HelpBox("For a saved in-game preference, mount the bike and click Adjust riding position → Save & ride. Editor play-mode edits otherwise reset when Play Mode stops.", MessageType.Info);
+''','');p.write_text(s)

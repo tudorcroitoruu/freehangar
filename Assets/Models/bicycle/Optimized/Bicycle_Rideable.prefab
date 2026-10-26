@@ -243,7 +243,9 @@ MonoBehaviour:
   steeringSmoothTime: 0.14
   maximumSteeringAngle: 30
   ridingCameraOffset: {x: 0, y: -0.5, z: 0}
-  ridingCameraPitch: 5.7
+  ridingCameraPitch: 8.2
+  pedalingPitchAmplitude: 0.45
+  pedalingPitchSmoothTime: 0.09
 --- !u!1 &9119476917816028267
 GameObject:
   m_ObjectHideFlags: 0
@@ -283,6 +285,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6989609780038012702}
     m_Modifications:
+    - target: {fileID: -8983884986012714969, guid: 19247ba92a3253844a3964fa1c073470, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -8927885676535474282, guid: 19247ba92a3253844a3964fa1c073470, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 

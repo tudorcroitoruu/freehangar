@@ -1,0 +1,1 @@
+PASS: sprint camera bob bounded to 1.2cm / 0.45 degrees, resting fade, crouch baseline and bike-mount cleanup.

@@ -24,6 +24,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float cameraMaxAngle = 80f;
     [SerializeField, Min(0.001f)] private float lookSmoothTime = 0.06f;
 
+    [Header("Sprint camera motion")]
+    [SerializeField, Range(0f, .04f)] private float sprintCameraHeight = .0075f;
+    [SerializeField, Range(0f, 2f)] private float sprintCameraPitch = .28125f;
+    [SerializeField, Range(1f, 4f)] private float sprintStepFrequency = 2.6f;
+    private float sprintCameraPhase, sprintCameraBlend;
+
     [Header("Crouch (hold Ctrl or C)")]
     [SerializeField, Min(0.1f)] private float crouchHeight = 1.2f;
     [SerializeField, Min(0f)] private float crouchSpeed = 1.5f;
@@ -57,6 +63,7 @@ public class PlayerController : MonoBehaviour
     private readonly Collider[] crouchHits = new Collider[32];
 
     public bool IsCrouching => isCrouching;
+    public StaminaManager Stamina => staminaManager;
 
     private void Reset()
     {
@@ -122,7 +129,7 @@ public class PlayerController : MonoBehaviour
         bool wasLocked = Cursor.lockState == CursorLockMode.Locked;
         if (Input.GetKeyDown(KeyCode.Escape))
             SetCursorLocked(false);
-        else if (Input.GetMouseButtonDown(0) && (bicycleInteraction == null || !bicycleInteraction.BlocksCursorCapture))
+        else if (Input.GetMouseButtonDown(0))
             SetCursorLocked(true);
 
         bool bicycleInput = Application.isFocused && Time.timeScale > 0 && Cursor.lockState == CursorLockMode.Locked;
@@ -160,6 +167,25 @@ public class PlayerController : MonoBehaviour
         targetYaw = transform.eulerAngles.y; yawVelocity = pitchVelocity = 0;
         cameraRotationX = smoothedPitch = Mathf.DeltaAngle(0, characterCamera.transform.localEulerAngles.x);
         verticalVelocity = 0;
+        sprintCameraBlend = sprintCameraPhase = 0;
+    }
+
+    public void ClearSprintCameraMotion()
+    {
+        sprintCameraBlend = sprintCameraPhase = 0;
+        if (characterCamera == null || characterController == null) return;
+        characterCamera.transform.localPosition = cameraRestPosition - Vector3.up * Mathf.Max(0, standingHeight - characterController.height);
+        characterCamera.transform.localRotation = Quaternion.Euler(smoothedPitch, 0, 0);
+    }
+
+    private void UpdateSprintCamera(bool sprinting, float dt)
+    {
+        sprintCameraBlend = Mathf.Lerp(sprintCameraBlend, sprinting ? 1 : 0, 1f - Mathf.Exp(-8f * dt));
+        if (sprintCameraBlend > .0001f)
+            sprintCameraPhase = Mathf.Repeat(sprintCameraPhase + dt * sprintStepFrequency * Mathf.PI * 2, Mathf.PI * 2);
+        Vector3 baseline = cameraRestPosition - Vector3.up * Mathf.Max(0, standingHeight - characterController.height);
+        characterCamera.transform.localPosition = baseline + Vector3.up * (Mathf.Sin(sprintCameraPhase) * sprintCameraHeight * sprintCameraBlend);
+        characterCamera.transform.localRotation = Quaternion.Euler(smoothedPitch + Mathf.Cos(sprintCameraPhase) * sprintCameraPitch * sprintCameraBlend, 0, 0);
     }
 
     private void HandleGrainScooped()
@@ -190,6 +216,10 @@ public class PlayerController : MonoBehaviour
             verticalVelocity = 0f;
         if ((collisions & CollisionFlags.Below) != 0 && verticalVelocity < 0f)
             verticalVelocity = -2f;
+        Vector3 actualMovement = Vector3.ProjectOnPlane(characterController.velocity, Vector3.up);
+        bool sprinting = acceptInput && Input.GetKey(KeyCode.LeftShift) && input.sqrMagnitude > .01f &&
+            !isCrouching && characterController.isGrounded && actualMovement.sqrMagnitude > .25f;
+        UpdateSprintCamera(sprinting, Time.deltaTime);
     }
 
     private void HandleCamera()
