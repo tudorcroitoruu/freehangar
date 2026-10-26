@@ -1,0 +1,4 @@
+PASS 227 grove cells have valid complete 3D LODs and material slots
+PASS 340 individual trees retain fuller 3D near models and 3D far models
+PASS User-highlighted grove uses moderate 3D detail below its original 9904 triangles
+Hill highest-detail total=1715442; individual highest-detail total=1156660

@@ -13,6 +13,10 @@ public sealed class SceneLightVisibilityController : MonoBehaviour
     private float viewPaddingDegrees = 10f;
     [SerializeField, Range(0f, 15f), Tooltip("Extra exit margin to prevent flicker at view edges.")]
     private float viewHysteresisDegrees = 5f;
+    [SerializeField, Min(0f), Tooltip("Lights this close to the camera stay on in every direction. Zero disables this exception.")]
+    private float nearbyKeepAliveDistance = 8f;
+    [SerializeField, Min(0f), Tooltip("Nearby lights remain on this much farther away before view culling resumes.")]
+    private float nearbyDistanceHysteresis = 1f;
     [SerializeField, Min(0f), Tooltip("Shadows are allowed within this distance of the camera, in metres.")]
     private float shadowDistance = 18f;
     [SerializeField, Min(0f), Tooltip("Shadows already enabled remain on this much farther away.")]
@@ -27,7 +31,7 @@ public sealed class SceneLightVisibilityController : MonoBehaviour
     private sealed class LightState
     {
         public Light Light;
-        public bool AuthoredEnabled, LastEnabled, Visible, NearForShadows, Seen;
+        public bool AuthoredEnabled, LastEnabled, Visible, NearForLight, NearForShadows, Seen;
         public LightShadows AuthoredShadows, LastShadows;
     }
 
@@ -169,7 +173,7 @@ public sealed class SceneLightVisibilityController : MonoBehaviour
                 if (!ShouldManage(light) || !hasCamera || !light.gameObject.activeInHierarchy || !state.AuthoredEnabled)
                 {
                     Apply(state, state.AuthoredEnabled, state.AuthoredShadows);
-                    state.Visible = state.NearForShadows = false;
+                    state.Visible = state.NearForLight = state.NearForShadows = false;
                 }
                 else
                 {
@@ -190,10 +194,14 @@ public sealed class SceneLightVisibilityController : MonoBehaviour
                         state.Visible = offset.sqrMagnitude < .000001f ||
                             (local.z > 0 && Mathf.Abs(local.x) <= local.z * limitX && Mathf.Abs(local.y) <= local.z * limitY);
                     }
+                    float distanceSquared = offset.sqrMagnitude;
+                    float nearbyLimit = nearbyKeepAliveDistance + (state.NearForLight ? nearbyDistanceHysteresis : 0);
+                    state.NearForLight = nearbyKeepAliveDistance > 0 && distanceSquared <= nearbyLimit * nearbyLimit;
+                    bool enabled = state.Visible || state.NearForLight;
                     float distanceLimit = shadowDistance + (state.NearForShadows ? shadowDistanceHysteresis : 0);
-                    state.NearForShadows = offset.sqrMagnitude <= distanceLimit * distanceLimit;
-                    Apply(state, state.Visible,
-                        state.Visible && state.NearForShadows ? state.AuthoredShadows : LightShadows.None);
+                    state.NearForShadows = distanceSquared <= distanceLimit * distanceLimit;
+                    Apply(state, enabled,
+                        enabled && state.NearForShadows ? state.AuthoredShadows : LightShadows.None);
                 }
                 if (!light.isActiveAndEnabled) continue;
                 EnabledLightCount++;
@@ -244,6 +252,8 @@ public sealed class SceneLightVisibilityController : MonoBehaviour
     private void OnValidate()
     {
         shadowDistance = Mathf.Max(0, shadowDistance);
+        nearbyKeepAliveDistance = Mathf.Max(0, nearbyKeepAliveDistance);
+        nearbyDistanceHysteresis = Mathf.Max(0, nearbyDistanceHysteresis);
         shadowDistanceHysteresis = Mathf.Max(0, shadowDistanceHysteresis);
         discoveryInterval = Mathf.Max(.5f, discoveryInterval);
         updateInterval = Mathf.Max(0, updateInterval);

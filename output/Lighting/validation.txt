@@ -1,4 +1,4 @@
-37 passed, 0 failed
+50 passed, 0 failed
 PASS Only same-scene realtime non-directional lights are registered
 PASS Near visible HDRP light and authored hard shadows remain on
 PASS HDRP light component observes managed shadow state
@@ -34,6 +34,19 @@ PASS Camera return resumes view/shadow culling
 PASS Disabling controller restores authored on/off and shadow types
 PASS Re-enabling controller rescans and resumes correctly
 PASS Duplicate controller in the same scene cannot compete for lights
+PASS Nearby light behind camera stays on with its authored shadows
+PASS Nearby exit buffer retains offscreen light at 8.5m
+PASS Offscreen light switches off beyond 9m buffered nearby radius
+PASS Nearby re-entry waits until 8m
+PASS Offscreen light restores inside nearby radius
+PASS Nearby exception does not revive authored-disabled lights
+PASS Gameplay off switch overrides nearby exception
+PASS Gameplay enable restores nearby offscreen illumination
+PASS Nearby illumination still obeys independent shadow distance
+PASS Authored shadow type restores when shadow distance permits
+PASS Zero nearby radius disables exception even after it was active
+PASS Moving camera away resumes offscreen culling
+PASS Moving camera near enables offscreen light
 PASS 500 stable view updates allocate 0 managed bytes
-Stable 6-light fixture evaluation average: 0.0025ms; no GPU/frame-rate claim.
+Stable 6-light fixture evaluation average: 0.0026ms; no GPU/frame-rate claim.
 PASS Other-scene light states were not altered by fixture controller

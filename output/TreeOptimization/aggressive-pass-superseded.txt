@@ -1,0 +1,8 @@
+Tree mesh reduction
+Exact placement replay: 1002 trees in 227 cells; max pre-change local bounds error=0.00002m.
+Hill groves top-detail triangles: 3495122 -> 127544; far representation=8016.
+Individual active map trees: 340; top-detail triangles: 1375678 -> 164240; far representation=2720.
+Combined top-detail triangle reduction=94.01%.
+Hill grove 267.asset: 9904 -> 40 triangles (same GUID).
+Unused high-detail renderer/LOD nodes removed=1766.
+Native penultimate LODs (~500 triangles/tree) used nearby; original 8-triangle atlas billboards used far away. Outer hills always use billboards. Tree positions, materials and individual-tree colliders retained. Imported models untouched. No FPS/GPU benchmark claim.

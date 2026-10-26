@@ -7,14 +7,14 @@ PASS Hangar 2 closed door blocks entry
 PASS Hangar 3 closed door blocks entry
 PASS Hangar 4 closed door blocks entry
 PASS Hangar 5 closed door blocks entry
-PASS Five interactive grain piles
-PASS Hangar 4 - Grain bank to entrance mass 5515284 kg
-PASS Hangar 3 - Almost full grain bank mass 2166146 kg
-PASS Hangar 5 - Grain bank to entrance mass 5518543 kg
-PASS Corn pile - scoop with left click mass 25079 kg
-PASS Hangar 2 - Almost full grain bank mass 2164968 kg
-PASS Large hangars contain more grain than medium hangars
+PASS Five authored grain piles
+PASS Corn pile - scoop with left click mass 116956 kg
+PASS Hangar 4 - Grain bank to entrance simulation disabled until hangar opens
+PASS Hangar 3 - Almost full grain bank simulation disabled until hangar opens
+PASS Hangar 2 - Almost full grain bank simulation disabled until hangar opens
+PASS Hangar 5 - Grain bank to entrance simulation disabled until hangar opens
+PASS Closed hangar grain stays inactive; no simulation initialized by audit
 PASS Continuous perimeter collision sampled 100/100
 PASS Main road walking corridor clear; obstructions=0
 PASS LOD renderer references intact
-Active renderers=9039; active transforms=11546; five-hangar section mesh assets shared between buildings. No runtime economy/progression added.
+Active renderers=8350; active transforms=10855; five-hangar section mesh assets shared between buildings. No runtime economy/progression added.

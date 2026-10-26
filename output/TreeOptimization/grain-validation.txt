@@ -1,0 +1,15 @@
+PASS Only starter grain simulation active on startup
+PASS 01_Modular_Hangar grain matches opened=True
+PASS Hangar 2 - Medium grain matches opened=False
+PASS Hangar 2 - Medium grain and kernels initialize when opened
+PASS Hangar 2 - Medium whole grain object deactivates when closed
+PASS Hangar 3 - Medium grain matches opened=False
+PASS Hangar 3 - Medium grain and kernels initialize when opened
+PASS Hangar 3 - Medium whole grain object deactivates when closed
+PASS Hangar 4 - Large grain matches opened=False
+PASS Hangar 4 - Large grain and kernels initialize when opened
+PASS Hangar 4 - Large whole grain object deactivates when closed
+PASS Hangar 5 - Large grain matches opened=False
+PASS Hangar 5 - Large grain and kernels initialize when opened
+PASS Hangar 5 - Large whole grain object deactivates when closed
+PASS All grain visibility checks; original opened/closed states restored

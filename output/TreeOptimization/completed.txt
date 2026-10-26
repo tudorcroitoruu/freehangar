@@ -1,0 +1,7 @@
+Moderate tree optimization, replacing the overly aggressive pass.
+340 ordinary trees: full 3D native LOD1 close, then LOD2/LOD3/LOD4; screen thresholds 0.5 / 0.2 / 0.06 / 0.003.
+227 hill cells: complete native 3D LOD2 / LOD3 / LOD4 at thresholds 0.5 / 0.12 / 0.004. No tree billboards remain in the active map.
+Hill highest-detail triangles=1715442; far 3D representation=411560.
+Ordinary highest-detail triangles=1156660; far 3D representation=164240.
+Compared with original 4,870,800 top-detail tree triangles: 41.0% lower top-detail budget.
+Tree positions and colliders preserved; closed-hangar grain stays disabled. Source prefabs and global quality settings unchanged.
