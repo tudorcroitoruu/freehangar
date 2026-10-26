@@ -1,0 +1,1 @@
+Tree-only alpha clipping applied to 4023 material slots across 2041 LOD renderers, using 2 shared cutout materials. Existing toon atlas/ramp colours preserved. Alpha test 0.5, double-sided foliage, clipping in colour/depth/shadow passes. Shared building/ground materials untouched. LOD order remains high-detail close, lower-detail far.

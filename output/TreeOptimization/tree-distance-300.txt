@@ -1,0 +1,7 @@
+Solid shaped tree proxies replace the flat leaf-card geometry.
+340 ordinary trees: native LOD1/LOD2 near the player, then solid shaped crown/trunk proxy models; screen thresholds 0.5 / 0.2 / 0.06 / 0.003.
+227 hill cells: solid crown/trunk models at three triangle budgets at thresholds 0.5 / 0.12 / 0.004. No tree billboards remain in the active map.
+Hill highest-detail triangles=2927840; far 3D representation=324648.
+Ordinary highest-detail triangles=1156660; far 3D representation=110160.
+Compared with original 4,870,800 top-detail tree triangles: 16.1% lower top-detail budget.
+Tree positions and colliders preserved; closed-hangar grain stays disabled. Source prefabs and global quality settings unchanged.
