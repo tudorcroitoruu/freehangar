@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3108343413565966642}
   - component: {fileID: 6481402985087955990}
   - component: {fileID: 9199804713262668986}
+  - component: {fileID: 8423974865112346148}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: Untagged
@@ -69,7 +70,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 60
+  field of view: 55
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -234,6 +235,23 @@ MonoBehaviour:
       data1: 0
       data2: 0
   defaultFrameSettings: 0
+--- !u!114 &8423974865112346148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 209457976680921721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69a9359cc6527a348a3a9333848fa33c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeldToolCamera
+  worldCamera: {fileID: 3108343413565966642}
+  toolCamera: {fileID: 0}
+  toolLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1 &434780275654012787
 GameObject:
   m_ObjectHideFlags: 0
@@ -442,7 +460,7 @@ MonoBehaviour:
   grainPhysics: {fileID: 769307556019437259}
   reach: 2.6
   pourReach: 4
-  bagAimPadding: 0.35
+  aimedGripTravel: 0.65
   capacityKg: 6.5
   scoopRadius: 0.4
   scoopDepth: 0.18
@@ -559,6 +577,7 @@ MonoBehaviour:
   heldInstrument: {fileID: 7780978940241256279}
   shovelTool: {fileID: 1970793380129296705}
   bagInteraction: {fileID: 2532734745049135152}
+  staminaManager: {fileID: 0}
   speed: 3
   sprintSpeed: 7
   jumpForce: 5
@@ -672,6 +691,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShovelGrainPhysics
   kernelMesh: {fileID: 4300000, guid: 3bb82126ac32c4b478ecf0ded897a536, type: 2}
   kernelMaterial: {fileID: 2100000, guid: 4d12d273e8f7f9147a56a4a5d414afdf, type: 2}
+  airborneLayer: 0
   maximumKernels: 192
   maximumLoadHeight: 0.075
   bowlFloor:

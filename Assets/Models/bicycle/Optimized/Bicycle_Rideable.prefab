@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2106851202478714450
 Transform:
   m_ObjectHideFlags: 0
@@ -26,13 +26,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3273560822121334987}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.17, z: -0.56}
+  m_LocalRotation: {x: 0.031857572, y: -0, z: -0, w: 0.99949247}
+  m_LocalPosition: {x: 0, y: 0.238, z: -0.56}
   m_LocalScale: {x: 0.54, y: 0.04, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6989609780038012702}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 3.651, y: 0, z: 0}
 --- !u!33 &6042615114641514254
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -115,7 +115,7 @@ Transform:
   m_GameObject: {fileID: 7253533161626734907}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.05, z: -0.03}
+  m_LocalPosition: {x: 0, y: 1.13, z: -0.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -179,8 +179,8 @@ Transform:
   m_GameObject: {fileID: 8103419784928300965}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.6112421, y: 0.51097655, z: 21.345413}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.6112421, y: 0.728, z: 21.345413}
+  m_LocalScale: {x: 1.4560772, y: 1.4560772, z: 1.4560772}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5027474117213942188}
@@ -239,6 +239,11 @@ MonoBehaviour:
   - {fileID: 3476090794756468772}
   maximumSpeed: 7
   acceleration: 2.5
+  boostSpeedMultiplier: 1.5
+  steeringSmoothTime: 0.14
+  maximumSteeringAngle: 30
+  ridingCameraOffset: {x: 0, y: -0.5, z: 0}
+  ridingCameraPitch: 5.7
 --- !u!1 &9119476917816028267
 GameObject:
   m_ObjectHideFlags: 0

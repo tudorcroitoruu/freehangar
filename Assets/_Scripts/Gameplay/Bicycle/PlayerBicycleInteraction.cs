@@ -187,7 +187,9 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if(bags!=null)bags.enabled=true;
         if(instrument!=null)instrument.gameObject.SetActive(instrumentActive);
     }
-    void OnDisable() { if(riding) { if(!TryDismount())Restore(bicycle.transform.position+Vector3.up*1.5f); } }
+    bool applicationQuitting;
+    void OnApplicationQuit() => applicationQuitting = true;
+    void OnDisable() { if(!applicationQuitting && riding) { if(!TryDismount())Restore(bicycle.transform.position+Vector3.up*1.5f); } }
     float ViewSlider(string label, float value, float min, float max)
     {
         GUILayout.Label(label + "   " + value.ToString("0.00"));
@@ -222,4 +224,3 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         GUI.Box(new Rect(Mathf.Max(8, Screen.width/2-340),Screen.height-85,Mathf.Min(680, Screen.width-16),36),hint);
     }
 }
-
