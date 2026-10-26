@@ -1,0 +1,29 @@
+Renderers: 587 -> 28; triangles preserved: 11940; original box shapes baked: 375. World bounds match within 2mm.
+Wall Left: 66 renderers -> 1; 32 boxes baked
+Window Left 1 Glass: 1 renderers -> 1; 0 boxes baked
+Window Left 1 Frame: 6 renderers -> 1; 6 boxes baked
+Window Left 2 Glass: 1 renderers -> 1; 0 boxes baked
+Window Left 2 Frame: 6 renderers -> 1; 6 boxes baked
+Window Left 3 Glass: 1 renderers -> 1; 0 boxes baked
+Window Left 3 Frame: 6 renderers -> 1; 6 boxes baked
+Wall Right: 66 renderers -> 1; 32 boxes baked
+Window Right 1 Glass: 1 renderers -> 1; 0 boxes baked
+Window Right 1 Frame: 6 renderers -> 1; 6 boxes baked
+Window Right 2 Glass: 1 renderers -> 1; 0 boxes baked
+Window Right 2 Frame: 6 renderers -> 1; 6 boxes baked
+Window Right 3 Glass: 1 renderers -> 1; 0 boxes baked
+Window Right 3 Frame: 6 renderers -> 1; 6 boxes baked
+Wall Front: 154 renderers -> 1; 92 boxes baked
+Wall Rear: 82 renderers -> 1; 82 boxes baked
+Timber Structure: 122 renderers -> 1; 50 boxes baked
+Roof: 17 renderers -> 1; 17 boxes baked
+Skylight Left 1 Glass: 1 renderers -> 1; 0 boxes baked
+Skylight Left 1 Frame: 6 renderers -> 1; 6 boxes baked
+Skylight Left 2 Glass: 1 renderers -> 1; 0 boxes baked
+Skylight Left 2 Frame: 6 renderers -> 1; 6 boxes baked
+Skylight Right 1 Glass: 1 renderers -> 1; 0 boxes baked
+Skylight Right 1 Frame: 6 renderers -> 1; 6 boxes baked
+Skylight Right 2 Glass: 1 renderers -> 1; 0 boxes baked
+Skylight Right 2 Frame: 6 renderers -> 1; 6 boxes baked
+Door Left: 5 renderers -> 1; 5 boxes baked
+Door Right: 5 renderers -> 1; 5 boxes baked
