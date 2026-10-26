@@ -1,0 +1,1 @@
+11 separate editable shop display objects, each with its own mesh asset. Counter hammer and handsaw have their thin axis vertical and rest on the 1.151m tabletop. Wall/shelf displays retained. Solid weatherboard fascia, full front gable, side supports and structural headers now connect the sign to the roof/posts; upper facade combined as one static mesh.

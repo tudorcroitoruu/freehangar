@@ -1,0 +1,39 @@
+37 passed, 0 failed
+PASS Only same-scene realtime non-directional lights are registered
+PASS Near visible HDRP light and authored hard shadows remain on
+PASS HDRP light component observes managed shadow state
+PASS Far visible light remains lit without shadows
+PASS Light behind camera is culled
+PASS Realtime area lights are managed
+PASS Authored disabled light stays disabled
+PASS Directional lighting is untouched
+PASS Baked and mixed lights are untouched
+PASS Explicitly excluded light is untouched
+PASS Turning camera swaps visible lights and preserves soft shadows
+PASS Shadow exit buffer retains shadows at 19m
+PASS Shadows switch off beyond 20m buffered distance
+PASS Shadow re-entry waits until 18m
+PASS Shadows restore inside 18m
+PASS View exit buffer retains a previously visible edge light
+PASS Light switches off beyond view exit margin
+PASS View re-entry uses tighter entry margin
+PASS Light restores inside view entry margin
+PASS Gameplay API can switch a managed light off
+PASS Gameplay enable still respects view culling
+PASS Gameplay-enabled light returns when viewed
+PASS Distinct external disable is respected
+PASS Distinct external re-enable is respected
+PASS External shadow type change is preserved
+PASS Inactive light hierarchy retains authored component state
+PASS Reactivated hierarchy is evaluated
+PASS New runtime light discovered by rescan
+PASS Destroyed runtime light removed safely
+PASS Light changing to directional leaves management with authored state restored
+PASS Unavailable camera restores original lighting
+PASS Camera return resumes view/shadow culling
+PASS Disabling controller restores authored on/off and shadow types
+PASS Re-enabling controller rescans and resumes correctly
+PASS Duplicate controller in the same scene cannot compete for lights
+PASS 500 stable view updates allocate 0 managed bytes
+Stable 6-light fixture evaluation average: 0.0025ms; no GPU/frame-rate claim.
+PASS Other-scene light states were not altered by fixture controller

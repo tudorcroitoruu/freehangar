@@ -1,0 +1,1 @@
+Planted 1002 low-poly trees: 294 on perimeter slopes and 708 on distant hills. 3 existing beech variants, irregular groves with varied scale/rotation. Combined into 227 spatial cells / 681 LOD renderers; no per-tree hierarchy or new colliders. Trees grounded on terrain/backdrop triangles. Gameplay area, roads, doors and shop unchanged.

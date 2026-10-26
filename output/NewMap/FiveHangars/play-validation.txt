@@ -1,0 +1,20 @@
+19 passed, 0 failed
+PASS Hangar 2 - Medium blocks CharacterController at locked door
+PASS Hangar 3 - Medium blocks CharacterController at locked door
+PASS Hangar 4 - Large blocks CharacterController at locked door
+PASS Hangar 5 - Large blocks CharacterController at locked door
+PASS Starter hangar entrance remains open
+PASS Map perimeter stops CharacterController (1.00, 0.00, 0.00)
+PASS Map perimeter stops CharacterController (-1.00, 0.00, 0.00)
+PASS Map perimeter stops CharacterController (0.00, 0.00, -1.00)
+PASS Map perimeter stops CharacterController (0.00, 0.00, 1.00)
+PASS Hangar 4 - Grain bank to entrance kernels initialized after scene load
+PASS Hangar 4 - Grain bank to entrance remains scoopable with conserved mass
+PASS Hangar 2 - Almost full grain bank kernels initialized after scene load
+PASS Hangar 2 - Almost full grain bank remains scoopable with conserved mass
+PASS Hangar 3 - Almost full grain bank kernels initialized after scene load
+PASS Hangar 3 - Almost full grain bank remains scoopable with conserved mass
+PASS Hangar 5 - Grain bank to entrance kernels initialized after scene load
+PASS Hangar 5 - Grain bank to entrance remains scoopable with conserved mass
+PASS Corn pile - scoop with left click kernels initialized after scene load
+PASS Corn pile - scoop with left click remains scoopable with conserved mass

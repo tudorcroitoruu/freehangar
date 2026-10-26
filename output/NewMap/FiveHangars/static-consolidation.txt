@@ -1,0 +1,1 @@
+Static mesh renderers consolidated: 2928 -> 790 (LOD levels retained). Active hierarchy: 13662 -> 11753 transforms. Inactive original hangar construction archived as prefab. Trees, vehicles, grain, shop text and separate door leaves retain independent behavior.

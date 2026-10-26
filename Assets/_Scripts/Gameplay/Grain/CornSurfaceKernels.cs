@@ -58,6 +58,14 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private void Build()
     {
         if (pile == null || kernelMesh == null || kernelMaterial == null) return;
+        // Component OnEnable order is not guaranteed when a scene is loaded.
+        // The generated surface and cell cache both depend on the pile's field.
+        pile.Initialize();
+        if (pile.HeightField == null)
+        {
+            samples = null; batches = null; KernelCount = 0;
+            return;
+        }
         if (Application.isPlaying && samples != null && previousHeights != null &&
             sampledScale == pile.WorldScale && lastTransform == transform.localToWorldMatrix)
         { UpdateChangedCells(); return; }

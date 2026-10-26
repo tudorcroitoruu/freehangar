@@ -250,7 +250,7 @@ MonoBehaviour:
     colorBufferFormat: 48
     depthBufferFormat: 0
     supportCustomPass: 1
-    supportVariableRateShading: 0
+    supportVariableRateShading: 1
     customBufferFormat: 12
     supportedLitShaderMode: 2
     planarReflectionResolution:
@@ -273,7 +273,7 @@ MonoBehaviour:
     supportDataDrivenLensFlare: 1
     supportDitheringCrossFade: 0
     supportRuntimeAOVAPI: 0
-    supportTerrainHole: 0
+    supportTerrainHole: 1
     lightProbeSystem: 1
     oldLightProbeSystem: 0
     probeVolumeMemoryBudget: 1024
@@ -351,7 +351,7 @@ MonoBehaviour:
       maxScreenSpaceShadowSlots: 4
       screenSpaceShadowBufferFormat: 48
     decalSettings:
-      drawDistance: 500
+      drawDistance: 100
       atlasWidth: 1024
       atlasHeight: 1024
       transparentTextureResolution:
@@ -443,7 +443,7 @@ MonoBehaviour:
         m_Id: With3Levels
     lodBias:
       m_Values:
-      - 5
+      - 1
       - 1
       - 1
       m_SchemaId:

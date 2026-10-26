@@ -1,0 +1,5 @@
+PASS 11 separate editable tool objects
+PASS Each tool has its own mesh asset
+PASS Counter - hammer lying flat tabletop contact=1.1510m; thickness=0.0713m
+PASS Counter - handsaw lying flat tabletop contact=1.1510m; thickness=0.0345m
+PASS Solid framed facade extends from canopy to roof ridge

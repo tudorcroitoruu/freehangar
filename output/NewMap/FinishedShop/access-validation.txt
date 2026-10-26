@@ -1,0 +1,7 @@
+6 passed, 0 failed
+PASS Side aisle -1 is accessible past the counter
+PASS Rear shop floor reachable from aisle -1
+PASS Side aisle 1 is accessible past the counter
+PASS Rear shop floor reachable from aisle 1
+PASS Lowered counter retains solid collision
+PASS Player eye line clears the counter top

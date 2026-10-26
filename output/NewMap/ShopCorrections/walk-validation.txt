@@ -1,0 +1,1 @@
+PASS CharacterController walked 82m yard/road transition in 164 half-metre steps; max horizontal obstruction error=0.0000m.

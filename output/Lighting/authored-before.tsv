@@ -1,0 +1,11 @@
+Graphics/Directional Light	Directional	Realtime	True	Hard
+New_Map/01_Modular_Hangar/Front softbox bounce	Point	Realtime	True	None
+New_Map/01_Modular_Hangar/Reference pendant lamps/Bell pendant 1/Warm pendant	Spot	Realtime	True	Hard
+New_Map/01_Modular_Hangar/Reference pendant lamps/Bell pendant 2/Warm pendant	Spot	Realtime	True	Hard
+New_Map/01_Modular_Hangar/Reference pendant lamps/Bell pendant 3/Warm pendant	Spot	Realtime	True	Hard
+New_Map/01_Modular_Hangar/Reference pendant lamps/Bell pendant 4/Warm pendant	Spot	Realtime	True	Hard
+New_Map/11_Five_Hangar_Farm/Hangar 2 - Medium/Daylight interior bounce	Point	Realtime	True	None
+New_Map/11_Five_Hangar_Farm/Hangar 3 - Medium/Daylight interior bounce	Point	Realtime	True	None
+New_Map/11_Five_Hangar_Farm/Hangar 4 - Large/Daylight interior bounce	Point	Realtime	True	None
+New_Map/11_Five_Hangar_Farm/Hangar 5 - Large/Daylight interior bounce	Point	Realtime	True	None
+New_Map/11_Five_Hangar_Farm/S - Farm supplies and cottage/Farm supplies shop/Warm shop ceiling light	Point	Realtime	True	None

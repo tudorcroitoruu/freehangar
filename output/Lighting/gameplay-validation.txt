@@ -1,0 +1,12 @@
+Player camera: Player/Main Camera; managed=10; on=4; shadowed=1
+View yaw 0: enabled=4; shadowed=1
+View yaw 45: enabled=5; shadowed=1
+View yaw 90: enabled=2; shadowed=0
+View yaw 135: enabled=1; shadowed=0
+View yaw 180: enabled=0; shadowed=0
+View yaw 225: enabled=1; shadowed=0
+View yaw 270: enabled=2; shadowed=0
+View yaw 315: enabled=4; shadowed=1
+PASS Gameplay directional lights unchanged across all headings
+PASS Player camera binding restored after probe
+PASS All 11 Gameplay lights retain their authored enabled/shadow settings after returning to Edit Mode

@@ -1,0 +1,4 @@
+Hangar 2 - Medium approach obstacles=0 
+Hangar 3 - Medium approach obstacles=0 
+Hangar 4 - Large approach obstacles=0 
+Hangar 5 - Large approach obstacles=0 
