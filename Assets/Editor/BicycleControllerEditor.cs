@@ -7,7 +7,13 @@ public sealed class BicycleControllerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        DrawDefaultInspector();
+        if (((BicycleController)target).motorDriven)
+        {
+            serializedObject.Update();
+            DrawPropertiesExcluding(serializedObject, "crank", "leftPedal", "rightPedal", "maximumSpeed", "acceleration", "wheelRadius", "wheelbase", "brakingDeceleration", "boostSpeedMultiplier", "motorDriven", "pedalingPitchAmplitude", "pedalingPitchSmoothTime");
+            serializedObject.ApplyModifiedProperties();
+        }
+        else DrawDefaultInspector();
         EditorGUILayout.Space();
         if (!EditorApplication.isPlaying && GUILayout.Button("Adjust Riding Position", GUILayout.Height(32)))
             BicycleRidingPositionWindow.Open((BicycleController)target);
@@ -26,7 +32,7 @@ public sealed class BicycleRidingPositionWindow : EditorWindow
 
     public static void Open(BicycleController bike)
     {
-        var window = GetWindow<BicycleRidingPositionWindow>("Bicycle riding position");
+        var window = GetWindow<BicycleRidingPositionWindow>(bike.motorDriven ? "Motoroller riding position" : "Bicycle riding position");
         window.RestorePreview();
         window.bicycle = bike;
         window.minSize = new Vector2(390, 360);

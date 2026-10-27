@@ -1,0 +1,2 @@
+using UnityEngine;using UnityEditor;using UnityEditor.SceneManagement;using System.Linq;
+public static class FinishMotoroller{public static string Main(){var scooter=Object.FindFirstObjectByType<MotorollerController>();var root=scooter.transform;Physics.SyncTransforms();var hits=Physics.OverlapBox(root.TransformPoint(new Vector3(0,.65f,0)),new Vector3(.35f,.43f,1.04f),root.rotation,~0,QueryTriggerInteraction.Ignore).Where(c=>!c.transform.IsChildOf(root)).Select(c=>c.name).ToArray();return string.Join(", ",hits);}}

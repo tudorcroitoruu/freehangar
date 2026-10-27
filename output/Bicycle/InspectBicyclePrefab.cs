@@ -1,0 +1,2 @@
+using UnityEngine;using UnityEditor;using System.Linq;
+public static class InspectBicyclePrefab {public static string Main(){var bike=Object.FindObjectsByType<BicycleController>(FindObjectsInactive.Include,FindObjectsSortMode.None).First(b=>!b.motorDriven&&b.gameObject.scene.IsValid());return "Playing="+Application.isPlaying+"; root="+bike.name+"; prefab="+PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(bike.gameObject)+"; children="+string.Join(",",bike.GetComponentsInChildren<Transform>(true).Select(t=>t.name))+"; cargo="+bike.cargoSlots.Sum(s=>s.childCount);}}

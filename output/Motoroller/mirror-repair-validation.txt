@@ -1,0 +1,1 @@
+PASS: 16 mirror hierarchy/bounds/double-sided/frustum checks. Glass normal=(-0.40, -0.01, -0.92)

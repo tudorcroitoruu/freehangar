@@ -1,0 +1,1 @@
+PASS: 22 checks for steering smoothing, boost/stamina/exhaustion/recovery, camera offsets/save/reload/clamps and dismount.

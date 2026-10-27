@@ -1042,6 +1042,10 @@ MonoBehaviour:
   - {fileID: 3476090794756468772}
   maximumSpeed: 7
   acceleration: 2.5
+  wheelRadius: 0.34
+  wheelbase: 1.117
+  brakingDeceleration: 12
+  motorDriven: 0
   boostSpeedMultiplier: 1.5
   steeringSmoothTime: 0.14
   maximumSteeringAngle: 30

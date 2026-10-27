@@ -8,6 +8,11 @@ public sealed class BicycleController : MonoBehaviour
     public Transform[] cargoSlots;
     [Min(1)] public float maximumSpeed = 7f;
     [Min(0)] public float acceleration = 2.5f;
+    [Min(.05f)] public float wheelRadius = .34f;
+    [Min(.2f)] public float wheelbase = 1.117f;
+    [Min(.1f)] public float brakingDeceleration = 12f;
+    [Tooltip("Disable crank and pedaling camera motion for motor-driven vehicles.")]
+    public bool motorDriven;
     [Min(1)] public float boostSpeedMultiplier = 1.5f;
     [Header("Steering")]
     [Range(.02f, .5f)] public float steeringSmoothTime = .14f;
@@ -46,6 +51,7 @@ public sealed class BicycleController : MonoBehaviour
     public bool IsRidden { get; private set; }
     public float Speed { get; private set; }
     CharacterController motor;
+    MotorollerController motoroller;
     float fallSpeed, wheelAngle, crankAngle;
     Quaternion steerRest, frontRest, rearRest, crankRest;
     Vector3 leftOffset, rightOffset;
@@ -54,8 +60,11 @@ public sealed class BicycleController : MonoBehaviour
     {
         if (motor != null) return;
         motor = GetComponent<CharacterController>();
+        motoroller = GetComponent<MotorollerController>();
         steerRest = steering.localRotation; frontRest = frontWheel.localRotation;
-        rearRest = rearWheel.localRotation; crankRest = crank.localRotation;
+        rearRest = rearWheel.localRotation;
+        if (motorDriven) return;
+        crankRest = crank.localRotation;
         leftOffset = leftPedal.position - crank.position; rightOffset = rightPedal.position - crank.position;
         leftOffset = transform.InverseTransformVector(leftOffset); rightOffset = transform.InverseTransformVector(rightOffset);
         leftRest = leftPedal.localRotation; rightRest = rightPedal.localRotation;
@@ -76,25 +85,30 @@ public sealed class BicycleController : MonoBehaviour
     }
     public void Drive(float throttle, float turn, bool brake, float dt, bool boost = false)
     {
-        if (!IsRidden || dt <= 0) return;
+        if (!IsRidden || dt <= 0 || !float.IsFinite(dt)) return;
         float target = Mathf.Clamp(throttle, -.3f, 1f) * maximumSpeed * (boost && throttle > 0 && !brake ? Mathf.Max(1, boostSpeedMultiplier) : 1);
-        Speed = Mathf.MoveTowards(Speed, brake ? 0 : target, (brake ? 12f : Mathf.Abs(throttle) < .01f ? 1.8f : acceleration) * dt);
+        Speed = Mathf.MoveTowards(Speed, brake ? 0 : target, (brake ? brakingDeceleration : Mathf.Abs(throttle) < .01f ? 1.8f : acceleration) * dt);
         float targetSteering = Mathf.Clamp(turn, -1, 1) * maximumSteeringAngle;
         currentSteering = Mathf.SmoothDampAngle(currentSteering, targetSteering, ref steeringVelocity,
             Mathf.Max(.02f, steeringSmoothTime), Mathf.Infinity, dt);
         float steer = currentSteering;
-        transform.Rotate(0, Mathf.Tan(steer * Mathf.Deg2Rad) * Speed / 1.117f * Mathf.Rad2Deg * dt, 0);
+        transform.Rotate(0, Mathf.Tan(steer * Mathf.Deg2Rad) * Speed / Mathf.Max(.2f,wheelbase * transform.lossyScale.z) * Mathf.Rad2Deg * dt, 0);
         if (motor.isGrounded && fallSpeed < 0) fallSpeed = -2;
         fallSpeed -= 9.81f * dt;
         Vector3 before = transform.position;
-        CollisionFlags hit = motor.Move((transform.forward * Speed + Vector3.up * fallSpeed) * dt);
+        Vector3 motion = transform.forward * Speed * dt;
+        if (motoroller != null) motion = motoroller.ConstrainMotion(motion);
+        CollisionFlags hit = motor.Move(motion + Vector3.up * fallSpeed * dt);
+        if (motoroller != null && motion.sqrMagnitude < .000001f && Mathf.Abs(Speed) > .1f) Speed = 0;
         if ((hit & CollisionFlags.Sides) != 0 && Vector3.ProjectOnPlane(transform.position-before,Vector3.up).magnitude < Mathf.Abs(Speed)*dt*.3f) Speed = 0;
         if ((hit & CollisionFlags.Above) != 0) fallSpeed = 0;
         steering.localRotation = steerRest * Quaternion.Euler(0, steer, 0);
-        wheelAngle += Speed / .34f * Mathf.Rad2Deg * dt;
+        float travelled = Vector3.Dot(transform.position-before, transform.forward);
+        wheelAngle += travelled / Mathf.Max(.05f,wheelRadius * transform.lossyScale.y) * Mathf.Rad2Deg;
         // The front wheel is carried by the shared headset pivot; only spin it at its axle.
         frontWheel.localRotation = frontRest * Quaternion.Euler(wheelAngle,0,0);
         rearWheel.localRotation = rearRest * Quaternion.Euler(wheelAngle,0,0);
+        if (motorDriven) { PedalingCameraPitch = 0; return; }
         if (Mathf.Abs(throttle) > .01f && !brake) crankAngle += Speed * 100 * dt;
         // Use the actual crank phase, so the rider motion follows the animated feet.
         bool pedaling = Mathf.Abs(throttle) > .01f && !brake && Mathf.Abs(Speed) > .1f;

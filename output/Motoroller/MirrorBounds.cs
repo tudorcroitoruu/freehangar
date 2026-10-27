@@ -1,0 +1,2 @@
+using UnityEngine;using UnityEditor;using System.Linq;
+public static class MirrorBounds{public static string Main(){var m=Object.FindFirstObjectByType<MotorollerController>();return string.Join("\n",m.GetComponentsInChildren<MeshFilter>().Where(f=>f.name.Contains("Mirror")).Select(f=>f.name+" mesh bounds="+f.sharedMesh.bounds.ToString("F6")+" vertex extent="+(f.sharedMesh.vertices.Max(v=>v.y)-f.sharedMesh.vertices.Min(v=>v.y))));}}

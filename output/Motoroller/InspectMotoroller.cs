@@ -1,0 +1,4 @@
+using UnityEngine;using UnityEditor;using System.Linq;
+public static class InspectMotoroller {public static object Main(){return Newtonsoft.Json.JsonConvert.SerializeObject(new {scene=UnityEngine.SceneManagement.SceneManager.GetActiveScene().path,dirty=UnityEngine.SceneManagement.SceneManager.GetActiveScene().isDirty,objects=Object.FindObjectsByType<Transform>(FindObjectsInactive.Include,FindObjectsSortMode.None).Where(t=>t.name.ToLower().Contains("motor")||t.name=="Bicycle - red rideable").Select(t=>new {t.name,pos=t.position.ToString(),rot=t.eulerAngles.ToString(),scale=t.lossyScale.ToString(),active=t.gameObject.activeInHierarchy,parts=t.GetComponentsInChildren<MeshFilter>(true).Select(m=>new {m.name,tris=m.sharedMesh==null?0:m.sharedMesh.triangles.Length/3,mesh=m.sharedMesh==null?"":AssetDatabase.GetAssetPath(m.sharedMesh)}).ToArray()}).ToArray()});}}
+
+

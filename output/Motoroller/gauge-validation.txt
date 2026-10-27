@@ -1,0 +1,1 @@
+PASS: 11 mirror and speedometer checks. Total triangles=13057

@@ -12,6 +12,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     public bool IsBoosting { get; private set; }
     StaminaManager stamina;
     bool boostExhausted;
+    MotorollerController motoroller;
     public bool IsRiding => riding;
     bool riding, instrumentActive;
     Camera view;
@@ -31,7 +32,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     }
     public bool Tick(bool input)
     {
-        if (!isActiveAndEnabled || bicycle == null || view == null) return false;
+        if (!isActiveAndEnabled || view == null) return false;
         if (riding)
         {
             if (input && Input.GetKeyDown(KeyCode.E)) { TryDismount(); return true; }
@@ -39,13 +40,17 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
                 !input || Input.GetKey(KeyCode.Space), input && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)), Time.deltaTime);
             if(input) { yaw = Mathf.Clamp(yaw + Input.GetAxisRaw("Mouse X")*2,-85,85); pitch=Mathf.Clamp(pitch-Input.GetAxisRaw("Mouse Y")*2,-65,65); }
             ApplyRidingView();
-            hint="W/S Pedal   A/D Steer   Shift Faster   Space Brake   E Get off";
+            hint=motoroller != null ? "W/S Drive / Reverse   A/D Steer   Space Brake   E Get off" : "W/S Pedal   A/D Steer   Shift Faster   Space Brake   E Get off";
             return true;
         }
         hint="";
         if (!input || Time.timeScale <= 0) return false;
-        if (Vector3.Distance(view.transform.position,bicycle.transform.position)>interactionDistance+1) return false;
         if(!Physics.Raycast(view.transform.position,view.transform.forward,out var hit,interactionDistance,~0,QueryTriggerInteraction.Ignore)) return false;
+        // Select the aimed vehicle, keeping the existing serialized bicycle as the default.
+        var aimedVehicle = hit.collider.GetComponentInParent<BicycleController>();
+        if (aimedVehicle != null) bicycle = aimedVehicle;
+        if (bicycle == null || !bicycle.isActiveAndEnabled) return false;
+        if (Vector3.Distance(view.transform.position,bicycle.transform.position)>interactionDistance+1) return false;
         var cargoBox = hit.collider.GetComponentInParent<BicycleCargoBox>();
         if(cargoBox != null && cargoBox.IsLoaded)
         {
@@ -63,7 +68,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             }
             // Aiming at an attached bag uses the existing bag interaction to take it back.
             if (hit.collider.GetComponentInParent<GrainContainer>() != null) return false;
-            hint="E Ride bicycle";
+            hint=bicycle.motorDriven ? "E Ride motoroller" : "E Ride bicycle";
             if(Input.GetKeyDown(KeyCode.E))return TryMount();
         }
         else
@@ -81,6 +86,13 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     {
         if (!riding || dt <= 0 || !float.IsFinite(dt)) return;
         if (stamina == null) stamina = player.Stamina;
+        if (motoroller != null)
+        {
+            motoroller.Drive(throttle, turn, brake, dt);
+            IsBoosting = false;
+            if (stamina != null) stamina.Tick(false, dt, false);
+            return;
+        }
         if (stamina != null && boostExhausted && (!requestBoost || stamina.NormalizedStamina >= .2f)) boostExhausted = false;
         bool boost = requestBoost && throttle > .01f && !brake &&
             stamina != null && stamina.isActiveAndEnabled && !stamina.IsExhausted && !boostExhausted;
@@ -115,7 +127,8 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     public bool TryMount()
     {
         CacheReferences();
-        if(view == null || player == null || player.characterController == null || riding || bicycle==null || (bags!=null && bags.IsCarrying) || Vector3.Distance(transform.position,bicycle.transform.position)>interactionDistance) return false;
+        if(view == null || player == null || player.characterController == null || riding || bicycle==null || !bicycle.isActiveAndEnabled || bicycle.IsRidden || bicycle.riderView==null || (bags!=null && bags.IsCarrying) || Vector3.Distance(transform.position,bicycle.transform.position)>interactionDistance) return false;
+        motoroller = bicycle.GetComponent<MotorollerController>();
         player.ClearSprintCameraMotion();
         cameraParent=view.transform.parent;cameraPosition=view.transform.localPosition;cameraRotation=view.transform.localRotation;
         player.characterController.enabled=false;
