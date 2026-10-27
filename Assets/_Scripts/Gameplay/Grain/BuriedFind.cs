@@ -6,7 +6,7 @@ using UnityEngine;
 [DisallowMultipleComponent, RequireComponent(typeof(BoxCollider))]
 public sealed class BuriedFind : MonoBehaviour, IInteractable
 {
-    public enum Kind { Key, CashChest, UpgradeVoucher, InfiniteStamina, CashCache }
+    public enum Kind { Key, CashChest, UpgradeVoucher, InfiniteStamina, CashCache, Hammer, Sledgehammer }
 
     [SerializeField] private Kind kind;
     [SerializeField] private string findId;
@@ -100,6 +100,8 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         bool hasKey = kind != Kind.CashChest || WasFound(SaveSystem.Data, requiredKeyId);
         string action = !hasProfile ? "Load save to collect" : !hasKey ? "Requires hidden key" :
             kind == Kind.Key ? "Take hidden key" :
+            kind == Kind.Hammer ? "Take hammer (equip with 2)" :
+            kind == Kind.Sledgehammer ? "Take sledgehammer (equip with 3)" :
             kind == Kind.UpgradeVoucher ? "Take free upgrade voucher" :
             kind == Kind.InfiniteStamina ? $"Take infinite stamina ({staminaDurationSeconds / 60} min)" :
             kind == Kind.CashCache ? $"Take cash cache (+${cashReward})" :

@@ -44,6 +44,7 @@ public class PlayerController : MonoBehaviour
 
     private PlayerBicycleInteraction bicycleInteraction;
     private PlayerInteractor interactor;
+    private PlayerCombatTools combatTools;
     private float verticalVelocity;
     private float cameraRotationX;
     private float targetYaw;
@@ -76,6 +77,7 @@ public class PlayerController : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
         bicycleInteraction = GetComponent<PlayerBicycleInteraction>();
+        combatTools = GetComponent<PlayerCombatTools>();
         if (staminaManager == null && !TryGetComponent(out staminaManager))
             staminaManager = FindFirstObjectByType<StaminaManager>();
         if (staminaManager == null)
@@ -149,6 +151,7 @@ public class PlayerController : MonoBehaviour
 
         HandleCrouch(acceptInput);
         HandleMovement(acceptInput);
+        if (combatTools != null) combatTools.Tick(acceptInput, wasLocked);
         bool interactionAction = acceptInput && interactor != null && Input.GetKeyDown(KeyCode.E) && interactor.TryInteract();
         if (shovelTool != null && shovelTool.isActiveAndEnabled && !interactionAction)
         {
