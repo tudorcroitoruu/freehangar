@@ -12,7 +12,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     [SerializeField] private string findId;
     [SerializeField] private string requiredKeyId;
     [SerializeField, Min(1)] private int cashReward = 500;
-    [SerializeField, Min(1)] private int staminaDurationSeconds = 3600;
+    [SerializeField, Min(1)] private int staminaDurationSeconds = 300;
     [SerializeField] private GrainPile coveringPile;
     [SerializeField] private bool settleOnReveal;
     [SerializeField] private Transform lidPivot;
