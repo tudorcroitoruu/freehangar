@@ -7,7 +7,7 @@ public class GameplayCanvas : MonoBehaviour
     
     [Header("Money")]
     [SerializeField] private Text moneyText;
-
+    
     private void Awake()
     {
         if (Instance == null)

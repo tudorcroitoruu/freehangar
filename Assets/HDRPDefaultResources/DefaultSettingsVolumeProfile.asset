@@ -2547,6 +2547,298 @@ MonoBehaviour:
   debug:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &-1488910839631118365
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e11e42a94562db44d833b37ae64090e0, type: 3}
+  m_Name: PolyverseStyleSky
+  m_EditorClassIdentifier: Assembly-CSharp::Liviu.Environment.HDRP.PolyverseStyleSky
+  active: 1
+  rotation:
+    m_OverrideState: 1
+    m_Value: 0
+  skyIntensityMode:
+    m_OverrideState: 1
+    m_Value: 0
+  exposure:
+    m_OverrideState: 1
+    m_Value: 0
+  multiplier:
+    m_OverrideState: 1
+    m_Value: 1
+  upperHemisphereLuxValue:
+    m_OverrideState: 1
+    m_Value: 1
+  upperHemisphereLuxColor:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0, z: 0}
+  desiredLuxValue:
+    m_OverrideState: 1
+    m_Value: 20000
+  updateMode:
+    m_OverrideState: 1
+    m_Value: 0
+  updatePeriod:
+    m_OverrideState: 1
+    m_Value: 0
+  includeSunInBaking:
+    m_OverrideState: 1
+    m_Value: 0
+  backgroundMode:
+    m_OverrideState: 1
+    m_Value: 0
+  skyColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.498, g: 0.745, b: 1, a: 1}
+  equatorColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 0.747, b: 0, a: 1}
+  groundColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.498, g: 0.497, b: 0, a: 1}
+  equatorHeight:
+    m_OverrideState: 1
+    m_Value: 0.5
+  equatorSmoothness:
+    m_OverrideState: 1
+    m_Value: 0.5
+  backgroundCubemap:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+  backgroundExposure:
+    m_OverrideState: 1
+    m_Value: 1
+  debugSolidColor:
+    m_OverrideState: 1
+    m_Value: 0
+  enablePatternOverlay:
+    m_OverrideState: 1
+    m_Value: 0
+  patternCubemap:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+  patternContrast:
+    m_OverrideState: 1
+    m_Value: 0.5
+  enableStars:
+    m_OverrideState: 1
+    m_Value: 0
+  starsCubemap:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+  starsIntensity:
+    m_OverrideState: 1
+    m_Value: 2
+  starsVisibility:
+    m_OverrideState: 1
+    m_Value: 1
+  starsIgnoreExposure:
+    m_OverrideState: 1
+    m_Value: 1
+  starsLayers:
+    m_OverrideState: 1
+    m_Value: 2
+  starsColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  starsSize:
+    m_OverrideState: 1
+    m_Value: 0.5
+  starsSunMask:
+    m_OverrideState: 1
+    m_Value: 0
+  starsHeightMask:
+    m_OverrideState: 1
+    m_Value: 0
+  starsBottomMask:
+    m_OverrideState: 1
+    m_Value: 0
+  enableStarsTwinkling:
+    m_OverrideState: 1
+    m_Value: 0
+  twinklingContrast:
+    m_OverrideState: 1
+    m_Value: 1
+  twinklingSpeed:
+    m_OverrideState: 1
+    m_Value: 0.05
+  enableStarsRotation:
+    m_OverrideState: 1
+    m_Value: 0
+  starsRotation:
+    m_OverrideState: 1
+    m_Value: 0
+  starsRotationAxis:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 1, z: 0}
+  starsRotationSpeed:
+    m_OverrideState: 1
+    m_Value: 0.5
+  enableSun:
+    m_OverrideState: 1
+    m_Value: 0
+  sunTexture:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+  sunColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  sunSize:
+    m_OverrideState: 1
+    m_Value: 0.5
+  sunIntensity:
+    m_OverrideState: 1
+    m_Value: 1
+  sunDirection:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0, z: 1}
+  enableMoon:
+    m_OverrideState: 1
+    m_Value: 0
+  moonTexture:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+  moonColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  moonSize:
+    m_OverrideState: 1
+    m_Value: 0.5
+  moonIntensity:
+    m_OverrideState: 1
+    m_Value: 1
+  moonPhase:
+    m_OverrideState: 1
+    m_Value: 0
+  moonDarkSideVisibility:
+    m_OverrideState: 1
+    m_Value: 0
+  moonPhaseRoundness:
+    m_OverrideState: 1
+    m_Value: 1.6
+  moonPhaseFade:
+    m_OverrideState: 1
+    m_Value: 0.5
+  moonDirection:
+    m_OverrideState: 1
+    m_Value: {x: 1, y: 0, z: 0}
+  enableClouds:
+    m_OverrideState: 1
+    m_Value: 0
+  cloudsCubemap:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+  cloudsOpacity:
+    m_OverrideState: 1
+    m_Value: 1
+  cloudsFade:
+    m_OverrideState: 1
+    m_Value: 1
+  cloudsHeight:
+    m_OverrideState: 1
+    m_Value: 0
+  cloudsOffset:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0}
+  cloudsCoverage:
+    m_OverrideState: 1
+    m_Value: 0.45
+  cloudsScale:
+    m_OverrideState: 1
+    m_Value: 3
+  cloudsSoftness:
+    m_OverrideState: 1
+    m_Value: 0.08
+  cloudsDetail:
+    m_OverrideState: 1
+    m_Value: 0.65
+  cloudsHorizonFade:
+    m_OverrideState: 1
+    m_Value: 0.1
+  cloudsMaxHeight:
+    m_OverrideState: 1
+    m_Value: 90
+  cloudsLayerAltitude:
+    m_OverrideState: 1
+    m_Value: 1000
+  cloudsDistanceFade:
+    m_OverrideState: 1
+    m_Value: {x: 3000, y: 8000}
+  cloudsDistantScale:
+    m_OverrideState: 1
+    m_Value: 0.35
+  cloudsBreakup:
+    m_OverrideState: 1
+    m_Value: 0.8
+  cloudsWindVelocity:
+    m_OverrideState: 1
+    m_Value: {x: 0.003, y: 0.001}
+  cloudsEvolutionSpeed:
+    m_OverrideState: 1
+    m_Value: 0.025
+  cloudsDeformation:
+    m_OverrideState: 1
+    m_Value: 0.35
+  cloudsLightColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  cloudsShadowColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.498, g: 0.745, b: 1, a: 1}
+  cloudsFollowSceneSun:
+    m_OverrideState: 1
+    m_Value: 1
+  cloudsDirectLight:
+    m_OverrideState: 1
+    m_Value: 0.9
+  cloudsAmbientFill:
+    m_OverrideState: 1
+    m_Value: 0.18
+  cloudsLightSoftness:
+    m_OverrideState: 1
+    m_Value: 0.45
+  cloudsSilverLining:
+    m_OverrideState: 1
+    m_Value: 0.18
+  enableCloudsRotation:
+    m_OverrideState: 1
+    m_Value: 0
+  cloudsRotation:
+    m_OverrideState: 1
+    m_Value: 0
+  cloudsRotationAxis:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 1, z: 0}
+  cloudsRotationSpeed:
+    m_OverrideState: 1
+    m_Value: 0.5
+  enableHorizonFog:
+    m_OverrideState: 1
+    m_Value: 0
+  horizonFogColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.55, g: 0.62, b: 0.7, a: 1}
+  fogHeight:
+    m_OverrideState: 1
+    m_Value: 0.15
+  fogSmoothness:
+    m_OverrideState: 1
+    m_Value: 0.5
+  fogFill:
+    m_OverrideState: 1
+    m_Value: 0
+  skyboxOffset:
+    m_OverrideState: 1
+    m_Value: 0
+  skyboxRotationAxis:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 1, z: 0}
 --- !u!114 &-1100453110102035959
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -3144,6 +3436,7 @@ MonoBehaviour:
   - {fileID: -3591331735759760951}
   - {fileID: -3134055322372161797}
   - {fileID: 7315919721127616198}
+  - {fileID: -1488910839631118365}
 --- !u!114 &172703836674317363
 MonoBehaviour:
   m_ObjectHideFlags: 3
