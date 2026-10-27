@@ -1,0 +1,1 @@
+PASS: 7 four-slot box capacity and wide-body unloading checks.

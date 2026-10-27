@@ -6,6 +6,9 @@ public sealed class BicycleController : MonoBehaviour
 {
     public Transform steering, frontWheel, rearWheel, crank, leftPedal, rightPedal, riderView;
     public Transform[] cargoSlots;
+    public string cargoLocationName = "rear rack";
+    [Min(.5f)] public float dismountSideDistance = 1.1f;
+    [Min(.5f)] public float dismountLongitudinalDistance = 1.5f;
     [Min(1)] public float maximumSpeed = 7f;
     [Min(0)] public float acceleration = 2.5f;
     [Min(.05f)] public float wheelRadius = .34f;

@@ -62,13 +62,14 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         {
             if (bags != null && bags.IsCarrying)
             {
-                hint=bicycle.FreeCargoSlot()!=null ? "E Secure bag on rear rack" : "Rear rack is full";
+                hint=bicycle.FreeCargoSlot()!=null ? "E Secure bag on " + bicycle.cargoLocationName : bicycle.cargoLocationName + " is full";
                 if (Input.GetKeyDown(KeyCode.E)) { TryLoadBag(); return true; }
                 return false;
             }
             // Aiming at an attached bag uses the existing bag interaction to take it back.
             if (hit.collider.GetComponentInParent<GrainContainer>() != null) return false;
-            hint=bicycle.motorDriven ? "E Ride motoroller" : "E Ride bicycle";
+            var engine = bicycle.GetComponent<MotorollerController>();
+            hint=engine != null ? "E Drive " + engine.VehicleName : "E Ride bicycle";
             if(Input.GetKeyDown(KeyCode.E))return TryMount();
         }
         else
@@ -76,7 +77,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             var box=hit.collider.GetComponentInParent<BicycleCargoBox>();
             if(box!=null && Vector3.Distance(box.transform.position,bicycle.transform.position)<2.5f)
             {
-                hint="E Secure box on rear rack";
+                hint="E Secure box on " + bicycle.cargoLocationName;
                 if(Input.GetKeyDown(KeyCode.E))return box.Load(bicycle.FreeCargoSlot());
             }
         }
@@ -114,7 +115,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if(box == null || !box.IsLoaded || riding) return false;
         for(int side=0;side<2;side++)
         {
-            Vector3 point=bicycle.transform.position+bicycle.transform.right*(side==0?1.1f:-1.1f);
+            Vector3 point=bicycle.transform.position+bicycle.transform.right*(side==0?bicycle.dismountSideDistance:-bicycle.dismountSideDistance);
             if(!Physics.Raycast(point+Vector3.up*2,Vector3.down,out var ground,5,~0,QueryTriggerInteraction.Ignore) || ground.normal.y<.65f)continue;
             var bounds=box.GetComponentInChildren<Renderer>().bounds;
             Vector3 center=ground.point+Vector3.up*(bounds.extents.y+.08f);
@@ -144,7 +145,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         Vector3 exit=default;bool clear=false;
         for(int side=0;side<4;side++)
         {
-            Vector3 offset=side<2 ? bicycle.transform.right*(side==0?-1.1f:1.1f) : bicycle.transform.forward*(side==2?-1.5f:1.5f);
+            Vector3 offset=side<2 ? bicycle.transform.right*(side==0?-bicycle.dismountSideDistance:bicycle.dismountSideDistance) : bicycle.transform.forward*(side==2?-bicycle.dismountLongitudinalDistance:bicycle.dismountLongitudinalDistance);
             Vector3 point=bicycle.transform.position+offset;
             if(!Physics.Raycast(point+Vector3.up*2,Vector3.down,out var ground,5,~0,QueryTriggerInteraction.Ignore) || ground.normal.y<.65f)continue;
             Vector3 bottom=ground.point+Vector3.up*.35f,top=ground.point+Vector3.up*1.55f;

@@ -1,0 +1,28 @@
+using UnityEngine;using UnityEditor;using UnityEditor.SceneManagement;using System;using System.Linq;
+public static class SetupTrike {
+const string Dir="Assets/Models/3WheelCar/Driveable/";
+public static string Main(){if(Application.isPlaying)throw new Exception("Edit Mode required");var original=GameObject.Find("Trike");if(original==null)throw new Exception("Original Trike missing");if(GameObject.Find("Trike - driveable")!=null)throw new Exception("Prepared Trike exists");
+if(!AssetDatabase.IsValidFolder(Dir.TrimEnd('/')))AssetDatabase.CreateFolder("Assets/Models/3WheelCar","Driveable");
+var asset=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Models/3WheelCar/Piaggio_Ape_FBX_Package/Piaggio_Ape_Articulated.fbx");var source=UnityEngine.Object.Instantiate(asset);source.transform.position=Vector3.zero;
+var root=new GameObject("Trike - driveable");root.SetActive(false);Undo.RegisterCreatedObjectUndo(root,"Prepare driveable Trike");root.transform.SetParent(original.transform.parent,false);root.transform.SetPositionAndRotation(original.transform.position,original.transform.rotation*Quaternion.Inverse(asset.transform.rotation));root.transform.localScale=original.transform.localScale;
+var terrain=Terrain.activeTerrains.FirstOrDefault(t=>root.transform.position.x>=t.transform.position.x&&root.transform.position.x<=t.transform.position.x+t.terrainData.size.x&&root.transform.position.z>=t.transform.position.z&&root.transform.position.z<=t.transform.position.z+t.terrainData.size.z);if(terrain!=null)root.transform.position=new Vector3(root.transform.position.x,terrain.SampleHeight(root.transform.position)+terrain.transform.position.y+.02f,root.transform.position.z);
+foreach(var mf in source.GetComponentsInChildren<MeshFilter>()){
+var matrix=mf.transform.localToWorldMatrix;var origin=mf.transform.position;var mesh=UnityEngine.Object.Instantiate(mf.sharedMesh);mesh.name=mf.name;var v=mesh.vertices;for(int i=0;i<v.Length;i++)v[i]=matrix.MultiplyPoint3x4(v[i])-origin;mesh.vertices=v;var n=mesh.normals;for(int i=0;i<n.Length;i++)n[i]=matrix.inverse.transpose.MultiplyVector(n[i]).normalized;mesh.normals=n;mesh.RecalculateBounds();mesh.RecalculateTangents();AssetDatabase.CreateAsset(mesh,Dir+mf.name+".asset");
+var part=new GameObject(mf.name);part.transform.SetParent(root.transform,false);part.transform.localPosition=origin;part.AddComponent<MeshFilter>().sharedMesh=mesh;
+var renderer=part.AddComponent<MeshRenderer>();var oldRenderer=original.GetComponentsInChildren<Renderer>().FirstOrDefault(r=>r.name==mf.name);renderer.sharedMaterials=oldRenderer!=null?oldRenderer.sharedMaterials:mf.GetComponent<Renderer>().sharedMaterials;
+}
+Transform Find(string name)=>root.GetComponentsInChildren<Transform>().First(t=>t.name==name);
+Transform Anchor(string name,Vector3 p){var a=new GameObject(name).transform;a.SetParent(root.transform,false);a.localPosition=p;return a;}
+var originalSteer=source.GetComponentsInChildren<Transform>().First(t=>t.name=="Steering_Front_Pivot");var pivot=Anchor("Steering_Front_Pivot",originalSteer.position);pivot.localRotation=Quaternion.FromToRotation(Vector3.up,originalSteer.forward);
+foreach(string name in new[]{"Wheel_Front","Front_Fork","Front_Mudguard","Handlebar"})Find(name).SetParent(pivot,true);
+UnityEngine.Object.DestroyImmediate(source);
+var rig=root.AddComponent<BicycleController>();rig.motorDriven=true;rig.steering=pivot;rig.frontWheel=Find("Wheel_Front");rig.rearWheel=Find("Wheel_Rear_Left");rig.maximumSteeringAngle=28;rig.steeringSmoothTime=.2f;rig.dismountSideDistance=1.65f;rig.dismountLongitudinalDistance=2.65f;
+rig.riderView=Anchor("Driver view",new Vector3(0,1.58f,.62f));rig.SetRidingCamera(Vector3.zero,3);
+rig.cargoSlots=new[]{Anchor("Bed cargo front left",new Vector3(-.43f,1.28f,-.35f)),Anchor("Bed cargo front right",new Vector3(.43f,1.28f,-.35f)),Anchor("Bed cargo rear left",new Vector3(-.43f,1.28f,-1.25f)),Anchor("Bed cargo rear right",new Vector3(.43f,1.28f,-1.25f))};
+var motor=root.AddComponent<MotorollerController>();using(var so=new SerializedObject(motor)){so.FindProperty("vehicleName").stringValue="Trike";so.FindProperty("maximumSpeed").floatValue=10;so.FindProperty("acceleration").floatValue=2.5f;so.FindProperty("brakingDeceleration").floatValue=8;so.FindProperty("wheelRadius").floatValue=.28586f;so.FindProperty("wheelbase").floatValue=2.55731f;so.FindProperty("collisionCenter").vector3Value=new Vector3(0,1.13f,0);so.FindProperty("collisionHalfExtents").vector3Value=new Vector3(.94f,.94f,1.91f);so.ApplyModifiedPropertiesWithoutUndo();}motor.Configure();
+var trike=root.AddComponent<TrikeController>();using(var so=new SerializedObject(trike)){so.FindProperty("rearRightWheel").objectReferenceValue=Find("Wheel_Rear_Right");so.ApplyModifiedPropertiesWithoutUndo();}
+var cc=root.GetComponent<CharacterController>();cc.height=2.05f;cc.radius=.72f;cc.center=new Vector3(0,1.045f,0);cc.stepOffset=.16f;cc.slopeLimit=35;cc.skinWidth=.025f;
+var box=root.AddComponent<BoxCollider>();box.center=new Vector3(0,1.05f,0);box.size=new Vector3(1.9f,2.05f,3.8f);
+Undo.RecordObject(original,"Keep original Trike as reference");original.SetActive(false);root.SetActive(true);PrefabUtility.SaveAsPrefabAssetAndConnect(root,Dir+"Trike_Driveable.prefab",InteractionMode.AutomatedAction);AssetDatabase.SaveAssets();EditorSceneManager.MarkSceneDirty(root.scene);EditorSceneManager.SaveScene(root.scene);Selection.activeGameObject=root;
+return "Saved Trike prefab and scene; triangles="+root.GetComponentsInChildren<MeshFilter>().Sum(f=>f.sharedMesh.triangles.Length/3)+"; steering axis="+pivot.up+"; materials="+string.Join(",",root.GetComponentsInChildren<Renderer>().SelectMany(r=>r.sharedMaterials).Distinct().Select(m=>m.name+":"+m.shader.name));
+}}

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// <summary>Motor drive settings on the shared upright two-wheel movement rig.</summary>
+/// <summary>Motor drive settings and body clearance on the shared upright vehicle rig.</summary>
 [RequireComponent(typeof(BicycleController)), DisallowMultipleComponent]
 public sealed class MotorollerController : MonoBehaviour
 {
@@ -9,6 +9,10 @@ public sealed class MotorollerController : MonoBehaviour
     [SerializeField, Min(.1f)] private float brakingDeceleration = 10f;
     [SerializeField, Min(.05f)] private float wheelRadius = .2471f;
     [SerializeField, Min(.2f)] private float wheelbase = 1.29826f;
+    [SerializeField] private string vehicleName = "motoroller";
+    [SerializeField] private Vector3 collisionCenter = new Vector3(0,.65f,0);
+    [SerializeField] private Vector3 collisionHalfExtents = new Vector3(.29f,.43f,.96f);
+    public string VehicleName => vehicleName;
     private BicycleController movement;
     private readonly RaycastHit[] obstacles = new RaycastHit[24];
     public BicycleController Movement => movement != null ? movement : movement = GetComponent<BicycleController>();
@@ -38,8 +42,8 @@ public sealed class MotorollerController : MonoBehaviour
         if (distance < .00001f) return motion;
         // A vertical CharacterController alone misses the scooter's long nose and tail.
         Vector3 scale = transform.lossyScale;
-        Vector3 extents = Vector3.Scale(new Vector3(.29f,.43f,.96f), scale);
-        int count = Physics.BoxCastNonAlloc(transform.TransformPoint(new Vector3(0,.65f,0)), extents,
+        Vector3 extents = Vector3.Scale(collisionHalfExtents, scale);
+        int count = Physics.BoxCastNonAlloc(transform.TransformPoint(collisionCenter), extents,
             motion / distance, obstacles, transform.rotation, distance + .025f, ~0, QueryTriggerInteraction.Ignore);
         float allowed = distance;
         if (count == obstacles.Length) return Vector3.zero;

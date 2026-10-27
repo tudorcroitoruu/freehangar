@@ -32,7 +32,8 @@ public sealed class BicycleRidingPositionWindow : EditorWindow
 
     public static void Open(BicycleController bike)
     {
-        var window = GetWindow<BicycleRidingPositionWindow>(bike.motorDriven ? "Motoroller riding position" : "Bicycle riding position");
+        var engine = bike.GetComponent<MotorollerController>();
+        var window = GetWindow<BicycleRidingPositionWindow>(engine != null ? engine.VehicleName + " driving position" : "Bicycle riding position");
         window.RestorePreview();
         window.bicycle = bike;
         window.minSize = new Vector2(390, 360);
