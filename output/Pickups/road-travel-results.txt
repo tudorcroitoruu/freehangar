@@ -1,18 +1,18 @@
-Pick Up Bigger - driveable offset=-1 return=False: end=(60.01, 4.86, 96.56) blockedFrames=0 reached=True
-Pick Up Bigger - driveable offset=-1 return=True: end=(38.99, 4.12, 86.90) blockedFrames=0 reached=True
-Pick Up Bigger - driveable offset=0 return=False: end=(60.01, 4.93, 97.56) blockedFrames=0 reached=True
-Pick Up Bigger - driveable offset=0 return=True: end=(38.99, 4.15, 87.90) blockedFrames=0 reached=True
-Pick Up Bigger - driveable offset=1 return=False: end=(60.01, 4.92, 98.56) blockedFrames=0 reached=True
-Pick Up Bigger - driveable offset=1 return=True: end=(38.99, 4.18, 88.90) blockedFrames=0 reached=True
-Pick Up Last - driveable offset=-1 return=False: end=(60.01, 4.86, 96.56) blockedFrames=0 reached=True
-Pick Up Last - driveable offset=-1 return=True: end=(38.99, 4.12, 86.90) blockedFrames=0 reached=True
-Pick Up Last - driveable offset=0 return=False: end=(60.01, 4.93, 97.56) blockedFrames=0 reached=True
-Pick Up Last - driveable offset=0 return=True: end=(38.99, 4.15, 87.90) blockedFrames=0 reached=True
-Pick Up Last - driveable offset=1 return=False: end=(60.01, 4.92, 98.56) blockedFrames=0 reached=True
-Pick Up Last - driveable offset=1 return=True: end=(38.99, 4.18, 88.90) blockedFrames=0 reached=True
+Pick Up Bigger - driveable offset=-1 return=False: end=(60.13, 4.87, 96.62) blockedFrames=0 reached=True
+Pick Up Bigger - driveable offset=-1 return=True: end=(38.87, 4.11, 86.84) blockedFrames=0 reached=True
+Pick Up Bigger - driveable offset=0 return=False: end=(60.13, 4.93, 97.62) blockedFrames=0 reached=True
+Pick Up Bigger - driveable offset=0 return=True: end=(38.87, 4.14, 87.84) blockedFrames=0 reached=True
+Pick Up Bigger - driveable offset=1 return=False: end=(60.13, 4.93, 98.62) blockedFrames=0 reached=True
+Pick Up Bigger - driveable offset=1 return=True: end=(38.87, 4.17, 88.84) blockedFrames=0 reached=True
 Pick up - driveable offset=-1 return=False: end=(60.05, 4.87, 96.58) blockedFrames=0 reached=True
 Pick up - driveable offset=-1 return=True: end=(38.95, 4.12, 86.88) blockedFrames=0 reached=True
 Pick up - driveable offset=0 return=False: end=(60.05, 4.93, 97.58) blockedFrames=0 reached=True
 Pick up - driveable offset=0 return=True: end=(38.95, 4.15, 87.88) blockedFrames=0 reached=True
 Pick up - driveable offset=1 return=False: end=(60.05, 4.93, 98.58) blockedFrames=0 reached=True
 Pick up - driveable offset=1 return=True: end=(38.95, 4.19, 88.88) blockedFrames=0 reached=True
+Pick Up Last - driveable offset=-1 return=False: end=(60.13, 4.87, 96.62) blockedFrames=0 reached=True
+Pick Up Last - driveable offset=-1 return=True: end=(38.87, 4.11, 86.84) blockedFrames=0 reached=True
+Pick Up Last - driveable offset=0 return=False: end=(60.13, 4.93, 97.62) blockedFrames=0 reached=True
+Pick Up Last - driveable offset=0 return=True: end=(38.87, 4.14, 87.84) blockedFrames=0 reached=True
+Pick Up Last - driveable offset=1 return=False: end=(60.13, 4.93, 98.62) blockedFrames=0 reached=True
+Pick Up Last - driveable offset=1 return=True: end=(38.87, 4.17, 88.84) blockedFrames=0 reached=True

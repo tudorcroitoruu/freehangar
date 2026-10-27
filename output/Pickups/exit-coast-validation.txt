@@ -1,5 +1,5 @@
-Pick Up Last - driveable: PASS (61 checks), coast=4,29m
+Pick Up Bigger - driveable: PASS (61 checks), coast=5,85m
 Pick up - driveable: PASS (61 checks), coast=5,07m
+Pick Up Last - driveable: PASS (61 checks), coast=7,80m
 Trike - driveable: PASS (61 checks), coast=3,90m
 Motoroller - rideable: PASS (61 checks), coast=4,68m
-Pick Up Bigger - driveable: PASS (61 checks), coast=4,29m

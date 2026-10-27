@@ -5,7 +5,7 @@ public static class ValidateScooterRegression {
  GameObject floor=null,wall=null,copy=null,playerObject=null;int checks=0;
  void Check(bool ok,string message){if(!ok)throw new Exception(message);checks++;}
  try{
- var source=UnityEngine.Object.FindObjectsByType<MotorollerController>(FindObjectsSortMode.None).First(m=>m.GetComponent<TrikeController>()==null&&m.GetComponent<LawnmowerController>()==null);
+ var source=UnityEngine.Object.FindObjectsByType<MotorollerController>(FindObjectsSortMode.None).First(m=>m.GetComponent<TrikeController>()==null&&m.GetComponent<LawnmowerController>()==null&&m.GetComponent<PickupController>()==null);
  floor=GameObject.CreatePrimitive(PrimitiveType.Cube);floor.transform.position=new Vector3(10000,-.5f,10000);floor.transform.localScale=new Vector3(300,1,300);
  copy=UnityEngine.Object.Instantiate(source.gameObject,new Vector3(10000,.02f,10000),Quaternion.identity);var scooter=copy.GetComponent<MotorollerController>();var bike=scooter.Movement;
  playerObject=new GameObject("Test motoroller rider");playerObject.SetActive(false);var camera=new GameObject("Test camera").AddComponent<Camera>();camera.enabled=false;camera.transform.SetParent(playerObject.transform,false);camera.transform.localPosition=Vector3.up*1.7f;
@@ -46,6 +46,7 @@ public static class ValidateScooterRegression {
  }finally{if(playerObject)UnityEngine.Object.DestroyImmediate(playerObject);if(copy)UnityEngine.Object.DestroyImmediate(copy);if(wall)UnityEngine.Object.DestroyImmediate(wall);if(floor)UnityEngine.Object.DestroyImmediate(floor);}
  }
 }
+
 
 
 

@@ -106,3 +106,5 @@ Variable road-width pass: 5.2-10m dirt core with asymmetric feathered shoulders,
 2026-10-27: Added driveable lawnmower + jointed tow trailer prefab using existing motor vehicle interaction; details in Docs/AI/Lawnmower.md. Bicycle rack now holds one bag OR two boxes centered above its rear rack, with exclusiveBagSlot enforcing shared capacity.
 
 2026-10-27: The three scene pickups now have driveable prefabs under Assets/Models/Pickups/Driveable, using the shared engine/interaction and PickupController for four-wheel visuals. Details and validation: Docs/AI/Pickups.md.
+
+Ground following update: all seven vehicle rigs now use runtime VehicleGroundAlignment for wheel-based pitch, roll and body height, with matching body sweeps/parked colliders. See Docs/AI/VehicleGroundAlignment.md for architecture and validation.

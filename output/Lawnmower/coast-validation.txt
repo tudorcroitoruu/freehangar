@@ -1,1 +1,1 @@
-PASS 16 mower/trailer physics checks; turn articulation=40,24758
+PASS 16 mower/trailer physics checks; turn articulation=40,24057
