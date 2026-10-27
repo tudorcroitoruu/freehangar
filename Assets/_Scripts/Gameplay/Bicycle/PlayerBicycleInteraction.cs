@@ -62,7 +62,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         {
             if (bags != null && bags.IsCarrying)
             {
-                hint=bicycle.FreeCargoSlot()!=null ? "E Secure bag on " + bicycle.cargoLocationName : bicycle.cargoLocationName + " is full";
+                hint=bicycle.FreeBagCargoSlot()!=null ? "E Secure bag on " + bicycle.cargoLocationName : bicycle.cargoLocationName + " is full";
                 if (Input.GetKeyDown(KeyCode.E)) { TryLoadBag(); return true; }
                 return false;
             }
@@ -124,7 +124,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         }
         hint="Make room to unload";return false;
     }
-    public bool TryLoadBag() => !riding && bags != null && bags.TryStow(bicycle.FreeCargoSlot());
+    public bool TryLoadBag() => !riding && bags != null && bicycle != null && bags.TryStow(bicycle.FreeBagCargoSlot());
     public bool TryMount()
     {
         CacheReferences();

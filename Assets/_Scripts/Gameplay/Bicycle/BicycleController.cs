@@ -6,6 +6,8 @@ public sealed class BicycleController : MonoBehaviour
 {
     public Transform steering, frontWheel, rearWheel, crank, leftPedal, rightPedal, riderView;
     public Transform[] cargoSlots;
+    [Tooltip("Optional single bag position sharing the entire box rack.")]
+    public Transform exclusiveBagSlot;
     public string cargoLocationName = "rear rack";
     [Min(.5f)] public float dismountSideDistance = 1.1f;
     [Min(.5f)] public float dismountLongitudinalDistance = 1.5f;
@@ -127,11 +129,20 @@ public sealed class BicycleController : MonoBehaviour
     }
     public Transform FreeCargoSlot()
     {
+        if (exclusiveBagSlot != null && exclusiveBagSlot.childCount > 0) return null;
         foreach (var slot in cargoSlots) if (slot != null && slot.childCount == 0) return slot;
         return null;
     }
+    public Transform FreeBagCargoSlot()
+    {
+        if (exclusiveBagSlot == null) return FreeCargoSlot();
+        if (exclusiveBagSlot.childCount > 0) return null;
+        foreach (var slot in cargoSlots) if (slot != null && slot.childCount > 0) return null;
+        return exclusiveBagSlot;
+    }
     public bool HasCargo(Transform item)
     {
+        if (exclusiveBagSlot != null && item.IsChildOf(exclusiveBagSlot)) return true;
         foreach(var slot in cargoSlots) if(item.IsChildOf(slot)) return true;
         return false;
     }

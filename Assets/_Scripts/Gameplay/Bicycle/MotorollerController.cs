@@ -14,11 +14,12 @@ public sealed class MotorollerController : MonoBehaviour
     [SerializeField] private Vector3 collisionHalfExtents = new Vector3(.29f,.43f,.96f);
     public string VehicleName => vehicleName;
     private BicycleController movement;
+    private LawnmowerController lawnmower;
     private readonly RaycastHit[] obstacles = new RaycastHit[24];
     public BicycleController Movement => movement != null ? movement : movement = GetComponent<BicycleController>();
     public float Speed => Movement.Speed;
     public bool IsRidden => Movement.IsRidden;
-    private void Awake() => Configure();
+    private void Awake() { Configure(); lawnmower = GetComponent<LawnmowerController>(); }
     private void OnValidate() => Configure();
     public void Configure()
     {
@@ -38,6 +39,7 @@ public sealed class MotorollerController : MonoBehaviour
     }
     public Vector3 ConstrainMotion(Vector3 motion)
     {
+        if (lawnmower != null) motion = lawnmower.ConstrainTowMotion(motion);
         float distance = motion.magnitude;
         if (distance < .00001f) return motion;
         // A vertical CharacterController alone misses the scooter's long nose and tail.
@@ -51,6 +53,8 @@ public sealed class MotorollerController : MonoBehaviour
         {
             var hit = obstacles[i];
             if (hit.transform.IsChildOf(transform) || hit.normal.y > .65f) continue;
+            if (lawnmower != null && lawnmower.trailerJoint != null &&
+                hit.transform.IsChildOf(lawnmower.trailerJoint.transform)) continue;
             // The upright body box can already overlap rising terrain at its nose.
             // Such sweeps report distance zero and a synthetic normal opposite travel,
             // not a wall normal. Let the CharacterController resolve ground and slopes.

@@ -1,0 +1,2 @@
+using UnityEngine;using UnityEditor;using System.Linq;
+public static class InspectRack {public static string Main(){var b=Object.FindObjectsByType<BicycleController>(FindObjectsSortMode.None).First(b=>!b.motorDriven);return string.Join("\n",b.GetComponentsInChildren<MeshFilter>().Select(f=>f.name+" pos="+b.transform.InverseTransformPoint(f.GetComponent<Renderer>().bounds.center)+" size="+f.sharedMesh.bounds.size))+"\nbox="+Object.FindFirstObjectByType<BicycleCargoBox>().GetComponent<Renderer>().bounds.size;}}
