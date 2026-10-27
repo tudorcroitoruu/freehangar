@@ -5,7 +5,6 @@ using UnityEngine;
 public sealed class PlayerInteractor : MonoBehaviour
 {
     [SerializeField] private Camera viewCamera;
-    [SerializeField] private InteractionPrompt prompt;
     [SerializeField, Min(.1f)] private float interactionDistance = 4f;
     [SerializeField] private LayerMask interactionMask = ~0;
     private readonly RaycastHit[] hits = new RaycastHit[32];
@@ -14,6 +13,8 @@ public sealed class PlayerInteractor : MonoBehaviour
     private InteractionHighlight highlight;
     public BagInteraction Bags { get; private set; }
     public IInteractable Target { get; private set; }
+
+    private InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;
 
     private bool CanInteract => isActiveAndEnabled && viewCamera != null && viewCamera.isActiveAndEnabled &&
         Time.timeScale > 0 && Application.isFocused && Cursor.lockState == CursorLockMode.Locked &&
@@ -27,11 +28,11 @@ public sealed class PlayerInteractor : MonoBehaviour
         Bags = GetComponent<BagInteraction>();
         if (viewCamera == null && player != null) viewCamera = player.characterCamera;
         if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
-        if (prompt == null && Bags != null) prompt = Bags.Prompt;
     }
 
     private void LateUpdate()
     {
+        var prompt = Prompt;
         Target = null;
         if (!CanInteract) { SetHighlightedTarget(null); HidePrompt(); return; }
         if (Bags != null && Bags.isActiveAndEnabled && Bags.IsCarrying)
@@ -80,7 +81,11 @@ public sealed class PlayerInteractor : MonoBehaviour
         return candidate;
     }
 
-    private void HidePrompt() { if (prompt != null) prompt.Hide(); }
+    private void HidePrompt()
+    {
+        var prompt = Prompt;
+        if (prompt != null) prompt.Hide();
+    }
 
     private void SetHighlightedTarget(IInteractable target)
     {

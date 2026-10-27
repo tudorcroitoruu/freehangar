@@ -8,7 +8,6 @@ public sealed class BagInteraction : MonoBehaviour
     [SerializeField] private ShovelTool shovel;
     [SerializeField] private Transform shovelPresentation;
     [SerializeField] private Transform carryAnchor;
-    [SerializeField] private InteractionPrompt prompt;
     [SerializeField, Min(.2f)] private float carriedHeight = .75f;
     private GrainContainer target, carried;
     private Transform originalParent;
@@ -23,7 +22,7 @@ public sealed class BagInteraction : MonoBehaviour
     private readonly Collider[] overlaps = new Collider[32];
     public bool IsCarrying => carried != null;
     public GrainContainer CarriedBag => carried;
-    public InteractionPrompt Prompt => prompt;
+    public InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;
     public string PromptAction => carried != null ? "Drop" : target == null ? "" : target.IsClosing ? "Closing…" : target.IsFinished ? "Take" : "Finish";
 
     private void LateUpdate() => RestoreShovelIfNeeded();
@@ -191,6 +190,7 @@ public sealed class BagInteraction : MonoBehaviour
 
     private void OnDisable()
     {
+        var prompt = Prompt;
         if (prompt != null) prompt.Hide();
         if (carried != null)
         {

@@ -272,6 +272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameplayCanvas
   moneyText: {fileID: 2321670133962752958}
+  interactionPrompt: {fileID: 3029976341701256075}
 --- !u!1 &593234970349521000
 GameObject:
   m_ObjectHideFlags: 0

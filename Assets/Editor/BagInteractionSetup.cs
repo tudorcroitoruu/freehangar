@@ -12,6 +12,8 @@ public static class BagInteractionSetup
         if (EditorApplication.isPlaying) throw new System.InvalidOperationException("Stop Play Mode before configuring bags.");
         var player = Object.FindFirstObjectByType<PlayerController>();
         if (player == null) throw new System.InvalidOperationException("PlayerController not found.");
+        var gameplayCanvas = Object.FindFirstObjectByType<GameplayCanvas>();
+        if (gameplayCanvas == null) throw new System.InvalidOperationException("GameplayCanvas not found.");
         var playerData = new SerializedObject(player);
         var hands = (Transform)playerData.FindProperty("heldInstrument").objectReferenceValue;
         var shovel = (ShovelTool)playerData.FindProperty("shovelTool").objectReferenceValue;
@@ -26,7 +28,7 @@ public static class BagInteractionSetup
             anchor.SetParent(player.characterCamera.transform, false);
             anchor.localPosition = new Vector3(.35f, -.35f, 1.05f);
         }
-        var hud = GameObject.Find("Bag interaction HUD");
+        var hud = gameplayCanvas.interactionPrompt != null ? gameplayCanvas.interactionPrompt.gameObject : GameObject.Find("Bag interaction HUD");
         if (hud == null)
         {
             hud = new GameObject("Bag interaction HUD", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(InteractionPrompt));
@@ -59,19 +61,21 @@ public static class BagInteractionSetup
         data.FindProperty("shovel").objectReferenceValue = shovel;
         data.FindProperty("shovelPresentation").objectReferenceValue = hands;
         data.FindProperty("carryAnchor").objectReferenceValue = anchor;
-        data.FindProperty("prompt").objectReferenceValue = hud.GetComponent<InteractionPrompt>();
         data.ApplyModifiedProperties();
         var interactor = player.GetComponent<PlayerInteractor>();
         if (interactor == null) interactor = Undo.AddComponent<PlayerInteractor>(player.gameObject);
         var interactorData = new SerializedObject(interactor);
         interactorData.FindProperty("viewCamera").objectReferenceValue = player.characterCamera;
-        interactorData.FindProperty("prompt").objectReferenceValue = hud.GetComponent<InteractionPrompt>();
         interactorData.ApplyModifiedProperties();
+        var canvasData = new SerializedObject(gameplayCanvas);
+        canvasData.FindProperty("interactionPrompt").objectReferenceValue = hud.GetComponent<InteractionPrompt>();
+        canvasData.ApplyModifiedProperties();
         playerData.FindProperty("bagInteraction").objectReferenceValue = interaction;
         playerData.ApplyModifiedProperties();
         foreach (var bag in Object.FindObjectsByType<GrainContainer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             CornPresentationSetup.FitSackCollider(bag);
         EditorSceneManager.MarkSceneDirty(player.gameObject.scene);
+        EditorSceneManager.MarkSceneDirty(gameplayCanvas.gameObject.scene);
         AssetDatabase.SaveAssets();
     }
 

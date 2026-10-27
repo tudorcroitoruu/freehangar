@@ -9242,6 +9242,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: def2a2e4d587bab4d809a66ba02b6bf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrainPile
+  useSpatialLayout: 0
+  arrangement: 0
+  regionWaviness: 0.12
+  sectionCenter: {x: 0.55, y: 0.48}
+  sectionRotation: 0
+  grainLayoutSeed: 731
+  regions:
+  - percent: 100
+    layers:
+    - percent: 100
+      mixture:
+        parts:
+        - grain: 0
+          weight: 1
+  previewClearedPercent: 0
+  grainLayers:
+  - kilograms: 52
+    mixture:
+      parts:
+      - grain: 0
+        weight: 1
+  previewHarvestedKg: 0
   resolution: 33
   size: 6
   initialHeight: 1.8
@@ -61956,6 +61978,8 @@ MonoBehaviour:
   bicycle: {fileID: 1172481759}
   instrument: {fileID: 1526751496}
   interactionDistance: 2.5
+  cameraReturnDelay: 3
+  cameraReturnSmoothTime: 0.6
   boostStaminaPerSecond: 12
 --- !u!114 &217606949
 MonoBehaviour:
@@ -61970,7 +61994,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
   viewCamera: {fileID: 1328303950}
-  prompt: {fileID: 0}
   interactionDistance: 4
   interactionMask:
     serializedVersion: 2
@@ -72978,6 +73001,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: def2a2e4d587bab4d809a66ba02b6bf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrainPile
+  useSpatialLayout: 0
+  arrangement: 0
+  regionWaviness: 0.12
+  sectionCenter: {x: 0.55, y: 0.48}
+  sectionRotation: 0
+  grainLayoutSeed: 731
+  regions:
+  - percent: 100
+    layers:
+    - percent: 100
+      mixture:
+        parts:
+        - grain: 0
+          weight: 1
+  previewClearedPercent: 0
+  grainLayers:
+  - kilograms: 52
+    mixture:
+      parts:
+      - grain: 0
+        weight: 1
+  previewHarvestedKg: 0
   resolution: 33
   size: 24
   initialHeight: 6.4
@@ -78858,6 +78903,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GrainContainer
   capacityKg: 50
   kilograms: 0
+  restrictGrain: 0
+  acceptedGrain: 0
   sack: {fileID: 278083022}
   fitFillCollider: 1
   emptyBounds:
@@ -212717,6 +212764,29 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2798360226040852612, guid: a9504b8f37b81214db939e967fda030c, type: 3}
   m_PrefabInstance: {fileID: 753293956}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &753310121 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1626656037155824039, guid: 1647f57f7fa81e64aa728ceb0e0d987d, type: 3}
+  m_PrefabInstance: {fileID: 920742979}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &753310124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753310121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1001 &753379705
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -226409,6 +226479,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: def2a2e4d587bab4d809a66ba02b6bf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrainPile
+  useSpatialLayout: 0
+  arrangement: 0
+  regionWaviness: 0.12
+  sectionCenter: {x: 0.55, y: 0.48}
+  sectionRotation: 0
+  grainLayoutSeed: 731
+  regions:
+  - percent: 100
+    layers:
+    - percent: 100
+      mixture:
+        parts:
+        - grain: 0
+          weight: 1
+  previewClearedPercent: 0
+  grainLayers:
+  - kilograms: 52
+    mixture:
+      parts:
+      - grain: 0
+        weight: 1
+  previewHarvestedKg: 0
   resolution: 33
   size: 24
   initialHeight: 8.4
@@ -245705,6 +245797,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HangarGrainVisibility
   hangarOpen: 1
   grainRoot: {fileID: 28963969}
+  previewInEditor: 0
 --- !u!1 &858993721
 GameObject:
   m_ObjectHideFlags: 0
@@ -263583,6 +263676,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1647f57f7fa81e64aa728ceb0e0d987d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 920742985}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1647f57f7fa81e64aa728ceb0e0d987d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 920742986}
+    - targetCorrespondingSourceObject: {fileID: 1626656037155824039, guid: 1647f57f7fa81e64aa728ceb0e0d987d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 753310124}
   m_SourcePrefab: {fileID: 100100000, guid: 1647f57f7fa81e64aa728ceb0e0d987d, type: 3}
 --- !u!4 &920742980 stripped
 Transform:
@@ -263629,6 +263728,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GrainContainer
   capacityKg: 50
   kilograms: 0
+  restrictGrain: 0
+  acceptedGrain: 0
   sack: {fileID: 920742984}
   fitFillCollider: 1
   emptyBounds:
@@ -263673,6 +263774,20 @@ MonoBehaviour:
   kernelMaterial: {fileID: 2100000, guid: 4d12d273e8f7f9147a56a4a5d414afdf, type: 2}
   surfaceUp: {x: 0, y: -0.00000011920929, z: 0.99999994}
   spacing: 0.026
+--- !u!114 &920742986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920742981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f51fec49dc09194698499dbeff3e27a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionHighlight
+  outlines:
+  - {fileID: 753310124}
 --- !u!1001 &921747653
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -321417,6 +321532,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HangarGrainVisibility
   hangarOpen: 0
   grainRoot: {fileID: 795295154}
+  previewInEditor: 0
 --- !u!1 &1139337924
 GameObject:
   m_ObjectHideFlags: 0
@@ -329822,8 +329938,17 @@ MonoBehaviour:
   cargoSlots:
   - {fileID: 1051877456}
   - {fileID: 211857148}
+  exclusiveBagSlot: {fileID: 0}
+  cargoLocationName: rear rack
+  dismountSideDistance: 1.1
+  dismountLongitudinalDistance: 1.5
   maximumSpeed: 7
   acceleration: 2.5
+  wheelRadius: 0.34
+  wheelbase: 1.117
+  brakingDeceleration: 12
+  motorDriven: 0
+  exitCoastDuration: 0.8
   boostSpeedMultiplier: 1.5
   steeringSmoothTime: 0.14
   maximumSteeringAngle: 30
@@ -355595,6 +355720,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HangarGrainVisibility
   hangarOpen: 0
   grainRoot: {fileID: 258152882}
+  previewInEditor: 0
 --- !u!1 &1263064958
 GameObject:
   m_ObjectHideFlags: 0
@@ -407693,6 +407819,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: def2a2e4d587bab4d809a66ba02b6bf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrainPile
+  useSpatialLayout: 0
+  arrangement: 0
+  regionWaviness: 0.12
+  sectionCenter: {x: 0.55, y: 0.48}
+  sectionRotation: 0
+  grainLayoutSeed: 731
+  regions:
+  - percent: 100
+    layers:
+    - percent: 100
+      mixture:
+        parts:
+        - grain: 0
+          weight: 1
+  previewClearedPercent: 0
+  grainLayers:
+  - kilograms: 52
+    mixture:
+      parts:
+      - grain: 0
+        weight: 1
+  previewHarvestedKg: 0
   resolution: 33
   size: 24
   initialHeight: 6.4
@@ -420775,6 +420923,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HangarGrainVisibility
   hangarOpen: 0
   grainRoot: {fileID: 1984240459}
+  previewInEditor: 0
 --- !u!1 &1486280259
 GameObject:
   m_ObjectHideFlags: 0
@@ -489285,6 +489434,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HangarGrainVisibility
   hangarOpen: 0
   grainRoot: {fileID: 1445713578}
+  previewInEditor: 0
 --- !u!1 &1735301626
 GameObject:
   m_ObjectHideFlags: 0
@@ -560927,6 +561077,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: def2a2e4d587bab4d809a66ba02b6bf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrainPile
+  useSpatialLayout: 0
+  arrangement: 0
+  regionWaviness: 0.12
+  sectionCenter: {x: 0.55, y: 0.48}
+  sectionRotation: 0
+  grainLayoutSeed: 731
+  regions:
+  - percent: 100
+    layers:
+    - percent: 100
+      mixture:
+        parts:
+        - grain: 0
+          weight: 1
+  previewClearedPercent: 0
+  grainLayers:
+  - kilograms: 52
+    mixture:
+      parts:
+      - grain: 0
+        weight: 1
+  previewHarvestedKg: 0
   resolution: 33
   size: 24
   initialHeight: 8.4

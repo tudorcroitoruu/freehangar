@@ -8,6 +8,9 @@ public class GameplayCanvas : MonoBehaviour
     [Header("Money")]
     [SerializeField] private Text moneyText;
     
+    [Space, Header("Interactor")]
+    public InteractionPrompt interactionPrompt;
+    
     private void Awake()
     {
         if (Instance == null)
