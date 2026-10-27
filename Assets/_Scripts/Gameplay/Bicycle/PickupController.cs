@@ -7,6 +7,8 @@ public sealed class PickupController : MonoBehaviour
     public Transform frontRightSteering, frontRightWheel, rearRightWheel, steeringWheel;
     [Tooltip("Subtle road vibration. Set to zero to disable it.")]
     [Range(0, 1)] public float roadCameraIntensity = .65f;
+    [Tooltip("Maximum camera roll around Z from road bumps, in degrees, before intensity scaling.")]
+    [Range(0, .75f)] public float roadCameraRollDegrees = .45f;
     public Vector3 RoadCameraOffset { get; private set; }
     public Vector3 RoadCameraAngles { get; private set; }
     BicycleController movement;
@@ -49,9 +51,13 @@ public sealed class PickupController : MonoBehaviour
         float lateral = Mathf.PerlinNoise(roadPhase, 47.1f) * 2 - 1;
         float amount = Mathf.Clamp01(roadCameraIntensity) * speedWeight * (.25f + .75f * bumpStrength);
         var offset = new Vector3(lateral * .002f, vertical * .006f, 0) * amount;
-        var angles = new Vector3(vertical * .12f, 0, lateral * .06f) * amount;
+        float rocking = Mathf.PerlinNoise(roadPhase * .55f, 81.3f) * 2 - 1;
+        float roll = rocking * Mathf.Clamp(roadCameraRollDegrees, 0, .75f) *
+            Mathf.Clamp01(roadCameraIntensity) * speedWeight * (.08f + .92f * bumpStrength);
+        var angles = new Vector3(vertical * .12f * amount, 0, roll);
         RoadCameraOffset = Vector3.Lerp(RoadCameraOffset, offset, blend);
-        RoadCameraAngles = Vector3.Lerp(RoadCameraAngles, angles, blend);
+        RoadCameraAngles = new Vector3(Mathf.Lerp(RoadCameraAngles.x, angles.x, blend), 0,
+            Mathf.Lerp(RoadCameraAngles.z, angles.z, 1 - Mathf.Exp(-dt / .18f)));
     }
     void LateUpdate() => RefreshWheels();
     public void RefreshWheels()
