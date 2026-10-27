@@ -59,6 +59,7 @@ public sealed class BicycleController : MonoBehaviour
     public float Speed { get; private set; }
     CharacterController motor;
     MotorollerController motoroller;
+    VehicleGroundAlignment groundAlignment;
     float fallSpeed, wheelAngle, crankAngle;
     Quaternion steerRest, frontRest, rearRest, crankRest;
     Vector3 leftOffset, rightOffset;
@@ -70,11 +71,15 @@ public sealed class BicycleController : MonoBehaviour
         motoroller = GetComponent<MotorollerController>();
         steerRest = steering.localRotation; frontRest = frontWheel.localRotation;
         rearRest = rearWheel.localRotation;
-        if (motorDriven) return;
+        if (!motorDriven)
+        {
         crankRest = crank.localRotation;
         leftOffset = leftPedal.position - crank.position; rightOffset = rightPedal.position - crank.position;
         leftOffset = transform.InverseTransformVector(leftOffset); rightOffset = transform.InverseTransformVector(rightOffset);
         leftRest = leftPedal.localRotation; rightRest = rightPedal.localRotation;
+        }
+        groundAlignment = GetComponent<VehicleGroundAlignment>() ?? gameObject.AddComponent<VehicleGroundAlignment>();
+        groundAlignment.Initialize(this);
     }
     void Awake() { Initialize(); LoadRidingCamera(); }
     Collider[] cargoColliders;
@@ -83,7 +88,11 @@ public sealed class BicycleController : MonoBehaviour
     float coastDeceleration;
     bool pedalingInput;
     public bool IsCoasting => coasting;
-    void Update() => TickUnoccupied(Time.deltaTime);
+    void Update()
+    {
+        TickUnoccupied(Time.deltaTime);
+        if (!IsRidden && !coasting && groundAlignment != null) groundAlignment.Align(Time.deltaTime);
+    }
     public void TickUnoccupied(float dt)
     {
         if (!coasting || IsRidden || dt <= 0 || !float.IsFinite(dt)) return;
@@ -147,6 +156,7 @@ public sealed class BicycleController : MonoBehaviour
         if (motoroller != null && motion.sqrMagnitude < .000001f && Mathf.Abs(Speed) > .1f) Speed = 0;
         if ((hit & CollisionFlags.Sides) != 0 && Vector3.ProjectOnPlane(transform.position-before,Vector3.up).magnitude < Mathf.Abs(Speed)*dt*.3f) Speed = 0;
         if ((hit & CollisionFlags.Above) != 0) fallSpeed = 0;
+        groundAlignment.Align(dt);
         steering.localRotation = steerRest * Quaternion.Euler(0, steer, 0);
         float travelled = Vector3.Dot(transform.position-before, transform.forward);
         wheelAngle += travelled / Mathf.Max(.05f,wheelRadius * transform.lossyScale.y) * Mathf.Rad2Deg;
@@ -163,8 +173,8 @@ public sealed class BicycleController : MonoBehaviour
             1f - Mathf.Exp(-dt / Mathf.Max(.01f, pedalingPitchSmoothTime)));
         Quaternion rotation = Quaternion.Euler(crankAngle,0,0);
         crank.localRotation = crankRest * rotation;
-        leftPedal.position = crank.position + transform.TransformVector(rotation * leftOffset);
-        rightPedal.position = crank.position + transform.TransformVector(rotation * rightOffset);
+        leftPedal.position = crank.position + groundAlignment.Pose.TransformVector(rotation * leftOffset);
+        rightPedal.position = crank.position + groundAlignment.Pose.TransformVector(rotation * rightOffset);
         leftPedal.localRotation = leftRest; rightPedal.localRotation = rightRest;
     }
     public Transform FreeCargoSlot()

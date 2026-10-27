@@ -15,6 +15,7 @@ public sealed class MotorollerController : MonoBehaviour
     public string VehicleName => vehicleName;
     private BicycleController movement;
     private LawnmowerController lawnmower;
+    private VehicleGroundAlignment groundAlignment;
     private readonly RaycastHit[] obstacles = new RaycastHit[24];
     public BicycleController Movement => movement != null ? movement : movement = GetComponent<BicycleController>();
     public float Speed => Movement.Speed;
@@ -45,8 +46,10 @@ public sealed class MotorollerController : MonoBehaviour
         // A vertical CharacterController alone misses the scooter's long nose and tail.
         Vector3 scale = transform.lossyScale;
         Vector3 extents = Vector3.Scale(collisionHalfExtents, scale);
-        int count = Physics.BoxCastNonAlloc(transform.TransformPoint(collisionCenter), extents,
-            motion / distance, obstacles, transform.rotation, distance + .025f, ~0, QueryTriggerInteraction.Ignore);
+        if (groundAlignment == null) groundAlignment = GetComponent<VehicleGroundAlignment>();
+        Transform bodyPose = groundAlignment != null && groundAlignment.Pose != null ? groundAlignment.Pose : transform;
+        int count = Physics.BoxCastNonAlloc(bodyPose.TransformPoint(collisionCenter), extents,
+            motion / distance, obstacles, bodyPose.rotation, distance + .025f, ~0, QueryTriggerInteraction.Ignore);
         float allowed = distance;
         if (count == obstacles.Length) return Vector3.zero;
         for (int i = 0; i < count; i++)

@@ -1,0 +1,7 @@
+Pick_Up_Bigger_Driveable: PASS tilt error=0,000 tire gaps=-0,002,-0,002,0,000,0,000,
+Pick_up_Driveable: PASS tilt error=0,000 tire gaps=-0,004,-0,001,0,000,0,000,
+Pick_Up_Last_Driveable: PASS tilt error=0,000 tire gaps=-0,007,-0,007,0,000,0,000,
+Lawnmower - driveable: PASS tilt error=0,000 tire gaps=0,001,0,000,0,001,0,000,
+Bicycle_Rideable: PASS tilt error=0,000 tire gaps=0,000,0,000,
+Motoroller_Rideable: PASS tilt error=0,000 tire gaps=0,002,0,002,
+Trike_Driveable: PASS tilt error=0,000 tire gaps=0,001,0,001,0,000,
