@@ -1,0 +1,12 @@
+Motoroller - rideable offset=-1 return=False: end=(60.04, 4.86, 96.58) blockedFrames=0 reached=True
+Motoroller - rideable offset=-1 return=True: end=(38.96, 4.11, 86.88) blockedFrames=0 reached=True
+Motoroller - rideable offset=0 return=False: end=(60.04, 4.93, 97.58) blockedFrames=0 reached=True
+Motoroller - rideable offset=0 return=True: end=(38.96, 4.15, 87.88) blockedFrames=0 reached=True
+Motoroller - rideable offset=1 return=False: end=(60.04, 4.92, 98.58) blockedFrames=0 reached=True
+Motoroller - rideable offset=1 return=True: end=(38.96, 4.18, 88.88) blockedFrames=0 reached=True
+Trike - driveable offset=-1 return=False: end=(60.17, 4.88, 96.64) blockedFrames=0 reached=True
+Trike - driveable offset=-1 return=True: end=(38.83, 4.11, 86.82) blockedFrames=0 reached=True
+Trike - driveable offset=0 return=False: end=(60.17, 4.94, 97.64) blockedFrames=0 reached=True
+Trike - driveable offset=0 return=True: end=(38.83, 4.15, 87.82) blockedFrames=0 reached=True
+Trike - driveable offset=1 return=False: end=(60.17, 4.94, 98.64) blockedFrames=0 reached=True
+Trike - driveable offset=1 return=True: end=(38.83, 4.18, 88.82) blockedFrames=0 reached=True

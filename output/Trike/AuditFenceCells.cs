@@ -1,0 +1,2 @@
+using UnityEngine;using System.Linq;
+public static class AuditFenceCells{public static string Main(){return string.Join("\n",Object.FindObjectsByType<Transform>(FindObjectsSortMode.None).Where(t=>t.name.StartsWith("Static fence cell")).Select(t=>t.parent.name+"/"+t.name+" renderers="+t.GetComponentsInChildren<Renderer>(true).Length+" colliders="+t.GetComponentsInChildren<Collider>(true).Length+" children="+string.Join(",",t.Cast<Transform>().Select(c=>c.name))));}}

@@ -51,6 +51,10 @@ public sealed class MotorollerController : MonoBehaviour
         {
             var hit = obstacles[i];
             if (hit.transform.IsChildOf(transform) || hit.normal.y > .65f) continue;
+            // The upright body box can already overlap rising terrain at its nose.
+            // Such sweeps report distance zero and a synthetic normal opposite travel,
+            // not a wall normal. Let the CharacterController resolve ground and slopes.
+            if (hit.collider is TerrainCollider && hit.distance <= 0f) continue;
             allowed = Mathf.Min(allowed, Mathf.Max(0,hit.distance-.025f));
         }
         return motion * (allowed / distance);

@@ -1,0 +1,2 @@
+using UnityEngine;using System.Linq;
+public static class AuditHiddenFences {public static string Main(){return string.Join("\n",Object.FindObjectsByType<Transform>(FindObjectsSortMode.None).Where(t=>t.name.StartsWith("Static fence cell")).Select(t=>new{t,r=t.GetComponentInChildren<Renderer>(true),c=t.GetComponentInChildren<Collider>()}).Where(v=>v.c&&v.r&&(!v.r.enabled||!v.r.gameObject.activeInHierarchy)).Select(v=>v.t.parent.name+"/"+v.t.name+" rendererEnabled="+v.r.enabled+" active="+v.r.gameObject.activeSelf+" collider="+v.c.bounds));}}

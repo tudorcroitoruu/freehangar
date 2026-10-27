@@ -1,0 +1,2 @@
+using UnityEngine;using System.Linq;
+public static class InspectRoadFences{public static string Main(){return string.Join("\n",Object.FindObjectsByType<MeshCollider>(FindObjectsSortMode.None).Where(c=>c.name.Contains("roadside fence")).Select(c=>c.name+" convex="+c.convex+" bounds="+c.bounds+" triangles="+c.sharedMesh.triangles.Length/3))+"\n"+string.Join("\n",new[]{new Vector3(51,20,93),new Vector3(51,20,99),new Vector3(57,20,93)}.Select(p=>Physics.Raycast(p,Vector3.down,out var h,40)?p+" -> "+h.point+" "+h.collider.name+" normal="+h.normal:"none"));}}
