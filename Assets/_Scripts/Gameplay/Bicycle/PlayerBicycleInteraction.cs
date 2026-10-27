@@ -15,6 +15,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     StaminaManager stamina;
     bool boostExhausted;
     MotorollerController motoroller;
+    PickupController pickup;
     public bool IsRiding => riding;
     bool riding, instrumentActive;
     Camera view;
@@ -93,6 +94,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if (motoroller != null)
         {
             motoroller.Drive(throttle, turn, brake, dt);
+            if (pickup != null) pickup.UpdateRoadCamera(dt);
             IsBoosting = false;
             if (stamina != null) stamina.Tick(false, dt, false);
             return;
@@ -131,8 +133,10 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     }
     void ApplyRidingView()
     {
-        view.transform.localPosition = bicycle.RidingCameraOffset;
-        view.transform.localRotation = Quaternion.Euler(pitch + bicycle.RidingCameraPitch + bicycle.PedalingCameraPitch, yaw, 0);
+        Vector3 roadOffset = pickup != null ? pickup.RoadCameraOffset : Vector3.zero;
+        Vector3 roadAngles = pickup != null ? pickup.RoadCameraAngles : Vector3.zero;
+        view.transform.localPosition = bicycle.RidingCameraOffset + roadOffset;
+        view.transform.localRotation = Quaternion.Euler(pitch + bicycle.RidingCameraPitch + bicycle.PedalingCameraPitch, yaw, 0) * Quaternion.Euler(roadAngles);
     }
     public bool TryUnloadBox(BicycleCargoBox box)
     {
@@ -154,6 +158,8 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         CacheReferences();
         if(view == null || player == null || player.characterController == null || riding || bicycle==null || !bicycle.isActiveAndEnabled || bicycle.IsRidden || bicycle.riderView==null || (bags!=null && bags.IsCarrying) || Vector3.Distance(transform.position,bicycle.transform.position)>interactionDistance) return false;
         motoroller = bicycle.GetComponent<MotorollerController>();
+        pickup = bicycle.GetComponent<PickupController>();
+        if (pickup != null) pickup.ResetRoadCamera();
         player.ClearSprintCameraMotion();
         cameraParent=view.transform.parent;cameraPosition=view.transform.localPosition;cameraRotation=view.transform.localRotation;
         player.characterController.enabled=false;
@@ -184,6 +190,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     void Restore(Vector3 exit)
     {
         riding=false;IsBoosting=false;boostExhausted=false;bicycle.SetRidden(false);
+        if (pickup != null) pickup.ResetRoadCamera();
         view.transform.SetParent(cameraParent,false);view.transform.localPosition=cameraPosition;view.transform.localRotation=cameraRotation;
         transform.SetPositionAndRotation(exit,Quaternion.Euler(0,bicycle.transform.eulerAngles.y+yaw,0));
         player.ResetLook();player.characterController.enabled=true;
