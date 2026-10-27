@@ -17,7 +17,8 @@ Shader "Custom/Outline Fill" {
   SubShader {
     Tags {
       "RenderPipeline" = "HDRenderPipeline"
-      "Queue" = "Transparent+110"
+      // HDRP's standard transparent range ends at 3100.
+      "Queue" = "Transparent+99"
       "RenderType" = "Transparent"
       "DisableBatching" = "True"
     }

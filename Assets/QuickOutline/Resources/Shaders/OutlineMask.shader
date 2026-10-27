@@ -14,7 +14,8 @@ Shader "Custom/Outline Mask" {
   SubShader {
     Tags {
       "RenderPipeline" = "HDRenderPipeline"
-      "Queue" = "Transparent+100"
+      // Render the mask before the fill, within HDRP's transparent range.
+      "Queue" = "Transparent+98"
       "RenderType" = "Transparent"
     }
 
