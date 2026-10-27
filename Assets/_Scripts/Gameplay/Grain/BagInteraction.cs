@@ -8,7 +8,7 @@ public sealed class BagInteraction : MonoBehaviour
     [SerializeField] private ShovelTool shovel;
     [SerializeField] private Transform shovelPresentation;
     [SerializeField] private Transform carryAnchor;
-    [SerializeField] private BagInteractionPrompt prompt;
+    [SerializeField] private InteractionPrompt prompt;
     [SerializeField, Min(.2f)] private float carriedHeight = .75f;
     private GrainContainer target, carried;
     private Transform originalParent;
@@ -23,23 +23,27 @@ public sealed class BagInteraction : MonoBehaviour
     private readonly Collider[] overlaps = new Collider[32];
     public bool IsCarrying => carried != null;
     public GrainContainer CarriedBag => carried;
+    public InteractionPrompt Prompt => prompt;
     public string PromptAction => carried != null ? "Drop" : target == null ? "" : target.IsClosing ? "Closing…" : target.IsFinished ? "Take" : "Finish";
 
-    private void LateUpdate()
+    private void LateUpdate() => RestoreShovelIfNeeded();
+
+    public bool TryGetPrompt(GrainContainer bag, out InteractionPromptData data)
     {
-        if (carried == null)
-        {
-            RestoreShovelIfNeeded();
-            target = shovel != null ? shovel.FindBagForHandling(viewCamera, transform) : null;
-        }
-        if (prompt == null) return;
-        var bag = carried != null ? carried : target;
-        if (bag == null || (bag.IsFull && shovel != null && shovel.IsBusy)) { prompt.Hide(); return; }
+        data = default;
+        if (!isActiveAndEnabled || bag == null || !bag.isActiveAndEnabled || bag.GetComponent<SackController>() == null ||
+            bag.IsClosing || (bag.IsCarried && bag != carried) || (bag.IsFull && shovel != null && shovel.IsBusy)) return false;
+        if (carried == null) target = bag;
         Bounds bounds = bag.WorldBounds;
-        Vector3 position = carried != null ? bounds.center : new Vector3(bounds.center.x, bounds.max.y + .12f, bounds.center.z);
+        Vector3 position = bag == carried ? bounds.center : new Vector3(bounds.center.x, bounds.max.y + .12f, bounds.center.z);
         bool blocked = Time.time < blockedUntil;
-        prompt.Show(viewCamera, position, blocked ? "Make room to drop" : bag.IsFull ? PromptAction : "",
-            bag.IsFull && !bag.IsClosing && !blocked, bag);
+        string action = bag == carried ? "Drop" : bag.IsFinished ? "Take" : "Finish";
+        data = new InteractionPromptData(position, blocked ? "Make room to drop" : bag.IsFull ? action : "Fill",
+            bag.IsFull && !blocked);
+        data.ShowPrimaryButton = data.ShowProgress = !bag.IsFull;
+        data.Progress = bag.CapacityKg > 0f ? Mathf.Clamp01(bag.Kilograms / bag.CapacityKg) : 0f;
+        data.ProgressText = $"{bag.Kilograms:0.##} / {bag.CapacityKg:0.##} kg";
+        return true;
     }
 
     public bool TryInteract()
@@ -48,7 +52,14 @@ public sealed class BagInteraction : MonoBehaviour
         if (carried != null) return Drop();
         if (shovel == null || shovel.IsBusy) return false;
         target = shovel.FindBagForHandling(viewCamera, transform);
-        if (target == null || target.IsClosing) return false;
+        return TryInteract(target);
+    }
+
+    public bool TryInteract(GrainContainer bag)
+    {
+        if (!isActiveAndEnabled || Time.timeScale <= 0 || viewCamera == null || carryAnchor == null ||
+            carried != null || shovel == null || shovel.IsBusy || bag == null || !bag.CanHandle || bag.IsClosing) return false;
+        target = bag;
         if (!target.IsFinished) return target.Finish();
         return Take(target);
     }

@@ -29,7 +29,7 @@ public static class BagInteractionSetup
         var hud = GameObject.Find("Bag interaction HUD");
         if (hud == null)
         {
-            hud = new GameObject("Bag interaction HUD", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(BagInteractionPrompt));
+            hud = new GameObject("Bag interaction HUD", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(InteractionPrompt));
             Undo.RegisterCreatedObjectUndo(hud, "Create bag interaction HUD");
             var canvas = hud.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -46,7 +46,7 @@ public static class BagInteractionSetup
             var label = Label("Finish", panel, new Vector2(148, 44), new Vector2(24, 0), 22, new Color(1f, .94f, .82f));
             label.enableAutoSizing = true; label.fontSizeMin = 14; label.fontSizeMax = 22;
             foreach (var graphic in hud.GetComponentsInChildren<Graphic>()) graphic.raycastTarget = false;
-            var promptData = new SerializedObject(hud.GetComponent<BagInteractionPrompt>());
+            var promptData = new SerializedObject(hud.GetComponent<InteractionPrompt>());
             promptData.FindProperty("panel").objectReferenceValue = panel;
             promptData.FindProperty("canvasRect").objectReferenceValue = hud.GetComponent<RectTransform>();
             promptData.FindProperty("description").objectReferenceValue = label;
@@ -59,8 +59,14 @@ public static class BagInteractionSetup
         data.FindProperty("shovel").objectReferenceValue = shovel;
         data.FindProperty("shovelPresentation").objectReferenceValue = hands;
         data.FindProperty("carryAnchor").objectReferenceValue = anchor;
-        data.FindProperty("prompt").objectReferenceValue = hud.GetComponent<BagInteractionPrompt>();
+        data.FindProperty("prompt").objectReferenceValue = hud.GetComponent<InteractionPrompt>();
         data.ApplyModifiedProperties();
+        var interactor = player.GetComponent<PlayerInteractor>();
+        if (interactor == null) interactor = Undo.AddComponent<PlayerInteractor>(player.gameObject);
+        var interactorData = new SerializedObject(interactor);
+        interactorData.FindProperty("viewCamera").objectReferenceValue = player.characterCamera;
+        interactorData.FindProperty("prompt").objectReferenceValue = hud.GetComponent<InteractionPrompt>();
+        interactorData.ApplyModifiedProperties();
         playerData.FindProperty("bagInteraction").objectReferenceValue = interaction;
         playerData.ApplyModifiedProperties();
         foreach (var bag in Object.FindObjectsByType<GrainContainer>(FindObjectsInactive.Include, FindObjectsSortMode.None))

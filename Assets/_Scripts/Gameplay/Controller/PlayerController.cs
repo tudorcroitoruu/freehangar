@@ -43,6 +43,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float idleFrequency = 0.8f;
 
     private PlayerBicycleInteraction bicycleInteraction;
+    private PlayerInteractor interactor;
     private float verticalVelocity;
     private float cameraRotationX;
     private float targetYaw;
@@ -97,6 +98,7 @@ public class PlayerController : MonoBehaviour
         cameraRestPosition = characterCamera.transform.localPosition;
         previousPresentationCamera = characterCamera.transform.rotation;
         if (!TryGetComponent<PlayerAim>(out _)) gameObject.AddComponent<PlayerAim>();
+        if (!TryGetComponent(out interactor)) interactor = gameObject.AddComponent<PlayerInteractor>();
         if (heldInstrument != null)
         {
             instrumentRestPosition = heldInstrument.localPosition;
@@ -145,8 +147,8 @@ public class PlayerController : MonoBehaviour
 
         HandleCrouch(acceptInput);
         HandleMovement(acceptInput);
-        bool bagAction = acceptInput && bagInteraction != null && Input.GetKeyDown(KeyCode.E) && bagInteraction.TryInteract();
-        if (shovelTool != null && shovelTool.isActiveAndEnabled && !bagAction)
+        bool interactionAction = acceptInput && interactor != null && Input.GetKeyDown(KeyCode.E) && interactor.TryInteract();
+        if (shovelTool != null && shovelTool.isActiveAndEnabled && !interactionAction)
         {
             if (!acceptInput) shovelTool.CancelAction();
             else

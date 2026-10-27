@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>Single-species receiver for sacks, boxes and barrels. Unassigned receivers bind on first fill.</summary>
 [DisallowMultipleComponent]
-public sealed class GrainContainer : MonoBehaviour
+public sealed class GrainContainer : MonoBehaviour, IInteractable
 {
     [SerializeField, Min(.01f)] private float capacityKg = 50f;
     [SerializeField, Min(0f)] private float kilograms;
@@ -26,6 +26,15 @@ public sealed class GrainContainer : MonoBehaviour
     public bool IsClosing { get; private set; }
     public bool IsCarried { get; private set; }
     public bool CanHandle => isActiveAndEnabled && sack != null && IsFull && !IsCarried;
+
+    public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
+    {
+        prompt = default;
+        return interactor != null && interactor.Bags != null && interactor.Bags.TryGetPrompt(this, out prompt);
+    }
+
+    public bool TryInteract(PlayerInteractor interactor) => interactor != null && interactor.Bags != null && interactor.Bags.TryInteract(this);
+
     public Bounds WorldBounds
     {
         get
