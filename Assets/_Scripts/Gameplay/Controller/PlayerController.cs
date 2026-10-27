@@ -141,6 +141,8 @@ public class PlayerController : MonoBehaviour
             return;
 
         bool acceptInput = Application.isFocused && Cursor.lockState == CursorLockMode.Locked;
+        if (acceptInput && interactor != null && interactor.PushedWheelbarrow != null && Input.GetKeyDown(KeyCode.U))
+            interactor.PushedWheelbarrow.TryUpgrade(interactor);
         lookInput = Vector2.zero;
         if (acceptInput)
             HandleCamera();

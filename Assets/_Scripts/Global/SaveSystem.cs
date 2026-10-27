@@ -17,6 +17,20 @@ public static class SaveSystem
     public static event Action<int> MoneyChanged;
     public static int Money => Data != null ? Data.cash : 0;
 
+    public static bool TryPurchaseUpgrade(int price, Func<PlayerData, bool> apply, out bool usedVoucher)
+    {
+        usedVoucher = false;
+        if (Data == null || price <= 0) return false;
+        bool free = Data.freeUpgradeVouchers > 0;
+        if (!free && Data.cash < price) return false;
+        if (apply == null || !apply(Data)) return false;
+        if (free) Data.freeUpgradeVouchers--;
+        else Data.cash -= price;
+        usedVoucher = free;
+        SaveData();
+        return true;
+    }
+
     public static bool AddMoney(int amount)
     {
         if (Data == null || amount <= 0 || Data.cash > int.MaxValue - amount) return false;
@@ -238,6 +252,9 @@ public class PlayerData
     [Header("Grain progression")]
     public double grainBaggedKilograms;
     public string[] foundSecrets = Array.Empty<string>();
+    public int freeUpgradeVouchers;
+    public long infiniteStaminaUntilUtc;
+    public int[] wheelbarrowUpgradeLevels = new int[3];
     [Header("Data")]
     public string playerName;
     public bool tutorialPassed;

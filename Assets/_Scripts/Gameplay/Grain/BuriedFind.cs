@@ -6,13 +6,15 @@ using UnityEngine;
 [DisallowMultipleComponent, RequireComponent(typeof(BoxCollider))]
 public sealed class BuriedFind : MonoBehaviour, IInteractable
 {
-    public enum Kind { Key, CashChest }
+    public enum Kind { Key, CashChest, UpgradeVoucher, InfiniteStamina, CashCache }
 
     [SerializeField] private Kind kind;
     [SerializeField] private string findId;
     [SerializeField] private string requiredKeyId;
     [SerializeField, Min(1)] private int cashReward = 500;
+    [SerializeField, Min(1)] private int staminaDurationSeconds = 3600;
     [SerializeField] private GrainPile coveringPile;
+    [SerializeField] private bool settleOnReveal;
     [SerializeField] private Transform lidPivot;
     [SerializeField] private float lidOpenDegrees = -110f;
     private BoxCollider interactionCollider;
@@ -74,6 +76,18 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     private void SetRevealed(bool value)
     {
         revealed = value;
+        if (value && settleOnReveal && coveringPile != null)
+        {
+            Bounds bounds = VisualBounds();
+            float surface = coveringPile.SurfaceHeight(bounds.center);
+            transform.position += Vector3.up * (surface + .04f - bounds.min.y);
+            Rigidbody body = GetComponent<Rigidbody>();
+            if (body == null) body = gameObject.AddComponent<Rigidbody>();
+            body.mass = 1f;
+            body.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+            body.useGravity = true;
+            body.isKinematic = false;
+        }
         if (interactionCollider != null) interactionCollider.enabled = value;
         if (visuals != null) foreach (Renderer visual in visuals) if (visual != null) visual.enabled = value;
     }
@@ -85,7 +99,11 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         bool hasProfile = SaveSystem.savesLoaded && SaveSystem.Data != null;
         bool hasKey = kind != Kind.CashChest || WasFound(SaveSystem.Data, requiredKeyId);
         string action = !hasProfile ? "Load save to collect" : !hasKey ? "Requires hidden key" :
-            kind == Kind.Key ? "Take hidden key" : $"Open mystery chest (+${cashReward})";
+            kind == Kind.Key ? "Take hidden key" :
+            kind == Kind.UpgradeVoucher ? "Take free upgrade voucher" :
+            kind == Kind.InfiniteStamina ? $"Take infinite stamina ({staminaDurationSeconds / 60} min)" :
+            kind == Kind.CashCache ? $"Take cash cache (+${cashReward})" :
+            $"Open mystery chest (+${cashReward})";
         Bounds bounds = VisualBounds();
         prompt = new InteractionPromptData(new Vector3(bounds.center.x, bounds.max.y + .15f, bounds.center.z),
             action, hasProfile && hasKey);
@@ -96,10 +114,21 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     {
         if (!TryGetPrompt(interactor, out var prompt) || !prompt.ShowKey) return false;
         PlayerData data = SaveSystem.Data;
-        if (kind == Kind.CashChest)
+        if (kind == Kind.CashChest || kind == Kind.CashCache)
         {
             if (cashReward <= 0 || data.cash > int.MaxValue - cashReward) return false;
             data.cash += cashReward;
+        }
+        else if (kind == Kind.UpgradeVoucher)
+        {
+            if (data.freeUpgradeVouchers == int.MaxValue) return false;
+            data.freeUpgradeVouchers++;
+        }
+        else if (kind == Kind.InfiniteStamina)
+        {
+            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            long start = Math.Max(now, data.infiniteStaminaUntilUtc);
+            data.infiniteStaminaUntilUtc = Math.Min(long.MaxValue - staminaDurationSeconds, start) + staminaDurationSeconds;
         }
         if (data.foundSecrets == null) data.foundSecrets = Array.Empty<string>();
         int index = data.foundSecrets.Length;

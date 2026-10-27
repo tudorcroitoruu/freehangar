@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,8 +17,12 @@ public sealed class StaminaManager : MonoBehaviour
     private float recoveryDelayRemaining;
     public float CurrentStamina { get; private set; }
     public float MaxStamina => maxStamina;
-    public float NormalizedStamina => maxStamina > 0f ? Mathf.Clamp01(CurrentStamina / maxStamina) : 0f;
-    public bool IsExhausted => CurrentStamina <= 0f;
+    public bool HasInfiniteStamina => SaveSystem.Data != null &&
+        SaveSystem.Data.infiniteStaminaUntilUtc > DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+    public long InfiniteStaminaSecondsRemaining => SaveSystem.Data == null ? 0L :
+        Math.Max(0L, SaveSystem.Data.infiniteStaminaUntilUtc - DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+    public float NormalizedStamina => HasInfiniteStamina ? 1f : maxStamina > 0f ? Mathf.Clamp01(CurrentStamina / maxStamina) : 0f;
+    public bool IsExhausted => !HasInfiniteStamina && CurrentStamina <= 0f;
     public bool IsWorking { get; private set; }
 
     private void Awake()
@@ -28,6 +33,7 @@ public sealed class StaminaManager : MonoBehaviour
 
     public void ConsumeShovelStamina()
     {
+        if (HasInfiniteStamina) { CurrentStamina = maxStamina; UpdateStaminaBar(); return; }
         if (!isActiveAndEnabled || Time.timeScale <= 0f || shovelActionCost <= 0f) return;
         CurrentStamina = Mathf.Clamp(CurrentStamina - shovelActionCost, 0f, maxStamina);
         recoveryDelayRemaining = recoveryDelay;
@@ -38,6 +44,13 @@ public sealed class StaminaManager : MonoBehaviour
     {
         if (!isActiveAndEnabled || !(deltaTime > 0f) || float.IsInfinity(deltaTime)) return;
         IsWorking = isWorking;
+        if (HasInfiniteStamina)
+        {
+            CurrentStamina = maxStamina;
+            recoveryDelayRemaining = 0f;
+            UpdateStaminaBar();
+            return;
+        }
         if (isWorking)
         {
             CurrentStamina = Mathf.Clamp(CurrentStamina - (consumptionPerSecond >= 0f && float.IsFinite(consumptionPerSecond) ? consumptionPerSecond : workConsumptionPerSecond) * deltaTime, 0f, maxStamina);
@@ -61,6 +74,14 @@ public sealed class StaminaManager : MonoBehaviour
     private void UpdateStaminaBar()
     {
         if (staminaBarFill != null) staminaBarFill.fillAmount = NormalizedStamina;
+    }
+
+    private void OnGUI()
+    {
+        if (!HasInfiniteStamina) return;
+        long remaining = InfiniteStaminaSecondsRemaining;
+        GUI.Box(new Rect(Mathf.Max(8f, Screen.width - 226f), 12f, 218f, 30f),
+            $"Infinite stamina  {remaining / 60:00}:{remaining % 60:00}");
     }
 
     private void OnValidate()
