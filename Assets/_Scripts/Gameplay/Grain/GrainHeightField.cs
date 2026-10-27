@@ -14,6 +14,9 @@ public sealed class GrainHeightField
     private readonly float[] referenceHeights;
     private readonly bool[] disturbed;
     private int minX, minZ, maxX, maxZ;
+    public Action<int, double> Removed;
+    public Action<int, int, double> Transferred;
+    public float AreaAt(int index) => areas[index];
 
     public GrainHeightField(int resolution, float size, float height, Func<float, float, float> profile = null)
     {
@@ -98,6 +101,7 @@ public sealed class GrainHeightField
         {
             float previous = Heights[i];
             Heights[i] = Mathf.Max(0, previous - removal[i] * fraction);
+            if (previous > Heights[i]) Removed?.Invoke(i, (previous - Heights[i]) * (double)areas[i]);
             removed += (previous - Heights[i]) * (double)areas[i];
         }
         if (removed > 0) WakeNeighborhood(x, z, radius + Mathf.Max(0, settlingMargin), metric);
@@ -168,6 +172,7 @@ public sealed class GrainHeightField
         float volume = excess / (1f / areas[high] + 1f / areas[low]) * Mathf.Clamp01(fraction);
         volume = Mathf.Min(volume, Heights[high] * areas[high]);
         if (volume <= .000000001f) return false;
+        Transferred?.Invoke(high, low, volume);
         Heights[high] -= volume / areas[high];
         Heights[low] += volume / areas[low];
         return true;

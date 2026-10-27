@@ -34,7 +34,11 @@ public sealed class ShovelTool : MonoBehaviour
     private bool scoopReported;
     private Camera actionCamera;
     private Transform actor;
-    public float Kilograms { get; private set; }
+    private readonly GrainCargo cargo = new GrainCargo();
+    private readonly GrainCargo scoopCargo = new GrainCargo();
+    // Keep the old private preload setter for editor fixtures; cargo owns runtime mass.
+    public float Kilograms { get => cargo.Total; private set { cargo.Clear(); cargo.Add(GrainType.Corn, value); } }
+    public GrainCargo Cargo => cargo;
     public float CapacityKg => capacityKg;
     public bool IsBusy { get; private set; }
     public bool IsScooping => IsBusy && pendingPile != null;
@@ -158,9 +162,15 @@ public sealed class ShovelTool : MonoBehaviour
             if (pendingPile != null && phase <= .58f && hit.collider.GetComponentInParent<GrainPile>() == pendingPile && HasScoopContact())
             {
                 Vector3 point = targetPoint; point.y = pendingPile.SurfaceHeight(point);
-                float collected = pendingPile.Scoop(point, scoopRadius, scoopDepth, Mathf.Min(amount, capacityKg - Kilograms));
-                Kilograms += collected;
-                if (collected > 0) GoalContext.ReportProgress(pendingPile, GoalType.GrainCollected, collected);
+                scoopCargo.Clear();
+                float collected = pendingPile.Scoop(point, scoopRadius, scoopDepth, Mathf.Min(amount, capacityKg - Kilograms), scoopCargo);
+                GoalContext.Resolve(pendingPile, out int hangar, out _);
+                for (int type = 0; type < GrainCargo.TypeCount; type++)
+                {
+                    float kg = scoopCargo[(GrainType)type];
+                    cargo.Add((GrainType)type, kg);
+                    if (kg > 0) GoalChecker.ReportProgress(GoalType.GrainCollected, kg, hangar, (GrainType)type);
+                }
                 transferredFraction = fraction;
                 if (collected > 0 && !scoopReported)
                 {
@@ -174,12 +184,11 @@ public sealed class ShovelTool : MonoBehaviour
                 pendingContainer.isActiveAndEnabled && pendingContainer.IsOpen &&
                 !pendingContainer.IsClosing && !pendingContainer.IsCarried)
             {
-                float poured = Mathf.Min(amount, Kilograms);
-                pendingContainer.Add(poured);
-                // Finish emptying the shovel even when the last pour exceeds the bag's
-                // capacity. Excess is discarded; the container remains capped.
-                Kilograms = Mathf.Max(0, Kilograms - poured);
-                if (fraction >= 1f && Kilograms < .001f) Kilograms = 0;
+                if (grainPhysics != null) grainPhysics.SetPourGrain(pendingContainer.HasAssignedGrain ? pendingContainer.AcceptedGrain : cargo.Dominant);
+                cargo.PourInto(pendingContainer, Mathf.Min(amount, Kilograms));
+                // Complete floating-point dust through the same capacity/type checks; never discard it.
+                float residue = cargo[pendingContainer.AcceptedGrain];
+                if (fraction >= 1f && residue > 0 && residue < .0001f) cargo.PourInto(pendingContainer, residue);
             }
             if (grainPhysics != null) grainPhysics.SetFill(Kilograms / capacityKg);
         }

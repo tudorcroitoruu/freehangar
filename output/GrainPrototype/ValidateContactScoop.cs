@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.HighDefinition;
@@ -16,6 +17,9 @@ public static class ValidateContactScoop
     public static string Main(bool capture = false, int captureStep = 85)
     {
         Check(Application.isPlaying, "Play mode required");
+        var listeners = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None)
+            .Where(b => (b is GoalsManager || b is GrainProgression) && b.enabled).ToArray();
+        foreach (var listener in listeners) listener.enabled = false;
         float timeScale = Time.timeScale;
         var cursor = Cursor.lockState;
         bool cursorVisible = Cursor.visible;
@@ -140,23 +144,25 @@ public static class ValidateContactScoop
             Check(tool.TryUse(player.characterCamera, rig.transform), "Pour did not start");
             Check(Field<GrainContainer>(tool, "pendingContainer") == bag, "Centered bag not selected");
             for (int i = 0; i < 90; i++) tool.Tick(1f / 60f);
-            Check(Mathf.Abs(bag.Kilograms - 50) < .001f && tool.Kilograms == 0,
-                "Final pour did not empty shovel while capping bag");
+            Check(Mathf.Abs(bag.Kilograms - 50) < .001f && Mathf.Abs(tool.Kilograms - (fullLoad - 2)) < .001f,
+                "Final pour did not preserve overflow while capping bag");
+            tool.Cargo.Clear();
             typeof(ShovelTool).GetProperty("Kilograms").SetValue(tool, 1f);
             grains.SetFill(1f / tool.CapacityKg);
             Check(tool.TryUse(player.characterCamera, rig.transform), "Already-full bag pour did not start");
             for (int i = 0; i < 90; i++) tool.Tick(1f / 60f);
-            Check(tool.Kilograms == 0 && Mathf.Abs(bag.Kilograms - 50) < .001f,
-                "Already-full bag retained leftovers or exceeded capacity");
+            Check(Mathf.Abs(tool.Kilograms - 1f) < .001f && Mathf.Abs(bag.Kilograms - 50) < .001f,
+                "Already-full bag discarded cargo or exceeded capacity");
             for (int i = 0; i < 180; i++) simulate.Invoke(grains, new object[] { 1f / 60f });
             grains.SendMessage("LateUpdate");
-            Check(grains.KernelCount == 0 && grains.PackedKernelCount == 0,
-                "Completed full-bag pour still displays corn on the shovel");
+            Check(grains.KernelCount > 0,
+                "Rejected full-bag pour hides retained grain on the shovel");
             Object.DestroyImmediate(bagObject);
 
             // Empty gestures, cancellation and an intervening solid wall must not invent corn.
             float collected = fullLoad;
             double remaining = pile.Kilograms;
+            tool.Cargo.Clear();
             typeof(ShovelTool).GetProperty("Kilograms").SetValue(tool, 0f);
             grains.SetFill(0);
             cameraTransform.rotation = Quaternion.LookRotation(Vector3.up);
@@ -189,11 +195,12 @@ public static class ValidateContactScoop
             for (int i = 0; i < 90; i++) simulate.Invoke(grains, new object[] { 1f / 60f });
             grains.SendMessage("LateUpdate");
             Check(grains.KernelCount == 0 && grains.PackedKernelCount == 0, "Empty shovel still displays grain");
-            return $"PASS: contact pickup at phase {firstLoad:F2}, {collected:F2}kg, extraction lift {highestLift-lowestTip:F3}m, max grip travel {maximumTravel:F3}m; conserved scoop mass; tapered A={aCount}/B={bCount} visible kernels, height {aHeight:F3}/{bHeight:F3}m; containment/sleep/tilt; dry swing, cancellation, obstruction, full capacity, final-pour overflow discard, already-full bag, queue, empty load. " + string.Join("; ", trace);
+            return $"PASS: contact pickup at phase {firstLoad:F2}, {collected:F2}kg, extraction lift {highestLift-lowestTip:F3}m, max grip travel {maximumTravel:F3}m; conserved scoop mass; tapered A={aCount}/B={bCount} visible kernels, height {aHeight:F3}/{bHeight:F3}m; containment/sleep/tilt; dry swing, cancellation, obstruction, full capacity, retained overflow, already-full bag, queue, empty load. " + string.Join("; ", trace);
         }
         finally
         {
             Object.DestroyImmediate(root);
+            foreach (var listener in listeners) if (listener != null) listener.enabled = true;
             Time.timeScale = timeScale;
             Cursor.lockState = cursor;
             Cursor.visible = cursorVisible;

@@ -1,11 +1,13 @@
 using UnityEngine;
 
-/// <summary>Shared capacity logic for sacks, boxes and barrels. One grain type for this prototype.</summary>
+/// <summary>Single-species receiver for sacks, boxes and barrels. Unassigned receivers bind on first fill.</summary>
 [DisallowMultipleComponent]
 public sealed class GrainContainer : MonoBehaviour
 {
     [SerializeField, Min(.01f)] private float capacityKg = 50f;
     [SerializeField, Min(0f)] private float kilograms;
+    [SerializeField, Tooltip("A designated receiver accepts only this crop. Otherwise the first pour assigns it.")] private bool restrictGrain;
+    [SerializeField] private GrainType acceptedGrain;
     [SerializeField] private SackController sack;
     [SerializeField] private bool fitFillCollider;
     [SerializeField] private Bounds emptyBounds;
@@ -15,6 +17,9 @@ public sealed class GrainContainer : MonoBehaviour
     private BoxCollider fillCollider;
     public float Kilograms => kilograms;
     public float CapacityKg => capacityKg;
+    public bool HasAssignedGrain => restrictGrain || kilograms > .000001f;
+    public GrainType AcceptedGrain => acceptedGrain;
+    public bool Accepts(GrainType grain) => !HasAssignedGrain || grain == acceptedGrain;
     public bool IsOpen => sack == null || sack.Close < .05f;
     public bool IsFull => kilograms >= capacityKg - .001f;
     public bool IsFinished => sack != null && sack.Close >= .999f;
@@ -55,21 +60,31 @@ public sealed class GrainContainer : MonoBehaviour
         ApplyFill();
     }
 
-    public float Add(float amountKg)
+    public float Add(float amountKg) => Add(GrainType.Corn, amountKg);
+
+    public float Add(GrainType grain, float amountKg)
     {
-        if (!isActiveAndEnabled || IsClosing || IsCarried || !IsOpen || !(amountKg > 0) || float.IsInfinity(amountKg)) return 0;
+        if (!isActiveAndEnabled || IsClosing || IsCarried || !IsOpen || !Accepts(grain) ||
+            (int)grain < 0 || (int)grain >= GrainCargo.TypeCount || !(amountKg > 0) || !float.IsFinite(amountKg)) return 0;
         float accepted = Mathf.Min(amountKg, Mathf.Max(0, capacityKg - kilograms));
         bool wasFull = IsFull;
+        if (accepted > 0) acceptedGrain = grain;
         kilograms += accepted;
         ApplyFill();
         if (accepted > 0)
         {
-            GoalContext.ReportProgress(this, GoalType.GrainMoved, accepted);
-            GoalContext.ReportValue(this, GoalType.SackFilled, IsFull ? capacityKg : kilograms);
-            if (!wasFull && IsFull) GoalContext.ReportProgress(this, GoalType.BagsFilled);
+            GoalContext.Resolve(this, out int hangar, out _);
+            GoalChecker.ReportProgress(GoalType.GrainMoved, accepted, hangar, grain);
+            GoalChecker.ReportValue(GoalType.SackFilled, IsFull ? capacityKg : kilograms, hangar, grain);
+            GrainDeposited?.Invoke(accepted);
+            if (!wasFull && IsFull) GoalChecker.ReportProgress(GoalType.BagsFilled, 1, hangar, grain);
         }
         return accepted;
     }
+
+    public static event System.Action<float> GrainDeposited;
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetEvents() => GrainDeposited = null;
 
     public bool Finish()
     {
@@ -88,7 +103,8 @@ public sealed class GrainContainer : MonoBehaviour
         if (IsFinished)
         {
             IsClosing = false;
-            GoalContext.ReportProgress(this, GoalType.SackClosed);
+            GoalContext.Resolve(this, out int hangar, out _);
+            GoalChecker.ReportProgress(GoalType.SackClosed, 1, hangar, acceptedGrain);
         }
     }
 

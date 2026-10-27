@@ -235,6 +235,8 @@ public static class SaveSystem
 [Serializable]
 public class PlayerData
 {
+    [Header("Grain progression")]
+    public double grainBaggedKilograms;
     [Header("Data")]
     public string playerName;
     public bool tutorialPassed;

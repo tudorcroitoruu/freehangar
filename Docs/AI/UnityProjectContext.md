@@ -1,5 +1,25 @@
 # Unity project context
 
+2026-10-27 spatial correction: all five Gameplay piles now store local crop
+regions and optional buried percentage layers in GrainSpatialField. The original
+hangar is always 100% corn; hangars 4 and 5 are exactly 5% corn by starting mass.
+The shader samples spatial composition maps, and scoop/settling callbacks move
+the same typed material. GrainProgression no longer repaints spatial piles.
+Inspector region presets, per-crop inventory and Preview Cleared Percent replace
+global kg scrubbing for these hangars. Added 23 Edit Mode and 9 spatial Play Mode
+assertions; existing mixed collection/sorting regressions pass. See the newest
+GrainPrototype.md section and output/GrainTypes/Hangar5Spatial.png.
+
+2026-10-27 grain expansion: Gameplay has ten crop appearances using an instanced
+HDRP shader, mixed shovel cargo and single-crop receiver sorting, retained
+overflow, three replacement-sack stations, and persistent progression based on
+accepted bagged kilograms (0/100/250/500/1000 kg). GrainPile recipes use whole-pile
+harvest budgets, not spatial strata; the last recipe layer fills remaining mass.
+Edit Mode includes layer/progression scrubbing and closed-hangar previews.
+GrainGallery.unity shows all ten crops. 28 Edit Mode assertions, 33 Play Mode
+assertions and existing mass/contact-scoop regressions pass. See the newest
+section of GrainPrototype.md for authoring, persistence boundaries and validation.
+
 Terrain checkout recovery, 2026-10-26: the nine damaged Git terrain blobs were
 re-staged from intact local sources under the existing binary attributes.
 Fresh-GUID imports and byte-identical checkout exports passed. NewMap's seven

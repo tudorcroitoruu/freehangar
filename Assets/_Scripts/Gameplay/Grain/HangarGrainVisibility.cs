@@ -8,6 +8,8 @@ public sealed class HangarGrainVisibility : MonoBehaviour
     private bool hangarOpen;
     [SerializeField, Tooltip("Entire grain-pile GameObject, including kernels, collision and simulation.")]
     private GameObject grainRoot;
+    [SerializeField, Tooltip("Show the pile while editing even when the hangar is closed. Runtime visibility still follows Hangar Open.")]
+    private bool previewInEditor;
 
     private bool applyRequested = true;
     public bool HangarOpen => hangarOpen;
@@ -31,6 +33,7 @@ public sealed class HangarGrainVisibility : MonoBehaviour
     {
         applyRequested = false;
         if (!grainRoot || transform.IsChildOf(grainRoot.transform)) return;
-        if (grainRoot.activeSelf != hangarOpen) grainRoot.SetActive(hangarOpen);
+        bool visible = hangarOpen || (!Application.isPlaying && previewInEditor);
+        if (grainRoot.activeSelf != visible) grainRoot.SetActive(visible);
     }
 }

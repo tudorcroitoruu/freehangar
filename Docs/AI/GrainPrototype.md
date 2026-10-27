@@ -1,5 +1,164 @@
 # Grain interaction prototype
 
+## Spatial hangar stock correction — 2026-10-27
+
+The five Gameplay hangars now use physical crop regions rather than the earlier
+whole-pile recipe switches. This supersedes the milestone-driven stock repainting
+described in the historical section below. The first hangar remains 100% corn at
+every career milestone. Later hangars are already visibly varied in Edit Mode.
+
+| Hangar | Authored layout |
+| --- | --- |
+| 1 / original pile | 100% corn |
+| 2 | 60% pure corn, 20% pure wheat, 20% corn/wheat mix: 70% corn overall |
+| 3 | Five 20% chunks with staggered junctions and straight/curved borders: wheat, barley, oats, rice, soybeans |
+| 4 | Repeating regions: 10% wheat, 5% rice, 10% wheat, 15% oats, 20% soybeans, 20% barley, 15% rice, 5% corn |
+| 5 | Irregular rice/peas/soybean/buckwheat/corn/rye/sunflower/oats/barley/wheat patches, including mixed patches and repeated rice; exactly 5% corn overall |
+
+The **Curved Sections** arrangement follows the annotated sketch with broad adjoining
+areas. Adjust **Section Center** (0..1 footprint), **Section Rotation**, and
+**Region Waviness** in Edit Mode. It uses the same physical stock map for rendering
+and excavation; a scoop across the junction can collect several crops. The spatial
+validation now passes 31 assertions, including section mass shares and junction scooping.
+
+Select a pile and edit **Regions**. Region percentages describe starting **mass**,
+not visible surface area; they normalize to 100. Each region can be pure or mixed,
+and can have its own top-to-bottom **Local depth layers**, also expressed as mass
+percentages. Repeating the same crop in separate entries makes the requested
+10% crop A → 5% crop B → crop A sequences. Arrangement chooses front-to-back,
+left-to-right, or irregular patches; Waviness and Seed vary their outlines.
+The Inspector shows actual per-crop inventory and includes useful presets.
+
+**Preview Cleared Percent** temporarily removes stock from the start of the
+region sequence in Edit Mode, so 20/40/60% previews expose the next regions.
+Runtime starts with the intact authored stock. Local buried strata are revealed
+by excavating the corresponding columns. There is no guaranteed global crop
+order if the player deliberately walks to a different region: scooping there
+collects the crop that is actually there. A scoop crossing a region boundary or
+layer boundary can contain several crops, all handled by the existing sorting
+system. Milestones continue to track accepted bagged kg, but cannot change any
+spatial pile's existing species or percentages; old non-spatial piles retain the
+legacy recipe option.
+
+`GrainSpatialField` assigns exact volume budgets after wall clipping, holds
+per-column material stacks, and receives actual volume removal/transfer events
+from `GrainHeightField`. Settling transports each crop into neighboring cells
+rather than relabeling it. Stacks merge adjacent identical compositions and cap
+history at 32 entries by blending deeply buried entries while retaining crop
+mass. Three small RGBAHalf maps expose the current top composition to the HDRP
+shader in pile-local coordinates. Instanced kernel shapes/colors, substrate and
+decorative scatter therefore use the spatial stock, including rotated and
+nonuniformly scaled piles. Boundary display interpolates over grid cells; the
+physics remains the existing height-field approximation, not individual kernels.
+
+Validation: **23 new Edit Mode assertions** cover exact 20% regions, repeat
+patterns, rice-location scoops, depth reveals, per-crop settling conservation,
+20% preview clearing, transformed 5%-corn stock, shader bindings and protection
+from legacy recipe replacement. **9 spatial Play Mode assertions** check saved
+hangar percentages, corn-only first hangar after the final milestone, location
+and boundary scoops, sorting and runtime shader maps. Existing 28 mixed-grain
+model checks, 33 animated mixed-load Play Mode checks, and volume/capacity
+regressions pass. Actual hangars 3/4/5 were rendered and visually inspected;
+captures are `output/GrainTypes/Hangar{3,4,5}Spatial.png`. No platform build or
+new hardware performance claim.
+
+Authoring preset installer: `Tools > Grain > Apply spatial hangar layouts`.
+This deliberately replaces region authoring with the five defaults; normal
+Inspector edits do not rerun it. Validation menu: `Tools > Grain > Validate
+spatial crop stock`. Runtime fixture: `output/GrainTypes/ValidateSpatialPlay.cs`.
+
+## Mixed grain types and progression — 2026-10-27
+
+Historical first implementation: spatial Gameplay piles now use the correction
+above. This section describes the retained sorting system and legacy recipes.
+
+Gameplay now uses all ten stable GrainType IDs: corn, wheat, barley, oats, rye,
+rice, peas, soybeans, sunflower seeds and buckwheat. `GrainKernels.shader` supplies
+distinct kernel proportions, colors and cereal creases/soybean hilum/sunflower
+stripes. It is an HDRP instanced shader with stylized directional shading, not a
+full HDRP Lit material. Pile skins, instanced kernels, floor scatter, shovel loads,
+airborne kernels and sack fill surfaces use the same type palette. Instancing,
+pile LOD, camera culling and the bounded shovel particle pool are retained.
+
+Open `Assets/Scenes/GrainGallery.unity` to inspect all ten crops outside Play Mode.
+The reusable crop materials and empty sorting sack prefab live in
+`Assets/GrainPrototype/Grains`. A rendered reference is
+`output/GrainTypes/GrainPalette.png`.
+
+Select a **GrainPile** in Edit Mode:
+
+- **Grain Layers** is a top-to-bottom sequence. Each layer has a kg budget and a
+  mixture of crop/weight entries. Weights normalize automatically; the last layer
+  fills the remaining pile. Empty/invalid mixtures fall back to corn.
+- **52 kg** is eight full scoops with the current 6.5 kg shovel. Partial scoops
+  advance proportionally. Crossing a layer boundary collects portions of both
+  layers; a mixed layer supplies all of its crops in each scoop.
+- **Preview Harvested Kg** previews later layers without removing grain. Preset
+  buttons provide a single crop, corn-to-rice after eight scoops, and two different
+  three-crop mixtures. Existing shape/scale/mound handles remain available.
+- These are **whole-pile harvest stages**, not spatially simulated buried strata.
+  Digging in another spot still advances the same pile's kg cursor. The visual
+  surface blends over a 1 kg boundary window; mass transfer splits at the exact
+  budget. Height-field excavation/settling remains independent and conservative.
+- **HangarGrainVisibility > Preview In Editor** shows a closed hangar's pile for
+  authoring. This never unlocks it or exposes its collision during Play Mode.
+
+`GrainCargo` owns per-type shovel kilograms. Pouring into a designated or already
+filled container transfers only its crop. An empty, unrestricted container binds
+to the largest portion on the shovel on first fill. Other crops and capacity
+overflow remain on the shovel. `GrainContainer` supports sacks and generic
+box/barrel receivers; sack fill geometry is wired in Gameplay. The HUD lists
+individual portions, and the existing bag prompt identifies the receiver's crop.
+Goal reports now carry actual crop IDs, including each part of mixed collection.
+
+Gameplay contains three open sorting sacks. Each station's `GrainBagSupply`
+replaces its sack when the finished sack is picked up, preserving the full bag
+and its contents. Finish/take/drop uses the existing E interactions.
+
+The **Grain progression** object owns configurable stages and references all five
+piles, including closed hangars. Only successfully accepted container kilograms
+advance progression; collecting or rejected pours do not count.
+
+| Total bagged | Default remaining stock |
+| --- | --- |
+| 0 kg | Corn |
+| 100 kg | Corn + wheat |
+| 250 kg | Wheat + barley + oats |
+| 500 kg | Corn for 52 kg, then rice + soybeans |
+| 1,000 kg | Rye + peas + sunflower seeds for 52 kg, then buckwheat + soybeans |
+
+The 500 kg stage demonstrates independent hangars: Hangar 3 (left) is rice,
+Hangar 2 (right) is wheat, and the original pile is corn/rice/soybeans mixed.
+Other hangars use the default sequence. Edit stage thresholds, default recipes,
+and **Overrides** for other assignments. Keep thresholds in ascending order.
+The progression Inspector can preview any stage on the scene's piles with Undo.
+Runtime progression takes precedence over manual recipes on its referenced piles;
+remove a pile from its list to author a permanently independent recipe.
+
+Stage changes replace remaining stock recipes without restoring excavated volume
+or changing shovel/bag contents. They reset each affected pile's layer cursor.
+`PlayerData.grainBaggedKilograms` persists the cumulative milestone through the
+existing save system with a one-second debounce and pause/exit flush. Old saves
+default to zero. Individual excavations, layers, carried cargo and bags remain
+session state, as before; this is not a world-state save implementation.
+
+Validation: Unity 6000.3.20f1 compiled scripts and all shader passes; the rendered
+ten-crop palette was inspected. **28 Edit Mode assertions** cover types, boundary
+splitting, mixed collection, sorting, overflow, mass, thresholds and JSON save
+compatibility. Existing height-field/capacity checks pass. **33 Play Mode
+assertions** exercise animated mixed scooping, four sorted pours, full-bag
+retention, exact final emptying, replacement supply, actual deposit-driven
+progression and closed-hangar visibility. The original contact-scoop regression
+passes with its expectations updated from discarded to retained overflow. No new
+Console errors remain; pre-existing unrelated C# warnings persist. No platform
+build or hardware performance certification was performed.
+
+Run `Tools > Grain > Validate mixed grains and progression` in Edit Mode, or run
+`output/GrainTypes/ValidateMixedPlay.cs` through Unity CLI in Play Mode. Tests use
+isolated fixtures and disable career listeners so validation deposits do not
+change player progress. `Tools > Grain > Install grain types and progression`
+is the reusable authoring setup; it preserves existing progression configuration.
+
 Updated 2026-10-24 in Unity 6000.3.20f1. Includes 3D kernel presentation and localized refill after scooping.
 
 ## Pile authoring
@@ -166,3 +325,6 @@ Ctrl+E v1.2 clean export: only FBX plus textures/Albedo, AO and Normal PNGs are 
 
 
 2026-10-26 spatial grain submission: CornSurfaceKernels retains the exact original seeded samples, colors, rotations, sizes and near/medium/far kernel meshes. Draw submission is now Morton ordered in X/Z per palette, with tight surface bounds for frustum and LOD selection. Dirty batch surface bounds are rebuilt after excavation; empty batches are skipped. The old base-extruded bounds incorrectly made large batches select high detail. Same-view capture dropped from 1,226,720 to 816,640 submitted triangles (33.4%); this is camera dependent, not an FPS claim. All 82,753 per-sample matrices compared byte-identical before/after. Coverage tests passed with unchanged 0.045m spacing; Play Mode mass/local deformation/settling checks passed (2,382 local kernels updated, distant view 662,024 triangles). Previews and baseline binaries are in output/GrainPrototype/spatial-*.
+
+The Chunks And Curves arrangement divides broad areas repeatedly, alternating straight and bowed cuts. Hangar 3 now uses this arrangement rather than radial sectors. Region Waviness controls bending; Section Rotation rotates the cuts. Section Center applies only to the older Curved Sections mode. Spatial validation passes 37 assertions.
+

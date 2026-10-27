@@ -19,11 +19,14 @@ public sealed class BagCornSurface : MonoBehaviour
     private float lastFill = -1, lastClose = -1;
     private Matrix4x4 lastTransform;
     private uint randomState;
+    private GrainContainer container;
+    private readonly GrainAppearance grainAppearance = new GrainAppearance();
     public int KernelCount { get; private set; }
 
     private void OnEnable()
     {
         lastFill = -1;
+        container = GetComponent<GrainContainer>();
         if (sack != null) sack.RefreshBindings();
         RenderPipelineManager.beginCameraRendering += Draw;
     }
@@ -107,9 +110,11 @@ public sealed class BagCornSurface : MonoBehaviour
     private void Draw(ScriptableRenderContext context, Camera camera)
     {
         if (KernelCount == 0 || kernelMesh == null || kernelMaterial == null || camera.cameraType == CameraType.Preview) return;
-        Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, first, Mathf.Min(1023, KernelCount), null,
+        grainAppearance.Set(container != null ? container.AcceptedGrain : GrainType.Corn);
+        if (grainSurface != null) grainSurface.SetPropertyBlock(grainAppearance.Block);
+        Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, first, Mathf.Min(1023, KernelCount), grainAppearance.Block,
             ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
-        if (KernelCount > 1023) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, second, KernelCount - 1023, null,
+        if (KernelCount > 1023) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, second, KernelCount - 1023, grainAppearance.Block,
             ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
     }
     private void OnDestroy()

@@ -25,7 +25,7 @@ public sealed class BagInteractionPrompt : MonoBehaviour
         Vector3 screen = camera.WorldToScreenPoint(worldPosition);
         if (screen.z <= 0 || screen.x < 0 || screen.x > Screen.width || screen.y < 0 || screen.y > Screen.height) { Hide(); return; }
         if (!panel.gameObject.activeSelf) panel.gameObject.SetActive(true);
-        if (showFill) action = "Fill";
+        if (showFill) action = bag.HasAssignedGrain ? "Fill " + GrainNames.Display(bag.AcceptedGrain) : "Fill · unassigned";
         showKey = showKey && !showFill;
         CurrentText = action;
         if (description != null && description.text != action) description.text = action;
@@ -37,7 +37,7 @@ public sealed class BagInteractionPrompt : MonoBehaviour
             if (bagFill != null) bagFill.fillAmount = bag.CapacityKg > 0f ? Mathf.Clamp01(bag.Kilograms / bag.CapacityKg) : 0f;
             if (bagFillStatus != null)
             {
-                string status = $"{bag.Kilograms:0.##} / {bag.CapacityKg:0.##} kg";
+                string status = $"{(bag.HasAssignedGrain ? GrainNames.Display(bag.AcceptedGrain) : "Empty")}  {bag.Kilograms:0.##} / {bag.CapacityKg:0.##} kg";
                 if (bagFillStatus.text != status) bagFillStatus.text = status;
             }
         }

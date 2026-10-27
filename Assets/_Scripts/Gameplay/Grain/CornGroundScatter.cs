@@ -15,6 +15,7 @@ public sealed class CornGroundScatter : MonoBehaviour
     private Matrix4x4 lastTransform;
     private int revision = -1;
     private float nextRefresh;
+    private readonly GrainAppearance grainAppearance = new GrainAppearance();
     public int KernelCount { get; private set; }
 
     private void OnEnable()
@@ -92,7 +93,9 @@ public sealed class CornGroundScatter : MonoBehaviour
     {
         if (KernelCount == 0 || kernelMesh == null || kernelMaterial == null || camera.cameraType == CameraType.Preview) return;
         if ((camera.transform.position - transform.position).sqrMagnitude > 35f * 35f) return;
-        Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, matrices, KernelCount, null,
+        grainAppearance.Set(pile.SurfaceGrain);
+        pile.ApplySpatialAppearance(grainAppearance.Block);
+        Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, matrices, KernelCount, grainAppearance.Block,
             ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
     }
 }

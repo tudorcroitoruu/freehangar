@@ -39,6 +39,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private int[] drawOrder;
     private readonly Plane[] cameraPlanes = new Plane[6];
     private Mesh mediumMesh, distantMesh;
+    private readonly GrainAppearance grainAppearance = new GrainAppearance();
     public int LastUpdatedKernels { get; private set; }
     public int LastDrawTriangles { get; private set; }
 
@@ -294,6 +295,8 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         if (renderer != null && (renderer.bounds.ClosestPoint(camera.transform.position) - camera.transform.position).sqrMagnitude > drawDistance * drawDistance) return;
         if (mediumMesh == null) { mediumMesh = CreateLodMesh(8); distantMesh = CreateLodMesh(4); }
         GeometryUtility.CalculateFrustumPlanes(camera, cameraPlanes);
+        grainAppearance.Set(pile.SurfaceGrain);
+        pile.ApplySpatialAppearance(grainAppearance.Block);
         LastDrawTriangles = 0;
         for (int i = 0; i < batches.Length; i++)
             if (counts[i] > 0 && liveBatches[i] && GeometryUtility.TestPlanesAABB(cameraPlanes, surfaceBounds[i]))
@@ -304,7 +307,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                 LastDrawTriangles += counts[i] * (int)(lod.GetIndexCount(0) / 3);
                 Graphics.DrawMeshInstanced(lod, 0,
                     colorVariants != null && colorVariants.Length == colorCount && colorVariants[i / batchesPerColor] != null
-                        ? colorVariants[i / batchesPerColor] : kernelMaterial, batches[i], counts[i], null,
+                        ? colorVariants[i / batchesPerColor] : kernelMaterial, batches[i], counts[i], grainAppearance.Block,
                     ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
             }
     }

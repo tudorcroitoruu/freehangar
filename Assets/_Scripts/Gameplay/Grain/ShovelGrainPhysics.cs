@@ -46,6 +46,14 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     private Vector3 pourDestination;
     private Collider receiver;
     private System.Random random;
+    private ShovelTool tool;
+    private GrainType pourGrain;
+    private readonly GrainAppearance loadAppearance = new GrainAppearance();
+    private readonly GrainAppearance streamAppearance = new GrainAppearance();
+    private readonly GrainCargo debrisGrain = new GrainCargo();
+    private readonly float[] streamSpecies = new float[StreamCapacity], drawnSpecies = new float[StreamCapacity];
+    private static readonly int SpeciesProperty = Shader.PropertyToID("_GrainType");
+    public void SetPourGrain(GrainType grain) => pourGrain = grain;
 
     public int KernelCount => count;
     public int AirborneCount => streamCount;
@@ -58,6 +66,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
 
     private void Awake()
     {
+        tool = GetComponentInParent<ShovelTool>();
         positions = new Vector3[maximumKernels]; velocities = new Vector3[maximumKernels];
         rotations = new Quaternion[maximumKernels]; matrices = new Matrix4x4[maximumKernels + PackedCapacity];
         random = new System.Random(213);
@@ -150,17 +159,21 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
             matrices[count + PackedKernelCount++] = transform.localToWorldMatrix * Matrix4x4.TRS(p, packedRotations[i],
                 new Vector3(.016f, .011f, .019f) * reveal);
         }
-        if (count + PackedKernelCount > 0) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, matrices, count + PackedKernelCount, null,
+        if (tool != null) loadAppearance.Set(tool.Cargo); else loadAppearance.Set(GrainType.Corn);
+        if (count + PackedKernelCount > 0) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, matrices, count + PackedKernelCount, loadAppearance.Block,
             ShadowCastingMode.On, true, gameObject.layer, null, LightProbeUsage.Off);
         streamCount = 0;
         for (int i = 0; i < StreamCapacity; i++)
         {
             if (streamLife[i] <= 0) continue;
+            drawnSpecies[streamCount] = streamSpecies[i];
             float scale = Mathf.Clamp01(streamLife[i] * (scoopStream[i] ? 35f : 5f));
             streamMatrices[streamCount++] = Matrix4x4.TRS(streamPosition[i],
                 Quaternion.Euler(streamLife[i] * 170f, i * 71f, streamLife[i] * 90f), new Vector3(.013f, .009f, .017f) * scale);
         }
-        if (streamCount > 0) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, streamMatrices, streamCount, null,
+        streamAppearance.Set(pourGrain);
+        streamAppearance.Block.SetFloatArray(SpeciesProperty, drawnSpecies);
+        if (streamCount > 0) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, streamMatrices, streamCount, streamAppearance.Block,
             ShadowCastingMode.Off, true, airborneLayer, null, LightProbeUsage.Off);
     }
 
@@ -352,6 +365,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     private void Emit(Vector3 position)
     {
         int i = streamHead++ % StreamCapacity;
+        streamSpecies[i] = (int)pourGrain;
         cosmeticStream[i] = false;
         scoopStream[i] = false;
         streamPosition[i] = position;
@@ -366,6 +380,8 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     {
         // Extra visual copies: neither the load population nor gameplay kilograms are removed.
         int i = streamHead++ % StreamCapacity;
+        if (fromScoop && disturbedPile != null) disturbedPile.SampleSurfaceGrain(position, debrisGrain);
+        streamSpecies[i] = (int)(fromScoop && disturbedPile != null ? debrisGrain.Sample(Random(0, 1)) : tool != null ? tool.Cargo.Sample(Random(0, 1)) : GrainType.Corn);
         cosmeticStream[i] = true;
         scoopStream[i] = fromScoop;
         streamPosition[i] = position;

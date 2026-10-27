@@ -5,6 +5,95 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public sealed class GrainPile : MonoBehaviour
 {
+    [Header("Spatial grain regions (percent of starting mass)")]
+    [SerializeField] private bool useSpatialLayout;
+    [SerializeField] private GrainSpatialField.Arrangement arrangement;
+    [SerializeField, Range(0,.5f)] private float regionWaviness = .12f;
+    [Tooltip("Curved Sections junction in normalized footprint coordinates (0..1).")]
+    [SerializeField] private Vector2 sectionCenter = new Vector2(.55f, .48f);
+    [SerializeField, Range(-180,180)] private float sectionRotation;
+    [SerializeField] private int grainLayoutSeed = 731;
+    [SerializeField] private GrainRegion[] regions = { new GrainRegion(100, GrainType.Corn) };
+    [SerializeField, Range(0,100), Tooltip("Edit Mode only. Clear this percentage from the front of the region sequence to inspect later crops. Play Mode always starts intact.")]
+    private float previewClearedPercent;
+    private GrainSpatialField spatial;
+    public bool HasSpatialLayout => useSpatialLayout;
+    public double GrainKilograms(GrainType grain) => spatial == null ? 0 : spatial.VolumeOf(grain) * kilogramsPerCubicMetre * VolumeScale;
+    public void ConfigureRegions(GrainRegion[] value, GrainSpatialField.Arrangement pattern = GrainSpatialField.Arrangement.FrontToBack, float waviness = .12f)
+    {
+        if (Application.isPlaying) throw new System.InvalidOperationException("Author spatial stock outside Play Mode; changing it would replace stored grain.");
+        useSpatialLayout = true; regions = value; arrangement = pattern; regionWaviness = waviness;
+        previewClearedPercent = 0; RebuildPreview();
+    }
+    public void ApplySpatialAppearance(MaterialPropertyBlock block)
+    {
+        if (useSpatialLayout && spatial != null) spatial.Bind(block, transform);
+        else block.SetFloat("_UseSpatialGrain", 0);
+    }
+    public void SampleSurfaceGrain(Vector3 worldPoint, GrainCargo output)
+    {
+        Initialize();
+        if (spatial != null)
+        {
+            Vector3 local = transform.InverseTransformPoint(worldPoint);
+            spatial.Sample(local.x, local.z, output);
+        }
+        else { output.Clear(); CollectRecipe(Application.isPlaying ? harvestedKg : previewHarvestedKg, 1, output); }
+    }
+    [Header("Grain recipe — top to bottom")]
+    [SerializeField] private GrainLayer[] grainLayers = { new GrainLayer(52, GrainType.Corn) };
+    [SerializeField, Min(0), Tooltip("Editor only: preview the recipe after collecting this many kg. Does not excavate or change gameplay mass.")]
+    private float previewHarvestedKg;
+    private double harvestedKg;
+    private readonly GrainCargo surfaceGrain = new GrainCargo();
+    private readonly GrainAppearance appearance = new GrainAppearance();
+    public double HarvestedKg => harvestedKg;
+    public GrainCargo SurfaceGrain { get { RefreshGrainAppearance(); return surfaceGrain; } }
+    private double lastAppearanceKg = -1;
+    private MeshRenderer surfaceRenderer;
+
+    public void SetRecipe(GrainLayer[] layers)
+    {
+        if (layers == null || layers.Length == 0) return;
+        grainLayers = layers;
+        harvestedKg = 0;
+        lastAppearanceKg = -1;
+        SurfaceRevision++;
+        RefreshGrainAppearance();
+    }
+
+    public void CollectRecipe(double offsetKg, float amountKg, GrainCargo destination)
+    {
+        if (destination == null || !float.IsFinite(amountKg) || amountKg <= 0) return;
+        if (grainLayers == null || grainLayers.Length == 0) { destination.Add(GrainType.Corn, amountKg); return; }
+        double offset = System.Math.Max(0, offsetKg);
+        float remaining = amountKg;
+        for (int i = 0; i < grainLayers.Length && remaining > 0; i++)
+        {
+            var layer = grainLayers[i];
+            float limit = layer != null && float.IsFinite(layer.kilograms) ? Mathf.Max(.01f, layer.kilograms) : 52;
+            bool last = i == grainLayers.Length - 1;
+            if (!last && offset >= limit) { offset -= limit; continue; }
+            float part = last ? remaining : Mathf.Min(remaining, (float)(limit - offset));
+            if (layer?.mixture != null) layer.mixture.AddTo(destination, part); else destination.Add(GrainType.Corn, part);
+            remaining -= part;
+            offset = 0;
+        }
+    }
+
+    private void RefreshGrainAppearance()
+    {
+        double offset = Application.isPlaying ? harvestedKg : previewHarvestedKg;
+        if (lastAppearanceKg == offset && spatial == null) return;
+        lastAppearanceKg = offset;
+        surfaceGrain.Clear();
+        // Show a one-kilogram transition at layer boundaries, also in the substrate shader.
+        if (spatial != null) spatial.Sample(0, 0, surfaceGrain); else CollectRecipe(offset, 1, surfaceGrain);
+        appearance.Set(surfaceGrain);
+        ApplySpatialAppearance(appearance.Block);
+        if (surfaceRenderer == null) surfaceRenderer = GetComponent<MeshRenderer>();
+        if (surfaceRenderer != null) surfaceRenderer.SetPropertyBlock(appearance.Block);
+    }
     [SerializeField, Range(9, 65)] private int resolution = 33;
     [SerializeField, Min(1f)] private float size = 6f;
     [SerializeField, Min(0f)] private float initialHeight = 1.8f;
@@ -103,6 +192,7 @@ public sealed class GrainPile : MonoBehaviour
 
     private void Awake() => Initialize();
     private void OnEnable() => Initialize();
+    private void OnDisable() => spatial?.ReleaseTextures();
 
     private float Profile(float x, float z)
     {
@@ -141,6 +231,11 @@ public sealed class GrainPile : MonoBehaviour
         DetectWalls();
         boundary = new GrainWallBoundary();
         if (detectedWalls.Count > 0) boundary.Build(field, transform, detectedWalls, wallClearance);
+        if (useSpatialLayout)
+        {
+            spatial = new GrainSpatialField(field, regions, arrangement, regionWaviness, grainLayoutSeed, sectionCenter, sectionRotation);
+            if (!Application.isPlaying && previewClearedPercent > 0) spatial.PreviewClear(previewClearedPercent);
+        }
         lastPlacement = transform.localToWorldMatrix;
         lastScale = scale;
         activeTriangles = new List<int>(field.Triangles.Length);
@@ -172,9 +267,11 @@ public sealed class GrainPile : MonoBehaviour
         rebuildRequested = false;
     }
 
-    public float Scoop(Vector3 worldPoint, float radius, float depth, float capacityKg)
+    public float Scoop(Vector3 worldPoint, float radius, float depth, float capacityKg) => Scoop(worldPoint, radius, depth, capacityKg, null);
+
+    public float Scoop(Vector3 worldPoint, float radius, float depth, float capacityKg, GrainCargo destination)
     {
-        if (!isActiveAndEnabled || !(capacityKg > 0f)) return 0;
+        if (!isActiveAndEnabled || !float.IsFinite(capacityKg) || !(capacityKg > 0f)) return 0;
         Initialize();
         if (field == null || !IsInsideBoundary(worldPoint)) return 0;
         Vector3 p = transform.InverseTransformPoint(worldPoint);
@@ -182,9 +279,16 @@ public sealed class GrainPile : MonoBehaviour
         Vector3 scale = WorldScale;
         if (Mathf.Abs(p.y - field.Sample(p.x, p.z)) * scale.y > depth + .15f) return 0;
         float density = kilogramsPerCubicMetre * VolumeScale;
-        float removed = field.Scoop(p.x, p.z, radius, depth / scale.y, capacityKg / density, settlingMargin, scale);
+        if (spatial != null) spatial.BeginCollection(destination, density);
+        float removed;
+        try { removed = field.Scoop(p.x, p.z, radius, depth / scale.y, capacityKg / density, settlingMargin, scale); }
+        finally { if (spatial != null) spatial.EndCollection(); }
         if (removed > 0)
         {
+            float kg = removed * density;
+            if (destination != null && spatial == null) CollectRecipe(harvestedKg, kg, destination);
+            harvestedKg += kg;
+            RefreshGrainAppearance();
             settling = true;
             RefreshSurface();
             if (Time.time >= nextCollider) RefreshCollider();
@@ -194,6 +298,7 @@ public sealed class GrainPile : MonoBehaviour
 
     private void Update()
     {
+        RefreshGrainAppearance();
         if (!Application.isPlaying)
         {
             DetectWalls();
@@ -240,7 +345,7 @@ public sealed class GrainPile : MonoBehaviour
         colliderDirty = true;
     }
 
-    private void OnValidate() { rebuildRequested = true; SurfaceRevision++; }
+    private void OnValidate() { rebuildRequested = true; lastAppearanceKg = -1; SurfaceRevision++; }
 
     public void RebuildPreview()
     {
@@ -282,6 +387,7 @@ public sealed class GrainPile : MonoBehaviour
 
     private void ReleaseMeshes()
     {
+        spatial?.Dispose(); spatial = null;
         if (mesh != null) { if (Application.isPlaying) Destroy(mesh); else DestroyImmediate(mesh); }
         if (collisionMesh != null) { if (Application.isPlaying) Destroy(collisionMesh); else DestroyImmediate(collisionMesh); }
         mesh = collisionMesh = null;
