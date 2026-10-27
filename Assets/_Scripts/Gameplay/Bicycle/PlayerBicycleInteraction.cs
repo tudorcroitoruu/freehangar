@@ -8,6 +8,8 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     public BicycleController bicycle;
     public Transform instrument;
     public float interactionDistance = 2.5f;
+    [Min(0)] public float cameraReturnDelay = 3f;
+    [Min(.05f)] public float cameraReturnSmoothTime = .6f;
     [Min(0)] public float boostStaminaPerSecond = 12f;
     public bool IsBoosting { get; private set; }
     StaminaManager stamina;
@@ -21,6 +23,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     Vector3 cameraPosition;
     Quaternion cameraRotation;
     float yaw, pitch;
+    float lookIdleTime, yawReturnVelocity, pitchReturnVelocity;
     string hint = "";
     readonly Collider[] hits = new Collider[32];
     void Awake() => CacheReferences();
@@ -38,7 +41,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             if (input && Input.GetKeyDown(KeyCode.E)) { TryDismount(); return true; }
             DriveRiding(input ? Input.GetAxisRaw("Vertical") : 0, input ? Input.GetAxisRaw("Horizontal") : 0,
                 !input || Input.GetKey(KeyCode.Space), input && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)), Time.deltaTime);
-            if(input) { yaw = Mathf.Clamp(yaw + Input.GetAxisRaw("Mouse X")*2,-85,85); pitch=Mathf.Clamp(pitch-Input.GetAxisRaw("Mouse Y")*2,-65,65); }
+            if(input) UpdateRidingLook(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"), Time.deltaTime);
             ApplyRidingView();
             hint=motoroller != null ? "W/S Drive / Reverse   A/D Steer   Space Brake   E Get off" : "W/S Pedal   A/D Steer   Shift Faster   Space Brake   E Get off";
             return true;
@@ -105,6 +108,27 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             if (stamina.IsExhausted) { boostExhausted = true; IsBoosting = false; }
         }
     }
+    public void UpdateRidingLook(float mouseX, float mouseY, float dt)
+    {
+        if (!riding || dt <= 0 || !float.IsFinite(dt) || !float.IsFinite(mouseX) || !float.IsFinite(mouseY)) return;
+        if (Mathf.Abs(mouseX) > .0001f || Mathf.Abs(mouseY) > .0001f)
+        {
+            lookIdleTime = yawReturnVelocity = pitchReturnVelocity = 0;
+            yaw = Mathf.Clamp(yaw + mouseX * 2, -85, 85);
+            pitch = Mathf.Clamp(pitch - mouseY * 2, -65, 65);
+        }
+        else
+        {
+            lookIdleTime += dt;
+            if (lookIdleTime > cameraReturnDelay)
+            {
+                float returnDt = Mathf.Min(dt, lookIdleTime - cameraReturnDelay);
+                yaw = Mathf.SmoothDampAngle(yaw, 0, ref yawReturnVelocity, Mathf.Max(.05f, cameraReturnSmoothTime), Mathf.Infinity, returnDt);
+                pitch = Mathf.SmoothDampAngle(pitch, 0, ref pitchReturnVelocity, Mathf.Max(.05f, cameraReturnSmoothTime), Mathf.Infinity, returnDt);
+            }
+        }
+        ApplyRidingView();
+    }
     void ApplyRidingView()
     {
         view.transform.localPosition = bicycle.RidingCameraOffset;
@@ -137,7 +161,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         instrumentActive=instrument!=null && instrument.gameObject.activeSelf;
         if(instrument!=null)instrument.gameObject.SetActive(false);
         view.transform.SetParent(bicycle.riderView,false);view.transform.localPosition=Vector3.zero;view.transform.localRotation=Quaternion.identity;
-        yaw=pitch=0;riding=true;bicycle.SetRidden(true);ApplyRidingView();return true;
+        yaw=pitch=lookIdleTime=yawReturnVelocity=pitchReturnVelocity=0;riding=true;bicycle.SetRidden(true);ApplyRidingView();return true;
     }
     public bool TryDismount()
     {

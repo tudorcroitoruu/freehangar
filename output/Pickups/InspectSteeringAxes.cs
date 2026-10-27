@@ -1,0 +1,2 @@
+using UnityEngine;using System.Linq;
+public static class InspectSteeringAxes{public static string Main(){return string.Join("\n",Object.FindObjectsByType<PickupController>(FindObjectsSortMode.None).Select(p=>{var t=p.steeringWheel;var m=t.GetComponent<MeshFilter>().sharedMesh;return p.name+" rotation="+t.localEulerAngles+" bounds="+m.bounds+" vertices="+string.Join(";",m.vertices.Take(12));}))+"\nplay="+Application.isPlaying;}}

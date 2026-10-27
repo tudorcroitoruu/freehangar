@@ -1,0 +1,3 @@
+Pick up - driveable: PASS 21 checks
+Pick Up Bigger - driveable: PASS 21 checks
+Pick Up Last - driveable: PASS 21 checks

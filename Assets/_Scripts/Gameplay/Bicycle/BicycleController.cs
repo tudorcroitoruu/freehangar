@@ -18,6 +18,8 @@ public sealed class BicycleController : MonoBehaviour
     [Min(.1f)] public float brakingDeceleration = 12f;
     [Tooltip("Disable crank and pedaling camera motion for motor-driven vehicles.")]
     public bool motorDriven;
+    [Tooltip("Maximum time a motor vehicle coasts after the driver exits. Zero stops immediately.")]
+    [Min(0)] public float exitCoastDuration = .8f;
     [Min(1)] public float boostSpeedMultiplier = 1.5f;
     [Header("Steering")]
     [Range(.02f, .5f)] public float steeringSmoothTime = .14f;
@@ -77,22 +79,60 @@ public sealed class BicycleController : MonoBehaviour
     void Awake() { Initialize(); LoadRidingCamera(); }
     Collider[] cargoColliders;
     bool[] cargoColliderStates;
+    bool coasting;
+    float coastDeceleration;
+    bool pedalingInput;
+    public bool IsCoasting => coasting;
+    void Update() => TickUnoccupied(Time.deltaTime);
+    public void TickUnoccupied(float dt)
+    {
+        if (!coasting || IsRidden || dt <= 0 || !float.IsFinite(dt)) return;
+        Speed = Mathf.MoveTowards(Speed, 0, coastDeceleration * dt);
+        StepMotion(0, dt);
+        if (Mathf.Abs(Speed) < .01f) StopCoasting();
+    }
+    void RestoreCargoColliders()
+    {
+        if (cargoColliders == null) return;
+        for (int i = 0; i < cargoColliders.Length; i++)
+            if (cargoColliders[i] != null && cargoColliders[i] != motor)
+                cargoColliders[i].enabled = cargoColliderStates[i];
+        cargoColliders = null;
+        cargoColliderStates = null;
+    }
+    void StopCoasting() { coasting = false; Speed = 0; RestoreCargoColliders(); }
+    void OnDisable() { if (coasting) StopCoasting(); }
     public void SetRidden(bool value)
     {
         Initialize(); if (IsRidden == value) return;
-        IsRidden = value; Speed = 0; fallSpeed = 0; steeringVelocity = 0; PedalingCameraPitch = 0;
+        bool wasCoasting = coasting;
+        IsRidden = value; steeringVelocity = 0; PedalingCameraPitch = 0;
         if(value)
         {
+            coasting = false;
+            // Re-entering a rolling vehicle keeps its momentum and original collider states.
+            if (wasCoasting) return;
+            Speed = 0; fallSpeed = 0;
             cargoColliders = GetComponentsInChildren<Collider>(); cargoColliderStates = new bool[cargoColliders.Length];
             for(int i=0;i<cargoColliders.Length;i++){cargoColliderStates[i]=cargoColliders[i].enabled;if(cargoColliders[i]!=motor)cargoColliders[i].enabled=false;}
         }
-        else if(cargoColliders!=null) for(int i=0;i<cargoColliders.Length;i++)if(cargoColliders[i]!=null && cargoColliders[i]!=motor)cargoColliders[i].enabled=cargoColliderStates[i];
+        else if (motorDriven && exitCoastDuration > 0 && Mathf.Abs(Speed) > .1f)
+        {
+            coasting = true;
+            coastDeceleration = Mathf.Max(brakingDeceleration, Mathf.Abs(Speed) / exitCoastDuration);
+        }
+        else StopCoasting();
     }
     public void Drive(float throttle, float turn, bool brake, float dt, bool boost = false)
     {
         if (!IsRidden || dt <= 0 || !float.IsFinite(dt)) return;
+        pedalingInput = Mathf.Abs(throttle) > .01f && !brake;
         float target = Mathf.Clamp(throttle, -.3f, 1f) * maximumSpeed * (boost && throttle > 0 && !brake ? Mathf.Max(1, boostSpeedMultiplier) : 1);
         Speed = Mathf.MoveTowards(Speed, brake ? 0 : target, (brake ? brakingDeceleration : Mathf.Abs(throttle) < .01f ? 1.8f : acceleration) * dt);
+        StepMotion(turn, dt);
+    }
+    void StepMotion(float turn, float dt)
+    {
         float targetSteering = Mathf.Clamp(turn, -1, 1) * maximumSteeringAngle;
         currentSteering = Mathf.SmoothDampAngle(currentSteering, targetSteering, ref steeringVelocity,
             Mathf.Max(.02f, steeringSmoothTime), Mathf.Infinity, dt);
@@ -114,9 +154,9 @@ public sealed class BicycleController : MonoBehaviour
         frontWheel.localRotation = frontRest * Quaternion.Euler(wheelAngle,0,0);
         rearWheel.localRotation = rearRest * Quaternion.Euler(wheelAngle,0,0);
         if (motorDriven) { PedalingCameraPitch = 0; return; }
-        if (Mathf.Abs(throttle) > .01f && !brake) crankAngle += Speed * 100 * dt;
+        if (pedalingInput) crankAngle += Speed * 100 * dt;
         // Use the actual crank phase, so the rider motion follows the animated feet.
-        bool pedaling = Mathf.Abs(throttle) > .01f && !brake && Mathf.Abs(Speed) > .1f;
+        bool pedaling = pedalingInput && Mathf.Abs(Speed) > .1f;
         float pitchTarget = pedaling ? Mathf.Sin(crankAngle * Mathf.Deg2Rad) * pedalingPitchAmplitude *
             Mathf.Clamp01(Mathf.Abs(Speed) / Mathf.Max(.1f, maximumSpeed)) : 0f;
         PedalingCameraPitch = Mathf.Lerp(PedalingCameraPitch, pitchTarget,

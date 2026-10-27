@@ -1,0 +1,3 @@
+Pick up - driveable: column axis and hub fixed, left/right spin and centering pass
+Pick Up Bigger - driveable: column axis and hub fixed, left/right spin and centering pass
+Pick Up Last - driveable: column axis and hub fixed, left/right spin and centering pass
