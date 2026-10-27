@@ -201,14 +201,15 @@ public class PlayerController : MonoBehaviour
             ? new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
             : Vector2.zero;
         input = Vector2.ClampMagnitude(input, 1f);
-        float currentSpeed = isCrouching ? crouchSpeed :
+        bool pushingWheelbarrow = interactor != null && interactor.PushedWheelbarrow != null;
+        float currentSpeed = pushingWheelbarrow ? Mathf.Min(speed, 3.5f) : isCrouching ? crouchSpeed :
             acceptInput && Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : speed;
         Vector3 velocity = (transform.right * input.x + transform.forward * input.y) * currentSpeed;
 
         if (characterController.isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;
 
-        if (acceptInput && !isCrouching && characterController.isGrounded && Input.GetKeyDown(KeyCode.Space))
+        if (acceptInput && !pushingWheelbarrow && !isCrouching && characterController.isGrounded && Input.GetKeyDown(KeyCode.Space))
             verticalVelocity = jumpForce;
 
         verticalVelocity -= gravity * Time.deltaTime;
@@ -219,7 +220,7 @@ public class PlayerController : MonoBehaviour
         if ((collisions & CollisionFlags.Below) != 0 && verticalVelocity < 0f)
             verticalVelocity = -2f;
         Vector3 actualMovement = Vector3.ProjectOnPlane(characterController.velocity, Vector3.up);
-        bool sprinting = acceptInput && Input.GetKey(KeyCode.LeftShift) && input.sqrMagnitude > .01f &&
+        bool sprinting = !pushingWheelbarrow && acceptInput && Input.GetKey(KeyCode.LeftShift) && input.sqrMagnitude > .01f &&
             !isCrouching && characterController.isGrounded && actualMovement.sqrMagnitude > .25f;
         UpdateSprintCamera(sprinting, Time.deltaTime);
     }

@@ -156,7 +156,8 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     public bool TryMount()
     {
         CacheReferences();
-        if(view == null || player == null || player.characterController == null || riding || bicycle==null || !bicycle.isActiveAndEnabled || bicycle.IsRidden || bicycle.riderView==null || (bags!=null && bags.IsCarrying) || Vector3.Distance(transform.position,bicycle.transform.position)>interactionDistance) return false;
+        if(view == null || player == null || player.characterController == null || riding || bicycle==null || !bicycle.isActiveAndEnabled || bicycle.IsRidden || bicycle.riderView==null || (bags!=null && bags.IsCarrying) ||
+            GetComponent<PlayerInteractor>()?.PushedWheelbarrow != null || Vector3.Distance(transform.position,bicycle.transform.position)>interactionDistance) return false;
         motoroller = bicycle.GetComponent<MotorollerController>();
         pickup = bicycle.GetComponent<PickupController>();
         if (pickup != null) pickup.ResetRoadCamera();

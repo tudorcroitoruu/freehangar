@@ -182,7 +182,7 @@ public static class SaveSystem
         //InitAchievementsList();
 
         SaveData();
-        await GlobalManager.Instance.LoadData();
+        if (GlobalManager.Instance != null) await GlobalManager.Instance.LoadData();
         Debug.Log("<color=red>New save</color>");
         return Data;
     }
@@ -237,6 +237,7 @@ public class PlayerData
 {
     [Header("Grain progression")]
     public double grainBaggedKilograms;
+    public string[] foundSecrets = Array.Empty<string>();
     [Header("Data")]
     public string playerName;
     public bool tutorialPassed;

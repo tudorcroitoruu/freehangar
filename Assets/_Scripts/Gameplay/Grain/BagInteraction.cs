@@ -12,6 +12,7 @@ public sealed class BagInteraction : MonoBehaviour
     private GrainContainer target, carried;
     private Transform originalParent;
     private Vector3 originalScale, originalWorldScale, worldExtents, localCenter;
+    private float carriedVolume;
     private Quaternion uprightRotation;
     private Rigidbody carriedBody;
     private Collider[] carriedColliders;
@@ -22,6 +23,7 @@ public sealed class BagInteraction : MonoBehaviour
     private readonly Collider[] overlaps = new Collider[32];
     public bool IsCarrying => carried != null;
     public GrainContainer CarriedBag => carried;
+    public float CarriedVolume => carriedVolume;
     public InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;
     public string PromptAction => carried != null ? "Drop" : target == null ? "" : target.IsClosing ? "Closing…" : target.IsFinished ? "Take" : "Finish";
 
@@ -66,13 +68,18 @@ public sealed class BagInteraction : MonoBehaviour
     private bool Take(GrainContainer bag)
     {
         if (!bag.CanHandle || !bag.IsFinished) return false;
+        var sourceWheelbarrow = bag.GetComponentInParent<WheelbarrowCargo>();
         carried = bag;
-        originalParent = bag.GetComponentInParent<BicycleController>() != null ? null : bag.transform.parent;
+        originalParent = bag.GetComponentInParent<BicycleController>() != null ||
+            sourceWheelbarrow != null ? null : bag.transform.parent;
         originalScale = bag.transform.localScale;
         originalWorldScale = bag.transform.lossyScale;
         worldExtents = bag.WorldBounds.extents;
         var box = bag.GetComponent<BoxCollider>();
         localCenter = box != null ? box.center : Vector3.zero;
+        carriedVolume = box != null ? Mathf.Abs(box.size.x * originalWorldScale.x *
+            box.size.y * originalWorldScale.y * box.size.z * originalWorldScale.z) :
+            bag.WorldBounds.size.x * bag.WorldBounds.size.y * bag.WorldBounds.size.z;
         uprightRotation = Quaternion.FromToRotation(bag.transform.InverseTransformDirection(Vector3.up), Vector3.up);
         carriedBody = bag.GetComponent<Rigidbody>();
         if (carriedBody == null) carriedBody = bag.gameObject.AddComponent<Rigidbody>();
@@ -86,6 +93,7 @@ public sealed class BagInteraction : MonoBehaviour
         shovelWasActive = shovelPresentation != null && shovelPresentation.gameObject.activeSelf;
         if (shovelPresentation != null) shovelPresentation.gameObject.SetActive(false);
         bag.transform.SetParent(carryAnchor, false);
+        if (sourceWheelbarrow != null) sourceWheelbarrow.NotifyBagTaken(bag);
         float factor = Mathf.Min(1f, carriedHeight / Mathf.Max(.1f, worldExtents.y * 2f));
         Vector3 parentScale = carryAnchor.lossyScale;
         bag.transform.localScale = new Vector3(originalWorldScale.x / parentScale.x, originalWorldScale.y / parentScale.y, originalWorldScale.z / parentScale.z) * factor;

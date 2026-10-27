@@ -12,6 +12,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     private PlayerBicycleInteraction bicycle;
     private InteractionHighlight highlight;
     public BagInteraction Bags { get; private set; }
+    public WheelbarrowCargo PushedWheelbarrow { get; set; }
     public IInteractable Target { get; private set; }
 
     private InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;
@@ -35,9 +36,23 @@ public sealed class PlayerInteractor : MonoBehaviour
         var prompt = Prompt;
         Target = null;
         if (!CanInteract) { SetHighlightedTarget(null); HidePrompt(); return; }
+        if (PushedWheelbarrow != null)
+        {
+            SetHighlightedTarget(null);
+            if (PushedWheelbarrow.TryGetPrompt(this, out var pushPrompt) && prompt != null)
+                prompt.Show(viewCamera, pushPrompt);
+            else HidePrompt();
+            return;
+        }
         if (Bags != null && Bags.isActiveAndEnabled && Bags.IsCarrying)
         {
             SetHighlightedTarget(null);
+            var wheelbarrow = FindTarget() as WheelbarrowCargo;
+            if (wheelbarrow != null && wheelbarrow.TryGetPrompt(this, out var loadPrompt))
+            {
+                if (prompt != null) prompt.Show(viewCamera, loadPrompt);
+                return;
+            }
             if (Bags.TryGetPrompt(Bags.CarriedBag, out var carriedPrompt) && prompt != null)
                 prompt.Show(viewCamera, carriedPrompt);
             else HidePrompt();
@@ -55,8 +70,16 @@ public sealed class PlayerInteractor : MonoBehaviour
     public bool TryInteract()
     {
         if (!CanInteract) return false;
+        if (PushedWheelbarrow != null) return PushedWheelbarrow.TryInteract(this);
         // Carrying reserves E for dropping; bicycle cargo handling takes priority in PlayerController.
-        if (Bags != null && Bags.isActiveAndEnabled && Bags.IsCarrying) return Bags.TryInteract();
+        if (Bags != null && Bags.isActiveAndEnabled && Bags.IsCarrying)
+        {
+            var wheelbarrow = FindTarget() as WheelbarrowCargo;
+            if (wheelbarrow != null)
+                return wheelbarrow.TryGetPrompt(this, out var loadPrompt) && loadPrompt.ShowKey &&
+                    wheelbarrow.TryInteract(this);
+            return Bags.TryInteract();
+        }
         Target = FindTarget();
         return Target != null && Target.TryGetPrompt(this, out var data) && data.ShowKey && Target.TryInteract(this);
     }
