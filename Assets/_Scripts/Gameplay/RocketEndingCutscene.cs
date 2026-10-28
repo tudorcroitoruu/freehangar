@@ -207,6 +207,15 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         if (sunDisc != null && view != null) sunDisc.position = view.transform.position - sun.transform.forward * 1400;
     }
     private static float Smooth(float t) => Mathf.SmoothStep(0,1,Mathf.Clamp01(t));
+    private static void ApplyFlightShake(ref Vector3 position, ref Quaternion rotation, float time, float strength)
+    {
+        // Smooth irregular vibration, shared across the close shot and its widening transition.
+        float x = (Mathf.PerlinNoise(time * 6f, 13.7f) - .5f) * 2;
+        float y = (Mathf.PerlinNoise(7.3f, time * 7f) - .5f) * 2;
+        float roll = (Mathf.PerlinNoise(time * 4f, 27.1f) - .5f) * 2;
+        position += rotation * new Vector3(x * .025f, y * .018f, 0) * strength;
+        rotation *= Quaternion.Euler(new Vector3(y * .28f, x * .2f, roll * .22f) * strength);
+    }
     private void Evaluate(float time)
     {
         foreach (var exhaustRenderer in heroExhaust)
@@ -240,6 +249,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
             float shake = Mathf.Sin(shakePhase * Mathf.PI) * (1-shakePhase);
             position += rotation * new Vector3(Mathf.Sin(shakeTime*31)*.018f,Mathf.Sin(shakeTime*37)*.012f,0) * shake;
             rotation *= Quaternion.Euler(new Vector3(Mathf.Sin(shakeTime*29)*.4f,Mathf.Sin(shakeTime*34)*.25f,Mathf.Sin(shakeTime*23)*.35f) * shake);
+            ApplyFlightShake(ref position,ref rotation,time,Smooth(shakeTime / .3f));
             view.transform.SetPositionAndRotation(position,rotation);
             view.fieldOfView = Mathf.Lerp(50,53,Smooth(t)); return;
         }
@@ -249,7 +259,10 @@ public sealed class RocketEndingCutscene : MonoBehaviour
             float t = Smooth((time-cabinSeconds-pullbackSeconds)/fleetSeconds);
             var local = Vector3.Lerp(new Vector3(8,18,17),new Vector3(35,100,130),t);
             var position = hero.TransformPoint(local);
-            view.transform.SetPositionAndRotation(position,Quaternion.LookRotation(hero.TransformPoint(new Vector3(0,4.3f,0))-position,direction) * Quaternion.Euler(0,0,Mathf.Lerp(-35,-12,t)));
+            var rotation = Quaternion.LookRotation(hero.TransformPoint(new Vector3(0,4.3f,0))-position,direction) * Quaternion.Euler(0,0,Mathf.Lerp(-35,-12,t));
+            float wideningTime = time - cabinSeconds - pullbackSeconds;
+            ApplyFlightShake(ref position,ref rotation,time,1-Smooth(wideningTime / 2f));
+            view.transform.SetPositionAndRotation(position,rotation);
             view.fieldOfView = Mathf.Lerp(53,62,t); return;
         }
         if (!sunStarted)
