@@ -7,7 +7,8 @@ using UnityEngine.UI;
 public sealed class StaminaManager : MonoBehaviour
 {
     [SerializeField, Min(.01f)] private float maxStamina = 100f;
-    [SerializeField, Min(0f)] private float shovelActionCost = 10f;
+    [SerializeField, Min(0f), Tooltip("Stamina per scoop for a 1 kg shovel; multiplied by the equipped shovel's weight.")]
+    private float shovelActionCost = 10f;
     [Tooltip("Stamina consumed per second while carrying a bag.")]
     [SerializeField, Min(0f)] private float workConsumptionPerSecond = 10f;
     [SerializeField, Min(0f)] private float recoveryPerSecond = 15f;
@@ -69,9 +70,15 @@ public sealed class StaminaManager : MonoBehaviour
 
     public void ConsumeShovelStamina()
     {
+        ConsumeShovelStamina(1f);
+    }
+
+    public void ConsumeShovelStamina(float shovelWeightKg)
+    {
         if (HasInfiniteStamina) { CurrentStamina = CurrentMaxStamina; UpdateStaminaBar(); return; }
-        if (!isActiveAndEnabled || Time.timeScale <= 0f || shovelActionCost <= 0f) return;
-        CurrentStamina = Mathf.Clamp(CurrentStamina - shovelActionCost, 0f, CurrentMaxStamina);
+        if (!isActiveAndEnabled || Time.timeScale <= 0f || shovelActionCost <= 0f ||
+            !float.IsFinite(shovelWeightKg) || shovelWeightKg <= 0f) return;
+        CurrentStamina = Mathf.Clamp(CurrentStamina - shovelActionCost * shovelWeightKg, 0f, CurrentMaxStamina);
         recoveryDelayRemaining = recoveryDelay;
         UpdateStaminaBar();
     }

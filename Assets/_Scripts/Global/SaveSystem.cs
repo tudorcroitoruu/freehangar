@@ -19,6 +19,13 @@ public static class SaveSystem
     public static event Action OwnedProductsChanged;
     public static int Money => Data != null ? Data.cash : 0;
 
+    public static bool TryPurchaseShovelUpgrade(int price, int expectedLevel, int maxLevel)
+    {
+        if (Data == null || !Data.TryUpgradeShovel(price, expectedLevel, maxLevel)) return false;
+        SaveData();
+        return true;
+    }
+
     public static bool TryPurchaseUpgrade(int price, Func<PlayerData, bool> apply, out bool usedVoucher)
     {
         usedVoucher = false;
@@ -276,6 +283,16 @@ public class PlayerData
     public int freeUpgradeVouchers;
     public long infiniteStaminaUntilUtc;
     public int[] wheelbarrowUpgradeLevels = new int[3];
+    public int shovelUpgradeLevel;
+
+    public bool TryUpgradeShovel(int price, int expectedLevel, int maxLevel)
+    {
+        if (price < 0 || cash < price || expectedLevel < 0 || shovelUpgradeLevel != expectedLevel ||
+            shovelUpgradeLevel >= maxLevel) return false;
+        cash -= price;
+        shovelUpgradeLevel++;
+        return true;
+    }
     [Header("Data")]
     public string playerName;
     public bool tutorialPassed;

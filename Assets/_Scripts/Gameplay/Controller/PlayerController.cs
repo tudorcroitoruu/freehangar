@@ -137,6 +137,13 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (UpgradeManager.BlocksGameplayInput)
+        {
+            if (shovelTool != null) shovelTool.CancelAction();
+            if (characterController.enabled && Time.deltaTime > 0) HandleMovement(false);
+            if (staminaManager != null) staminaManager.Tick(false, Time.deltaTime);
+            return;
+        }
         if (interactor != null && interactor.DiscoveryBusy)
         {
             if (characterController.enabled && Time.deltaTime > 0) HandleMovement(false);
@@ -195,7 +202,7 @@ public class PlayerController : MonoBehaviour
 
     public bool ToggleShovel()
     {
-        if (!isActiveAndEnabled || shovelTool == null || Time.timeScale <= 0f || UIPopups.BasePopupUI.HasActivePopup ||
+        if (!isActiveAndEnabled || shovelTool == null || Time.timeScale <= 0f || UIPopups.BasePopupUI.HasActivePopup || UpgradeManager.BlocksGameplayInput ||
             (characterController != null && !characterController.enabled) ||
             (bicycleInteraction != null && bicycleInteraction.IsRiding) ||
             (interactor != null && interactor.PushedWheelbarrow != null)) return false;
@@ -234,7 +241,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleGrainScooped()
     {
-        if (staminaManager != null) staminaManager.ConsumeShovelStamina();
+        if (staminaManager != null) staminaManager.ConsumeShovelStamina(shovelTool != null ? shovelTool.WeightKg : 1f);
     }
 
     private void HandleMovement(bool acceptInput)

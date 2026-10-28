@@ -29,7 +29,7 @@ public sealed class PlayerInteractor : MonoBehaviour
 
     private InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;
 
-    private bool CanInteract => !DiscoveryBusy && isActiveAndEnabled && viewCamera != null && viewCamera.isActiveAndEnabled &&
+    private bool CanInteract => !UpgradeManager.BlocksGameplayInput && !DiscoveryBusy && isActiveAndEnabled && viewCamera != null && viewCamera.isActiveAndEnabled &&
         Time.timeScale > 0 && Application.isFocused && Cursor.lockState == CursorLockMode.Locked && !UIPopups.BasePopupUI.HasActivePopup &&
         (player == null || (player.isActiveAndEnabled && player.characterController != null && player.characterController.enabled)) &&
         (bicycle == null || !bicycle.IsRiding);
