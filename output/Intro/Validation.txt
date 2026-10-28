@@ -1,0 +1,2 @@
+PASS: default false; all five shots; input/HUD suppressed throughout; full completion; camera/controller/HUD restored; shovel equipped; replay prevented.
+Shots: Farm panorama, Bicycle approach, Purchase paper, Grain reveal, First shovel, ReadyPASS: cancellation restores controls; skipTutorial=true bypasses intro. Save snapshot restored after leaving Play Mode.

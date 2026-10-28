@@ -93,8 +93,9 @@ Material:
     - _DoubleSidedNormalMode: 2
     - _DstBlend: 0
     - _EmissionIntensity: 1
+    - _EnableBlendModePreserveSpecularLighting: 1
     - _EnableFogOnTransparent: 1
-    - _GlossMapScale: 1
+    - _GlossMapScale: 2
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _HDRPboost: 1000

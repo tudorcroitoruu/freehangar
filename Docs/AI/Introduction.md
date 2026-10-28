@@ -1,0 +1,9 @@
+# Game introduction
+
+`GameManager.skipTutorial` defaults to false. When false, Gameplay starts the approximately 34-second `GameIntroduction`. When true, it starts ordinary gameplay immediately. This toggle does not reset saves or mark existing goals complete. The introduction plays once per scene load, not once per saved account.
+
+The scene's `Introduction staging` root contains editable panorama, arrival, grain-look and shovel-look markers. The sequence slides past the wooden house and wheat field with the existing `Audio Game` birdsong, follows the road in bicycle POV, raises and lowers a purchase deed stamped SOLD OUT, looks left at grain, looks right at the shovel, and equips it before handing control back. Timing fields are on the GameIntroduction component on GameManager. The purchase deed prefab and its materials/handwriting mesh live in `Assets/NewMap/Introduction`.
+
+The controller temporarily disables player movement, interactions, bicycle simulation, stamina presentation and all HUD canvases. Its own fade canvas remains visible. Camera parenting/FOV, components, colliders and HUD states are restored at completion or cancellation. The bicycle stays parked by the first hangar after completion. The shovel prop is cinematic only; normal gameplay uses the existing held shovel. The sequence uses scaled time so game pauses also pause it.
+
+Validated in Unity Play Mode on 2026-10-28: all five shots, HUD/input suppression throughout, completion, camera/controller restoration, equipped shovel, HUD restoration, replay prevention, cancellation and skip=true. Final runtime validation took 33.75 seconds. Screenshots and validation script/report are in `output/Intro`. No player save changes were retained. Editor reported compilationFailed=false and zero current Console errors; historical Pipeline logs contain unrelated Polygonmaker shader errors. A standalone player build was not run.
