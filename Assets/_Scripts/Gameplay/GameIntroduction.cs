@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Rendering.HighDefinition;
 
 /// <summary>Authored, HUD-free arrival sequence; all temporary state is restored on interruption.</summary>
 [DisallowMultipleComponent]
@@ -16,10 +17,14 @@ public sealed class GameIntroduction : MonoBehaviour
     [SerializeField] private GameObject worldShovel;
     [SerializeField] private AudioSource birds;
     [Header("Shot timing")]
+    [SerializeField, Min(.1f)] private float playbackSpeed = 2f;
     [SerializeField, Min(.1f)] private float landscapeSeconds = 6f;
-    [SerializeField, Min(.1f)] private float bicycleSeconds = 11f;
+    [SerializeField, Min(.1f)] private float bicycleSeconds = 19f;
     [SerializeField, Min(.1f)] private float paperSeconds = 5.5f;
-    [SerializeField, Min(.05f)] private float fadeSeconds = .65f;
+    [SerializeField, Min(0f)] private float arrivalPauseSeconds = 2f;
+    [SerializeField, Min(.1f)] private float openingFadeSeconds = 1.2f;
+    [Tooltip("Actual seconds for stepping off the bike; independent of cutscene playback speed.")]
+    [SerializeField, Min(.1f)] private float dismountSeconds = 1.8f;
     public bool IsPlaying { get; private set; }
     public bool Completed { get; private set; }
     public string CurrentShot { get; private set; } = "Gameplay";
@@ -28,8 +33,9 @@ public sealed class GameIntroduction : MonoBehaviour
     private Vector3 cameraLocalPosition, playerPosition, bikePosition;
     private Quaternion cameraLocalRotation, playerRotation, bikeRotation;
     private float originalFov;
-    private GameObject paper, fadeObject;
-    private Image fade;
+    private GameObject paper;
+    private Canvas openingFade;
+    private Image openingFadeImage;
     private bool instrumentActive, shovelEnabled, worldShovelActive, birdsWerePlaying;
     private readonly List<Behaviour> suspended = new List<Behaviour>();
     private readonly List<bool> enabledStates = new List<bool>();
@@ -41,6 +47,9 @@ public sealed class GameIntroduction : MonoBehaviour
     private Vector3 worldShovelPosition;
     private Quaternion worldShovelRotation;
     private float[] routeLengths;
+    private Quaternion steeringRest;
+    private Transform heldShovelPose;
+    private Vector3 worldShovelScale;
 
     public bool Play()
     {
@@ -51,11 +60,20 @@ public sealed class GameIntroduction : MonoBehaviour
         cameraParent = view.transform.parent; cameraLocalPosition = view.transform.localPosition; cameraLocalRotation = view.transform.localRotation;
         originalFov = view.fieldOfView; playerPosition = player.transform.position; playerRotation = player.transform.rotation;
         bikePosition = bicycle.transform.position; bikeRotation = bicycle.transform.rotation;
+        if (bicycle.steering != null) steeringRest = bicycle.steering.localRotation;
         controllerEnabled = player.characterController.enabled;
         instrumentActive = player.HeldInstrument != null && player.HeldInstrument.gameObject.activeSelf;
         shovelEnabled = player.Shovel != null && player.Shovel.enabled;
         worldShovelActive = worldShovel != null && worldShovel.activeSelf;
-        if (worldShovel != null) { worldShovelPosition = worldShovel.transform.position; worldShovelRotation = worldShovel.transform.rotation; }
+        if (worldShovel != null)
+        {
+            worldShovelPosition = worldShovel.transform.position; worldShovelRotation = worldShovel.transform.rotation;
+            worldShovelScale = worldShovel.transform.localScale;
+            var propMesh = worldShovel.GetComponent<MeshFilter>();
+            if (propMesh != null && player.HeldInstrument != null)
+                foreach (var candidate in player.HeldInstrument.GetComponentsInChildren<MeshFilter>(true))
+                    if (candidate.sharedMesh == propMesh.sharedMesh) { heldShovelPose = candidate.transform; break; }
+        }
         Suspend(player); Suspend(player.GetComponent<PlayerInteractor>()); Suspend(player.GetComponent<PlayerBicycleInteraction>());
         Suspend(player.GetComponent<BagInteraction>()); Suspend(player.GetComponent<PlayerItemCarry>()); Suspend(player.Stamina); Suspend(bicycle);
         player.characterController.enabled = false;
@@ -66,7 +84,8 @@ public sealed class GameIntroduction : MonoBehaviour
         foreach (var wheel in new[] { bicycle.frontWheel, bicycle.rearWheel, bicycle.crank }) if (wheel != null && !wheelRotations.ContainsKey(wheel)) wheelRotations.Add(wheel, wheel.localRotation);
         birdsWerePlaying = birds != null && birds.isPlaying;
         if (birds != null && !birdsWerePlaying) birds.Play();
-        HideHud(); CreateFade();
+        HideHud();
+        CreateOpeningFade();
         Cursor.lockState = CursorLockMode.Locked; Cursor.visible = false;
         view.transform.SetParent(null, true); view.fieldOfView = 60;
         routeLengths = new float[bicycleRoute.Length];
@@ -82,27 +101,30 @@ public sealed class GameIntroduction : MonoBehaviour
     {
         foreach (var canvas in FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (fadeObject != null && canvas.gameObject == fadeObject) continue;
+            if (canvas == openingFade) continue;
             if (!hud.ContainsKey(canvas)) hud.Add(canvas, canvas.enabled);
             canvas.enabled = false;
         }
     }
     private void LateUpdate() { if (IsPlaying) HideHud(); }
-    private void CreateFade()
+    private void CreateOpeningFade()
     {
-        fadeObject = new GameObject("Introduction fade", typeof(Canvas), typeof(CanvasScaler));
-        var canvas = fadeObject.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 32760;
-        var panel = new GameObject("Fade", typeof(RectTransform), typeof(Image)); panel.transform.SetParent(fadeObject.transform, false);
-        fade = panel.GetComponent<Image>(); fade.color = Color.black; fade.raycastTarget = false;
-        fade.rectTransform.anchorMin = Vector2.zero; fade.rectTransform.anchorMax = Vector2.one; fade.rectTransform.offsetMin = fade.rectTransform.offsetMax = Vector2.zero;
-    }
-    private IEnumerator FadeTo(float alpha)
-    {
-        float start = fade.color.a;
-        yield return Animate(fadeSeconds, t => { var c = Color.black; c.a = Mathf.Lerp(start, alpha, t); fade.color = c; });
+        var root = new GameObject("Introduction opening fade", typeof(Canvas));
+        openingFade = root.GetComponent<Canvas>();
+        openingFade.renderMode = RenderMode.ScreenSpaceOverlay;
+        openingFade.sortingOrder = 32760;
+        var panel = new GameObject("Black", typeof(RectTransform), typeof(Image));
+        panel.transform.SetParent(root.transform, false);
+        openingFadeImage = panel.GetComponent<Image>();
+        openingFadeImage.color = Color.black;
+        openingFadeImage.raycastTarget = false;
+        var rect = openingFadeImage.rectTransform;
+        rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
     }
     private IEnumerator Animate(float duration, Action<float> apply)
     {
+        duration /= Mathf.Max(.1f, playbackSpeed);
         float elapsed = 0;
         while (elapsed < duration)
         {
@@ -114,21 +136,42 @@ public sealed class GameIntroduction : MonoBehaviour
     {
         CurrentShot = "Farm panorama";
         view.transform.SetPositionAndRotation(landscapeStart.position, landscapeStart.rotation);
-        yield return FadeTo(0);
+        HDCamera.GetOrCreate(view).Reset();
         yield return Animate(landscapeSeconds, t => {
-            float eased = Mathf.SmoothStep(0, 1, t);
+            float eased = Mathf.Lerp(.025f, .975f, t);
             view.transform.SetPositionAndRotation(Vector3.Lerp(landscapeStart.position, landscapeEnd.position, eased), Quaternion.Slerp(landscapeStart.rotation, landscapeEnd.rotation, eased));
+            float elapsed = t * landscapeSeconds / Mathf.Max(.1f, playbackSpeed);
+            float fadeDuration = Mathf.Min(openingFadeSeconds, landscapeSeconds / Mathf.Max(.1f, playbackSpeed));
+            openingFadeImage.color = new Color(0, 0, 0, 1 - Mathf.SmoothStep(0, 1, elapsed / fadeDuration));
         });
-        yield return FadeTo(1);
-        CurrentShot = "Bicycle approach"; SetBicycleShot(0);
-        yield return FadeTo(0);
-        yield return Animate(bicycleSeconds, SetBicycleShot);
-        yield return FadeTo(1);
+        Destroy(openingFade.gameObject); openingFade = null; openingFadeImage = null;
+        // Hard cuts: neither camera travels between locations nor waits to start moving.
+        CurrentShot = "Bicycle approach"; SetBicycleShot(.025f);
+        HDCamera.GetOrCreate(view).Reset();
+        yield return Animate(Mathf.Max(.1f, bicycleSeconds - .8f), t => SetBicycleShot(Mathf.Lerp(.025f, 1f, t)));
+        // Rise from the saddle, step sideways, then settle at standing eye height.
+        Vector3 riderPosition = view.transform.position;
+        Quaternion riderRotation = view.transform.rotation;
+        Vector3 standingPosition = arrival.position + Vector3.up * cameraLocalPosition.y;
+        Vector3 stepDirection = Vector3.ProjectOnPlane(standingPosition - riderPosition, Vector3.up).normalized;
+        Vector3 liftedPosition = riderPosition + Vector3.up * .22f + stepDirection * .12f;
+        Vector3 stepPosition = Vector3.Lerp(riderPosition, standingPosition, .78f) + Vector3.up * .12f;
+        yield return Animate(dismountSeconds * Mathf.Max(.1f, playbackSpeed), t => {
+            Vector3 position;
+            if (t < .25f)
+                position = Vector3.Lerp(riderPosition, liftedPosition, Mathf.SmoothStep(0, 1, t / .25f));
+            else if (t < .78f)
+                position = Vector3.Lerp(liftedPosition, stepPosition, Mathf.SmoothStep(0, 1, (t - .25f) / .53f));
+            else
+                position = Vector3.Lerp(stepPosition, standingPosition, Mathf.SmoothStep(0, 1, (t - .78f) / .22f));
+            float bodyMotion = Mathf.Sin(t * Mathf.PI);
+            float side = Mathf.Sign(Vector3.Dot(stepDirection, bicycle.transform.right));
+            Quaternion facing = Quaternion.Slerp(riderRotation, arrival.rotation, Mathf.SmoothStep(0, 1, t));
+            view.transform.SetPositionAndRotation(position, facing * Quaternion.Euler(bodyMotion * 7f, 0, bodyMotion * side * -4f));
+        });
+        yield return Animate(arrivalPauseSeconds, _ => { });
         CurrentShot = "Purchase paper";
-        bicycle.transform.SetPositionAndRotation(arrival.position + arrival.right * -2.2f + arrival.forward * -1.2f, arrival.rotation);
-        view.transform.SetPositionAndRotation(arrival.position + Vector3.up * cameraLocalPosition.y, arrival.rotation);
         paper = Instantiate(purchasePaperPrefab, view.transform, false); paper.transform.localPosition = new Vector3(.02f, -.8f, .7f);
-        yield return FadeTo(0);
         yield return Animate(paperSeconds, t => {
             float lift = Mathf.SmoothStep(0, 1, t / .2f), lower = Mathf.SmoothStep(0, 1, (t - .72f) / .28f);
             paper.transform.localPosition = Vector3.Lerp(new Vector3(.02f, -.8f, .7f), new Vector3(.015f, -.025f, .65f), lift) - Vector3.up * (lower * .8f);
@@ -141,15 +184,20 @@ public sealed class GameIntroduction : MonoBehaviour
         CurrentShot = "First shovel";
         yield return LookAt(shovelLook.position, 2.2f);
         // The prop flies to the established held-tool pose, then the normal shovel takes over.
-        if (worldShovel != null && player.HeldInstrument != null)
+        if (worldShovel != null && heldShovelPose != null)
         {
             Vector3 from = worldShovel.transform.position; Quaternion fromRotation = worldShovel.transform.rotation;
+            Vector3 fromScale = worldShovel.transform.localScale;
             yield return Animate(1.25f, t => {
                 float smooth = Mathf.SmoothStep(0, 1, t);
-                worldShovel.transform.position = Vector3.Lerp(from, view.transform.TransformPoint(new Vector3(.28f, -.34f, .7f)), smooth);
-                worldShovel.transform.rotation = Quaternion.Slerp(fromRotation, view.transform.rotation * Quaternion.Euler(15, 0, 0), smooth);
+                worldShovel.transform.position = Vector3.Lerp(from, heldShovelPose.position, smooth);
+                worldShovel.transform.rotation = Quaternion.Slerp(fromRotation, heldShovelPose.rotation, smooth);
+                Vector3 parentScale = worldShovel.transform.parent != null ? worldShovel.transform.parent.lossyScale : Vector3.one;
+                Vector3 heldScale = heldShovelPose.lossyScale;
+                worldShovel.transform.localScale = Vector3.Lerp(fromScale, new Vector3(heldScale.x / parentScale.x, heldScale.y / parentScale.y, heldScale.z / parentScale.z), smooth);
             });
             worldShovel.SetActive(false);
+            player.HeldInstrument.gameObject.SetActive(true);
         }
         CurrentShot = "Ready";
         yield return LookAt(grainLook.position, 1.2f);
@@ -171,6 +219,15 @@ public sealed class GameIntroduction : MonoBehaviour
         float distance = total * t;
         Vector3 p = RoutePoint(distance), ahead = RoutePoint(Mathf.Min(total, distance + 2));
         Vector3 direction = ahead - p;
+        if (direction.sqrMagnitude < .001f) direction = p - RoutePoint(Mathf.Max(0, distance - 2));
+        if (bicycle.steering != null)
+        {
+            Vector3 behind = RoutePoint(Mathf.Max(0, distance - 3));
+            Vector3 forward = RoutePoint(Mathf.Min(total, distance + 5));
+            float bend = Vector3.SignedAngle(p - behind, forward - p, Vector3.up);
+            float steer = Mathf.Clamp(bend * .65f + Mathf.Sin(t * 27) * 2.5f, -bicycle.maximumSteeringAngle, bicycle.maximumSteeringAngle);
+            bicycle.steering.localRotation = steeringRest * Quaternion.Euler(0, steer, 0);
+        }
         if (direction.sqrMagnitude > .001f) bicycle.transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(direction, Vector3.up), Vector3.up);
         bicycle.transform.position = p;
         float spin = distance / Mathf.Max(.05f, bicycle.wheelRadius * bicycle.transform.lossyScale.x) * Mathf.Rad2Deg;
@@ -189,7 +246,9 @@ public sealed class GameIntroduction : MonoBehaviour
     {
         if (!IsPlaying) return;
         IsPlaying = false; CurrentShot = "Gameplay";
-        if (paper != null) Destroy(paper); if (fadeObject != null) Destroy(fadeObject);
+        if (paper != null) Destroy(paper);
+        if (openingFade != null) Destroy(openingFade.gameObject);
+        openingFade = null; openingFadeImage = null;
         if (view != null)
         {
             Quaternion finalLook = view.transform.rotation;
@@ -203,6 +262,7 @@ public sealed class GameIntroduction : MonoBehaviour
             }
         }
         foreach (var wheel in wheelRotations) if (wheel.Key != null) wheel.Key.localRotation = wheel.Value;
+        if (bicycle != null && bicycle.steering != null) bicycle.steering.localRotation = steeringRest;
         if (!finished && bicycle != null) bicycle.transform.SetPositionAndRotation(bikePosition, bikeRotation);
         for (int i = 0; i < bikeColliders.Count; i++) if (bikeColliders[i] != null) bikeColliders[i].enabled = colliderStates[i];
         if (player != null)
@@ -211,7 +271,7 @@ public sealed class GameIntroduction : MonoBehaviour
             if (player.HeldInstrument != null) player.HeldInstrument.gameObject.SetActive(finished || instrumentActive);
             if (player.Shovel != null) player.Shovel.enabled = finished || shovelEnabled;
         }
-        if (worldShovel != null) { worldShovel.transform.SetPositionAndRotation(worldShovelPosition, worldShovelRotation); worldShovel.SetActive(finished ? false : worldShovelActive); }
+        if (worldShovel != null) { worldShovel.transform.SetPositionAndRotation(worldShovelPosition, worldShovelRotation); worldShovel.transform.localScale = worldShovelScale; worldShovel.SetActive(finished ? false : worldShovelActive); }
         for (int i = 0; i < suspended.Count; i++) if (suspended[i] != null) suspended[i].enabled = enabledStates[i];
         foreach (var pair in hud) if (pair.Key != null) pair.Key.enabled = pair.Value;
         if (birds != null && !birdsWerePlaying) birds.Stop();

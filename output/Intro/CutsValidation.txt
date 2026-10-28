@@ -1,0 +1,1 @@
+PASS: 6 stages, 131 moving samples, steering range 14,8 degrees, duration 21,63s, bicycle reached endpoint, camera dismounted at arrival, held shovel visible for final look, no visible canvases/fades, controls restored.

@@ -1,0 +1,1 @@
+Added 81027 low-poly grass clumps: 9247 perimeter, 71780 outer hills. 180 spatial cells, 3 LODs, 810270 maximum triangles total, one shared material. No colliders or runtime scripts. Grounded on terrain/backdrop. Existing gameplay interior unchanged.
