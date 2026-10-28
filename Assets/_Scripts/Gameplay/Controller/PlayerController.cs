@@ -137,6 +137,12 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (interactor != null && interactor.DiscoveryBusy)
+        {
+            if (characterController.enabled && Time.deltaTime > 0) HandleMovement(false);
+            if (staminaManager != null) staminaManager.Tick(false, Time.deltaTime);
+            return;
+        }
         bool wasLocked = Cursor.lockState == CursorLockMode.Locked;
         if (Input.GetKeyDown(KeyCode.Escape))
             SetCursorLocked(false);

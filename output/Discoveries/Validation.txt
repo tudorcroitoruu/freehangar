@@ -1,0 +1,28 @@
+PASS Hangar key cannot open a chest
+PASS Chest begins insertion and reserves interaction
+PASS Repeated input cannot duplicate chest reward
+PASS Visible insertion key precedes reward
+PASS Interrupted insertion releases input and grants no reward
+PASS Interrupted chest can be retried
+PASS Cash commits once when chest opens
+PASS Chest lid animates open
+PASS Opening spawns treasure VFX
+PASS Chest finishes and restores input without second payment
+PASS Bottle starts drinking before activating perk
+PASS Bottle lifts to first-person mouth position before sip
+PASS Interrupted drink restores bottle and grants no stamina
+PASS Interrupted drink can be retried
+PASS Sip starts saved infinite-stamina timer
+PASS Stamina volume blends gradually after sip
+PASS Full stamina look and restored input after drinking
+PASS Stamina look fades out on expiry
+PASS Other hidden pickups award once and disappear
+PASS Other hidden pickups spawn VFX
+PASS Hangar key prompt names its destination
+PASS Numbered key ownership is saved separately from chest keys
+PASS Wrong numbered key leaves hangar locked
+PASS Matching key unlocks hangar and enables grain
+PASS Both hangar leaves slide open
+PASS Door unlock persists and cannot be repeated
+PASS Saved unlocked door restores open state
+PASS Discovery effects clean up after their lifetime

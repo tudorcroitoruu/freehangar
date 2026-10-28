@@ -15,13 +15,21 @@ public sealed class PlayerInteractor : MonoBehaviour
     public PlayerItemCarry Items { get; private set; }
     public WheelbarrowCargo PushedWheelbarrow { get; set; }
     public IInteractable Target { get; private set; }
+    private Object discoveryOwner;
+    public bool DiscoveryBusy => discoveryOwner != null;
+    public bool BeginDiscovery(Object owner)
+    {
+        if (owner == null || DiscoveryBusy) return false;
+        discoveryOwner = owner; return true;
+    }
+    public void EndDiscovery(Object owner) { if (discoveryOwner == owner) discoveryOwner = null; }
     public bool HandsOccupied => (GetComponent<PlayerController>() is PlayerController actor &&
         (actor.IsShovelEquipped || actor.IsCarrying)) || (Bags != null && Bags.IsCarrying) ||
         (Items != null && Items.IsCarrying) || PushedWheelbarrow != null;
 
     private InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;
 
-    private bool CanInteract => isActiveAndEnabled && viewCamera != null && viewCamera.isActiveAndEnabled &&
+    private bool CanInteract => !DiscoveryBusy && isActiveAndEnabled && viewCamera != null && viewCamera.isActiveAndEnabled &&
         Time.timeScale > 0 && Application.isFocused && Cursor.lockState == CursorLockMode.Locked && !UIPopups.BasePopupUI.HasActivePopup &&
         (player == null || (player.isActiveAndEnabled && player.characterController != null && player.characterController.enabled)) &&
         (bicycle == null || !bicycle.IsRiding);

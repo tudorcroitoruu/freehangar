@@ -6,7 +6,7 @@ using UnityEngine;
 [DisallowMultipleComponent, RequireComponent(typeof(BoxCollider))]
 public sealed class BuriedFind : MonoBehaviour, IInteractable
 {
-    public enum Kind { Key, CashChest, UpgradeVoucher, InfiniteStamina, CashCache, Hammer, Sledgehammer }
+    public enum Kind { Key, CashChest, UpgradeVoucher, InfiniteStamina, CashCache, Hammer, Sledgehammer, HangarKey }
 
     [SerializeField] private Kind kind;
     [SerializeField] private string findId;
@@ -17,15 +17,34 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     [SerializeField] private bool settleOnReveal;
     [SerializeField] private Transform lidPivot;
     [SerializeField] private float lidOpenDegrees = -110f;
+    [Header("Discovery presentation")]
+    [SerializeField] private Transform keySocket;
+    [SerializeField] private GameObject insertionKeyPrefab;
+    [SerializeField] private DiscoveryBurst pickupEffect;
+    [SerializeField, Range(2, 5)] private int targetHangar = 2;
     private BoxCollider interactionCollider;
     private Renderer[] visuals;
     private float nextRevealCheck;
     private bool revealed;
     private bool opening;
+    private bool committed;
+    private PlayerInteractor actor;
+    private PlayerData animationProfile;
+    private Camera view;
+    private GameObject insertionKey;
+    private Vector3 originalPosition, originalScale;
+    private Quaternion originalRotation, closedLid;
+    private Rigidbody body;
+    private bool wasKinematic;
+    private Renderer[] heldVisuals;
+    private bool[] heldVisible;
     private static bool profileLoadRequested;
 
     public string FindId => findId;
     public bool IsRevealed => revealed;
+    public Kind FindKind => kind;
+    public int TargetHangar => targetHangar;
+    public bool IsAnimating => opening;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetProfileRequest() => profileLoadRequested = false;
@@ -95,27 +114,58 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
     {
         prompt = default;
-        if (!isActiveAndEnabled || !revealed || string.IsNullOrEmpty(findId) || WasFound(SaveSystem.Data, findId)) return false;
+        if (!isActiveAndEnabled || opening || !revealed || string.IsNullOrEmpty(findId) || WasFound(SaveSystem.Data, findId)) return false;
         bool hasProfile = SaveSystem.savesLoaded && SaveSystem.Data != null;
         bool hasKey = kind != Kind.CashChest || WasFound(SaveSystem.Data, requiredKeyId);
-        string action = !hasProfile ? "Load save to collect" : !hasKey ? "Requires hidden key" :
-            kind == Kind.Key ? "Take hidden key" :
+        string action = !hasProfile ? "Load save to collect" : !hasKey ? "Requires chest key" :
+            kind == Kind.Key ? "Take CHEST key" :
+            kind == Kind.HangarKey ? $"Take HANGAR {targetHangar} key" :
             kind == Kind.Hammer ? "Take hammer (equip with 2)" :
             kind == Kind.Sledgehammer ? "Take sledgehammer (equip with 3)" :
             kind == Kind.UpgradeVoucher ? "Take free upgrade voucher" :
-            kind == Kind.InfiniteStamina ? $"Take infinite stamina ({staminaDurationSeconds / 60} min)" :
+            kind == Kind.InfiniteStamina ? $"Drink stamina tonic ({staminaDurationSeconds / 60} min)" :
             kind == Kind.CashCache ? $"Take cash cache (+${cashReward})" :
             $"Open mystery chest (+${cashReward})";
         Bounds bounds = VisualBounds();
         prompt = new InteractionPromptData(new Vector3(bounds.center.x, bounds.max.y + .15f, bounds.center.z),
             action, hasProfile && hasKey);
+        if (interactor != null && (kind == Kind.CashChest || kind == Kind.InfiniteStamina))
+            prompt.RequiresFreeHands = (interactor.Bags != null && interactor.Bags.IsCarrying) ||
+                (interactor.Items != null && interactor.Items.IsCarrying) || interactor.PushedWheelbarrow != null;
         return true;
     }
 
     public bool TryInteract(PlayerInteractor interactor)
     {
-        if (!TryGetPrompt(interactor, out var prompt) || !prompt.ShowKey) return false;
+        if (!TryGetPrompt(interactor, out var prompt) || !prompt.ShowKey || prompt.RequiresFreeHands || Time.timeScale <= 0) return false;
+        if (kind == Kind.CashChest || kind == Kind.InfiniteStamina)
+        {
+            if (interactor == null || interactor.DiscoveryBusy) return false;
+            var player = interactor.GetComponent<PlayerController>();
+            if (player != null && player.Shovel != null && player.Shovel.IsBusy) return false;
+            view = player != null ? player.characterCamera : interactor.GetComponentInChildren<Camera>();
+            if (view == null || !interactor.BeginDiscovery(this)) return false;
+            actor = interactor; animationProfile = SaveSystem.Data; opening = true; committed = false;
+            originalPosition = transform.position; originalRotation = transform.rotation; originalScale = transform.localScale;
+            if (lidPivot != null) closedLid = lidPivot.localRotation;
+            body = GetComponent<Rigidbody>();
+            if (body != null) { wasKinematic = body.isKinematic; body.isKinematic = true; }
+            interactionCollider.enabled = false;
+            heldVisuals = view.GetComponentsInChildren<Renderer>(); heldVisible = new bool[heldVisuals.Length];
+            for (int i = 0; i < heldVisuals.Length; i++) { heldVisible[i] = heldVisuals[i].enabled; heldVisuals[i].enabled = false; }
+            StartCoroutine(kind == Kind.CashChest ? OpenChest() : Drink());
+            return true;
+        }
+        if (!CommitReward()) return false;
+        DiscoveryBurst.Play(pickupEffect, VisualBounds().center, Receipt(), interactor != null ? interactor.GetComponentInChildren<Camera>() : null);
+        gameObject.SetActive(false);
+        return true;
+    }
+
+    private bool CommitReward()
+    {
         PlayerData data = SaveSystem.Data;
+        if (data == null || WasFound(data, findId)) return false;
         if (kind == Kind.CashChest || kind == Kind.CashCache)
         {
             if (cashReward <= 0 || data.cash > int.MaxValue - cashReward) return false;
@@ -137,31 +187,104 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         Array.Resize(ref data.foundSecrets, index + 1);
         data.foundSecrets[index] = findId;
         SaveSystem.SaveData();
-        if (kind == Kind.CashChest && lidPivot != null)
-        {
-            opening = true;
-            interactionCollider.enabled = false;
-            StartCoroutine(OpenAndHide());
-        }
-        else gameObject.SetActive(false);
+        if (kind == Kind.HangarKey) GoalChecker.ReportProgress(GoalType.HangarKeyCollected, 1, targetHangar);
+        if ((kind == Kind.CashChest || kind == Kind.CashCache) && DataHolderUI.Instance != null) DataHolderUI.Instance.RefreshDataPlayer();
         return true;
     }
 
-    private IEnumerator OpenAndHide()
+    private string Receipt() => kind == Kind.HangarKey ? $"HANGAR {targetHangar} KEY\nUse at Hangar {targetHangar}" :
+        kind == Kind.Key ? "CHEST KEY FOUND" : kind == Kind.InfiniteStamina ? "INFINITE STAMINA!" :
+        kind == Kind.CashChest || kind == Kind.CashCache ? $"+${cashReward}" :
+        kind == Kind.UpgradeVoucher ? "FREE UPGRADE!" : kind == Kind.Hammer ? "HAMMER FOUND" : "SLEDGEHAMMER FOUND";
+
+    private bool PresentationValid => actor != null && actor.isActiveAndEnabled && view != null &&
+        view.isActiveAndEnabled && SaveSystem.Data == animationProfile;
+
+    private IEnumerator OpenChest()
     {
-        Quaternion closed = lidPivot.localRotation;
-        Quaternion open = closed * Quaternion.Euler(lidOpenDegrees, 0f, 0f);
-        float elapsed = 0f;
-        while (elapsed < 1.1f)
+        if (keySocket != null && insertionKeyPrefab != null)
         {
+            Quaternion facing = Quaternion.LookRotation(-keySocket.forward, keySocket.up);
+            insertionKey = Instantiate(insertionKeyPrefab, keySocket.position + keySocket.forward * .45f, facing);
+            float keyTime = 0;
+            while (keyTime < 1.05f)
+            {
+                if (!PresentationValid) { CancelPresentation(); yield break; }
+                keyTime += Time.deltaTime;
+                float slide = Mathf.SmoothStep(0, 1, keyTime / .6f);
+                insertionKey.transform.position = keySocket.position + keySocket.forward * Mathf.Lerp(.45f, .015f, slide);
+                insertionKey.transform.rotation = facing * Quaternion.Euler(0, 0, Mathf.SmoothStep(0, 90, (keyTime - .65f) / .4f));
+                yield return null;
+            }
+        }
+        float elapsed = 0f;
+        while (elapsed < .85f)
+        {
+            if (!PresentationValid) { CancelPresentation(); yield break; }
             elapsed += Time.deltaTime;
-            float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / 1.1f));
-            lidPivot.localRotation = Quaternion.Slerp(closed, open, t);
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / .85f);
+            if (lidPivot != null) lidPivot.localRotation = closedLid * Quaternion.Euler(lidOpenDegrees * t, 0, 0);
+            if (!committed && elapsed >= .28f)
+            {
+                if (!CommitReward()) { CancelPresentation(); yield break; }
+                committed = true;
+                DiscoveryBurst.Play(pickupEffect, VisualBounds().center + Vector3.up * .4f, Receipt(), view);
+            }
             yield return null;
         }
-        yield return new WaitForSeconds(1.5f);
+        ReleaseActor();
+        yield return new WaitForSeconds(1.2f);
         gameObject.SetActive(false);
     }
+
+    private IEnumerator Drink()
+    {
+        float elapsed = 0;
+        while (elapsed < 1.8f)
+        {
+            if (!PresentationValid) { CancelPresentation(); yield break; }
+            elapsed += Time.deltaTime;
+            float lift = Mathf.SmoothStep(0, 1, elapsed / .55f);
+            float tilt = Mathf.SmoothStep(0, 1, (elapsed - .55f) / .45f);
+            Vector3 hold = view.transform.TransformPoint(new Vector3(.13f, -.08f, .48f));
+            float lower = Mathf.SmoothStep(0, 1, (elapsed - 1.4f) / .4f);
+            transform.position = Vector3.Lerp(originalPosition, hold, lift) - view.transform.up * lower * .3f;
+            transform.rotation = Quaternion.Slerp(originalRotation, view.transform.rotation * Quaternion.Euler(-68 * tilt, 0, -12), lift);
+            transform.localScale = originalScale * (1 - lower);
+            if (!committed && elapsed >= 1.2f)
+            {
+                if (!CommitReward()) { CancelPresentation(); yield break; }
+                committed = true;
+                DiscoveryBurst.Play(pickupEffect, view.transform.position + view.transform.forward * 1.1f, Receipt(), view);
+            }
+            yield return null;
+        }
+        gameObject.SetActive(false);
+    }
+
+    private void ReleaseActor()
+    {
+        if (actor != null) actor.EndDiscovery(this);
+        if (heldVisuals != null) for (int i = 0; i < heldVisuals.Length; i++) if (heldVisuals[i] != null) heldVisuals[i].enabled = heldVisible[i];
+        heldVisuals = null; heldVisible = null; actor = null;
+        if (insertionKey != null) Destroy(insertionKey);
+        insertionKey = null;
+    }
+    private void CancelPresentation()
+    {
+        if (!opening) return;
+        ReleaseActor();
+        if (!committed)
+        {
+            transform.SetPositionAndRotation(originalPosition, originalRotation); transform.localScale = originalScale;
+            if (lidPivot != null) lidPivot.localRotation = closedLid;
+            if (body != null) body.isKinematic = wasKinematic;
+            if (interactionCollider != null) interactionCollider.enabled = revealed;
+        }
+        else gameObject.SetActive(false);
+        opening = false;
+    }
+    private void OnDisable() { StopAllCoroutines(); CancelPresentation(); }
 
     public static bool WasFound(PlayerData data, string id)
     {

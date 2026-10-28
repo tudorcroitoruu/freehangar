@@ -1,5 +1,45 @@
 # Buried finds
 
+## Discovery presentation and hangar keys (2026-10-28)
+
+Gameplay now has 20 buried finds. Four additional silver keys with blue,
+barn-shaped numbered tags are buried in hangars 1–4 and open hangars 2–5,
+respectively. Their IDs (`farm.hangar.key.N`) are independent of the original
+copper/iron chest keys. Keys retain the existing grain-cover reveal check and
+settle onto the exposed surface. Their prompts and pickup receipts name the
+destination. Numbered blue locks at the doors accept only the matching key,
+slide both leaves outward, enable the target grain pile, and save
+`farm.hangar.open.N` through the existing foundSecrets array. Key collection and
+unlock report the corresponding GoalChecker events. Original enum values and
+save fields are preserved; HangarKey is appended to BuriedFind.Kind.
+
+Chests now insert and turn a brass key before opening. Reward commits once as
+the lid starts opening, with a golden particle burst and cash receipt. Bottles
+lift into first-person view, tilt for a sip, then lower out of view; infinite
+stamina starts at the sip. Chest/bottle presentation briefly reserves player
+input and hides held-tool renderers without changing tool contents. Interrupting
+before reward restores the item, physics, lid and input, allowing a retry.
+Committed rewards remain claimed. Other hidden finds emit brief pickup bursts
+and labeled receipts. Effects use bounded mesh particles and self-cleanup.
+
+`InfiniteStaminaVolume` on Graphics drives the user's existing `Global Volume
+Infinite Stamina` (Gameplay Post Stamina profile) from weight 0 to 1 over 1.2 s,
+then back to 0 on saved timer expiry. Its priority is above the ordinary volume;
+the authored profile contents are unchanged. Saved active perks also blend in
+when loading Gameplay.
+
+Assets: `Assets/NewMap/Discoveries`. Authoring, validation and visual captures:
+`output/Discoveries`. The original scene with user edits was copied to
+`output/Discoveries/Before.unity` before authoring. All 28 Play Mode checks pass:
+key separation, insertion/retry, cash timing, lid animation, bottle positioning,
+interruption/retry, perk timing and volume blend/expiry, once-only pickups,
+numbered ownership, wrong-key rejection, door/grain activation, sliding and
+persistent restore, and VFX cleanup. Final eight key/lock labels fit without text
+overflow. Reviewed first-person captures and adjusted bottle framing and tag
+type size. No Console errors or compilation failures; no standalone build.
+Tests restore the original save data and PlayerPrefs; test scene state is
+discarded by leaving Play Mode.
+
 Gameplay contains sixteen discoveries under the grain, grouped at `New_Map/15_Buried_Finds`:
 
 1. Copper key beneath the starter pile.
