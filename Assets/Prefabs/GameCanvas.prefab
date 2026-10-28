@@ -8404,6 +8404,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecf2e1a29d8edf94bad594f8b3e75776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeStamina
+  settings: {fileID: 11400000, guid: 4e2e8d54983b4dfd9ef56f179553f573, type: 2}
   currentLevelText: {fileID: 7094009288856853914}
   staminaModification: {fileID: 770547811073780064}
   nextLevelColor: {r: 0.30588236, g: 0.6039216, b: 0.19607843, a: 1}

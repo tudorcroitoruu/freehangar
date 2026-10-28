@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public sealed class StaminaManager : MonoBehaviour
 {
     [SerializeField, Min(.01f)] private float maxStamina = 100f;
+    [SerializeField] private StaminaUpgradeSettings upgradeSettings;
     [SerializeField, Min(0f), Tooltip("Stamina per scoop for a 1 kg shovel; multiplied by the equipped shovel's weight.")]
     private float shovelActionCost = 10f;
     [Tooltip("Stamina consumed per second while carrying a bag.")]
@@ -26,10 +27,20 @@ public sealed class StaminaManager : MonoBehaviour
     private float recoveryDelayRemaining;
     private RectTransform backgroundRect;
     private float initialBackgroundSizeDeltaX;
+    private PlayerData staminaProfile;
     public float CurrentStamina { get; private set; }
-    public float MaxStamina => maxStamina;
+    private StaminaUpgradeSettings UpgradeSettings
+    {
+        get
+        {
+            if (upgradeSettings == null) upgradeSettings = Resources.Load<StaminaUpgradeSettings>(StaminaUpgradeSettings.ResourcePath);
+            return upgradeSettings;
+        }
+    }
+    public float MaxStamina => UpgradeSettings != null && UpgradeSettings.IsConfigured
+        ? UpgradeSettings.Capacity(SaveSystem.Data?.staminaUpgradeLevel ?? 0) : maxStamina;
     public float HungryPercent => hungryPercent;
-    public float CurrentMaxStamina => maxStamina * (1f - Mathf.Clamp01(hungryPercent / 100f));
+    public float CurrentMaxStamina => MaxStamina * (1f - Mathf.Clamp01(hungryPercent / 100f));
     public bool HasInfiniteStamina => SaveSystem.Data != null &&
         SaveSystem.Data.infiniteStaminaUntilUtc > DateTimeOffset.UtcNow.ToUnixTimeSeconds();
     public long InfiniteStaminaSecondsRemaining => SaveSystem.Data == null ? 0L :
@@ -40,7 +51,24 @@ public sealed class StaminaManager : MonoBehaviour
 
     private void Awake()
     {
+        staminaProfile = SaveSystem.Data;
         CurrentStamina = CurrentMaxStamina;
+        UpdateStaminaBar();
+    }
+
+    private void OnEnable()
+    {
+        SaveSystem.MoneyChanged += RefreshUpgrade;
+        RefreshUpgrade(SaveSystem.Money);
+    }
+
+    private void OnDisable() => SaveSystem.MoneyChanged -= RefreshUpgrade;
+
+    private void RefreshUpgrade(int _)
+    {
+        bool profileChanged = staminaProfile != SaveSystem.Data;
+        staminaProfile = SaveSystem.Data;
+        CurrentStamina = profileChanged || HasInfiniteStamina ? CurrentMaxStamina : Mathf.Clamp(CurrentStamina, 0f, CurrentMaxStamina);
         UpdateStaminaBar();
     }
 
@@ -149,6 +177,9 @@ public sealed class StaminaManager : MonoBehaviour
         recoveryDelay = Mathf.Max(0f, recoveryDelay);
         hungryPercent = Mathf.Clamp(hungryPercent, 0f, 100f);
         hungerIncreasePerMinute = Mathf.Max(0f, hungerIncreasePerMinute);
-        CurrentStamina = Mathf.Clamp(CurrentStamina, 0f, CurrentMaxStamina);
+        // OnValidate may run during asset import: do not load Resources here.
+        float validatedMax = upgradeSettings != null && upgradeSettings.IsConfigured
+            ? upgradeSettings.Capacity(SaveSystem.Data?.staminaUpgradeLevel ?? 0) : maxStamina;
+        CurrentStamina = Mathf.Clamp(CurrentStamina, 0f, validatedMax * (1f - hungryPercent / 100f));
     }
 }

@@ -8,6 +8,8 @@ public class ShovelUpgradeInteractionTests
     private UpgradeManager manager;
     private UpgradeShovel screen;
     private ShovelUpgradeSettings settings;
+    private UpgradeStamina staminaScreen;
+    private StaminaUpgradeSettings staminaSettings;
     private PlayerData previousData;
     private SettingsData previousSettings;
     private ActivityData previousActivity;
@@ -43,6 +45,13 @@ public class ShovelUpgradeInteractionTests
         settings.shovels = new[] { new ShovelUpgradeSettings.ShovelType() };
         SetField(screen, "settings", settings);
         SetField(manager, "upgradeShovelScreen", screen);
+        var staminaPanel = new GameObject("Stamina panel");
+        staminaPanel.transform.SetParent(root.transform);
+        staminaScreen = staminaPanel.AddComponent<UpgradeStamina>();
+        staminaSettings = ScriptableObject.CreateInstance<StaminaUpgradeSettings>();
+        staminaSettings.prices = new[] { 0, 250 };
+        SetField(staminaScreen, "settings", staminaSettings);
+        SetField(manager, "upgradeStaminaScreen", staminaScreen);
         actor = new GameObject("Actor");
         actor.AddComponent<PlayerInteractor>();
         station = new GameObject("Workshop shovel");
@@ -58,6 +67,7 @@ public class ShovelUpgradeInteractionTests
         Object.DestroyImmediate(actor);
         Object.DestroyImmediate(root);
         Object.DestroyImmediate(settings);
+        Object.DestroyImmediate(staminaSettings);
         SaveSystem.Data = previousData;
         SaveSystem.settingsData = previousSettings;
         SaveSystem.activityData = previousActivity;
@@ -68,6 +78,38 @@ public class ShovelUpgradeInteractionTests
         typeof(UpgradeManager).GetField("closedFrame", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, previousClosedFrame);
         Cursor.lockState = previousCursorLock;
         Cursor.visible = previousCursorVisible;
+    }
+
+    [Test]
+    public void StaminaStationOpensOnlyStaminaAndRoutesEToItsOwnSavedProgress()
+    {
+        var interactable = station.AddComponent<StaminaUpgradeInteractable>();
+        SetField(interactable, "upgradeManager", manager);
+        SaveSystem.Data.cash = 0;
+        Assert.IsTrue(interactable.TryInteract(actor.GetComponent<PlayerInteractor>()));
+        Assert.IsTrue(staminaScreen.isActiveAndEnabled);
+        Assert.IsFalse(screen.isActiveAndEnabled);
+        Press(false, true);
+        Assert.AreEqual(0, SaveSystem.Data.staminaUpgradeLevel);
+        SetField(manager, "openedFrame", Time.frameCount - 1);
+        Press(false, true);
+        Assert.AreEqual(1, SaveSystem.Data.staminaUpgradeLevel);
+        Assert.AreEqual(0, SaveSystem.Data.shovelUpgradeLevel);
+        Assert.AreEqual(0, SaveSystem.Money);
+        Press(false, true);
+        Assert.AreEqual(1, SaveSystem.Data.staminaUpgradeLevel);
+        SaveSystem.Data.cash = 250;
+        Press(false, true);
+        Assert.AreEqual(2, SaveSystem.Data.staminaUpgradeLevel);
+        Assert.AreEqual(0, SaveSystem.Money);
+        Press(false, true);
+        Assert.AreEqual(2, SaveSystem.Data.staminaUpgradeLevel);
+        Press(true, false);
+        Assert.IsFalse(manager.IsOpen);
+        Assert.IsFalse(staminaScreen.isActiveAndEnabled);
+        Assert.IsTrue(manager.OpenShovel());
+        Assert.IsTrue(screen.isActiveAndEnabled);
+        Assert.IsFalse(staminaScreen.isActiveAndEnabled);
     }
 
     [Test]

@@ -26,6 +26,13 @@ public static class SaveSystem
         return true;
     }
 
+    public static bool TryPurchaseStaminaUpgrade(int price, int expectedLevel, int maxLevel)
+    {
+        if (Data == null || !Data.TryUpgradeStamina(price, expectedLevel, maxLevel)) return false;
+        SaveData();
+        return true;
+    }
+
     public static bool TryPurchaseUpgrade(int price, Func<PlayerData, bool> apply, out bool usedVoucher)
     {
         usedVoucher = false;
@@ -284,6 +291,16 @@ public class PlayerData
     public long infiniteStaminaUntilUtc;
     public int[] wheelbarrowUpgradeLevels = new int[3];
     public int shovelUpgradeLevel;
+    public int staminaUpgradeLevel;
+
+    public bool TryUpgradeStamina(int price, int expectedLevel, int maxLevel)
+    {
+        if (price < 0 || cash < price || expectedLevel < 0 || staminaUpgradeLevel != expectedLevel ||
+            staminaUpgradeLevel >= maxLevel) return false;
+        cash -= price;
+        staminaUpgradeLevel++;
+        return true;
+    }
 
     public bool TryUpgradeShovel(int price, int expectedLevel, int maxLevel)
     {
