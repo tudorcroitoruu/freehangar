@@ -8,7 +8,7 @@ public sealed class InteractionPrompt : MonoBehaviour
     [SerializeField] private RectTransform panel;
     [SerializeField] private RectTransform canvasRect;
     [SerializeField] private TMP_Text description;
-    [SerializeField] private GameObject keycap;
+    [SerializeField] private TMP_Text keycap;
     [SerializeField] private GameObject mouseLeft;
 
     [SerializeField] private GameObject bagSliderFill;
@@ -19,7 +19,7 @@ public sealed class InteractionPrompt : MonoBehaviour
 
     public void Show(Camera camera, Vector3 worldPosition, string action, bool showKey = true, GrainContainer bag = null)
     {
-        if (bag != null && bag.IsClosing) { Hide(); return; }
+        if (bag != null && (bag.IsClosing || bag.IsCarried)) { Hide(); return; }
         bool showFill = bag != null && !bag.IsFull;
         var data = new InteractionPromptData(worldPosition, showFill ? "Fill" : action, showKey && !showFill);
         data.ShowPrimaryButton = data.ShowProgress = showFill;
@@ -33,13 +33,15 @@ public sealed class InteractionPrompt : MonoBehaviour
 
     public void Show(Camera camera, InteractionPromptData data)
     {
+        if (data.RequiresFreeHands || Time.timeScale <= 0f || UIPopups.BasePopupUI.HasActivePopup) { Hide(); return; }
         if (panel == null || canvasRect == null || camera == null || (string.IsNullOrEmpty(data.Action) && !data.ShowProgress)) { Hide(); return; }
         Vector3 screen = camera.WorldToScreenPoint(data.Position);
         if (screen.z <= 0 || screen.x < 0 || screen.x > Screen.width || screen.y < 0 || screen.y > Screen.height) { Hide(); return; }
         if (!panel.gameObject.activeSelf) panel.gameObject.SetActive(true);
         CurrentText = data.Action;
         if (description != null && description.text != data.Action) description.text = data.Action;
-        if (keycap != null && keycap.activeSelf != data.ShowKey) keycap.SetActive(data.ShowKey);
+        if (keycap != null && data.ShowKey && keycap.text != "E") keycap.text = "E";
+        if (keycap != null && keycap.gameObject.activeSelf != data.ShowKey) keycap.gameObject.SetActive(data.ShowKey);
         if (mouseLeft != null && mouseLeft.activeSelf != data.ShowPrimaryButton) mouseLeft.SetActive(data.ShowPrimaryButton);
         if (bagSliderFill != null && bagSliderFill.activeSelf != data.ShowProgress) bagSliderFill.SetActive(data.ShowProgress);
         if (bagFill != null) bagFill.fillAmount = Mathf.Clamp01(data.Progress);
@@ -56,5 +58,6 @@ public sealed class InteractionPrompt : MonoBehaviour
     {
         if (panel != null && panel.gameObject.activeSelf) panel.gameObject.SetActive(false);
         CurrentText = "";
+        if (description != null && description.text.Length > 0) description.text = "";
     }
 }

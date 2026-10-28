@@ -44,6 +44,7 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
         DrawProperty(materialEditor, properties, "_Color");
         DrawProperty(materialEditor, properties, "_FadeColor");
         DrawProperty(materialEditor, properties, "_Saturation");
+        DrawProperty(materialEditor, properties, "_RoundCorners");
         EndSection();
     }
 
@@ -203,6 +204,8 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
                 return "Controls sprite color intensity. 0 makes the image black and white; 1 keeps full original color.";
             case "_FadeLeftSize":
                 return "Width of the left fade band in normalized sprite UVs. Set to 0 to disable the left fade.";
+            case "_RoundCorners":
+                return "Rounds all four corners with a smooth transparent edge. 0 keeps square corners; 1 uses half the shorter side as the radius (a capsule on rectangular Images).";
             case "_FadeLeftSoftness":
                 return "Smoothness of the left fade transition. Higher values spread the fade more softly.";
             case "_FadeRightSize":

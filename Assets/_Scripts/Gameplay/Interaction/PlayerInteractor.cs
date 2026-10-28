@@ -12,13 +12,17 @@ public sealed class PlayerInteractor : MonoBehaviour
     private PlayerBicycleInteraction bicycle;
     private InteractionHighlight highlight;
     public BagInteraction Bags { get; private set; }
+    public PlayerItemCarry Items { get; private set; }
     public WheelbarrowCargo PushedWheelbarrow { get; set; }
     public IInteractable Target { get; private set; }
+    public bool HandsOccupied => (GetComponent<PlayerController>() is PlayerController actor &&
+        (actor.IsShovelEquipped || actor.IsCarrying)) || (Bags != null && Bags.IsCarrying) ||
+        (Items != null && Items.IsCarrying) || PushedWheelbarrow != null;
 
     private InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;
 
     private bool CanInteract => isActiveAndEnabled && viewCamera != null && viewCamera.isActiveAndEnabled &&
-        Time.timeScale > 0 && Application.isFocused && Cursor.lockState == CursorLockMode.Locked &&
+        Time.timeScale > 0 && Application.isFocused && Cursor.lockState == CursorLockMode.Locked && !UIPopups.BasePopupUI.HasActivePopup &&
         (player == null || (player.isActiveAndEnabled && player.characterController != null && player.characterController.enabled)) &&
         (bicycle == null || !bicycle.IsRiding);
 
@@ -27,6 +31,8 @@ public sealed class PlayerInteractor : MonoBehaviour
         player = GetComponent<PlayerController>();
         bicycle = GetComponent<PlayerBicycleInteraction>();
         Bags = GetComponent<BagInteraction>();
+        Items = GetComponent<PlayerItemCarry>();
+        if (Items == null && player != null) Items = gameObject.AddComponent<PlayerItemCarry>();
         if (viewCamera == null && player != null) viewCamera = player.characterCamera;
         if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
     }
@@ -35,7 +41,24 @@ public sealed class PlayerInteractor : MonoBehaviour
     {
         var prompt = Prompt;
         Target = null;
-        if (!CanInteract) { SetHighlightedTarget(null); HidePrompt(); return; }
+        if (!CanInteract) { SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
+        var aimedTarget = FindTarget();
+        InteractionPromptData aimedPrompt = default;
+        bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
+        SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
+        if (hasAimedPrompt && aimedPrompt.RequiresFreeHands)
+        {
+            Target = aimedTarget;
+            SetHighlightedTarget(null);
+            HidePrompt();
+            return;
+        }
+        if (Items != null && Items.IsCarrying)
+        {
+            SetHighlightedTarget(null);
+            HidePrompt();
+            return;
+        }
         if (PushedWheelbarrow != null)
         {
             SetHighlightedTarget(null);
@@ -47,22 +70,20 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (Bags != null && Bags.isActiveAndEnabled && Bags.IsCarrying)
         {
             SetHighlightedTarget(null);
-            var wheelbarrow = FindTarget() as WheelbarrowCargo;
+            var wheelbarrow = aimedTarget as WheelbarrowCargo;
             if (wheelbarrow != null && wheelbarrow.TryGetPrompt(this, out var loadPrompt))
             {
                 if (prompt != null) prompt.Show(viewCamera, loadPrompt);
                 return;
             }
-            if (Bags.TryGetPrompt(Bags.CarriedBag, out var carriedPrompt) && prompt != null)
-                prompt.Show(viewCamera, carriedPrompt);
-            else HidePrompt();
+            HidePrompt();
             return;
         }
-        Target = FindTarget();
-        if (Target != null && Target.TryGetPrompt(this, out var data))
+        Target = aimedTarget;
+        if (hasAimedPrompt)
         {
             SetHighlightedTarget(Target);
-            if (prompt != null) prompt.Show(viewCamera, data);
+            if (prompt != null) prompt.Show(viewCamera, aimedPrompt);
         }
         else { SetHighlightedTarget(null); HidePrompt(); }
     }
@@ -70,6 +91,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     public bool TryInteract()
     {
         if (!CanInteract) return false;
+        if (Items != null && Items.IsCarrying) return Items.TryPlace();
         if (PushedWheelbarrow != null) return PushedWheelbarrow.TryInteract(this);
         // Carrying reserves E for dropping; bicycle cargo handling takes priority in PlayerController.
         if (Bags != null && Bags.isActiveAndEnabled && Bags.IsCarrying)
@@ -121,5 +143,10 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (highlight != null) highlight.SetFocused(true);
     }
 
-    private void OnDisable() { Target = null; SetHighlightedTarget(null); HidePrompt(); }
+    private void SetFreeHandsWarning(bool visible)
+    {
+        if (GameplayCanvas.Instance != null) GameplayCanvas.Instance.SetFreeHandsWarning(visible);
+    }
+
+    private void OnDisable() { Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
 }

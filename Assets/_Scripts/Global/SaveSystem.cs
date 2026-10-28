@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -15,6 +16,7 @@ public static class SaveSystem
     public static ActivityData activityData;
 
     public static event Action<int> MoneyChanged;
+    public static event Action OwnedProductsChanged;
     public static int Money => Data != null ? Data.cash : 0;
 
     public static bool TryPurchaseUpgrade(int price, Func<PlayerData, bool> apply, out bool usedVoucher)
@@ -44,6 +46,22 @@ public static class SaveSystem
         if (Data == null || amount <= 0 || Data.cash < amount) return false;
         Data.cash -= amount;
         SaveData();
+        return true;
+    }
+
+    public static bool TryBuyProduct(string productID, int price)
+    {
+        if (Data == null || !Data.TryBuyProduct(productID, price)) return false;
+        SaveData();
+        OwnedProductsChanged?.Invoke();
+        return true;
+    }
+
+    public static bool TryTakeProduct(string productID)
+    {
+        if (Data == null || !Data.TryTakeProduct(productID)) return false;
+        SaveData();
+        OwnedProductsChanged?.Invoke();
         return true;
     }
 
@@ -158,12 +176,15 @@ public static class SaveSystem
         {
             activityData = new ActivityData();
         }
+
+        Data.ownedProducts ??= new List<OwnedProductData>();
         
      //  InitAchievementsList();
         
         savesLoaded = true;
 
         MoneyChanged?.Invoke(Money);
+        OwnedProductsChanged?.Invoke();
         return (Data,settingsData,activityData);
     }
 
@@ -263,6 +284,42 @@ public class PlayerData
     public int cash = 150000;
     public int currentCarFromOwnedSelected;
 
+    [Space, Header("Owned products")]
+    public List<OwnedProductData> ownedProducts = new List<OwnedProductData>();
+
+    public int GetOwnedProductCount(string productID)
+    {
+        if (string.IsNullOrWhiteSpace(productID)) return 0;
+        var owned = ownedProducts?.Find(product => product != null && product.productID == productID);
+        return Math.Max(0, owned?.ownCount ?? 0);
+    }
+
+    public bool TryTakeProduct(string productID)
+    {
+        if (string.IsNullOrWhiteSpace(productID)) return false;
+        var owned = ownedProducts?.Find(product => product != null && product.productID == productID);
+        if (owned == null || owned.ownCount <= 0) return false;
+        owned.ownCount--;
+        return true;
+    }
+
+    public bool TryBuyProduct(string productID, int price)
+    {
+        if (string.IsNullOrWhiteSpace(productID) || price < 0 || cash < price) return false;
+        var owned = ownedProducts?.Find(product => product != null && product.productID == productID);
+        if (owned != null && (owned.ownCount < 0 || owned.ownCount == int.MaxValue)) return false;
+
+        ownedProducts ??= new List<OwnedProductData>();
+        if (owned == null)
+        {
+            owned = new OwnedProductData { productID = productID };
+            ownedProducts.Add(owned);
+        }
+        owned.ownCount++;
+        cash -= price;
+        return true;
+    }
+
     [Space, Header("Goals")]
     public GoalSettingsSave[] goals = Array.Empty<GoalSettingsSave>();
 
@@ -274,6 +331,13 @@ public class PlayerData
     
    // [Space, Header("Achievements")] 
     //public List<AchievementStatus> achievements = new List<AchievementStatus>();
+}
+
+[Serializable]
+public class OwnedProductData
+{
+    public string productID;
+    public int ownCount;
 }
 
 [Serializable]

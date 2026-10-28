@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>Tracks stamina spent while working and recovered while resting.</summary>
+/// <summary>Tracks work, recovery and the stamina capacity lost to hunger.</summary>
 [DisallowMultipleComponent]
 public sealed class StaminaManager : MonoBehaviour
 {
@@ -12,30 +12,66 @@ public sealed class StaminaManager : MonoBehaviour
     [SerializeField, Min(0f)] private float workConsumptionPerSecond = 10f;
     [SerializeField, Min(0f)] private float recoveryPerSecond = 15f;
     [SerializeField, Min(0f)] private float recoveryDelay = 2f;
+
+    [Header("Hunger")]
+    [SerializeField, Range(0f, 100f)] private float hungryPercent;
+    [SerializeField, Min(0f), Tooltip("Percentage points of hunger gained per minute of game time. Zero pauses hunger growth.")]
+    private float hungerIncreasePerMinute = 1f;
+
+    [Header("UI")]
     [SerializeField] private Image staminaBarFill;
+    [SerializeField] private Image staminaBarBackground;
 
     private float recoveryDelayRemaining;
+    private RectTransform backgroundRect;
+    private float initialBackgroundSizeDeltaX;
     public float CurrentStamina { get; private set; }
     public float MaxStamina => maxStamina;
+    public float HungryPercent => hungryPercent;
+    public float CurrentMaxStamina => maxStamina * (1f - Mathf.Clamp01(hungryPercent / 100f));
     public bool HasInfiniteStamina => SaveSystem.Data != null &&
         SaveSystem.Data.infiniteStaminaUntilUtc > DateTimeOffset.UtcNow.ToUnixTimeSeconds();
     public long InfiniteStaminaSecondsRemaining => SaveSystem.Data == null ? 0L :
         Math.Max(0L, SaveSystem.Data.infiniteStaminaUntilUtc - DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-    public float NormalizedStamina => HasInfiniteStamina ? 1f : maxStamina > 0f ? Mathf.Clamp01(CurrentStamina / maxStamina) : 0f;
-    public bool IsExhausted => !HasInfiniteStamina && CurrentStamina <= 0f;
+    public float NormalizedStamina => CurrentMaxStamina > 0f ? HasInfiniteStamina ? 1f : Mathf.Clamp01(CurrentStamina / CurrentMaxStamina) : 0f;
+    public bool IsExhausted => CurrentMaxStamina <= 0f || (!HasInfiniteStamina && CurrentStamina <= 0f);
     public bool IsWorking { get; private set; }
 
     private void Awake()
     {
-        CurrentStamina = maxStamina;
+        CurrentStamina = CurrentMaxStamina;
         UpdateStaminaBar();
+    }
+
+    private void Update() => TickHunger(Time.deltaTime);
+
+    public void TickHunger(float deltaTime)
+    {
+        if (!isActiveAndEnabled || !(deltaTime > 0f) || !float.IsFinite(deltaTime)) return;
+        SetHungerPercent(hungryPercent + hungerIncreasePerMinute * (deltaTime / 60f));
+    }
+
+    public void SetHungerPercent(float percent)
+    {
+        if (!float.IsFinite(percent)) return;
+        hungryPercent = Mathf.Clamp(percent, 0f, 100f);
+        CurrentStamina = HasInfiniteStamina ? CurrentMaxStamina : Mathf.Clamp(CurrentStamina, 0f, CurrentMaxStamina);
+        UpdateStaminaBar();
+    }
+
+    public bool ConsumeFood(float hungerReductionPercent)
+    {
+        if (!isActiveAndEnabled || Time.timeScale <= 0f || !float.IsFinite(hungerReductionPercent) ||
+            hungerReductionPercent <= 0f || hungryPercent <= 0f) return false;
+        SetHungerPercent(hungryPercent - hungerReductionPercent);
+        return true;
     }
 
     public void ConsumeShovelStamina()
     {
-        if (HasInfiniteStamina) { CurrentStamina = maxStamina; UpdateStaminaBar(); return; }
+        if (HasInfiniteStamina) { CurrentStamina = CurrentMaxStamina; UpdateStaminaBar(); return; }
         if (!isActiveAndEnabled || Time.timeScale <= 0f || shovelActionCost <= 0f) return;
-        CurrentStamina = Mathf.Clamp(CurrentStamina - shovelActionCost, 0f, maxStamina);
+        CurrentStamina = Mathf.Clamp(CurrentStamina - shovelActionCost, 0f, CurrentMaxStamina);
         recoveryDelayRemaining = recoveryDelay;
         UpdateStaminaBar();
     }
@@ -46,14 +82,14 @@ public sealed class StaminaManager : MonoBehaviour
         IsWorking = isWorking;
         if (HasInfiniteStamina)
         {
-            CurrentStamina = maxStamina;
+            CurrentStamina = CurrentMaxStamina;
             recoveryDelayRemaining = 0f;
             UpdateStaminaBar();
             return;
         }
         if (isWorking)
         {
-            CurrentStamina = Mathf.Clamp(CurrentStamina - (consumptionPerSecond >= 0f && float.IsFinite(consumptionPerSecond) ? consumptionPerSecond : workConsumptionPerSecond) * deltaTime, 0f, maxStamina);
+            CurrentStamina = Mathf.Clamp(CurrentStamina - (consumptionPerSecond >= 0f && float.IsFinite(consumptionPerSecond) ? consumptionPerSecond : workConsumptionPerSecond) * deltaTime, 0f, CurrentMaxStamina);
             recoveryDelayRemaining = recoveryDelay;
             UpdateStaminaBar();
             return;
@@ -67,13 +103,26 @@ public sealed class StaminaManager : MonoBehaviour
 
         float restingTime = Mathf.Max(0f, deltaTime - recoveryDelayRemaining);
         recoveryDelayRemaining = Mathf.Max(0f, recoveryDelayRemaining - deltaTime);
-        CurrentStamina = Mathf.Clamp(CurrentStamina + recoveryPerSecond * restingTime, 0f, maxStamina);
+        CurrentStamina = Mathf.Clamp(CurrentStamina + recoveryPerSecond * restingTime, 0f, CurrentMaxStamina);
         UpdateStaminaBar();
     }
 
     private void UpdateStaminaBar()
     {
         if (staminaBarFill != null) staminaBarFill.fillAmount = NormalizedStamina;
+        if (staminaBarBackground == null) return;
+        if (backgroundRect != staminaBarBackground.rectTransform)
+        {
+            backgroundRect = staminaBarBackground.rectTransform;
+            initialBackgroundSizeDeltaX = backgroundRect.sizeDelta.x;
+        }
+
+        // Rebuild the full width from the original layout, including stretched anchors.
+        float parentWidth = backgroundRect.parent is RectTransform parent ? parent.rect.width : 0f;
+        float fullWidth = Mathf.Max(0f, parentWidth * (backgroundRect.anchorMax.x - backgroundRect.anchorMin.x) + initialBackgroundSizeDeltaX);
+        float width = fullWidth * (1f - Mathf.Clamp01(hungryPercent / 100f));
+        if (!Mathf.Approximately(backgroundRect.rect.width, width))
+            backgroundRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
     }
 
     private void OnGUI()
@@ -91,6 +140,8 @@ public sealed class StaminaManager : MonoBehaviour
         workConsumptionPerSecond = Mathf.Max(0f, workConsumptionPerSecond);
         recoveryPerSecond = Mathf.Max(0f, recoveryPerSecond);
         recoveryDelay = Mathf.Max(0f, recoveryDelay);
-        CurrentStamina = Mathf.Clamp(CurrentStamina, 0f, maxStamina);
+        hungryPercent = Mathf.Clamp(hungryPercent, 0f, 100f);
+        hungerIncreasePerMinute = Mathf.Max(0f, hungerIncreasePerMinute);
+        CurrentStamina = Mathf.Clamp(CurrentStamina, 0f, CurrentMaxStamina);
     }
 }

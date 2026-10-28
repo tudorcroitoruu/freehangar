@@ -6,6 +6,7 @@ Shader "UI/Image Margin Fade"
         _Color ("Tint", Color) = (1,1,1,1)
         _FadeColor ("Fade Color", Color) = (0,0,0,0)
         _Saturation ("Saturation", Range(0, 1)) = 1
+        _RoundCorners ("Round Corners", Range(0, 1)) = 0
         _FadeLeftSize ("Left Fade Size", Range(0, 1)) = 0.1
         _FadeLeftSoftness ("Left Softness", Range(0, 1)) = 1
         _FadeRightSize ("Right Fade Size", Range(0, 1)) = 0.1
@@ -130,6 +131,7 @@ Shader "UI/Image Margin Fade"
             half _FadeBottomSize;
             half _FadeBottomSoftness;
             half _Saturation;
+            half _RoundCorners;
             half _NoiseScale;
             half _NoiseStrength;
             half _TornPaper;
@@ -180,6 +182,25 @@ Shader "UI/Image Margin Fade"
             {
                 half luma = dot(rgb, half3(0.2126, 0.7152, 0.0722));
                 return lerp(luma.xxx, rgb, saturate(saturation));
+            }
+
+            half RoundedCornersMask(float2 uv)
+            {
+                if (_RoundCorners <= 0.0)
+                    return 1.0;
+
+                // Convert the UV rectangle into screen-pixel units so a non-square
+                // Image still has circular corner arcs instead of stretched ellipses.
+                float2 uvDx = ddx(uv);
+                float2 uvDy = ddy(uv);
+                float2 uvPerPixel = max(sqrt(uvDx * uvDx + uvDy * uvDy), float2(0.000001, 0.000001));
+                float2 halfSize = 0.5 / uvPerPixel;
+                float radius = saturate(_RoundCorners) * min(halfSize.x, halfSize.y);
+                float2 position = (uv - 0.5) / uvPerPixel;
+                float2 corner = abs(position) - (halfSize - radius);
+                float distance = length(max(corner, 0.0)) + min(max(corner.x, corner.y), 0.0) - radius;
+                float antialias = max(fwidth(distance), 0.0001);
+                return saturate(0.5 - distance / antialias);
             }
 
             half SamplePaintedNoise(float2 noisePosition)
@@ -322,6 +343,7 @@ Shader "UI/Image Margin Fade"
                 // alpha 0 fades margins to transparent, alpha 1 keeps the sprite alpha and tints to _FadeColor.
                 fixed4 fadeTarget = fixed4(_FadeColor.rgb, color.a * _FadeColor.a);
                 color = lerp(color, fadeTarget, edgeFade);
+                color.a *= RoundedCornersMask(IN.texcoord);
 
                 #ifdef UNITY_UI_CLIP_RECT
                 half2 maskSoftness = saturate(

@@ -2,21 +2,11 @@ using UnityEngine;
 
 public class ShopProduct : MonoBehaviour, IInteractable
 {
+    [SerializeField] private string productID;
     [SerializeField] private string productName;
-    [SerializeField] private int productPrice;
+    [SerializeField, Min(0)] private int productPrice;
     [SerializeField] private bool toBuy = true;
     [SerializeField] private bool toRent;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
     {
@@ -32,6 +22,7 @@ public class ShopProduct : MonoBehaviour, IInteractable
 
     public bool TryInteract(PlayerInteractor interactor)
     {
-        throw new System.NotImplementedException();
+        if (!isActiveAndEnabled || !toBuy) return false;
+        return SaveSystem.TryBuyProduct(productID, productPrice);
     }
 }

@@ -44,7 +44,7 @@ public static class BagInteractionSetup
             panel.gameObject.AddComponent<Image>().color = new Color(.16f, .095f, .045f, .94f);
             var key = Rect("E key", panel, new Vector2(38, 38), new Vector2(-75, 0));
             key.gameObject.AddComponent<Image>().color = new Color(.97f, .9f, .75f);
-            Label("E", key, new Vector2(38, 38), Vector2.zero, 26, new Color(.22f, .14f, .08f));
+            var keyLabel = Label("E", key, new Vector2(38, 38), Vector2.zero, 26, new Color(.22f, .14f, .08f));
             var label = Label("Finish", panel, new Vector2(148, 44), new Vector2(24, 0), 22, new Color(1f, .94f, .82f));
             label.enableAutoSizing = true; label.fontSizeMin = 14; label.fontSizeMax = 22;
             foreach (var graphic in hud.GetComponentsInChildren<Graphic>()) graphic.raycastTarget = false;
@@ -52,7 +52,7 @@ public static class BagInteractionSetup
             promptData.FindProperty("panel").objectReferenceValue = panel;
             promptData.FindProperty("canvasRect").objectReferenceValue = hud.GetComponent<RectTransform>();
             promptData.FindProperty("description").objectReferenceValue = label;
-            promptData.FindProperty("keycap").objectReferenceValue = key.gameObject;
+            promptData.FindProperty("keycap").objectReferenceValue = keyLabel;
             promptData.ApplyModifiedProperties();
             panel.gameObject.SetActive(false);
         }

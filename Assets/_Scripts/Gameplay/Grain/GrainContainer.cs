@@ -6,6 +6,8 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
 {
     [SerializeField, Min(.01f)] private float capacityKg = 50f;
     [SerializeField, Min(0f)] private float kilograms;
+    [SerializeField, Tooltip("Whether the player can carry this container, regardless of its fill level. Disable for Big Bag.")]
+    private bool canBeCarried = true;
     [SerializeField, Tooltip("A designated receiver accepts only this crop. Otherwise the first pour assigns it.")] private bool restrictGrain;
     [SerializeField] private GrainType acceptedGrain;
     [SerializeField] private SackController sack;
@@ -25,6 +27,8 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     public bool IsFinished => sack != null && sack.Close >= .999f;
     public bool IsClosing { get; private set; }
     public bool IsCarried { get; private set; }
+    public bool CanBeCarried => canBeCarried;
+    public bool CanCarry => canBeCarried && isActiveAndEnabled && !IsCarried && !IsClosing;
     public bool CanHandle => isActiveAndEnabled && sack != null && IsFull && !IsCarried;
 
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
@@ -40,7 +44,17 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
         get
         {
             var box = GetComponent<BoxCollider>();
-            if (box == null) return new Bounds(transform.position, Vector3.one * .5f);
+            if (box == null)
+            {
+                Bounds bounds = new Bounds(transform.position, Vector3.one * .5f);
+                bool found = false;
+                foreach (var renderer in GetComponentsInChildren<Renderer>())
+                {
+                    if (!found) { bounds = renderer.bounds; found = true; }
+                    else bounds.Encapsulate(renderer.bounds);
+                }
+                return bounds;
+            }
             Bounds result = default;
             for (int i = 0; i < 8; i++)
             {

@@ -138,7 +138,7 @@ public sealed class ShovelTool : MonoBehaviour
             closest = hits[i].collider; distance = hits[i].distance;
         }
         var direct = closest != null ? closest.GetComponentInParent<GrainContainer>() : null;
-        if (direct != null && direct.isActiveAndEnabled && !direct.IsCarried && direct.GetComponent<SackController>() != null) return direct;
+        if (direct != null && direct.isActiveAndEnabled && !direct.IsCarried) return direct;
         return null;
     }
 

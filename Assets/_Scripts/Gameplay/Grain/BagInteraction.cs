@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// <summary>Finish, carry and drop the same filled bag; contents remain owned by GrainContainer.</summary>
+/// <summary>Finish sacks and carry portable grain containers at any fill level.</summary>
 [DefaultExecutionOrder(200), DisallowMultipleComponent]
 public sealed class BagInteraction : MonoBehaviour
 {
@@ -25,23 +25,35 @@ public sealed class BagInteraction : MonoBehaviour
     public GrainContainer CarriedBag => carried;
     public float CarriedVolume => carriedVolume;
     public InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;
-    public string PromptAction => carried != null ? "Drop" : target == null ? "" : target.IsClosing ? "Closing…" : target.IsFinished ? "Take" : "Finish";
+    private bool IsShovelEquipped => GetComponent<PlayerController>() is PlayerController player ?
+        player.IsShovelEquipped : shovel != null && shovel.isActiveAndEnabled;
+    public string PromptAction => carried != null ? "Drop" : target == null ? "" : target.IsClosing ? "Closing…" :
+        IsShovelEquipped && target.CanHandle && !target.IsFinished ? "Finish" :
+        target.CanCarry && !IsShovelEquipped ? "Take" : target.IsFull ? "Full" : "Fill";
 
     private void LateUpdate() => RestoreShovelIfNeeded();
 
     public bool TryGetPrompt(GrainContainer bag, out InteractionPromptData data)
     {
         data = default;
-        if (!isActiveAndEnabled || bag == null || !bag.isActiveAndEnabled || bag.GetComponent<SackController>() == null ||
-            bag.IsClosing || (bag.IsCarried && bag != carried) || (bag.IsFull && shovel != null && shovel.IsBusy)) return false;
+        if (!isActiveAndEnabled || bag == null || !bag.isActiveAndEnabled ||
+            bag.IsClosing || (bag.IsCarried && bag != carried) || (shovel != null && shovel.IsBusy)) return false;
         if (carried == null) target = bag;
         Bounds bounds = bag.WorldBounds;
         Vector3 position = bag == carried ? bounds.center : new Vector3(bounds.center.x, bounds.max.y + .12f, bounds.center.z);
         bool blocked = Time.time < blockedUntil;
-        string action = bag == carried ? "Drop" : bag.IsFinished ? "Take" : "Finish";
-        data = new InteractionPromptData(position, blocked ? "Make room to drop" : bag.IsFull ? action : "Fill",
-            bag.IsFull && !blocked);
-        data.ShowPrimaryButton = data.ShowProgress = !bag.IsFull;
+        bool shovelEquipped = IsShovelEquipped;
+        bool canFinish = shovelEquipped && bag.CanHandle && !bag.IsFinished;
+        bool canCarry = (bag.CanCarry && !shovelEquipped) || bag == carried;
+        string action = bag == carried ? "Drop" : canFinish ? "Finish" : canCarry ? "Take" :
+            shovelEquipped && bag.CanCarry && bag.IsFull ? "Unequip shovel (G)" : bag.IsFull ? "Full" : "Fill";
+        data = new InteractionPromptData(position, blocked ? "Make room to drop" : action,
+            (canFinish || canCarry) && !blocked);
+        data.ShowProgress = !bag.IsFull;
+        data.ShowPrimaryButton = shovelEquipped && bag != carried && bag.IsOpen && !bag.IsFull;
+        var interactor = GetComponent<PlayerInteractor>();
+        data.RequiresFreeHands = bag != carried && bag.CanCarry && !canFinish && !data.ShowPrimaryButton &&
+            (shovelEquipped || (interactor != null && interactor.HandsOccupied));
         data.Progress = bag.CapacityKg > 0f ? Mathf.Clamp01(bag.Kilograms / bag.CapacityKg) : 0f;
         data.ProgressText = $"{bag.Kilograms:0.##} / {bag.CapacityKg:0.##} kg";
         return true;
@@ -59,15 +71,16 @@ public sealed class BagInteraction : MonoBehaviour
     public bool TryInteract(GrainContainer bag)
     {
         if (!isActiveAndEnabled || Time.timeScale <= 0 || viewCamera == null || carryAnchor == null ||
-            carried != null || shovel == null || shovel.IsBusy || bag == null || !bag.CanHandle || bag.IsClosing) return false;
+            carried != null || (shovel != null && shovel.IsBusy) || bag == null || bag.IsClosing ||
+            (GetComponent<PlayerItemCarry>() is PlayerItemCarry items && items.IsCarrying)) return false;
         target = bag;
-        if (!target.IsFinished) return target.Finish();
+        if (IsShovelEquipped) return target.CanHandle && !target.IsFinished && target.Finish();
         return Take(target);
     }
 
     private bool Take(GrainContainer bag)
     {
-        if (!bag.CanHandle || !bag.IsFinished) return false;
+        if (!bag.CanCarry || IsShovelEquipped) return false;
         var sourceWheelbarrow = bag.GetComponentInParent<WheelbarrowCargo>();
         carried = bag;
         originalParent = bag.GetComponentInParent<BicycleController>() != null ||
@@ -76,7 +89,7 @@ public sealed class BagInteraction : MonoBehaviour
         originalWorldScale = bag.transform.lossyScale;
         worldExtents = bag.WorldBounds.extents;
         var box = bag.GetComponent<BoxCollider>();
-        localCenter = box != null ? box.center : Vector3.zero;
+        localCenter = box != null ? box.center : bag.transform.InverseTransformPoint(bag.WorldBounds.center);
         carriedVolume = box != null ? Mathf.Abs(box.size.x * originalWorldScale.x *
             box.size.y * originalWorldScale.y * box.size.z * originalWorldScale.z) :
             bag.WorldBounds.size.x * bag.WorldBounds.size.y * bag.WorldBounds.size.z;
@@ -89,7 +102,7 @@ public sealed class BagInteraction : MonoBehaviour
         colliderStates = new bool[carriedColliders.Length];
         for (int i = 0; i < carriedColliders.Length; i++) { colliderStates[i] = carriedColliders[i].enabled; carriedColliders[i].enabled = false; }
         bag.SetCarried(true);
-        shovel.CancelAction();
+        if (shovel != null) shovel.CancelAction();
         shovelWasActive = shovelPresentation != null && shovelPresentation.gameObject.activeSelf;
         if (shovelPresentation != null) shovelPresentation.gameObject.SetActive(false);
         bag.transform.SetParent(carryAnchor, false);
@@ -101,6 +114,13 @@ public sealed class BagInteraction : MonoBehaviour
         bag.transform.localPosition = -(uprightRotation * Vector3.Scale(localCenter, bag.transform.localScale));
         target = null;
         return true;
+    }
+
+    // Roll back inventory delivery without leaving a destroyed object in the carrier.
+    public void CancelTake(GrainContainer bag)
+    {
+        if (carried == null || carried != bag) return;
+        Release(carried.WorldBounds.center);
     }
 
     public bool TryStow(Transform slot)
@@ -177,7 +197,9 @@ public sealed class BagInteraction : MonoBehaviour
             // Check the path too, so a clear spot behind a wall is not considered reachable.
             Vector3 start = viewCamera.transform.position;
             Vector3 delta = center - start;
-            count = Physics.SphereCastNonAlloc(start, radius, delta.normalized, castHits, delta.magnitude, ~0, QueryTriggerInteraction.Ignore);
+            // Preserve the bag's height: a width-sized sphere clips the floor for flat/empty bags.
+            count = Physics.BoxCastNonAlloc(start, half, delta.normalized, castHits, Quaternion.identity,
+                delta.magnitude, ~0, QueryTriggerInteraction.Ignore);
             clear = count < castHits.Length;
             for (int i = 0; i < count && clear; i++) if (!Ignore(castHits[i].collider)) clear = false;
             if (clear) return true;

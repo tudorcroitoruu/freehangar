@@ -66,6 +66,12 @@ public class PlayerController : MonoBehaviour
 
     public bool IsCrouching => isCrouching;
     public StaminaManager Stamina => staminaManager;
+    public Transform HeldInstrument => heldInstrument;
+    public ShovelTool Shovel => shovelTool;
+    public bool IsShovelEquipped => shovelTool != null && shovelTool.isActiveAndEnabled &&
+        (heldInstrument == null || heldInstrument.gameObject.activeInHierarchy);
+    public bool IsCarrying => (bagInteraction != null && bagInteraction.IsCarrying) ||
+        (interactor != null && interactor.Items != null && interactor.Items.IsCarrying);
 
     private void Reset()
     {
@@ -78,6 +84,7 @@ public class PlayerController : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         bicycleInteraction = GetComponent<PlayerBicycleInteraction>();
         combatTools = GetComponent<PlayerCombatTools>();
+        if (bagInteraction == null) bagInteraction = GetComponent<BagInteraction>();
         if (staminaManager == null && !TryGetComponent(out staminaManager))
             staminaManager = FindFirstObjectByType<StaminaManager>();
         if (staminaManager == null)
@@ -133,16 +140,17 @@ public class PlayerController : MonoBehaviour
         bool wasLocked = Cursor.lockState == CursorLockMode.Locked;
         if (Input.GetKeyDown(KeyCode.Escape))
             SetCursorLocked(false);
-        else if (Input.GetMouseButtonDown(0))
+        else if (Input.GetMouseButtonDown(0) && !UIPopups.BasePopupUI.HasActivePopup)
             SetCursorLocked(true);
 
-        bool bicycleInput = Application.isFocused && Time.timeScale > 0 && Cursor.lockState == CursorLockMode.Locked;
+        bool bicycleInput = Application.isFocused && Time.timeScale > 0 && Cursor.lockState == CursorLockMode.Locked && !UIPopups.BasePopupUI.HasActivePopup;
         if (bicycleInteraction != null && bicycleInteraction.Tick(bicycleInput)) return;
 
         if (!characterController.enabled || Time.deltaTime <= 0f)
             return;
 
-        bool acceptInput = Application.isFocused && Cursor.lockState == CursorLockMode.Locked;
+        bool acceptInput = Application.isFocused && Cursor.lockState == CursorLockMode.Locked && !UIPopups.BasePopupUI.HasActivePopup;
+        if (acceptInput && Input.GetKeyDown(KeyCode.G)) ToggleShovel();
         if (acceptInput && interactor != null && interactor.PushedWheelbarrow != null && Input.GetKeyDown(KeyCode.U))
             interactor.PushedWheelbarrow.TryUpgrade(interactor);
         lookInput = Vector2.zero;
@@ -151,9 +159,9 @@ public class PlayerController : MonoBehaviour
 
         HandleCrouch(acceptInput);
         HandleMovement(acceptInput);
-        if (combatTools != null) combatTools.Tick(acceptInput, wasLocked);
+        if (combatTools != null) combatTools.Tick(acceptInput && !IsCarrying, wasLocked);
         bool interactionAction = acceptInput && interactor != null && Input.GetKeyDown(KeyCode.E) && interactor.TryInteract();
-        if (shovelTool != null && shovelTool.isActiveAndEnabled && !interactionAction)
+        if (IsShovelEquipped && !interactionAction && !IsCarrying)
         {
             if (!acceptInput) shovelTool.CancelAction();
             else
@@ -164,7 +172,7 @@ public class PlayerController : MonoBehaviour
                 shovelTool.Tick(Time.deltaTime);
             }
         }
-        bool isCarrying = bagInteraction != null && bagInteraction.IsCarrying;
+        bool isCarrying = IsCarrying;
         bool recoveryBlocked = shovelTool != null && (shovelTool.Kilograms > 0f || shovelTool.IsBusy);
         if (staminaManager != null) staminaManager.Tick(isCarrying, Time.deltaTime, recoveryBlocked);
     }
@@ -175,6 +183,27 @@ public class PlayerController : MonoBehaviour
         cameraRotationX = smoothedPitch = Mathf.DeltaAngle(0, characterCamera.transform.localEulerAngles.x);
         verticalVelocity = 0;
         sprintCameraBlend = sprintCameraPhase = 0;
+    }
+
+    public bool ToggleShovel()
+    {
+        if (!isActiveAndEnabled || shovelTool == null || Time.timeScale <= 0f || UIPopups.BasePopupUI.HasActivePopup ||
+            (characterController != null && !characterController.enabled) ||
+            (bicycleInteraction != null && bicycleInteraction.IsRiding) ||
+            (interactor != null && interactor.PushedWheelbarrow != null)) return false;
+
+        bool equip = IsCarrying || !IsShovelEquipped;
+        if (equip)
+        {
+            if (bagInteraction != null && bagInteraction.IsCarrying && !bagInteraction.TryInteract()) return false;
+            if (interactor != null && interactor.Items != null && interactor.Items.IsCarrying &&
+                !interactor.Items.TryPlace()) return false;
+            if (combatTools != null && !combatTools.TryEquip(PlayerCombatTools.Tool.Shovel)) return false;
+        }
+        if (!equip) shovelTool.CancelAction();
+        if (heldInstrument != null) heldInstrument.gameObject.SetActive(equip);
+        shovelTool.enabled = equip;
+        return true;
     }
 
     public void ClearSprintCameraMotion()
@@ -278,7 +307,7 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (heldInstrument == null || Time.deltaTime <= 0f || (bagInteraction != null && bagInteraction.IsCarrying))
+        if (heldInstrument == null || Time.deltaTime <= 0f || IsCarrying)
             return;
 
         idleTime += Time.deltaTime * idleFrequency * Mathf.PI * 2f;
