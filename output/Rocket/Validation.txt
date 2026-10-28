@@ -1,0 +1,10 @@
+Rocket Modular prefab
+Assets/Models/Rocket Modular/Rocket Modular.prefab
+
+Separate Entrance Door (vertical hinge pivot), Entrance Stairs (landing pivot), Hull, and Interior Devices. Original source FBX preserved. The saved Last Scene contains the modular prefab under the original rocket transform; the original renderer is disabled for rollback.
+
+Interior: navigation, engine and power consoles; 512x256 emissive telemetry texture; cyan/amber indicators; cabin wall strips, floor, ceiling and two fill lights. Device controls are decorative; no interaction or door animation system was requested.
+
+Validation: separate objects and pivots; doorway ray passes the front hull; zero missing meshes/materials; HDRP emission texture and keyword assigned; interior rendered and visually checked. 11,482 mesh triangles including cabin devices. Existing project compiler warnings remain; no current Console errors. Last Scene prefab reference verified after the user switched the Editor to Gameplay.
+
+Open the prefab to edit. Rotate Entrance Door about local Y to open it (110 degrees used in the preview). Preview: output/Rocket/Interior.png. Blender source: output/Rocket/Rocket separated.blend. Before-scene backup: output/Rocket/Before.unity.

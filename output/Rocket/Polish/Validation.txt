@@ -1,0 +1,8 @@
+Cabin polish validation
+
+Confirmed bright geometry source by A/B capture: disabling only Hull removed the bright patches. Radial mesh probes showed the hull narrowing to 0.835m at floor level while the old lining had a fixed 1.3m radius.
+Replaced the straight liner with a tapered inner shell, matching floor and an open entrance. 432 vertex/ray samples: no lining vertices outside the hull, minimum measured clearance 0.066m at prefab scale. Both the saved prefab instance and the existing full-size preview use the new mesh.
+Added cabin panel albedo, metal mask and deck tread textures. Darkened trim and reduced smoothness, screen emission, status emission and preview fill light intensity. Kept controls readable. Before/after captures visually inspected.
+Corrected a temporary material property type error during authoring by removing the invalid _SpecularColor setter from the authoring script; verified no erroneous float entry was persisted. Existing Sack_Body read-access error is unrelated to this change. No player build was run.
+Updated saved prefab and Last Scene. Preserved the user's full-size preview copy and restored its camera view after captures.
+
