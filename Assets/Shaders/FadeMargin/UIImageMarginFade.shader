@@ -7,6 +7,9 @@ Shader "UI/Image Margin Fade"
         _FadeColor ("Fade Color", Color) = (0,0,0,0)
         _Saturation ("Saturation", Range(0, 1)) = 1
         _RoundCorners ("Round Corners", Range(0, 1)) = 0
+        [Toggle] _Outline ("Outline", Float) = 0
+        _OutlineThickness ("Outline Thickness (Pixels)", Range(0, 32)) = 2
+        _OutlineColor ("Outline Color", Color) = (0,0,0,1)
         _FadeLeftSize ("Left Fade Size", Range(0, 1)) = 0.1
         _FadeLeftSoftness ("Left Softness", Range(0, 1)) = 1
         _FadeRightSize ("Right Fade Size", Range(0, 1)) = 0.1
@@ -116,6 +119,9 @@ Shader "UI/Image Margin Fade"
             float4 _NoiseTex_ST;
             fixed4 _Color;
             fixed4 _FadeColor;
+            fixed4 _OutlineColor;
+            half _Outline;
+            float _OutlineThickness;
             fixed4 _TextureSampleAdd;
             float4 _ClipRect;
             float4 _NoiseOffset;
@@ -184,11 +190,8 @@ Shader "UI/Image Margin Fade"
                 return lerp(luma.xxx, rgb, saturate(saturation));
             }
 
-            half RoundedCornersMask(float2 uv)
+            float RoundedCornersDistance(float2 uv)
             {
-                if (_RoundCorners <= 0.0)
-                    return 1.0;
-
                 // Convert the UV rectangle into screen-pixel units so a non-square
                 // Image still has circular corner arcs instead of stretched ellipses.
                 float2 uvDx = ddx(uv);
@@ -198,7 +201,14 @@ Shader "UI/Image Margin Fade"
                 float radius = saturate(_RoundCorners) * min(halfSize.x, halfSize.y);
                 float2 position = (uv - 0.5) / uvPerPixel;
                 float2 corner = abs(position) - (halfSize - radius);
-                float distance = length(max(corner, 0.0)) + min(max(corner.x, corner.y), 0.0) - radius;
+                return length(max(corner, 0.0)) + min(max(corner.x, corner.y), 0.0) - radius;
+            }
+
+            half RoundedCornersMask(float2 uv)
+            {
+                if (_RoundCorners <= 0.0)
+                    return 1.0;
+                float distance = RoundedCornersDistance(uv);
                 float antialias = max(fwidth(distance), 0.0001);
                 return saturate(0.5 - distance / antialias);
             }
@@ -211,7 +221,7 @@ Shader "UI/Image Margin Fade"
                 noiseUV = noiseUV * _NoiseTex_ST.xy + _NoiseTex_ST.zw + _NoiseOffset.xy;
 
                 #if defined(_ANIMATE_PAINTED_EDGE_NOISE)
-                noiseUV += _Time.y * _NoiseAnimationDirection.xy * _NoiseAnimationSpeed;
+                if (_Outline <= 0.5) noiseUV += _Time.y * _NoiseAnimationDirection.xy * _NoiseAnimationSpeed;
                 #endif
 
                 half noise = tex2D(_NoiseTex, noiseUV).r * 2.0 - 1.0;
@@ -221,7 +231,7 @@ Shader "UI/Image Margin Fade"
                 secondaryUV = secondaryUV * _NoiseTex_ST.xy + _NoiseTex_ST.zw + _NoiseOffset.xy;
 
                 #if defined(_ANIMATE_PAINTED_EDGE_NOISE)
-                secondaryUV += _Time.y * _SecondaryNoiseSpeed.xy;
+                if (_Outline <= 0.5) secondaryUV += _Time.y * _SecondaryNoiseSpeed.xy;
                 #endif
 
                 half secondaryNoise = tex2D(_NoiseTex, secondaryUV).r * 2.0 - 1.0;
@@ -234,10 +244,39 @@ Shader "UI/Image Margin Fade"
                 #endif
             }
 
+            float NoisyRoundedCornersDistance(float2 uv, float2 noisePosition)
+            {
+                float distance = RoundedCornersDistance(uv);
+                #if defined(_USE_PAINTED_EDGE_NOISE)
+                if (_RoundCorners > 0.0 && _NoiseStrength > 0.0)
+                {
+                    float2 uvPerPixel = max(sqrt(ddx(uv) * ddx(uv) + ddy(uv) * ddy(uv)), float2(0.000001, 0.000001));
+                    float2 halfSize = 0.5 / uvPerPixel;
+                    float radius = saturate(_RoundCorners) * min(halfSize.x, halfSize.y);
+                    float2 position = (uv - 0.5) / uvPerPixel;
+                    float2 corner = max(abs(position) - (halfSize - radius), 0.0);
+                    float cornerLength = length(corner);
+                    float2 normal = corner / max(cornerLength, 0.0001);
+                    // Blend to zero where each arc joins a straight side.
+                    float arcWeight = smoothstep(0.0, 0.2, min(normal.x, normal.y));
+                    float2 localUnitsPerPixel = fwidth(noisePosition) / max(fwidth(uv), float2(0.000001, 0.000001)) * uvPerPixel;
+                    // Project onto the original arc: noise stays constant along its
+                    // inward normal, preserving a continuous tear without interior holes.
+                    float2 contourPosition = noisePosition + sign(position) * normal * (radius - cornerLength) * localUnitsPerPixel;
+                    if (_TornPaper > 0.5) contourPosition /= max(_TornPaperStretch, 0.1);
+                    half noise = SamplePaintedNoise(contourPosition);
+                    float roughness = saturate(_NoiseStrength) * (_TornPaper > 0.5 ? saturate(_TornPaperRoughness) : 1.0);
+                    // Cut inward so the noisy arc remains inside the Image geometry.
+                    distance += (0.5 + 0.5 * noise) * min(radius * 0.25, 16.0) * roughness * arcWeight;
+                }
+                #endif
+                return distance;
+            }
+
             half EdgePhase(half edgeIndex)
             {
                 #if defined(_ANIMATE_PAINTED_EDGE_NOISE)
-                return edgeIndex * saturate(_IndependentEdgeAnimation) * _EdgeVariation;
+                return _Outline > 0.5 ? 0.0 : edgeIndex * saturate(_IndependentEdgeAnimation) * _EdgeVariation;
                 #else
                 return 0.0;
                 #endif
@@ -247,7 +286,7 @@ Shader "UI/Image Margin Fade"
             {
                 #if defined(_ANIMATE_PAINTED_EDGE_NOISE)
                 half phase = EdgePhase(edgeIndex);
-                return sin((_Time.y * _NoisePulseSpeed + phase) * 6.2831853) * _NoisePulseAmount;
+                return _Outline > 0.5 ? 0.0 : sin((_Time.y * _NoisePulseSpeed + phase) * 6.2831853) * _NoisePulseAmount;
                 #else
                 return 0.0;
                 #endif
@@ -257,7 +296,7 @@ Shader "UI/Image Margin Fade"
             {
                 #if defined(_ANIMATE_PAINTED_EDGE_NOISE)
                 half phase = EdgePhase(edgeIndex) * 1.618;
-                return sin((_Time.y * _FadeWaveSpeed + phase) * 6.2831853) * _FadeWaveAmount;
+                return _Outline > 0.5 ? 0.0 : sin((_Time.y * _FadeWaveSpeed + phase) * 6.2831853) * _FadeWaveAmount;
                 #else
                 return 0.0;
                 #endif
@@ -343,7 +382,29 @@ Shader "UI/Image Margin Fade"
                 // alpha 0 fades margins to transparent, alpha 1 keeps the sprite alpha and tints to _FadeColor.
                 fixed4 fadeTarget = fixed4(_FadeColor.rgb, color.a * _FadeColor.a);
                 color = lerp(color, fadeTarget, edgeFade);
-                color.a *= RoundedCornersMask(IN.texcoord);
+                float roundedDistance = NoisyRoundedCornersDistance(IN.texcoord, IN.noisePosition);
+                float roundedAntialias = max(fwidth(roundedDistance), 0.0001);
+                half roundedMask = saturate(0.5 - roundedDistance / roundedAntialias);
+                if (_RoundCorners > 0.0) color.a *= roundedMask;
+
+                if (_Outline > 0.5 && _OutlineThickness > 0.0)
+                {
+                    // Erode the same four noisy boundaries; reuse their tangent samples
+                    // so the inner contour follows Torn Paper instead of a rectangle.
+                    float2 uvDx = ddx(IN.texcoord);
+                    float2 uvDy = ddy(IN.texcoord);
+                    float2 inset = _OutlineThickness * sqrt(uvDx * uvDx + uvDy * uvDy);
+                    half innerLeft = EdgeFade(uv.x - inset.x, _FadeLeftSize, _FadeLeftSoftness, leftNoise, 0.0);
+                    half innerRight = EdgeFade(1.0 - uv.x - inset.x, _FadeRightSize, _FadeRightSoftness, rightNoise, 1.0);
+                    half innerBottom = EdgeFade(uv.y - inset.y, _FadeBottomSize, _FadeBottomSoftness, bottomNoise, 2.0);
+                    half innerTop = EdgeFade(1.0 - uv.y - inset.y, _FadeTopSize, _FadeTopSoftness, topNoise, 3.0);
+                    half innerFade = max(max(innerLeft, innerRight), max(innerTop, innerBottom));
+                    half outerShape = roundedMask;
+                    half innerShape = saturate(0.5 - (roundedDistance + _OutlineThickness) / roundedAntialias);
+                    half outlineMask = saturate((1.0 - edgeFade) * outerShape - (1.0 - innerFade) * innerShape);
+                    // Preserve sprite transparency and the UI tint/CanvasGroup opacity.
+                    color.rgb = lerp(color.rgb, _OutlineColor.rgb, outlineMask * _OutlineColor.a);
+                }
 
                 #ifdef UNITY_UI_CLIP_RECT
                 half2 maskSoftness = saturate(

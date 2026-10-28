@@ -13,6 +13,7 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
 
         DrawMainProperties(materialEditor, properties);
         DrawEdgeProperties(materialEditor, properties);
+        DrawOutlineProperties(materialEditor, properties);
         DrawNoiseProperties(materialEditor, properties);
         DrawUIProperties(materialEditor, properties);
 
@@ -62,6 +63,26 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
         EndSection();
     }
 
+    private static void DrawOutlineProperties(MaterialEditor materialEditor, MaterialProperty[] properties)
+    {
+        BeginSection("Outline", "An inward outline following the margin fade, rounded corners, and Torn Paper contour. Mutually exclusive with Noise Animation.");
+        MaterialProperty outline = FindOptionalProperty("_Outline", properties);
+        EditorGUI.BeginChangeCheck();
+        DrawProperty(materialEditor, outline);
+        if (EditorGUI.EndChangeCheck() && outline != null && outline.floatValue > 0.5f)
+        {
+            MaterialProperty animation = FindOptionalProperty("_AnimateNoise", properties);
+            if (animation != null) animation.floatValue = 0f;
+        }
+        if (outline != null && (outline.hasMixedValue || outline.floatValue > 0.5f))
+        {
+            DrawProperty(materialEditor, properties, "_OutlineThickness");
+            DrawProperty(materialEditor, properties, "_OutlineColor");
+            EditorGUILayout.HelpBox("Disable Outline to enable Noise Animation. Static noise and Torn Paper remain available.", MessageType.Info);
+        }
+        EndSection();
+    }
+
     private static void DrawNoiseProperties(MaterialEditor materialEditor, MaterialProperty[] properties)
     {
         BeginSection("Painted Noise", "Adds brush-like irregularity to the fade boundary so the edges do not look perfectly rectangular.");
@@ -93,9 +114,12 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
         BeginSection("Noise Animation", "Moves and pulses the painted noise over time for a subtle living-edge reveal effect.");
 
         MaterialProperty animateNoise = FindOptionalProperty("_AnimateNoise", properties);
-        DrawProperty(materialEditor, animateNoise);
+        MaterialProperty outline = FindOptionalProperty("_Outline", properties);
+        bool outlineEnabled = outline != null && (outline.hasMixedValue || outline.floatValue > 0.5f);
+        using (new EditorGUI.DisabledScope(outlineEnabled))
+            DrawProperty(materialEditor, animateNoise);
 
-        if (animateNoise != null && (animateNoise.hasMixedValue || animateNoise.floatValue > 0.5f))
+        if (!outlineEnabled && animateNoise != null && (animateNoise.hasMixedValue || animateNoise.floatValue > 0.5f))
         {
             DrawVector2Property(properties, "_NoiseAnimationDirection");
             DrawProperty(materialEditor, properties, "_NoiseAnimationSpeed");
@@ -202,10 +226,16 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
                 return "Target color at the faded margins. Alpha 0 fades to transparent; alpha 1 fades to this visible color.";
             case "_Saturation":
                 return "Controls sprite color intensity. 0 makes the image black and white; 1 keeps full original color.";
+            case "_Outline":
+                return "Enables an inward contour following the faded edges and Torn Paper. Disables Noise Animation.";
+            case "_OutlineThickness":
+                return "Outline width in screen pixels, drawn inward so it fits inside the UI Image.";
+            case "_OutlineColor":
+                return "Outline color and blend opacity. Preserves sprite, Image, and CanvasGroup transparency.";
             case "_FadeLeftSize":
                 return "Width of the left fade band in normalized sprite UVs. Set to 0 to disable the left fade.";
             case "_RoundCorners":
-                return "Rounds all four corners with a smooth transparent edge. 0 keeps square corners; 1 uses half the shorter side as the radius (a capsule on rectangular Images).";
+                return "Rounds all four corners. Use Noise adds irregularity to the arcs, controlled by Noise Strength and Torn Paper settings; Outline follows the same contour. 0 keeps square corners; 1 uses half the shorter side as the radius.";
             case "_FadeLeftSoftness":
                 return "Smoothness of the left fade transition. Higher values spread the fade more softly.";
             case "_FadeRightSize":
@@ -296,8 +326,10 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
 
     private static void UpdateKeywords(Material material)
     {
+        if (IsEnabled(material, "_Outline") && IsEnabled(material, "_AnimateNoise"))
+            material.SetFloat("_AnimateNoise", 0f);
         SetKeyword(material, UseNoiseKeyword, IsEnabled(material, "_UseNoise"));
-        SetKeyword(material, AnimateNoiseKeyword, IsEnabled(material, "_AnimateNoise"));
+        SetKeyword(material, AnimateNoiseKeyword, IsEnabled(material, "_AnimateNoise") && !IsEnabled(material, "_Outline"));
         SetKeyword(material, SecondaryNoiseKeyword, IsEnabled(material, "_UseSecondaryNoise"));
     }
 
