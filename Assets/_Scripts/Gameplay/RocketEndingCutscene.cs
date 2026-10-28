@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
+using TMPro;
 
 /// <summary>Scene-owned cinematic. Runtime staging is removed and authored state restored on cancellation.</summary>
 [DefaultExecutionOrder(-300)]
@@ -17,6 +18,11 @@ public sealed class RocketEndingCutscene : MonoBehaviour
     [Header("Seconds")]
     [SerializeField] private float cabinSeconds = 6.5f, pullbackSeconds = 6f, fleetSeconds = 8f, sunSeconds = 7f;
     [SerializeField] private float openingFadeSeconds = 1.6f;
+    [Header("Ending card")]
+    [SerializeField, Min(0)] private float finalSunHoldSeconds = 1f;
+    [SerializeField, Min(.1f)] private float finalFadeSeconds = 1.5f;
+    [SerializeField, Min(.1f)] private float endingTextFadeSeconds = .8f;
+    [SerializeField, Min(0)] private float friendsTextDelaySeconds = 2f;
     [Header("Flight")]
     [SerializeField, Range(1,16)] private int companionCount = 8;
     [SerializeField] private float rocketScale = .9f, flightSpeed = 4f;
@@ -31,6 +37,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
     private Transform hero;
     private Canvas overlay;
     private Image black;
+    private TextMeshProUGUI continuedText, friendsText;
     private Transform sunDisc;
     private Material sunMaterial;
     private VolumeProfile transitionProfile;
@@ -126,11 +133,26 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         discRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         var fadeObject = new GameObject("Ending fade", typeof(Canvas)); fadeObject.transform.SetParent(staging.transform);
         overlay = fadeObject.GetComponent<Canvas>(); overlay.renderMode = RenderMode.ScreenSpaceOverlay; overlay.sortingOrder = 32760;
+        var scaler = fadeObject.AddComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920,1080); scaler.matchWidthOrHeight = .5f;
         var panel = new GameObject("Black", typeof(RectTransform), typeof(Image)); panel.transform.SetParent(fadeObject.transform,false);
         black = panel.GetComponent<Image>(); black.color = Color.black; black.raycastTarget = false;
         black.rectTransform.anchorMin = Vector2.zero; black.rectTransform.anchorMax = Vector2.one;
         black.rectTransform.offsetMin = black.rectTransform.offsetMax = Vector2.zero;
+        continuedText = CreateEndingText("TO BE CONTINUED...", 64, 44);
+        friendsText = CreateEndingText("CALL YOUR FRIENDS", 36, -52);
         HideHud(); Evaluate(0); HDCamera.GetOrCreate(view).Reset(); return true;
+    }
+    private TextMeshProUGUI CreateEndingText(string message, float size, float verticalOffset)
+    {
+        var go = new GameObject(message,typeof(RectTransform)); go.transform.SetParent(overlay.transform,false);
+        var text = go.AddComponent<TextMeshProUGUI>(); text.text = message;
+        text.fontSize = size; text.alignment = TextAlignmentOptions.Center; text.characterSpacing = 3;
+        text.color = new Color(1,1,1,0); text.raycastTarget = false;
+        var rect = text.rectTransform; rect.anchorMin = new Vector2(.08f,.5f); rect.anchorMax = new Vector2(.92f,.5f);
+        rect.sizeDelta = new Vector2(0,100); rect.anchoredPosition = new Vector2(0,verticalOffset);
+        text.enableAutoSizing = true; text.fontSizeMin = size*.55f; text.fontSizeMax = size;
+        return text;
     }
     private Transform Spawn(GameObject prefab,string name,Vector3 position,bool interior)
     {
@@ -275,7 +297,17 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         float decelerate = 1-Mathf.Pow(1-u,3);
         var sunLook = Quaternion.LookRotation(-sun.transform.forward,Vector3.up);
         view.transform.SetPositionAndRotation(Vector3.Lerp(finalCameraStart,finalCameraEnd,decelerate),Quaternion.Slerp(sunStartRotation,sunLook,Smooth(u)));
-        if (u >= 1) { Completed = true; CurrentShot = "Complete: sun hold"; }
+        if (u >= 1)
+        {
+            float endingTime = time-cabinSeconds-pullbackSeconds-fleetSeconds-sunSeconds-finalSunHoldSeconds;
+            black.color = new Color(0,0,0,Smooth(endingTime/finalFadeSeconds));
+            float titleTime = endingTime-finalFadeSeconds;
+            continuedText.alpha = Smooth(titleTime/endingTextFadeSeconds);
+            friendsText.alpha = Smooth((titleTime-friendsTextDelaySeconds)/endingTextFadeSeconds);
+            CurrentShot = endingTime < 0 ? "Final: sun hold" : "Final: ending card";
+            if (titleTime >= friendsTextDelaySeconds+endingTextFadeSeconds)
+            { Completed = true; CurrentShot = "Complete: to be continued"; }
+        }
     }
     public void Cancel()
     {
