@@ -23,6 +23,10 @@ public sealed class ShovelTool : MonoBehaviour
     [SerializeField] private LayerMask interactionMask = ~0;
     private readonly RaycastHit[] hits = new RaycastHit[32];
     private GrainPile pendingPile;
+    private bool dropping;
+    private Collider dropSurface;
+    private bool smallPileScoop;
+    private bool dropCommitted;
     private GrainContainer pendingContainer;
     private Vector3 targetPoint, restPosition, tipInHands, gripInHands;
     private Vector3 scoopDirection, scoopTipInParent;
@@ -70,7 +74,7 @@ public sealed class ShovelTool : MonoBehaviour
         if (IsBusy) { queued = true; return true; }
         actionCamera = camera;
         actor = player;
-        pendingPile = null; pendingContainer = null;
+        pendingPile = null; pendingContainer = null; smallPileScoop = false;
         Vector3 restTip = transform.parent.TransformPoint(restPosition + restRotation * tipInHands);
         targetPoint = restTip + camera.transform.forward * .38f - Vector3.up * .06f;
         if (FindHit(camera, player, out RaycastHit hit))
@@ -78,6 +82,18 @@ public sealed class ShovelTool : MonoBehaviour
             targetPoint = hit.point;
             var pile = hit.collider.GetComponentInParent<GrainPile>();
             var container = hit.collider.GetComponentInParent<GrainContainer>();
+            Vector3 scoopPoint = hit.point;
+            if (pile == null && container == null && hit.normal.y > .65f && hit.collider.attachedRigidbody == null)
+            {
+                float nearest = .45f;
+                foreach (var candidate in FindObjectsByType<GrainPile>(FindObjectsSortMode.None))
+                {
+                    if (candidate.Size * Mathf.Max(candidate.WorldScale.x, candidate.WorldScale.z) > 2f ||
+                        !candidate.TryNearestSurface(hit.point, nearest, out var point) ||
+                        !CanReachPoint(camera, player, point, reach, candidate.GetComponent<Collider>())) continue;
+                    nearest = Vector3.Distance(hit.point, point); pile = candidate; scoopPoint = point;
+                }
+            }
             if (container != null && container.IsOpen && container.isActiveAndEnabled &&
                 !container.IsClosing && !container.IsCarried && Kilograms > .0001f)
             {
@@ -86,10 +102,11 @@ public sealed class ShovelTool : MonoBehaviour
                 if (grainPhysics != null) grainPhysics.SetPourTarget(container.PourPoint, container.GetComponent<Collider>());
             }
             else if (pile != null && pile.isActiveAndEnabled && Kilograms < capacityKg - .0001f &&
-                pile.IsInsideBoundary(hit.point))
+                pile.IsInsideBoundary(scoopPoint))
             {
                 pendingPile = pile;
-                targetPoint = hit.point;
+                targetPoint = scoopPoint;
+                smallPileScoop = pile.Size * Mathf.Max(pile.WorldScale.x, pile.WorldScale.z) <= 2f;
                 targetPoint.y = pile.SurfaceHeight(targetPoint);
                 scoopDirection = Vector3.ProjectOnPlane(camera.transform.forward, Vector3.up).normalized;
                 if (scoopDirection.sqrMagnitude < .001f) scoopDirection = player.forward;
@@ -103,9 +120,86 @@ public sealed class ShovelTool : MonoBehaviour
         return true;
     }
 
+    public bool TryDrop(Camera camera, Transform player)
+    {
+        if (IsBusy || Kilograms <= .0001f || !isActiveAndEnabled || camera == null || player == null ||
+            bladeTip == null || transform.parent == null || Time.timeScale <= 0) return false;
+        if (!FindDropHit(camera, player, out RaycastHit hit) || hit.normal.y < .65f ||
+            hit.collider.GetComponentInParent<GrainContainer>() != null || hit.collider.attachedRigidbody != null) return false;
+        actionCamera = camera; actor = player;
+        pendingPile = null; pendingContainer = null;
+        targetPoint = hit.point; dropSurface = hit.collider;
+        dropping = true; dropCommitted = false; queued = false;
+        elapsed = transferredFraction = 0; availableAtStart = Kilograms;
+        if (grainPhysics != null) grainPhysics.SetPourTarget(targetPoint, hit.collider);
+        IsBusy = true;
+        return true;
+    }
+
+    private void CommitDrop()
+    {
+        if (dropSurface == null || !dropSurface.enabled || !dropSurface.gameObject.activeInHierarchy ||
+            !CanReachPoint(actionCamera, actor, targetPoint, pourReach, dropSurface)) return;
+        GrainPile receiver = dropSurface.GetComponentInParent<GrainPile>();
+        GrainPile source = receiver;
+        Vector3 point = targetPoint;
+        if (receiver == null)
+        {
+            float nearest = .45f;
+            foreach (var pile in FindObjectsByType<GrainPile>(FindObjectsSortMode.None))
+            {
+                if (source == null) source = pile;
+                if (!pile.TryNearestSurface(point, nearest, out Vector3 surface)) continue;
+                if (Physics.Linecast(point + Vector3.up * .08f, surface + Vector3.up * .08f, out var obstruction,
+                    interactionMask, QueryTriggerInteraction.Ignore) && obstruction.collider.GetComponentInParent<GrainPile>() != pile) continue;
+                nearest = Vector3.Distance(point, surface); receiver = pile; targetPoint = surface;
+            }
+            if (receiver != null) point = targetPoint;
+        }
+        bool created = receiver == null;
+        if (created)
+        {
+            if (source == null) return; // Keep cargo if no grain rendering assets are available.
+            receiver = GrainPile.CreateDroppedPile(point, source);
+        }
+        if (grainPhysics != null) grainPhysics.SetPourGrain(cargo.Dominant);
+        if (!receiver.Deposit(point, cargo) && created) Destroy(receiver.gameObject);
+        if (grainPhysics != null) grainPhysics.SetFill(Kilograms / capacityKg);
+    }
+
+    private bool CanReachPoint(Camera camera, Transform player, Vector3 point, float distance, Collider receiver)
+    {
+        Vector3 delta = point + Vector3.up * .025f - camera.transform.position;
+        if (delta.magnitude > distance) return false;
+        int count = Physics.RaycastNonAlloc(camera.transform.position, delta.normalized, hits, delta.magnitude,
+            interactionMask, QueryTriggerInteraction.Ignore);
+        if (count == hits.Length) return false;
+        for (int i = 0; i < count; i++)
+            if (!hits[i].transform.IsChildOf(player) && hits[i].collider != receiver) return false;
+        return true;
+    }
+
+    private bool FindDropHit(Camera camera, Transform player, out RaycastHit hit)
+    {
+        // Ground pouring gets the same reach as bag pouring.
+        if (FindHit(camera, player, out hit, true)) return true;
+        // Looking ahead: pour onto the ground a short distance in front of the player.
+        Vector3 forward = Vector3.ProjectOnPlane(camera.transform.forward, Vector3.up).normalized;
+        Vector3 origin = camera.transform.position + forward * 1.1f;
+        int count = Physics.RaycastNonAlloc(origin, Vector3.down, hits, pourReach, interactionMask, QueryTriggerInteraction.Ignore);
+        float nearest = float.PositiveInfinity;
+        for (int i = 0; i < count; i++)
+        {
+            if (hits[i].transform.IsChildOf(player) || hits[i].distance >= nearest) continue;
+            nearest = hits[i].distance; hit = hits[i];
+        }
+        return count < hits.Length && nearest < float.PositiveInfinity &&
+            CanReachPoint(camera, player, hit.point, pourReach, hit.collider);
+    }
+
     private void OnEnable() => GoalContext.ReportValue(this, GoalType.ShovelEquipped, 1f);
 
-    private bool FindHit(Camera camera, Transform player, out RaycastHit nearest)
+    private bool FindHit(Camera camera, Transform player, out RaycastHit nearest, bool groundPour = false)
     {
         nearest = default;
         float queryReach = Kilograms > .0001f ? Mathf.Max(reach, pourReach) : reach;
@@ -121,7 +215,7 @@ public sealed class ShovelTool : MonoBehaviour
         }
         if (distance == float.PositiveInfinity) return false;
         // Resolve the nearest obstruction first; the longer range applies only to containers.
-        return distance <= reach || nearest.collider.GetComponentInParent<GrainContainer>() != null;
+        return groundPour || distance <= reach || nearest.collider.GetComponentInParent<GrainContainer>() != null;
     }
 
     public GrainContainer FindBagForHandling(Camera camera, Transform player)
@@ -155,15 +249,24 @@ public sealed class ShovelTool : MonoBehaviour
         UpdatePose(phase);
         float fraction = Mathf.SmoothStep(0, 1, pendingPile != null
             ? Mathf.InverseLerp(.38f, .56f, phase) : Mathf.InverseLerp(.32f, .67f, phase));
+        if (dropping)
+        {
+            if (!dropCommitted && phase >= .48f) { dropCommitted = true; CommitDrop(); }
+            if (phase >= 1f) CancelAction();
+            return;
+        }
         float amount = (fraction - transferredFraction) * availableAtStart;
         if (pendingPile == null) transferredFraction = fraction;
-        if (amount > 0 && actionCamera != null && actor != null && FindHit(actionCamera, actor, out RaycastHit hit))
+        RaycastHit hit = default;
+        bool scrapeTarget = smallPileScoop && pendingPile != null && pendingPile.isActiveAndEnabled &&
+            CanReachPoint(actionCamera, actor, targetPoint, reach, pendingPile.GetComponent<Collider>());
+        if (amount > 0 && actionCamera != null && actor != null && (scrapeTarget || FindHit(actionCamera, actor, out hit)))
         {
-            if (pendingPile != null && phase <= .58f && hit.collider.GetComponentInParent<GrainPile>() == pendingPile && HasScoopContact())
+            if (pendingPile != null && phase <= .58f && (scrapeTarget || (hit.collider.GetComponentInParent<GrainPile>() == pendingPile && HasScoopContact())))
             {
                 Vector3 point = targetPoint; point.y = pendingPile.SurfaceHeight(point);
                 scoopCargo.Clear();
-                float collected = pendingPile.Scoop(point, scoopRadius, scoopDepth, Mathf.Min(amount, capacityKg - Kilograms), scoopCargo);
+                float collected = pendingPile.Scoop(point, smallPileScoop ? Mathf.Max(.65f, scoopRadius) : scoopRadius, smallPileScoop ? Mathf.Max(.3f, scoopDepth) : scoopDepth, Mathf.Min(amount, capacityKg - Kilograms), scoopCargo);
                 GoalContext.Resolve(pendingPile, out int hangar, out _);
                 for (int type = 0; type < GrainCargo.TypeCount; type++)
                 {
@@ -212,9 +315,9 @@ public sealed class ShovelTool : MonoBehaviour
         Quaternion ra, rb;
         float t;
         Quaternion windup = Quaternion.Euler(-9, -3, 7);
-        Quaternion insert = pendingContainer != null ? Quaternion.Euler(-8, -5, -15) : Quaternion.Euler(8, 3, -7);
-        Quaternion lift = pendingContainer != null ? Quaternion.Euler(-15, -8, -25) : Quaternion.Euler(-15, -4, 5);
-        if (pendingContainer != null)
+        Quaternion insert = (pendingContainer != null || dropping) ? Quaternion.Euler(-8, -5, -15) : Quaternion.Euler(8, 3, -7);
+        Quaternion lift = (pendingContainer != null || dropping) ? Quaternion.Euler(-15, -8, -25) : Quaternion.Euler(-15, -4, 5);
+        if (pendingContainer != null || dropping)
         {
             // Raise the blade over a tall/full rim by turning at the grip, rather than
             // translating the entire shovel forward or firing grain through the sack wall.
@@ -230,9 +333,9 @@ public sealed class ShovelTool : MonoBehaviour
         else if (phase < .38f)
         { a = restTip + new Vector3(.025f, .055f, -.1f); b = contact; ra = windup; rb = insert; t = (phase - .16f) / .22f; }
         else if (phase < .68f)
-        { a = contact; b = pendingContainer != null ? contact : lifted; ra = insert; rb = lift; t = (phase - .38f) / .3f; }
+        { a = contact; b = (pendingContainer != null || dropping) ? contact : lifted; ra = insert; rb = lift; t = (phase - .38f) / .3f; }
         else
-        { a = pendingContainer != null ? contact : lifted; b = restTip; ra = lift; rb = Quaternion.identity; t = (phase - .68f) / .32f; }
+        { a = (pendingContainer != null || dropping) ? contact : lifted; b = restTip; ra = lift; rb = Quaternion.identity; t = (phase - .68f) / .32f; }
         t = Mathf.SmoothStep(0, 1, t);
         RotationOffset = Quaternion.Slerp(ra, rb, t);
         // Aim selects the interaction, but cannot pull the handle out of the player's hands.
@@ -302,7 +405,7 @@ public sealed class ShovelTool : MonoBehaviour
         out Vector3 offset, out Quaternion rotation)
     {
         bool preparingLoad = pendingPile != null && ActionProgress > .2f;
-        float target = pendingContainer == null && (Kilograms > .0001f || preparingLoad) ? 1f : 0f;
+        float target = !dropping && pendingContainer == null && (Kilograms > .0001f || preparingLoad) ? 1f : 0f;
         carryBlend = Mathf.MoveTowards(carryBlend, target, dt * 6f);
         Quaternion action = IsBusy ? RotationOffset : Quaternion.identity;
         float swayScale = Mathf.Lerp(1f, .3f, carryBlend);
@@ -328,7 +431,7 @@ public sealed class ShovelTool : MonoBehaviour
         if (shaft.sqrMagnitude < .0001f || transform.parent == null) return rotation;
         Quaternion frame = transform.parent.rotation * restRotation;
         Vector3 direction = (frame * rotation * shaft).normalized;
-        float limit = pendingContainer != null ? maximumPourDownwardTilt : maximumDownwardTilt;
+        float limit = (pendingContainer != null || dropping) ? maximumPourDownwardTilt : maximumDownwardTilt;
         float elevation = Mathf.Asin(Mathf.Clamp(direction.y, -1f, 1f)) * Mathf.Rad2Deg;
         float limitedElevation = Mathf.Clamp(elevation, -limit, maximumUpwardTilt);
         if (Mathf.Abs(elevation - limitedElevation) < .0001f) return rotation;
@@ -344,7 +447,8 @@ public sealed class ShovelTool : MonoBehaviour
 
     public void CancelAction()
     {
-        IsBusy = queued = false;
+        IsBusy = queued = dropping = smallPileScoop = false;
+        dropSurface = null;
         pendingPile = null; pendingContainer = null;
         PositionOffset = Vector3.zero;
         RotationOffset = Quaternion.identity;

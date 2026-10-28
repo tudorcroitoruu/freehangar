@@ -195,6 +195,11 @@ public sealed class GrainSpatialField
             stack[0] = new Segment(a.volume + b.volume, mix); stack.RemoveAt(1);
         }
     }
+    public void Deposit(int cell, double volume, float[] weights)
+    {
+        Push(cell, volume, weights);
+        dirty = true;
+    }
     public double VolumeOf(GrainType grain)
     {
         double sum = 0; foreach (var column in columns) foreach (var layer in column) sum += layer.volume * layer.weights[(int)grain]; return sum;

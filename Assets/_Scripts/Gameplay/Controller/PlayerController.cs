@@ -167,7 +167,9 @@ public class PlayerController : MonoBehaviour
             else
             {
                 // The first click after Escape only captures the mouse.
-                if (wasLocked && Input.GetMouseButtonDown(0))
+                if (wasLocked && Input.GetMouseButtonDown(1))
+                    shovelTool.TryDrop(characterCamera, transform);
+                else if (wasLocked && Input.GetMouseButtonDown(0))
                     shovelTool.TryUse(characterCamera, transform);
                 shovelTool.Tick(Time.deltaTime);
             }

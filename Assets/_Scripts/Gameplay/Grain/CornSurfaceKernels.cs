@@ -45,6 +45,13 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     public int KernelCount { get; private set; }
 
+    public void CopyAppearanceFrom(CornSurfaceKernels source)
+    {
+        kernelMesh = source.kernelMesh; kernelMaterial = source.kernelMaterial;
+        colorVariants = source.colorVariants; spacing = source.spacing;
+        pile = GetComponent<GrainPile>();
+    }
+
     private void OnEnable()
     {
         // Unity hot reload can restore flat arrays but not jagged draw batches. Rebuild them together.

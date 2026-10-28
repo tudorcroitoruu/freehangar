@@ -181,7 +181,7 @@ public sealed class GrainPile : MonoBehaviour
             float z = i < 0 ? local.z : (i / field.Resolution) * field.Spacing - field.Size * .5f;
             if (Mathf.Abs(x) > field.Size * .5f || Mathf.Abs(z) > field.Size * .5f) continue;
             float height = i < 0 ? field.Sample(x, z) : field.Heights[i];
-            if (height * heightScale < .025f) continue;
+            if (height * heightScale < .000001f) continue;
             Vector3 candidate = transform.TransformPoint(new Vector3(x, height, z));
             float distance = (candidate - worldPoint).sqrMagnitude;
             if (distance >= best || !IsInsideBoundary(candidate, .025f)) continue;
@@ -294,6 +294,77 @@ public sealed class GrainPile : MonoBehaviour
             if (Time.time >= nextCollider) RefreshCollider();
         }
         return removed * density;
+    }
+
+    /// <summary>Adds typed material locally without replacing the existing stock.</summary>
+    public bool Deposit(Vector3 worldPoint, GrainCargo cargo)
+    {
+        Initialize();
+        if (field == null || cargo == null || cargo.Total <= 0 || !IsInsideBoundary(worldPoint)) return false;
+        Vector3 local = transform.InverseTransformPoint(worldPoint);
+        if (Mathf.Abs(local.x) > size * .5f || Mathf.Abs(local.z) > size * .5f) return false;
+        var weights = new float[field.Heights.Length];
+        double sum = 0;
+        float radius = Mathf.Max(.25f, field.Spacing * Mathf.Max(WorldScale.x, WorldScale.z) * 1.5f);
+        for (int i = 0; i < weights.Length; i++)
+        {
+            Vector3 point = new Vector3(i % field.Resolution * field.Spacing - size * .5f, 0,
+                i / field.Resolution * field.Spacing - size * .5f);
+            if (field.AreaAt(i) <= 0 || !IsInsideBoundary(transform.TransformPoint(point))) continue;
+            float distance = Vector3.Scale(point - new Vector3(local.x, 0, local.z), WorldScale).magnitude;
+            weights[i] = Mathf.Max(0, 1 - distance / radius);
+            sum += weights[i] * field.AreaAt(i);
+        }
+        if (sum <= 0) return false;
+        if (spatial == null)
+        {
+            // Convert the remaining legacy recipe into local strata before covering it.
+            var layers = new List<GrainStratum>();
+            double skip = harvestedKg, remaining = Kilograms;
+            foreach (var layer in grainLayers)
+            {
+                double amount = layer == grainLayers[grainLayers.Length - 1] ? remaining : System.Math.Min(remaining, System.Math.Max(0, layer.kilograms - skip));
+                skip = System.Math.Max(0, skip - layer.kilograms);
+                if (amount <= 0) continue;
+                layers.Add(new GrainStratum { percent = (float)amount, mixture = layer.mixture });
+                remaining -= amount;
+            }
+            spatial = new GrainSpatialField(field, new[] { new GrainRegion { percent = 100, layers = layers.ToArray() } }, arrangement, 0, grainLayoutSeed);
+            useSpatialLayout = true;
+        }
+        var mixture = new float[GrainCargo.TypeCount];
+        for (int t = 0; t < mixture.Length; t++) mixture[t] = cargo.Weight(t);
+        double volume = cargo.Total / (kilogramsPerCubicMetre * VolumeScale);
+        for (int i = 0; i < weights.Length; i++)
+        {
+            if (weights[i] <= 0) continue;
+            float height = (float)(volume * weights[i] / sum);
+            field.Heights[i] += height;
+            spatial.Deposit(i, height * (double)field.AreaAt(i), mixture);
+        }
+        cargo.Clear();
+        field.WakeNeighborhood(local.x, local.z, radius + settlingMargin, WorldScale);
+        settling = true;
+        RefreshGrainAppearance(); RefreshSurface(); RefreshCollider();
+        return true;
+    }
+
+    public static GrainPile CreateDroppedPile(Vector3 position, GrainPile appearanceSource)
+    {
+        var go = new GameObject("Dropped grain pile");
+        go.SetActive(false);
+        go.transform.position = position;
+        var pile = go.AddComponent<GrainPile>();
+        pile.initialHeight = 0; pile.size = 1.5f; pile.resolution = 33;
+        pile.fitToWalls = true; pile.useSpatialLayout = true;
+        if (appearanceSource != null)
+        {
+            go.GetComponent<MeshRenderer>().sharedMaterials = appearanceSource.GetComponent<MeshRenderer>().sharedMaterials;
+            var sourceKernels = appearanceSource.GetComponent<CornSurfaceKernels>();
+            if (sourceKernels != null) go.AddComponent<CornSurfaceKernels>().CopyAppearanceFrom(sourceKernels);
+        }
+        go.SetActive(true);
+        return pile;
     }
 
     private void Update()

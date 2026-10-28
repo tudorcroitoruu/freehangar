@@ -108,7 +108,7 @@ public sealed class GrainHeightField
         return (float)removed;
     }
 
-    private void WakeNeighborhood(float x, float z, float radius, Vector3 metric)
+    public void WakeNeighborhood(float x, float z, float radius, Vector3 metric)
     {
         int left = Mathf.Clamp(Mathf.FloorToInt((x - radius / metric.x + Size * .5f) / Spacing), 0, Resolution - 1);
         int right = Mathf.Clamp(Mathf.CeilToInt((x + radius / metric.x + Size * .5f) / Spacing), 0, Resolution - 1);
