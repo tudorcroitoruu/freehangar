@@ -29,7 +29,7 @@ public sealed class BagInteraction : MonoBehaviour
         player.IsShovelEquipped : shovel != null && shovel.isActiveAndEnabled;
     public string PromptAction => carried != null ? "Drop" : target == null ? "" : target.IsClosing ? "Closing…" :
         IsShovelEquipped && target.CanHandle && !target.IsFinished ? "Finish" :
-        target.CanCarry && !IsShovelEquipped ? "Take" : target.IsFull ? "Full" : "Fill";
+        target.CanCarry ? "Take" : target.IsFull ? "Full" : "Fill";
 
     private void LateUpdate() => RestoreShovelIfNeeded();
 
@@ -44,16 +44,17 @@ public sealed class BagInteraction : MonoBehaviour
         bool blocked = Time.time < blockedUntil;
         bool shovelEquipped = IsShovelEquipped;
         bool canFinish = shovelEquipped && bag.CanHandle && !bag.IsFinished;
-        bool canCarry = (bag.CanCarry && !shovelEquipped) || bag == carried;
-        string action = bag == carried ? "Drop" : canFinish ? "Finish" : canCarry ? "Take" :
-            shovelEquipped && bag.CanCarry && bag.IsFull ? "Unequip shovel (G)" : bag.IsFull ? "Full" : "Fill";
+        bool canCarry = bag.CanCarry || bag == carried;
+        bool canPour = shovelEquipped && shovel != null && bag != carried && shovel.CanPourInto(bag);
+        string action = canPour ? "Fill" : bag == carried ? "Drop" : canFinish ? "Finish" : canCarry ? "Take" :
+            bag.IsFull ? "Full" : "Fill";
         data = new InteractionPromptData(position, blocked ? "Make room to drop" : action,
-            (canFinish || canCarry) && !blocked);
+            !canPour && (canFinish || canCarry) && !blocked);
         data.ShowProgress = !bag.IsFull;
-        data.ShowPrimaryButton = shovelEquipped && bag != carried && bag.IsOpen && !bag.IsFull;
+        data.ShowPrimaryButton = canPour;
         var interactor = GetComponent<PlayerInteractor>();
         data.RequiresFreeHands = bag != carried && bag.CanCarry && !canFinish && !data.ShowPrimaryButton &&
-            (shovelEquipped || (interactor != null && interactor.HandsOccupied));
+            interactor != null && interactor.HandsOccupied;
         data.Progress = bag.CapacityKg > 0f ? Mathf.Clamp01(bag.Kilograms / bag.CapacityKg) : 0f;
         data.ProgressText = $"{bag.Kilograms:0.##} / {bag.CapacityKg:0.##} kg";
         return true;
@@ -74,7 +75,13 @@ public sealed class BagInteraction : MonoBehaviour
             carried != null || (shovel != null && shovel.IsBusy) || bag == null || bag.IsClosing ||
             (GetComponent<PlayerItemCarry>() is PlayerItemCarry items && items.IsCarrying)) return false;
         target = bag;
-        if (IsShovelEquipped) return target.CanHandle && !target.IsFinished && target.Finish();
+        if (IsShovelEquipped && target.CanHandle && !target.IsFinished) return target.Finish();
+        if (!target.CanCarry) return false;
+        if (IsShovelEquipped)
+        {
+            var player = GetComponent<PlayerController>();
+            if (player == null || !player.ToggleShovel()) return false;
+        }
         return Take(target);
     }
 

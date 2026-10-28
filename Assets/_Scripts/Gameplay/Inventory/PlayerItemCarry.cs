@@ -25,7 +25,7 @@ public sealed class PlayerItemCarry : MonoBehaviour
 
     public bool IsCarrying => carried != null;
     public GameObject CarriedObject => carried;
-    public bool CanTake => isActiveAndEnabled && player != null && player.isActiveAndEnabled && !player.IsShovelEquipped &&
+    public bool CanTake => isActiveAndEnabled && player != null && player.isActiveAndEnabled &&
         view != null && !IsCarrying && (player.Shovel == null || !player.Shovel.IsBusy) && (bicycle == null || !bicycle.IsRiding) &&
         (interactor == null || (interactor.PushedWheelbarrow == null &&
             (interactor.Bags == null || !interactor.Bags.IsCarrying)));
@@ -55,6 +55,7 @@ public sealed class PlayerItemCarry : MonoBehaviour
         }
         Vector3 anchorScale = carryAnchor.lossyScale;
         if (Mathf.Abs(anchorScale.x * anchorScale.y * anchorScale.z) < .000001f) return false;
+        if (player.IsShovelEquipped && !player.ToggleShovel()) return false;
 
         carried = item;
         worldScale = item.transform.lossyScale;

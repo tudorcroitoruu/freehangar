@@ -24,7 +24,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     }
     public void EndDiscovery(Object owner) { if (discoveryOwner == owner) discoveryOwner = null; }
     public bool HandsOccupied => (GetComponent<PlayerController>() is PlayerController actor &&
-        (actor.IsShovelEquipped || actor.IsCarrying)) || (Bags != null && Bags.IsCarrying) ||
+        actor.IsCarrying) || (Bags != null && Bags.IsCarrying) ||
         (Items != null && Items.IsCarrying) || PushedWheelbarrow != null;
 
     private InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;

@@ -9,7 +9,8 @@ public sealed class InteractionPrompt : MonoBehaviour
     [SerializeField] private RectTransform canvasRect;
     [SerializeField] private TMP_Text description;
     [SerializeField] private TMP_Text keycap;
-    [SerializeField] private GameObject mouseLeft;
+    [SerializeField, Tooltip("Right mouse button indicator for pouring (legacy serialized field name).")]
+    private GameObject mouseLeft;
 
     [SerializeField] private GameObject bagSliderFill;
     [SerializeField] private Image bagFill;
@@ -21,8 +22,11 @@ public sealed class InteractionPrompt : MonoBehaviour
     {
         if (bag != null && (bag.IsClosing || bag.IsCarried)) { Hide(); return; }
         bool showFill = bag != null && !bag.IsFull;
-        var data = new InteractionPromptData(worldPosition, showFill ? "Fill" : action, showKey && !showFill);
-        data.ShowPrimaryButton = data.ShowProgress = showFill;
+        var player = camera != null ? camera.GetComponentInParent<PlayerController>() : null;
+        bool canPour = bag != null && player != null && player.IsShovelEquipped && player.Shovel.CanPourInto(bag);
+        var data = new InteractionPromptData(worldPosition, canPour ? "Fill" : action, showKey && !canPour);
+        data.ShowPrimaryButton = canPour;
+        data.ShowProgress = showFill;
         if (bag != null)
         {
             data.Progress = bag.CapacityKg > 0f ? Mathf.Clamp01(bag.Kilograms / bag.CapacityKg) : 0f;
@@ -40,8 +44,9 @@ public sealed class InteractionPrompt : MonoBehaviour
         if (!panel.gameObject.activeSelf) panel.gameObject.SetActive(true);
         CurrentText = data.Action;
         if (description != null && description.text != data.Action) description.text = data.Action;
-        if (keycap != null && data.ShowKey && keycap.text != "E") keycap.text = "E";
-        if (keycap != null && keycap.gameObject.activeSelf != data.ShowKey) keycap.gameObject.SetActive(data.ShowKey);
+        bool showKey = data.ShowKey && !data.ShowPrimaryButton;
+        if (keycap != null && showKey && keycap.text != "E") keycap.text = "E";
+        if (keycap != null && keycap.gameObject.activeSelf != showKey) keycap.gameObject.SetActive(showKey);
         if (mouseLeft != null && mouseLeft.activeSelf != data.ShowPrimaryButton) mouseLeft.SetActive(data.ShowPrimaryButton);
         if (bagSliderFill != null && bagSliderFill.activeSelf != data.ShowProgress) bagSliderFill.SetActive(data.ShowProgress);
         if (bagFill != null) bagFill.fillAmount = Mathf.Clamp01(data.Progress);

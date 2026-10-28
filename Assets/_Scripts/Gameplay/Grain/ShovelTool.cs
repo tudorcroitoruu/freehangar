@@ -68,6 +68,16 @@ public sealed class ShovelTool : MonoBehaviour
         if (loadVisual != null) loadVisual.gameObject.SetActive(false);
     }
 
+    public bool CanPourInto(GrainContainer container)
+    {
+        if (!isActiveAndEnabled || container == null || !container.isActiveAndEnabled ||
+            !container.IsOpen || container.IsFull || container.IsClosing || container.IsCarried ||
+            Kilograms <= .0001f) return false;
+        for (int i = 0; i < GrainCargo.TypeCount; i++)
+            if (cargo[(GrainType)i] > .0001f && container.Accepts((GrainType)i)) return true;
+        return false;
+    }
+
     public bool TryUse(Camera camera, Transform player)
     {
         if (!isActiveAndEnabled || camera == null || player == null || bladeTip == null || transform.parent == null || Time.timeScale <= 0) return false;
@@ -94,14 +104,7 @@ public sealed class ShovelTool : MonoBehaviour
                     nearest = Vector3.Distance(hit.point, point); pile = candidate; scoopPoint = point;
                 }
             }
-            if (container != null && container.IsOpen && container.isActiveAndEnabled &&
-                !container.IsClosing && !container.IsCarried && Kilograms > .0001f)
-            {
-                pendingContainer = container;
-                targetPoint = container.PourPoint + Vector3.up * .35f + camera.transform.right * .3f;
-                if (grainPhysics != null) grainPhysics.SetPourTarget(container.PourPoint, container.GetComponent<Collider>());
-            }
-            else if (pile != null && pile.isActiveAndEnabled && Kilograms < capacityKg - .0001f &&
+            if (pile != null && pile.isActiveAndEnabled && Kilograms < capacityKg - .0001f &&
                 pile.IsInsideBoundary(scoopPoint))
             {
                 pendingPile = pile;
@@ -124,6 +127,19 @@ public sealed class ShovelTool : MonoBehaviour
     {
         if (IsBusy || Kilograms <= .0001f || !isActiveAndEnabled || camera == null || player == null ||
             bladeTip == null || transform.parent == null || Time.timeScale <= 0) return false;
+        if (FindHit(camera, player, out var pourHit) &&
+            CanPourInto(pourHit.collider.GetComponentInParent<GrainContainer>()))
+        {
+            actionCamera = camera; actor = player;
+            pendingPile = null;
+            pendingContainer = pourHit.collider.GetComponentInParent<GrainContainer>();
+            targetPoint = pendingContainer.PourPoint + Vector3.up * .35f + camera.transform.right * .3f;
+            dropping = false; dropCommitted = false; queued = false;
+            elapsed = transferredFraction = 0; availableAtStart = Kilograms;
+            if (grainPhysics != null) grainPhysics.SetPourTarget(pendingContainer.PourPoint, pendingContainer.GetComponent<Collider>());
+            IsBusy = true;
+            return true;
+        }
         if (!FindDropHit(camera, player, out RaycastHit hit) || hit.normal.y < .65f ||
             hit.collider.GetComponentInParent<GrainContainer>() != null || hit.collider.attachedRigidbody != null) return false;
         actionCamera = camera; actor = player;

@@ -99,12 +99,6 @@ public class InventoryProduct : MonoBehaviour, IInteractable
         var carryable = objectPrefab.GetComponent<CarryableItem>();
         if (carryable != null && !carryable.CanBeCarried) return "Cannot carry this item";
         if (interactor == null || interactor.Items == null) return "Unavailable";
-        var player = interactor.GetComponent<PlayerController>();
-        if (player != null && player.IsShovelEquipped)
-        {
-            requiresFreeHands = true;
-            return "Press G to put away shovel";
-        }
         requiresFreeHands = !interactor.Items.CanTake && interactor.HandsOccupied;
         return interactor.Items.CanTake ? null : "Free your hands first";
     }

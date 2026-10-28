@@ -121,7 +121,7 @@ public class PlayerItemCarryTests
     [TestCase(0f)]
     [TestCase(25f)]
     [TestCase(50f)]
-    public void ShovelMustBeUnequippedBeforeTakingContainerAndStaysUnequippedAfterRelease(float kilograms)
+    public void TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease(float kilograms)
     {
         var player = actor.GetComponent<PlayerController>();
         var shovel = instrument.gameObject.AddComponent<ShovelTool>();
@@ -133,13 +133,11 @@ public class PlayerItemCarryTests
         SetField(container, "kilograms", kilograms);
 
         Assert.IsTrue(player.IsShovelEquipped);
-        Assert.IsFalse(carrier.CanTake);
-        Assert.IsFalse(carrier.TryTake(item));
-        Assert.IsTrue(player.ToggleShovel());
+        Assert.IsTrue(carrier.CanTake);
+        Assert.IsTrue(carrier.TryTake(item));
         Assert.IsFalse(player.IsShovelEquipped);
         Assert.IsFalse(shovel.enabled);
         Assert.IsFalse(instrument.gameObject.activeSelf);
-        Assert.IsTrue(carrier.TryTake(item));
         Assert.IsFalse(player.ToggleShovel());
         carrier.CancelTake(item);
         Assert.IsFalse(player.IsShovelEquipped);
@@ -152,7 +150,7 @@ public class PlayerItemCarryTests
     [TestCase(0f)]
     [TestCase(25f)]
     [TestCase(50f)]
-    public void WorldPickupCannotBypassEquippedShovel(float kilograms)
+    public void WorldPickupAutomaticallyPutsShovelAway(float kilograms)
     {
         var player = actor.GetComponent<PlayerController>();
         var shovel = instrument.gameObject.AddComponent<ShovelTool>();
@@ -164,17 +162,65 @@ public class PlayerItemCarryTests
         SetField(interaction, "carryAnchor", player.characterCamera.transform);
         SetField(interaction, "shovel", shovel);
 
-        Assert.IsFalse(interaction.TryInteract(container));
-        Assert.IsFalse(container.IsCarried);
         interaction.TryGetPrompt(container, out var prompt);
-        Assert.IsFalse(prompt.ShowKey);
-        Assert.IsTrue(player.ToggleShovel());
-        interaction.TryGetPrompt(container, out prompt);
         Assert.AreEqual("Take", prompt.Action);
         Assert.IsTrue(prompt.ShowKey);
+        Assert.IsFalse(prompt.RequiresFreeHands);
         Assert.IsTrue(interaction.TryInteract(container));
+        Assert.IsFalse(player.IsShovelEquipped);
+        Assert.IsFalse(shovel.enabled);
         Assert.IsTrue(container.IsCarried);
         Assert.AreEqual(kilograms, container.Kilograms);
+    }
+
+    [Test]
+    public void ContainerPourUsesDropActionInsteadOfScoopAction()
+    {
+        var player = actor.GetComponent<PlayerController>();
+        actor.transform.position = new Vector3(10000f, 10000f, 10000f);
+        item.transform.position = actor.transform.position + Vector3.forward * 2f;
+        var container = item.AddComponent<GrainContainer>();
+        var shovel = instrument.gameObject.AddComponent<ShovelTool>();
+        SetField(shovel, "bladeTip", instrument);
+        typeof(ShovelTool).GetMethod("Awake", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(shovel, null);
+        shovel.Cargo.Add(GrainType.Corn, 2f);
+        Physics.SyncTransforms();
+
+        Assert.IsTrue(shovel.TryUse(player.characterCamera, actor.transform));
+        shovel.Tick(2f);
+        Assert.AreEqual(0f, container.Kilograms);
+        Assert.AreEqual(2f, shovel.Kilograms);
+
+        Assert.IsTrue(shovel.TryDrop(player.characterCamera, actor.transform));
+        shovel.Tick(2f);
+        Assert.That(container.Kilograms, Is.EqualTo(2f).Within(.0001f));
+        Assert.That(shovel.Kilograms, Is.LessThan(.0001f));
+    }
+
+    [TestCase(false, 2f, false, 0f, false)]
+    [TestCase(true, 0f, false, 0f, false)]
+    [TestCase(true, 2f, false, 0f, true)]
+    [TestCase(true, 2f, true, 0f, false)]
+    [TestCase(true, 2f, false, 50f, false)]
+    public void ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(
+        bool equipped, float load, bool differentGrain, float filled, bool showMouse)
+    {
+        var player = actor.GetComponent<PlayerController>();
+        var shovel = instrument.gameObject.AddComponent<ShovelTool>();
+        SetField(player, "shovelTool", shovel);
+        shovel.Cargo.Add(GrainType.Corn, load);
+        shovel.enabled = equipped;
+        var container = item.AddComponent<GrainContainer>();
+        SetField(container, "kilograms", filled);
+        SetField(container, "restrictGrain", differentGrain);
+        SetField(container, "acceptedGrain", differentGrain ? GrainType.Wheat : GrainType.Corn);
+        var bags = actor.AddComponent<BagInteraction>();
+        SetField(bags, "shovel", shovel);
+
+        Assert.IsTrue(bags.TryGetPrompt(container, out var prompt));
+        Assert.AreEqual(showMouse, prompt.ShowPrimaryButton);
+        Assert.AreEqual(!showMouse, prompt.ShowKey);
+        Assert.AreEqual(showMouse ? "Fill" : "Take", prompt.Action);
     }
 
     [TestCase(true)]
@@ -241,12 +287,14 @@ public class PlayerItemCarryTests
         return player;
     }
 
-    [Test]
-    public void InventoryPromptExplainsShovelBlockAndEnablesEAfterUnequipping()
+    [TestCase(0f)]
+    [TestCase(2f)]
+    public void InventoryPickupIsAvailableWithShovelAndAutomaticallyPutsItAway(float load)
     {
         var player = actor.GetComponent<PlayerController>();
         var shovel = instrument.gameObject.AddComponent<ShovelTool>();
         SetField(player, "shovelTool", shovel);
+        shovel.Cargo.Add(GrainType.Corn, load);
         var interactor = actor.AddComponent<PlayerInteractor>();
         typeof(PlayerInteractor).GetProperty("Items").SetValue(interactor, carrier);
         SetField(player, "interactor", interactor);
@@ -261,15 +309,16 @@ public class PlayerItemCarryTests
         manager.RefreshVisuals();
 
         Assert.IsTrue(product.TryGetPrompt(interactor, out var prompt));
-        Assert.IsFalse(prompt.ShowKey);
-        Assert.AreEqual("Take 1 Free Bag", prompt.Action);
-        Assert.IsFalse(prompt.HasAvailableInput);
-        Assert.IsTrue(prompt.RequiresFreeHands);
-        Assert.IsTrue(player.ToggleShovel());
-        Assert.IsTrue(product.TryGetPrompt(interactor, out prompt));
         Assert.IsTrue(prompt.ShowKey);
+        Assert.IsTrue(prompt.HasAvailableInput);
+        Assert.IsFalse(prompt.ShowPrimaryButton);
         Assert.AreEqual("Take 1 Free Bag", prompt.Action);
         Assert.IsFalse(prompt.RequiresFreeHands);
+        Assert.IsTrue(product.TryInteract(interactor));
+        Assert.IsFalse(player.IsShovelEquipped);
+        var delivered = carrier.CarriedObject;
+        carrier.CancelTake(delivered);
+        Object.DestroyImmediate(delivered);
         Assert.IsTrue(carrier.TryTake(item));
         product.TryGetPrompt(interactor, out prompt);
         Assert.IsFalse(prompt.ShowKey);

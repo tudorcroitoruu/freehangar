@@ -36,7 +36,7 @@ public sealed class GrainSortingHUD : MonoBehaviour
                 if (!first) text.Append("  ·  "); first = false;
                 text.Append(GrainNames.Display((GrainType)i)).Append(' ').Append(kg.ToString("0.00")).Append(" kg");
             }
-            text.Append("\nAim at a bag and click to pour its crop. Other crops stay on the shovel. Right-click ground to drop the load.");
+            text.Append("\nRight-click a bag to pour its crop. Other crops stay on the shovel. Right-click ground to drop the load.");
         }
         description.SetText(text);
     }
