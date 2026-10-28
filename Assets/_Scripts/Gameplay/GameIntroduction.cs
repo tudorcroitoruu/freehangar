@@ -23,6 +23,8 @@ public sealed class GameIntroduction : MonoBehaviour
     [SerializeField, Min(.1f)] private float paperSeconds = 5.5f;
     [SerializeField, Min(0f)] private float arrivalPauseSeconds = 2f;
     [SerializeField, Min(.1f)] private float openingFadeSeconds = 1.2f;
+    [Tooltip("Actual seconds for each half of the panorama-to-bicycle fade.")]
+    [SerializeField, Min(.1f)] private float cameraTransitionFadeSeconds = .65f;
     [Tooltip("Actual seconds for stepping off the bike; independent of cutscene playback speed.")]
     [SerializeField, Min(.1f)] private float dismountSeconds = 1.8f;
     public bool IsPlaying { get; private set; }
@@ -141,14 +143,25 @@ public sealed class GameIntroduction : MonoBehaviour
             float eased = Mathf.Lerp(.025f, .975f, t);
             view.transform.SetPositionAndRotation(Vector3.Lerp(landscapeStart.position, landscapeEnd.position, eased), Quaternion.Slerp(landscapeStart.rotation, landscapeEnd.rotation, eased));
             float elapsed = t * landscapeSeconds / Mathf.Max(.1f, playbackSpeed);
-            float fadeDuration = Mathf.Min(openingFadeSeconds, landscapeSeconds / Mathf.Max(.1f, playbackSpeed));
+            float shotDuration = landscapeSeconds / Mathf.Max(.1f, playbackSpeed);
+            float fadeDuration = Mathf.Min(openingFadeSeconds, shotDuration * .5f);
+            float transitionDuration = Mathf.Min(cameraTransitionFadeSeconds, shotDuration * .5f);
+            float openingAlpha = 1 - Mathf.SmoothStep(0, 1, elapsed / fadeDuration);
+            float closingAlpha = Mathf.SmoothStep(0, 1, (elapsed - shotDuration + transitionDuration) / transitionDuration);
+            openingFadeImage.color = new Color(0, 0, 0, Mathf.Max(openingAlpha, closingAlpha));
+        });
+        // Reposition only under full black; both shots keep moving during their fades.
+        openingFadeImage.color = Color.black;
+        CurrentShot = "Bicycle approach"; SetBicycleShot(.025f);
+        HDCamera.GetOrCreate(view).Reset();
+        float rideDuration = Mathf.Max(.1f, bicycleSeconds - .8f);
+        yield return Animate(rideDuration, t => {
+            SetBicycleShot(Mathf.Lerp(.025f, 1f, t));
+            float elapsed = t * rideDuration / Mathf.Max(.1f, playbackSpeed);
+            float fadeDuration = Mathf.Min(cameraTransitionFadeSeconds, rideDuration / Mathf.Max(.1f, playbackSpeed));
             openingFadeImage.color = new Color(0, 0, 0, 1 - Mathf.SmoothStep(0, 1, elapsed / fadeDuration));
         });
         Destroy(openingFade.gameObject); openingFade = null; openingFadeImage = null;
-        // Hard cuts: neither camera travels between locations nor waits to start moving.
-        CurrentShot = "Bicycle approach"; SetBicycleShot(.025f);
-        HDCamera.GetOrCreate(view).Reset();
-        yield return Animate(Mathf.Max(.1f, bicycleSeconds - .8f), t => SetBicycleShot(Mathf.Lerp(.025f, 1f, t)));
         // Rise from the saddle, step sideways, then settle at standing eye height.
         Vector3 riderPosition = view.transform.position;
         Quaternion riderRotation = view.transform.rotation;
