@@ -1,0 +1,16 @@
+PASS Empty containers are not sold
+PASS Held bags are not sold
+PASS Cargo outside center is not sold
+PASS Player blocks sale and cash
+PASS Clear platform starts animation and locks pickup
+PASS Sale lifts cargo before shrinking to zero
+PASS Entering during animation restores cargo without payout
+PASS Vehicle blocks sale even without rider
+PASS Filled box disappears and pays exactly its grain value
+PASS Sold cargo cannot pay twice
+PASS Multiple containers sell once each in sequence
+PASS Missing save profile preserves cargo
+PASS Cash overflow preserves cargo
+PASS Sale recovers after account becomes available
+PASS Disabling station restores pending cargo
+PASS Real filled sack sells on authored station for exact cash
