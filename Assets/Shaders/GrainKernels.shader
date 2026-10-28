@@ -81,16 +81,16 @@ Shader "Freehangar/HDRP/Grain Kernels"
         if (t == 9) return float3(.27,.12,.055);
         return float3(.88,.49,.055);
     }
-    struct Attributes { float3 positionOS:POSITION; float3 normalOS:NORMAL; UNITY_VERTEX_INPUT_INSTANCE_ID };
+    struct Attributes { float3 positionOS:POSITION; float3 normalOS:NORMAL; float2 uv1:TEXCOORD1; float2 uv2:TEXCOORD2; UNITY_VERTEX_INPUT_INSTANCE_ID };
     struct Varyings
     {
         float4 positionCS:SV_POSITION; float3 normalWS:TEXCOORD0; float3 local:TEXCOORD1;
         float3 world:TEXCOORD2; nointerpolation float species:TEXCOORD3;
-        nointerpolation float variation:TEXCOORD4; UNITY_VERTEX_OUTPUT_STEREO
+        nointerpolation float variation:TEXCOORD4; float4 lightmapUV:TEXCOORD5; UNITY_VERTEX_INPUT_INSTANCE_ID UNITY_VERTEX_OUTPUT_STEREO
     };
     Varyings Vert(Attributes input)
     {
-        Varyings o; UNITY_SETUP_INSTANCE_ID(input); UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+        Varyings o; UNITY_SETUP_INSTANCE_ID(input); UNITY_TRANSFER_INSTANCE_ID(input, o); UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         float3 origin = GetAbsolutePositionWS(TransformObjectToWorld(float3(0,0,0)));
         float3 stableSeed = origin;
         #if defined(UNITY_INSTANCING_ENABLED)
@@ -120,10 +120,10 @@ Shader "Freehangar/HDRP/Grain Kernels"
         o.world = GetAbsolutePositionWS(TransformObjectToWorld(p));
         o.positionCS = TransformObjectToHClip(p);
         o.normalWS = TransformObjectToWorldNormal(n);
-        o.species = t; o.variation = .86 + Hash(stableSeed * 73.3) * .28;
+        o.lightmapUV = float4(input.uv1, input.uv2); o.species = t; o.variation = .86 + Hash(stableSeed * 73.3) * .28;
         return o;
     }
-    float4 Frag(Varyings i):SV_Target
+    float3 GrainAlbedo(Varyings i)
     {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
         int t = (int)i.species;
@@ -141,8 +141,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
         if (t == 7) color *= 1 - .75 * (1 - smoothstep(.10,.25,length(p.xz * float2(2,1)))) * step(.5,p.y);
         if (t == 8) color = lerp(color, float3(.63,.57,.43), pow(abs(sin(p.x * 15)), 20) * .75);
         if (t == 0) color *= .91 + .09 * smoothstep(-.8,.5,p.z);
-        float light = .48 + .52 * saturate(dot(normalize(i.normalWS), normalize(float3(-.35,1,.28))));
-        return float4(color * variation * light * _Brightness * GetCurrentExposureMultiplier(), 1);
+        return color * variation * _Brightness;
     }
     ENDHLSL
     SubShader
@@ -151,21 +150,83 @@ Shader "Freehangar/HDRP/Grain Kernels"
         Pass
         {
             Name "ForwardOnly" Tags { "LightMode"="ForwardOnly" }
-            Cull Back ZWrite On
+            Cull Back ZWrite Off ZTest Equal
+            Stencil { WriteMask 3 Ref 2 Comp Always Pass Replace }
             HLSLPROGRAM
             #pragma vertex Vert
-            #pragma fragment Frag
+            #pragma fragment FragLit
             #pragma multi_compile_instancing
+            #pragma instancing_options renderinglayer
+            #pragma multi_compile _ LIGHTMAP_ON
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
+            #pragma multi_compile_fragment _ PROBE_VOLUMES_L1 PROBE_VOLUMES_L2
+            #pragma multi_compile_fragment SCREEN_SPACE_SHADOWS_OFF SCREEN_SPACE_SHADOWS_ON
+            #pragma multi_compile_fragment PUNCTUAL_SHADOW_LOW PUNCTUAL_SHADOW_MEDIUM PUNCTUAL_SHADOW_HIGH
+            #pragma multi_compile_fragment DIRECTIONAL_SHADOW_LOW DIRECTIONAL_SHADOW_MEDIUM DIRECTIONAL_SHADOW_HIGH
+            #pragma multi_compile_fragment AREA_SHADOW_MEDIUM AREA_SHADOW_HIGH
+            #pragma multi_compile_fragment USE_FPTL_LIGHTLIST USE_CLUSTERED_LIGHTLIST
+            #ifndef SHADER_STAGE_FRAGMENT
+                #define SHADOW_LOW
+                #define USE_FPTL_LIGHTLIST
+            #endif
+            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/ShaderPass/ShaderPass.cs.hlsl"
+            #define SHADERPASS SHADERPASS_FORWARD
+            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Material.hlsl"
+            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/Lighting.hlsl"
+            #define HAS_LIGHTLOOP
+            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/LightLoopDef.hlsl"
+            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Lit/Lit.hlsl"
+            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/LightLoop.hlsl"
+            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/BuiltinUtilities.hlsl"
+            float4 FragLit(Varyings i) : SV_Target
+            {
+                UNITY_SETUP_INSTANCE_ID(i);
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+                float3 positionRWS = GetCameraRelativePositionWS(i.world);
+                PositionInputs pos = GetPositionInput(i.positionCS.xy, _ScreenSize.zw,
+                    i.positionCS.z, i.positionCS.w, positionRWS, uint2(i.positionCS.xy) / GetTileSize());
+                float3 V = GetWorldSpaceNormalizeViewDir(positionRWS);
+                SurfaceData surface;
+                ZERO_INITIALIZE(SurfaceData, surface);
+                surface.materialFeatures = MATERIALFEATUREFLAGS_LIT_STANDARD;
+                surface.baseColor = GrainAlbedo(i);
+                surface.normalWS = normalize(i.normalWS);
+                surface.geomNormalWS = surface.normalWS;
+                surface.perceptualSmoothness = 0.15;
+                surface.ambientOcclusion = 1;
+                surface.specularOcclusion = 1;
+                BuiltinData builtin;
+                InitBuiltinData(pos, 1, surface.normalWS, -surface.normalWS, float4(i.lightmapUV.xy,0,0), float4(i.lightmapUV.zw,0,0), builtin);
+                PostInitBuiltinData(V, pos, surface, builtin);
+                BSDFData bsdf = ConvertSurfaceDataToBSDFData(i.positionCS.xy, surface);
+                PreLightData preLight = GetPreLightData(V, pos, bsdf);
+                LightLoopOutput lighting;
+                LightLoop(V, pos, preLight, bsdf, builtin, LIGHT_FEATURE_MASK_FLAGS_OPAQUE, lighting);
+                return float4((lighting.diffuseLighting + lighting.specularLighting) * GetCurrentExposureMultiplier(), 1);
+            }
             ENDHLSL
         }
         Pass
         {
             Name "DepthForwardOnly" Tags { "LightMode"="DepthForwardOnly" }
-            Cull Back ZWrite On ColorMask 0
+            Cull Back ZWrite On
+            Stencil { WriteMask 8 Ref 0 Comp Always Pass Replace }
             HLSLPROGRAM
             #pragma vertex Vert
-            #pragma fragment Frag
+            #pragma fragment FragDepth
             #pragma multi_compile_instancing
+            #pragma instancing_options renderinglayer
+            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/NormalBuffer.hlsl"
+            float4 FragDepth(Varyings i) : SV_Target
+            {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+                NormalData normal;
+                normal.normalWS = normalize(i.normalWS);
+                normal.perceptualRoughness = 0.85;
+                float4 encoded;
+                EncodeIntoNormalBuffer(normal, encoded);
+                return encoded;
+            }
             ENDHLSL
         }
         Pass
@@ -174,8 +235,9 @@ Shader "Freehangar/HDRP/Grain Kernels"
             Cull Back ZWrite On ColorMask 0
             HLSLPROGRAM
             #pragma vertex Vert
-            #pragma fragment Frag
+            #pragma fragment FragShadow
             #pragma multi_compile_instancing
+            float4 FragShadow(Varyings i) : SV_Target { return 0; }
             ENDHLSL
         }
     }

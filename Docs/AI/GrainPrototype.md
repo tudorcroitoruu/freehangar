@@ -1,5 +1,21 @@
 # Grain interaction prototype
 
+## Grain lighting correction — 2026-10-28
+
+`GrainKernels.shader` now feeds the existing procedural crop colors into HDRP's
+Lit light loop instead of multiplying them by a fixed fake sun direction. The
+pile substrate and instanced kernels receive scene lighting and shadows; the
+forward depth pass also writes their normals for HDRP screen-space effects.
+Crop shapes, spatial maps, mixtures and draw batching remain unchanged.
+
+Verified in the open Gameplay scene on Unity 6000.3.20f1 / HDRP 17.3: identical
+camera renders with the original and corrected shaders demonstrate window light
+and shadow on the corn pile. Images: `output/GrainLighting/Before.png` and
+`output/GrainLighting/After.png`. Shader diagnostics are empty, and the existing
+mixed-grain and spatial-stock Edit Mode validation suites pass. Player builds
+and target-device performance were not tested.
+
+
 ## Spatial hangar stock correction — 2026-10-27
 
 The five Gameplay hangars now use physical crop regions rather than the earlier
@@ -327,4 +343,3 @@ Ctrl+E v1.2 clean export: only FBX plus textures/Albedo, AO and Normal PNGs are 
 2026-10-26 spatial grain submission: CornSurfaceKernels retains the exact original seeded samples, colors, rotations, sizes and near/medium/far kernel meshes. Draw submission is now Morton ordered in X/Z per palette, with tight surface bounds for frustum and LOD selection. Dirty batch surface bounds are rebuilt after excavation; empty batches are skipped. The old base-extruded bounds incorrectly made large batches select high detail. Same-view capture dropped from 1,226,720 to 816,640 submitted triangles (33.4%); this is camera dependent, not an FPS claim. All 82,753 per-sample matrices compared byte-identical before/after. Coverage tests passed with unchanged 0.045m spacing; Play Mode mass/local deformation/settling checks passed (2,382 local kernels updated, distant view 662,024 triangles). Previews and baseline binaries are in output/GrainPrototype/spatial-*.
 
 The Chunks And Curves arrangement divides broad areas repeatedly, alternating straight and bowed cuts. Hangar 3 now uses this arrangement rather than radial sectors. Region Waviness controls bending; Section Rotation rotates the cuts. Section Center applies only to the older Curved Sections mode. Spatial validation passes 37 assertions.
-
