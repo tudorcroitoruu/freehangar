@@ -643972,8 +643972,7 @@ PrefabInstance:
       value: ContainersShop
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 1171874108010244980, guid: 2c5752ed11cdabb43ad13b3b2bc89797, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2c5752ed11cdabb43ad13b3b2bc89797, type: 3}
@@ -646225,6 +646224,7 @@ MonoBehaviour:
     foundSecrets: []
     freeUpgradeVouchers: 0
     infiniteStaminaUntilUtc: 0
+    wheelbarrowTier: 0
     wheelbarrowUpgradeLevels: 000000000000000000000000
     shovelUpgradeLevel: 0
     staminaUpgradeLevel: 0
