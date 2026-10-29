@@ -245,4 +245,143 @@ public class ShopPurchaseTests
             .SetValue(manager, new[] { product });
         manager.RefreshVisuals();
     }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void ShopDeliversImmediatelyWithoutAddingPickupStock(bool toHands)
+    {
+        var previousData = SaveSystem.Data;
+        var root = new GameObject("Direct shop delivery test");
+        var prefab = new GameObject("Shop delivery prefab");
+        var actor = new GameObject("Shop customer");
+        var manager = root.AddComponent<InventoryManager>();
+        PlayerItemCarry carrier = null;
+        try
+        {
+            SaveSystem.Data = new PlayerData { cash = 100 };
+            SaveSystem.Data.TryBuyProduct("crate", 0);
+            var player = actor.AddComponent<PlayerController>();
+            var camera = new GameObject("Camera");
+            camera.transform.SetParent(actor.transform);
+            player.characterCamera = camera.AddComponent<Camera>();
+            carrier = actor.AddComponent<PlayerItemCarry>();
+            const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            typeof(PlayerItemCarry).GetMethod("Awake", flags).Invoke(carrier, null);
+            var interactor = actor.AddComponent<PlayerInteractor>();
+            typeof(PlayerInteractor).GetMethod("Awake", flags).Invoke(interactor, null);
+            var shop = root.AddComponent<ShopProduct>();
+            ConfigureShop(shop, manager, prefab);
+            SetShopField(shop, "deliveryMode", toHands ? ShopProduct.DeliveryMode.Hands : ShopProduct.DeliveryMode.AtSpawnPoint);
+            root.transform.SetPositionAndRotation(new Vector3(2, 3, 4), Quaternion.Euler(0, 60, 0));
+
+            Assert.IsTrue(shop.TryGetPrompt(interactor, out var prompt));
+            Assert.IsTrue(prompt.ShowKey);
+            StringAssert.DoesNotContain("<color=", prompt.Action);
+            Assert.IsTrue(shop.TryInteract(interactor));
+            Assert.AreEqual(0, SaveSystem.Money);
+            Assert.AreEqual(1, SaveSystem.Data.GetOwnedProductCount("crate"));
+            Assert.AreEqual(1, manager.GetActiveCount("crate"));
+            var instance = manager.SpawnedProducts[0].gameObject;
+            if (toHands) Assert.AreSame(instance, carrier.CarriedObject);
+            else
+            {
+                Assert.IsFalse(carrier.IsCarrying);
+                Assert.AreEqual(root.transform.position, instance.transform.position);
+                Assert.That(Quaternion.Angle(root.transform.rotation, instance.transform.rotation), Is.LessThan(.01f));
+            }
+        }
+        finally
+        {
+            if (carrier != null && carrier.IsCarrying) carrier.CancelTake(carrier.CarriedObject);
+            DestroyDeliveredProducts(manager);
+            Object.DestroyImmediate(actor);
+            Object.DestroyImmediate(prefab);
+            Object.DestroyImmediate(root);
+            SaveSystem.Data = previousData;
+        }
+    }
+
+    [TestCase("money")]
+    [TestCase("prefab")]
+    [TestCase("point")]
+    [TestCase("manager")]
+    [TestCase("limit")]
+    [TestCase("hands")]
+    public void BlockedShopPurchaseDoesNotChargeOrSpawn(string reason)
+    {
+        var previousData = SaveSystem.Data;
+        var root = new GameObject("Blocked shop test");
+        var prefab = new GameObject("Shop delivery prefab");
+        var manager = root.AddComponent<InventoryManager>();
+        try
+        {
+            SaveSystem.Data = new PlayerData { cash = reason == "money" ? 99 : 100 };
+            var shop = root.AddComponent<ShopProduct>();
+            ConfigureShop(shop, manager, prefab);
+            if (reason == "prefab") SetShopField(shop, "objectPrefab", null);
+            if (reason == "point") SetShopField(shop, "spawnPoint", null);
+            if (reason == "manager") SetShopField(shop, "inventoryManager", null);
+            if (reason == "hands") SetShopField(shop, "deliveryMode", ShopProduct.DeliveryMode.Hands);
+            if (reason == "limit")
+            {
+                SetShopField(shop, "maxActiveInScene", 1);
+                manager.RegisterInstance(new GameObject("Already delivered crate"), "crate", 1);
+            }
+            int cash = SaveSystem.Money;
+            int count = manager.GetActiveCount("crate");
+            Assert.IsTrue(shop.TryGetPrompt(null, out var prompt));
+            Assert.IsTrue(prompt.ShowKey);
+            Assert.IsFalse(prompt.RequiresFreeHands);
+            if (reason == "money") StringAssert.Contains("<color=#D92D2D>$ 100</color>", prompt.Action);
+            Assert.IsFalse(shop.TryInteract(null));
+            Assert.AreEqual(cash, SaveSystem.Money);
+            Assert.AreEqual(0, SaveSystem.Data.GetOwnedProductCount("crate"));
+            Assert.AreEqual(count, manager.GetActiveCount("crate"));
+        }
+        finally
+        {
+            DestroyDeliveredProducts(manager);
+            Object.DestroyImmediate(prefab);
+            Object.DestroyImmediate(root);
+            SaveSystem.Data = previousData;
+        }
+    }
+
+    [Test]
+    public void FailedDeliveryDoesNotCharge()
+    {
+        var previousData = SaveSystem.Data;
+        try
+        {
+            SaveSystem.Data = new PlayerData { cash = 100 };
+            Assert.IsFalse(SaveSystem.TryBuyProduct("crate", 100, () => false));
+            Assert.AreEqual(100, SaveSystem.Money);
+            Assert.IsEmpty(SaveSystem.Data.ownedProducts);
+        }
+        finally { SaveSystem.Data = previousData; }
+    }
+
+    private static void ConfigureShop(ShopProduct shop, InventoryManager manager, GameObject prefab)
+    {
+        SetShopField(shop, "productID", "crate");
+        SetShopField(shop, "productPrice", 100);
+        SetShopField(shop, "objectPrefab", prefab);
+        SetShopField(shop, "inventoryManager", manager);
+        SetShopField(shop, "deliveryMode", ShopProduct.DeliveryMode.AtSpawnPoint);
+        SetShopField(shop, "spawnPoint", shop.transform);
+    }
+
+    private static void SetShopField(ShopProduct shop, string field, object value) =>
+        typeof(ShopProduct).GetField(field, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+            .SetValue(shop, value);
+
+    private static void DestroyDeliveredProducts(InventoryManager manager)
+    {
+        while (manager.SpawnedProducts.Count > 0)
+        {
+            var item = manager.SpawnedProducts[0];
+            manager.UnregisterInstance(item);
+            Object.DestroyImmediate(item.gameObject);
+        }
+    }
 }

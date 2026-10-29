@@ -110209,11 +110209,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2136213332081319394, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
   m_PrefabInstance: {fileID: 1902772967}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &406739772 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2136213332081672642, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
-  m_PrefabInstance: {fileID: 1902772967}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &406739773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -110227,48 +110222,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WheelbarrowCargo
   cargoVolumeCubicMeters: 0.4
-  upgradeIndex: 0
-  upgradePrice: 250
   trayCenter: {x: 0, y: 0.46, z: -0.72}
   traySize: {x: 0.7, y: 0.35, z: 0.85}
   pushDistance: 1.4
---- !u!114 &406739774
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 406739769}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7766699f18f62549b7829328c08b440, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgradeInteractable
-  upgradeManager: {fileID: 0}
-  targetVehicle: {fileID: 406739769}
-  promptAnchor: {fileID: 406739772}
-  promptOffset: {x: 0, y: 0.3, z: 0}
---- !u!65 &406739775
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 406739769}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 0.7131318, z: 1.8024919}
-  m_Center: {x: -0.0000013305064, y: 0.4637013, z: -0.6429343}
 --- !u!1 &406831249
 GameObject:
   m_ObjectHideFlags: 0
@@ -283006,7 +282962,6 @@ Transform:
   - {fileID: 716093983}
   - {fileID: 1706161972}
   - {fileID: 43654657}
-  - {fileID: 2031906057}
   - {fileID: 1753143605}
   - {fileID: 520521944}
   m_Father: {fileID: 0}
@@ -329198,6 +329153,7 @@ MonoBehaviour:
   motorDriven: 0
   exitCoastDuration: 0.8
   boostSpeedMultiplier: 1.5
+  downhillSpeedMultiplier: 1.2
   steeringSmoothTime: 0.14
   maximumSteeringAngle: 30
   ridingCameraOffset: {x: 0, y: -0.5, z: 0}
@@ -484560,8 +484516,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WheelbarrowCargo
   cargoVolumeCubicMeters: 0.4
-  upgradeIndex: 0
-  upgradePrice: 250
   trayCenter: {x: 0, y: 0.46, z: -0.72}
   traySize: {x: 0.7, y: 0.35, z: 0.85}
   pushDistance: 1.4
@@ -520621,8 +520575,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WheelbarrowCargo
   cargoVolumeCubicMeters: 0.4
-  upgradeIndex: 0
-  upgradePrice: 250
   trayCenter: {x: 0, y: 0.46, z: -0.72}
   traySize: {x: 0.7, y: 0.35, z: 0.85}
   pushDistance: 1.4
@@ -537911,13 +537863,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2136213332081319394, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 406739774}
-    - targetCorrespondingSourceObject: {fileID: 2136213332081319394, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 406739773}
-    - targetCorrespondingSourceObject: {fileID: 2136213332081319394, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 406739775}
   m_SourcePrefab: {fileID: 100100000, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
 --- !u!1 &1902879912
 GameObject:
@@ -574748,7 +574694,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2031906057}
   m_Layer: 0
-  m_Name: 11_Five_Hangar_Farm
+  m_Name: Hangars
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -574762,7 +574708,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2031906056}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -574774,7 +574720,7 @@ Transform:
   - {fileID: 775270131}
   - {fileID: 298216138}
   - {fileID: 1085795185}
-  m_Father: {fileID: 995841599}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2031939776
 GameObject:
@@ -648104,6 +648050,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 209814530}
   - {fileID: 2024873281}
+  - {fileID: 2031906057}
   - {fileID: 995841599}
   - {fileID: 5877819208465033855}
   - {fileID: 1285533226}

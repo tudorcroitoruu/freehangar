@@ -185,9 +185,9 @@ RectTransform:
   - {fileID: 6348607735400531118}
   m_Father: {fileID: 2361098720760704435}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -45.7, y: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 36.3, y: 0}
   m_SizeDelta: {x: 38, y: 38}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4759091470338551552
@@ -941,6 +941,7 @@ MonoBehaviour:
   bagSliderFill: {fileID: 2274562060591844815}
   bagFill: {fileID: 7925694482381865645}
   bagFillStatus: {fileID: 5037136240950816127}
+  actionRowSpacing: 8
 --- !u!114 &1765483811765461374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8208,10 +8209,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2361098720760704435}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 36.762794, y: 0}
-  m_SizeDelta: {x: 73.7256, y: 44}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 150.7, y: 0}
+  m_SizeDelta: {x: 157.1207, y: 44}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2661110637204014631
 CanvasRenderer:
@@ -8241,7 +8242,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Finish
+  m_text: Finish the bag
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e1eb4cc802486e943a53420bbcf95693, type: 2}
   m_sharedMaterial: {fileID: 873612259039654660, guid: e1eb4cc802486e943a53420bbcf95693, type: 2}
@@ -8737,6 +8738,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaminaManager
   maxStamina: 100
+  upgradeSettings: {fileID: 0}
   shovelActionCost: 10
   workConsumptionPerSecond: 10
   recoveryPerSecond: 5
@@ -11499,7 +11501,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 163.5879, y: 61.9332}
+  m_SizeDelta: {x: 256, y: 61.9332}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4473403268836812681
 CanvasRenderer:
@@ -11521,15 +11523,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.2, g: 0.17254902, b: 0.14509805, a: 0.9019608}
+  m_Material: {fileID: 2100000, guid: f18f24d428bc8d7499d2989804b8c0af, type: 2}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.9019608}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 568ff5500adbd0c4b9d070d4262eee12, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

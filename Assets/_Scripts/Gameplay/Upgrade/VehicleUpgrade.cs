@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>Shared saved cargo upgrades for wheelbarrows and vehicles using BicycleController.</summary>
+/// <summary>Saved cargo upgrades for vehicles using BicycleController.</summary>
 [DisallowMultipleComponent]
 public sealed class VehicleUpgrade : MonoBehaviour
 {
@@ -13,15 +13,12 @@ public sealed class VehicleUpgrade : MonoBehaviour
     private Transform[] originalSlots;
     private readonly List<Transform> generatedSlots = new List<Transform>();
     private BicycleController bicycle;
-    private WheelbarrowCargo wheelbarrow;
 
     public string VehicleId
     {
         get
         {
             if (!string.IsNullOrWhiteSpace(vehicleId)) return vehicleId;
-            var barrow = GetComponent<WheelbarrowCargo>();
-            if (barrow != null) return barrow.UpgradeId;
             if (GetComponent<PickupController>() != null) return "pickup";
             if (GetComponent<TrikeController>() != null) return "trike";
             if (GetComponent<LawnmowerController>() != null) return "lawnmower";
@@ -48,7 +45,6 @@ public sealed class VehicleUpgrade : MonoBehaviour
     private void Awake()
     {
         bicycle = GetComponent<BicycleController>();
-        wheelbarrow = GetComponent<WheelbarrowCargo>();
         if (bicycle != null) originalSlots = bicycle.cargoSlots ?? new Transform[0];
     }
     private void OnEnable()
@@ -103,14 +99,12 @@ public sealed class VehicleUpgrade : MonoBehaviour
     {
         get
         {
-            var barrow = wheelbarrow != null ? wheelbarrow : GetComponent<WheelbarrowCargo>();
-            if (barrow != null) return barrow.OccupiedVolume;
             float volume = 0;
             foreach (var root in CargoRoots()) volume += MeasureVolume(root.gameObject);
             return volume;
         }
     }
-    public int CargoCount => GetComponent<WheelbarrowCargo>() is WheelbarrowCargo barrow ? barrow.BagCount : CargoRoots().Count;
+    public int CargoCount => CargoRoots().Count;
     public bool CanLoadVolume(float volume, int slotCost = 1)
     {
         if (GetComponent<VehicleCargoRack>() is VehicleCargoRack rack)
@@ -143,10 +137,7 @@ public sealed class VehicleUpgrade : MonoBehaviour
     {
         if (!isActiveAndEnabled || !IsConfigured || IsMaxed || SaveSystem.Data == null) return false;
         int level = SaveSystem.Data.GetVehicleUpgradeLevel(VehicleId);
-        bool purchased = SaveSystem.TryPurchaseVehicleUpgrade(VehicleId, Price, level, Profile.MaxLevel);
-        if (purchased && GetComponent<WheelbarrowCargo>() != null)
-            GoalChecker.ReportValue(GoalType.UpgradePurchased, 1, upgradeType: GoalUpgradeType.Wheelbarrow);
-        return purchased;
+        return SaveSystem.TryPurchaseVehicleUpgrade(VehicleId, Price, level, Profile.MaxLevel);
     }
     public bool OpenMenu()
     {

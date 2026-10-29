@@ -86,6 +86,16 @@ public static class SaveSystem
         return true;
     }
 
+    /// <summary>Charge for an immediately delivered product without adding pickup stock.</summary>
+    public static bool TryBuyProduct(string productID, int price, Func<bool> tryDeliver)
+    {
+        if (Data == null || string.IsNullOrWhiteSpace(productID) || price < 0 || Data.cash < price ||
+            tryDeliver == null || !tryDeliver()) return false;
+        Data.cash -= price;
+        SaveData();
+        return true;
+    }
+
     static string savePath = "/save";
 
     static int key = 5;

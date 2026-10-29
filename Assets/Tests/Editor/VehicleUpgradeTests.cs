@@ -192,8 +192,27 @@ public class VehicleUpgradeTests
     {
         var shared = Resources.Load<VehicleUpgradeSettings>(VehicleUpgradeSettings.ResourcePath);
         Assert.IsNotNull(shared);
-        foreach (var id in new[] { "wheelbarrow.0", "wheelbarrow.1", "wheelbarrow.2", "bicycle", "motoroller", "trike", "pickup", "lawnmower" })
+        foreach (var id in new[] { "bicycle", "motoroller", "trike", "pickup", "lawnmower" })
             Assert.IsTrue(shared.Find(id)?.IsConfigured ?? false, id);
+        foreach (var id in new[] { "wheelbarrow.0", "wheelbarrow.1", "wheelbarrow.2" })
+            Assert.IsNull(shared.Find(id), id);
+    }
+
+    [Test]
+    public void WheelbarrowHasFixedCapacityAndDoesNotCreateUpgradeComponents()
+    {
+        var barrow = root.AddComponent<WheelbarrowCargo>();
+        Call(barrow, "Awake");
+        Assert.IsNull(root.GetComponent<VehicleUpgrade>());
+        SetField(barrow, "cargoVolumeCubicMeters", .7f);
+        SaveSystem.Data.wheelbarrowUpgradeLevels = new[] { 2, 2, 2 };
+        Assert.AreEqual(.7f, barrow.CapacityVolume);
+
+        var station = root.AddComponent<VehicleUpgradeInteractable>();
+        var interactor = root.AddComponent<PlayerInteractor>();
+        Assert.IsFalse(station.TryGetPrompt(interactor, out _));
+        Assert.IsFalse(station.TryInteract(interactor));
+        Assert.IsNull(root.GetComponent<VehicleUpgrade>());
     }
     private GameObject Child(string name)
     {

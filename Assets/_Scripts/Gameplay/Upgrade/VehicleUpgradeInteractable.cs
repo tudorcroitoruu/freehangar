@@ -24,7 +24,7 @@ public sealed class VehicleUpgradeInteractable : MonoBehaviour, IKeyedInteractab
         {
             var root = targetVehicle != null ? targetVehicle : gameObject;
             var target = root.GetComponent<VehicleUpgrade>();
-            if (target == null && (root.GetComponent<WheelbarrowCargo>() != null || root.GetComponent<BicycleController>() != null))
+            if (target == null && root.GetComponent<BicycleController>() != null)
                 target = root.AddComponent<VehicleUpgrade>();
             return target;
         }

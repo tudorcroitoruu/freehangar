@@ -13,51 +13,6 @@ MonoBehaviour:
   m_Name: VehicleUpgradeSettings
   m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgradeSettings
   vehicles:
-  - id: wheelbarrow.0
-    displayName: Wheelbarrow 1
-    levels:
-    - image: {fileID: 0}
-      capacityCubicMeters: 0.4
-      slots: 6
-      price: 250
-    - image: {fileID: 0}
-      capacityCubicMeters: 0.8
-      slots: 8
-      price: 500
-    - image: {fileID: 0}
-      capacityCubicMeters: 1.2
-      slots: 10
-      price: 0
-  - id: wheelbarrow.1
-    displayName: Wheelbarrow 2
-    levels:
-    - image: {fileID: 0}
-      capacityCubicMeters: 0.4
-      slots: 6
-      price: 250
-    - image: {fileID: 0}
-      capacityCubicMeters: 0.8
-      slots: 8
-      price: 500
-    - image: {fileID: 0}
-      capacityCubicMeters: 1.2
-      slots: 10
-      price: 0
-  - id: wheelbarrow.2
-    displayName: Wheelbarrow 3
-    levels:
-    - image: {fileID: 0}
-      capacityCubicMeters: 0.4
-      slots: 6
-      price: 250
-    - image: {fileID: 0}
-      capacityCubicMeters: 0.8
-      slots: 8
-      price: 500
-    - image: {fileID: 0}
-      capacityCubicMeters: 1.2
-      slots: 10
-      price: 0
   - id: bicycle
     displayName: Bicycle
     levels:

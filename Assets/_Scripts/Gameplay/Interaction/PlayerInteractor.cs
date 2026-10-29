@@ -76,8 +76,6 @@ public sealed class PlayerInteractor : MonoBehaviour
             SetHighlightedTarget(null);
             if (PushedWheelbarrow.TryGetPrompt(this, out var pushPrompt) && prompt != null)
             {
-                if (PushedWheelbarrow.GetComponent<VehicleUpgrade>() is VehicleUpgrade upgrades && upgrades.IsConfigured)
-                    pushPrompt.AdditionalActions = new[] { new InteractionPromptAction("Upgrade vehicle", KeyCode.F) };
                 prompt.Show(viewCamera, pushPrompt);
             }
             else HidePrompt();
@@ -126,7 +124,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     public bool TryAdditionalInput()
     {
         if (!Input.anyKeyDown || !CanInteract) return false;
-        if (PushedWheelbarrow != null) return Input.GetKeyDown(KeyCode.F) && TryInteract(KeyCode.F);
+        if (PushedWheelbarrow != null) return false;
         var primary = FindTarget();
         if (!(primary is Component component)) return false;
         foreach (var behaviour in ActionBehaviours(component))
@@ -140,7 +138,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     {
         if (key == KeyCode.E) return TryInteract();
         if (!CanInteract || (Items != null && Items.IsCarrying) || (Bags != null && Bags.IsCarrying)) return false;
-        if (PushedWheelbarrow != null) return key == KeyCode.F && PushedWheelbarrow.TryUpgrade(this);
+        if (PushedWheelbarrow != null) return false;
         var primary = FindTarget();
         if (!(primary is Component component)) return false;
         foreach (var behaviour in ActionBehaviours(component))

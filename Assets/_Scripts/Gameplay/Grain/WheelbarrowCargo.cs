@@ -6,8 +6,6 @@ using UnityEngine;
 public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
 {
     [SerializeField, Min(.01f)] private float cargoVolumeCubicMeters = .4f;
-    [SerializeField, Range(0, 2)] private int upgradeIndex;
-    [SerializeField, Min(1)] private int upgradePrice = 250;
     [SerializeField] private Vector3 trayCenter = new Vector3(0f, .46f, -.72f);
     [SerializeField] private Vector3 traySize = new Vector3(.7f, .35f, .85f);
     [SerializeField, Min(.5f)] private float pushDistance = 1.4f;
@@ -26,21 +24,13 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     private bool instrumentWasActive, shovelWasEnabled;
     private readonly List<GameObject> hiddenTools = new List<GameObject>();
 
-    public int UpgradeLevel => Upgrades != null && Upgrades.IsConfigured ? Upgrades.Level :
-        SaveSystem.Data != null && SaveSystem.Data.wheelbarrowUpgradeLevels != null &&
-        upgradeIndex < SaveSystem.Data.wheelbarrowUpgradeLevels.Length ?
-        SaveSystem.Data.wheelbarrowUpgradeLevels[upgradeIndex] : 0;
-    public float CapacityVolume => Upgrades != null && Upgrades.IsConfigured ? Upgrades.CapacityVolume : cargoVolumeCubicMeters + .4f * UpgradeLevel;
+    public float CapacityVolume => cargoVolumeCubicMeters;
     public float OccupiedVolume => occupiedVolume;
     public int BagCount => bags.Count;
-    public string UpgradeId => "wheelbarrow." + upgradeIndex;
-    private VehicleUpgrade Upgrades => GetComponent<VehicleUpgrade>();
-    public int CargoSlotCount => Upgrades != null && Upgrades.IsConfigured ? Upgrades.SlotCount :
-        Mathf.Max(1, Mathf.FloorToInt(traySize.z / .25f) * 2);
+    public int CargoSlotCount => Mathf.Max(1, Mathf.FloorToInt(traySize.z / .25f) * 2);
 
     private void Awake()
     {
-        if (GetComponent<VehicleUpgrade>() == null) gameObject.AddComponent<VehicleUpgrade>();
         RebuildCargo();
         var found = new List<Transform>(2);
         foreach (Transform child in GetComponentsInChildren<Transform>(true))
@@ -174,11 +164,6 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         var tools = interactor.GetComponent<PlayerCombatTools>();
         if (tools != null) tools.HideForPushing(hiddenTools);
         return true;
-    }
-
-    public bool TryUpgrade(PlayerInteractor interactor)
-    {
-        return pusher == interactor && interactor != null && Upgrades != null && Upgrades.OpenMenu();
     }
 
     private void LateUpdate()
