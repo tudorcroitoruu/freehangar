@@ -24,8 +24,6 @@ public class InventorySceneLimitTests
         SetField(product, "objectPrefab", prefab);
         SetField(product, "deliveryMode", InventoryProduct.DeliveryMode.AtSpawnPoint);
         SetField(product, "spawnPoint", root.transform);
-        SetField(manager, "allContainers", new[] { product });
-        manager.RefreshVisuals();
     }
 
     [TearDown]
@@ -114,8 +112,6 @@ public class InventorySceneLimitTests
         SetField(second, "objectPrefab", prefab);
         SetField(second, "deliveryMode", InventoryProduct.DeliveryMode.AtSpawnPoint);
         SetField(second, "spawnPoint", secondRoot.transform);
-        SetField(manager, "allContainers", new[] { product, second });
-        manager.RefreshVisuals();
         Assert.IsTrue(product.TryInteract(null));
         Assert.IsFalse(second.TryInteract(null));
         Assert.AreEqual(1, manager.SpawnedProducts.Count);

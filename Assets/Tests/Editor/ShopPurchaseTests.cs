@@ -203,7 +203,7 @@ public class ShopPurchaseTests
         {
             SaveSystem.Data = null;
             var product = root.AddComponent<InventoryProduct>();
-            var manager = root.AddComponent<InventoryManager>();
+            root.AddComponent<InventoryManager>();
             const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
             typeof(InventoryProduct).GetField("unlimitedCount", flags).SetValue(product, true);
             typeof(InventoryProduct).GetField("productID", flags).SetValue(product, "freeBag");
@@ -212,9 +212,8 @@ public class ShopPurchaseTests
             typeof(InventoryProduct).GetField("deliveryMode", flags).SetValue(product, InventoryProduct.DeliveryMode.AtSpawnPoint);
             typeof(InventoryProduct).GetField("spawnPoint", flags).SetValue(product, root.transform);
             typeof(InventoryProduct).GetField("visual", flags).SetValue(product, new[] { visual });
-            typeof(InventoryManager).GetField("allContainers", flags).SetValue(manager, new[] { product });
             visual.SetActive(false);
-            manager.RefreshVisuals();
+            typeof(InventoryProduct).GetMethod("RefreshOwnedVisuals", flags).Invoke(product, null);
             Assert.IsTrue(visual.activeSelf);
             Assert.IsTrue(product.TryGetPrompt(null, out var prompt));
             Assert.AreEqual("Take 1 Free Bag", prompt.Action);
@@ -240,10 +239,7 @@ public class ShopPurchaseTests
 
     private static void BindInventoryManager(InventoryProduct product)
     {
-        var manager = product.gameObject.AddComponent<InventoryManager>();
-        typeof(InventoryManager).GetField("allContainers", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-            .SetValue(manager, new[] { product });
-        manager.RefreshVisuals();
+        product.gameObject.AddComponent<InventoryManager>();
     }
 
     [TestCase(false)]
@@ -281,6 +277,8 @@ public class ShopPurchaseTests
             Assert.AreEqual(0, SaveSystem.Money);
             Assert.AreEqual(1, SaveSystem.Data.GetOwnedProductCount("crate"));
             Assert.AreEqual(1, manager.GetActiveCount("crate"));
+            Assert.AreEqual(1, manager.SpawnedProducts.Count);
+            Assert.AreEqual("crate", manager.SpawnedProducts[0].ProductID);
             var instance = manager.SpawnedProducts[0].gameObject;
             if (toHands) Assert.AreSame(instance, carrier.CarriedObject);
             else
@@ -304,7 +302,6 @@ public class ShopPurchaseTests
     [TestCase("money")]
     [TestCase("prefab")]
     [TestCase("point")]
-    [TestCase("manager")]
     [TestCase("limit")]
     [TestCase("hands")]
     public void BlockedShopPurchaseDoesNotChargeOrSpawn(string reason)
@@ -320,7 +317,6 @@ public class ShopPurchaseTests
             ConfigureShop(shop, manager, prefab);
             if (reason == "prefab") SetShopField(shop, "objectPrefab", null);
             if (reason == "point") SetShopField(shop, "spawnPoint", null);
-            if (reason == "manager") SetShopField(shop, "inventoryManager", null);
             if (reason == "hands") SetShopField(shop, "deliveryMode", ShopProduct.DeliveryMode.Hands);
             if (reason == "limit")
             {
@@ -359,6 +355,72 @@ public class ShopPurchaseTests
             Assert.IsEmpty(SaveSystem.Data.ownedProducts);
         }
         finally { SaveSystem.Data = previousData; }
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void ProductsResolveManagerEvenWhenTheOldDepotIsDisabled(bool inactiveDepot)
+    {
+        var previousData = SaveSystem.Data;
+        var root = new GameObject("Delivery manager discovery test");
+        var depot = new GameObject("Disabled depot");
+        depot.transform.SetParent(root.transform);
+        var manager = depot.AddComponent<InventoryManager>();
+        manager.enabled = false;
+        if (inactiveDepot) depot.SetActive(false);
+        var prefab = new GameObject("Delivered product");
+        var expectedManager = inactiveDepot ? Object.FindFirstObjectByType<InventoryManager>(FindObjectsInactive.Include) : manager;
+        bool wasActive = expectedManager.gameObject.activeSelf;
+        string id = "discovery." + System.Guid.NewGuid().ToString("N");
+        const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        string[] keys = { "/save", "/save_Settings", "levelsCompleted" };
+        var previousPrefs = new string[keys.Length];
+        for (int i = 0; i < keys.Length; i++) previousPrefs[i] = PlayerPrefs.HasKey(keys[i]) ? PlayerPrefs.GetString(keys[i]) : null;
+        try
+        {
+            SaveSystem.Data = new PlayerData { cash = 200 };
+            var shopObject = new GameObject("Shop product");
+            shopObject.transform.SetParent(inactiveDepot ? root.transform : depot.transform);
+            var shop = shopObject.AddComponent<ShopProduct>();
+            ConfigureShop(shop, null, prefab);
+            SetShopField(shop, "productID", id);
+            Assert.IsTrue(shop.TryInteract(null));
+            Assert.AreSame(expectedManager, typeof(ShopProduct).GetField("inventoryManager", flags).GetValue(shop));
+            Assert.AreEqual(100, SaveSystem.Money);
+            Assert.AreEqual(0, SaveSystem.Data.GetOwnedProductCount(id));
+
+            var inventoryObject = new GameObject("Free inventory product");
+            inventoryObject.transform.SetParent(shopObject.transform.parent);
+            var inventory = inventoryObject.AddComponent<InventoryProduct>();
+            typeof(InventoryProduct).GetField("productID", flags).SetValue(inventory, id);
+            typeof(InventoryProduct).GetField("unlimitedCount", flags).SetValue(inventory, true);
+            typeof(InventoryProduct).GetField("objectPrefab", flags).SetValue(inventory, prefab);
+            typeof(InventoryProduct).GetField("deliveryMode", flags).SetValue(inventory, InventoryProduct.DeliveryMode.AtSpawnPoint);
+            typeof(InventoryProduct).GetField("spawnPoint", flags).SetValue(inventory, root.transform);
+            Assert.IsTrue(inventory.TryGetPrompt(null, out var prompt));
+            Assert.IsTrue(prompt.ShowKey);
+            Assert.IsTrue(inventory.TryInteract(null));
+            Assert.AreSame(expectedManager, typeof(InventoryProduct).GetField("inventoryManager", flags).GetValue(inventory));
+            Assert.AreEqual(2, expectedManager.GetActiveCount(id));
+            Assert.AreEqual(wasActive, expectedManager.gameObject.activeSelf);
+            Assert.AreEqual(!inactiveDepot, depot.activeSelf);
+        }
+        finally
+        {
+            for (int i = expectedManager.SpawnedProducts.Count - 1; i >= 0; i--)
+            {
+                var item = expectedManager.SpawnedProducts[i];
+                if (item == null || item.ProductID != id) continue;
+                expectedManager.UnregisterInstance(item);
+                Object.DestroyImmediate(item.gameObject);
+            }
+            Object.DestroyImmediate(root);
+            Object.DestroyImmediate(prefab);
+            SaveSystem.Data = previousData;
+            for (int i = 0; i < keys.Length; i++)
+                if (previousPrefs[i] == null) PlayerPrefs.DeleteKey(keys[i]); else PlayerPrefs.SetString(keys[i], previousPrefs[i]);
+            PlayerPrefs.Save();
+        }
     }
 
     private static void ConfigureShop(ShopProduct shop, InventoryManager manager, GameObject prefab)

@@ -15,7 +15,7 @@ public class ShopProduct : MonoBehaviour, IInteractable
     [SerializeField] private DeliveryMode deliveryMode = DeliveryMode.Hands;
     [SerializeField, Tooltip("Required when Delivery Mode is At Spawn Point.")]
     private Transform spawnPoint;
-    [SerializeField, Tooltip("Use the same manager as inventory products to share the active scene count.")]
+    [SerializeField, Tooltip("Optional. Automatically finds a shared manager, including on a disabled inventory depot.")]
     private InventoryManager inventoryManager;
     [SerializeField, Min(0), Tooltip("Maximum active instances of this product ID in the scene. Zero disables the limit.")]
     private int maxActiveInScene = 10;
@@ -46,6 +46,10 @@ public class ShopProduct : MonoBehaviour, IInteractable
     private bool CanDeliver(PlayerInteractor interactor, out bool requiresFreeHands)
     {
         requiresFreeHands = false;
+        if (inventoryManager == null)
+            inventoryManager = GetComponentInParent<InventoryManager>(true);
+        if (inventoryManager == null)
+            inventoryManager = FindFirstObjectByType<InventoryManager>(FindObjectsInactive.Include);
         if (objectPrefab == null || inventoryManager == null || string.IsNullOrWhiteSpace(productID) ||
             !inventoryManager.CanSpawn(productID, maxActiveInScene)) return false;
         if (deliveryMode == DeliveryMode.AtSpawnPoint) return spawnPoint != null;
@@ -66,6 +70,7 @@ public class ShopProduct : MonoBehaviour, IInteractable
         var rotation = deliveryMode == DeliveryMode.Hands ? objectPrefab.transform.rotation : point.rotation;
         var instance = Instantiate(objectPrefab, point.position, rotation);
         if (instance == null) return false;
+        // Track the purchased scene object; a failed handoff unregisters it below.
         var registration = inventoryManager.RegisterInstance(instance, productID, maxActiveInScene);
         if (registration == null)
         {

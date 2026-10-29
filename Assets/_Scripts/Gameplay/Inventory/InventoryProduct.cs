@@ -24,6 +24,16 @@ public class InventoryProduct : MonoBehaviour, IInteractable
 
     internal void SetInventoryManager(InventoryManager manager) => inventoryManager = manager;
 
+    private void OnEnable()
+    {
+        SaveSystem.OwnedProductsChanged += RefreshOwnedVisuals;
+        RefreshOwnedVisuals();
+    }
+
+    private void OnDisable() => SaveSystem.OwnedProductsChanged -= RefreshOwnedVisuals;
+
+    private void RefreshOwnedVisuals() => SetOwned(unlimitedCount || (SaveSystem.Data?.GetOwnedProductCount(productID) ?? 0) > 0);
+
     public void SetOwned(bool owned)
     {
         if (visual == null) return;
@@ -90,6 +100,10 @@ public class InventoryProduct : MonoBehaviour, IInteractable
     private string GetDeliveryBlockReason(PlayerInteractor interactor, out bool requiresFreeHands)
     {
         requiresFreeHands = false;
+        if (inventoryManager == null)
+            inventoryManager = GetComponentInParent<InventoryManager>(true);
+        if (inventoryManager == null)
+            inventoryManager = FindFirstObjectByType<InventoryManager>(FindObjectsInactive.Include);
         if (objectPrefab == null || inventoryManager == null || string.IsNullOrWhiteSpace(productID)) return "Unavailable";
         if (!inventoryManager.CanSpawn(productID, maxActiveInScene)) return $"Scene limit reached ({maxActiveInScene})";
         if (deliveryMode == DeliveryMode.AtSpawnPoint) return spawnPoint != null ? null : "Unavailable";

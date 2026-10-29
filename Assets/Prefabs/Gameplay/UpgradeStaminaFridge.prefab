@@ -84,10 +84,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InteractionHighlight
   outlines:
+  - {fileID: 0}
   - {fileID: 8781296205677264968}
   - {fileID: 545654572805632114}
   - {fileID: 2512938718955362381}
   - {fileID: 3318136670133357816}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1001 &3402456041497595042
 PrefabInstance:
   m_ObjectHideFlags: 0

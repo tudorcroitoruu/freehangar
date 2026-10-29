@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
-    [SerializeField] private InventoryProduct[] allContainers;
     [SerializeField] private List<InventoryItemInstance> spawnedProducts = new List<InventoryItemInstance>();
 
     public IReadOnlyList<InventoryItemInstance> SpawnedProducts => spawnedProducts;
@@ -45,22 +44,5 @@ public class InventoryManager : MonoBehaviour
     {
         foreach (var item in spawnedProducts)
             if (item != null) item.RestoreOwner(this);
-        SaveSystem.OwnedProductsChanged += RefreshVisuals;
-        RefreshVisuals();
-    }
-
-    private void Start() => RefreshVisuals();
-
-    private void OnDisable() => SaveSystem.OwnedProductsChanged -= RefreshVisuals;
-
-    public void RefreshVisuals()
-    {
-        if (allContainers == null) return;
-        foreach (var container in allContainers)
-        {
-            if (container == null) continue;
-            container.SetInventoryManager(this);
-            container.SetOwned(container.UnlimitedCount || (SaveSystem.Data?.GetOwnedProductCount(container.ProductID) ?? 0) > 0);
-        }
     }
 }

@@ -304,9 +304,7 @@ public class PlayerItemCarryTests
         SetField(product, "productName", "Free Bag");
         SetField(product, "unlimitedCount", true);
         SetField(product, "objectPrefab", item);
-        var manager = secondItem.AddComponent<InventoryManager>();
-        SetField(manager, "allContainers", new[] { product });
-        manager.RefreshVisuals();
+        secondItem.AddComponent<InventoryManager>();
 
         Assert.IsTrue(product.TryGetPrompt(interactor, out var prompt));
         Assert.IsTrue(prompt.ShowKey);
@@ -349,8 +347,6 @@ public class PlayerItemCarryTests
         SetField(product, "unlimitedCount", true);
         SetField(product, "objectPrefab", item);
         var manager = secondItem.AddComponent<InventoryManager>();
-        SetField(manager, "allContainers", new[] { product });
-        manager.RefreshVisuals();
         GameObject delivered = null;
         try
         {

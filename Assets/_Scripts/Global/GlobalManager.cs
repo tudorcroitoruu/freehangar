@@ -98,7 +98,7 @@ public class GlobalManager : MonoBehaviour
         if (threshold >= 1f)
         {
             threshold = 0f;
-            if (Application.internetReachability == NetworkReachability.NotReachable)
+            /*if (Application.internetReachability == NetworkReachability.NotReachable)
             {
                 if (!noInternetConnection.activeSelf)
                 {
@@ -113,7 +113,7 @@ public class GlobalManager : MonoBehaviour
                     noInternetConnection.SetActive(false);
                     noInternet = false;
                 }
-            }
+            }*/
 
             /*float fps = frameCount / deltaTime;
             float cpuUsage = (Time.unscaledDeltaTime * 1000); // CPU time in milliseconds per frame
