@@ -106,7 +106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GrainContainer
   capacityKg: 25
   kilograms: 0
-  canBeCarried: 1
+  canBeCarried: 0
   restrictGrain: 0
   acceptedGrain: 0
   sack: {fileID: 5521972492265250693}
