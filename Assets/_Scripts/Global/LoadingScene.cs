@@ -208,6 +208,7 @@ public class LoadingScene : MonoBehaviour
         while (!loadOperation.isDone)
         {
             progress = Mathf.Clamp01(loadOperation.progress / 0.9f);
+            LoadingScreen.Instance?.SetProgress(progress);
 
             if (instance.loadingImage != null)
             {
@@ -234,6 +235,7 @@ public class LoadingScene : MonoBehaviour
         while (loadOperation.progress < 0.9f)
         {
             progress = Mathf.Clamp01(loadOperation.progress / 0.9f);
+            LoadingScreen.Instance?.SetProgress(progress);
 
             if (instance != null)
             {
@@ -248,6 +250,7 @@ public class LoadingScene : MonoBehaviour
         }
 
         progress = 1f;
+        LoadingScreen.Instance?.SetProgress(progress);
         if (instance != null)
         {
             if (instance.loadingImage != null)
@@ -315,6 +318,7 @@ public class LoadingScene : MonoBehaviour
 
     private static void CompleteSceneLoad()
     {
+        LoadingScreen.Instance?.SetProgress(1f);
         gameplayRevealScheduled = false;
         activeLoading = false;
         asyncCompleted = false;

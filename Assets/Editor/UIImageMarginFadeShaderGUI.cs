@@ -12,8 +12,12 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
         EditorGUI.BeginChangeCheck();
 
         DrawMainProperties(materialEditor, properties);
+        DrawGradientProperties(materialEditor, properties);
+        DrawSurfaceProperties(materialEditor, properties);
+        DrawFillProperties(materialEditor, properties);
         DrawEdgeProperties(materialEditor, properties);
         DrawOutlineProperties(materialEditor, properties);
+        DrawGlowProperties(materialEditor, properties);
         DrawNoiseProperties(materialEditor, properties);
         DrawUIProperties(materialEditor, properties);
 
@@ -49,6 +53,48 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
         EndSection();
     }
 
+    private static void DrawGradientProperties(MaterialEditor materialEditor, MaterialProperty[] properties)
+    {
+        BeginSection("Gradient", "Two-color gradient anchored to the full Image, including when using Fill. Tint and Image Color multiply the gradient; use white for the original gradient colors.");
+        MaterialProperty gradient = FindOptionalProperty("_UseGradient", properties);
+        DrawProperty(materialEditor, gradient);
+        if (gradient != null && (gradient.hasMixedValue || gradient.floatValue > 0.5f))
+        {
+            DrawProperty(materialEditor, properties, "_GradientStartColor");
+            DrawProperty(materialEditor, properties, "_GradientEndColor");
+            DrawProperty(materialEditor, properties, "_GradientDirection");
+        }
+        EndSection();
+    }
+
+    private static void DrawSurfaceProperties(MaterialEditor materialEditor, MaterialProperty[] properties)
+    {
+        BeginSection("Surface", "Simulated UI gloss. Higher Smoothness makes the highlight brighter and sharper, independently of scene lights and Bloom.");
+        MaterialProperty smoothness = FindOptionalProperty("_UISmoothness", properties);
+        DrawProperty(materialEditor, smoothness);
+        if (smoothness != null && (smoothness.hasMixedValue || smoothness.floatValue > 0f))
+        {
+            DrawProperty(materialEditor, properties, "_ShineColor");
+            DrawProperty(materialEditor, properties, "_ShineIntensity");
+            DrawProperty(materialEditor, properties, "_ShinePosition");
+        }
+        EndSection();
+    }
+
+    private static void DrawFillProperties(MaterialEditor materialEditor, MaterialProperty[] properties)
+    {
+        BeginSection("Fill", "Shader-driven fill. Image Type can remain Simple and Source Image can be None.");
+        MaterialProperty fill = FindOptionalProperty("_UseFill", properties);
+        DrawProperty(materialEditor, fill);
+        if (fill != null && (fill.hasMixedValue || fill.floatValue > 0.5f))
+        {
+            DrawProperty(materialEditor, properties, "_FillAmount");
+            DrawProperty(materialEditor, properties, "_FillDirection");
+            DrawProperty(materialEditor, properties, "_FillRoundCorners");
+        }
+        EndSection();
+    }
+
     private static void DrawEdgeProperties(MaterialEditor materialEditor, MaterialProperty[] properties)
     {
         BeginSection("Edge Fade", "Controls how far each side fades inward and how soft that fade transition is.");
@@ -79,6 +125,23 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
             DrawProperty(materialEditor, properties, "_OutlineThickness");
             DrawProperty(materialEditor, properties, "_OutlineColor");
             EditorGUILayout.HelpBox("Disable Outline to enable Noise Animation. Static noise and Torn Paper remain available.", MessageType.Info);
+        }
+        EndSection();
+    }
+
+    private static void DrawGlowProperties(MaterialEditor materialEditor, MaterialProperty[] properties)
+    {
+        BeginSection("UI Glow", "Direct UI glow, independent of scene Bloom. No runtime script required.");
+        MaterialProperty glow = FindOptionalProperty("_UseGlow", properties);
+        DrawProperty(materialEditor, glow);
+        if (glow != null && (glow.hasMixedValue || glow.floatValue > 0.5f))
+        {
+            DrawProperty(materialEditor, properties, "_GlowColor");
+            DrawProperty(materialEditor, properties, "_GlowSize");
+            DrawProperty(materialEditor, properties, "_GlowIntensity");
+            DrawProperty(materialEditor, properties, "_GlowSoftness");
+            DrawProperty(materialEditor, properties, "_GlowPadding");
+            EditorGUILayout.HelpBox("Glow Padding reserves transparent space inside the Image. Increase its width and height by twice the padding (screen pixels) to preserve the original visible size. Set padding at least as large as Glow Size. Keep the Canvas in Screen Space Overlay for independence from scene post-processing.", MessageType.Info);
         }
         EndSection();
     }

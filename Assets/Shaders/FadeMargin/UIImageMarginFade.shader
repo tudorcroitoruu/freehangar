@@ -4,12 +4,30 @@ Shader "UI/Image Margin Fade"
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
+        [ToggleUI] _UseGradient ("Use Gradient", Float) = 0
+        _GradientStartColor ("Start Color", Color) = (1,1,1,1)
+        _GradientEndColor ("End Color", Color) = (1,0.5,0,1)
+        [Enum(Left To Right,0,Right To Left,1,Bottom To Top,2,Top To Bottom,3)] _GradientDirection ("Gradient Direction", Float) = 0
+        _UISmoothness ("Smoothness", Range(0,1)) = 0
+        _ShineColor ("Shine Color", Color) = (1,1,1,1)
+        _ShineIntensity ("Shine Intensity", Range(0,2)) = 1
+        _ShinePosition ("Shine Position", Range(0,1)) = 0.7
         _FadeColor ("Fade Color", Color) = (0,0,0,0)
         _Saturation ("Saturation", Range(0, 1)) = 1
         _RoundCorners ("Round Corners", Range(0, 1)) = 0
+        [ToggleUI] _UseFill ("Use Fill", Float) = 0
+        _FillAmount ("Fill Amount", Range(0,1)) = 1
+        [Enum(Left To Right,0,Right To Left,1,Bottom To Top,2,Top To Bottom,3)] _FillDirection ("Fill Direction", Float) = 0
+        [ToggleUI] _FillRoundCorners ("Round Fill Corners", Float) = 0
         [Toggle] _Outline ("Outline", Float) = 0
         _OutlineThickness ("Outline Thickness (Pixels)", Range(0, 32)) = 2
         _OutlineColor ("Outline Color", Color) = (0,0,0,1)
+        [ToggleUI] _UseGlow ("Use Glow", Float) = 0
+        _GlowColor ("Glow Color", Color) = (1,0.7,0.2,1)
+        _GlowSize ("Glow Size (Pixels)", Range(0,32)) = 8
+        _GlowIntensity ("Glow Intensity", Range(0,5)) = 1
+        _GlowSoftness ("Glow Softness", Range(0.01,1)) = 0.7
+        _GlowPadding ("Glow Padding (Pixels)", Range(0,64)) = 12
         _FadeLeftSize ("Left Fade Size", Range(0, 1)) = 0.1
         _FadeLeftSoftness ("Left Softness", Range(0, 1)) = 1
         _FadeRightSize ("Right Fade Size", Range(0, 1)) = 0.1
@@ -86,7 +104,7 @@ Shader "UI/Image Margin Fade"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #pragma target 2.0
+            #pragma target 3.0
 
             #include "UnityCG.cginc"
             #include "UnityUI.cginc"
@@ -118,8 +136,22 @@ Shader "UI/Image Margin Fade"
             sampler2D _NoiseTex;
             float4 _NoiseTex_ST;
             fixed4 _Color;
+            float _UseGradient;
+            fixed4 _GradientStartColor;
+            fixed4 _GradientEndColor;
+            float _GradientDirection;
+            float _UISmoothness;
+            fixed4 _ShineColor;
+            float _ShineIntensity;
+            float _ShinePosition;
             fixed4 _FadeColor;
             fixed4 _OutlineColor;
+            float _UseGlow;
+            float4 _GlowColor;
+            float _GlowSize;
+            float _GlowIntensity;
+            float _GlowSoftness;
+            float _GlowPadding;
             half _Outline;
             float _OutlineThickness;
             fixed4 _TextureSampleAdd;
@@ -138,6 +170,10 @@ Shader "UI/Image Margin Fade"
             half _FadeBottomSoftness;
             half _Saturation;
             half _RoundCorners;
+            float _UseFill;
+            float _FillAmount;
+            float _FillDirection;
+            float _FillRoundCorners;
             half _NoiseScale;
             half _NoiseStrength;
             half _TornPaper;
@@ -190,7 +226,14 @@ Shader "UI/Image Margin Fade"
                 return lerp(luma.xxx, rgb, saturate(saturation));
             }
 
-            float RoundedCornersDistance(float2 uv)
+            float CornerRadius(float2 uv)
+            {
+                float2 uvPerPixel = max(sqrt(ddx(uv) * ddx(uv) + ddy(uv) * ddy(uv)), float2(0.000001, 0.000001));
+                float2 halfSize = 0.5 / uvPerPixel;
+                return saturate(_RoundCorners) * min(halfSize.x, halfSize.y);
+            }
+
+            float RoundedCornersDistance(float2 uv, float radius)
             {
                 // Convert the UV rectangle into screen-pixel units so a non-square
                 // Image still has circular corner arcs instead of stretched ellipses.
@@ -198,7 +241,6 @@ Shader "UI/Image Margin Fade"
                 float2 uvDy = ddy(uv);
                 float2 uvPerPixel = max(sqrt(uvDx * uvDx + uvDy * uvDy), float2(0.000001, 0.000001));
                 float2 halfSize = 0.5 / uvPerPixel;
-                float radius = saturate(_RoundCorners) * min(halfSize.x, halfSize.y);
                 float2 position = (uv - 0.5) / uvPerPixel;
                 float2 corner = abs(position) - (halfSize - radius);
                 return length(max(corner, 0.0)) + min(max(corner.x, corner.y), 0.0) - radius;
@@ -208,7 +250,7 @@ Shader "UI/Image Margin Fade"
             {
                 if (_RoundCorners <= 0.0)
                     return 1.0;
-                float distance = RoundedCornersDistance(uv);
+                float distance = RoundedCornersDistance(uv, CornerRadius(uv));
                 float antialias = max(fwidth(distance), 0.0001);
                 return saturate(0.5 - distance / antialias);
             }
@@ -244,15 +286,14 @@ Shader "UI/Image Margin Fade"
                 #endif
             }
 
-            float NoisyRoundedCornersDistance(float2 uv, float2 noisePosition)
+            float NoisyRoundedCornersDistance(float2 uv, float2 noisePosition, float radius)
             {
-                float distance = RoundedCornersDistance(uv);
+                float distance = RoundedCornersDistance(uv, radius);
                 #if defined(_USE_PAINTED_EDGE_NOISE)
                 if (_RoundCorners > 0.0 && _NoiseStrength > 0.0)
                 {
                     float2 uvPerPixel = max(sqrt(ddx(uv) * ddx(uv) + ddy(uv) * ddy(uv)), float2(0.000001, 0.000001));
                     float2 halfSize = 0.5 / uvPerPixel;
-                    float radius = saturate(_RoundCorners) * min(halfSize.x, halfSize.y);
                     float2 position = (uv - 0.5) / uvPerPixel;
                     float2 corner = max(abs(position) - (halfSize - radius), 0.0);
                     float cornerLength = length(corner);
@@ -342,12 +383,91 @@ Shader "UI/Image Margin Fade"
                 return edgeMask * hasFade;
             }
 
-            fixed4 frag(v2f IN) : SV_Target
+            // Signed distance to the midpoint of the existing noisy fade transition.
+            // Negative is inside the shape. No fade means the original UV boundary.
+            float GlowEdgeDistance(float edgeDistance, half fadeSize, half softness, half noise, half edgeIndex)
             {
-                fixed4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color;
-                color.rgb = ApplySaturation(color.rgb, _Saturation);
+                float boundary = 0.0;
+                if (fadeSize >= 0.0001)
+                {
+                    half fadeStart;
+                    half fadeEnd;
+                    #if defined(_USE_PAINTED_EDGE_NOISE)
+                    if (_TornPaper > 0.5)
+                    {
+                        half roughness = saturate(_NoiseStrength) * saturate(_TornPaperRoughness);
+                        half tornBoundary = fadeSize * (0.5 + 0.5 * noise * roughness * (1.0 + NoisePulse(edgeIndex)));
+                        fadeEnd = clamp(tornBoundary + FadeWave(edgeIndex), 0.0001, max(fadeSize, 0.0001));
+                        half transition = max(fadeSize * saturate(_TornPaperSoftness), fwidth(edgeDistance));
+                        fadeStart = max(0.0, fadeEnd - max(transition, 0.0001));
+                    }
+                    else
+                    #endif
+                    {
+                        half pulsedNoise = noise * (1.0 + NoisePulse(edgeIndex));
+                        half widthMultiplier = max(1.0 + pulsedNoise * saturate(_NoiseStrength), 0.05);
+                        fadeEnd = max(fadeSize * widthMultiplier + FadeWave(edgeIndex), 0.0001);
+                        fadeStart = fadeEnd * (1.0 - max(saturate(softness), 0.0001));
+                    }
+                    boundary = (fadeStart + fadeEnd) * 0.5;
+                }
+                float distance = boundary - edgeDistance;
+                return distance / max(length(float2(ddx(distance), ddy(distance))), 0.000001);
+            }
 
-                half2 uv = IN.texcoord;
+            float4 frag(v2f IN) : SV_Target
+            {
+                bool useGlow = _UseGlow > 0.5 && _GlowIntensity > 0.0 && _GlowSize > 0.0;
+                float2 shapeUV = IN.texcoord;
+                if (useGlow)
+                {
+                    // Reserve transparent pixels INSIDE the existing Image geometry.
+                    // Zero intensity leaves the original UVs and appearance untouched.
+                    float2 uvPerPixel = sqrt(ddx(shapeUV) * ddx(shapeUV) + ddy(shapeUV) * ddy(shapeUV));
+                    float2 padding = min(max(_GlowPadding, 0.0) * uvPerPixel, float2(0.49, 0.49));
+                    shapeUV = (shapeUV - padding) / (1.0 - 2.0 * padding);
+                }
+                // Re-evaluate the existing contour on the filled rectangle. Derivatives
+                // keep corner radii and outline thickness in pixels instead of stretching them.
+                bool roundedFill = _UseFill > 0.5 && _FillRoundCorners > 0.5 && _RoundCorners > 0.0
+                    && _FillAmount > 0.0 && _FillAmount < 1.0;
+                // Keep the full bar's radius even when the filled width/height becomes
+                // smaller than its diameter. The end caps then intersect into a lens
+                // instead of turning the remainder into a tall, narrow capsule.
+                float cornerRadius = CornerRadius(shapeUV);
+                float2 contourUV = shapeUV;
+                if (roundedFill)
+                {
+                    float amount = max(saturate(_FillAmount), 0.0001);
+                    if (_FillDirection < 1.5)
+                        contourUV.x = (shapeUV.x - (_FillDirection < 0.5 ? 0.0 : 1.0 - amount)) / amount;
+                    else
+                        contourUV.y = (shapeUV.y - (_FillDirection < 2.5 ? 0.0 : 1.0 - amount)) / amount;
+                }
+                fixed4 color = (tex2D(_MainTex, useGlow ? saturate(shapeUV) : shapeUV) + _TextureSampleAdd) * IN.color;
+                if (_UseGradient > 0.5)
+                {
+                    // Anchor the gradient to the full Image, so fill changes reveal
+                    // more of the same gradient rather than stretching its colors.
+                    float coordinate = _GradientDirection < 0.5 ? shapeUV.x
+                        : _GradientDirection < 1.5 ? 1.0 - shapeUV.x
+                        : _GradientDirection < 2.5 ? shapeUV.y : 1.0 - shapeUV.y;
+                    color *= lerp(_GradientStartColor, _GradientEndColor, saturate(coordinate));
+                }
+                color.rgb = ApplySaturation(color.rgb, _Saturation);
+                if (_UISmoothness > 0.0 && _ShineIntensity > 0.0)
+                {
+                    // A simulated surface reflection for unlit UI: higher smoothness
+                    // produces a narrower, brighter highlight without HDR or scene lighting.
+                    float smoothness = saturate(_UISmoothness);
+                    float width = max(lerp(0.45, 0.035, smoothness), fwidth(shapeUV.y));
+                    float distance = (shapeUV.y - _ShinePosition) / width;
+                    float highlight = exp2(-4.0 * distance * distance);
+                    float strength = saturate(highlight * smoothness * smoothness * _ShineIntensity * _ShineColor.a);
+                    color.rgb = lerp(color.rgb, _ShineColor.rgb, strength);
+                }
+
+                float2 uv = contourUV;
                 half edgeNoise = SamplePaintedNoise(IN.noisePosition);
                 half leftNoise = edgeNoise;
                 half rightNoise = edgeNoise;
@@ -382,7 +502,7 @@ Shader "UI/Image Margin Fade"
                 // alpha 0 fades margins to transparent, alpha 1 keeps the sprite alpha and tints to _FadeColor.
                 fixed4 fadeTarget = fixed4(_FadeColor.rgb, color.a * _FadeColor.a);
                 color = lerp(color, fadeTarget, edgeFade);
-                float roundedDistance = NoisyRoundedCornersDistance(IN.texcoord, IN.noisePosition);
+                float roundedDistance = NoisyRoundedCornersDistance(contourUV, IN.noisePosition, cornerRadius);
                 float roundedAntialias = max(fwidth(roundedDistance), 0.0001);
                 half roundedMask = saturate(0.5 - roundedDistance / roundedAntialias);
                 if (_RoundCorners > 0.0) color.a *= roundedMask;
@@ -391,8 +511,8 @@ Shader "UI/Image Margin Fade"
                 {
                     // Erode the same four noisy boundaries; reuse their tangent samples
                     // so the inner contour follows Torn Paper instead of a rectangle.
-                    float2 uvDx = ddx(IN.texcoord);
-                    float2 uvDy = ddy(IN.texcoord);
+                    float2 uvDx = ddx(contourUV);
+                    float2 uvDy = ddy(contourUV);
                     float2 inset = _OutlineThickness * sqrt(uvDx * uvDx + uvDy * uvDy);
                     half innerLeft = EdgeFade(uv.x - inset.x, _FadeLeftSize, _FadeLeftSoftness, leftNoise, 0.0);
                     half innerRight = EdgeFade(1.0 - uv.x - inset.x, _FadeRightSize, _FadeRightSoftness, rightNoise, 1.0);
@@ -406,19 +526,60 @@ Shader "UI/Image Margin Fade"
                     color.rgb = lerp(color.rgb, _OutlineColor.rgb, outlineMask * _OutlineColor.a);
                 }
 
+                float4 result = float4(color);
+
+                if (useGlow)
+                {
+                    float4 edges = float4(
+                        GlowEdgeDistance(uv.x, _FadeLeftSize, _FadeLeftSoftness, leftNoise, 0.0),
+                        GlowEdgeDistance(1.0 - uv.x, _FadeRightSize, _FadeRightSoftness, rightNoise, 1.0),
+                        GlowEdgeDistance(uv.y, _FadeBottomSize, _FadeBottomSoftness, bottomNoise, 2.0),
+                        GlowEdgeDistance(1.0 - uv.y, _FadeTopSize, _FadeTopSoftness, topNoise, 3.0));
+                    float2 edgeDistance = float2(max(edges.x, edges.y), max(edges.z, edges.w));
+                    float distance = length(max(edgeDistance, 0.0)) + min(max(edgeDistance.x, edgeDistance.y), 0.0);
+                    distance = max(distance, roundedDistance);
+                    float softStart = _GlowSize * (1.0 - clamp(_GlowSoftness, 0.01, 1.0));
+                    float glow = 1.0 - smoothstep(softStart, _GlowSize, max(distance, 0.0));
+
+                    float insideImage = step(0.0, contourUV.x) * step(contourUV.x, 1.0)
+                        * step(0.0, contourUV.y) * step(contourUV.y, 1.0);
+                    result.a *= insideImage;
+                    // Compose behind the original image/outline, then apply CanvasGroup
+                    // opacity once. The sharp outline's original color stays on top.
+                    float baseAlpha = IN.color.a > 0.0 ? saturate(result.a / IN.color.a) : 0.0;
+                    float glowAlpha = saturate(glow * _GlowIntensity * _GlowColor.a);
+                    float behindAlpha = glowAlpha * (1.0 - baseAlpha);
+                    float combinedAlpha = baseAlpha + behindAlpha;
+                    float3 glowColor = saturate(_GlowColor.rgb * _GlowIntensity);
+                    result.rgb = (result.rgb * baseAlpha + glowColor * behindAlpha) / max(combinedAlpha, 0.000001);
+                    result.a = combinedAlpha * IN.color.a;
+                }
+
+                // Shader-driven fill also works on a Simple Image with no Source Image.
+                // Apply to the complete result so the outline/glow cannot remain in empty space.
+                if (_UseFill > 0.5 && _FillAmount < 1.0 && !roundedFill)
+                {
+                    float coordinate = _FillDirection < 0.5 ? shapeUV.x
+                        : _FillDirection < 1.5 ? 1.0 - shapeUV.x
+                        : _FillDirection < 2.5 ? shapeUV.y : 1.0 - shapeUV.y;
+                    float fill = _FillAmount <= 0.0 ? 0.0
+                        : saturate((_FillAmount - coordinate) / max(fwidth(coordinate), 0.000001) + 0.5);
+                    result.a *= fill;
+                }
+
                 #ifdef UNITY_UI_CLIP_RECT
                 half2 maskSoftness = saturate(
                     (_ClipRect.zw - _ClipRect.xy - abs(IN.mask.xy)) * IN.mask.zw
                 );
 
-                color.a *= maskSoftness.x * maskSoftness.y;
+                result.a *= maskSoftness.x * maskSoftness.y;
                 #endif
 
                 #ifdef UNITY_UI_ALPHACLIP
-                clip(color.a - 0.001);
+                clip(result.a - 0.001);
                 #endif
 
-                return color;
+                return result;
             }
 
             ENDCG
