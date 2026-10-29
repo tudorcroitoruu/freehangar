@@ -33,6 +33,13 @@ public static class SaveSystem
         return true;
     }
 
+    public static bool TryPurchaseVehicleUpgrade(string id, int price, int expectedLevel, int maxLevel)
+    {
+        if (Data == null || !Data.TryUpgradeVehicle(id, price, expectedLevel, maxLevel)) return false;
+        SaveData();
+        return true;
+    }
+
     public static bool TryPurchaseUpgrade(int price, Func<PlayerData, bool> apply, out bool usedVoucher)
     {
         usedVoucher = false;
@@ -292,6 +299,34 @@ public class PlayerData
     public int[] wheelbarrowUpgradeLevels = new int[3];
     public int shovelUpgradeLevel;
     public int staminaUpgradeLevel;
+    public List<VehicleUpgradeSave> vehicleUpgrades = new List<VehicleUpgradeSave>();
+
+    public int GetVehicleUpgradeLevel(string id)
+    {
+        var saved = vehicleUpgrades?.Find(entry => entry != null && entry.id == id);
+        if (saved != null) return Math.Max(0, saved.level);
+        // Preserve upgrades purchased with the former wheelbarrow U shortcut.
+        const string prefix = "wheelbarrow.";
+        if (id != null && id.StartsWith(prefix, StringComparison.Ordinal) &&
+            int.TryParse(id.Substring(prefix.Length), out int index) && index >= 0 &&
+            wheelbarrowUpgradeLevels != null && index < wheelbarrowUpgradeLevels.Length)
+            return Math.Max(0, wheelbarrowUpgradeLevels[index]);
+        return 0;
+    }
+
+    public bool TryUpgradeVehicle(string id, int price, int expectedLevel, int maxLevel)
+    {
+        bool voucher = price > 0 && freeUpgradeVouchers > 0;
+        if (string.IsNullOrWhiteSpace(id) || price < 0 || (!voucher && cash < price) ||
+            expectedLevel < 0 || expectedLevel >= maxLevel || GetVehicleUpgradeLevel(id) != expectedLevel) return false;
+        vehicleUpgrades ??= new List<VehicleUpgradeSave>();
+        var saved = vehicleUpgrades.Find(entry => entry != null && entry.id == id);
+        if (saved == null) { saved = new VehicleUpgradeSave { id = id }; vehicleUpgrades.Add(saved); }
+        saved.level = expectedLevel + 1;
+        if (voucher) freeUpgradeVouchers--;
+        else cash -= price;
+        return true;
+    }
 
     public bool TryUpgradeStamina(int price, int expectedLevel, int maxLevel)
     {
@@ -372,6 +407,13 @@ public class OwnedProductData
 {
     public string productID;
     public int ownCount;
+}
+
+[Serializable]
+public class VehicleUpgradeSave
+{
+    public string id;
+    public int level;
 }
 
 [Serializable]

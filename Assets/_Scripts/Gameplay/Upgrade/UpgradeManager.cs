@@ -73,6 +73,27 @@ public class UpgradeManager : MonoBehaviour
         return true;
     }
 
+    public bool OpenVehicle(VehicleUpgrade vehicle)
+    {
+        if (!enabled || upgradeVehicleScreen == null || vehicle == null || !vehicle.isActiveAndEnabled || !vehicle.IsConfigured ||
+            (current != null && current.IsOpen) || UIPopups.BasePopupUI.HasActivePopup ||
+            (transform.parent != null && !transform.parent.gameObject.activeInHierarchy)) return false;
+        Initialize();
+        previousCursorLock = Cursor.lockState;
+        previousCursorVisible = Cursor.visible;
+        openedFrame = Time.frameCount;
+        IsOpen = true;
+        current = this;
+        if (upgradeShovelScreen != null) upgradeShovelScreen.gameObject.SetActive(false);
+        if (upgradeStaminaScreen != null) upgradeStaminaScreen.gameObject.SetActive(false);
+        upgradeVehicleScreen.SetTarget(vehicle);
+        gameObject.SetActive(true);
+        upgradeVehicleScreen.gameObject.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        return true;
+    }
+
     private void OnEnable()
     {
         if (closeButton != null) closeButton.onClick.AddListener(Close);
@@ -93,6 +114,8 @@ public class UpgradeManager : MonoBehaviour
             upgradeShovelScreen.TryUpgrade();
         else if (upgradePressed && upgradeStaminaScreen != null && upgradeStaminaScreen.isActiveAndEnabled)
             upgradeStaminaScreen.TryUpgrade();
+        else if (upgradePressed && upgradeVehicleScreen != null && upgradeVehicleScreen.isActiveAndEnabled)
+            upgradeVehicleScreen.TryUpgrade();
     }
 
     public void Close()

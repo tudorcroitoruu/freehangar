@@ -39,6 +39,78 @@ public class PlayerInteractorTests
     }
 
     [Test]
+    public void WheelbarrowKeepsEAndAddsASeparateFUpgradeAction()
+    {
+        var body = Create("Wheelbarrow station", origin + Vector3.forward * 2);
+        var wheelbarrow = body.AddComponent<WheelbarrowCargo>();
+        var upgrade = body.AddComponent<VehicleUpgradeInteractable>();
+        var collider = body.AddComponent<BoxCollider>();
+        var menu = Create("Upgrade manager", origin);
+        menu.SetActive(false);
+        var manager = menu.AddComponent<UpgradeManager>();
+        SetField(upgrade, "upgradeManager", manager);
+        Assert.AreSame(wheelbarrow, FindTarget());
+        Assert.IsTrue(wheelbarrow.TryGetPrompt(interactor, out var prompt));
+        object[] args = { wheelbarrow, prompt };
+        typeof(PlayerInteractor).GetMethod("AddActions", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(interactor, args);
+        prompt = (InteractionPromptData)args[1];
+        Assert.AreEqual(KeyCode.E, prompt.InteractionKey);
+        Assert.AreEqual(1, prompt.AdditionalActions.Length);
+        Assert.AreEqual(KeyCode.F, prompt.AdditionalActions[0].Key);
+        Assert.AreSame(upgrade, VehicleUpgradeInteractable.FindForHit(collider, interactor));
+        upgrade.enabled = false;
+        Assert.IsNull(VehicleUpgradeInteractable.FindForHit(collider, interactor));
+        Assert.AreSame(body.GetComponent<WheelbarrowCargo>(), FindTarget());
+    }
+
+    [Test]
+    public void UpgradeActionOnChildColliderCoexistsWithTheParentVehicleAction()
+    {
+        var body = Create("Parent wheelbarrow", origin + Vector3.forward * 2);
+        var wheelbarrow = body.AddComponent<WheelbarrowCargo>();
+        var child = Create("Upgrade collider", body.transform.position);
+        child.transform.SetParent(body.transform);
+        child.AddComponent<BoxCollider>();
+        var upgrade = child.AddComponent<VehicleUpgradeInteractable>();
+        SetField(upgrade, "targetVehicle", body);
+        var menu = Create("Upgrade manager", origin);
+        menu.SetActive(false);
+        SetField(upgrade, "upgradeManager", menu.AddComponent<UpgradeManager>());
+        Assert.AreSame(wheelbarrow, FindTarget());
+        wheelbarrow.TryGetPrompt(interactor, out var prompt);
+        object[] args = { wheelbarrow, prompt };
+        typeof(PlayerInteractor).GetMethod("AddActions", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(interactor, args);
+        prompt = (InteractionPromptData)args[1];
+        Assert.AreEqual(KeyCode.F, prompt.AdditionalActions[0].Key);
+    }
+
+    [Test]
+    public void StandaloneUpgradeStationUsesFInsteadOfE()
+    {
+        var body = Create("Upgrade station", origin + Vector3.forward * 2);
+        var station = body.AddComponent<VehicleUpgradeInteractable>();
+        body.AddComponent<BoxCollider>();
+        Assert.AreSame(station, FindTarget());
+        Assert.AreEqual(KeyCode.F, station.InteractionKey);
+    }
+
+    [Test]
+    public void CargoOnUpgradeVehicleStillUsesItsOwnInteraction()
+    {
+        var body = Create("Vehicle station", origin + Vector3.forward * 2);
+        body.AddComponent<VehicleUpgradeInteractable>();
+        var bag = Create("Loaded bag", body.transform.position);
+        bag.transform.SetParent(body.transform);
+        var container = bag.AddComponent<GrainContainer>();
+        var collider = bag.AddComponent<BoxCollider>();
+        Assert.IsNull(VehicleUpgradeInteractable.FindForHit(collider, interactor));
+        Assert.AreSame(container, FindTarget());
+        Object.DestroyImmediate(container);
+        bag.AddComponent<BicycleCargoBox>();
+        Assert.IsNull(VehicleUpgradeInteractable.FindForHit(collider, interactor));
+    }
+
+    [Test]
     public void WallBlocksInteractionBehindIt()
     {
         CreateTarget(3);

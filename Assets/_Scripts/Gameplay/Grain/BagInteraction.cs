@@ -133,6 +133,8 @@ public sealed class BagInteraction : MonoBehaviour
     public bool TryStow(Transform slot)
     {
         if (carried == null || slot == null) return false;
+        var upgrades = slot.GetComponentInParent<VehicleUpgrade>();
+        if (upgrades != null && !upgrades.CanLoadVolume(carriedVolume)) return false;
         var bag = carried;
         bag.transform.SetParent(slot, true);
         bag.transform.localScale = new Vector3(originalWorldScale.x / slot.lossyScale.x, originalWorldScale.y / slot.lossyScale.y, originalWorldScale.z / slot.lossyScale.z);

@@ -2,8 +2,9 @@ using UnityEngine;
 
 /// <summary>Attach to the workshop display root, with shovel models and colliders on children.</summary>
 [DisallowMultipleComponent]
-public sealed class ShovelUpgradeInteractable : MonoBehaviour, IInteractable
+public sealed class ShovelUpgradeInteractable : MonoBehaviour, IKeyedInteractable
 {
+    public KeyCode InteractionKey => KeyCode.F;
     [SerializeField] private UpgradeManager upgradeManager;
     [SerializeField] private Transform promptAnchor;
     [SerializeField] private Vector3 promptOffset = Vector3.up * .3f;
@@ -51,6 +52,7 @@ public sealed class ShovelUpgradeInteractable : MonoBehaviour, IInteractable
     {
         prompt = new InteractionPromptData(
             (promptAnchor != null ? promptAnchor.position : transform.position) + promptOffset, "Upgrade shovel");
+        prompt.InteractionKey = InteractionKey;
         return isActiveAndEnabled && interactor != null && Manager != null && !Manager.IsOpen &&
             !UpgradeManager.BlocksGameplayInput && !UIPopups.BasePopupUI.HasActivePopup;
     }

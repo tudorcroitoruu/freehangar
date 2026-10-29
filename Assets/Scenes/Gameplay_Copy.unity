@@ -36748,7 +36748,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3563179074102822998, guid: c7a46f96b970c8446a66fec77f721f9f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1717743136}
   m_SourcePrefab: {fileID: 100100000, guid: c7a46f96b970c8446a66fec77f721f9f, type: 3}
 --- !u!1001 &128479131
 PrefabInstance:
@@ -61490,6 +61493,11 @@ MonoBehaviour:
   interactionMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!4 &217606950 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1601243519141173141, guid: cbe0848666b2e0e4d9c92359a06cb7fb, type: 3}
+  m_PrefabInstance: {fileID: 5877819208465033855}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &218101820
 GameObject:
   m_ObjectHideFlags: 0
@@ -101591,6 +101599,84 @@ LODGroup:
     - renderer: {fileID: 1050424521}
     - renderer: {fileID: 2013216439}
   m_Enabled: 1
+--- !u!1001 &371199466
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 217606950}
+    m_Modifications:
+    - target: {fileID: 343473208926135921, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 343473208926135921, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.788
+      objectReference: {fileID: 0}
+    - target: {fileID: 343473208926135921, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 343473208926135921, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.9947345
+      objectReference: {fileID: 0}
+    - target: {fileID: 343473208926135921, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 343473208926135921, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.10248559
+      objectReference: {fileID: 0}
+    - target: {fileID: 343473208926135921, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 343473208926135921, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 343473208926135921, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 343473208926135921, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 569244549738036266, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2506253300954519927, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6973703425810668286, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9158635742410941698, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_Name
+      value: LevelupCylinderYellow
+      objectReference: {fileID: 0}
+    - target: {fileID: 9158635742410941698, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+--- !u!4 &371199467 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 343473208926135921, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
+  m_PrefabInstance: {fileID: 371199466}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &371581998
 GameObject:
   m_ObjectHideFlags: 0
@@ -110118,6 +110204,71 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 406639908}
   m_Mesh: {fileID: 4300000, guid: c1ecab4aebf06a64c90ab7b16085242e, type: 2}
+--- !u!1 &406739769 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2136213332081319394, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
+  m_PrefabInstance: {fileID: 1902772967}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &406739772 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2136213332081672642, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
+  m_PrefabInstance: {fileID: 1902772967}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &406739773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 406739769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea001df6e518a8f4e8a78465611b9e39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WheelbarrowCargo
+  cargoVolumeCubicMeters: 0.4
+  upgradeIndex: 0
+  upgradePrice: 250
+  trayCenter: {x: 0, y: 0.46, z: -0.72}
+  traySize: {x: 0.7, y: 0.35, z: 0.85}
+  pushDistance: 1.4
+--- !u!114 &406739774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 406739769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7766699f18f62549b7829328c08b440, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgradeInteractable
+  upgradeManager: {fileID: 0}
+  targetVehicle: {fileID: 406739769}
+  promptAnchor: {fileID: 406739772}
+  promptOffset: {x: 0, y: 0.3, z: 0}
+--- !u!65 &406739775
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 406739769}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 0.7131318, z: 1.8024919}
+  m_Center: {x: -0.0000013305064, y: 0.4637013, z: -0.6429343}
 --- !u!1 &406831249
 GameObject:
   m_ObjectHideFlags: 0
@@ -117326,7 +117477,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3906765685510906400, guid: bbf0259cc1ae3124cb1bd81e36bf8283, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1848710743}
   m_SourcePrefab: {fileID: 100100000, guid: bbf0259cc1ae3124cb1bd81e36bf8283, type: 3}
 --- !u!1 &431099673
 GameObject:
@@ -329002,6 +329156,7 @@ GameObject:
   - component: {fileID: 1172481761}
   - component: {fileID: 1172481760}
   - component: {fileID: 1172481759}
+  - component: {fileID: 1172481762}
   m_Layer: 0
   m_Name: Bicycle - red rideable
   m_TagString: Untagged
@@ -329095,6 +329250,22 @@ Transform:
   - {fileID: 881785646}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1172481762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1172481758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7766699f18f62549b7829328c08b440, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgradeInteractable
+  upgradeManager: {fileID: 0}
+  targetVehicle: {fileID: 1172481758}
+  promptAnchor: {fileID: 1172481761}
+  promptOffset: {x: 0, y: 0.3, z: 0}
 --- !u!1 &1172655205
 GameObject:
   m_ObjectHideFlags: 0
@@ -484371,6 +484542,29 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1717642874}
   m_Mesh: {fileID: 4300000, guid: 9cfacd2f414a2ab45a0f1eb524414bf1, type: 2}
+--- !u!1 &1717743133 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3563179074102822998, guid: c7a46f96b970c8446a66fec77f721f9f, type: 3}
+  m_PrefabInstance: {fileID: 127885348}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1717743136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1717743133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea001df6e518a8f4e8a78465611b9e39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WheelbarrowCargo
+  cargoVolumeCubicMeters: 0.4
+  upgradeIndex: 0
+  upgradePrice: 250
+  trayCenter: {x: 0, y: 0.46, z: -0.72}
+  traySize: {x: 0.7, y: 0.35, z: 0.85}
+  pushDistance: 1.4
 --- !u!1 &1717920185
 GameObject:
   m_ObjectHideFlags: 0
@@ -520409,6 +520603,29 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1848705199}
   m_Mesh: {fileID: 4300000, guid: 649c79af901bf284d972eb44cb361e6c, type: 2}
+--- !u!1 &1848710740 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3906765685510906400, guid: bbf0259cc1ae3124cb1bd81e36bf8283, type: 3}
+  m_PrefabInstance: {fileID: 430742274}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1848710743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848710740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea001df6e518a8f4e8a78465611b9e39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WheelbarrowCargo
+  cargoVolumeCubicMeters: 0.4
+  upgradeIndex: 0
+  upgradePrice: 250
+  trayCenter: {x: 0, y: 0.46, z: -0.72}
+  traySize: {x: 0.7, y: 0.35, z: 0.85}
+  pushDistance: 1.4
 --- !u!1 &1849017917
 GameObject:
   m_ObjectHideFlags: 0
@@ -537691,7 +537908,16 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2136213332081319394, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 406739774}
+    - targetCorrespondingSourceObject: {fileID: 2136213332081319394, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 406739773}
+    - targetCorrespondingSourceObject: {fileID: 2136213332081319394, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 406739775}
   m_SourcePrefab: {fileID: 100100000, guid: 0c16ef6a4512cef4bba8d7827f968fe8, type: 3}
 --- !u!1 &1902879912
 GameObject:
@@ -641923,6 +642149,9 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 1601243519141173141, guid: cbe0848666b2e0e4d9c92359a06cb7fb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 371199467}
     - targetCorrespondingSourceObject: {fileID: 770069233985893199, guid: cbe0848666b2e0e4d9c92359a06cb7fb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2046853733}

@@ -67,15 +67,16 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         {
             if (bags != null && bags.IsCarrying)
             {
-                hint=bicycle.FreeBagCargoSlot()!=null ? "E Secure bag on " + bicycle.cargoLocationName : bicycle.cargoLocationName + " is full";
+                var upgrades = bicycle.GetComponent<VehicleUpgrade>();
+                bool canLoad = bicycle.FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadVolume(bags.CarriedVolume));
+                hint=canLoad ? "E Secure bag on " + bicycle.cargoLocationName : bicycle.cargoLocationName + " is full";
                 if (Input.GetKeyDown(KeyCode.E)) { TryLoadBag(); return true; }
                 return false;
             }
             // Aiming at an attached bag uses the existing bag interaction to take it back.
             if (hit.collider.GetComponentInParent<GrainContainer>() != null) return false;
-            var engine = bicycle.GetComponent<MotorollerController>();
-            hint=engine != null ? "E Drive " + engine.VehicleName : "E Ride bicycle";
-            if(Input.GetKeyDown(KeyCode.E))return TryMount();
+            // Body actions and their key prompts are handled by PlayerInteractor.
+            return false;
         }
         else
         {
@@ -205,6 +206,8 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     void OnGUI()
     {
         if(string.IsNullOrEmpty(hint) || Cursor.lockState!=CursorLockMode.Locked)return;
+        if (!riding && hint.StartsWith("E ") && GameplayCanvas.Instance != null &&
+            GameplayCanvas.Instance.interactionPrompt != null && GameplayCanvas.Instance.interactionPrompt.IsVisible) return;
         GUI.Box(new Rect(Mathf.Max(8, Screen.width/2-340),Screen.height-85,Mathf.Min(680, Screen.width-16),36),hint);
     }
 }

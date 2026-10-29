@@ -157,6 +157,7 @@ public class PlayerController : MonoBehaviour
             SetCursorLocked(true);
 
         bool bicycleInput = Application.isFocused && Time.timeScale > 0 && Cursor.lockState == CursorLockMode.Locked && !UIPopups.BasePopupUI.HasActivePopup;
+        if (bicycleInput && interactor != null && interactor.TryAdditionalInput()) return;
         if (bicycleInteraction != null && bicycleInteraction.Tick(bicycleInput)) return;
 
         if (!characterController.enabled || Time.deltaTime <= 0f)
@@ -164,8 +165,6 @@ public class PlayerController : MonoBehaviour
 
         bool acceptInput = Application.isFocused && Cursor.lockState == CursorLockMode.Locked && !UIPopups.BasePopupUI.HasActivePopup;
         if (acceptInput && Input.GetKeyDown(KeyCode.G)) ToggleShovel();
-        if (acceptInput && interactor != null && interactor.PushedWheelbarrow != null && Input.GetKeyDown(KeyCode.U))
-            interactor.PushedWheelbarrow.TryUpgrade(interactor);
         lookInput = Vector2.zero;
         if (acceptInput)
             HandleCamera();

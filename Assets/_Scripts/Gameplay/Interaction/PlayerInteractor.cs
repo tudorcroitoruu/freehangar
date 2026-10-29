@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>Resolves the nearest visible interactable and owns its shared prompt.</summary>
 [DefaultExecutionOrder(300), DisallowMultipleComponent]
@@ -11,6 +12,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     private PlayerController player;
     private PlayerBicycleInteraction bicycle;
     private InteractionHighlight highlight;
+    private Transform actionOrigin;
     public BagInteraction Bags { get; private set; }
     public PlayerItemCarry Items { get; private set; }
     public WheelbarrowCargo PushedWheelbarrow { get; set; }
@@ -53,6 +55,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         var aimedTarget = FindTarget();
         InteractionPromptData aimedPrompt = default;
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
+        if (hasAimedPrompt) AddActions(aimedTarget, ref aimedPrompt);
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
         if (hasAimedPrompt && aimedPrompt.RequiresFreeHands)
         {
@@ -71,15 +74,19 @@ public sealed class PlayerInteractor : MonoBehaviour
         {
             SetHighlightedTarget(null);
             if (PushedWheelbarrow.TryGetPrompt(this, out var pushPrompt) && prompt != null)
+            {
+                if (PushedWheelbarrow.GetComponent<VehicleUpgrade>() is VehicleUpgrade upgrades && upgrades.IsConfigured)
+                    pushPrompt.AdditionalActions = new[] { new InteractionPromptAction("Upgrade vehicle", KeyCode.F) };
                 prompt.Show(viewCamera, pushPrompt);
+            }
             else HidePrompt();
             return;
         }
         if (Bags != null && Bags.isActiveAndEnabled && Bags.IsCarrying)
         {
             SetHighlightedTarget(null);
-            var wheelbarrow = aimedTarget as WheelbarrowCargo;
-            if (wheelbarrow != null && wheelbarrow.TryGetPrompt(this, out var loadPrompt))
+            if ((aimedTarget is WheelbarrowCargo || aimedTarget is BicycleController) &&
+                aimedTarget.TryGetPrompt(this, out var loadPrompt))
             {
                 if (prompt != null) prompt.Show(viewCamera, loadPrompt);
                 return;
@@ -111,11 +118,67 @@ public sealed class PlayerInteractor : MonoBehaviour
             return Bags.TryInteract();
         }
         Target = FindTarget();
-        return Target != null && Target.TryGetPrompt(this, out var data) && data.ShowKey && Target.TryInteract(this);
+        return Target != null && KeyFor(Target) == KeyCode.E && Target.TryGetPrompt(this, out var data) && data.ShowKey && Target.TryInteract(this);
+    }
+
+    public bool TryAdditionalInput()
+    {
+        if (!Input.anyKeyDown || !CanInteract) return false;
+        if (PushedWheelbarrow != null) return Input.GetKeyDown(KeyCode.F) && TryInteract(KeyCode.F);
+        var primary = FindTarget();
+        if (!(primary is Component component)) return false;
+        foreach (var behaviour in ActionBehaviours(component))
+            if (behaviour != null && behaviour.isActiveAndEnabled && behaviour is IKeyedInteractable action &&
+                action.InteractionKey != KeyCode.E && action.InteractionKey != KeyCode.None && Input.GetKeyDown(action.InteractionKey))
+                return TryInteract(action.InteractionKey);
+        return false;
+    }
+
+    public bool TryInteract(KeyCode key)
+    {
+        if (key == KeyCode.E) return TryInteract();
+        if (!CanInteract || (Items != null && Items.IsCarrying) || (Bags != null && Bags.IsCarrying)) return false;
+        if (PushedWheelbarrow != null) return key == KeyCode.F && PushedWheelbarrow.TryUpgrade(this);
+        var primary = FindTarget();
+        if (!(primary is Component component)) return false;
+        foreach (var behaviour in ActionBehaviours(component))
+            if (behaviour != null && behaviour.isActiveAndEnabled && behaviour is IKeyedInteractable action && action.InteractionKey == key &&
+                action.TryGetPrompt(this, out var data) && data.ShowKey && !data.RequiresFreeHands)
+                return action.TryInteract(this);
+        return false;
+    }
+
+    private static KeyCode KeyFor(IInteractable target) => target is IKeyedInteractable action ? action.InteractionKey : KeyCode.E;
+
+    private void AddActions(IInteractable primary, ref InteractionPromptData data)
+    {
+        data.InteractionKey = KeyFor(primary);
+        if (!(primary is Component component) || HandsOccupied) return;
+        var actions = new List<InteractionPromptAction>();
+        foreach (var behaviour in ActionBehaviours(component))
+        {
+            if (behaviour == null || !behaviour.isActiveAndEnabled || !(behaviour is IKeyedInteractable action) ||
+                ReferenceEquals(primary, action) || action.InteractionKey == data.InteractionKey ||
+                !action.TryGetPrompt(this, out var extra) || !extra.ShowKey || extra.RequiresFreeHands) continue;
+            if (actions.Exists(item => item.Key == action.InteractionKey)) continue;
+            actions.Add(new InteractionPromptAction(extra.Action, action.InteractionKey));
+        }
+        data.AdditionalActions = actions.Count > 0 ? actions.ToArray() : null;
+    }
+
+    private IEnumerable<MonoBehaviour> ActionBehaviours(Component primary)
+    {
+        var origin = actionOrigin != null && actionOrigin.IsChildOf(primary.transform) ? actionOrigin : primary.transform;
+        for (var host = origin; host != null; host = host.parent)
+        {
+            foreach (var behaviour in host.GetComponents<MonoBehaviour>()) yield return behaviour;
+            if (host == primary.transform) yield break;
+        }
     }
 
     private IInteractable FindTarget()
     {
+        actionOrigin = null;
         int count = Physics.RaycastNonAlloc(PlayerAim.CenterRay(viewCamera), hits, interactionDistance,
             interactionMask, QueryTriggerInteraction.Ignore);
         if (count == hits.Length) return null;
@@ -129,9 +192,24 @@ public sealed class PlayerInteractor : MonoBehaviour
         }
         // Resolve only the first obstruction, including interactables on a collider's parent.
         if (closest == null) return null;
-        var candidate = closest.GetComponentInParent<IInteractable>();
-        if (candidate is Behaviour behaviour && !behaviour.isActiveAndEnabled) return null;
-        return candidate;
+        actionOrigin = closest.transform;
+        // Prefer E on the nearest interaction host; other keys are shown beside it.
+        // Never skip an obstruction to reach an interaction farther behind it.
+        IInteractable fallback = null;
+        for (Transform host = closest.transform; host != null; host = host.parent)
+        {
+            bool foundDefault = false;
+            foreach (var behaviour in host.GetComponents<MonoBehaviour>())
+            {
+                if (!(behaviour is IInteractable candidate)) continue;
+                if (KeyFor(candidate) == KeyCode.E) foundDefault = true;
+                if (!behaviour.isActiveAndEnabled) continue;
+                if (KeyFor(candidate) == KeyCode.E) return candidate;
+                if (fallback == null) fallback = candidate;
+            }
+            if (foundDefault) return fallback;
+        }
+        return fallback;
     }
 
     private void HidePrompt()

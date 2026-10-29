@@ -2,8 +2,9 @@ using UnityEngine;
 
 /// <summary>Opens stamina upgrades when the player interacts with this station's collider.</summary>
 [DisallowMultipleComponent]
-public sealed class StaminaUpgradeInteractable : MonoBehaviour, IInteractable
+public sealed class StaminaUpgradeInteractable : MonoBehaviour, IKeyedInteractable
 {
+    public KeyCode InteractionKey => KeyCode.F;
     [SerializeField] private UpgradeManager upgradeManager;
     [SerializeField] private Transform promptAnchor;
     [SerializeField] private Vector3 promptOffset = Vector3.up * .3f;
@@ -22,6 +23,7 @@ public sealed class StaminaUpgradeInteractable : MonoBehaviour, IInteractable
     {
         prompt = new InteractionPromptData(
             (promptAnchor != null ? promptAnchor.position : transform.position) + promptOffset, "Upgrade stamina");
+        prompt.InteractionKey = InteractionKey;
         return isActiveAndEnabled && interactor != null && Manager != null && !Manager.IsOpen &&
             !UpgradeManager.BlocksGameplayInput && !UIPopups.BasePopupUI.HasActivePopup;
     }

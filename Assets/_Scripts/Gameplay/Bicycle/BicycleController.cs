@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>Arcade bicycle movement with collision, slope support and separately animated parts.</summary>
 [RequireComponent(typeof(CharacterController)), DisallowMultipleComponent]
-public sealed class BicycleController : MonoBehaviour
+public sealed class BicycleController : MonoBehaviour, IInteractable
 {
     public Transform steering, frontWheel, rearWheel, crank, leftPedal, rightPedal, riderView;
     public Transform[] cargoSlots;
@@ -81,7 +81,11 @@ public sealed class BicycleController : MonoBehaviour
         groundAlignment = GetComponent<VehicleGroundAlignment>() ?? gameObject.AddComponent<VehicleGroundAlignment>();
         groundAlignment.Initialize(this);
     }
-    void Awake() { Initialize(); LoadRidingCamera(); }
+    void Awake()
+    {
+        Initialize(); LoadRidingCamera();
+        if (GetComponent<VehicleUpgrade>() == null) gameObject.AddComponent<VehicleUpgrade>();
+    }
     Collider[] cargoColliders;
     bool[] cargoColliderStates;
     bool coasting;
@@ -179,12 +183,25 @@ public sealed class BicycleController : MonoBehaviour
     }
     public Transform FreeCargoSlot()
     {
-        if (exclusiveBagSlot != null && exclusiveBagSlot.childCount > 0) return null;
-        foreach (var slot in cargoSlots) if (slot != null && slot.childCount == 0) return slot;
+        var upgrades = GetComponent<VehicleUpgrade>();
+        bool configured = upgrades != null && upgrades.IsConfigured;
+        if (configured && upgrades.CargoCount >= upgrades.SlotCount) return null;
+        if (!configured && exclusiveBagSlot != null && exclusiveBagSlot.childCount > 0) return null;
+        if (cargoSlots == null) return null;
+        int limit = configured ? Mathf.Min(cargoSlots.Length, upgrades.SlotCount) : cargoSlots.Length;
+        for (int i = 0; i < limit; i++)
+            if (cargoSlots[i] != null && cargoSlots[i].childCount == 0) return cargoSlots[i];
         return null;
     }
     public Transform FreeBagCargoSlot()
     {
+        var upgrades = GetComponent<VehicleUpgrade>();
+        if (upgrades != null && upgrades.IsConfigured)
+        {
+            if (upgrades.CargoCount >= upgrades.SlotCount) return null;
+            if (upgrades.CargoCount == 0 && exclusiveBagSlot != null && exclusiveBagSlot.childCount == 0) return exclusiveBagSlot;
+            return FreeCargoSlot();
+        }
         if (exclusiveBagSlot == null) return FreeCargoSlot();
         if (exclusiveBagSlot.childCount > 0) return null;
         foreach (var slot in cargoSlots) if (slot != null && slot.childCount > 0) return null;
@@ -193,7 +210,36 @@ public sealed class BicycleController : MonoBehaviour
     public bool HasCargo(Transform item)
     {
         if (exclusiveBagSlot != null && item.IsChildOf(exclusiveBagSlot)) return true;
-        foreach(var slot in cargoSlots) if(item.IsChildOf(slot)) return true;
+        if (cargoSlots != null) foreach(var slot in cargoSlots) if(slot != null && item.IsChildOf(slot)) return true;
         return false;
+    }
+
+    public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
+    {
+        prompt = default;
+        if (!isActiveAndEnabled || IsRidden || interactor == null) return false;
+        var rider = interactor.GetComponent<PlayerBicycleInteraction>();
+        var actor = interactor.GetComponent<PlayerController>();
+        if (rider == null || rider.IsRiding || actor == null || actor.characterCamera == null ||
+            Vector3.Distance(actor.transform.position, transform.position) > rider.interactionDistance) return false;
+        if (interactor.Bags != null && interactor.Bags.IsCarrying)
+        {
+            var upgrades = GetComponent<VehicleUpgrade>();
+            bool available = FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadVolume(interactor.Bags.CarriedVolume));
+            prompt = new InteractionPromptData(transform.position + Vector3.up, available ? "Load bag" : "Vehicle full", available);
+            return true;
+        }
+        if (actor.IsCarrying) return false;
+        var engine = GetComponent<MotorollerController>();
+        prompt = new InteractionPromptData(transform.position + Vector3.up, engine != null ? "Drive " + engine.VehicleName : "Ride bicycle");
+        return true;
+    }
+
+    public bool TryInteract(PlayerInteractor interactor)
+    {
+        if (!TryGetPrompt(interactor, out var prompt) || !prompt.ShowKey) return false;
+        var rider = interactor.GetComponent<PlayerBicycleInteraction>();
+        rider.bicycle = this;
+        return interactor.Bags != null && interactor.Bags.IsCarrying ? rider.TryLoadBag() : rider.TryMount();
     }
 }

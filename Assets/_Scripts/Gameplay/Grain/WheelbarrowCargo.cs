@@ -19,15 +19,21 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     private PlayerInteractor pusher;
     private float occupiedVolume;
 
-    public int UpgradeLevel => SaveSystem.Data != null && SaveSystem.Data.wheelbarrowUpgradeLevels != null &&
+    public int UpgradeLevel => Upgrades != null && Upgrades.IsConfigured ? Upgrades.Level :
+        SaveSystem.Data != null && SaveSystem.Data.wheelbarrowUpgradeLevels != null &&
         upgradeIndex < SaveSystem.Data.wheelbarrowUpgradeLevels.Length ?
         SaveSystem.Data.wheelbarrowUpgradeLevels[upgradeIndex] : 0;
-    public float CapacityVolume => cargoVolumeCubicMeters + .4f * UpgradeLevel;
+    public float CapacityVolume => Upgrades != null && Upgrades.IsConfigured ? Upgrades.CapacityVolume : cargoVolumeCubicMeters + .4f * UpgradeLevel;
     public float OccupiedVolume => occupiedVolume;
     public int BagCount => bags.Count;
+    public string UpgradeId => "wheelbarrow." + upgradeIndex;
+    private VehicleUpgrade Upgrades => GetComponent<VehicleUpgrade>();
+    public int CargoSlotCount => Upgrades != null && Upgrades.IsConfigured ? Upgrades.SlotCount :
+        Mathf.Max(1, Mathf.FloorToInt(traySize.z / .25f) * 2);
 
     private void Awake()
     {
+        if (GetComponent<VehicleUpgrade>() == null) gameObject.AddComponent<VehicleUpgrade>();
         RebuildCargo();
         var found = new List<Transform>(2);
         foreach (Transform child in GetComponentsInChildren<Transform>(true))
@@ -73,8 +79,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     {
         if (carrier == null || !carrier.IsCarrying || carrier.CarriedBag == null || pusher != null) return false;
         float volume = carrier.CarriedVolume;
-        return occupiedVolume + volume <= CapacityVolume + .0001f &&
-            bags.Count < Mathf.Max(1, Mathf.FloorToInt(traySize.z / .25f) * 2);
+        return occupiedVolume + volume <= CapacityVolume + .0001f && bags.Count < CargoSlotCount;
     }
 
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
@@ -86,8 +91,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         bool available = true;
         if (pusher == interactor)
         {
-            string price = SaveSystem.Data != null && SaveSystem.Data.freeUpgradeVouchers > 0 ? "FREE" : "$" + upgradePrice;
-            action = UpgradeLevel > 0 ? "Release wheelbarrow" : "Release wheelbarrow  |  U: upgrade " + price;
+            action = "Release wheelbarrow";
         }
         else if (interactor.Bags != null && interactor.Bags.IsCarrying)
         {
@@ -128,18 +132,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
 
     public bool TryUpgrade(PlayerInteractor interactor)
     {
-        if (pusher != interactor || UpgradeLevel > 0 || SaveSystem.Data == null) return false;
-        bool purchased = SaveSystem.TryPurchaseUpgrade(upgradePrice, data =>
-        {
-            if (data.wheelbarrowUpgradeLevels == null || data.wheelbarrowUpgradeLevels.Length < 3)
-                System.Array.Resize(ref data.wheelbarrowUpgradeLevels, 3);
-            if (data.wheelbarrowUpgradeLevels[upgradeIndex] > 0) return false;
-            data.wheelbarrowUpgradeLevels[upgradeIndex] = 1;
-            return true;
-        }, out _);
-        if (purchased) GoalChecker.ReportValue(GoalType.UpgradePurchased, 1,
-            upgradeType: GoalUpgradeType.Wheelbarrow);
-        return purchased;
+        return pusher == interactor && interactor != null && Upgrades != null && Upgrades.OpenMenu();
     }
 
     private void LateUpdate()
