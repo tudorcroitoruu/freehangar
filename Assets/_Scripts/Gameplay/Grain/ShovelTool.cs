@@ -89,6 +89,24 @@ public sealed class ShovelTool : MonoBehaviour
         restPosition = transform.localPosition;
         restRotation = transform.localRotation;
         heldLevels = GetComponent<HeldGrainToolLevels>();
+        CacheShovelAnchors();
+    }
+
+    public void BindShovel(HeldShovelPose pose)
+    {
+        if (pose == null) return;
+        CancelAction();
+        if (grainPhysics != null) grainPhysics.SetFill(0);
+        bladeTip = pose.bladeTip;
+        gripAnchor = pose.gripAnchor;
+        grainPhysics = pose.grainPhysics;
+        carryBlend = 0;
+        CacheShovelAnchors();
+        if (grainPhysics != null) grainPhysics.SetFill(Kilograms / CapacityKg);
+    }
+
+    private void CacheShovelAnchors()
+    {
         if (bladeTip != null) tipInHands = transform.InverseTransformPoint(bladeTip.position);
         gripInHands = gripAnchor != null ? transform.InverseTransformPoint(gripAnchor.position) : Vector3.zero;
         if (grainPhysics != null)
@@ -312,6 +330,7 @@ public sealed class ShovelTool : MonoBehaviour
             IsBusy=ActiveVacuum.Emptying || ActiveVacuum.Sucking;
             return;
         }
+        if (grainPhysics != null) grainPhysics.SetFill(Kilograms / CapacityKg);
         if (!IsBusy || deltaTime <= 0) return;
         elapsed += deltaTime;
         if (pendingContainer != null)
@@ -527,7 +546,7 @@ public sealed class ShovelTool : MonoBehaviour
         // The leveling references belong to LVL_1. Applying them to the other
         // authored shovel models changes their Editor poses even while idle.
         bool authoredPose = heldLevels != null && heldLevels.UsesAuthoredShovelPose;
-        rotation = motion * (authoredPose ? Quaternion.identity :
+        rotation = motion * (authoredPose ? Quaternion.Slerp(Quaternion.identity, Quaternion.Euler(-4f, -12f, 0), carryBlend) :
             Quaternion.Slerp(Quaternion.identity, levelCarryRotation, carryBlend)) * action;
         if (!authoredPose) rotation = LimitDownwardTilt(rotation);
         if (IsScooping)
@@ -539,6 +558,7 @@ public sealed class ShovelTool : MonoBehaviour
         }
         // Compose every cosmetic rotation at the same handle anchor, preserving its reach limit.
         offset = (IsBusy ? PositionOffset : idle) + restRotation * (action * gripInHands - rotation * gripInHands);
+        if (authoredPose && !IsBusy) offset += new Vector3(-.12f, .025f, .02f) * carryBlend;
     }
 
     private Quaternion LimitDownwardTilt(Quaternion rotation)

@@ -17,5 +17,6 @@ public sealed class HeldGrainToolLevels : MonoBehaviour
         tool.CancelAction();
         for(int i=0;i<levels.Length;i++)if(levels[i]!=null)levels[i].SetActive(i==index);
         selected=index;
+        if(levels[index]!=null)tool.BindShovel(levels[index].GetComponent<HeldShovelPose>());
     }
 }

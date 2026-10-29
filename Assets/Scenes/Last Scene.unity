@@ -3366,6 +3366,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 768575834}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &777259007 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2300000, guid: 1cc11ffbe578fa547b800e780e45b9c1, type: 3}
+  m_PrefabInstance: {fileID: 435678222}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &797319144
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7106,6 +7111,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1683502127}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1709646676 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2300000, guid: 1cc11ffbe578fa547b800e780e45b9c1, type: 3}
+  m_PrefabInstance: {fileID: 322287645}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1724402812
 GameObject:
   m_ObjectHideFlags: 0
@@ -7843,6 +7853,10 @@ MonoBehaviour:
   fleetSeconds: 8
   sunSeconds: 7
   openingFadeSeconds: 1
+  finalSunHoldSeconds: 1
+  finalFadeSeconds: 1.5
+  endingTextFadeSeconds: 0.8
+  friendsTextDelaySeconds: 2
   companionCount: 8
   rocketScale: 0.9
   flightSpeed: 3
@@ -8809,6 +8823,7 @@ GameObject:
   - component: {fileID: 2127240978}
   - component: {fileID: 2127240977}
   - component: {fileID: 2127240976}
+  - component: {fileID: 2127240979}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -9168,6 +9183,22 @@ Light:
   m_LightUnit: 2
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
+--- !u!114 &2127240979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2127240974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82f8864e75d350f41bfc22a134e5ba5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EarthSunLighting
+  sun: {fileID: 2127240978}
+  surfaces:
+  - {fileID: 1709646676}
+  - {fileID: 777259007}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

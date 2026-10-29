@@ -12,7 +12,7 @@ Shader "Earth"
 		
 		_CloudAndNightTex("Cloud And Night", 2D) = "black" {}
 
-		//_LightDir("Light Dir", Vector) = (-1,0,0,1)
+		[HideInInspector] _EarthSunDirection("HDRP Sun Direction", Vector) = (0,1,0,0)
 	}
 
 	SubShader 
@@ -34,7 +34,7 @@ Shader "Earth"
 			float _AtmospherePow;
 			float _AtmosphereMultiply;
 
-			//float4 _LightDir;
+			float4 _EarthSunDirection;
 
 			struct vertexInput 
 			{
@@ -58,7 +58,7 @@ Shader "Earth"
 				output.pos = UnityObjectToClipPos(input.pos);
 				output.uv = input.uv;
 
-				float3 localLightDir = normalize(ObjSpaceLightDir(input.pos));
+				float3 localLightDir = normalize(_EarthSunDirection.w > 0.5 ? mul((float3x3)unity_WorldToObject, _EarthSunDirection.xyz) : ObjSpaceLightDir(input.pos));
 				output.diffuse = saturate(dot(localLightDir, input.normal) * 1.2);
 				output.night = 1 - saturate(output.diffuse * 2);
 

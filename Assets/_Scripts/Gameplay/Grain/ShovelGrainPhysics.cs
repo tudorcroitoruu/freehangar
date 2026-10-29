@@ -64,6 +64,66 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     public float HighestLoadPoint { get; private set; }
     public bool IsLoadSleeping => loadSleeping;
 
+    private Mesh visibleLoad;
+    private MeshRenderer loadRenderer;
+    private Vector3[] loadVertices, loadNormals, sourceVertices, sourceNormals;
+    private int indicesPerKernel;
+
+    private void BuildLoadRenderer()
+    {
+        if (kernelMesh == null || kernelMaterial == null) return;
+        int capacity = maximumKernels + PackedCapacity;
+        sourceVertices = kernelMesh.vertices; sourceNormals = kernelMesh.normals;
+        var sourceUV = kernelMesh.uv; var sourceIndices = kernelMesh.triangles;
+        indicesPerKernel = sourceIndices.Length;
+        loadVertices = new Vector3[capacity * sourceVertices.Length];
+        loadNormals = new Vector3[loadVertices.Length];
+        var uv = new Vector2[loadVertices.Length]; var indices = new int[capacity * indicesPerKernel];
+        for (int k = 0; k < capacity; k++)
+        {
+            for (int j = 0; j < sourceUV.Length; j++) uv[k * sourceVertices.Length + j] = sourceUV[j];
+            for (int j = 0; j < indicesPerKernel; j++) indices[k * indicesPerKernel + j] = k * sourceVertices.Length + sourceIndices[j];
+        }
+        visibleLoad = new Mesh { name = "Held shovel visible grain", indexFormat = IndexFormat.UInt32 };
+        visibleLoad.MarkDynamic(); visibleLoad.vertices = loadVertices; visibleLoad.normals = loadNormals;
+        visibleLoad.uv = uv; visibleLoad.triangles = indices;
+        var filter = GetComponent<MeshFilter>();
+        if (filter == null) filter = gameObject.AddComponent<MeshFilter>();
+        filter.sharedMesh = visibleLoad;
+        loadRenderer = GetComponent<MeshRenderer>();
+        if (loadRenderer == null) loadRenderer = gameObject.AddComponent<MeshRenderer>();
+        loadRenderer.sharedMaterial = kernelMaterial; loadRenderer.enabled = false;
+    }
+
+    private void DrawLoad(int amount)
+    {
+        if (visibleLoad == null) BuildLoadRenderer();
+        if (loadRenderer == null) return;
+        loadRenderer.enabled = amount > 0;
+        if (amount == 0) return;
+        Matrix4x4 inverse = transform.worldToLocalMatrix;
+        for (int k = 0; k < amount; k++)
+        {
+            Matrix4x4 matrix = inverse * matrices[k];
+            Matrix4x4 normal = matrix.inverse.transpose;
+            for (int j = 0; j < sourceVertices.Length; j++)
+            {
+                int index = k * sourceVertices.Length + j;
+                loadVertices[index] = matrix.MultiplyPoint3x4(sourceVertices[j]);
+                loadNormals[index] = normal.MultiplyVector(sourceNormals[j]).normalized;
+            }
+        }
+        visibleLoad.vertices = loadVertices; visibleLoad.normals = loadNormals;
+        visibleLoad.SetSubMesh(0, new SubMeshDescriptor(0, amount * indicesPerKernel));
+        visibleLoad.RecalculateBounds(); loadRenderer.SetPropertyBlock(loadAppearance.Block);
+    }
+
+    private void OnDestroy()
+    {
+        if (visibleLoad == null) return;
+        if (Application.isPlaying) Destroy(visibleLoad); else DestroyImmediate(visibleLoad);
+    }
+
     private void Awake()
     {
         tool = GetComponentInParent<ShovelTool>();
@@ -160,8 +220,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
                 new Vector3(.016f, .011f, .019f) * reveal);
         }
         if (tool != null) loadAppearance.Set(tool.Cargo); else loadAppearance.Set(GrainType.Corn);
-        if (count + PackedKernelCount > 0) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, matrices, count + PackedKernelCount, loadAppearance.Block,
-            ShadowCastingMode.On, true, gameObject.layer, null, LightProbeUsage.Off);
+        DrawLoad(count + PackedKernelCount);
         streamCount = 0;
         for (int i = 0; i < StreamCapacity; i++)
         {

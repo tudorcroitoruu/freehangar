@@ -6,7 +6,7 @@ Shader "Atmosphere"
 	{
 		_Color ("Color", Color) = (0.1, 0.35, 1.0, 1.0)
 		_Intensity("Intensity", float) = 200
-		//_LightDir("Light Dir", Vector) = (-1,0,0,1)
+		[HideInInspector] _EarthSunDirection("HDRP Sun Direction", Vector) = (0,1,0,0)
 	}
 
 	SubShader 
@@ -28,7 +28,7 @@ Shader "Atmosphere"
 			float4 _Color;
 			float _Intensity;
 
-			//float4 _LightDir;
+			float4 _EarthSunDirection;
 
 			struct vertexInput 
 			{
@@ -51,7 +51,7 @@ Shader "Atmosphere"
 				output.normal = input.normal;
 				output.viewDir = ObjSpaceViewDir(input.pos);
 
-				fixed3 lightDir = _WorldSpaceLightPos0.xyz;
+				float3 lightDir = normalize(mul((float3x3)unity_WorldToObject, _EarthSunDirection.w > 0.5 ? _EarthSunDirection.xyz : _WorldSpaceLightPos0.xyz));
 
 				float d = saturate(dot(input.normal, lightDir) * 3);
 				output.diffuse = d;//pow(d, 15);
