@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField, Min(0f)] private float speed = 3f;
     [SerializeField, Min(0f)] private float sprintSpeed = 10f;
+    [SerializeField, Range(.1f, 1f), Tooltip("Movement speed multiplier while carrying a bag.")] private float bagCarrySpeedMultiplier = .6f;
     [SerializeField, Min(0f)] private float jumpForce = 5f;
     [SerializeField, Min(0f)] private float gravity = 9.81f;
 
@@ -29,6 +30,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(0f, 2f)] private float sprintCameraPitch = .15625f;
     [SerializeField, Range(1f, 4f)] private float sprintStepFrequency = 2.6f;
     private float sprintCameraPhase, sprintCameraBlend;
+    private bool sprintMoving, sprintExhausted;
 
     [Header("Crouch (hold Ctrl or C)")]
     [SerializeField, Min(0.1f)] private float crouchHeight = 1.2f;
@@ -190,7 +192,7 @@ public class PlayerController : MonoBehaviour
         }
         bool isCarrying = IsCarrying;
         bool recoveryBlocked = shovelTool != null && (shovelTool.Kilograms > 0f || shovelTool.IsBusy);
-        if (staminaManager != null) staminaManager.Tick(isCarrying, Time.deltaTime, recoveryBlocked);
+        if (staminaManager != null) staminaManager.Tick(isCarrying, Time.deltaTime, recoveryBlocked, sprinting: sprintMoving);
     }
 
     public void ResetLook()
@@ -258,8 +260,16 @@ public class PlayerController : MonoBehaviour
             : Vector2.zero;
         input = Vector2.ClampMagnitude(input, 1f);
         bool pushingWheelbarrow = interactor != null && interactor.PushedWheelbarrow != null;
-        float currentSpeed = pushingWheelbarrow ? (acceptInput && Input.GetKey(KeyCode.LeftShift) ? Mathf.Min(sprintSpeed, 6f) : speed) : isCrouching ? crouchSpeed :
-            acceptInput && Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : speed;
+        bool wantsSprint = acceptInput && Input.GetKey(KeyCode.LeftShift);
+        if (!wantsSprint || staminaManager == null || staminaManager.NormalizedStamina >= .2f) sprintExhausted = false;
+        if (staminaManager != null && staminaManager.IsExhausted) sprintExhausted = true;
+        bool canSprint = wantsSprint && !sprintExhausted && !isCrouching &&
+            (bagInteraction == null || !bagInteraction.IsCarrying);
+        sprintMoving = false;
+        float currentSpeed = pushingWheelbarrow ? (canSprint ? Mathf.Min(sprintSpeed, 6f) : speed) : isCrouching ? crouchSpeed :
+            canSprint ? sprintSpeed : speed;
+        if (!pushingWheelbarrow && bagInteraction != null && bagInteraction.IsCarrying)
+            currentSpeed *= bagCarrySpeedMultiplier;
         Vector3 velocity = (transform.right * input.x + transform.forward * input.y) * currentSpeed;
 
         if (characterController.isGrounded && verticalVelocity < 0f)
@@ -274,7 +284,8 @@ public class PlayerController : MonoBehaviour
         {
             interactor.PushedWheelbarrow.Move(input, currentSpeed, verticalVelocity, Time.deltaTime);
             targetYaw = transform.eulerAngles.y;
-            UpdateSprintCamera(acceptInput && Input.GetKey(KeyCode.LeftShift) && Mathf.Abs(input.y) > .01f, Time.deltaTime);
+            sprintMoving = canSprint && Mathf.Abs(input.y) > .01f && characterController.velocity.sqrMagnitude > .25f;
+            UpdateSprintCamera(sprintMoving, Time.deltaTime);
             return;
         }
         CollisionFlags collisions = characterController.Move(velocity * Time.deltaTime);
@@ -283,9 +294,8 @@ public class PlayerController : MonoBehaviour
         if ((collisions & CollisionFlags.Below) != 0 && verticalVelocity < 0f)
             verticalVelocity = -2f;
         Vector3 actualMovement = Vector3.ProjectOnPlane(characterController.velocity, Vector3.up);
-        bool sprinting = !pushingWheelbarrow && acceptInput && Input.GetKey(KeyCode.LeftShift) && input.sqrMagnitude > .01f &&
-            !isCrouching && characterController.isGrounded && actualMovement.sqrMagnitude > .25f;
-        UpdateSprintCamera(sprinting, Time.deltaTime);
+        sprintMoving = canSprint && input.sqrMagnitude > .01f && characterController.isGrounded && actualMovement.sqrMagnitude > .25f;
+        UpdateSprintCamera(sprintMoving, Time.deltaTime);
     }
 
     private void HandleCamera()

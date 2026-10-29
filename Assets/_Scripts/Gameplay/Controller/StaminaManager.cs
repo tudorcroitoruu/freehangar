@@ -12,6 +12,8 @@ public sealed class StaminaManager : MonoBehaviour
     private float shovelActionCost = 10f;
     [Tooltip("Stamina consumed per second while carrying a bag.")]
     [SerializeField, Min(0f)] private float workConsumptionPerSecond = 10f;
+    [SerializeField, Min(0f), Tooltip("Additional stamina consumed per second while sprinting.")]
+    private float sprintConsumptionPerSecond = 10f;
     [SerializeField, Min(0f)] private float recoveryPerSecond = 15f;
     [SerializeField, Min(0f)] private float recoveryDelay = 2f;
 
@@ -111,10 +113,10 @@ public sealed class StaminaManager : MonoBehaviour
         UpdateStaminaBar();
     }
 
-    public void Tick(bool isWorking, float deltaTime, bool recoveryBlocked = false, float consumptionPerSecond = -1f)
+    public void Tick(bool isWorking, float deltaTime, bool recoveryBlocked = false, float consumptionPerSecond = -1f, bool sprinting = false)
     {
         if (!isActiveAndEnabled || !(deltaTime > 0f) || float.IsInfinity(deltaTime)) return;
-        IsWorking = isWorking;
+        IsWorking = isWorking || sprinting;
         if (HasInfiniteStamina)
         {
             CurrentStamina = CurrentMaxStamina;
@@ -122,9 +124,10 @@ public sealed class StaminaManager : MonoBehaviour
             UpdateStaminaBar();
             return;
         }
-        if (isWorking)
+        if (isWorking || sprinting)
         {
-            CurrentStamina = Mathf.Clamp(CurrentStamina - (consumptionPerSecond >= 0f && float.IsFinite(consumptionPerSecond) ? consumptionPerSecond : workConsumptionPerSecond) * deltaTime, 0f, CurrentMaxStamina);
+            float workRate = isWorking ? (consumptionPerSecond >= 0f && float.IsFinite(consumptionPerSecond) ? consumptionPerSecond : workConsumptionPerSecond) : 0f;
+            CurrentStamina = Mathf.Clamp(CurrentStamina - (workRate + (sprinting ? sprintConsumptionPerSecond : 0f)) * deltaTime, 0f, CurrentMaxStamina);
             recoveryDelayRemaining = recoveryDelay;
             UpdateStaminaBar();
             return;
@@ -173,6 +176,7 @@ public sealed class StaminaManager : MonoBehaviour
         maxStamina = Mathf.Max(.01f, maxStamina);
         shovelActionCost = Mathf.Max(0f, shovelActionCost);
         workConsumptionPerSecond = Mathf.Max(0f, workConsumptionPerSecond);
+        sprintConsumptionPerSecond = Mathf.Max(0f, sprintConsumptionPerSecond);
         recoveryPerSecond = Mathf.Max(0f, recoveryPerSecond);
         recoveryDelay = Mathf.Max(0f, recoveryDelay);
         hungryPercent = Mathf.Clamp(hungryPercent, 0f, 100f);

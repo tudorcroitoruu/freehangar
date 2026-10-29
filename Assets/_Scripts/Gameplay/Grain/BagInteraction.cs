@@ -77,12 +77,16 @@ public sealed class BagInteraction : MonoBehaviour
         target = bag;
         if (IsShovelEquipped && target.CanHandle && !target.IsFinished) return target.Finish();
         if (!target.CanCarry) return false;
-        if (IsShovelEquipped)
+        bool restoreShovel = IsShovelEquipped;
+        if (restoreShovel)
         {
             var player = GetComponent<PlayerController>();
             if (player == null || !player.ToggleShovel()) return false;
         }
-        return Take(target);
+        bool taken = Take(target);
+        if (taken) shovelWasActive = restoreShovel;
+        else if (restoreShovel) GetComponent<PlayerController>()?.ToggleShovel();
+        return taken;
     }
 
     private bool Take(GrainContainer bag)
@@ -110,7 +114,6 @@ public sealed class BagInteraction : MonoBehaviour
         for (int i = 0; i < carriedColliders.Length; i++) { colliderStates[i] = carriedColliders[i].enabled; carriedColliders[i].enabled = false; }
         bag.SetCarried(true);
         if (shovel != null) shovel.CancelAction();
-        shovelWasActive = shovelPresentation != null && shovelPresentation.gameObject.activeSelf;
         if (shovelPresentation != null) shovelPresentation.gameObject.SetActive(false);
         bag.transform.SetParent(carryAnchor, false);
         if (sourceWheelbarrow != null) sourceWheelbarrow.NotifyBagTaken(bag);
@@ -225,8 +228,9 @@ public sealed class BagInteraction : MonoBehaviour
     private void RestoreShovelIfNeeded()
     {
         if (!shovelWasActive || carried != null) return;
-        if (shovelPresentation != null) shovelPresentation.gameObject.SetActive(true);
-        shovelWasActive = false;
+        var player = GetComponent<PlayerController>();
+        if (player == null || !player.isActiveAndEnabled || player.IsCarrying) return;
+        if (player.IsShovelEquipped || player.ToggleShovel()) shovelWasActive = false;
     }
 
     private void OnDisable()

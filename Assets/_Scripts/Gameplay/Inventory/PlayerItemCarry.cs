@@ -55,9 +55,11 @@ public sealed class PlayerItemCarry : MonoBehaviour
         }
         Vector3 anchorScale = carryAnchor.lossyScale;
         if (Mathf.Abs(anchorScale.x * anchorScale.y * anchorScale.z) < .000001f) return false;
-        if (player.IsShovelEquipped && !player.ToggleShovel()) return false;
+        bool restoreShovel = player.IsShovelEquipped;
+        if (restoreShovel && !player.ToggleShovel()) return false;
 
         carried = item;
+        instrumentWasActive = restoreShovel;
         worldScale = item.transform.lossyScale;
         originalRotation = item.transform.rotation;
         Bounds bounds = new Bounds(item.transform.position, Vector3.one * .5f);
@@ -87,7 +89,6 @@ public sealed class PlayerItemCarry : MonoBehaviour
         containers = itemContainers;
         foreach (var container in containers) container.SetCarried(true);
         if (player.Shovel != null) player.Shovel.CancelAction();
-        instrumentWasActive = player.HeldInstrument != null && player.HeldInstrument.gameObject.activeSelf;
         if (player.HeldInstrument != null) player.HeldInstrument.gameObject.SetActive(false);
         item.transform.SetParent(carryAnchor, false);
         float scale = Mathf.Min(1f, carriedHeight / Mathf.Max(.1f, bounds.size.y));
@@ -182,8 +183,8 @@ public sealed class PlayerItemCarry : MonoBehaviour
     private void RestoreInstrument()
     {
         if (IsCarrying || !instrumentWasActive) return;
-        if (player != null && player.HeldInstrument != null) player.HeldInstrument.gameObject.SetActive(true);
-        instrumentWasActive = false;
+        if (player == null || !player.isActiveAndEnabled || player.IsCarrying) return;
+        if (player.IsShovelEquipped || player.ToggleShovel()) instrumentWasActive = false;
     }
 
     private void LateUpdate() => RestoreInstrument();
