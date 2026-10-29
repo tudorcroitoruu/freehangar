@@ -56,7 +56,7 @@ public class UpgradeVehicle : MonoBehaviour
     {
         bool configured = target != null && target.IsConfigured;
         bool maxed = configured && target.IsMaxed;
-        bool available = configured && target.isActiveAndEnabled && SaveSystem.Data != null && !maxed;
+        bool available = configured && target.isActiveAndEnabled && !target.HasCargo && SaveSystem.Data != null && !maxed;
         int cost = configured && !target.UsesVoucher ? target.Price : 0;
         int missing = available ? Mathf.Max(0, cost - SaveSystem.Money) : 0;
         bool affordable = available && missing == 0;
@@ -68,12 +68,12 @@ public class UpgradeVehicle : MonoBehaviour
             var current = target.Profile.At(target.Level);
             var next = target.Profile.At(target.Level + 1);
             var maximum = target.Profile.At(target.Profile.MaxLevel);
-            SetText(currentLevelCapacity, Volume(current.capacityCubicMeters));
-            SetText(nextLevelCapacity, Colored(Volume(next.capacityCubicMeters)));
-            SetText(maxLevelCapacity, Volume(maximum.capacityCubicMeters));
-            SetText(currentLevelSlots, current.slots.ToString());
-            SetText(nextLevelSlots, Colored(next.slots.ToString()));
-            SetText(maxLevelSlots, maximum.slots.ToString());
+            SetText(currentLevelCapacity, $"Capacity: <b>{Volume(current.capacityCubicMeters)}</b>");
+            SetText(nextLevelCapacity, $"Capacity: <b>{Colored(Volume(next.capacityCubicMeters))}</b>");
+            SetText(maxLevelCapacity, $"Capacity: <b>{Volume(maximum.capacityCubicMeters)}</b>");
+            SetText(currentLevelSlots, $"Slots: <b>{current.slots}</b>");
+            SetText(nextLevelSlots, $"Slots: <b>{Colored(next.slots.ToString())}</b>");
+            SetText(maxLevelSlots, $"Slots: <b>{maximum.slots}</b>");
             if (vehicleImages != null)
                 for (int i = 0; i < vehicleImages.Length; i++)
                 {
@@ -88,7 +88,7 @@ public class UpgradeVehicle : MonoBehaviour
         if (upgradeButtonCanvas != null) upgradeButtonCanvas.alpha = affordable ? 1f : .5f;
         UpdateButtonMaterial(affordable ? 1f : .5f);
     }
-    private static string Volume(float value) => value.ToString("0.##", CultureInfo.InvariantCulture) + " m\u00b3";
+    private static string Volume(float value) => value.ToString("0.##", CultureInfo.InvariantCulture) + " kg";
     private string Colored(string value) => $"<color=#{ColorUtility.ToHtmlStringRGBA(nextLevelColor)}>{value}</color>";
     private static void SetText(Text label, string value)
     {

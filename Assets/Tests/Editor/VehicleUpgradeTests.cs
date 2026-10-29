@@ -130,8 +130,8 @@ public class VehicleUpgradeTests
         SetField(screen, "currentLevelSlots", slots);
         SaveSystem.Data.cash = 40;
         screen.SetTarget(upgrades);
-        Assert.AreEqual("1 m\u00b3", capacity.text);
-        Assert.AreEqual("1", slots.text);
+        Assert.AreEqual("Capacity: <b>1 kg</b>", capacity.text);
+        Assert.AreEqual("Slots: <b>1</b>", slots.text);
         Assert.AreEqual("You need $60 more.", shortage.text);
         Assert.IsFalse(button.interactable);
         settings.vehicles[0].levels[0].price = 0;
@@ -196,6 +196,78 @@ public class VehicleUpgradeTests
             Assert.IsTrue(shared.Find(id)?.IsConfigured ?? false, id);
         foreach (var id in new[] { "wheelbarrow.0", "wheelbarrow.1", "wheelbarrow.2" })
             Assert.IsNull(shared.Find(id), id);
+    }
+
+    [TestCase("slot")]
+    [TestCase("bag")]
+    [TestCase("rack")]
+    public void LoadedVehicleHidesUpgradePromptAndBlocksMenuAndPurchaseUntilUnloaded(string cargoLocation)
+    {
+        root.SetActive(false);
+        var bicycle = root.AddComponent<BicycleController>();
+        bicycle.motorDriven = true;
+        bicycle.steering = Child("Steering").transform;
+        bicycle.frontWheel = Child("Front wheel").transform;
+        bicycle.rearWheel = Child("Rear wheel").transform;
+        var slot = Child("Cargo slot").transform;
+        bicycle.cargoSlots = new[] { slot };
+        if (cargoLocation == "bag") bicycle.exclusiveBagSlot = slot;
+        var upgrades = root.AddComponent<VehicleUpgrade>();
+        SetField(upgrades, "settings", settings);
+        SetField(upgrades, "vehicleId", "test");
+        root.SetActive(true);
+        if (cargoLocation == "rack")
+        {
+            var rack = root.AddComponent<VehicleCargoRack>();
+            rack.surface = slot;
+            slot = rack.FreeSlot(false);
+        }
+        var menu = Child("Upgrade menu");
+        menu.SetActive(false);
+        var manager = menu.AddComponent<UpgradeManager>();
+        var screenObject = new GameObject("Vehicle screen");
+        screenObject.transform.SetParent(menu.transform);
+        var screen = screenObject.AddComponent<UpgradeVehicle>();
+        var button = Child("Upgrade button").AddComponent<Button>();
+        SetField(screen, "upgradeButton", button);
+        SetField(manager, "upgradeVehicleScreen", screen);
+        var station = root.AddComponent<VehicleUpgradeInteractable>();
+        SetField(station, "upgradeManager", manager);
+        var interactor = Child("Interactor").AddComponent<PlayerInteractor>();
+        var closedFrame = typeof(UpgradeManager).GetField("closedFrame", BindingFlags.Static | BindingFlags.NonPublic);
+        int previousFrame = (int)closedFrame.GetValue(null);
+        var previousLock = Cursor.lockState;
+        bool previousVisible = Cursor.visible;
+        var cargo = new GameObject("Loaded cargo");
+        cargo.transform.SetParent(slot);
+        try
+        {
+            closedFrame.SetValue(null, -1);
+            Assert.IsTrue(upgrades.HasCargo);
+            Assert.IsFalse(station.TryGetPrompt(interactor, out _));
+            Assert.IsFalse(station.TryInteract(interactor));
+            Assert.IsFalse(manager.OpenVehicle(upgrades));
+            Assert.IsFalse(upgrades.OpenMenu());
+            Assert.IsFalse(upgrades.TryUpgrade());
+            screen.SetTarget(upgrades);
+            Assert.IsFalse(button.interactable);
+            Assert.AreEqual(100, SaveSystem.Money);
+            Assert.AreEqual(0, SaveSystem.Data.GetVehicleUpgradeLevel("test"));
+
+            Object.DestroyImmediate(cargo);
+            Assert.IsFalse(upgrades.HasCargo);
+            Assert.IsTrue(station.TryGetPrompt(interactor, out _));
+            Assert.IsTrue(manager.OpenVehicle(upgrades));
+            Assert.IsTrue(button.interactable);
+        }
+        finally
+        {
+            manager.Close();
+            Object.DestroyImmediate(cargo);
+            closedFrame.SetValue(null, previousFrame);
+            Cursor.lockState = previousLock;
+            Cursor.visible = previousVisible;
+        }
     }
 
     [Test]

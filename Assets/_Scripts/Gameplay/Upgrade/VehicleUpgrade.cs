@@ -105,6 +105,7 @@ public sealed class VehicleUpgrade : MonoBehaviour
         }
     }
     public int CargoCount => CargoRoots().Count;
+    public bool HasCargo => CargoCount > 0;
     public bool CanLoadVolume(float volume, int slotCost = 1)
     {
         if (GetComponent<VehicleCargoRack>() is VehicleCargoRack rack)
@@ -135,7 +136,7 @@ public sealed class VehicleUpgrade : MonoBehaviour
 
     public bool TryUpgrade()
     {
-        if (!isActiveAndEnabled || !IsConfigured || IsMaxed || SaveSystem.Data == null) return false;
+        if (!isActiveAndEnabled || !IsConfigured || HasCargo || IsMaxed || SaveSystem.Data == null) return false;
         int level = SaveSystem.Data.GetVehicleUpgradeLevel(VehicleId);
         return SaveSystem.TryPurchaseVehicleUpgrade(VehicleId, Price, level, Profile.MaxLevel);
     }

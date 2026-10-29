@@ -35,7 +35,7 @@ public sealed class VehicleUpgradeInteractable : MonoBehaviour, IKeyedInteractab
         prompt.InteractionKey = InteractionKey;
         if (upgradeManager == null) upgradeManager = FindFirstObjectByType<UpgradeManager>(FindObjectsInactive.Include);
         var target = Target;
-        return isActiveAndEnabled && interactor != null && target != null && target.isActiveAndEnabled && target.IsConfigured &&
+        return isActiveAndEnabled && interactor != null && target != null && target.isActiveAndEnabled && target.IsConfigured && !target.HasCargo &&
             upgradeManager != null && !UpgradeManager.BlocksGameplayInput && !UIPopups.BasePopupUI.HasActivePopup;
     }
     public bool TryInteract(PlayerInteractor interactor)
