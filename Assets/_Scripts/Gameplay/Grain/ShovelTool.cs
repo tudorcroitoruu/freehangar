@@ -398,7 +398,7 @@ public sealed class ShovelTool : MonoBehaviour
 
     internal float VacuumEmptyStep(float phase,float dt)
     {
-        float fraction = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.3f, .78f, phase));
+        float fraction = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(VacuumTool.PourStart, VacuumTool.PourEnd, phase));
         float maximum = Mathf.Max(0, availableAtStart * fraction - transferredFraction);
         if (maximum <= 0) return 0;
         float before=Kilograms;

@@ -25,6 +25,7 @@ public sealed class VacuumTool : MonoBehaviour
     private Transform actor;
     private float pourPose;
     public const float EmptyDuration = 3.2f;
+    public const float PourStart = .4f, PourEnd = .8f;
     private float clock, emptyTime, suctionBlend, shownFill, emission;
     private Vector3 trayPosition;
     private Quaternion trayRotation;
@@ -41,15 +42,27 @@ public sealed class VacuumTool : MonoBehaviour
     private int verticesPerKernel;
     private readonly GrainAppearance appearance = new GrainAppearance();
 
+    private void OnEnable()
+    {
+        // Never display the authored full-reservoir preview before the first cargo update.
+        if (fillFrame != null && fillFrame.TryGetComponent<MeshRenderer>(out var renderer))
+            renderer.enabled = false;
+    }
+
     public void Initialize()
     {
         if (initialized) return;
         initialized = true;
         trayPosition = dustTray.localPosition; trayRotation = dustTray.localRotation;
+        // The upright model's tray is only the lid, not its grain reservoir.
+        // Keep the packed grain in the cylinder when the lid opens.
+        if (uprightCylinder && fillFrame.IsChildOf(dustTray))
+            fillFrame.SetParent(transform, true);
         fillMesh = new Mesh { name = "Vacuum grain reservoir" }; fillMesh.MarkDynamic();
         fillFrame.GetComponent<MeshFilter>().sharedMesh = fillMesh;
         fillRenderer = fillFrame.GetComponent<MeshRenderer>();
         BuildPackedGrain();
+        UpdateFill(0);
         fillRenderer.sharedMaterial=kernelMaterial;
         var go=new GameObject("Vacuum grain stream");go.transform.SetParent(transform,false);go.layer=0;
         stream=go.AddComponent<ParticleSystem>();stream.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -68,13 +81,14 @@ public sealed class VacuumTool : MonoBehaviour
         if(Emptying)
         {
             emptyTime+=dt;float p=Mathf.Clamp01(emptyTime/EmptyDuration);
-            float pull=p<.2f?Mathf.SmoothStep(0,1,p/.2f):p<.82f?1:1-Mathf.SmoothStep(0,1,(p-.82f)/.18f);
-            float tip=p<.12f?0:p<.3f?Mathf.SmoothStep(0,1,(p-.12f)/.18f):p<.78f?1:1-Mathf.SmoothStep(0,1,(p-.78f)/.22f);
+            float pull=p<.22f?Mathf.SmoothStep(0,1,p/.22f):p<.92f?1:1-Mathf.SmoothStep(0,1,(p-.92f)/.08f);
+            float tip=p<.22f?0:p<PourStart?Mathf.SmoothStep(0,1,(p-.22f)/(PourStart-.22f)):p<PourEnd?1:1-Mathf.SmoothStep(0,1,(p-PourEnd)/.12f);
             pourPose=tip;
             dustTray.localPosition=trayPosition-trayRemoval*.65f*pull;
-            dustTray.localRotation=trayRotation*Quaternion.Euler(trayTilt*tip);
+            // Only the lid opens independently; the whole vacuum performs the pour rotation.
+            dustTray.localRotation=trayRotation*Quaternion.Euler(uprightCylinder ? trayTilt*pull : Vector3.zero);
             float moved=tool.VacuumEmptyStep(p,dt);
-            if(moved>0)Emit(dustTray.position,tool.VacuumDropPoint,true,Mathf.Clamp(Mathf.CeilToInt(dt*500),1,32));
+            if(moved>0)Emit(fillFrame.TransformPoint(uprightCylinder ? Vector3.up*fillLength*.5f : Vector3.forward*fillLength*.5f),tool.VacuumDropPoint,true,Mathf.Clamp(Mathf.CeilToInt(dt*500),1,32));
             if(p>=1){Cancel();tool.CancelAction();}
         }
         else if(requested && view!=null && actor!=null && tool.Kilograms<tool.CapacityKg-.0001f)
@@ -98,7 +112,9 @@ public sealed class VacuumTool : MonoBehaviour
         int count=0;
         for(int i=0;i<96;i++)
         {
-            ages[i]+=dt/.45f;if(ages[i]>=1)continue;float t=ages[i];
+            float lifetime=pouring[i] ? .18f : .45f;
+            ages[i]+=dt/lifetime;if(ages[i]>=1)continue;float t=ages[i];
+            if(pouring[i] && Emptying && emptyTime>=PourEnd*EmptyDuration){ages[i]=1;continue;}
             Vector3 end=pouring[i]?ends[i]:nozzle.position;
             Vector3 p=Vector3.Lerp(starts[i],end,t*t)+Vector3.up*(Mathf.Sin(t*Mathf.PI)*(pouring[i]?.06f:.12f));
             // World particles end at the mouth. Reservoir kernels enter through the internal inlet.

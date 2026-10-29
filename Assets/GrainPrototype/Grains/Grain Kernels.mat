@@ -23,13 +23,26 @@ Material:
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs: []
+    m_TexEnvs:
+    - _GrainMapA:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GrainMapB:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GrainMapC:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _Brightness: 0.8
     - _DetailScale: 48
     - _GrainType: -1
     - _KernelMode: 1
+    - _UseSpatialGrain: 0
     m_Colors:
     - _GrainWeightsA: {r: 1, g: 0, b: 0, a: 0}
     - _GrainWeightsB: {r: 0, g: 0, b: 0, a: 0}

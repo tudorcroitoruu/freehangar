@@ -7,10 +7,17 @@ public static class VerifyVacuumGroundPour {
  var cameraGo=new GameObject("Camera");cameraGo.transform.SetParent(actor.transform,false);var camera=cameraGo.AddComponent<Camera>();camera.transform.localPosition=Vector3.up*2.5f;camera.transform.rotation=Quaternion.Euler(90,0,0);
  var hands=UnityEngine.Object.Instantiate(source.gameObject,actor.transform);var tool=hands.GetComponent<ShovelTool>();foreach(Transform level in hands.transform.Find("Item In Hands"))level.gameObject.SetActive(level.name=="LVL_"+tier);typeof(ShovelTool).GetMethod("Awake",flags).Invoke(tool,null);var vac=tool.ActiveVacuum;
  floor=GameObject.CreatePrimitive(PrimitiveType.Cube);floor.transform.position=actor.transform.position-Vector3.up*.1f;floor.transform.localScale=new Vector3(20,.2f,20);Physics.SyncTransforms();float total=tool.CapacityKg;tool.Cargo.Add(GrainType.Corn,total);vac.Tick(tool,1);
+ var grainPosition=vac.fillFrame.position;
  if(!tool.TryDrop(camera,actor.transform))throw new Exception("Ground drop rejected");
  float halfway=0,maxStep=0,last=total;
  for(int i=0;i<200;i++){
- tool.Tick(.02f);maxStep=Mathf.Max(maxStep,last-tool.Kilograms);last=tool.Kilograms;
+ tool.Tick(.02f);
+ float phase=(i+1)*.02f/VacuumTool.EmptyDuration;
+ if(phase<.22f && Quaternion.Angle(vac.RotationOffset,Quaternion.identity)>.01f)throw new Exception("Rotation before opening completed");
+ if(phase<VacuumTool.PourStart && Mathf.Abs(tool.Kilograms-total)>.01f)throw new Exception("Grain drained before tipping completed");
+ if(tier==6 && phase<VacuumTool.PourStart && Vector3.Distance(vac.fillFrame.position,grainPosition)>.001f)throw new Exception("Lid pulled grain out of reservoir");
+ if(phase>VacuumTool.PourStart+.02f && phase<VacuumTool.PourEnd-.02f){var ps=vac.GetComponentInChildren<ParticleSystem>();if(ps.particleCount==0)throw new Exception("Draining without visible stream");}
+ maxStep=Mathf.Max(maxStep,last-tool.Kilograms);last=tool.Kilograms;
  if(i==85)halfway=tool.Kilograms;
  if(dropped==null)foreach(var p in UnityEngine.Object.FindObjectsByType<GrainPile>(FindObjectsSortMode.None))if(Vector3.Distance(p.transform.position,actor.transform.position)<1)dropped=p;
  if(dropped!=null && Math.Abs(dropped.Kilograms+tool.Kilograms-total)>.15)throw new Exception("Mass mismatch");
