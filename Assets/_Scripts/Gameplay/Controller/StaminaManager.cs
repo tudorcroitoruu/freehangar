@@ -141,7 +141,7 @@ public sealed class StaminaManager : MonoBehaviour
 
         float restingTime = Mathf.Max(0f, deltaTime - recoveryDelayRemaining);
         recoveryDelayRemaining = Mathf.Max(0f, recoveryDelayRemaining - deltaTime);
-        CurrentStamina = Mathf.Clamp(CurrentStamina + recoveryPerSecond * restingTime, 0f, CurrentMaxStamina);
+        CurrentStamina = Mathf.Clamp(CurrentStamina + recoveryPerSecond * 1.5f * restingTime, 0f, CurrentMaxStamina);
         UpdateStaminaBar();
     }
 
