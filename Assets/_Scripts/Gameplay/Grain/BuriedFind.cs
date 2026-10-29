@@ -6,7 +6,7 @@ using UnityEngine;
 [DisallowMultipleComponent, RequireComponent(typeof(BoxCollider))]
 public sealed class BuriedFind : MonoBehaviour, IInteractable
 {
-    public enum Kind { Key, CashChest, UpgradeVoucher, InfiniteStamina, CashCache, Hammer, Sledgehammer, HangarKey }
+    public enum Kind { Key, CashChest, UpgradeVoucher, InfiniteStamina, CashCache, Hammer, Sledgehammer, HangarKey, Broom }
 
     [SerializeField] private Kind kind;
     [SerializeField] private string findId;
@@ -123,8 +123,9 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         string action = !hasProfile ? "Load save to collect" : !hasKey ? (string.IsNullOrEmpty(matchingKeyColor) ? "Requires chest key" : $"Requires {matchingKeyColor} key") :
             kind == Kind.Key ? "Take CHEST key" :
             kind == Kind.HangarKey ? $"Take HANGAR {targetHangar} key" :
-            kind == Kind.Hammer ? "Take hammer (equip with 2)" :
-            kind == Kind.Sledgehammer ? "Take sledgehammer (equip with 3)" :
+            kind == Kind.Broom ? "Take broom (equip with 2)" :
+            kind == Kind.Hammer ? "Take hammer (equip with 3)" :
+            kind == Kind.Sledgehammer ? "Take sledgehammer (equip with 4)" :
             kind == Kind.UpgradeVoucher ? "Take free upgrade voucher" :
             kind == Kind.InfiniteStamina ? $"Drink stamina tonic ({staminaDurationSeconds / 60} min)" :
             kind == Kind.CashCache ? $"Take cash cache (+${cashReward})" :
@@ -196,7 +197,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     }
 
     private string Receipt() => kind == Kind.HangarKey ? $"HANGAR {targetHangar} KEY\nUse at Hangar {targetHangar}" :
-        kind == Kind.Key ? "CHEST KEY FOUND" : kind == Kind.InfiniteStamina ? "INFINITE STAMINA!" :
+        kind == Kind.Broom ? "BROOM FOUND\nPress 2 to equip" : kind == Kind.Key ? "CHEST KEY FOUND" : kind == Kind.InfiniteStamina ? "INFINITE STAMINA!" :
         kind == Kind.CashChest || kind == Kind.CashCache ? $"+${cashReward}" :
         kind == Kind.UpgradeVoucher ? "FREE UPGRADE!" : kind == Kind.Hammer ? "HAMMER FOUND" : "SLEDGEHAMMER FOUND";
 
@@ -293,7 +294,11 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
 
     public static bool WasFound(PlayerData data, string id)
     {
-        if (data == null || string.IsNullOrEmpty(id) || data.foundSecrets == null) return false;
+        if (string.IsNullOrEmpty(id)) return false;
+#if UNITY_EDITOR
+        if (Application.isPlaying && GameManager.HasEditorTestItem(id)) return true;
+#endif
+        if (data == null || data.foundSecrets == null) return false;
         foreach (string found in data.foundSecrets) if (found == id) return true;
         return false;
     }

@@ -97,7 +97,7 @@ Material:
     - _ZTestTransparent: 4
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.14999998, g: 0.75, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _EmissiveColor: {r: 0.45000002, g: 2.25, b: 3, a: 3}
     - _EmissiveColorLDR: {r: 0, g: 0, b: 0, a: 1}

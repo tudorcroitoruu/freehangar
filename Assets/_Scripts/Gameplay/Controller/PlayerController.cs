@@ -176,7 +176,7 @@ public class PlayerController : MonoBehaviour
 
         HandleCrouch(acceptInput);
         HandleMovement(acceptInput);
-        if (combatTools != null) combatTools.Tick(acceptInput && !IsCarrying && !IsPushing, wasLocked);
+        if (combatTools != null) combatTools.Tick(acceptInput && !IsPushing, wasLocked);
         bool interactionAction = acceptInput && interactor != null && Input.GetKeyDown(KeyCode.E) && interactor.TryInteract();
         if (IsShovelEquipped && !interactionAction && !IsCarrying)
         {
@@ -245,6 +245,7 @@ public class PlayerController : MonoBehaviour
         Vector3 baseline = cameraRestPosition - Vector3.up * Mathf.Max(0, standingHeight - characterController.height);
         characterCamera.transform.localPosition = baseline + Vector3.up * (Mathf.Sin(sprintCameraPhase) * sprintCameraHeight * sprintCameraBlend);
         characterCamera.transform.localRotation = Quaternion.Euler(smoothedPitch + Mathf.Cos(sprintCameraPhase) * sprintCameraPitch * sprintCameraBlend, IsPushing ? pushLookYaw : 0, 0);
+        if (combatTools != null) characterCamera.transform.localRotation *= combatTools.BroomCameraKick;
     }
 
     private void HandleGrainScooped()

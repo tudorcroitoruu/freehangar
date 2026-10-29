@@ -116,6 +116,29 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
         return true;
     }
 
+    // Initialise newly spawned demonstration cargo without reporting player work.
+    public void SetDemonstrationFill(float amount)
+    {
+        if (!isActiveAndEnabled || !float.IsFinite(amount)) return;
+        kilograms = Mathf.Clamp(amount, 0f, capacityKg);
+        ApplyFill();
+    }
+
+    public float ConsumeByPest(float amount)
+    {
+        if (!isActiveAndEnabled || !float.IsFinite(amount) || amount <= 0f) return 0f;
+        float removed = Mathf.Min(kilograms, amount);
+        kilograms -= removed;
+        if (removed > 0f && sack != null)
+        {
+            // Pest damage opens a closed sack so the missing grain can be replaced.
+            IsClosing = false;
+            sack.Close = 0f;
+        }
+        ApplyFill();
+        return removed;
+    }
+
     public void SetCarried(bool carried) => IsCarried = carried;
 
     private void Update()

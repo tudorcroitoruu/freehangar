@@ -1,74 +1,206 @@
 fileFormatVersion: 2
 guid: 865ee62463c09074a950d11b0a967c52
 ModelImporter:
-  serializedVersion: 23
-  fileIDToRecycleName:
-    100000: //RootNode
-    100002: rat_LOD1
-    100004: ratHead
-    100006: ratLegLBack1
-    100008: ratLegLBack2
-    100010: ratLegLBack3
-    100012: ratLegLBackPalm
-    100014: ratLegLFront1
-    100016: ratLegLFront2
-    100018: ratLegLFrontPalm
-    100020: ratLegRBack1
-    100022: ratLegRBack2
-    100024: ratLegRBack3
-    100026: ratLegRBackPalm
-    100028: ratLegRFront1
-    100030: ratLegRFront2
-    100032: ratLegRFrontPalm
-    100034: ratLLegCollarbone
-    100036: ratNeck
-    100038: ratPelvis
-    100040: ratRibcage
-    100042: ratRLegCollarbone
-    100044: ratSpine1
-    100046: ratSpine2
-    100048: ratTail1
-    100050: ratTail2
-    100052: ratTail3
-    100054: ratTail4
-    100056: ratTail5
-    100058: root
-    400000: //RootNode
-    400002: rat_LOD1
-    400004: ratHead
-    400006: ratLegLBack1
-    400008: ratLegLBack2
-    400010: ratLegLBack3
-    400012: ratLegLBackPalm
-    400014: ratLegLFront1
-    400016: ratLegLFront2
-    400018: ratLegLFrontPalm
-    400020: ratLegRBack1
-    400022: ratLegRBack2
-    400024: ratLegRBack3
-    400026: ratLegRBackPalm
-    400028: ratLegRFront1
-    400030: ratLegRFront2
-    400032: ratLegRFrontPalm
-    400034: ratLLegCollarbone
-    400036: ratNeck
-    400038: ratPelvis
-    400040: ratRibcage
-    400042: ratRLegCollarbone
-    400044: ratSpine1
-    400046: ratSpine2
-    400048: ratTail1
-    400050: ratTail2
-    400052: ratTail3
-    400054: ratTail4
-    400056: ratTail5
-    400058: root
-    2100000: rat_01
-    4300000: rat_LOD1
-    7400000: run-inplace
-    9500000: //RootNode
-    13700000: rat_LOD1
-    2186277476908879412: ImportLogs
+  serializedVersion: 24300
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: //RootNode
+  - first:
+      1: 100002
+    second: rat_LOD1
+  - first:
+      1: 100004
+    second: ratHead
+  - first:
+      1: 100006
+    second: ratLegLBack1
+  - first:
+      1: 100008
+    second: ratLegLBack2
+  - first:
+      1: 100010
+    second: ratLegLBack3
+  - first:
+      1: 100012
+    second: ratLegLBackPalm
+  - first:
+      1: 100014
+    second: ratLegLFront1
+  - first:
+      1: 100016
+    second: ratLegLFront2
+  - first:
+      1: 100018
+    second: ratLegLFrontPalm
+  - first:
+      1: 100020
+    second: ratLegRBack1
+  - first:
+      1: 100022
+    second: ratLegRBack2
+  - first:
+      1: 100024
+    second: ratLegRBack3
+  - first:
+      1: 100026
+    second: ratLegRBackPalm
+  - first:
+      1: 100028
+    second: ratLegRFront1
+  - first:
+      1: 100030
+    second: ratLegRFront2
+  - first:
+      1: 100032
+    second: ratLegRFrontPalm
+  - first:
+      1: 100034
+    second: ratLLegCollarbone
+  - first:
+      1: 100036
+    second: ratNeck
+  - first:
+      1: 100038
+    second: ratPelvis
+  - first:
+      1: 100040
+    second: ratRibcage
+  - first:
+      1: 100042
+    second: ratRLegCollarbone
+  - first:
+      1: 100044
+    second: ratSpine1
+  - first:
+      1: 100046
+    second: ratSpine2
+  - first:
+      1: 100048
+    second: ratTail1
+  - first:
+      1: 100050
+    second: ratTail2
+  - first:
+      1: 100052
+    second: ratTail3
+  - first:
+      1: 100054
+    second: ratTail4
+  - first:
+      1: 100056
+    second: ratTail5
+  - first:
+      1: 100058
+    second: root
+  - first:
+      4: 400000
+    second: //RootNode
+  - first:
+      4: 400002
+    second: rat_LOD1
+  - first:
+      4: 400004
+    second: ratHead
+  - first:
+      4: 400006
+    second: ratLegLBack1
+  - first:
+      4: 400008
+    second: ratLegLBack2
+  - first:
+      4: 400010
+    second: ratLegLBack3
+  - first:
+      4: 400012
+    second: ratLegLBackPalm
+  - first:
+      4: 400014
+    second: ratLegLFront1
+  - first:
+      4: 400016
+    second: ratLegLFront2
+  - first:
+      4: 400018
+    second: ratLegLFrontPalm
+  - first:
+      4: 400020
+    second: ratLegRBack1
+  - first:
+      4: 400022
+    second: ratLegRBack2
+  - first:
+      4: 400024
+    second: ratLegRBack3
+  - first:
+      4: 400026
+    second: ratLegRBackPalm
+  - first:
+      4: 400028
+    second: ratLegRFront1
+  - first:
+      4: 400030
+    second: ratLegRFront2
+  - first:
+      4: 400032
+    second: ratLegRFrontPalm
+  - first:
+      4: 400034
+    second: ratLLegCollarbone
+  - first:
+      4: 400036
+    second: ratNeck
+  - first:
+      4: 400038
+    second: ratPelvis
+  - first:
+      4: 400040
+    second: ratRibcage
+  - first:
+      4: 400042
+    second: ratRLegCollarbone
+  - first:
+      4: 400044
+    second: ratSpine1
+  - first:
+      4: 400046
+    second: ratSpine2
+  - first:
+      4: 400048
+    second: ratTail1
+  - first:
+      4: 400050
+    second: ratTail2
+  - first:
+      4: 400052
+    second: ratTail3
+  - first:
+      4: 400054
+    second: ratTail4
+  - first:
+      4: 400056
+    second: ratTail5
+  - first:
+      4: 400058
+    second: root
+  - first:
+      21: 2100000
+    second: rat_01
+  - first:
+      43: 4300000
+    second: rat_LOD1
+  - first:
+      74: 7400000
+    second: run-inplace
+  - first:
+      95: 9500000
+    second: //RootNode
+  - first:
+      137: 13700000
+    second: rat_LOD1
+  - first:
+      41386430: 2186277476908879412
+    second: ImportLogs
   externalObjects:
   - first:
       type: UnityEngine:Material
@@ -76,18 +208,18 @@ ModelImporter:
       name: rat_01
     second: {fileID: 2100000, guid: 3e4498d22c206c44ebc2a5296f6d9c55, type: 2}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1
+    searchTexturesGlobally: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -105,6 +237,7 @@ ModelImporter:
     - serializedVersion: 16
       name: run-inplace
       takeName: run
+      internalID: 7400000
       firstFrame: 50
       lastFrame: 60
       wrapMode: 0
@@ -114,13 +247,13 @@ ModelImporter:
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 1
-      loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      loopBlend: 1
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
@@ -137,25 +270,39 @@ ModelImporter:
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
     importVisibility: 0
     importBlendShapes: 1
     importCameras: 0
     importLights: 0
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    bakeAxisConversion: 0
     preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
     indexFormat: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
-    previousCalculatedGlobalScale: 0.0254
-    hasPreviousCalculatedGlobalScale: 1
+    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
@@ -164,10 +311,10 @@ ModelImporter:
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -177,13 +324,19 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 
