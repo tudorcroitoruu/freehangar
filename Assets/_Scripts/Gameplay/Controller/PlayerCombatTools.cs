@@ -70,6 +70,13 @@ public sealed class PlayerCombatTools : MonoBehaviour
         return true;
     }
 
+    public void HideForPushing(System.Collections.Generic.List<GameObject> hidden)
+    {
+        strikeStart = -10f;
+        foreach (var tool in new[] { heldHammer, heldSledgehammer })
+            if (tool != null && tool.gameObject.activeSelf) { hidden.Add(tool.gameObject); tool.gameObject.SetActive(false); }
+    }
+
     private void ApplyVisuals()
     {
         if (shovelHands != null) shovelHands.gameObject.SetActive(equipped == Tool.Shovel);

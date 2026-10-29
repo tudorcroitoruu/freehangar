@@ -10,6 +10,7 @@ public sealed class BicycleCargoBox : MonoBehaviour, IInteractable
         var upgrades = slot.GetComponentInParent<VehicleUpgrade>();
         if (upgrades != null && !upgrades.CanLoadVolume(VehicleUpgrade.MeasureVolume(gameObject))) return false;
         originalParent=transform.parent; transform.SetParent(slot,true);transform.localPosition=Vector3.zero;transform.localRotation=Quaternion.identity;
+        if(slot.GetComponentInParent<VehicleCargoRack>()!=null)VehicleCargoRack.Seat(transform,slot);
         if(TryGetComponent<Rigidbody>(out var body)){body.linearVelocity=Vector3.zero;body.angularVelocity=Vector3.zero;body.isKinematic=true;}
         loaded=true;return true;
     }

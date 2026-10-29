@@ -134,12 +134,14 @@ public sealed class BagInteraction : MonoBehaviour
     {
         if (carried == null || slot == null) return false;
         var upgrades = slot.GetComponentInParent<VehicleUpgrade>();
-        if (upgrades != null && !upgrades.CanLoadVolume(carriedVolume)) return false;
+        var rack = slot.GetComponentInParent<VehicleCargoRack>();
+        if (upgrades != null && !upgrades.CanLoadVolume(carriedVolume,rack != null ? 2 : 1)) return false;
         var bag = carried;
         bag.transform.SetParent(slot, true);
         bag.transform.localScale = new Vector3(originalWorldScale.x / slot.lossyScale.x, originalWorldScale.y / slot.lossyScale.y, originalWorldScale.z / slot.lossyScale.z);
         bag.transform.rotation = Quaternion.AngleAxis(slot.eulerAngles.y, Vector3.up) * uprightRotation;
         bag.transform.position += slot.position - bag.WorldBounds.center;
+        if (rack != null) VehicleCargoRack.Seat(bag.transform,slot);
         for (int i = 0; i < carriedColliders.Length; i++) if (carriedColliders[i] != null) carriedColliders[i].enabled = colliderStates[i];
         carriedBody.isKinematic = true;
         bag.SetCarried(false);

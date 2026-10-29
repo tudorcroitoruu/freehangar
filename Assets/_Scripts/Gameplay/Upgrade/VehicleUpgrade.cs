@@ -60,6 +60,7 @@ public sealed class VehicleUpgrade : MonoBehaviour
 
     private void RefreshSlots(int _)
     {
+        if (GetComponent<VehicleCargoRack>() != null) return;
         if (bicycle == null || !IsConfigured) return;
         if (originalSlots == null) originalSlots = bicycle.cargoSlots ?? new Transform[0];
         var slots = new List<Transform>();
@@ -110,8 +111,10 @@ public sealed class VehicleUpgrade : MonoBehaviour
         }
     }
     public int CargoCount => GetComponent<WheelbarrowCargo>() is WheelbarrowCargo barrow ? barrow.BagCount : CargoRoots().Count;
-    public bool CanLoadVolume(float volume) => !IsConfigured ||
-        (float.IsFinite(volume) && volume > 0 && CargoCount < SlotCount && OccupiedVolume + volume <= CapacityVolume + .0001f);
+    public bool CanLoadVolume(float volume, int slotCost = 1) => !IsConfigured ||
+        (float.IsFinite(volume) && volume > 0 &&
+        (GetComponent<VehicleCargoRack>() is VehicleCargoRack rack ? rack.UsedSlots : CargoCount) + slotCost <= SlotCount &&
+        OccupiedVolume + volume <= CapacityVolume + .0001f);
 
     public static float MeasureVolume(GameObject item)
     {

@@ -67,7 +67,8 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (Items != null && Items.IsCarrying)
         {
             SetHighlightedTarget(null);
-            HidePrompt();
+            if (aimedTarget is WheelbarrowCargo && hasAimedPrompt && prompt != null) prompt.Show(viewCamera, aimedPrompt);
+            else HidePrompt();
             return;
         }
         if (PushedWheelbarrow != null)
@@ -106,7 +107,8 @@ public sealed class PlayerInteractor : MonoBehaviour
     public bool TryInteract()
     {
         if (!CanInteract) return false;
-        if (Items != null && Items.IsCarrying) return Items.TryPlace();
+        if (Items != null && Items.IsCarrying)
+            return FindTarget() is WheelbarrowCargo barrow ? barrow.TryInteract(this) : Items.TryPlace();
         if (PushedWheelbarrow != null) return PushedWheelbarrow.TryInteract(this);
         // Carrying reserves E for dropping; bicycle cargo handling takes priority in PlayerController.
         if (Bags != null && Bags.isActiveAndEnabled && Bags.IsCarrying)

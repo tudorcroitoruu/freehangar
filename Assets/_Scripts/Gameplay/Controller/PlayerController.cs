@@ -48,6 +48,8 @@ public class PlayerController : MonoBehaviour
     private float verticalVelocity;
     private float cameraRotationX;
     private float targetYaw;
+    private float pushLookYaw, pushLookTarget;
+    private bool IsPushing => interactor != null && interactor.PushedWheelbarrow != null;
     private float yawVelocity;
     private float pitchVelocity;
     private float smoothedPitch;
@@ -171,7 +173,7 @@ public class PlayerController : MonoBehaviour
 
         HandleCrouch(acceptInput);
         HandleMovement(acceptInput);
-        if (combatTools != null) combatTools.Tick(acceptInput && !IsCarrying, wasLocked);
+        if (combatTools != null) combatTools.Tick(acceptInput && !IsCarrying && !IsPushing, wasLocked);
         bool interactionAction = acceptInput && interactor != null && Input.GetKeyDown(KeyCode.E) && interactor.TryInteract();
         if (IsShovelEquipped && !interactionAction && !IsCarrying)
         {
@@ -193,6 +195,12 @@ public class PlayerController : MonoBehaviour
 
     public void ResetLook()
     {
+        if (!IsPushing && Mathf.Abs(pushLookYaw) > .001f)
+        {
+            transform.rotation = Quaternion.Euler(0, characterCamera.transform.eulerAngles.y, 0);
+            characterCamera.transform.localRotation = Quaternion.Euler(smoothedPitch, 0, 0);
+        }
+        pushLookYaw = pushLookTarget = 0;
         targetYaw = transform.eulerAngles.y; yawVelocity = pitchVelocity = 0;
         cameraRotationX = smoothedPitch = Mathf.DeltaAngle(0, characterCamera.transform.localEulerAngles.x);
         verticalVelocity = 0;
@@ -235,7 +243,7 @@ public class PlayerController : MonoBehaviour
             sprintCameraPhase = Mathf.Repeat(sprintCameraPhase + dt * sprintStepFrequency * Mathf.PI * 2, Mathf.PI * 2);
         Vector3 baseline = cameraRestPosition - Vector3.up * Mathf.Max(0, standingHeight - characterController.height);
         characterCamera.transform.localPosition = baseline + Vector3.up * (Mathf.Sin(sprintCameraPhase) * sprintCameraHeight * sprintCameraBlend);
-        characterCamera.transform.localRotation = Quaternion.Euler(smoothedPitch + Mathf.Cos(sprintCameraPhase) * sprintCameraPitch * sprintCameraBlend, 0, 0);
+        characterCamera.transform.localRotation = Quaternion.Euler(smoothedPitch + Mathf.Cos(sprintCameraPhase) * sprintCameraPitch * sprintCameraBlend, IsPushing ? pushLookYaw : 0, 0);
     }
 
     private void HandleGrainScooped()
@@ -250,7 +258,7 @@ public class PlayerController : MonoBehaviour
             : Vector2.zero;
         input = Vector2.ClampMagnitude(input, 1f);
         bool pushingWheelbarrow = interactor != null && interactor.PushedWheelbarrow != null;
-        float currentSpeed = pushingWheelbarrow ? Mathf.Min(speed, 3.5f) : isCrouching ? crouchSpeed :
+        float currentSpeed = pushingWheelbarrow ? (acceptInput && Input.GetKey(KeyCode.LeftShift) ? Mathf.Min(sprintSpeed, 6f) : speed) : isCrouching ? crouchSpeed :
             acceptInput && Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : speed;
         Vector3 velocity = (transform.right * input.x + transform.forward * input.y) * currentSpeed;
 
@@ -262,6 +270,13 @@ public class PlayerController : MonoBehaviour
 
         verticalVelocity -= gravity * Time.deltaTime;
         velocity.y = verticalVelocity;
+        if (pushingWheelbarrow)
+        {
+            interactor.PushedWheelbarrow.Move(input, currentSpeed, verticalVelocity, Time.deltaTime);
+            targetYaw = transform.eulerAngles.y;
+            UpdateSprintCamera(acceptInput && Input.GetKey(KeyCode.LeftShift) && Mathf.Abs(input.y) > .01f, Time.deltaTime);
+            return;
+        }
         CollisionFlags collisions = characterController.Move(velocity * Time.deltaTime);
         if ((collisions & CollisionFlags.Above) != 0 && verticalVelocity > 0f)
             verticalVelocity = 0f;
@@ -275,7 +290,21 @@ public class PlayerController : MonoBehaviour
 
     private void HandleCamera()
     {
-        lookInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+        ApplyLook(new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")));
+    }
+
+    private void ApplyLook(Vector2 input)
+    {
+        lookInput = input;
+        if (IsPushing)
+        {
+            pushLookTarget = Mathf.Clamp(pushLookTarget + lookInput.x * cameraSensitivity, -65f, 65f);
+            cameraRotationX = Mathf.Clamp(cameraRotationX - lookInput.y * cameraSensitivity, -50f, 65f);
+            pushLookYaw = Mathf.SmoothDampAngle(pushLookYaw, pushLookTarget, ref yawVelocity, lookSmoothTime);
+            smoothedPitch = Mathf.SmoothDampAngle(smoothedPitch, cameraRotationX, ref pitchVelocity, lookSmoothTime);
+            characterCamera.transform.localRotation = Quaternion.Euler(smoothedPitch, pushLookYaw, 0);
+            return;
+        }
         targetYaw += lookInput.x * cameraSensitivity;
         cameraRotationX -= lookInput.y * cameraSensitivity;
         cameraRotationX = Mathf.Clamp(cameraRotationX, cameraMinAngle, cameraMaxAngle);
@@ -287,7 +316,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleCrouch(bool acceptInput)
     {
-        bool requested = acceptInput && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C));
+        bool requested = acceptInput && !IsPushing && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C));
         float minimumHeight = Mathf.Min(standingHeight, Mathf.Max(crouchHeight, characterController.radius * 2f));
         float nextHeight = Mathf.MoveTowards(characterController.height,
             requested ? minimumHeight : standingHeight, crouchTransitionSpeed * Time.deltaTime);

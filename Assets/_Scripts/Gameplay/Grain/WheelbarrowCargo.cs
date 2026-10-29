@@ -15,9 +15,16 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     private readonly List<float> bagVolumes = new List<float>(6);
     private readonly List<Transform> slots = new List<Transform>(6);
     private readonly Collider[] blockers = new Collider[32];
+    private readonly RaycastHit[] groundHits = new RaycastHit[32];
+    private readonly List<(Collider player, Collider barrow)> ignoredCollisions = new List<(Collider, Collider)>();
+    private Bounds bodyBounds;
+    private float handleDistance;
     private Transform[] wheels;
     private PlayerInteractor pusher;
     private float occupiedVolume;
+    private PlayerController pushingPlayer;
+    private bool instrumentWasActive, shovelWasEnabled;
+    private readonly List<GameObject> hiddenTools = new List<GameObject>();
 
     public int UpgradeLevel => Upgrades != null && Upgrades.IsConfigured ? Upgrades.Level :
         SaveSystem.Data != null && SaveSystem.Data.wheelbarrowUpgradeLevels != null &&
@@ -37,9 +44,13 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         RebuildCargo();
         var found = new List<Transform>(2);
         foreach (Transform child in GetComponentsInChildren<Transform>(true))
-            if (child != transform && child.name.Contains("_Wheel") &&
+            if (child != transform && (child.name.EndsWith("_Wheel", System.StringComparison.Ordinal) ||
+                child.name.Contains("_Wheel_")) &&
                 child.GetComponent<MeshFilter>() != null) found.Add(child);
         wheels = found.ToArray();
+        var bodyCollider = GetComponent<MeshCollider>();
+        bodyBounds = bodyCollider != null && bodyCollider.sharedMesh != null ? bodyCollider.sharedMesh.bounds :
+            new Bounds(trayCenter, traySize + new Vector3(.15f,.2f,.3f));
     }
 
     private void RebuildCargo()
@@ -98,7 +109,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
             available = CanLoad(interactor.Bags);
             action = available ? "Load bag" : "Wheelbarrow full";
         }
-        else action = "Push wheelbarrow";
+        else action = interactor.Items != null && interactor.Items.IsCarrying ? "Put down item and push" : "Push wheelbarrow";
         prompt = new InteractionPromptData(transform.TransformPoint(trayCenter + Vector3.up * .35f),
             action + $"  ({occupiedVolume:0.00}/{CapacityVolume:0.00} m³)", available);
         return true;
@@ -125,8 +136,43 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         }
         if (interactor.GetComponent<PlayerBicycleInteraction>() is PlayerBicycleInteraction vehicle && vehicle.IsRiding)
             return false;
+        if (interactor.Items != null && interactor.Items.IsCarrying && !interactor.Items.TryPlace()) return false;
         pusher = interactor;
+        var controller = interactor.GetComponent<CharacterController>();
+        float playerRadius = controller != null ? controller.radius * Mathf.Abs(interactor.transform.lossyScale.x) : .3f;
+        handleDistance = Mathf.Max(pushDistance, -bodyBounds.min.z * Mathf.Abs(transform.lossyScale.z) + playerRadius + .12f);
+        foreach (var playerCollider in interactor.GetComponentsInChildren<Collider>(true))
+            foreach (var barrowCollider in GetComponentsInChildren<Collider>(true))
+            {
+                if (playerCollider == barrowCollider || Physics.GetIgnoreCollision(playerCollider,barrowCollider)) continue;
+                Physics.IgnoreCollision(playerCollider,barrowCollider,true);
+                ignoredCollisions.Add((playerCollider,barrowCollider));
+            }
+        // Attach to the handles once; subsequent movement is committed as a single pair.
+        Vector3 previousPosition = interactor.transform.position;
+        Vector3 handle = transform.position - transform.forward * handleDistance;
+        handle.y = previousPosition.y;
+        if (controller != null) controller.Move(handle - previousPosition);
+        else interactor.transform.position = handle;
+        if (Vector3.ProjectOnPlane(interactor.transform.position - handle, Vector3.up).sqrMagnitude > .0025f)
+        {
+            interactor.transform.position = previousPosition;
+            StopPushing();
+            return false;
+        }
+        interactor.transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
         interactor.PushedWheelbarrow = this;
+        pushingPlayer = interactor.GetComponent<PlayerController>();
+        if (pushingPlayer != null)
+        {
+            instrumentWasActive = pushingPlayer.HeldInstrument != null && pushingPlayer.HeldInstrument.gameObject.activeSelf;
+            shovelWasEnabled = pushingPlayer.Shovel != null && pushingPlayer.Shovel.enabled;
+            if (pushingPlayer.Shovel != null) { pushingPlayer.Shovel.CancelAction(); pushingPlayer.Shovel.enabled = false; }
+            if (pushingPlayer.HeldInstrument != null) pushingPlayer.HeldInstrument.gameObject.SetActive(false);
+            pushingPlayer.ResetLook();
+        }
+        var tools = interactor.GetComponent<PlayerCombatTools>();
+        if (tools != null) tools.HideForPushing(hiddenTools);
         return true;
     }
 
@@ -146,31 +192,83 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         if (!pusher.isActiveAndEnabled || !pusher.gameObject.activeInHierarchy ||
             Vector3.Distance(pusher.transform.position, transform.position) > 3.5f)
         { StopPushing(); return; }
-        Vector3 forward = Vector3.ProjectOnPlane(pusher.transform.forward, Vector3.up).normalized;
-        if (forward.sqrMagnitude < .01f) return;
-        Vector3 target = pusher.transform.position + forward * pushDistance;
-        Vector3 origin = target + Vector3.up * 2f;
-        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 5f, ~0, QueryTriggerInteraction.Ignore) &&
-            !hit.collider.transform.IsChildOf(transform) && hit.normal.y > .65f)
-            target.y = hit.point.y + .02f;
-        else target.y = transform.position.y;
-        Quaternion rotation = Quaternion.LookRotation(forward, Vector3.up);
-        Vector3 center = target + rotation * new Vector3(0f, .4f, -.7f);
-        int count = Physics.OverlapBoxNonAlloc(center, new Vector3(.4f, .35f, .8f), blockers,
-            rotation, ~0, QueryTriggerInteraction.Ignore);
-        if (count == blockers.Length) return;
+    }
+
+    // The player and barrow advance together in short collision-checked steps, including turns.
+    public void Move(Vector2 input, float speed, float verticalSpeed, float dt)
+    {
+        if (pusher == null || dt <= 0) return;
+        var controller = pusher.GetComponent<CharacterController>();
+        if (controller == null || !controller.enabled) return;
+        int steps = Mathf.Max(1, Mathf.CeilToInt(Mathf.Max(Mathf.Abs(input.y * speed * dt) / .06f,
+            Mathf.Abs(input.x * 80f * dt) / 3f)));
+        float step = dt / steps;
+        for (int n = 0; n < steps; n++)
+        {
+            Quaternion rotation = Quaternion.Euler(0, transform.eulerAngles.y + input.x * 80f * step, 0);
+            Vector3 forward = rotation * Vector3.forward;
+            Vector3 target = transform.position + forward * (input.y * speed * step);
+            if (!CanMoveTo(ref target, rotation)) break;
+            Vector3 previous = pusher.transform.position;
+            Vector3 handle = target - forward * handleDistance;
+            handle.y = previous.y;
+            controller.Move(handle - previous + Vector3.up * (verticalSpeed * step));
+            // Sliding against a wall must stop the barrow too, rather than breaking the handle offset.
+            if (Vector3.ProjectOnPlane(pusher.transform.position - handle, Vector3.up).sqrMagnitude > .0004f)
+            {
+                pusher.transform.position = previous;
+                Physics.SyncTransforms();
+                break;
+            }
+            Vector3 oldPosition = transform.position;
+            transform.SetPositionAndRotation(target, rotation);
+            pusher.transform.rotation = rotation;
+            float roll = Vector3.Dot(target - oldPosition, forward) / (.29f * Mathf.Abs(transform.lossyScale.y)) * Mathf.Rad2Deg;
+            foreach (Transform wheel in wheels) if (wheel != null) wheel.Rotate(Vector3.right, roll, Space.Self);
+            Physics.SyncTransforms();
+        }
+    }
+
+    private bool CanMoveTo(ref Vector3 target, Quaternion rotation)
+    {
+        int groundCount = Physics.RaycastNonAlloc(target + Vector3.up * 2f, Vector3.down, groundHits, 5f, ~0, QueryTriggerInteraction.Ignore);
+        if (groundCount == groundHits.Length) return false;
+        float nearest = float.PositiveInfinity;
+        for (int i = 0; i < groundCount; i++)
+        {
+            var hit = groundHits[i];
+            if (hit.collider.transform.IsChildOf(transform) || hit.collider.transform.IsChildOf(pusher.transform) ||
+                hit.normal.y <= .65f || hit.distance >= nearest) continue;
+            nearest = hit.distance; target.y = hit.point.y + .02f;
+        }
+        if (float.IsPositiveInfinity(nearest) || Mathf.Abs(target.y - transform.position.y) > .25f) return false;
+        Vector3 scale = transform.lossyScale;
+        scale = new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z));
+        Vector3 center = target + rotation * Vector3.Scale(bodyBounds.center, scale);
+        Vector3 extents = Vector3.Scale(bodyBounds.extents, scale);
+        extents.y = Mathf.Max(.01f, extents.y - .03f);
+        int count = Physics.OverlapBoxNonAlloc(center, extents, blockers, rotation, ~0, QueryTriggerInteraction.Ignore);
+        if (count == blockers.Length) return false;
         for (int i = 0; i < count; i++)
-            if (!blockers[i].transform.IsChildOf(transform) && !blockers[i].transform.IsChildOf(pusher.transform)) return;
-        Vector3 previous = transform.position;
-        transform.SetPositionAndRotation(Vector3.MoveTowards(transform.position, target, 3.5f * Time.deltaTime),
-            Quaternion.RotateTowards(transform.rotation, rotation, 150f * Time.deltaTime));
-        float roll = Vector3.Distance(previous, transform.position) / (.29f * transform.lossyScale.y) * Mathf.Rad2Deg;
-        foreach (Transform wheel in wheels) if (wheel != null) wheel.Rotate(Vector3.right, roll, Space.Self);
+            if (!blockers[i].transform.IsChildOf(transform) && !blockers[i].transform.IsChildOf(pusher.transform)) return false;
+        return true;
     }
 
     private void StopPushing()
     {
+        foreach (var pair in ignoredCollisions)
+            if (pair.player != null && pair.barrow != null) Physics.IgnoreCollision(pair.player,pair.barrow,false);
+        ignoredCollisions.Clear();
         if (pusher != null && pusher.PushedWheelbarrow == this) pusher.PushedWheelbarrow = null;
+        if (pushingPlayer != null)
+        {
+            if (pushingPlayer.HeldInstrument != null) pushingPlayer.HeldInstrument.gameObject.SetActive(instrumentWasActive);
+            if (pushingPlayer.Shovel != null) pushingPlayer.Shovel.enabled = shovelWasEnabled;
+            pushingPlayer.ResetLook();
+        }
+        foreach (var tool in hiddenTools) if (tool != null) tool.SetActive(true);
+        hiddenTools.Clear();
+        pushingPlayer = null;
         pusher = null;
     }
 

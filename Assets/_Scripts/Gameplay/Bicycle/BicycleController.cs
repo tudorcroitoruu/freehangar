@@ -183,6 +183,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     }
     public Transform FreeCargoSlot()
     {
+        if (TryGetComponent<VehicleCargoRack>(out var rack)) return rack.FreeSlot(false);
         var upgrades = GetComponent<VehicleUpgrade>();
         bool configured = upgrades != null && upgrades.IsConfigured;
         if (configured && upgrades.CargoCount >= upgrades.SlotCount) return null;
@@ -195,6 +196,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     }
     public Transform FreeBagCargoSlot()
     {
+        if (TryGetComponent<VehicleCargoRack>(out var rack)) return rack.FreeSlot(true);
         var upgrades = GetComponent<VehicleUpgrade>();
         if (upgrades != null && upgrades.IsConfigured)
         {

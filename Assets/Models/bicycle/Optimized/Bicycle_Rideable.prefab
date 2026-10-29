@@ -275,6 +275,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2248225711529951802
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2399664327943757645}
+  m_Layer: 0
+  m_Name: Cargo rack surface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2399664327943757645
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2248225711529951802}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.26001978, z: -0.55872655}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6989609780038012702}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2609022344999099130
 GameObject:
   m_ObjectHideFlags: 0
@@ -996,6 +1027,7 @@ GameObject:
   - component: {fileID: 6989609780038012702}
   - component: {fileID: 2334464101167429173}
   - component: {fileID: 2537139611389393807}
+  - component: {fileID: 8243199730402402936}
   m_Layer: 0
   m_Name: Bicycle_Rideable
   m_TagString: Untagged
@@ -1023,6 +1055,7 @@ Transform:
   - {fileID: 2106851202478714450}
   - {fileID: 1401512911442356809}
   - {fileID: 7792665619763750299}
+  - {fileID: 2399664327943757645}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &2334464101167429173
@@ -1082,6 +1115,7 @@ MonoBehaviour:
   wheelbase: 1.117
   brakingDeceleration: 12
   motorDriven: 0
+  exitCoastDuration: 0.8
   boostSpeedMultiplier: 1.5
   steeringSmoothTime: 0.14
   maximumSteeringAngle: 30
@@ -1089,6 +1123,20 @@ MonoBehaviour:
   ridingCameraPitch: 8.2
   pedalingPitchAmplitude: 0.3
   pedalingPitchSmoothTime: 0.09
+--- !u!114 &8243199730402402936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8103419784928300965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc1d4e79176b51a4796e49cf591adb85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleCargoRack
+  surface: {fileID: 2399664327943757645}
+  baySpacing: 0.6
 --- !u!1 &9119476917816028267
 GameObject:
   m_ObjectHideFlags: 0
