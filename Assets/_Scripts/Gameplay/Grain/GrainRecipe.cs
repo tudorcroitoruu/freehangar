@@ -72,6 +72,19 @@ public sealed class GrainCargo
         if (accepted > 0) { kilograms[(int)type] = Mathf.Max(0, kilograms[(int)type] - accepted); Revision++; }
         return accepted;
     }
+    public void TransferTo(GrainCargo destination, float maximumKg)
+    {
+        float total = Total;
+        if (destination == null || destination == this || total <= 0 || maximumKg <= 0) return;
+        float fraction = Mathf.Clamp01(maximumKg / total);
+        for (int i = 0; i < TypeCount; i++)
+        {
+            float amount = kilograms[i] * fraction;
+            kilograms[i] -= amount;
+            destination.Add((GrainType)i, amount);
+        }
+        Revision++;
+    }
     public float Weight(int type) { float total = Total; return total > .000001f ? kilograms[type] / total : type == 0 ? 1 : 0; }
     public GrainType Sample(float seed)
     {

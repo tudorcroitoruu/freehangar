@@ -297,7 +297,7 @@ public sealed class GrainPile : MonoBehaviour
     }
 
     /// <summary>Adds typed material locally without replacing the existing stock.</summary>
-    public bool Deposit(Vector3 worldPoint, GrainCargo cargo)
+    public bool Deposit(Vector3 worldPoint, GrainCargo cargo, float spreadRadius = 0)
     {
         Initialize();
         if (field == null || cargo == null || cargo.Total <= 0 || !IsInsideBoundary(worldPoint)) return false;
@@ -305,7 +305,7 @@ public sealed class GrainPile : MonoBehaviour
         if (Mathf.Abs(local.x) > size * .5f || Mathf.Abs(local.z) > size * .5f) return false;
         var weights = new float[field.Heights.Length];
         double sum = 0;
-        float radius = Mathf.Max(.25f, field.Spacing * Mathf.Max(WorldScale.x, WorldScale.z) * 1.5f);
+        float radius = Mathf.Max(spreadRadius, Mathf.Max(.25f, field.Spacing * Mathf.Max(WorldScale.x, WorldScale.z) * 1.5f));
         for (int i = 0; i < weights.Length; i++)
         {
             Vector3 point = new Vector3(i % field.Resolution * field.Spacing - size * .5f, 0,
@@ -349,13 +349,16 @@ public sealed class GrainPile : MonoBehaviour
         return true;
     }
 
-    public static GrainPile CreateDroppedPile(Vector3 position, GrainPile appearanceSource)
+    public static float DropRadius(float kilograms) => Mathf.Max(.3f,
+        Mathf.Pow(3f * kilograms / (720f * Mathf.PI * Mathf.Tan(32f * Mathf.Deg2Rad)), 1f / 3f));
+
+    public static GrainPile CreateDroppedPile(Vector3 position, GrainPile appearanceSource, float expectedKg = 0)
     {
         var go = new GameObject("Dropped grain pile");
         go.SetActive(false);
         go.transform.position = position;
         var pile = go.AddComponent<GrainPile>();
-        pile.initialHeight = 0; pile.size = 1.5f; pile.resolution = 33;
+        pile.initialHeight = 0; pile.size = Mathf.Max(1.5f, DropRadius(expectedKg) * 2f + .5f); pile.resolution = 65;
         pile.fitToWalls = true; pile.useSpatialLayout = true;
         if (appearanceSource != null)
         {

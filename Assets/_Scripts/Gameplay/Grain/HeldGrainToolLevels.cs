@@ -6,6 +6,7 @@ public sealed class HeldGrainToolLevels : MonoBehaviour
     private ShovelUpgradeSettings settings;
     private ShovelTool tool;
     private int selected=-1;
+    public bool UsesAuthoredShovelPose => selected >= 1 && selected <= 3;
     private void Awake(){settings=Resources.Load<ShovelUpgradeSettings>(ShovelUpgradeSettings.ResourcePath);tool=GetComponent<ShovelTool>();Apply();}
     private void Update()=>Apply();
     private void Apply()

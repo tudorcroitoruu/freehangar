@@ -27,6 +27,8 @@ public sealed class ShovelTool : MonoBehaviour
     private GrainPile pendingPile;
     private bool dropping;
     private Collider dropSurface;
+    private GrainPile dropReceiver;
+    private readonly GrainCargo dropBatch = new GrainCargo();
     private bool smallPileScoop;
     private bool dropCommitted;
     private GrainContainer pendingContainer;
@@ -41,6 +43,7 @@ public sealed class ShovelTool : MonoBehaviour
     private Camera actionCamera;
     private Transform actor;
     private VacuumTool[] vacuums;
+    private HeldGrainToolLevels heldLevels;
     public VacuumTool ActiveVacuum
     {
         get
@@ -84,6 +87,7 @@ public sealed class ShovelTool : MonoBehaviour
     {
         restPosition = transform.localPosition;
         restRotation = transform.localRotation;
+        heldLevels = GetComponent<HeldGrainToolLevels>();
         if (bladeTip != null) tipInHands = transform.InverseTransformPoint(bladeTip.position);
         gripInHands = gripAnchor != null ? transform.InverseTransformPoint(gripAnchor.position) : Vector3.zero;
         if (grainPhysics != null)
@@ -178,6 +182,7 @@ public sealed class ShovelTool : MonoBehaviour
         if (!FindDropHit(camera, player, out RaycastHit hit) || hit.normal.y < .65f ||
             hit.collider.GetComponentInParent<GrainContainer>() != null || hit.collider.attachedRigidbody != null) return false;
         actionCamera = camera; actor = player;
+        dropReceiver = null;
         pendingPile = null; pendingContainer = null;
         targetPoint = hit.point; dropSurface = hit.collider;
         dropping = true; dropCommitted = false; queued = false;
@@ -188,11 +193,11 @@ public sealed class ShovelTool : MonoBehaviour
         return true;
     }
 
-    private void CommitDrop()
+    private void CommitDrop(float maximumKg = float.MaxValue)
     {
         if (dropSurface == null || !dropSurface.enabled || !dropSurface.gameObject.activeInHierarchy ||
             !CanReachPoint(actionCamera, actor, targetPoint, pourReach, dropSurface)) return;
-        GrainPile receiver = dropSurface.GetComponentInParent<GrainPile>();
+        GrainPile receiver = dropReceiver != null ? dropReceiver : dropSurface.GetComponentInParent<GrainPile>();
         GrainPile source = receiver;
         Vector3 point = targetPoint;
         if (receiver == null)
@@ -212,10 +217,20 @@ public sealed class ShovelTool : MonoBehaviour
         if (created)
         {
             if (source == null) return; // Keep cargo if no grain rendering assets are available.
-            receiver = GrainPile.CreateDroppedPile(point, source);
+            receiver = GrainPile.CreateDroppedPile(point, source, availableAtStart);
         }
         if (grainPhysics != null) grainPhysics.SetPourGrain(cargo.Dominant);
-        if (!receiver.Deposit(point, cargo) && created) Destroy(receiver.gameObject);
+        cargo.TransferTo(dropBatch, maximumKg);
+        if (!receiver.Deposit(point, dropBatch, GrainPile.DropRadius(availableAtStart)))
+        {
+            dropBatch.TransferTo(cargo, float.MaxValue);
+            if (created) Destroy(receiver.gameObject);
+        }
+        else
+        {
+            dropReceiver = receiver;
+            dropSurface = receiver.GetComponent<Collider>();
+        }
         if (grainPhysics != null) grainPhysics.SetFill(Kilograms / CapacityKg);
     }
 
@@ -383,14 +398,17 @@ public sealed class ShovelTool : MonoBehaviour
 
     internal float VacuumEmptyStep(float phase,float dt)
     {
-        if(phase<.4f || phase>.72f)return 0;
+        float fraction = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.3f, .78f, phase));
+        float maximum = Mathf.Max(0, availableAtStart * fraction - transferredFraction);
+        if (maximum <= 0) return 0;
         float before=Kilograms;
         if(pendingContainer!=null)
         {
             if(CanPourInto(pendingContainer)&&CanReachPoint(actionCamera,actor,pendingContainer.PourPoint,pourReach,pendingContainer.GetComponent<Collider>()))
-                cargo.PourInto(pendingContainer,availableAtStart*dt/.6f);
+                cargo.PourInto(pendingContainer,maximum);
         }
-        else if(dropping&&!dropCommitted){dropCommitted=true;CommitDrop();}
+        else if(dropping) CommitDrop(maximum);
+        transferredFraction += before-Kilograms;
         return before-Kilograms;
     }
 
@@ -505,8 +523,12 @@ public sealed class ShovelTool : MonoBehaviour
         Quaternion action = IsBusy ? RotationOffset : Quaternion.identity;
         float swayScale = Mathf.Lerp(1f, .3f, carryBlend);
         Quaternion motion = Quaternion.Euler(sway.y * swayScale, -sway.x * swayScale, turnRoll * swayScale);
-        rotation = motion * Quaternion.Slerp(Quaternion.identity, levelCarryRotation, carryBlend) * action;
-        rotation = LimitDownwardTilt(rotation);
+        // The leveling references belong to LVL_1. Applying them to the other
+        // authored shovel models changes their Editor poses even while idle.
+        bool authoredPose = heldLevels != null && heldLevels.UsesAuthoredShovelPose;
+        rotation = motion * (authoredPose ? Quaternion.identity :
+            Quaternion.Slerp(Quaternion.identity, levelCarryRotation, carryBlend)) * action;
+        if (!authoredPose) rotation = LimitDownwardTilt(rotation);
         if (IsScooping)
         {
             // Solve contact after leveling/tilt limits, so cosmetic carry rotation cannot

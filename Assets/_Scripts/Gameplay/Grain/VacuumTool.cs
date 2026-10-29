@@ -18,11 +18,13 @@ public sealed class VacuumTool : MonoBehaviour
     public float fillRadius = .1f, fillLength = .3f;
     public bool Emptying { get; private set; }
     public bool Sucking { get; private set; }
-    public Vector3 PositionOffset => new Vector3(0, -.015f * suctionBlend, .07f * suctionBlend);
-    public Quaternion RotationOffset => Quaternion.Euler(-3f * suctionBlend, 0, Mathf.Sin(clock * 40) * .18f * suctionBlend);
+    public Vector3 PositionOffset => new Vector3(-.08f * pourPose, .10f * pourPose - .015f * suctionBlend, .07f * suctionBlend);
+    public Quaternion RotationOffset => Quaternion.Euler(-55f * pourPose - 3f * suctionBlend, -12f * pourPose, -35f * pourPose + Mathf.Sin(clock * 40) * .18f * suctionBlend);
     private bool requested, initialized, grainMoving;
     private Camera view;
     private Transform actor;
+    private float pourPose;
+    public const float EmptyDuration = 3.2f;
     private float clock, emptyTime, suctionBlend, shownFill, emission;
     private Vector3 trayPosition;
     private Quaternion trayRotation;
@@ -65,13 +67,14 @@ public sealed class VacuumTool : MonoBehaviour
         Initialize();clock+=dt;Sucking=false;
         if(Emptying)
         {
-            emptyTime+=dt;float p=Mathf.Clamp01(emptyTime/2.1f);
-            float pull=p<.25f?Mathf.SmoothStep(0,1,p/.25f):p<.75f?1:1-Mathf.SmoothStep(0,1,(p-.75f)/.25f);
-            float tip=p<.3f?0:p<.45f?Mathf.SmoothStep(0,1,(p-.3f)/.15f):p<.7f?1:1-Mathf.SmoothStep(0,1,(p-.7f)/.2f);
-            dustTray.localPosition=trayPosition+trayRemoval*pull;
+            emptyTime+=dt;float p=Mathf.Clamp01(emptyTime/EmptyDuration);
+            float pull=p<.2f?Mathf.SmoothStep(0,1,p/.2f):p<.82f?1:1-Mathf.SmoothStep(0,1,(p-.82f)/.18f);
+            float tip=p<.12f?0:p<.3f?Mathf.SmoothStep(0,1,(p-.12f)/.18f):p<.78f?1:1-Mathf.SmoothStep(0,1,(p-.78f)/.22f);
+            pourPose=tip;
+            dustTray.localPosition=trayPosition-trayRemoval*.65f*pull;
             dustTray.localRotation=trayRotation*Quaternion.Euler(trayTilt*tip);
             float moved=tool.VacuumEmptyStep(p,dt);
-            if(moved>0)Emit(dustTray.position,tool.VacuumDropPoint,true,Mathf.Max(8,Mathf.CeilToInt(moved*15)));
+            if(moved>0)Emit(dustTray.position,tool.VacuumDropPoint,true,Mathf.Clamp(Mathf.CeilToInt(dt*500),1,32));
             if(p>=1){Cancel();tool.CancelAction();}
         }
         else if(requested && view!=null && actor!=null && tool.Kilograms<tool.CapacityKg-.0001f)
@@ -82,7 +85,7 @@ public sealed class VacuumTool : MonoBehaviour
         }
         requested=false;
         suctionBlend=Mathf.MoveTowards(suctionBlend,Sucking?1:0,dt*6);
-        shownFill=Mathf.MoveTowards(shownFill,Mathf.Clamp01(tool.Kilograms/tool.CapacityKg),dt*2);
+        shownFill=Emptying ? Mathf.Clamp01(tool.Kilograms/tool.CapacityKg) : Mathf.MoveTowards(shownFill,Mathf.Clamp01(tool.Kilograms/tool.CapacityKg),dt*2);
         UpdateFill(shownFill);appearance.Set(tool.Cargo);fillRenderer.SetPropertyBlock(appearance.Block);UpdateParticles(dt);
     }
     private void Emit(Vector3 from,Vector3 to,bool pour,int count)
@@ -167,7 +170,7 @@ public sealed class VacuumTool : MonoBehaviour
     }
     public void Cancel()
     {
-        requested=Sucking=Emptying=false;suctionBlend=0;
+        requested=Sucking=Emptying=false;suctionBlend=0;pourPose=0;
         if(!initialized)return;
         dustTray.localPosition=trayPosition;dustTray.localRotation=trayRotation;
         for(int i=0;i<ages.Length;i++)ages[i]=1;
