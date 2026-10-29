@@ -39,7 +39,8 @@ public sealed class RocketEndingCutscene : MonoBehaviour
     private Image black;
     private TextMeshProUGUI continuedText, friendsText;
     private Transform sunDisc;
-    private Material sunMaterial;
+    private Material sunMaterial, trailMaterial;
+    private readonly List<TrailRenderer> flightTrails = new List<TrailRenderer>();
     private VolumeProfile transitionProfile;
     private ChromaticAberration chromatic;
     private Renderer[] heroExhaust = new Renderer[0];
@@ -97,6 +98,9 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         foreach (var r in earth.GetComponentsInChildren<Renderer>()) radius = Mathf.Max(radius, Mathf.Min(r.bounds.extents.x,r.bounds.extents.y,r.bounds.extents.z));
         earthRadius = radius;
         departure = earth.position + direction * (radius * 1.06f);
+        trailMaterial = new Material(Shader.Find("Freehangar/HDRP/Particles Unlit"));
+        trailMaterial.name = "Rocket flight trail";
+        trailMaterial.SetColor("_Color", Color.white);
         hero = Spawn(rocketPrefab, "Player rocket", departure, true);
         var engine = hero.Find("Engine exhaust VFX");
         heroExhaust = engine != null ? engine.GetComponentsInChildren<Renderer>() : new Renderer[0];
@@ -188,6 +192,23 @@ public sealed class RocketEndingCutscene : MonoBehaviour
             }
             particle.Play(true);
         }
+        var trailObject = new GameObject("Flight trail");
+        trailObject.transform.SetParent(ship.transform, false);
+        trailObject.transform.localPosition = new Vector3(0, .2f, 0);
+        var trail = trailObject.AddComponent<TrailRenderer>();
+        trail.sharedMaterial = trailMaterial;
+        trail.time = 6f;
+        trail.minVertexDistance = .12f;
+        trail.widthCurve = new AnimationCurve(new Keyframe(0, .7f), new Keyframe(.2f, 1.15f), new Keyframe(1, .15f));
+        var gradient = new Gradient();
+        gradient.SetKeys(
+            new[] { new GradientColorKey(new Color(.55f,.85f,1f),0), new GradientColorKey(new Color(1f,.64f,.2f),.3f), new GradientColorKey(new Color(.38f,.48f,.6f),1) },
+            new[] { new GradientAlphaKey(.8f,0), new GradientAlphaKey(.5f,.25f), new GradientAlphaKey(0,1) });
+        trail.colorGradient = gradient;
+        trail.shadowCastingMode = ShadowCastingMode.Off;
+        trail.receiveShadows = false;
+        trail.emitting = false;
+        flightTrails.Add(trail);
         ships.Add(ship.transform); shipStarts.Add(position); shipDirections.Add(direction); launchDelays.Add(0); shipSpeeds.Add(1); return ship.transform;
     }
     private void Suspend(Behaviour b) { behaviours[b] = b.enabled; b.enabled = false; }
@@ -205,6 +226,8 @@ public sealed class RocketEndingCutscene : MonoBehaviour
             float flightTime = elapsed - launchDelays[k];
             if (flightTime < 0) continue;
             if (!ships[k].gameObject.activeSelf) ships[k].gameObject.SetActive(true);
+            if (k < flightTrails.Count && flightTrails[k] != null)
+                flightTrails[k].emitting = k != 0 || elapsed >= cabinSeconds;
             float thrustTime = Mathf.Max(0, flightTime - (k == 0 ? cabinSeconds : 0));
             float distance = flightTime * flightSpeed + .22f * thrustTime * thrustTime;
             ships[k].position = shipStarts[k] + shipDirections[k] * distance * shipSpeeds[k]
@@ -315,6 +338,8 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         IsPlaying = false;
         if (staging != null) Destroy(staging);
         if (sunMaterial != null) Destroy(sunMaterial);
+        if (trailMaterial != null) Destroy(trailMaterial);
+        flightTrails.Clear();
         if (transitionProfile != null) { foreach (var component in transitionProfile.components) Destroy(component); Destroy(transitionProfile); }
         foreach (var state in behaviours) if (state.Key != null) state.Key.enabled = state.Value;
         foreach (var state in hidden) if (state.Key != null) state.Key.SetActive(state.Value);

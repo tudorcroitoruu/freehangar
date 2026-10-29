@@ -84,21 +84,23 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         yield return Animate(.7f,t=>roomLight.intensity=Mathf.Lerp(0,180,t));
         yield return TurnToward(revealView,.8f);
         yield return new WaitForSecondsRealtime(.15f);
-        yield return WalkTo(revealView,2.1f);
         yield return Animate(1.4f,t=>revealDoor.localPosition=revealClosed+Vector3.up*revealLift*t);
-        yield return Animate(.8f,t=>rocketDoor.localRotation=hatchClosed*Quaternion.Euler(0,hatchOpenAngle*t,0));
+        // Begin walking as the hatch opens, keeping the movement and door in sync.
+        yield return WalkToOpening(revealView,2.1f);
         yield return LookAroundOpening();
         yield return WalkTo(approachView,2.2f);
-        yield return WalkTo(cabinView,2f);
-        // Turn back before the hatch shuts, then watch the room through its window.
-        if(lookBackView!=null)yield return MoveCamera(lookBackView,.8f);
-        yield return Animate(1.2f,t=>rocketDoor.localRotation=hatchClosed*Quaternion.Euler(0,hatchOpenAngle*(1-t),0));
-        // The player notices the cabin only after the hatch locks.
-        if(cockpitRevealView!=null)yield return MoveCamera(cockpitRevealView,1f);
-        yield return LookAroundCabin();
+        yield return EnterCabin(cabinView,2.5f);
+        // Inspect the controls while the hatch closes behind the player.
+        Quaternion cabinLook = cinematic.transform.rotation;
+        yield return Animate(1.2f,t=>{
+            rocketDoor.localRotation=hatchClosed*Quaternion.Euler(0,hatchOpenAngle*(1-t),0);
+            cinematic.transform.rotation=cabinLook*Quaternion.Euler(-2f*Mathf.Sin(t*Mathf.PI), -8f*Mathf.Sin(t*Mathf.PI), 0);
+        });
+        // The latch catches their attention: turn sharply toward the door.
+        if(lookBackView!=null)yield return MoveCamera(lookBackView,.48f);
+        yield return new WaitForSecondsRealtime(.3f);
         subtitle.text="GET READY FOR LAUNCH";Play(readyVoice);
         yield return new WaitForSecondsRealtime(.5f);
-        if(lookBackView!=null)yield return MoveCamera(lookBackView,1.35f);
         subtitle.text="GET READY FOR LAUNCH\n3...";Play(threeVoice);
         Vector3 windowStart=cinematic.transform.position;
         Quaternion windowRotation=cinematic.transform.rotation;
@@ -109,7 +111,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         subtitle.text="2...\n<size=25>— No, no, let me out!</size>";Play(twoVoice);if(protestVoice!=null)voice.PlayOneShot(protestVoice);
         Vector3 closePosition=cinematic.transform.position;
         Quaternion closeRotation=cinematic.transform.rotation;
-        yield return Animate(1.4f,t=>{
+        yield return Animate(2.2f,t=>{
             cinematic.transform.position=Vector3.Lerp(closePosition,windowStart,t);
             cinematic.transform.rotation=Quaternion.Slerp(closeRotation,windowRotation*Quaternion.Euler(3,-4,0),t);
         });
@@ -127,6 +129,23 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         Quaternion end = direction.sqrMagnitude > .001f ? Quaternion.LookRotation(direction.normalized, Vector3.up) : target.rotation;
         yield return Animate(duration, t => cinematic.transform.rotation = Quaternion.Slerp(start, end, t));
     }
+    private IEnumerator WalkToOpening(Transform target, float duration)
+    {
+        Vector3 start = cinematic.transform.position;
+        Quaternion startRotation = cinematic.transform.rotation;
+        Vector3 right = cinematic.transform.right;
+        yield return Animate(duration, t =>
+        {
+            float envelope = Mathf.Sin(Mathf.PI * t);
+            float steps = t * Mathf.PI * 8f;
+            Vector3 sway = right * (Mathf.Sin(steps) * .018f * envelope)
+                + Vector3.up * (Mathf.Abs(Mathf.Sin(steps)) * .035f * envelope);
+            cinematic.transform.SetPositionAndRotation(Vector3.Lerp(start, target.position, t) + sway,
+                Quaternion.Slerp(startRotation, target.rotation, t) * Quaternion.Euler(0, 0, Mathf.Sin(steps) * .2f * envelope));
+            float doorProgress = Mathf.SmoothStep(0, 1, Mathf.Clamp01(t * 2.5f));
+            rocketDoor.localRotation = hatchClosed * Quaternion.Euler(0, hatchOpenAngle * doorProgress, 0);
+        });
+    }
     private IEnumerator WalkTo(Transform target, float duration)
     {
         Vector3 start = cinematic.transform.position;
@@ -140,6 +159,24 @@ public sealed class HangarLaunchSequence : MonoBehaviour
                 + Vector3.up * (Mathf.Abs(Mathf.Sin(steps)) * .035f * envelope);
             cinematic.transform.SetPositionAndRotation(Vector3.Lerp(start, target.position, t) + sway,
                 Quaternion.Slerp(startRotation, target.rotation, t) * Quaternion.Euler(0, 0, Mathf.Sin(steps) * .2f * envelope));
+        });
+    }
+    private IEnumerator EnterCabin(Transform target, float duration)
+    {
+        Vector3 start = cinematic.transform.position;
+        Quaternion startRotation = cinematic.transform.rotation;
+        Vector3 right = cinematic.transform.right;
+        yield return Animate(duration, t =>
+        {
+            float envelope = Mathf.Sin(Mathf.PI * t);
+            float steps = t * Mathf.PI * 7f;
+            Vector3 sway = right * (Mathf.Sin(steps) * .012f * envelope)
+                + Vector3.up * (Mathf.Abs(Mathf.Sin(steps)) * .025f * envelope);
+            // One glance to each side, returning naturally to the forward view.
+            float glance = Mathf.Sin(t * Mathf.PI * 2f) * envelope;
+            Quaternion look = Quaternion.Euler(-2.5f * envelope, 7f * glance, .25f * glance);
+            cinematic.transform.SetPositionAndRotation(Vector3.Lerp(start, target.position, t) + sway,
+                Quaternion.Slerp(startRotation, target.rotation, t) * look);
         });
     }
     private IEnumerator LookAroundCabin()
