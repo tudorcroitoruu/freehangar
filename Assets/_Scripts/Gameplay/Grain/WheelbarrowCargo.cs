@@ -24,6 +24,60 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     private bool instrumentWasActive, shovelWasEnabled;
     private readonly List<GameObject> hiddenTools = new List<GameObject>();
 
+    private bool progressionApplied;
+    private int Tier => name.Contains("Max") ? 2 : name.Contains("Medium") ? 1 : 0;
+    private bool IsUpgrade => SaveSystem.Data != null && Tier > SaveSystem.Data.wheelbarrowTier;
+    private bool UpgradeExposed()
+    {
+        var hangar = GetComponentInParent<HangarGrainVisibility>();
+        if (hangar == null) return true;
+        if (!hangar.HangarOpen || hangar.GrainRoot == null) return false;
+        var grain = hangar.GrainRoot.GetComponent<GrainPile>();
+        if (grain == null) return true;
+        grain.Initialize();
+        Vector3 point = transform.TransformPoint(bodyBounds.center);
+        return grain.SurfaceHeight(point) <= point.y + bodyBounds.extents.y * Mathf.Abs(transform.lossyScale.y) + .1f;
+    }
+    private bool ReplacePrevious()
+    {
+        if (!IsUpgrade || !UpgradeExposed()) return false;
+        var previous = System.Array.Find(FindObjectsByType<WheelbarrowCargo>(FindObjectsInactive.Include,FindObjectsSortMode.None),
+            x => x != this && x.Tier == SaveSystem.Data.wheelbarrowTier);
+        if (previous == null || previous.OccupiedVolume > CapacityVolume || previous.BagCount > CargoSlotCount) return false;
+        previous.StopPushing();
+        Vector3 position = previous.transform.position; Quaternion rotation = previous.transform.rotation;
+        transform.SetParent(null,true);
+        transform.SetPositionAndRotation(position,rotation);
+        foreach (var bag in previous.bags.ToArray())
+        {
+            if (bag == null) continue;
+            var slot = new GameObject("Bag slot " + bags.Count).transform;
+            slot.SetParent(transform,false);
+            slot.localPosition = trayCenter + Vector3.up * bags.Count * .32f;
+            bag.transform.SetParent(slot,true);
+            VehicleCargoRack.Seat(bag.transform,slot);
+            bags.Add(bag);
+        }
+        RebuildCargo();
+        previous.RebuildCargo();
+        previous.gameObject.SetActive(false);
+        SaveSystem.Data.wheelbarrowTier = Tier;
+        SaveSystem.SaveData();
+        return true;
+    }
+    private void ApplyWheelbarrowProgression()
+    {
+        if (progressionApplied || !SaveSystem.savesLoaded || SaveSystem.Data == null) return;
+        progressionApplied = true;
+        int tier = SaveSystem.Data.wheelbarrowTier;
+        if (Tier == tier && tier > 0)
+        {
+            var starter = System.Array.Find(FindObjectsByType<WheelbarrowCargo>(FindObjectsInactive.Include,FindObjectsSortMode.None), x => x.Tier == 0);
+            if (starter != null) { transform.SetParent(null,true); transform.SetPositionAndRotation(starter.transform.position,starter.transform.rotation); }
+        }
+        if (Tier < tier) gameObject.SetActive(false);
+    }
+
     public float CapacityVolume => cargoVolumeCubicMeters;
     public float OccupiedVolume => occupiedVolume;
     public int BagCount => bags.Count;
@@ -88,6 +142,12 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         prompt = default;
         if (!isActiveAndEnabled || interactor == null) return false;
         if (pusher != null && pusher != interactor) return false;
+        if (IsUpgrade)
+        {
+            bool exposed = UpgradeExposed();
+            prompt = new InteractionPromptData(transform.position + Vector3.up, exposed ? "Replace current wheelbarrow" : "Uncover the new wheelbarrow", exposed);
+            return true;
+        }
         string action;
         bool available = true;
         if (pusher == interactor)
@@ -108,6 +168,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     public bool TryInteract(PlayerInteractor interactor)
     {
         if (!isActiveAndEnabled || interactor == null || Time.timeScale <= 0f) return false;
+        if (IsUpgrade) return ReplacePrevious();
         if (pusher == interactor) { StopPushing(); return true; }
         if (pusher != null) return false;
         if (interactor.Bags != null && interactor.Bags.IsCarrying)
@@ -168,6 +229,8 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
 
     private void LateUpdate()
     {
+        ApplyWheelbarrowProgression();
+        if (!gameObject.activeInHierarchy) return;
         for (int i = bags.Count - 1; i >= 0; i--)
         {
             if (bags[i] != null && bags[i].transform.IsChildOf(transform)) continue;

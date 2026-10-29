@@ -183,6 +183,12 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         Vector3 travelDirection = motor.isGrounded && groundAlignment.HasSupport
             ? Vector3.ProjectOnPlane(transform.forward, groundAlignment.GroundNormal).normalized : transform.forward;
         Vector3 motion = travelDirection * Speed * dt;
+        float clearance = Mathf.Max(motor.bounds.extents.x, motor.bounds.extents.z);
+        if (HangarVehicleAccess.Blocks(transform.position, transform.position + motion, clearance))
+        {
+            motion = Vector3.zero;
+            Speed = 0f;
+        }
         if (motoroller != null) motion = motoroller.ConstrainMotion(motion);
         CollisionFlags hit = motor.Move(motion + Vector3.up * fallSpeed * dt);
         if (motoroller != null && motion.sqrMagnitude < .000001f && Mathf.Abs(Speed) > .1f) Speed = 0;
@@ -271,5 +277,55 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         var rider = interactor.GetComponent<PlayerBicycleInteraction>();
         rider.bicycle = this;
         return interactor.Bags != null && interactor.Bags.IsCarrying ? rider.TryLoadBag() : rider.TryMount();
+    }
+}
+
+
+// Movement guard shared by all driveable vehicle rigs. Wheelbarrows do not use this path.
+public static class HangarVehicleAccess
+{
+    private static readonly System.Collections.Generic.List<Transform> hangars = new System.Collections.Generic.List<Transform>();
+    private static float nextScan, hintUntil;
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void Reset() { hangars.Clear(); nextScan = hintUntil = 0; }
+    public static bool Blocks(Vector3 from, Vector3 to, float clearance)
+    {
+        if ((to-from).sqrMagnitude < .0000001f) return false;
+        if (Time.time >= nextScan)
+        {
+            hangars.Clear();
+            foreach (var h in Object.FindObjectsByType<HangarGrainVisibility>(FindObjectsInactive.Include,FindObjectsSortMode.None))
+                if (h != null && !hangars.Contains(h.transform)) hangars.Add(h.transform);
+            var first = GameObject.Find("01_Modular_Hangar");
+            if (first != null && !hangars.Contains(first.transform)) hangars.Add(first.transform);
+            nextScan = Time.time + 2f;
+        }
+        foreach (var h in hangars)
+        {
+            if (h == null) continue;
+            var a = h.InverseTransformPoint(from); var b = h.InverseTransformPoint(to);
+            if (a.y > 12f || a.y < -3f) continue;
+            a.y = b.y = 0;
+            var scale = h.lossyScale;
+            var bounds = new Bounds(Vector3.zero,new Vector3(20f,24f,30.5f));
+            bounds.Expand(new Vector3(clearance*2f/Mathf.Max(.01f,Mathf.Abs(scale.x)),0,
+                clearance*2f/Mathf.Max(.01f,Mathf.Abs(scale.z))));
+            // Allow vehicles already inside when the scene loads to drive out.
+            if (bounds.Contains(a)) continue;
+            Vector3 delta = b-a;
+            if (bounds.Contains(b) || (bounds.IntersectRay(new Ray(a,delta.normalized),out float distance) && distance <= delta.magnitude))
+            {
+                hintUntil = Time.time + 2f;
+                return true;
+            }
+        }
+        return false;
+    }
+    public static void DrawHint()
+    {
+        if (Time.time >= hintUntil) return;
+        var style = new GUIStyle(GUI.skin.box) { fontSize=16, alignment=TextAnchor.MiddleCenter, wordWrap=true };
+        GUI.Box(new Rect(Screen.width*.2f,Screen.height*.72f,Screen.width*.6f,55),
+            "Vehicles aren't allowed in hangars — protect the grain. Use a wheelbarrow.",style);
     }
 }

@@ -205,6 +205,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     void OnDisable() { if(!applicationQuitting && riding) { if(!TryDismount())Restore(bicycle.transform.position+Vector3.up*1.5f); } }
     void OnGUI()
     {
+        HangarVehicleAccess.DrawHint();
         if(string.IsNullOrEmpty(hint) || Cursor.lockState!=CursorLockMode.Locked)return;
         if (!riding && hint.StartsWith("E ") && GameplayCanvas.Instance != null &&
             GameplayCanvas.Instance.interactionPrompt != null && GameplayCanvas.Instance.interactionPrompt.IsVisible) return;
