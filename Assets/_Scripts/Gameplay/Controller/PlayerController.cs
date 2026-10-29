@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float speed = 3f;
     [SerializeField, Min(0f)] private float sprintSpeed = 10f;
     [SerializeField, Range(.1f, 1f), Tooltip("Movement speed multiplier while carrying a bag.")] private float bagCarrySpeedMultiplier = .6f;
+    [SerializeField, Min(.1f), Tooltip("Grain weight at which the maximum bag movement penalty applies.")] private float heavyBagWeightKg = 10f;
     [SerializeField, Min(0f)] private float jumpForce = 5f;
     [SerializeField, Min(0f)] private float gravity = 9.81f;
 
@@ -190,9 +191,7 @@ public class PlayerController : MonoBehaviour
                 shovelTool.Tick(Time.deltaTime);
             }
         }
-        bool isCarrying = IsCarrying;
-        bool recoveryBlocked = shovelTool != null && (shovelTool.Kilograms > 0f || shovelTool.IsBusy);
-        if (staminaManager != null) staminaManager.Tick(isCarrying, Time.deltaTime, recoveryBlocked, sprinting: sprintMoving);
+        if (staminaManager != null) staminaManager.Tick(false, Time.deltaTime, sprinting: sprintMoving);
     }
 
     public void ResetLook()
@@ -263,13 +262,14 @@ public class PlayerController : MonoBehaviour
         bool wantsSprint = acceptInput && Input.GetKey(KeyCode.LeftShift);
         if (!wantsSprint || staminaManager == null || staminaManager.NormalizedStamina >= .2f) sprintExhausted = false;
         if (staminaManager != null && staminaManager.IsExhausted) sprintExhausted = true;
-        bool canSprint = wantsSprint && !sprintExhausted && !isCrouching &&
-            (bagInteraction == null || !bagInteraction.IsCarrying);
+        var carriedBag = bagInteraction != null ? bagInteraction.CarriedBag : null;
+        float bagWeight = carriedBag != null ? Mathf.Clamp01(carriedBag.Kilograms / Mathf.Max(.1f, heavyBagWeightKg)) : 0f;
+        bool canSprint = wantsSprint && !sprintExhausted && !isCrouching && bagWeight < .999f;
         sprintMoving = false;
         float currentSpeed = pushingWheelbarrow ? (canSprint ? Mathf.Min(sprintSpeed, 6f) : speed) : isCrouching ? crouchSpeed :
-            canSprint ? sprintSpeed : speed;
-        if (!pushingWheelbarrow && bagInteraction != null && bagInteraction.IsCarrying)
-            currentSpeed *= bagCarrySpeedMultiplier;
+            canSprint ? Mathf.Lerp(sprintSpeed, speed, bagWeight) : speed;
+        if (!pushingWheelbarrow && carriedBag != null)
+            currentSpeed *= Mathf.Lerp(1f, bagCarrySpeedMultiplier, bagWeight);
         Vector3 velocity = (transform.right * input.x + transform.forward * input.y) * currentSpeed;
 
         if (characterController.isGrounded && verticalVelocity < 0f)
