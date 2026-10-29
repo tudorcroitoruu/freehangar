@@ -111,10 +111,15 @@ public sealed class VehicleUpgrade : MonoBehaviour
         }
     }
     public int CargoCount => GetComponent<WheelbarrowCargo>() is WheelbarrowCargo barrow ? barrow.BagCount : CargoRoots().Count;
-    public bool CanLoadVolume(float volume, int slotCost = 1) => !IsConfigured ||
-        (float.IsFinite(volume) && volume > 0 &&
-        (GetComponent<VehicleCargoRack>() is VehicleCargoRack rack ? rack.UsedSlots : CargoCount) + slotCost <= SlotCount &&
-        OccupiedVolume + volume <= CapacityVolume + .0001f);
+    public bool CanLoadVolume(float volume, int slotCost = 1)
+    {
+        if (GetComponent<VehicleCargoRack>() is VehicleCargoRack rack)
+            // Rack bays are authored for one sack or two boxes. Closing a sack changes its
+            // collider volume, but must not make it too large for an otherwise empty bay.
+            return slotCost > 0 && rack.UsedSlots + slotCost <= (IsConfigured ? SlotCount : 2);
+        return !IsConfigured || (float.IsFinite(volume) && volume > 0 &&
+            CargoCount + slotCost <= SlotCount && OccupiedVolume + volume <= CapacityVolume + .0001f);
+    }
 
     public static float MeasureVolume(GameObject item)
     {

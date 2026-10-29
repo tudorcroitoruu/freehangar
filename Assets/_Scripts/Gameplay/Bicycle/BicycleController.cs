@@ -21,6 +21,9 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     [Tooltip("Maximum time a motor vehicle coasts after the driver exits. Zero stops immediately.")]
     [Min(0)] public float exitCoastDuration = .8f;
     [Min(1)] public float boostSpeedMultiplier = 1.5f;
+    [Header("Slope gravity")]
+    [Tooltip("Maximum downhill speed relative to normal speed, reached on a 30 degree descent.")]
+    [Range(1f, 1.5f)] public float downhillSpeedMultiplier = 1.2f;
     [Header("Steering")]
     [Range(.02f, .5f)] public float steeringSmoothTime = .14f;
     [Range(5f, 45f)] public float maximumSteeringAngle = 30f;
@@ -140,10 +143,33 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     {
         if (!IsRidden || dt <= 0 || !float.IsFinite(dt)) return;
         pedalingInput = Mathf.Abs(throttle) > .01f && !brake;
-        float target = Mathf.Clamp(throttle, -.3f, 1f) * maximumSpeed * (boost && throttle > 0 && !brake ? Mathf.Max(1, boostSpeedMultiplier) : 1);
-        Speed = Mathf.MoveTowards(Speed, brake ? 0 : target, (brake ? brakingDeceleration : Mathf.Abs(throttle) < .01f ? 1.8f : acceleration) * dt);
+        float topSpeed = maximumSpeed * (boost && throttle > 0 && !brake ? Mathf.Max(1, boostSpeedMultiplier) : 1);
+        float grade = 0;
+        if (motor.isGrounded && groundAlignment.HasSupport)
+        {
+            Vector3 tangent = Vector3.ProjectOnPlane(transform.forward, groundAlignment.GroundNormal).normalized;
+            grade = -tangent.y;
+        }
+        Speed = SlopeSpeed(Speed, throttle, brake, dt, topSpeed, acceleration, brakingDeceleration, grade, downhillSpeedMultiplier);
         StepMotion(turn, dt);
     }
+    // Signed grade is positive when the nose points downhill; braking always overrides gravity.
+    internal static float SlopeSpeed(float speed, float throttle, bool brake, float dt, float topSpeed,
+        float acceleration, float braking, float grade, float downhillMultiplier)
+    {
+        if (brake) return Mathf.MoveTowards(speed, 0, braking * dt);
+        grade = Mathf.Clamp(grade, -1, 1);
+        float forwardLimit = topSpeed * (1 + (downhillMultiplier - 1) * Mathf.Clamp01(grade / .5f));
+        float reverseLimit = topSpeed * .3f * (1 + (downhillMultiplier - 1) * Mathf.Clamp01(-grade / .5f));
+        float target = throttle >= 0 ? Mathf.Clamp01(throttle) * forwardLimit : Mathf.Clamp01(-throttle / .3f) * -reverseLimit;
+        float rate = Mathf.Abs(throttle) < .01f ? 1.8f : acceleration;
+        float next = Mathf.MoveTowards(speed, target, rate * dt) + 9.81f * grade * dt;
+        // Build up downhill momentum gradually, and shed it smoothly when the road levels out.
+        if (next > forwardLimit) next = speed > forwardLimit ? Mathf.MoveTowards(speed, forwardLimit, rate * dt) : forwardLimit;
+        if (next < -reverseLimit) next = speed < -reverseLimit ? Mathf.MoveTowards(speed, -reverseLimit, rate * dt) : -reverseLimit;
+        return next;
+    }
+
     void StepMotion(float turn, float dt)
     {
         float targetSteering = Mathf.Clamp(turn, -1, 1) * maximumSteeringAngle;
@@ -154,7 +180,9 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         if (motor.isGrounded && fallSpeed < 0) fallSpeed = -2;
         fallSpeed -= 9.81f * dt;
         Vector3 before = transform.position;
-        Vector3 motion = transform.forward * Speed * dt;
+        Vector3 travelDirection = motor.isGrounded && groundAlignment.HasSupport
+            ? Vector3.ProjectOnPlane(transform.forward, groundAlignment.GroundNormal).normalized : transform.forward;
+        Vector3 motion = travelDirection * Speed * dt;
         if (motoroller != null) motion = motoroller.ConstrainMotion(motion);
         CollisionFlags hit = motor.Move(motion + Vector3.up * fallSpeed * dt);
         if (motoroller != null && motion.sqrMagnitude < .000001f && Mathf.Abs(Speed) > .1f) Speed = 0;
@@ -227,7 +255,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         if (interactor.Bags != null && interactor.Bags.IsCarrying)
         {
             var upgrades = GetComponent<VehicleUpgrade>();
-            bool available = FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadVolume(interactor.Bags.CarriedVolume));
+            bool available = FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadVolume(interactor.Bags.CarriedVolume, GetComponent<VehicleCargoRack>() != null ? 2 : 1));
             prompt = new InteractionPromptData(transform.position + Vector3.up, available ? "Load bag" : "Vehicle full", available);
             return true;
         }

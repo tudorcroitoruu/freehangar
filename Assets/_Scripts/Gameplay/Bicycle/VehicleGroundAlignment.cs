@@ -6,6 +6,8 @@ using System.Collections.Generic;
 public sealed class VehicleGroundAlignment : MonoBehaviour
 {
     public Transform Pose { get; private set; }
+    public bool HasSupport { get; private set; }
+    public Vector3 GroundNormal { get; private set; } = Vector3.up;
     readonly List<Vector3> axles = new List<Vector3>(4);
     readonly List<float> radii = new List<float>(4);
     readonly RaycastHit[] hits = new RaycastHit[32];
@@ -77,6 +79,7 @@ public sealed class VehicleGroundAlignment : MonoBehaviour
     }
     public void Align(float dt)
     {
+        HasSupport = false;
         if (Pose == null || dt <= 0) return;
         int count = 0; Vector3 mean = Vector3.zero, meanNormal = Vector3.zero;
         for (int i = 0; i < axles.Count; i++)
@@ -113,6 +116,8 @@ public sealed class VehicleGroundAlignment : MonoBehaviour
             normal = Vector3.Cross(forward, Vector3.Cross(meanNormal.normalized, forward)).normalized;
         }
         if (normal.y < .65f) return;
+        GroundNormal = normal;
+        HasSupport = true;
         var target = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, normal), normal);
         float blend = 1 - Mathf.Exp(-dt / .08f);
         Pose.rotation = Quaternion.Slerp(Pose.rotation, target, blend);

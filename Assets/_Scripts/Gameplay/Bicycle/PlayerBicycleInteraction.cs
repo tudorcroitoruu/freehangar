@@ -68,7 +68,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             if (bags != null && bags.IsCarrying)
             {
                 var upgrades = bicycle.GetComponent<VehicleUpgrade>();
-                bool canLoad = bicycle.FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadVolume(bags.CarriedVolume));
+                bool canLoad = bicycle.FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadVolume(bags.CarriedVolume, bicycle.GetComponent<VehicleCargoRack>() != null ? 2 : 1));
                 hint=canLoad ? "E Secure bag on " + bicycle.cargoLocationName : bicycle.cargoLocationName + " is full";
                 if (Input.GetKeyDown(KeyCode.E)) { TryLoadBag(); return true; }
                 return false;
