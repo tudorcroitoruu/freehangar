@@ -40,6 +40,21 @@ public sealed class ShovelTool : MonoBehaviour
     private bool scoopReported;
     private Camera actionCamera;
     private Transform actor;
+    private VacuumTool[] vacuums;
+    public VacuumTool ActiveVacuum
+    {
+        get
+        {
+            if(vacuums==null)vacuums=GetComponentsInChildren<VacuumTool>(true);
+            foreach(var vacuum in vacuums)if(vacuum!=null&&vacuum.isActiveAndEnabled)return vacuum;
+            return null;
+        }
+    }
+    private float ScoopScale => Mathf.Clamp(Mathf.Pow(CapacityKg / 22.5f, 1f / 3f), 1f, 2.4f);
+    private float EffectiveScoopRadius => scoopRadius * ScoopScale * 2.08008382f;
+    private float EffectiveScoopDepth => scoopDepth * Mathf.Sqrt(ScoopScale) * 2.08008382f;
+    public bool IsVacuum => ActiveVacuum != null;
+    public Vector3 VacuumDropPoint => pendingContainer != null ? pendingContainer.PourPoint : targetPoint;
     private readonly GrainCargo cargo = new GrainCargo();
     private readonly GrainCargo scoopCargo = new GrainCargo();
     // Keep the old private preload setter for editor fixtures; cargo owns runtime mass.
@@ -53,12 +68,12 @@ public sealed class ShovelTool : MonoBehaviour
             return upgradeSettings;
         }
     }
-    public float CapacityKg => UpgradeSettings != null && UpgradeSettings.IsConfigured
+    public float CapacityKg => ActiveVacuum != null ? ActiveVacuum.capacityKg : UpgradeSettings != null && UpgradeSettings.IsConfigured
         ? UpgradeSettings.Capacity(SaveSystem.Data?.shovelUpgradeLevel ?? 0) : capacityKg;
     public float WeightKg => UpgradeSettings != null && UpgradeSettings.IsConfigured
         ? UpgradeSettings.Weight(SaveSystem.Data?.shovelUpgradeLevel ?? 0) : weightKg;
     public bool IsBusy { get; private set; }
-    public bool IsScooping => IsBusy && pendingPile != null;
+    public bool IsScooping => !IsVacuum && IsBusy && pendingPile != null;
     public event System.Action GrainScooped;
     public float ActionProgress => IsBusy ? Mathf.Clamp01(elapsed / actionDuration) : 0;
     public Vector3 PositionOffset { get; private set; }
@@ -93,6 +108,11 @@ public sealed class ShovelTool : MonoBehaviour
 
     public bool TryUse(Camera camera, Transform player)
     {
+        if(ActiveVacuum != null)
+        {
+            if(!isActiveAndEnabled || camera==null || player==null || Time.timeScale<=0 || ActiveVacuum.Emptying)return false;
+            ActiveVacuum.RequestSuction(camera,player);return true;
+        }
         if (!isActiveAndEnabled || camera == null || player == null || bladeTip == null || transform.parent == null || Time.timeScale <= 0) return false;
         if (IsBusy) { queued = true; return true; }
         actionCamera = camera;
@@ -138,6 +158,7 @@ public sealed class ShovelTool : MonoBehaviour
 
     public bool TryDrop(Camera camera, Transform player)
     {
+        if(ActiveVacuum != null && !ActiveVacuum.Emptying)IsBusy=false;
         if (IsBusy || Kilograms <= .0001f || !isActiveAndEnabled || camera == null || player == null ||
             bladeTip == null || transform.parent == null || Time.timeScale <= 0) return false;
         if (FindHit(camera, player, out var pourHit) &&
@@ -151,6 +172,7 @@ public sealed class ShovelTool : MonoBehaviour
             elapsed = transferredFraction = 0; availableAtStart = Kilograms;
             if (grainPhysics != null) grainPhysics.SetPourTarget(pendingContainer.PourPoint, pendingContainer.GetComponent<Collider>());
             IsBusy = true;
+            if(ActiveVacuum != null)ActiveVacuum.BeginEmpty();
             return true;
         }
         if (!FindDropHit(camera, player, out RaycastHit hit) || hit.normal.y < .65f ||
@@ -162,6 +184,7 @@ public sealed class ShovelTool : MonoBehaviour
         elapsed = transferredFraction = 0; availableAtStart = Kilograms;
         if (grainPhysics != null) grainPhysics.SetPourTarget(targetPoint, hit.collider);
         IsBusy = true;
+        if(ActiveVacuum != null)ActiveVacuum.BeginEmpty();
         return true;
     }
 
@@ -267,6 +290,12 @@ public sealed class ShovelTool : MonoBehaviour
 
     public void Tick(float deltaTime)
     {
+        if(ActiveVacuum != null)
+        {
+            if(deltaTime>0)ActiveVacuum.Tick(this,deltaTime);
+            IsBusy=ActiveVacuum.Emptying || ActiveVacuum.Sucking;
+            return;
+        }
         if (!IsBusy || deltaTime <= 0) return;
         elapsed += deltaTime;
         if (pendingContainer != null)
@@ -295,7 +324,7 @@ public sealed class ShovelTool : MonoBehaviour
             {
                 Vector3 point = targetPoint; point.y = pendingPile.SurfaceHeight(point);
                 scoopCargo.Clear();
-                float collected = pendingPile.Scoop(point, smallPileScoop ? Mathf.Max(.65f, scoopRadius) : scoopRadius, smallPileScoop ? Mathf.Max(.3f, scoopDepth) : scoopDepth, Mathf.Min(amount, CapacityKg - Kilograms), scoopCargo);
+                float collected = pendingPile.Scoop(point, smallPileScoop ? Mathf.Max(.65f, EffectiveScoopRadius) : EffectiveScoopRadius, smallPileScoop ? Mathf.Max(.3f, EffectiveScoopDepth) : EffectiveScoopDepth, Mathf.Min(amount, CapacityKg - Kilograms), scoopCargo);
                 GoalContext.Resolve(pendingPile, out int hangar, out _);
                 for (int type = 0; type < GrainCargo.TypeCount; type++)
                 {
@@ -310,7 +339,7 @@ public sealed class ShovelTool : MonoBehaviour
                     GrainScooped?.Invoke();
                 }
                 if (collected > 0 && grainPhysics != null)
-                    grainPhysics.EmitScoop(pendingPile, point, scoopRadius, collected / CapacityKg);
+                    grainPhysics.EmitScoop(pendingPile, point, EffectiveScoopRadius, collected / CapacityKg);
             }
             else if (pendingContainer != null && hit.collider.GetComponentInParent<GrainContainer>() == pendingContainer &&
                 pendingContainer.isActiveAndEnabled && pendingContainer.IsOpen &&
@@ -332,6 +361,37 @@ public sealed class ShovelTool : MonoBehaviour
             CancelAction();
             if (repeat) TryUse(actionCamera, actor);
         }
+    }
+
+    internal float VacuumCollect(Camera camera,Transform player,float maximum,out Vector3 point)
+    {
+        point=Vector3.zero;
+        if(!FindHit(camera,player,out var hit))return 0;
+        var pile=hit.collider.GetComponentInParent<GrainPile>();
+        if(pile==null||!pile.isActiveAndEnabled||!pile.IsInsideBoundary(hit.point))return 0;
+        point=hit.point;point.y=pile.SurfaceHeight(point);
+        scoopCargo.Clear();
+        float collected=pile.Scoop(point,ActiveVacuum.suctionRadius,ActiveVacuum.suctionDepth,Mathf.Min(maximum,Mathf.Max(0,CapacityKg-Kilograms)),scoopCargo);
+        GoalContext.Resolve(pile,out int hangar,out _);
+        for(int i=0;i<GrainCargo.TypeCount;i++)
+        {
+            float kg=scoopCargo[(GrainType)i];cargo.Add((GrainType)i,kg);
+            if(kg>0)GoalChecker.ReportProgress(GoalType.GrainCollected,kg,hangar,(GrainType)i);
+        }
+        return collected;
+    }
+
+    internal float VacuumEmptyStep(float phase,float dt)
+    {
+        if(phase<.4f || phase>.72f)return 0;
+        float before=Kilograms;
+        if(pendingContainer!=null)
+        {
+            if(CanPourInto(pendingContainer)&&CanReachPoint(actionCamera,actor,pendingContainer.PourPoint,pourReach,pendingContainer.GetComponent<Collider>()))
+                cargo.PourInto(pendingContainer,availableAtStart*dt/.6f);
+        }
+        else if(dropping&&!dropCommitted){dropCommitted=true;CommitDrop();}
+        return before-Kilograms;
     }
 
     private void UpdatePose(float phase)
@@ -382,8 +442,8 @@ public sealed class ShovelTool : MonoBehaviour
         if (!pendingPile.isActiveAndEnabled || !pendingPile.IsInsideBoundary(bladeTip.position)) return false;
         Vector3 difference = bladeTip.position - targetPoint;
         float surface = pendingPile.SurfaceHeight(bladeTip.position);
-        return new Vector2(difference.x, difference.z).sqrMagnitude <= scoopRadius * scoopRadius &&
-            bladeTip.position.y <= surface + .06f && bladeTip.position.y >= surface - scoopDepth - .12f;
+        return new Vector2(difference.x, difference.z).sqrMagnitude <= EffectiveScoopRadius * EffectiveScoopRadius &&
+            bladeTip.position.y <= surface + .06f && bladeTip.position.y >= surface - EffectiveScoopDepth - .12f;
     }
 
     private void UpdateScoopPose(float phase)
@@ -433,6 +493,12 @@ public sealed class ShovelTool : MonoBehaviour
     public void ComposePresentation(float dt, Vector2 sway, float turnRoll, Vector3 idle,
         out Vector3 offset, out Quaternion rotation)
     {
+        if(ActiveVacuum != null)
+        {
+            offset=idle+ActiveVacuum.PositionOffset;
+            rotation=Quaternion.Euler(sway.y*.25f,-sway.x*.25f,turnRoll*.2f)*ActiveVacuum.RotationOffset;
+            return;
+        }
         bool preparingLoad = pendingPile != null && ActionProgress > .2f;
         float target = !dropping && pendingContainer == null && (Kilograms > .0001f || preparingLoad) ? 1f : 0f;
         carryBlend = Mathf.MoveTowards(carryBlend, target, dt * 6f);
@@ -476,6 +542,7 @@ public sealed class ShovelTool : MonoBehaviour
 
     public void CancelAction()
     {
+        if(vacuums!=null)foreach(var vacuum in vacuums)if(vacuum!=null)vacuum.Cancel();
         IsBusy = queued = dropping = smallPileScoop = false;
         dropSurface = null;
         pendingPile = null; pendingContainer = null;

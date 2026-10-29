@@ -15,29 +15,43 @@ MonoBehaviour:
   shovels:
   - name: Basic Shovel
     image: {fileID: 21300000, guid: fa13a8b1d5c815b4787a7cfbdab1c20b, type: 3}
-    capacityKg: 2.5
+    capacityKg: 22.5
     weightKg: 1
-    capacityPerUpgrade: 1
+    capacityPerUpgrade: 9
     weightReductionPerUpgrade: 0.05
     prices: 64000000c80000002c01000090010000
   - name: Medium Shovel
     image: {fileID: 21300000, guid: fa13a8b1d5c815b4787a7cfbdab1c20b, type: 3}
-    capacityKg: 8.5
+    capacityKg: 76.5
     weightKg: 0.8
-    capacityPerUpgrade: 1
+    capacityPerUpgrade: 9
     weightReductionPerUpgrade: 0.05
     prices: f4010000ee020000e8030000dc050000
   - name: Improved Shovel
     image: {fileID: 21300000, guid: fa13a8b1d5c815b4787a7cfbdab1c20b, type: 3}
-    capacityKg: 14.5
+    capacityKg: 130.5
     weightKg: 0.6
-    capacityPerUpgrade: 1
+    capacityPerUpgrade: 9
     weightReductionPerUpgrade: 0.05
     prices: d0070000c4090000b80b0000a00f0000
   - name: Expert Shovel
     image: {fileID: 21300000, guid: fa13a8b1d5c815b4787a7cfbdab1c20b, type: 3}
-    capacityKg: 20
+    capacityKg: 180
     weightKg: 0.4
-    capacityPerUpgrade: 1
+    capacityPerUpgrade: 9
     weightReductionPerUpgrade: 0.05
     prices: 88130000641900003421000010270000
+  - name: Grain Vacuum
+    image: {fileID: 0}
+    capacityKg: 1350
+    weightKg: 0.35
+    capacityPerUpgrade: 0
+    weightReductionPerUpgrade: 0.02
+    prices: e02e0000983a000050460000f0550000
+  - name: High Capacity Vacuum
+    image: {fileID: 0}
+    capacityKg: 2700
+    weightKg: 0.3
+    capacityPerUpgrade: 0
+    weightReductionPerUpgrade: 0.02
+    prices: a861000030750000b8880000409c0000

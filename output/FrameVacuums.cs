@@ -1,0 +1,6 @@
+using UnityEngine;using UnityEditor;using UnityEditor.SceneManagement;using System.Linq;
+public static class FrameVacuums{
+ static Bounds ScreenBounds(Transform root,Camera c){bool first=true;Bounds bounds=default;foreach(var f in root.GetComponentsInChildren<MeshFilter>(true)){if(f.sharedMesh==null)continue;var b=f.sharedMesh.bounds;for(int i=0;i<8;i++){var v=b.center+Vector3.Scale(b.extents,new Vector3((i&1)==0?-1:1,(i&2)==0?-1:1,(i&4)==0?-1:1));var p=c.WorldToViewportPoint(f.transform.TransformPoint(v));if(first){bounds=new Bounds(p,Vector3.zero);first=false;}else bounds.Encapsulate(p);}}return bounds;}
+ public static object Run(){var player=Object.FindFirstObjectByType<PlayerController>();var c=player.characterCamera;var models=player.HeldInstrument.Find("Item In Hands");foreach(int tier in new[]{5,6}){var root=models.Find("LVL_"+tier);Undo.RecordObject(root,"Frame held vacuum");for(int i=0;i<4;i++){var b=ScreenBounds(root,c);float scale=Mathf.Min(.46f/b.size.x,.48f/b.size.y);root.localScale*=Mathf.Clamp(scale,.5f,1.5f);b=ScreenBounds(root,c);var target=c.ViewportToWorldPoint(new Vector3(.76f,.27f,b.center.z));var current=c.ViewportToWorldPoint(b.center);root.position+=target-current;}EditorUtility.SetDirty(root);}
+ EditorSceneManager.SaveScene(models.gameObject.scene);return true;}
+}
