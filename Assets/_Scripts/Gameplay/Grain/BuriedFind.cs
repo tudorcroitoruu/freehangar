@@ -11,6 +11,9 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     [SerializeField] private Kind kind;
     [SerializeField] private string findId;
     [SerializeField] private string requiredKeyId;
+    [SerializeField] private string matchingHangarKeyId;
+    [SerializeField] private string matchingKeyColor;
+    [SerializeField] private Material matchingKeyMaterial;
     [SerializeField, Min(1)] private int cashReward = 500;
     [SerializeField, Min(1)] private int staminaDurationSeconds = 300;
     [SerializeField] private GrainPile coveringPile;
@@ -116,8 +119,8 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         prompt = default;
         if (!isActiveAndEnabled || opening || !revealed || string.IsNullOrEmpty(findId) || WasFound(SaveSystem.Data, findId)) return false;
         bool hasProfile = SaveSystem.savesLoaded && SaveSystem.Data != null;
-        bool hasKey = kind != Kind.CashChest || WasFound(SaveSystem.Data, requiredKeyId);
-        string action = !hasProfile ? "Load save to collect" : !hasKey ? "Requires chest key" :
+        bool hasKey = kind != Kind.CashChest || WasFound(SaveSystem.Data, requiredKeyId) || (!string.IsNullOrEmpty(matchingHangarKeyId) && WasFound(SaveSystem.Data, matchingHangarKeyId));
+        string action = !hasProfile ? "Load save to collect" : !hasKey ? (string.IsNullOrEmpty(matchingKeyColor) ? "Requires chest key" : $"Requires {matchingKeyColor} key") :
             kind == Kind.Key ? "Take CHEST key" :
             kind == Kind.HangarKey ? $"Take HANGAR {targetHangar} key" :
             kind == Kind.Hammer ? "Take hammer (equip with 2)" :
@@ -206,6 +209,8 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         {
             Quaternion facing = Quaternion.LookRotation(-keySocket.forward, keySocket.up);
             insertionKey = Instantiate(insertionKeyPrefab, keySocket.position + keySocket.forward * .45f, facing);
+            if (matchingKeyMaterial != null && WasFound(SaveSystem.Data, matchingHangarKeyId))
+                foreach (var renderer in insertionKey.GetComponentsInChildren<Renderer>()) renderer.sharedMaterial = matchingKeyMaterial;
             float keyTime = 0;
             while (keyTime < 1.05f)
             {

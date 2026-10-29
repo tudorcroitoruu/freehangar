@@ -19,6 +19,7 @@ public sealed class HangarKeyDoor : MonoBehaviour, IInteractable
     public bool IsUnlocked { get; private set; }
     public string KeyId => KeyFor(hangarNumber);
     public static string KeyFor(int number) => "farm.hangar.key." + number;
+    public static string KeyColor(int number) => number == 2 ? "orange" : number == 3 ? "blue" : number == 4 ? "green" : "gold";
     private string OpenId => "farm.hangar.open." + hangarNumber;
     private void Awake()
     {
@@ -46,7 +47,7 @@ public sealed class HangarKeyDoor : MonoBehaviour, IInteractable
         if (!isActiveAndEnabled || IsUnlocked) return false;
         bool key = SaveSystem.savesLoaded && BuriedFind.WasFound(SaveSystem.Data, KeyId);
         prompt = new InteractionPromptData(transform.position + Vector3.up * .6f,
-            key ? $"Unlock HANGAR {hangarNumber}" : $"HANGAR {hangarNumber} • Find its blue key in Hangar {hangarNumber - 1}", key);
+            key ? $"Unlock HANGAR {hangarNumber}" : $"HANGAR {hangarNumber} • Find its {KeyColor(hangarNumber)} key in Hangar {hangarNumber - 1}", key);
         return true;
     }
     public bool TryInteract(PlayerInteractor interactor)
@@ -70,7 +71,7 @@ public sealed class HangarKeyDoor : MonoBehaviour, IInteractable
     private void RefreshLabel()
     {
         if (TryGetComponent<Collider>(out var lockCollider)) lockCollider.enabled = !IsUnlocked;
-        if (label != null) label.text = $"HANGAR {hangarNumber}\n" + (IsUnlocked ? "OPEN" : "BLUE KEY REQUIRED");
+        if (label != null) label.text = $"HANGAR {hangarNumber}\n" + (IsUnlocked ? "OPEN" : $"{KeyColor(hangarNumber).ToUpperInvariant()} KEY REQUIRED");
         if (overheadLabel != null) overheadLabel.text = IsUnlocked ? "OPEN" : "LOCKED";
     }
 }
