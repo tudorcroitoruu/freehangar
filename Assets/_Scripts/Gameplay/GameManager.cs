@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
     public bool skipTutorial = false;
     [Tooltip("Skip the arrival intro cutscene and start gameplay immediately.")]
     public bool skipIntroCutscene = false;
+    [Tooltip("Allow testing the final electrical room without clearing the hangar or opening its door first.")]
+    public bool bypassFinalRoomRestrictions = false;
     [SerializeField] private GameIntroduction introduction;
     public bool IsIntroPlaying => introduction != null && introduction.IsPlaying;
 
@@ -51,3 +53,4 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy() { if (Instance == this) Instance = null; }
 }
+
