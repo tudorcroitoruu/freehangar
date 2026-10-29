@@ -5,6 +5,7 @@ using UnityEngine;
 public sealed class ShovelUpgradeSettings : ScriptableObject
 {
     public const int UpgradesPerShovel = 4;
+    public const int FirstVacuumType = 4;
     public const string ResourcePath = "Upgrades/ShovelUpgradeSettings";
 
     [Serializable]
@@ -16,6 +17,9 @@ public sealed class ShovelUpgradeSettings : ScriptableObject
         [Min(.01f)] public float weightKg = 1f;
         [Min(0f)] public float capacityPerUpgrade = 1f;
         [Min(0f)] public float weightReductionPerUpgrade = .05f;
+        [Tooltip("Used from tool Level 5 onward, when the held tool is a vacuum.")]
+        [Min(.01f)] public float suctionKgPerSecond = 8f;
+        [Min(0f)] public float suctionPerUpgrade = 2f;
         [Tooltip("Four purchase prices. The fourth purchase advances to the next shovel's starting stats, or completes the last shovel.")]
         public int[] prices = { 100, 200, 300, 400 };
     }
@@ -32,6 +36,8 @@ public sealed class ShovelUpgradeSettings : ScriptableObject
                     !float.IsFinite(shovel.weightKg) || shovel.weightKg <= 0f ||
                     !float.IsFinite(shovel.capacityPerUpgrade) || shovel.capacityPerUpgrade < 0f ||
                     !float.IsFinite(shovel.weightReductionPerUpgrade) || shovel.weightReductionPerUpgrade < 0f ||
+                    !float.IsFinite(shovel.suctionKgPerSecond) || shovel.suctionKgPerSecond <= 0f ||
+                    !float.IsFinite(shovel.suctionPerUpgrade) || shovel.suctionPerUpgrade < 0f ||
                     shovel.prices == null || shovel.prices.Length != UpgradesPerShovel) return false;
             foreach (var shovel in shovels)
                 foreach (int price in shovel.prices) if (price < 0) return false;
@@ -41,6 +47,12 @@ public sealed class ShovelUpgradeSettings : ScriptableObject
 
     public int ClampLevel(int totalUpgrades) => Mathf.Clamp(totalUpgrades, 0, MaxUpgrades);
     public int TypeIndex(int totalUpgrades) => Mathf.Min(ClampLevel(totalUpgrades) / UpgradesPerShovel, Mathf.Max(0, (shovels?.Length ?? 0) - 1));
+    public bool IsVacuum(int totalUpgrades) => TypeIndex(totalUpgrades) >= FirstVacuumType;
+    public float SuctionSpeed(int totalUpgrades)
+    {
+        var vacuum = shovels[TypeIndex(totalUpgrades)];
+        return vacuum.suctionKgPerSecond + vacuum.suctionPerUpgrade * FilledDots(totalUpgrades);
+    }
     public int FilledDots(int totalUpgrades) => MaxUpgrades > 0 && totalUpgrades >= MaxUpgrades
         ? UpgradesPerShovel : ClampLevel(totalUpgrades) % UpgradesPerShovel;
     public float Capacity(int totalUpgrades)

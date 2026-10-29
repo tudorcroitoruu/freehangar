@@ -73,6 +73,7 @@ public sealed class ShovelTool : MonoBehaviour
     }
     public float CapacityKg => ActiveVacuum != null ? ActiveVacuum.capacityKg : UpgradeSettings != null && UpgradeSettings.IsConfigured
         ? UpgradeSettings.Capacity(SaveSystem.Data?.shovelUpgradeLevel ?? 0) : capacityKg;
+    internal ShovelUpgradeSettings ProgressionSettings => UpgradeSettings;
     public float WeightKg => UpgradeSettings != null && UpgradeSettings.IsConfigured
         ? UpgradeSettings.Weight(SaveSystem.Data?.shovelUpgradeLevel ?? 0) : weightKg;
     public bool IsBusy { get; private set; }

@@ -44,9 +44,23 @@ public sealed class VacuumTool : MonoBehaviour
 
     private void OnEnable()
     {
+        SaveSystem.MoneyChanged += OnUpgradeChanged;
+        ApplyUpgrades();
         // Never display the authored full-reservoir preview before the first cargo update.
         if (fillFrame != null && fillFrame.TryGetComponent<MeshRenderer>(out var renderer))
             renderer.enabled = false;
+    }
+
+    private void OnUpgradeChanged(int _) => ApplyUpgrades();
+
+    internal void ApplyUpgrades()
+    {
+        var owner = GetComponentInParent<ShovelTool>(true);
+        var settings = owner != null ? owner.ProgressionSettings : null;
+        int level = SaveSystem.Data?.shovelUpgradeLevel ?? 0;
+        if (settings == null || !settings.IsConfigured || !settings.IsVacuum(level)) return;
+        capacityKg = settings.Capacity(level);
+        suctionKgPerSecond = settings.SuctionSpeed(level);
     }
 
     public void Initialize()
@@ -192,6 +206,10 @@ public sealed class VacuumTool : MonoBehaviour
         for(int i=0;i<ages.Length;i++)ages[i]=1;
         stream.Clear();
     }
-    private void OnDisable()=>Cancel();
+    private void OnDisable()
+    {
+        SaveSystem.MoneyChanged -= OnUpgradeChanged;
+        Cancel();
+    }
     private void OnDestroy(){if(fillMesh!=null){if(Application.isPlaying)Destroy(fillMesh);else DestroyImmediate(fillMesh);}}
 }

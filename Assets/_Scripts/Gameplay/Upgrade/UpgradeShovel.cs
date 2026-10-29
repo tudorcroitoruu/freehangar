@@ -8,8 +8,15 @@ public class UpgradeShovel : MonoBehaviour
     [SerializeField] private Image shovelImage;
     [SerializeField] private Text currentLevelText;
     [SerializeField] private GameObject[] upgradeDots;
+    [Space, Header("Shovel")]
+    [SerializeField] private GameObject[] shovelModifications;
     [SerializeField] private Text scopeModification;
     [SerializeField] private Text weightModification;
+
+    [Space, Header("Vacuum")]
+    [SerializeField] private GameObject[] vacuumModifications;
+    [SerializeField] private Text suctionSpeedModification;
+    [SerializeField] private Text bagCapacityModification;
     [SerializeField] private Color nextLevelColor = Color.forestGreen;
 
     [Space, Header("Price")]
@@ -63,6 +70,13 @@ public class UpgradeShovel : MonoBehaviour
         bool available = configured && SaveSystem.Data != null && !maxed && cost >= 0;
         int missing = available ? Mathf.Max(0, cost - SaveSystem.Money) : 0;
         bool affordable = available && missing == 0;
+        bool vacuum = configured && settings.IsVacuum(level);
+        if (shovelModifications != null)
+            foreach (var item in shovelModifications)
+                if (item != null) item.SetActive(!vacuum);
+        if (vacuumModifications != null)
+            foreach (var item in vacuumModifications)
+                if (item != null) item.SetActive(vacuum);
 
         if (configured)
         {
@@ -73,8 +87,16 @@ public class UpgradeShovel : MonoBehaviour
                 for (int i = 0; i < upgradeDots.Length; i++)
                     if (upgradeDots[i] != null) upgradeDots[i].SetActive(i < settings.FilledDots(level));
             int next = Mathf.Min(level + 1, settings.MaxUpgrades);
-            SetModification(scopeModification, settings.Capacity(level), settings.Capacity(next), maxed);
-            SetModification(weightModification, settings.Weight(level), settings.Weight(next), maxed);
+            if (vacuum)
+            {
+                SetModification(suctionSpeedModification, settings.SuctionSpeed(level), settings.SuctionSpeed(next), maxed, "kg/s");
+                SetModification(bagCapacityModification, settings.Capacity(level), settings.Capacity(next), maxed);
+            }
+            else
+            {
+                SetModification(scopeModification, settings.Capacity(level), settings.Capacity(next), maxed);
+                SetModification(weightModification, settings.Weight(level), settings.Weight(next), maxed);
+            }
         }
         if (price != null) price.text = maxed ? "MAX" : configured ? cost == 0 ? "Free" : $"$ {cost:N0}" : "Unavailable";
         if (notEnoughMoney != null) notEnoughMoney.text = missing > 0 ? $"You need ${missing:N0} more." : "";
@@ -84,13 +106,13 @@ public class UpgradeShovel : MonoBehaviour
         UpdateButtonMaterial(affordable ? 1f : .5f);
     }
 
-    private void SetModification(Text label, float current, float next, bool maxed)
+    private void SetModification(Text label, float current, float next, bool maxed, string unit = "kg")
     {
         if (label == null) return;
         label.supportRichText = true;
         string value = current.ToString("0.##", CultureInfo.InvariantCulture);
-        label.text = maxed ? value + " kg (MAX)" :
-            $"{value}  ➜  <color=#{ColorUtility.ToHtmlStringRGBA(nextLevelColor)}>{next.ToString("0.##", CultureInfo.InvariantCulture)}</color> kg";
+        label.text = maxed ? $"{value} {unit} (MAX)" :
+            $"{value}  ➜  <color=#{ColorUtility.ToHtmlStringRGBA(nextLevelColor)}>{next.ToString("0.##", CultureInfo.InvariantCulture)}</color> {unit}";
     }
 
     private void UpdateButtonMaterial(float saturation)
