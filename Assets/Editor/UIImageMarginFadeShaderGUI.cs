@@ -15,6 +15,7 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
         DrawGradientProperties(materialEditor, properties);
         DrawSurfaceProperties(materialEditor, properties);
         DrawFillProperties(materialEditor, properties);
+        DrawTransparencyMaskProperties(materialEditor, properties);
         DrawEdgeProperties(materialEditor, properties);
         DrawOutlineProperties(materialEditor, properties);
         DrawGlowProperties(materialEditor, properties);
@@ -33,6 +34,11 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
         UpdateKeywords(material);
     }
 
+    public override void ValidateMaterial(Material material)
+    {
+        UpdateKeywords(material);
+    }
+
     private static void UpdateMaterialKeywords(MaterialEditor materialEditor)
     {
         for (int i = 0; i < materialEditor.targets.Length; i++)
@@ -45,11 +51,25 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
     private static void DrawMainProperties(MaterialEditor materialEditor, MaterialProperty[] properties)
     {
         BeginSection("Main", "Core UI Image texture, tint, and margin fade target color.");
+
+        BeginSection("Appearance", "Source Image texture, tint, and margin fade target color.");
         DrawTextureProperty(materialEditor, properties, "_MainTex");
         DrawProperty(materialEditor, properties, "_Color");
         DrawProperty(materialEditor, properties, "_FadeColor");
+        EndSection();
+
+        BeginSection("Mask", "Texture overlay for the main Image, with independent color, opacity, blend mode, tiling, and offset.");
+        DrawMaskProperties(materialEditor, properties, "_MainOverlayTex", "_MainOverlayOpacity");
+        EndSection();
+
+        BeginSection("Saturation", "Controls the color intensity of the Source Image.");
         DrawProperty(materialEditor, properties, "_Saturation");
+        EndSection();
+
+        BeginSection("Round Corners", "Controls rounding of the Image corners.");
         DrawProperty(materialEditor, properties, "_RoundCorners");
+        EndSection();
+
         EndSection();
     }
 
@@ -95,6 +115,23 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
         EndSection();
     }
 
+    private static void DrawTransparencyMaskProperties(MaterialEditor materialEditor, MaterialProperty[] properties)
+    {
+        BeginSection("Transparency Mask", "Cuts transparency throughout the Image, including its outline and glow. Edge Fade and Torn Paper apply in addition to this mask.");
+        DrawTextureProperty(materialEditor, properties, "_TransparencyMaskTex");
+        MaterialProperty texture = FindOptionalProperty("_TransparencyMaskTex", properties);
+        if (texture == null || (!texture.hasMixedValue && texture.textureValue == null))
+        {
+            EndSection();
+            return;
+        }
+        DrawProperty(materialEditor, properties, "_TransparencyMaskScale");
+        DrawProperty(materialEditor, properties, "_TransparencyMaskIntensity");
+        DrawProperty(materialEditor, properties, "_TransparencyMaskBlackTransparent");
+        EditorGUILayout.HelpBox("Black Is Transparent: enabled cuts black areas; disabled cuts white areas. Gray is partially transparent. Intensity 0 disables the mask; 1 applies it fully. Increase Scale for larger holes, decrease it for smaller repeating holes.", MessageType.Info);
+        EndSection();
+    }
+
     private static void DrawEdgeProperties(MaterialEditor materialEditor, MaterialProperty[] properties)
     {
         BeginSection("Edge Fade", "Controls how far each side fades inward and how soft that fade transition is.");
@@ -124,6 +161,7 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
         {
             DrawProperty(materialEditor, properties, "_OutlineThickness");
             DrawProperty(materialEditor, properties, "_OutlineColor");
+            DrawMaskProperties(materialEditor, properties, "_OutlineOverlayTex", "_OutlineOverlayOpacity");
             EditorGUILayout.HelpBox("Disable Outline to enable Noise Animation. Static noise and Torn Paper remain available.", MessageType.Info);
         }
         EndSection();
@@ -257,6 +295,28 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
         materialEditor.TexturePropertySingleLine(Content(property), property);
     }
 
+    private static void DrawMaskProperties(MaterialEditor materialEditor, MaterialProperty[] properties, string textureName, string channelName)
+    {
+        MaterialProperty texture = FindOptionalProperty(textureName, properties);
+        if (texture == null)
+            return;
+
+        materialEditor.TexturePropertySingleLine(Content(texture), texture);
+        if (texture.hasMixedValue || texture.textureValue != null)
+        {
+            DrawProperty(materialEditor, properties, textureName == "_MainOverlayTex" ? "_MainOverlayColor" : "_OutlineOverlayColor");
+            DrawProperty(materialEditor, properties, channelName);
+            MaterialProperty useMaskScale = FindOptionalProperty(textureName == "_MainOverlayTex" ? "_MainOverlayUseMaskScale" : "_OutlineOverlayUseMaskScale", properties);
+            DrawProperty(materialEditor, useMaskScale);
+            if (useMaskScale != null && (useMaskScale.hasMixedValue || useMaskScale.floatValue > 0.5f))
+                DrawProperty(materialEditor, properties, textureName == "_MainOverlayTex" ? "_MainOverlayScale" : "_OutlineOverlayScale");
+            DrawProperty(materialEditor, properties, textureName == "_MainOverlayTex" ? "_MainOverlayBlackTransparent" : "_OutlineOverlayBlackTransparent");
+            DrawProperty(materialEditor, properties, textureName == "_MainOverlayTex" ? "_MainOverlayBlend" : "_OutlineOverlayBlend");
+            materialEditor.TextureScaleOffsetProperty(texture);
+            EditorGUILayout.HelpBox("Multiply adds stains while preserving the base color. Normal blends the texture colors over it. Opacity 0 keeps the original appearance; 1 applies the full effect. Image transparency is preserved.", MessageType.Info);
+        }
+    }
+
     private static void DrawVector2Property(MaterialProperty[] properties, string propertyName)
     {
         MaterialProperty property = FindOptionalProperty(propertyName, properties);
@@ -285,6 +345,36 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
                 return "Sprite texture sampled by the shader. For UI Image this is normally provided by the Image Source Image, not manually assigned on the material.";
             case "_Color":
                 return "Multiplies the UI Image sprite color. The alpha includes Image tint and CanvasGroup alpha.";
+            case "_TransparencyMaskTex":
+                return "Grayscale transparency across the whole Image, outline, and glow. Uses RGB brightness, not texture alpha. Black Is Transparent controls which areas become transparent. Empty means white.";
+            case "_TransparencyMaskBlackTransparent":
+                return "Enabled: black is transparent and white is opaque. Disabled: white is transparent and black is opaque. Gray values are inverted too.";
+            case "_TransparencyMaskScale":
+                return "Size of the mask pattern relative to the Image's shorter side. Preserves texture proportions and blends randomized samples to hide seams and mirrored repetition. Higher values make holes larger; lower values make holes smaller. Independent of camera zoom.";
+            case "_TransparencyMaskIntensity":
+                return "Transparency strength. 0 preserves the original Image; 1 fully applies the grayscale mask. Margins and existing sprite transparency still apply.";
+            case "_MainOverlayTex":
+                return "Texture blended over the Source Image RGB to add stains/detail. Its alpha controls overlay strength without changing Image transparency. Preserves proportions and blends randomized samples to hide repetition, with independent scale, tiling, and offset.";
+            case "_MainOverlayScale":
+            case "_OutlineOverlayScale":
+                return "Pattern size relative to the Image's shorter side, preserving texture proportions. Higher values make details larger; lower values make details smaller. Uses blended randomized samples to hide seams and mirrored repetition.";
+            case "_MainOverlayUseMaskScale":
+            case "_OutlineOverlayUseMaskScale":
+                return "Enabled: preserve texture proportions and use Mask Scale with blended randomized repetition. Disabled: stretch the texture across the Image using Tiling and Offset, without randomized sampling.";
+            case "_OutlineOverlayTex":
+                return "Texture blended over the outline color with independent opacity and tiling/offset. Does not change the outline contour or Image transparency.";
+            case "_MainOverlayOpacity":
+            case "_OutlineOverlayOpacity":
+                return "Overlay opacity: 0 leaves the original color; 1 applies the full texture effect. Does not fade the Source Image itself.";
+            case "_MainOverlayColor":
+            case "_OutlineOverlayColor":
+                return "Tints the overlay texture. White preserves its original colors. Color alpha multiplies Overlay Opacity without changing Source Image transparency.";
+            case "_MainOverlayBlackTransparent":
+            case "_OutlineOverlayBlackTransparent":
+                return "Uses the untinted texture brightness as extra overlay transparency: black is transparent, gray is partially visible, and white retains its original opacity. Reveals the Source Image beneath the overlay.";
+            case "_MainOverlayBlend":
+            case "_OutlineOverlayBlend":
+                return "Multiply darkens the base with the texture (white leaves it unchanged), ideal for grayscale stains. Normal blends directly towards the texture RGB.";
             case "_FadeColor":
                 return "Target color at the faded margins. Alpha 0 fades to transparent; alpha 1 fades to this visible color.";
             case "_Saturation":
@@ -292,7 +382,7 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
             case "_Outline":
                 return "Enables an inward contour following the faded edges and Torn Paper. Disables Noise Animation.";
             case "_OutlineThickness":
-                return "Outline width in screen pixels, drawn inward so it fits inside the UI Image.";
+                return "Outline width in local UI units, drawn inward. Scales with the UI and Canvas Scaler to preserve proportions across resolutions and camera zoom.";
             case "_OutlineColor":
                 return "Outline color and blend opacity. Preserves sprite, Image, and CanvasGroup transparency.";
             case "_FadeLeftSize":
@@ -389,6 +479,14 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
 
     private static void UpdateKeywords(Material material)
     {
+        // Unity supplies a white fallback for empty texture slots. Track the
+        // actual assignment so its tint/blend settings cannot affect the image.
+        if (material.HasProperty("_HasTransparencyMaskTex"))
+            material.SetFloat("_HasTransparencyMaskTex", material.GetTexture("_TransparencyMaskTex") != null ? 1f : 0f);
+        if (material.HasProperty("_HasMainOverlayTex"))
+            material.SetFloat("_HasMainOverlayTex", material.GetTexture("_MainOverlayTex") != null ? 1f : 0f);
+        if (material.HasProperty("_HasOutlineOverlayTex"))
+            material.SetFloat("_HasOutlineOverlayTex", material.GetTexture("_OutlineOverlayTex") != null ? 1f : 0f);
         if (IsEnabled(material, "_Outline") && IsEnabled(material, "_AnimateNoise"))
             material.SetFloat("_AnimateNoise", 0f);
         SetKeyword(material, UseNoiseKeyword, IsEnabled(material, "_UseNoise"));

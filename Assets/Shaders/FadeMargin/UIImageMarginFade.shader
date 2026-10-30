@@ -4,6 +4,19 @@ Shader "UI/Image Margin Fade"
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
+        _TransparencyMaskTex ("Transparency Mask Texture", 2D) = "white" {}
+        [HideInInspector] _HasTransparencyMaskTex ("Has Transparency Mask Texture", Float) = 0
+        _TransparencyMaskScale ("Mask Scale", Range(0.1,10)) = 1
+        _TransparencyMaskIntensity ("Mask Intensity", Range(0,1)) = 0
+        [ToggleUI] _TransparencyMaskBlackTransparent ("Black Is Transparent", Float) = 1
+        _MainOverlayTex ("Main Overlay Texture", 2D) = "white" {}
+        [HideInInspector] _HasMainOverlayTex ("Has Main Overlay Texture", Float) = 0
+        _MainOverlayColor ("Main Overlay Color", Color) = (1,1,1,1)
+        _MainOverlayOpacity ("Main Overlay Opacity", Range(0,1)) = 0
+        _MainOverlayScale ("Mask Scale", Range(0.1,10)) = 1
+        [ToggleUI] _MainOverlayUseMaskScale ("Use Mask Scale", Float) = 1
+        [ToggleUI] _MainOverlayBlackTransparent ("Black Is Transparent", Float) = 0
+        [Enum(Multiply,0,Normal,1)] _MainOverlayBlend ("Main Overlay Blend", Float) = 0
         [ToggleUI] _UseGradient ("Use Gradient", Float) = 0
         _GradientStartColor ("Start Color", Color) = (1,1,1,1)
         _GradientEndColor ("End Color", Color) = (1,0.5,0,1)
@@ -20,8 +33,16 @@ Shader "UI/Image Margin Fade"
         [Enum(Left To Right,0,Right To Left,1,Bottom To Top,2,Top To Bottom,3)] _FillDirection ("Fill Direction", Float) = 0
         [ToggleUI] _FillRoundCorners ("Round Fill Corners", Float) = 0
         [Toggle] _Outline ("Outline", Float) = 0
-        _OutlineThickness ("Outline Thickness (Pixels)", Range(0, 32)) = 2
+        _OutlineThickness ("Outline Thickness (UI Units)", Range(0, 32)) = 2
         _OutlineColor ("Outline Color", Color) = (0,0,0,1)
+        _OutlineOverlayTex ("Outline Overlay Texture", 2D) = "white" {}
+        [HideInInspector] _HasOutlineOverlayTex ("Has Outline Overlay Texture", Float) = 0
+        _OutlineOverlayColor ("Outline Overlay Color", Color) = (1,1,1,1)
+        _OutlineOverlayOpacity ("Outline Overlay Opacity", Range(0,1)) = 0
+        _OutlineOverlayScale ("Mask Scale", Range(0.1,10)) = 1
+        [ToggleUI] _OutlineOverlayUseMaskScale ("Use Mask Scale", Float) = 1
+        [ToggleUI] _OutlineOverlayBlackTransparent ("Black Is Transparent", Float) = 0
+        [Enum(Multiply,0,Normal,1)] _OutlineOverlayBlend ("Outline Overlay Blend", Float) = 0
         [ToggleUI] _UseGlow ("Use Glow", Float) = 0
         _GlowColor ("Glow Color", Color) = (1,0.7,0.2,1)
         _GlowSize ("Glow Size (Pixels)", Range(0,32)) = 8
@@ -133,6 +154,32 @@ Shader "UI/Image Margin Fade"
             };
 
             sampler2D _MainTex;
+            sampler2D _TransparencyMaskTex;
+            float _HasTransparencyMaskTex;
+            float4 _TransparencyMaskTex_TexelSize;
+            float _TransparencyMaskScale;
+            float _TransparencyMaskIntensity;
+            float _TransparencyMaskBlackTransparent;
+            sampler2D _MainOverlayTex;
+            float _HasMainOverlayTex;
+            float4 _MainOverlayTex_ST;
+            float4 _MainOverlayTex_TexelSize;
+            float _MainOverlayScale;
+            float _MainOverlayUseMaskScale;
+            fixed4 _MainOverlayColor;
+            float _MainOverlayOpacity;
+            float _MainOverlayBlackTransparent;
+            float _MainOverlayBlend;
+            sampler2D _OutlineOverlayTex;
+            float _HasOutlineOverlayTex;
+            float4 _OutlineOverlayTex_ST;
+            float4 _OutlineOverlayTex_TexelSize;
+            float _OutlineOverlayScale;
+            float _OutlineOverlayUseMaskScale;
+            fixed4 _OutlineOverlayColor;
+            float _OutlineOverlayOpacity;
+            float _OutlineOverlayBlackTransparent;
+            float _OutlineOverlayBlend;
             sampler2D _NoiseTex;
             float4 _NoiseTex_ST;
             fixed4 _Color;
@@ -224,6 +271,54 @@ Shader "UI/Image Margin Fade"
             {
                 half luma = dot(rgb, half3(0.2126, 0.7152, 0.0722));
                 return lerp(luma.xxx, rgb, saturate(saturation));
+            }
+
+            // Convert a screen-space derivative to a gradient in local UI units.
+            // Inverting the position Jacobian removes camera zoom and Canvas scaling,
+            // including when the canvas is rotated or viewed in perspective.
+            float2 LocalUIGradient(float value, float2 localPosition)
+            {
+                float2 positionDx = ddx(localPosition);
+                float2 positionDy = ddy(localPosition);
+                float determinant = positionDx.x * positionDy.y - positionDx.y * positionDy.x;
+                float safeDeterminant = (determinant < 0.0 ? -1.0 : 1.0) * max(abs(determinant), 1e-12);
+                float valueDx = ddx(value);
+                float valueDy = ddy(value);
+                return float2(valueDx * positionDy.y - valueDy * positionDx.y,
+                              valueDy * positionDx.x - valueDx * positionDy.x) / safeDeterminant;
+            }
+
+            float2 TransparencyMaskOffset(float2 cell)
+            {
+                return frac(sin(float2(dot(cell, float2(127.1, 311.7)),
+                                       dot(cell, float2(269.5, 183.3)))) * 43758.5453) * 16.0;
+            }
+
+            float4 SampleTransparencyMaskTile(sampler2D maskTexture, float2 uv, float2 uvDx, float2 uvDy, float2 textureSize)
+            {
+                float2 phase = frac(uv * 0.5) * 2.0;
+                float2 mirroredUV = 1.0 - abs(phase - 1.0);
+                float2 direction = 1.0 - 2.0 * step(1.0, phase);
+                float2 halfTexel = 0.5 / textureSize;
+                mirroredUV = clamp(mirroredUV, halfTexel, 1.0 - halfTexel);
+                return tex2Dgrad(maskTexture, mirroredUV, uvDx * direction, uvDy * direction);
+            }
+
+            float4 SampleTransparencyMask(sampler2D maskTexture, float2 uv, float2 textureSize)
+            {
+                // Neighboring cells share the same samples at their borders. Smooth
+                // weights hide transitions while random offsets break mirrored repeats.
+                // Gradients come from the continuous coordinates, never the cell hash.
+                float2 cell = floor(uv);
+                float2 blend = frac(uv);
+                blend = blend * blend * (3.0 - 2.0 * blend);
+                float2 uvDx = ddx(uv);
+                float2 uvDy = ddy(uv);
+                float4 a = SampleTransparencyMaskTile(maskTexture, uv + TransparencyMaskOffset(cell), uvDx, uvDy, textureSize);
+                float4 b = SampleTransparencyMaskTile(maskTexture, uv + TransparencyMaskOffset(cell + float2(1, 0)), uvDx, uvDy, textureSize);
+                float4 c = SampleTransparencyMaskTile(maskTexture, uv + TransparencyMaskOffset(cell + float2(0, 1)), uvDx, uvDy, textureSize);
+                float4 d = SampleTransparencyMaskTile(maskTexture, uv + TransparencyMaskOffset(cell + float2(1, 1)), uvDx, uvDy, textureSize);
+                return lerp(lerp(a, b, blend.x), lerp(c, d, blend.x), blend.y);
             }
 
             float CornerRadius(float2 uv)
@@ -428,7 +523,7 @@ Shader "UI/Image Margin Fade"
                     shapeUV = (shapeUV - padding) / (1.0 - 2.0 * padding);
                 }
                 // Re-evaluate the existing contour on the filled rectangle. Derivatives
-                // keep corner radii and outline thickness in pixels instead of stretching them.
+                // keep corner arcs circular instead of stretching them.
                 bool roundedFill = _UseFill > 0.5 && _FillRoundCorners > 0.5 && _RoundCorners > 0.0
                     && _FillAmount > 0.0 && _FillAmount < 1.0;
                 // Keep the full bar's radius even when the filled width/height becomes
@@ -465,6 +560,60 @@ Shader "UI/Image Margin Fade"
                     float highlight = exp2(-4.0 * distance * distance);
                     float strength = saturate(highlight * smoothness * smoothness * _ShineIntensity * _ShineColor.a);
                     color.rgb = lerp(color.rgb, _ShineColor.rgb, strength);
+                }
+
+                // A color overlay stains the Source Image without cutting its alpha.
+                // Full-image coordinates keep the pattern fixed while Fill reveals it.
+                // All three masks share the same aspect-preserving scale convention.
+                float2 maskLocalSize = 1.0 / max(float2(
+                    length(LocalUIGradient(shapeUV.x, IN.noisePosition)),
+                    length(LocalUIGradient(shapeUV.y, IN.noisePosition))), float2(0.000001, 0.000001));
+                float2 imageAspect = maskLocalSize / min(maskLocalSize.x, maskLocalSize.y);
+                // Define interior transparency on the full Image before evaluating
+                // its margins. Fill and rounded contours do not stretch this pattern.
+                float transparencyMask = 1.0;
+                if (_HasTransparencyMaskTex > 0.5 && _TransparencyMaskIntensity > 0.0)
+                {
+                    // Larger scale means larger holes. Blended randomized samples
+                    // avoid seams and obvious mirrored repetition in non-tileable masks.
+                    // Measure the full shape in local UI units, not normalized UVs.
+                    // Anchor scale to the shorter side and repeat along the longer one.
+                    // Also preserve the source mask's own aspect ratio.
+                    float2 maskTextureSize = max(_TransparencyMaskTex_TexelSize.zw, float2(1.0, 1.0));
+                    float2 textureAspect = maskTextureSize / min(maskTextureSize.x, maskTextureSize.y);
+                    float2 maskUV = (shapeUV - 0.5) * imageAspect / textureAspect
+                        / max(_TransparencyMaskScale, 0.1) + 0.5;
+                    float3 maskSample = SampleTransparencyMask(_TransparencyMaskTex, maskUV, maskTextureSize).rgb;
+                    float maskValue = saturate(dot(maskSample, float3(0.2126, 0.7152, 0.0722)));
+                    if (_TransparencyMaskBlackTransparent < 0.5)
+                        maskValue = 1.0 - maskValue;
+                    transparencyMask = lerp(1.0, maskValue, saturate(_TransparencyMaskIntensity));
+                }
+                if (_HasMainOverlayTex > 0.5 && _MainOverlayOpacity > 0.0)
+                {
+                    half4 overlay;
+                    if (_MainOverlayUseMaskScale > 0.5)
+                    {
+                        float2 textureSize = max(_MainOverlayTex_TexelSize.zw, float2(1.0, 1.0));
+                        float2 textureAspect = textureSize / min(textureSize.x, textureSize.y);
+                        float2 maskUV = (shapeUV - 0.5) * imageAspect / textureAspect
+                            / max(_MainOverlayScale, 0.1) + 0.5;
+                        maskUV = maskUV * _MainOverlayTex_ST.xy + _MainOverlayTex_ST.zw;
+                        overlay = SampleTransparencyMask(_MainOverlayTex, maskUV, textureSize);
+                    }
+                    else
+                    {
+                        float2 maskUV = (useGlow ? saturate(shapeUV) : shapeUV)
+                            * _MainOverlayTex_ST.xy + _MainOverlayTex_ST.zw;
+                        overlay = tex2D(_MainOverlayTex, maskUV);
+                    }
+                    // Derive transparency before tinting, so changing the overlay
+                    // color does not change which parts of the texture are visible.
+                    if (_MainOverlayBlackTransparent > 0.5)
+                        overlay.a *= saturate(dot(overlay.rgb, half3(0.2126, 0.7152, 0.0722)));
+                    overlay *= _MainOverlayColor;
+                    half3 stainedColor = _MainOverlayBlend < 0.5 ? color.rgb * overlay.rgb : overlay.rgb;
+                    color.rgb = lerp(color.rgb, stainedColor, saturate(_MainOverlayOpacity * overlay.a));
                 }
 
                 float2 uv = contourUV;
@@ -511,19 +660,64 @@ Shader "UI/Image Margin Fade"
                 {
                     // Erode the same four noisy boundaries; reuse their tangent samples
                     // so the inner contour follows Torn Paper instead of a rectangle.
-                    float2 uvDx = ddx(contourUV);
-                    float2 uvDy = ddy(contourUV);
-                    float2 inset = _OutlineThickness * sqrt(uvDx * uvDx + uvDy * uvDy);
+                    // Thickness follows the UI's scale rather than staying fixed in
+                    // screen pixels. Keep derivatives for conversion and antialiasing.
+                    float2 localUVGradientX = LocalUIGradient(contourUV.x, IN.noisePosition);
+                    float2 localUVGradientY = LocalUIGradient(contourUV.y, IN.noisePosition);
+                    float2 inset = _OutlineThickness * float2(
+                        length(localUVGradientX), length(localUVGradientY));
                     half innerLeft = EdgeFade(uv.x - inset.x, _FadeLeftSize, _FadeLeftSoftness, leftNoise, 0.0);
                     half innerRight = EdgeFade(1.0 - uv.x - inset.x, _FadeRightSize, _FadeRightSoftness, rightNoise, 1.0);
                     half innerBottom = EdgeFade(uv.y - inset.y, _FadeBottomSize, _FadeBottomSoftness, bottomNoise, 2.0);
                     half innerTop = EdgeFade(1.0 - uv.y - inset.y, _FadeTopSize, _FadeTopSoftness, topNoise, 3.0);
                     half innerFade = max(max(innerLeft, innerRight), max(innerTop, innerBottom));
                     half outerShape = roundedMask;
-                    half innerShape = saturate(0.5 - (roundedDistance + _OutlineThickness) / roundedAntialias);
+                    // Convert thickness using the clean geometric normal. Differentiating
+                    // the noisy distance amplifies texture/half-precision steps into spikes
+                    // in the inner outline. Noise still defines both contour boundaries.
+                    float2 uvDx = ddx(contourUV);
+                    float2 uvDy = ddy(contourUV);
+                    float2 uvPerPixel = max(sqrt(uvDx * uvDx + uvDy * uvDy), float2(0.000001, 0.000001));
+                    float2 position = (contourUV - 0.5) / uvPerPixel;
+                    float2 corner = abs(position) - (0.5 / uvPerPixel - cornerRadius);
+                    float2 outsideCorner = max(corner, 0.0);
+                    float outsideLength = length(outsideCorner);
+                    float2 normal = outsideLength > 0.0001
+                        ? outsideCorner / max(outsideLength, 0.0001)
+                        : (corner.x > corner.y ? float2(1.0, 0.0) : float2(0.0, 1.0));
+                    normal *= sign(position);
+                    float2 localRoundedGradient = normal.x * localUVGradientX / uvPerPixel.x
+                        + normal.y * localUVGradientY / uvPerPixel.y;
+                    float roundedInset = _OutlineThickness * length(localRoundedGradient);
+                    half innerShape = saturate(0.5 - (roundedDistance + roundedInset) / roundedAntialias);
                     half outlineMask = saturate((1.0 - edgeFade) * outerShape - (1.0 - innerFade) * innerShape);
+                    half3 outlineColor = _OutlineColor.rgb;
+                    if (_HasOutlineOverlayTex > 0.5 && _OutlineOverlayOpacity > 0.0)
+                    {
+                        half4 overlay;
+                        if (_OutlineOverlayUseMaskScale > 0.5)
+                        {
+                            float2 textureSize = max(_OutlineOverlayTex_TexelSize.zw, float2(1.0, 1.0));
+                            float2 textureAspect = textureSize / min(textureSize.x, textureSize.y);
+                            float2 maskUV = (shapeUV - 0.5) * imageAspect / textureAspect
+                                / max(_OutlineOverlayScale, 0.1) + 0.5;
+                            maskUV = maskUV * _OutlineOverlayTex_ST.xy + _OutlineOverlayTex_ST.zw;
+                            overlay = SampleTransparencyMask(_OutlineOverlayTex, maskUV, textureSize);
+                        }
+                        else
+                        {
+                            float2 maskUV = (useGlow ? saturate(shapeUV) : shapeUV)
+                                * _OutlineOverlayTex_ST.xy + _OutlineOverlayTex_ST.zw;
+                            overlay = tex2D(_OutlineOverlayTex, maskUV);
+                        }
+                        if (_OutlineOverlayBlackTransparent > 0.5)
+                            overlay.a *= saturate(dot(overlay.rgb, half3(0.2126, 0.7152, 0.0722)));
+                        overlay *= _OutlineOverlayColor;
+                        half3 stainedColor = _OutlineOverlayBlend < 0.5 ? outlineColor * overlay.rgb : overlay.rgb;
+                        outlineColor = lerp(outlineColor, stainedColor, saturate(_OutlineOverlayOpacity * overlay.a));
+                    }
                     // Preserve sprite transparency and the UI tint/CanvasGroup opacity.
-                    color.rgb = lerp(color.rgb, _OutlineColor.rgb, outlineMask * _OutlineColor.a);
+                    color.rgb = lerp(color.rgb, outlineColor, outlineMask * _OutlineColor.a);
                 }
 
                 float4 result = float4(color);
@@ -554,6 +748,10 @@ Shader "UI/Image Margin Fade"
                     result.rgb = (result.rgb * baseAlpha + glowColor * behindAlpha) / max(combinedAlpha, 0.000001);
                     result.a = combinedAlpha * IN.color.a;
                 }
+
+                // Multiply the complete composite so outline and glow cannot fill
+                // the mask's holes. The existing margins multiply this opacity further.
+                result.a *= transparencyMask;
 
                 // Shader-driven fill also works on a Simple Image with no Source Image.
                 // Apply to the complete result so the outline/glow cannot remain in empty space.
