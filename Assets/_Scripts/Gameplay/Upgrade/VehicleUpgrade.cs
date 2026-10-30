@@ -36,7 +36,7 @@ public sealed class VehicleUpgrade : MonoBehaviour
     }
     public bool IsConfigured => Profile != null && Profile.IsConfigured;
     public int Level => IsConfigured ? Mathf.Clamp(SaveSystem.Data?.GetVehicleUpgradeLevel(VehicleId) ?? 0, 0, Profile.MaxLevel) : 0;
-    public float CapacityVolume => IsConfigured ? Profile.At(Level).capacityCubicMeters : float.PositiveInfinity;
+    public float CapacityVolume => IsConfigured && Profile.upgradeCapacity ? Profile.At(Level).capacityCubicMeters : float.PositiveInfinity;
     public int SlotCount => IsConfigured ? Profile.At(Level).slots : int.MaxValue;
     public bool IsMaxed => IsConfigured && Level >= Profile.MaxLevel;
     public int Price => IsConfigured && !IsMaxed ? Profile.At(Level).price : 0;

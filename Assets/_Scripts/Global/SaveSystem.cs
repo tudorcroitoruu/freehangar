@@ -17,7 +17,24 @@ public static class SaveSystem
 
     public static event Action<int> MoneyChanged;
     public static event Action OwnedProductsChanged;
+    public static event Action HangarProgressChanged;
     public static int Money => Data != null ? Data.cash : 0;
+
+    public static bool TryOpenHangar(int number)
+    {
+        if (!savesLoaded || Data == null || !Data.TryOpenHangar(number)) return false;
+        SaveData();
+        HangarProgressChanged?.Invoke();
+        return true;
+    }
+
+    public static bool TryUnlockFirstHangarShopProduct(float clearedPercent)
+    {
+        if (!savesLoaded || Data == null || !Data.TryRecordHangarClearance(1, clearedPercent)) return false;
+        SaveData();
+        HangarProgressChanged?.Invoke();
+        return true;
+    }
 
     public static bool TryPurchaseShovelUpgrade(int price, int expectedLevel, int maxLevel)
     {
@@ -157,6 +174,7 @@ public static class SaveSystem
     
     public static async Task<(PlayerData, SettingsData, ActivityData)> LoadData() //for PS
     {
+        savesLoaded = false;
         Data = new PlayerData();
         settingsData = new SettingsData();
         activityData = new ActivityData();
@@ -213,6 +231,9 @@ public static class SaveSystem
      //  InitAchievementsList();
         
         savesLoaded = true;
+
+        if (Data.MigrateHangarProgress()) SaveData();
+        HangarProgressChanged?.Invoke();
 
         MoneyChanged?.Invoke(Money);
         OwnedProductsChanged?.Invoke();
@@ -301,6 +322,44 @@ public static class SaveSystem
 [Serializable]
 public class PlayerData
 {
+    [Header("Hangar progression")]
+    public List<int> openedHangars = new List<int> { 1 };
+    public bool firstHangarHalfCleared;
+
+    public bool IsHangarOpen(int number) => number >= 1 && number <= 5 &&
+        (number == 1 || (openedHangars != null && openedHangars.Contains(number)) ||
+         Array.IndexOf(foundSecrets ?? Array.Empty<string>(), "farm.hangar.open." + number) >= 0);
+
+    public bool TryOpenHangar(int number)
+    {
+        if (number < 2 || number > 5 || IsHangarOpen(number)) return false;
+        openedHangars ??= new List<int> { 1 };
+        openedHangars.Add(number);
+        return true;
+    }
+
+    public bool TryRecordHangarClearance(int number, float clearedPercent)
+    {
+        if (number != 1 || !float.IsFinite(clearedPercent) || clearedPercent < 50f ||
+            clearedPercent > 100f || firstHangarHalfCleared) return false;
+        firstHangarHalfCleared = true;
+        return true;
+    }
+
+    /// <summary>Import hangars opened by older saves without treating a collected key as an open door.</summary>
+    public bool MigrateHangarProgress()
+    {
+        bool changed = false;
+        if (openedHangars == null) { openedHangars = new List<int>(); changed = true; }
+        for (int number = 1; number <= 5; number++)
+        {
+            if (!IsHangarOpen(number) || openedHangars.Contains(number)) continue;
+            openedHangars.Add(number);
+            changed = true;
+        }
+        return changed;
+    }
+
     [Header("Grain progression")]
     public double grainBaggedKilograms;
     public string[] foundSecrets = Array.Empty<string>();

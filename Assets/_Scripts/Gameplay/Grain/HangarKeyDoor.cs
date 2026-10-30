@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 
@@ -20,7 +19,6 @@ public sealed class HangarKeyDoor : MonoBehaviour, IInteractable
     public string KeyId => KeyFor(hangarNumber);
     public static string KeyFor(int number) => "farm.hangar.key." + number;
     public static string KeyColor(int number) => number == 2 ? "orange" : number == 3 ? "blue" : number == 4 ? "green" : "gold";
-    private string OpenId => "farm.hangar.open." + hangarNumber;
     private void Awake()
     {
         if (leftDoor != null) leftClosed = leftDoor.localPosition;
@@ -31,7 +29,7 @@ public sealed class HangarKeyDoor : MonoBehaviour, IInteractable
         if (SaveSystem.savesLoaded && SaveSystem.Data != null && loadedProfile != SaveSystem.Data)
         {
             loadedProfile = SaveSystem.Data;
-            IsUnlocked = BuriedFind.WasFound(loadedProfile, OpenId);
+            IsUnlocked = loadedProfile.IsHangarOpen(hangarNumber);
             progress = IsUnlocked ? 1 : 0;
             if (grainVisibility != null) grainVisibility.SetHangarOpen(IsUnlocked);
             RefreshLabel();
@@ -55,12 +53,7 @@ public sealed class HangarKeyDoor : MonoBehaviour, IInteractable
         if (Time.timeScale <= 0 || !TryGetPrompt(interactor, out var prompt) || !prompt.ShowKey) return false;
         var data = SaveSystem.Data;
         if (data == null) return false;
-        var found = data.foundSecrets ?? Array.Empty<string>();
-        if (!BuriedFind.WasFound(data, OpenId))
-        {
-            Array.Resize(ref found, found.Length + 1); found[found.Length - 1] = OpenId; data.foundSecrets = found;
-            SaveSystem.SaveData();
-        }
+        if (!SaveSystem.TryOpenHangar(hangarNumber)) return false;
         loadedProfile = data; IsUnlocked = true;
         if (grainVisibility != null) grainVisibility.SetHangarOpen(true);
         RefreshLabel();

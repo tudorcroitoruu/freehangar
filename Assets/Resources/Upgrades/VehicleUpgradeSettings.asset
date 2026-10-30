@@ -15,6 +15,7 @@ MonoBehaviour:
   vehicles:
   - id: bicycle
     displayName: Bicycle
+    upgradeCapacity: 1
     levels:
     - image: {fileID: 0}
       capacityCubicMeters: 0.4
@@ -22,14 +23,15 @@ MonoBehaviour:
       price: 300
     - image: {fileID: 0}
       capacityCubicMeters: 0.8
-      slots: 3
+      slots: 2
       price: 600
     - image: {fileID: 0}
       capacityCubicMeters: 1.2
-      slots: 4
-      price: 0
+      slots: 2
+      price: 1000
   - id: motoroller
     displayName: Motoroller
+    upgradeCapacity: 1
     levels:
     - image: {fileID: 0}
       capacityCubicMeters: 0.8
@@ -45,6 +47,7 @@ MonoBehaviour:
       price: 0
   - id: trike
     displayName: Trike
+    upgradeCapacity: 1
     levels:
     - image: {fileID: 0}
       capacityCubicMeters: 1
@@ -58,8 +61,25 @@ MonoBehaviour:
       capacityCubicMeters: 3
       slots: 8
       price: 0
+  - id: lawnmower
+    displayName: Lawnmower
+    upgradeCapacity: 1
+    levels:
+    - image: {fileID: 0}
+      capacityCubicMeters: 0.4
+      slots: 2
+      price: 300
+    - image: {fileID: 0}
+      capacityCubicMeters: 0.8
+      slots: 3
+      price: 600
+    - image: {fileID: 0}
+      capacityCubicMeters: 1.2
+      slots: 4
+      price: 0
   - id: pickup
     displayName: Pickup
+    upgradeCapacity: 1
     levels:
     - image: {fileID: 0}
       capacityCubicMeters: 2
@@ -73,18 +93,35 @@ MonoBehaviour:
       capacityCubicMeters: 6
       slots: 12
       price: 0
-  - id: lawnmower
-    displayName: Lawnmower
+  - id: pickupBig
+    displayName: Pickup Bigger
+    upgradeCapacity: 1
     levels:
     - image: {fileID: 0}
-      capacityCubicMeters: 0.4
-      slots: 2
-      price: 300
+      capacityCubicMeters: 2
+      slots: 6
+      price: 1000
     - image: {fileID: 0}
-      capacityCubicMeters: 0.8
-      slots: 3
-      price: 600
+      capacityCubicMeters: 4
+      slots: 8
+      price: 2000
     - image: {fileID: 0}
-      capacityCubicMeters: 1.2
-      slots: 4
+      capacityCubicMeters: 6
+      slots: 12
+      price: 0
+  - id: pickupLast
+    displayName: Pickup Cargo
+    upgradeCapacity: 1
+    levels:
+    - image: {fileID: 0}
+      capacityCubicMeters: 2
+      slots: 6
+      price: 1000
+    - image: {fileID: 0}
+      capacityCubicMeters: 4
+      slots: 8
+      price: 2000
+    - image: {fileID: 0}
+      capacityCubicMeters: 6
+      slots: 12
       price: 0

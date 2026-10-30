@@ -48,6 +48,10 @@ public sealed class GrainPile : MonoBehaviour
     private readonly GrainCargo surfaceGrain = new GrainCargo();
     private readonly GrainAppearance appearance = new GrainAppearance();
     public double HarvestedKg => harvestedKg;
+    private double initialKilograms;
+    public double InitialKilograms => initialKilograms;
+    public float ClearedPercent => initialKilograms > 0
+        ? Mathf.Clamp01((float)(1 - Kilograms / initialKilograms)) * 100f : 0f;
     public GrainCargo SurfaceGrain { get { RefreshGrainAppearance(); return surfaceGrain; } }
     private double lastAppearanceKg = -1;
     private MeshRenderer surfaceRenderer;
@@ -237,6 +241,7 @@ public sealed class GrainPile : MonoBehaviour
             if (!Application.isPlaying && previewClearedPercent > 0) spatial.PreviewClear(previewClearedPercent);
         }
         lastPlacement = transform.localToWorldMatrix;
+        initialKilograms = Kilograms;
         lastScale = scale;
         activeTriangles = new List<int>(field.Triangles.Length);
         vertices = new Vector3[field.Heights.Length];
@@ -380,6 +385,12 @@ public sealed class GrainPile : MonoBehaviour
             return;
         }
         if (field == null || Time.deltaTime <= 0) return;
+        if (SaveSystem.savesLoaded && SaveSystem.Data != null && !SaveSystem.Data.firstHangarHalfCleared &&
+            ClearedPercent >= 50f)
+        {
+            GoalContext.Resolve(this, out int hangar, out _);
+            if (hangar == 1) SaveSystem.TryUnlockFirstHangarShopProduct(ClearedPercent);
+        }
         if (settling && Time.time >= nextStep)
         {
             nextStep = Time.time + 1f / simulationRate;

@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 4845551227208907833}
   - component: {fileID: 1277971116820182687}
   - component: {fileID: 438190979915771856}
+  - component: {fileID: 228735083898221609}
   m_Layer: 0
   m_Name: Front_Mudguard
   m_TagString: Untagged
@@ -213,6 +214,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &228735083898221609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1153731722733895666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &1351313174350105464
 GameObject:
   m_ObjectHideFlags: 0
@@ -255,6 +274,7 @@ GameObject:
   - component: {fileID: 8218924396923117552}
   - component: {fileID: 1445463018744952283}
   - component: {fileID: 82945056387988125}
+  - component: {fileID: 4859851126927726574}
   m_Layer: 0
   m_Name: Bed_Side_Right
   m_TagString: Untagged
@@ -334,6 +354,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4859851126927726574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1562578974683329930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &1655279002439124341
 GameObject:
   m_ObjectHideFlags: 0
@@ -561,6 +599,9 @@ GameObject:
   - component: {fileID: 4067893181034933192}
   - component: {fileID: 2529932751072065078}
   - component: {fileID: 5607181108097211291}
+  - component: {fileID: 5415705928492026406}
+  - component: {fileID: 2522856616409821835}
+  - component: {fileID: 5793851107354065778}
   m_Layer: 0
   m_Name: Trike_Driveable
   m_TagString: Untagged
@@ -646,6 +687,7 @@ MonoBehaviour:
   - {fileID: 2297173805590720294}
   - {fileID: 1875724927481093531}
   - {fileID: 6181050670788274224}
+  exclusiveBagSlot: {fileID: 0}
   cargoLocationName: cargo bed
   dismountSideDistance: 1.65
   dismountLongitudinalDistance: 2.65
@@ -655,7 +697,9 @@ MonoBehaviour:
   wheelbase: 2.55731
   brakingDeceleration: 8
   motorDriven: 1
+  exitCoastDuration: 0.8
   boostSpeedMultiplier: 1
+  downhillSpeedMultiplier: 1.2
   steeringSmoothTime: 0.2
   maximumSteeringAngle: 28
   ridingCameraOffset: {x: 0, y: 0, z: 0}
@@ -716,6 +760,57 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.9, y: 2.05, z: 3.8}
   m_Center: {x: 0, y: 1.05, z: 0}
+--- !u!114 &5415705928492026406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2786117080285503785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7766699f18f62549b7829328c08b440, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgradeInteractable
+  upgradeManager: {fileID: 0}
+  targetVehicle: {fileID: 2786117080285503785}
+  promptAnchor: {fileID: 607370857106447789}
+  promptOffset: {x: 0, y: 0.3, z: 0}
+--- !u!114 &2522856616409821835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2786117080285503785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d31a7bed88d3fc243a5d518d5de0d6ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgrade
+  settings: {fileID: 11400000, guid: 0b15f2691eb74da684784edf778d5a6b, type: 2}
+  vehicleId: trike
+  additionalCargoSlots: []
+--- !u!114 &5793851107354065778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2786117080285503785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f51fec49dc09194698499dbeff3e27a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionHighlight
+  outlines:
+  - {fileID: 4288685879156672836}
+  - {fileID: 4859851126927726574}
+  - {fileID: 7573810008573584477}
+  - {fileID: 8875175735117213090}
+  - {fileID: 5178370909484118285}
+  - {fileID: 4875262211485544972}
+  - {fileID: 228735083898221609}
 --- !u!1 &2869809781374989015
 GameObject:
   m_ObjectHideFlags: 0
@@ -884,6 +979,7 @@ GameObject:
   - component: {fileID: 184607106071817329}
   - component: {fileID: 6875054485537887587}
   - component: {fileID: 8744829743429522671}
+  - component: {fileID: 7573810008573584477}
   m_Layer: 0
   m_Name: Bed_Tailgate
   m_TagString: Untagged
@@ -963,6 +1059,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7573810008573584477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3712955299379647978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &4158823328244743566
 GameObject:
   m_ObjectHideFlags: 0
@@ -974,6 +1088,7 @@ GameObject:
   - component: {fileID: 1375409734316279975}
   - component: {fileID: 4314850202681997658}
   - component: {fileID: 6172474368465415902}
+  - component: {fileID: 4288685879156672836}
   m_Layer: 0
   m_Name: Bed_Side_Left
   m_TagString: Untagged
@@ -1053,6 +1168,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4288685879156672836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4158823328244743566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &4182597945988579914
 GameObject:
   m_ObjectHideFlags: 0
@@ -1064,6 +1197,7 @@ GameObject:
   - component: {fileID: 4017351629154633429}
   - component: {fileID: 9178619196955309043}
   - component: {fileID: 5253823061728500763}
+  - component: {fileID: 5178370909484118285}
   m_Layer: 0
   m_Name: Door_Left
   m_TagString: Untagged
@@ -1146,6 +1280,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5178370909484118285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4182597945988579914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &4367602598504570699
 GameObject:
   m_ObjectHideFlags: 0
@@ -1279,6 +1431,7 @@ GameObject:
   - component: {fileID: 8248570860360329650}
   - component: {fileID: 8656562301885234051}
   - component: {fileID: 2837010203848724255}
+  - component: {fileID: 8875175735117213090}
   m_Layer: 0
   m_Name: Body_Static
   m_TagString: Untagged
@@ -1367,6 +1520,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &8875175735117213090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6471875607440913607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &7822554397021337614
 GameObject:
   m_ObjectHideFlags: 0
@@ -1378,6 +1549,7 @@ GameObject:
   - component: {fileID: 4965927069661576473}
   - component: {fileID: 7055734719292269923}
   - component: {fileID: 3753457809233068563}
+  - component: {fileID: 4875262211485544972}
   m_Layer: 0
   m_Name: Door_Right
   m_TagString: Untagged
@@ -1460,3 +1632,21 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4875262211485544972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7822554397021337614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []

@@ -1,0 +1,350 @@
+{
+    "scene":  "Assets/Scenes/Gameplay.unity",
+    "dirty":  false,
+    "playing":  false,
+    "roots":  [
+                  {
+                      "name":  "[Bootstraper]",
+                      "pos":  "(-17.56, 39.30, 24.79)"
+                  },
+                  {
+                      "name":  "Introduction staging",
+                      "pos":  "(0.00, 0.00, 0.00)"
+                  },
+                  {
+                      "name":  "Audio Game",
+                      "pos":  "(-35.51, 0.57, -1.23)"
+                  },
+                  {
+                      "name":  "GameManager",
+                      "pos":  "(-7.91, 1.04, -14.91)"
+                  },
+                  {
+                      "name":  "Scene Light Visibility",
+                      "pos":  "(0.00, 0.00, 0.00)"
+                  },
+                  {
+                      "name":  "EventSystem",
+                      "pos":  "(0.00, 0.00, 0.00)"
+                  },
+                  {
+                      "name":  "PlayerBase",
+                      "pos":  "(13.93, 0.00, 56.82)"
+                  },
+                  {
+                      "name":  "New_Map",
+                      "pos":  "(0.00, 0.00, 0.00)"
+                  },
+                  {
+                      "name":  "Player",
+                      "pos":  "(-0.80, 0.04, -8.35)"
+                  },
+                  {
+                      "name":  "Graphics",
+                      "pos":  "(15.50, 11.27, -3.70)"
+                  },
+                  {
+                      "name":  "Sack",
+                      "pos":  "(-1.48, 0.06, -5.79)"
+                  },
+                  {
+                      "name":  "Grain Prototype",
+                      "pos":  "(0.00, 0.00, 0.00)"
+                  },
+                  {
+                      "name":  "bicycle",
+                      "pos":  "(0.61, 1.30, 20.65)"
+                  },
+                  {
+                      "name":  "Motoroller_001",
+                      "pos":  "(2.11, 0.00, 21.44)"
+                  },
+                  {
+                      "name":  "Wheelbarrow_Small",
+                      "pos":  "(5.43, 0.02, 0.01)"
+                  },
+                  {
+                      "name":  "Lawnmower",
+                      "pos":  "(7.03, 0.00, 25.14)"
+                  },
+                  {
+                      "name":  "Trike",
+                      "pos":  "(4.12, -0.04, 21.75)"
+                  },
+                  {
+                      "name":  "GameCanvas",
+                      "pos":  "(960.00, 540.00, 0.00)"
+                  },
+                  {
+                      "name":  "Bicycle - red rideable",
+                      "pos":  "(6.63, 0.73, 18.64)"
+                  },
+                  {
+                      "name":  "Pick up",
+                      "pos":  "(10.52, 0.00, 22.31)"
+                  },
+                  {
+                      "name":  "Pick Up Bigger",
+                      "pos":  "(14.07, -0.09, 23.12)"
+                  },
+                  {
+                      "name":  "Pick Up Last",
+                      "pos":  "(18.49, -0.04, 23.19)"
+                  },
+                  {
+                      "name":  "Bicycle cargo box",
+                      "pos":  "(1.46, 0.26, 20.75)"
+                  },
+                  {
+                      "name":  "Grain progression",
+                      "pos":  "(0.00, 0.00, 0.00)"
+                  },
+                  {
+                      "name":  "Grain cargo HUD",
+                      "pos":  "(0.00, 0.00, 0.00)"
+                  },
+                  {
+                      "name":  "50 kg sack - fill with loaded shovel supply",
+                      "pos":  "(-2.21, 0.03, -5.58)"
+                  },
+                  {
+                      "name":  "Sorting sack 2 supply",
+                      "pos":  "(-1.16, 0.03, -5.58)"
+                  },
+                  {
+                      "name":  "Sorting sack 3 supply",
+                      "pos":  "(-0.11, 0.03, -5.58)"
+                  },
+                  {
+                      "name":  "Motoroller - rideable",
+                      "pos":  "(2.11, -0.01, 21.53)"
+                  },
+                  {
+                      "name":  "Lawnmower with trailer - driveable",
+                      "pos":  "(7.03, 0.00, 25.14)"
+                  },
+                  {
+                      "name":  "Pick up - driveable",
+                      "pos":  "(10.52, 0.02, 22.31)"
+                  },
+                  {
+                      "name":  "Pick Up Bigger - driveable",
+                      "pos":  "(14.07, 0.02, 23.12)"
+                  },
+                  {
+                      "name":  "Trike - driveable",
+                      "pos":  "(4.12, 0.02, 21.75)"
+                  },
+                  {
+                      "name":  "Pick Up Last - driveable",
+                      "pos":  "(18.49, 0.02, 23.19)"
+                  },
+                  {
+                      "name":  "Rat",
+                      "pos":  "(-1.14, 0.01, 7.75)"
+                  },
+                  {
+                      "name":  "Grain pests and broom tutorial",
+                      "pos":  "(0.00, 0.00, 0.00)"
+                  },
+                  {
+                      "name":  "TFP_Tipper_01B",
+                      "pos":  "(-97.63, 12.52, 169.40)"
+                  },
+                  {
+                      "name":  "TFP_Plane_01A",
+                      "pos":  "(-41.12, 82.10, 136.14)"
+                  }
+              ],
+    "plane":  {
+                  "pos":  "(-41.12, 82.10, 136.14)",
+                  "rot":  "(0.00, 0.00, 0.00)",
+                  "scale":  "(1.00, 1.00, 1.00)",
+                  "parent":  "",
+                  "components":  [
+                                     "UnityEngine.Transform",
+                                     "UnityEngine.LODGroup",
+                                     "UnityEngine.MeshCollider",
+                                     "UnityEngine.Animator"
+                                 ],
+                  "children":  [
+                                   {
+                                       "name":  "TFP_Plane_01A",
+                                       "pos":  "(-41.12, 82.10, 136.14)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Aileron.L_LOD0",
+                                       "pos":  "(-1.17, 2.08, 6.00)",
+                                       "rot":  "(356.50, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Aileron.R_LOD0",
+                                       "pos":  "(-1.17, 2.08, -6.00)",
+                                       "rot":  "(3.50, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Door_LOD0",
+                                       "pos":  "(-2.67, 2.94, 0.70)",
+                                       "rot":  "(0.00, 358.00, 2.30)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Elevator.L_LOD0",
+                                       "pos":  "(-7.20, 1.71, 1.56)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Elevator.R_LOD0",
+                                       "pos":  "(-7.20, 1.71, -1.56)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Flap.L_LOD0",
+                                       "pos":  "(-1.00, 2.02, 2.73)",
+                                       "rot":  "(356.50, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Flap.R_LOD0",
+                                       "pos":  "(-1.00, 2.02, -2.73)",
+                                       "rot":  "(3.50, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Fuselage_LOD0",
+                                       "pos":  "(0.00, 0.00, 0.00)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Fuselage_LOD1",
+                                       "pos":  "(0.00, 0.00, 0.00)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Fuselage_LOD2",
+                                       "pos":  "(0.00, 0.00, 0.00)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Fuselage_Logos_LOD0",
+                                       "pos":  "(0.00, 0.00, 0.00)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Propeller",
+                                       "pos":  "(3.78, 3.12, 0.00)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Rudder_LOD0",
+                                       "pos":  "(-7.17, 2.60, 0.00)",
+                                       "rot":  "(0.00, 0.00, 7.93)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Wheel_L_LOD0",
+                                       "pos":  "(0.67, 0.35, 1.71)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Wheel_R_LOD0",
+                                       "pos":  "(0.67, 0.35, -1.71)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_WheelStand_L_LOD0",
+                                       "pos":  "(-6.51, 1.29, 0.00)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Wheel_B_LOD0",
+                                       "pos":  "(-0.91, -1.08, 0.00)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   },
+                                   {
+                                       "name":  "TFP_Plane_01A_Yoke_LOD0",
+                                       "pos":  "(-2.27, 1.91, 0.00)",
+                                       "rot":  "(0.00, 0.00, 0.00)"
+                                   }
+                               ],
+                  "meshes":  [
+                                 {
+                                     "name":  "TFP_Plane_01A_Aileron.L_LOD0",
+                                     "bounds":  "Center: (-42.63, 84.13, 142.14), Extents: (0.36, 0.25, 1.78)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Aileron.R_LOD0",
+                                     "bounds":  "Center: (-42.63, 84.13, 130.14), Extents: (0.36, 0.25, 1.78)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Door_LOD0",
+                                     "bounds":  "Center: (-43.86, 85.41, 136.66), Extents: (0.52, 0.41, 0.20)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Elevator.L_LOD0",
+                                     "bounds":  "Center: (-48.60, 83.76, 137.70), Extents: (0.33, 0.12, 1.00)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Elevator.R_LOD0",
+                                     "bounds":  "Center: (-48.60, 83.76, 134.57), Extents: (0.33, 0.12, 1.00)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Flap.L_LOD0",
+                                     "bounds":  "Center: (-42.58, 83.95, 138.88), Extents: (0.52, 0.27, 1.41)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Flap.R_LOD0",
+                                     "bounds":  "Center: (-42.58, 83.95, 133.40), Extents: (0.52, 0.27, 1.41)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Fuselage_LOD0",
+                                     "bounds":  "Center: (-43.36, 84.19, 136.14), Extents: (5.47, 1.86, 8.19)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Fuselage_LOD1",
+                                     "bounds":  "Center: (-43.54, 84.05, 136.14), Extents: (5.64, 1.95, 8.17)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Fuselage_LOD2",
+                                     "bounds":  "Center: (-43.54, 84.04, 136.14), Extents: (5.63, 1.94, 8.03)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Fuselage_Logos_LOD0",
+                                     "bounds":  "Center: (-44.46, 83.77, 136.14), Extents: (0.70, 0.17, 0.74)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Propeller",
+                                     "bounds":  "Center: (-37.65, 84.79, 136.16), Extents: (0.33, 1.43, 1.62)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Rudder_LOD0",
+                                     "bounds":  "Center: (-48.74, 84.41, 136.14), Extents: (0.68, 1.29, 0.04)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Wheel_L_LOD0",
+                                     "bounds":  "Center: (-40.46, 82.45, 137.84), Extents: (0.33, 0.33, 0.16)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Wheel_R_LOD0",
+                                     "bounds":  "Center: (-40.46, 82.45, 134.43), Extents: (0.33, 0.33, 0.16)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_WheelStand_L_LOD0",
+                                     "bounds":  "Center: (-48.11, 82.83, 136.14), Extents: (0.51, 0.58, 0.19)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Wheel_B_LOD0",
+                                     "bounds":  "Center: (-48.54, 82.32, 136.14), Extents: (0.22, 0.22, 0.09)"
+                                 },
+                                 {
+                                     "name":  "TFP_Plane_01A_Yoke_LOD0",
+                                     "bounds":  "Center: (-43.39, 84.59, 136.14), Extents: (0.15, 0.60, 0.15)"
+                                 }
+                             ]
+              },
+    "terrains":  [
+                     {
+                         "name":  "New Terrain - 384 x 384",
+                         "pos":  "(-192.00, -8.00, -70.00)",
+                         "size":  "(384.00, 80.00, 384.00)",
+                         "bounds":  "Center: (192.00, 26.49, 192.00), Extents: (192.00, 18.58, 192.00)"
+                     }
+                 ]
+}

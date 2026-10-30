@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 402351332175513948}
   - component: {fileID: 8301927758879616373}
   - component: {fileID: 342596853629759272}
+  - component: {fileID: 5980876991362386589}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -301,6 +302,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5980876991362386589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 656391042698156662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &987528719362746692
 GameObject:
   m_ObjectHideFlags: 0
@@ -702,6 +721,7 @@ GameObject:
   - component: {fileID: 4207749060708269930}
   - component: {fileID: 8487838847959339915}
   - component: {fileID: 3346921782789179819}
+  - component: {fileID: 6912703409012362461}
   m_Layer: 0
   m_Name: Housing
   m_TagString: Untagged
@@ -781,6 +801,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6912703409012362461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4720612676781733241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &4757084474172428072
 GameObject:
   m_ObjectHideFlags: 0
@@ -994,6 +1032,7 @@ GameObject:
   - component: {fileID: 1871549775078274508}
   - component: {fileID: 8645870636986034706}
   - component: {fileID: 758003581619831412}
+  - component: {fileID: 7688280463686589815}
   m_Layer: 0
   m_Name: Housing
   m_TagString: Untagged
@@ -1073,6 +1112,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7688280463686589815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5930326524024641813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &6015343109988694990
 GameObject:
   m_ObjectHideFlags: 0
@@ -1084,6 +1141,7 @@ GameObject:
   - component: {fileID: 5616480060460033240}
   - component: {fileID: 1036549588382514194}
   - component: {fileID: 1682806243665137483}
+  - component: {fileID: 9014292002774141573}
   m_Layer: 0
   m_Name: Stem
   m_TagString: Untagged
@@ -1163,6 +1221,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &9014292002774141573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6015343109988694990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &6346523780560684371
 GameObject:
   m_ObjectHideFlags: 0
@@ -1354,6 +1430,7 @@ GameObject:
   - component: {fileID: 1340321800012835114}
   - component: {fileID: 2317980199930912801}
   - component: {fileID: 3583888134006954785}
+  - component: {fileID: 2153904891448228389}
   m_Layer: 0
   m_Name: SteeringAssembly
   m_TagString: Untagged
@@ -1433,6 +1510,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &2153904891448228389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6950404960058710344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &7319063144768944179
 GameObject:
   m_ObjectHideFlags: 0
@@ -1444,6 +1539,7 @@ GameObject:
   - component: {fileID: 4951314372770566495}
   - component: {fileID: 2985034193066465142}
   - component: {fileID: 8108865677993496952}
+  - component: {fileID: 3416959762157057734}
   m_Layer: 0
   m_Name: Stem
   m_TagString: Untagged
@@ -1523,6 +1619,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3416959762157057734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7319063144768944179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &7413415586859076879
 GameObject:
   m_ObjectHideFlags: 0
@@ -1607,6 +1721,9 @@ GameObject:
   - component: {fileID: 2092507072865993016}
   - component: {fileID: 7621001505306091119}
   - component: {fileID: 1178948812350384389}
+  - component: {fileID: 8021453211909120231}
+  - component: {fileID: 7111925690564969117}
+  - component: {fileID: 5170628464747333238}
   m_Layer: 0
   m_Name: Motoroller_Rideable
   m_TagString: Untagged
@@ -1694,6 +1811,7 @@ MonoBehaviour:
   motorDriven: 1
   exitCoastDuration: 0.8
   boostSpeedMultiplier: 1
+  downhillSpeedMultiplier: 1.2
   steeringSmoothTime: 0.16
   maximumSteeringAngle: 30
   ridingCameraOffset: {x: 0, y: 0, z: 0}
@@ -1755,6 +1873,56 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleCargoRack
   surface: {fileID: 8536322281977802862}
   baySpacing: 0.6
+--- !u!114 &8021453211909120231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7905374408960631068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7766699f18f62549b7829328c08b440, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgradeInteractable
+  upgradeManager: {fileID: 0}
+  targetVehicle: {fileID: 7905374408960631068}
+  promptAnchor: {fileID: 3373409907582154899}
+  promptOffset: {x: 0, y: 0.3, z: 0}
+--- !u!114 &7111925690564969117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7905374408960631068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d31a7bed88d3fc243a5d518d5de0d6ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgrade
+  settings: {fileID: 11400000, guid: 0b15f2691eb74da684784edf778d5a6b, type: 2}
+  vehicleId: motoroller
+  additionalCargoSlots: []
+--- !u!114 &5170628464747333238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7905374408960631068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f51fec49dc09194698499dbeff3e27a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionHighlight
+  outlines:
+  - {fileID: 5980876991362386589}
+  - {fileID: 2153904891448228389}
+  - {fileID: 9014292002774141573}
+  - {fileID: 6912703409012362461}
+  - {fileID: 3416959762157057734}
+  - {fileID: 7688280463686589815}
 --- !u!1 &7923003485792560148
 GameObject:
   m_ObjectHideFlags: 0

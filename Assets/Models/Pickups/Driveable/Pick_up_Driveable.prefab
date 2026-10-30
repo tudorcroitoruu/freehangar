@@ -411,6 +411,7 @@ GameObject:
   - component: {fileID: 7762758979225135535}
   - component: {fileID: 1216018902821797314}
   - component: {fileID: 7727236484128377149}
+  - component: {fileID: 1965722390561954941}
   m_Layer: 0
   m_Name: TFP_Utility_Pick_Up_01A_Body_LOD0
   m_TagString: Untagged
@@ -491,6 +492,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1965722390561954941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2653666202386626904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &2798293610261196451
 GameObject:
   m_ObjectHideFlags: 0
@@ -502,6 +521,7 @@ GameObject:
   - component: {fileID: 3154438930096212469}
   - component: {fileID: 8942708755229008685}
   - component: {fileID: 6981424761992953564}
+  - component: {fileID: 7299700780711766776}
   m_Layer: 0
   m_Name: TFP_Utility_Pick_Up_01A_Tailgate_LOD0
   m_TagString: Untagged
@@ -581,6 +601,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7299700780711766776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2798293610261196451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &2815553056328034034
 GameObject:
   m_ObjectHideFlags: 0
@@ -1107,6 +1145,7 @@ GameObject:
   - component: {fileID: 1656030570549645587}
   - component: {fileID: 2019948190515965988}
   - component: {fileID: 1543370660769528007}
+  - component: {fileID: 8646794164413330956}
   m_Layer: 0
   m_Name: TFP_Utility_Pick_Up_01A_Door_R_LOD0
   m_TagString: Untagged
@@ -1187,6 +1226,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &8646794164413330956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4557844927905478350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &4647647048644874191
 GameObject:
   m_ObjectHideFlags: 0
@@ -1288,6 +1345,7 @@ GameObject:
   - component: {fileID: 8069463824371852048}
   - component: {fileID: 7675841045271458605}
   - component: {fileID: 3152521884044276664}
+  - component: {fileID: 6137529643406624312}
   m_Layer: 0
   m_Name: TFP_Utility_Pick_Up_01A_Door_L_LOD0
   m_TagString: Untagged
@@ -1368,6 +1426,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6137529643406624312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5287513345099258143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &5394421250922462083
 GameObject:
   m_ObjectHideFlags: 0
@@ -2146,6 +2222,9 @@ GameObject:
   - component: {fileID: 6284207050190341457}
   - component: {fileID: 2863575736420085937}
   - component: {fileID: 2601440109836288352}
+  - component: {fileID: 7620096769030089901}
+  - component: {fileID: 8860964505218840547}
+  - component: {fileID: 5615148436300290132}
   m_Layer: 0
   m_Name: Pick_up_Driveable
   m_TagString: Untagged
@@ -2237,7 +2316,9 @@ MonoBehaviour:
   wheelbase: 3.2902236
   brakingDeceleration: 8
   motorDriven: 1
+  exitCoastDuration: 0.8
   boostSpeedMultiplier: 1
+  downhillSpeedMultiplier: 1.2
   steeringSmoothTime: 0.18
   maximumSteeringAngle: 28
   ridingCameraOffset: {x: 0, y: 0, z: 0}
@@ -2301,6 +2382,56 @@ MonoBehaviour:
   frontRightWheel: {fileID: 597982702319875502}
   rearRightWheel: {fileID: 253046577273922565}
   steeringWheel: {fileID: 1825773179574572658}
+  roadCameraIntensity: 0.65
+  roadCameraRollDegrees: 0.45
+--- !u!114 &7620096769030089901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8708892154946547016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7766699f18f62549b7829328c08b440, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgradeInteractable
+  upgradeManager: {fileID: 0}
+  targetVehicle: {fileID: 8708892154946547016}
+  promptAnchor: {fileID: 5659085426813912995}
+  promptOffset: {x: 0, y: 0.3, z: 0}
+--- !u!114 &8860964505218840547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8708892154946547016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d31a7bed88d3fc243a5d518d5de0d6ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgrade
+  settings: {fileID: 11400000, guid: 0b15f2691eb74da684784edf778d5a6b, type: 2}
+  vehicleId: pickup
+  additionalCargoSlots: []
+--- !u!114 &5615148436300290132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8708892154946547016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f51fec49dc09194698499dbeff3e27a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionHighlight
+  outlines:
+  - {fileID: 1965722390561954941}
+  - {fileID: 6137529643406624312}
+  - {fileID: 8646794164413330956}
+  - {fileID: 7299700780711766776}
 --- !u!1 &8757686875123567484
 GameObject:
   m_ObjectHideFlags: 0

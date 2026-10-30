@@ -35,6 +35,55 @@ public class VehicleUpgradeTests
     }
 
     [Test]
+    public void SlotsOnlyProfileAllowsZeroCapacityAndStillLimitsCargoCount()
+    {
+        var profile = settings.vehicles[0];
+        profile.upgradeCapacity = false;
+        foreach (var level in profile.levels) level.capacityCubicMeters = 0;
+        Assert.IsTrue(profile.IsConfigured);
+        var upgrades = root.AddComponent<VehicleUpgrade>();
+        SetField(upgrades, "settings", settings);
+        SetField(upgrades, "vehicleId", "test");
+        Assert.IsTrue(float.IsPositiveInfinity(upgrades.CapacityVolume));
+        Assert.IsTrue(upgrades.CanLoadVolume(1000));
+        Assert.IsFalse(upgrades.CanLoadVolume(1000, 2));
+        profile.upgradeCapacity = true;
+        Assert.IsFalse(profile.IsConfigured);
+    }
+
+    [Test]
+    public void CapacityLabelsHideAndRestoreWhenChangingProfilesIncludingMaxLevel()
+    {
+        var upgrades = root.AddComponent<VehicleUpgrade>();
+        SetField(upgrades, "settings", settings);
+        SetField(upgrades, "vehicleId", "test");
+        var screen = Child("Screen").AddComponent<UpgradeVehicle>();
+        var current = Child("Current capacity").AddComponent<Text>();
+        var next = Child("Next capacity").AddComponent<Text>();
+        var max = Child("Max capacity").AddComponent<Text>();
+        SetField(screen, "currentLevelCapacity", current);
+        SetField(screen, "nextLevelCapacity", next);
+        SetField(screen, "maxLevelCapacity", max);
+        settings.vehicles[0].upgradeCapacity = false;
+        screen.SetTarget(upgrades);
+        Assert.IsFalse(current.gameObject.activeSelf);
+        Assert.IsFalse(next.gameObject.activeSelf);
+        Assert.IsFalse(max.gameObject.activeSelf);
+        Assert.IsTrue(SaveSystem.Data.TryUpgradeVehicle("test", 0, 0, 1));
+        screen.Refresh();
+        Assert.IsFalse(max.gameObject.activeSelf);
+        settings.vehicles[0].upgradeCapacity = true;
+        screen.Refresh();
+        Assert.IsTrue(current.gameObject.activeSelf);
+        Assert.IsTrue(next.gameObject.activeSelf);
+        Assert.IsTrue(max.gameObject.activeSelf);
+        screen.SetTarget(null);
+        Assert.IsFalse(current.gameObject.activeSelf);
+        Assert.IsFalse(next.gameObject.activeSelf);
+        Assert.IsFalse(max.gameObject.activeSelf);
+    }
+
+    [Test]
     public void PurchasesAreSavedPerTypeAndRejectStaleUnaffordableOrMaxedRequests()
     {
         var data = SaveSystem.Data;

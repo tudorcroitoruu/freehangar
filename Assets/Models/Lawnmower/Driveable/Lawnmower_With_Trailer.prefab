@@ -605,6 +605,7 @@ GameObject:
   - component: {fileID: 8356278798260678967}
   - component: {fileID: 2781732018026158697}
   - component: {fileID: 8233423811223754019}
+  - component: {fileID: 7587566637297336118}
   m_Layer: 0
   m_Name: TFP_Lawnmower_01A_Steering_Wheel_LOD0
   m_TagString: Untagged
@@ -684,6 +685,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7587566637297336118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1270623778772850015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &1337950707146071007
 GameObject:
   m_ObjectHideFlags: 0
@@ -877,6 +896,9 @@ GameObject:
   - component: {fileID: 5852841650967405454}
   - component: {fileID: 9192223723974725750}
   - component: {fileID: 6453335953337801719}
+  - component: {fileID: 528298647463979128}
+  - component: {fileID: 6426863785060812347}
+  - component: {fileID: 6921285605859018695}
   m_Layer: 0
   m_Name: Lawnmower - driveable
   m_TagString: Untagged
@@ -962,7 +984,9 @@ MonoBehaviour:
   wheelbase: 1.56
   brakingDeceleration: 6
   motorDriven: 1
+  exitCoastDuration: 0.8
   boostSpeedMultiplier: 1
+  downhillSpeedMultiplier: 1.2
   steeringSmoothTime: 0.14
   maximumSteeringAngle: 28
   ridingCameraOffset: {x: 0, y: 0, z: 0}
@@ -1014,6 +1038,52 @@ MonoBehaviour:
   trailerWheelVisuals:
   - {fileID: 7393670014411793491}
   - {fileID: 6116590544844260319}
+--- !u!114 &528298647463979128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1809697905676644171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7766699f18f62549b7829328c08b440, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgradeInteractable
+  upgradeManager: {fileID: 0}
+  targetVehicle: {fileID: 1809697905676644171}
+  promptAnchor: {fileID: 6013012734015613169}
+  promptOffset: {x: 0, y: 0.3, z: 0}
+--- !u!114 &6426863785060812347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1809697905676644171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d31a7bed88d3fc243a5d518d5de0d6ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgrade
+  settings: {fileID: 0}
+  vehicleId: lawnmower
+  additionalCargoSlots: []
+--- !u!114 &6921285605859018695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1809697905676644171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f51fec49dc09194698499dbeff3e27a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionHighlight
+  outlines:
+  - {fileID: 6438921747412504248}
+  - {fileID: 7587566637297336118}
 --- !u!1 &2446899966131049833
 GameObject:
   m_ObjectHideFlags: 0
@@ -1111,6 +1181,7 @@ GameObject:
   - component: {fileID: 8518026638044781180}
   - component: {fileID: 4695076887761403198}
   - component: {fileID: 1061212337359400942}
+  - component: {fileID: 6438921747412504248}
   m_Layer: 0
   m_Name: TFP_Lawnmower_01A_Body_LOD0
   m_TagString: Untagged
@@ -1190,6 +1261,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6438921747412504248
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2721849648328254827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &2827908035186280045
 GameObject:
   m_ObjectHideFlags: 0

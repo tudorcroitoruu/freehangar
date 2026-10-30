@@ -55,6 +55,10 @@ public class UpgradeVehicle : MonoBehaviour
     public void Refresh()
     {
         bool configured = target != null && target.IsConfigured;
+        bool showCapacity = configured && target.Profile.upgradeCapacity;
+        if (currentLevelCapacity != null) currentLevelCapacity.gameObject.SetActive(showCapacity);
+        if (nextLevelCapacity != null) nextLevelCapacity.gameObject.SetActive(showCapacity);
+        if (maxLevelCapacity != null) maxLevelCapacity.gameObject.SetActive(showCapacity);
         bool maxed = configured && target.IsMaxed;
         bool available = configured && target.isActiveAndEnabled && !target.HasCargo && SaveSystem.Data != null && !maxed;
         int cost = configured && !target.UsesVoucher ? target.Price : 0;
@@ -69,10 +73,14 @@ public class UpgradeVehicle : MonoBehaviour
             var next = target.Profile.At(target.Level + 1);
             var maximum = target.Profile.At(target.Profile.MaxLevel);
             SetText(currentLevelCapacity, $"Capacity: <b>{Volume(current.capacityCubicMeters)}</b>");
-            SetText(nextLevelCapacity, $"Capacity: <b>{Colored(Volume(next.capacityCubicMeters))}</b>");
+            string nextCapacity = Volume(next.capacityCubicMeters);
+            if (next.capacityCubicMeters != current.capacityCubicMeters) nextCapacity = Colored(nextCapacity);
+            SetText(nextLevelCapacity, $"Capacity: <b>{nextCapacity}</b>");
             SetText(maxLevelCapacity, $"Capacity: <b>{Volume(maximum.capacityCubicMeters)}</b>");
             SetText(currentLevelSlots, $"Slots: <b>{current.slots}</b>");
-            SetText(nextLevelSlots, $"Slots: <b>{Colored(next.slots.ToString())}</b>");
+            string nextSlots = next.slots.ToString();
+            if (next.slots != current.slots) nextSlots = Colored(nextSlots);
+            SetText(nextLevelSlots, $"Slots: <b>{nextSlots}</b>");
             SetText(maxLevelSlots, $"Slots: <b>{maximum.slots}</b>");
             if (vehicleImages != null)
                 for (int i = 0; i < vehicleImages.Length; i++)
