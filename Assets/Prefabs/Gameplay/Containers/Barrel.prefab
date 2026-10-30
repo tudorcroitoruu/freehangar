@@ -260,7 +260,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b490a70abf7e5db4e850392a1c7ec809, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrainContainer
-  capacityKg: 10
+  capacityKg: 120
   kilograms: 0
   canBeCarried: 1
   restrictGrain: 0
