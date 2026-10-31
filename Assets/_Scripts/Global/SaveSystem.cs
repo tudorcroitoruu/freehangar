@@ -511,9 +511,22 @@ public class ActivityData
 [Serializable]
 public class SettingsData
 {
-    public float musicVolume = 1f;  
-    public float effectsVolume = 1f;
+    public int resolutionIndex = -1;
+    public int resolutionWidth;
+    public int resolutionHeight;
+    public int windowModeIndex;
+    public int displayIndex = -1;
+    public string displayName;
+    public bool vSync;
+    public int frameRateIndex = 3;
+    public int qualityIndex = -1;
+
     public float masterVolume = 1f;
+    public float musicVolume = 1f;
+    public float effectsVolume = 1f;
+
+    public float aimSensitivity = 1f;
+    public string inputBindingOverrides;
 }
 
 
