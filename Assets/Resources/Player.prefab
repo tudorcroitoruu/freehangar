@@ -462,6 +462,8 @@ MonoBehaviour:
   pourReach: 4
   aimedGripTravel: 0.65
   capacityKg: 6.5
+  weightKg: 1
+  upgradeSettings: {fileID: 0}
   scoopRadius: 0.4
   scoopDepth: 0.18
   actionDuration: 1.25
@@ -512,6 +514,7 @@ GameObject:
   - component: {fileID: 7348131179784532828}
   - component: {fileID: 7961350224667567484}
   - component: {fileID: 2532734745049135152}
+  - component: {fileID: 3184703036978754463}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -580,12 +583,28 @@ MonoBehaviour:
   staminaManager: {fileID: 0}
   speed: 3
   sprintSpeed: 7
+  bagCarrySpeedMultiplier: 0.6
+  heavyBagWeightKg: 10
   jumpForce: 5
   gravity: 9.81
+  movementAudioSource: {fileID: 3184703036978754463}
+  jumpClip: {fileID: 8300000, guid: b0f827416eeaf21438278fd25d56e514, type: 3}
+  landClip: {fileID: 8300000, guid: c8f6dec65d45e1b4abe5a1321cfb2b8c, type: 3}
+  footstepClips:
+  - {fileID: 8300000, guid: b095d6beee1138f409ae1c7a690f3e8f, type: 3}
+  - {fileID: 8300000, guid: c4c4c0519bd4d24488d3a377d5bcbd29, type: 3}
+  - {fileID: 8300000, guid: 70dc907c4a0248d4fa65edba72693941, type: 3}
+  - {fileID: 8300000, guid: 38e06754bc0d2204cb54eef394a72bf1, type: 3}
+  - {fileID: 8300000, guid: d5af4d346e2a79b4ab69375524520bee, type: 3}
+  walkingStepDistance: 1.4
+  sprintingStepDistance: 1.8
   cameraSensitivity: 2
   cameraMinAngle: -70
   cameraMaxAngle: 80
   lookSmoothTime: 0.06
+  sprintCameraHeight: 0.004166667
+  sprintCameraPitch: 0.15625
+  sprintStepFrequency: 2.6
   crouchHeight: 1.2
   crouchSpeed: 1.5
   crouchTransitionSpeed: 5
@@ -612,8 +631,104 @@ MonoBehaviour:
   shovel: {fileID: 1970793380129296705}
   shovelPresentation: {fileID: 7780978940241256279}
   carryAnchor: {fileID: 3469861416486198016}
-  prompt: {fileID: 0}
   carriedHeight: 0.75
+--- !u!82 &3184703036978754463
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7072437177929542807}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 3455396778696250076, guid: 2363768d8fc9b624a9219fcc1bf533a6, type: 2}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 0.7
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &7971581861005027898
 GameObject:
   m_ObjectHideFlags: 0

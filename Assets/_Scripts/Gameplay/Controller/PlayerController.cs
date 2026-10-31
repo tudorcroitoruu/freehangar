@@ -20,6 +20,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float jumpForce = 5f;
     [SerializeField, Min(0f)] private float gravity = 9.81f;
 
+    [Header("Movement audio")]
+    [SerializeField] private AudioSource movementAudioSource;
+    [SerializeField] private AudioClip jumpClip;
+    [SerializeField] private AudioClip landClip;
+    [SerializeField] private AudioClip[] footstepClips;
+    [SerializeField, Min(.1f)] private float walkingStepDistance = 1.4f;
+    [SerializeField, Min(.1f)] private float sprintingStepDistance = 1.8f;
+    private float distanceSinceStep;
+    private float airborneDuration;
+    private int previousFootstep = -1;
+
     [Header("Camera")]
     [SerializeField, Min(0f)] private float cameraSensitivity = 2f;
     [SerializeField] private float cameraMinAngle = -70f;
@@ -124,6 +135,7 @@ public class PlayerController : MonoBehaviour
     {
         if (shovelTool != null) shovelTool.GrainScooped += HandleGrainScooped;
         verticalVelocity = 0f;
+        distanceSinceStep = airborneDuration = 0f;
         SetCursorLocked(true);
     }
 
@@ -255,6 +267,8 @@ public class PlayerController : MonoBehaviour
 
     private void HandleMovement(bool acceptInput)
     {
+        bool wasGrounded = characterController.isGrounded;
+        Vector3 previousPosition = transform.position;
         Vector2 input = acceptInput
             ? new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
             : Vector2.zero;
@@ -276,20 +290,27 @@ public class PlayerController : MonoBehaviour
         if (characterController.isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;
 
-        if (acceptInput && !pushingWheelbarrow && !isCrouching && characterController.isGrounded && Input.GetKeyDown(KeyCode.Space))
+        bool jumped = acceptInput && !pushingWheelbarrow && !isCrouching && wasGrounded && Input.GetKeyDown(KeyCode.Space);
+        if (jumped)
+        {
             verticalVelocity = jumpForce;
+            PlayMovementClip(jumpClip);
+        }
 
         verticalVelocity -= gravity * Time.deltaTime;
+        float verticalSpeedBeforeMove = verticalVelocity;
         velocity.y = verticalVelocity;
         if (pushingWheelbarrow)
         {
             interactor.PushedWheelbarrow.Move(input, currentSpeed, verticalVelocity, Time.deltaTime);
+            UpdateMovementAudio(wasGrounded, jumped, verticalSpeedBeforeMove, previousPosition, input, canSprint);
             targetYaw = transform.eulerAngles.y;
             sprintMoving = canSprint && Mathf.Abs(input.y) > .01f && characterController.velocity.sqrMagnitude > .25f;
             UpdateSprintCamera(sprintMoving, Time.deltaTime);
             return;
         }
         CollisionFlags collisions = characterController.Move(velocity * Time.deltaTime);
+        UpdateMovementAudio(wasGrounded, jumped, verticalSpeedBeforeMove, previousPosition, input, canSprint);
         if ((collisions & CollisionFlags.Above) != 0 && verticalVelocity > 0f)
             verticalVelocity = 0f;
         if ((collisions & CollisionFlags.Below) != 0 && verticalVelocity < 0f)
@@ -297,6 +318,51 @@ public class PlayerController : MonoBehaviour
         Vector3 actualMovement = Vector3.ProjectOnPlane(characterController.velocity, Vector3.up);
         sprintMoving = canSprint && input.sqrMagnitude > .01f && characterController.isGrounded && actualMovement.sqrMagnitude > .25f;
         UpdateSprintCamera(sprintMoving, Time.deltaTime);
+    }
+
+    private void UpdateMovementAudio(bool wasGrounded, bool jumped, float verticalSpeedBeforeMove,
+        Vector3 previousPosition, Vector2 input, bool sprinting)
+    {
+        bool grounded = characterController.isGrounded;
+        if (!grounded)
+        {
+            airborneDuration += Time.deltaTime;
+            distanceSinceStep = 0f;
+            return;
+        }
+
+        if (!wasGrounded && !jumped && airborneDuration >= .15f && verticalSpeedBeforeMove < -1f)
+            PlayMovementClip(landClip);
+        bool landed = !wasGrounded && airborneDuration >= .15f;
+        airborneDuration = 0f;
+        if (landed)
+        {
+            distanceSinceStep = 0f;
+            return;
+        }
+
+        float horizontalDistance = Vector3.ProjectOnPlane(transform.position - previousPosition, Vector3.up).magnitude;
+        if (input.sqrMagnitude < .01f || horizontalDistance < .001f)
+        {
+            distanceSinceStep = 0f;
+            return;
+        }
+        distanceSinceStep += horizontalDistance;
+        float stepDistance = sprinting ? sprintingStepDistance : walkingStepDistance;
+        if (distanceSinceStep < stepDistance) return;
+        distanceSinceStep %= stepDistance;
+        if (footstepClips == null || footstepClips.Length == 0 || movementAudioSource == null) return;
+        int index = Random.Range(0, footstepClips.Length);
+        if (footstepClips.Length > 1 && index == previousFootstep)
+            index = (index + Random.Range(1, footstepClips.Length)) % footstepClips.Length;
+        previousFootstep = index;
+        PlayMovementClip(footstepClips[index]);
+    }
+
+    private void PlayMovementClip(AudioClip clip)
+    {
+        if (movementAudioSource != null && clip != null)
+            movementAudioSource.PlayOneShot(clip);
     }
 
     private void HandleCamera()
