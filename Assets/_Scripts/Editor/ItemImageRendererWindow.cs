@@ -16,11 +16,15 @@ public sealed class ItemImageRendererWindow : EditorWindow
         public string category;
         public GameObject source;
         public Vector3 rotation;
+        public bool customRotation;
+        public bool customCamera;
+        public Vector2 cameraAngles;
     }
     [SerializeField] private List<Item> items = new List<Item>();
     [SerializeField] private int resolution = 1024;
     [SerializeField] private float padding = 1.15f;
-    [SerializeField] private Vector2 viewAngles = new Vector2(18f, 145f);
+    [SerializeField] private Vector2 viewAngles = new Vector2(25f, 135f);
+    [SerializeField] private int cameraPresetVersion;
     [SerializeField] private string outputFolder = "Renders/Items";
     [SerializeField] private bool overwrite;
     private Vector2 scroll;
@@ -28,6 +32,14 @@ public sealed class ItemImageRendererWindow : EditorWindow
 
     [MenuItem("Tools/Freehangar/Render Item Images")]
     public static void Open() => GetWindow<ItemImageRendererWindow>("Item PNG Renderer");
+
+    private void OnEnable()
+    {
+        if (cameraPresetVersion != 0) return;
+        if (Mathf.Approximately(viewAngles.x, 18f) && Mathf.Approximately(viewAngles.y, 145f))
+            viewAngles = new Vector2(25f, 135f);
+        cameraPresetVersion = 1;
+    }
 
     private void OnGUI()
     {
@@ -42,7 +54,7 @@ public sealed class ItemImageRendererWindow : EditorWindow
             }
             resolution = EditorGUILayout.IntPopup("PNG size", resolution, new[] { "256", "512", "1024", "2048" }, new[] { 256, 512, 1024, 2048 });
             padding = EditorGUILayout.Slider("Frame padding", padding, 1.02f, 1.6f);
-            viewAngles = EditorGUILayout.Vector2Field("Camera pitch / yaw", viewAngles);
+            viewAngles = EditorGUILayout.Vector2Field("Default camera pitch / yaw", viewAngles);
             outputFolder = EditorGUILayout.TextField("Output folder", outputFolder);
             if (GUILayout.Button("Choose output folder"))
             {
@@ -64,7 +76,18 @@ public sealed class ItemImageRendererWindow : EditorWindow
                         entry.source = (GameObject)EditorGUILayout.ObjectField(entry.source, typeof(GameObject), true);
                         if (GUILayout.Button("X", GUILayout.Width(24))) { items.RemoveAt(i--); continue; }
                     }
-                    entry.rotation = EditorGUILayout.Vector3Field("Item rotation", entry.rotation);
+                    bool hasRotationOverride = entry.customRotation || entry.rotation != Vector3.zero;
+                    bool customRotation = EditorGUILayout.Toggle("Custom rotation", hasRotationOverride);
+                    if (customRotation && !hasRotationOverride) entry.rotation = ItemRotation(entry);
+                    if (!customRotation && hasRotationOverride) entry.rotation = Vector3.zero;
+                    entry.customRotation = customRotation;
+                    if (customRotation) entry.rotation = EditorGUILayout.Vector3Field("Item rotation", entry.rotation);
+                    else EditorGUILayout.LabelField("Item rotation", ItemRotation(entry).ToString());
+                    bool customCamera = EditorGUILayout.Toggle("Custom camera", entry.customCamera);
+                    if (customCamera && !entry.customCamera) entry.cameraAngles = CameraAngles(entry);
+                    entry.customCamera = customCamera;
+                    if (entry.customCamera) entry.cameraAngles = EditorGUILayout.Vector2Field("Camera pitch / yaw", entry.cameraAngles);
+                    else EditorGUILayout.LabelField("Camera pitch / yaw", CameraAngles(entry).ToString());
                 }
             }
             EditorGUILayout.EndScrollView();
@@ -169,6 +192,41 @@ public sealed class ItemImageRendererWindow : EditorWindow
         return string.IsNullOrWhiteSpace(name) ? "Item" : name;
     }
 
+    private Vector2 CameraAngles(Item entry)
+    {
+        if (entry.customCamera) return entry.cameraAngles;
+        if (entry.category == "Containers" && entry.source != null)
+        {
+            string name = entry.source.name;
+            if (IsBagOrSack(name)) return new Vector2(25f, 45f);
+            if (name.IndexOf("barrel", StringComparison.OrdinalIgnoreCase) >= 0)
+                return new Vector2(25f, 120f);
+            if (name.IndexOf("crate", StringComparison.OrdinalIgnoreCase) >= 0)
+                return new Vector2(25f, 135f);
+            return new Vector2(viewAngles.x, viewAngles.y - 90f);
+        }
+        if (IsShovel(entry)) return new Vector2(35f, viewAngles.y);
+        return viewAngles;
+    }
+
+    private static bool IsBagOrSack(string name) =>
+        name.IndexOf("bag", StringComparison.OrdinalIgnoreCase) >= 0 ||
+        name.IndexOf("sack", StringComparison.OrdinalIgnoreCase) >= 0;
+
+    private static bool IsShovel(Item entry) =>
+        entry.category == "Tools" && entry.source != null &&
+        entry.source.name.StartsWith("LVL_", StringComparison.OrdinalIgnoreCase) &&
+        int.TryParse(entry.source.name.Substring(4), out int level) && level >= 1 && level <= 4;
+
+    private static Vector3 ItemRotation(Item entry)
+    {
+        if (entry.customRotation || entry.rotation != Vector3.zero) return entry.rotation;
+        if (entry.category == "Containers" && entry.source != null && IsBagOrSack(entry.source.name))
+            return new Vector3(-90f, 0f, 0f);
+        if (IsShovel(entry)) return new Vector3(0f, 0f, -50f);
+        return Vector3.zero;
+    }
+
     private void Render(Item entry, string path)
     {
         var preview = new PreviewRenderUtility();
@@ -179,8 +237,11 @@ public sealed class ItemImageRendererWindow : EditorWindow
         {
             var visual = new GameObject("Item rendering copy") { hideFlags = HideFlags.HideAndDontSave };
             preview.AddSingleGO(visual);
-            visual.transform.rotation = Quaternion.Euler(entry.rotation);
-            CopyMeshes(entry.source, visual.transform, temporaryMeshes);
+            visual.transform.rotation = Quaternion.Euler(ItemRotation(entry));
+            CopyMeshes(entry.source, visual.transform, temporaryMeshes,
+                entry.category == "Containers" && entry.source != null &&
+                (entry.source.name.IndexOf("barrel", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                 entry.source.name.IndexOf("crate", StringComparison.OrdinalIgnoreCase) >= 0));
             var renderers = visual.GetComponentsInChildren<MeshRenderer>();
             if (renderers.Length == 0) throw new InvalidOperationException("No enabled visual meshes found.");
             var bounds = renderers[0].bounds;
@@ -195,7 +256,8 @@ public sealed class ItemImageRendererWindow : EditorWindow
             camera.aspect = 1;
             camera.nearClipPlane = .01f;
             camera.farClipPlane = Mathf.Max(100f, bounds.size.magnitude * 10f);
-            Quaternion facing = Quaternion.Euler(viewAngles.x, viewAngles.y, 0);
+            Vector2 angles = CameraAngles(entry);
+            Quaternion facing = Quaternion.Euler(angles.x, angles.y, 0);
             camera.transform.SetPositionAndRotation(bounds.center - facing * Vector3.forward * Mathf.Max(5f,bounds.size.magnitude * 3f), facing);
             Vector3 size = bounds.extents;
             float half = .01f;
@@ -212,10 +274,15 @@ public sealed class ItemImageRendererWindow : EditorWindow
                 var light = preview.lights[i];
                 if (light.GetComponent<HDAdditionalLightData>() == null) light.gameObject.AddComponent<HDAdditionalLightData>();
                 light.type = LightType.Directional;
-                light.intensity = i == 0 ? 3000f : 1500f;
-                light.color = i == 0 ? new Color(1,.94f,.84f) : new Color(.75f,.85f,1);
+                bool container = entry.category == "Containers";
+                light.intensity = container ? (i == 0 ? 10f : 5f) : (i == 0 ? 30f : 15f);
+                light.color = container ?
+                    (i == 0 ? new Color(1f,.98f,.95f) : new Color(.92f,.96f,1f)) :
+                    (i == 0 ? new Color(1,.94f,.84f) : new Color(.75f,.85f,1));
                 light.shadows = LightShadows.None;
-                light.transform.rotation = Quaternion.Euler(i == 0 ? 40 : 25,i == 0 ? 35 : 210,0);
+                light.transform.rotation = container ?
+                    facing * Quaternion.Euler(i == 0 ? 25f : 10f, i == 0 ? -35f : 50f, 0f) :
+                    Quaternion.Euler(i == 0 ? 40 : 25,i == 0 ? 35 : 210,0);
             }
             var volumeObject = new GameObject("Item studio exposure") { layer = 31, hideFlags = HideFlags.HideAndDontSave };
             preview.AddSingleGO(volumeObject);
@@ -292,9 +359,17 @@ public sealed class ItemImageRendererWindow : EditorWindow
         finally { if (begun) preview.EndPreview(); RenderTexture.active = previous; }
     }
 
-    private static void CopyMeshes(GameObject source, Transform parent, List<Mesh> temporary)
+    private static void CopyMeshes(GameObject source, Transform parent, List<Mesh> temporary, bool hideContents)
     {
         var lowerLods = new HashSet<Renderer>();
+        var sourceMeshRenderers = source.GetComponentsInChildren<MeshRenderer>(true)
+            .Where(r => r.enabled && r.gameObject.activeInHierarchy).ToArray();
+        Bounds mainBounds = default;
+        if (sourceMeshRenderers.Length > 0)
+        {
+            mainBounds = sourceMeshRenderers[0].bounds;
+            foreach (var renderer in sourceMeshRenderers) mainBounds.Encapsulate(renderer.bounds);
+        }
         foreach (var lod in source.GetComponentsInChildren<LODGroup>(true))
         {
             var levels = lod.GetLODs();
@@ -303,6 +378,8 @@ public sealed class ItemImageRendererWindow : EditorWindow
         foreach (var renderer in source.GetComponentsInChildren<Renderer>(true))
         {
             if (lowerLods.Contains(renderer) || !renderer.enabled || renderer is ParticleSystemRenderer || renderer.GetComponent<TMPro.TMP_Text>() != null) continue;
+            if (hideContents && (renderer.name.IndexOf("Grain", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                 renderer.name.IndexOf("Net", StringComparison.OrdinalIgnoreCase) >= 0)) continue;
             bool visible = true;
             for (var t = renderer.transform; t != source.transform && t != null; t = t.parent) if (!t.gameObject.activeSelf) { visible = false; break; }
             if (!visible) continue;
@@ -319,6 +396,16 @@ public sealed class ItemImageRendererWindow : EditorWindow
             go.transform.localPosition = matrix.GetColumn(3); go.transform.localRotation = matrix.rotation; go.transform.localScale = matrix.lossyScale;
             go.AddComponent<MeshFilter>().sharedMesh = mesh;
             var copy = go.AddComponent<MeshRenderer>(); copy.sharedMaterials = renderer.sharedMaterials;
+            // Some animated cables have a stale skin pose. Their baked bounds can dwarf
+            // the actual item and cause the camera to frame only that cable.
+            if (renderer is SkinnedMeshRenderer && sourceMeshRenderers.Length > 0 &&
+                copy.bounds.size.magnitude > mainBounds.size.magnitude * 3f)
+            {
+                UnityEngine.Object.DestroyImmediate(go);
+                temporary.Remove(mesh);
+                UnityEngine.Object.DestroyImmediate(mesh);
+                continue;
+            }
             copy.shadowCastingMode = ShadowCastingMode.Off;
             var block = new MaterialPropertyBlock(); renderer.GetPropertyBlock(block); copy.SetPropertyBlock(block);
         }
