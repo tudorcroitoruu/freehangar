@@ -17,7 +17,7 @@ public class UpgradeManager : MonoBehaviour
     private bool previousCursorVisible;
 
     public bool IsOpen { get; private set; }
-    public static bool BlocksGameplayInput => (current != null && current.IsOpen) || closedFrame == Time.frameCount;
+    public static bool BlocksGameplayInput => (current != null && current.IsOpen) || closedFrame == Time.frameCount || SellingScreen.BlocksGameplayInput;
 
     private void Awake() => Initialize();
 

@@ -80,7 +80,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainOverlayTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 3ebe4a4cf685dde4b9d293bd41ce4bb5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -202,13 +202,13 @@ Material:
     - _EnableFogOnTransparent: 1
     - _EnableGeometricSpecularAA: 0
     - _EnergyConservingSpecularColor: 1
-    - _FadeBottomSize: 0
+    - _FadeBottomSize: 0.2
     - _FadeBottomSoftness: 1
-    - _FadeLeftSize: 0.003
+    - _FadeLeftSize: 0.01
     - _FadeLeftSoftness: 1
-    - _FadeRightSize: 0.003
+    - _FadeRightSize: 0.01
     - _FadeRightSoftness: 1
-    - _FadeTopSize: 0
+    - _FadeTopSize: 0.2
     - _FadeTopSoftness: 1
     - _FadeWaveAmount: 0.004
     - _FadeWaveSpeed: 0.3
@@ -220,7 +220,7 @@ Material:
     - _GlowSize: 8
     - _GlowSoftness: 0.7
     - _GradientDirection: 0
-    - _HasMainOverlayTex: 0
+    - _HasMainOverlayTex: 1
     - _HasOutlineOverlayTex: 0
     - _HasTransparencyMaskTex: 0
     - _HeightAmplitude: 0.02
@@ -242,7 +242,7 @@ Material:
     - _MainOverlayBlackTransparent: 1
     - _MainOverlayBlend: 0
     - _MainOverlayOpacity: 0.833
-    - _MainOverlayScale: 1
+    - _MainOverlayScale: 10
     - _MainOverlayUseMaskScale: 1
     - _MaterialID: 1
     - _Metallic: 0
@@ -314,8 +314,8 @@ Material:
     - _TransmissionEnable: 1
     - _TransmissionMask: 1
     - _TransparencyMaskBlackTransparent: 0
-    - _TransparencyMaskIntensity: 0.156
-    - _TransparencyMaskScale: 10
+    - _TransparencyMaskIntensity: 0.349
+    - _TransparencyMaskScale: 4.01
     - _TransparentBackfaceEnable: 0
     - _TransparentCullMode: 2
     - _TransparentDepthPostpassEnable: 0
@@ -341,7 +341,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.80784315, g: 0.62532634, b: 0.3667608, a: 0.46666667}
+    - _Color: {r: 0.9372549, g: 0.8467721, b: 0.72449803, a: 1}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
@@ -353,7 +353,7 @@ Material:
     - _GradientStartColor: {r: 1, g: 1, b: 1, a: 1}
     - _InvPrimScale: {r: 1, g: 1, b: 0, a: 0}
     - _IridescenceThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
-    - _MainOverlayColor: {r: 0.674, g: 0.5289621, b: 0.3327342, a: 1}
+    - _MainOverlayColor: {r: 0.674, g: 0.528962, b: 0.33273417, a: 0.38431373}
     - _NoiseAnimationDirection: {r: 1, g: 0.35, b: 0, a: 0}
     - _NoiseOffset: {r: 0, g: 0, b: 0, a: 0}
     - _OutlineColor: {r: 0.5, g: 0.3646816, b: 0.21933961, a: 1}
