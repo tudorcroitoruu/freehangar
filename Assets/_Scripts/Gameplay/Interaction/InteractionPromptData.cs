@@ -34,5 +34,15 @@ public struct InteractionPromptAction
 {
     public string Action;
     public KeyCode Key;
-    public InteractionPromptAction(string action, KeyCode key) { Action = action; Key = key; }
+    public bool ShowProgress;
+    public float Progress;
+    public string ProgressText;
+    public InteractionPromptAction(string action, KeyCode key)
+    {
+        Action = action;
+        Key = key;
+        ShowProgress = false;
+        Progress = 0f;
+        ProgressText = "";
+    }
 }

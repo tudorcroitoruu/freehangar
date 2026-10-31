@@ -9,3 +9,5 @@ Capacity is based on the closed bag's physical box volume, independent of its wo
 The barrows currently use transform following rather than wheel physics; this is intended for easy on-foot transport. Their positions and loaded cargo are scene state only and are not yet serialized in SaveSystem.
 
 While pushing, press U to buy one capacity upgrade for that barrow. The upgrade adds 0.4 m³ (approximately one 50 kg sack) and is saved. A hidden free upgrade voucher is used before cash; otherwise the small, medium, and large upgrades cost $250, $500, and $1,000.
+
+Aim at a wheelbarrow, or keep pushing it, and hold R for two seconds to return it to its initial position and rotation. The interaction prompt fills while R is held; releasing R cancels progress. Resetting a pushed barrow releases it and keeps its loaded bags attached. After a wheelbarrow upgrade replaces the previous tier, the replacement location becomes its reset position.

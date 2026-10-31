@@ -49,6 +49,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         Vector3 position = previous.transform.position; Quaternion rotation = previous.transform.rotation;
         transform.SetParent(null,true);
         transform.SetPositionAndRotation(position,rotation);
+        GetComponent<VehicleReset>()?.SetHomePose();
         foreach (var bag in previous.bags.ToArray())
         {
             if (bag == null) continue;
@@ -74,7 +75,12 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         if (Tier == tier && tier > 0)
         {
             var starter = System.Array.Find(FindObjectsByType<WheelbarrowCargo>(FindObjectsInactive.Include,FindObjectsSortMode.None), x => x.Tier == 0);
-            if (starter != null) { transform.SetParent(null,true); transform.SetPositionAndRotation(starter.transform.position,starter.transform.rotation); }
+            if (starter != null)
+            {
+                transform.SetParent(null,true);
+                transform.SetPositionAndRotation(starter.transform.position,starter.transform.rotation);
+                GetComponent<VehicleReset>()?.SetHomePose();
+            }
         }
         if (Tier < tier) gameObject.SetActive(false);
     }
@@ -86,6 +92,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
 
     private void Awake()
     {
+        if (GetComponent<VehicleReset>() == null) gameObject.AddComponent<VehicleReset>();
         RebuildCargo();
         var found = new List<Transform>(2);
         foreach (Transform child in GetComponentsInChildren<Transform>(true))
@@ -329,6 +336,13 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         hiddenTools.Clear();
         pushingPlayer = null;
         pusher = null;
+    }
+
+    public void ResetToPose(Vector3 position, Quaternion rotation)
+    {
+        StopPushing();
+        transform.SetPositionAndRotation(position, rotation);
+        Physics.SyncTransforms();
     }
 
     private void OnDisable() => StopPushing();

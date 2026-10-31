@@ -88,6 +88,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     void Awake()
     {
         Initialize(); LoadRidingCamera();
+        if (GetComponent<VehicleReset>() == null) gameObject.AddComponent<VehicleReset>();
         if (GetComponent<VehicleUpgrade>() == null) gameObject.AddComponent<VehicleUpgrade>();
     }
     Collider[] cargoColliders;
@@ -119,6 +120,21 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         cargoColliderStates = null;
     }
     void StopCoasting() { coasting = false; Speed = 0; RestoreCargoColliders(); }
+    public void ResetToPose(Vector3 position, Quaternion rotation)
+    {
+        Initialize();
+        if (coasting) StopCoasting();
+        Speed = fallSpeed = currentSteering = steeringVelocity = 0f;
+        PedalingCameraPitch = 0f;
+        if (steering != null) steering.localRotation = steerRest;
+        bool motorEnabled = motor != null && motor.enabled;
+        if (motorEnabled) motor.enabled = false;
+        transform.SetPositionAndRotation(position, rotation);
+        Physics.SyncTransforms();
+        if (motorEnabled) motor.enabled = true;
+        groundAlignment?.Align(1f);
+        GameplayAudio.Instance?.VehicleMoving(this, false);
+    }
     void OnDisable() { if (coasting) StopCoasting(); GameplayAudio.Instance?.VehicleMoving(this, false); }
     public void SetRidden(bool value)
     {

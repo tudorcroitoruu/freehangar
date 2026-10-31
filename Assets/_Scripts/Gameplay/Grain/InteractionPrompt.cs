@@ -22,6 +22,8 @@ public sealed class InteractionPrompt : MonoBehaviour
         public RectTransform panel;
         public TMP_Text description, key;
         public GameObject mouse, progress;
+        public Image progressFill;
+        public Text progressText;
     }
     private readonly List<ActionRow> actionRows = new List<ActionRow>();
     public string CurrentText { get; private set; } = "";
@@ -73,7 +75,10 @@ public sealed class InteractionPrompt : MonoBehaviour
             if (row.description != null) row.description.text = action.Action;
             if (row.key != null) { row.key.text = KeyLabel(action.Key); row.key.gameObject.SetActive(true); }
             if (row.mouse != null) row.mouse.SetActive(false);
-            if (row.progress != null) row.progress.SetActive(false);
+            if (row.progress != null) row.progress.SetActive(action.ShowProgress);
+            if (row.progressFill != null) row.progressFill.fillAmount = Mathf.Clamp01(action.Progress);
+            if (row.progressText != null && row.progressText.text != action.ProgressText)
+                row.progressText.text = action.ProgressText ?? "";
             CurrentText += "\n[" + KeyLabel(action.Key) + "] " + action.Action;
         }
         RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screen, null, out Vector2 position);
@@ -107,6 +112,10 @@ public sealed class InteractionPrompt : MonoBehaviour
             row.key = key != null ? key.GetComponent<TMP_Text>() : null;
             row.mouse = mouse != null ? mouse.gameObject : null;
             row.progress = progress != null ? progress.gameObject : null;
+            var fill = CopyOf(bagFill != null ? bagFill.transform : null, panel, clone);
+            var status = CopyOf(bagFillStatus != null ? bagFillStatus.transform : null, panel, clone);
+            row.progressFill = fill != null ? fill.GetComponent<Image>() : null;
+            row.progressText = status != null ? status.GetComponent<Text>() : null;
             actionRows.Add(row);
         }
     }

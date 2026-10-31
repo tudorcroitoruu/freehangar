@@ -16,6 +16,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     bool boostExhausted;
     MotorollerController motoroller;
     PickupController pickup;
+    VehicleReset vehicleReset;
     public bool IsRiding => riding;
     bool riding, instrumentActive;
     Camera view;
@@ -40,11 +41,16 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if (riding)
         {
             if (input && Input.GetKeyDown(KeyCode.E)) { TryDismount(); return true; }
-            DriveRiding(input ? Input.GetAxisRaw("Vertical") : 0, input ? Input.GetAxisRaw("Horizontal") : 0,
-                !input || Input.GetKey(KeyCode.Space), input && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)), Time.deltaTime);
+            bool resetting = input && Input.GetKey(KeyCode.R);
+            if (vehicleReset != null) vehicleReset.TickHold(resetting, Time.deltaTime);
+            DriveRiding(input && !resetting ? Input.GetAxisRaw("Vertical") : 0,
+                input && !resetting ? Input.GetAxisRaw("Horizontal") : 0,
+                !input || resetting || Input.GetKey(KeyCode.Space),
+                input && !resetting && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)), Time.deltaTime);
             if(input) UpdateRidingLook(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"), Time.deltaTime);
             ApplyRidingView();
-            hint=motoroller != null ? "W/S Drive / Reverse   A/D Steer   Space Brake   E Get off" : "W/S Pedal   A/D Steer   Shift Faster   Space Brake   E Get off";
+            hint=(motoroller != null ? "W/S Drive / Reverse   A/D Steer   Space Brake   E Get off" :
+                "W/S Pedal   A/D Steer   Shift Faster   Space Brake   E Get off") + "   Hold R Reset";
             return true;
         }
         hint="";
@@ -164,6 +170,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             GetComponent<PlayerInteractor>()?.PushedWheelbarrow != null || Vector3.Distance(transform.position,bicycle.transform.position)>interactionDistance) return false;
         motoroller = bicycle.GetComponent<MotorollerController>();
         pickup = bicycle.GetComponent<PickupController>();
+        vehicleReset = bicycle.GetComponent<VehicleReset>();
         if (pickup != null) pickup.ResetRoadCamera();
         player.ClearSprintCameraMotion();
         cameraParent=view.transform.parent;cameraPosition=view.transform.localPosition;cameraRotation=view.transform.localRotation;
@@ -194,6 +201,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     }
     void Restore(Vector3 exit)
     {
+        if (vehicleReset != null) vehicleReset.CancelHold();
         riding=false;IsBoosting=false;boostExhausted=false;bicycle.SetRidden(false);
         if (pickup != null) pickup.ResetRoadCamera();
         view.transform.SetParent(cameraParent,false);view.transform.localPosition=cameraPosition;view.transform.localRotation=cameraRotation;
@@ -212,5 +220,15 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if (!riding && hint.StartsWith("E ") && GameplayCanvas.Instance != null &&
             GameplayCanvas.Instance.interactionPrompt != null && GameplayCanvas.Instance.interactionPrompt.IsVisible) return;
         GUI.Box(new Rect(Mathf.Max(8, Screen.width/2-340),Screen.height-85,Mathf.Min(680, Screen.width-16),36),hint);
+        if (!riding || vehicleReset == null || vehicleReset.Progress <= 0f) return;
+        Rect bar = new Rect(Mathf.Max(8, Screen.width / 2 - 170), Screen.height - 44, Mathf.Min(340, Screen.width - 16), 24);
+        GUI.Box(bar, GUIContent.none);
+        Rect fill = new Rect(bar.x + 3, bar.y + 3, (bar.width - 6) * vehicleReset.Progress, bar.height - 6);
+        Color previousColor = GUI.color;
+        GUI.color = new Color(.95f, .72f, .26f);
+        GUI.DrawTexture(fill, Texture2D.whiteTexture);
+        GUI.color = previousColor;
+        GUI.Label(bar, $"Resetting  {vehicleReset.HeldSeconds:0.0} / {vehicleReset.HoldSeconds:0.0} s",
+            new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
     }
 }

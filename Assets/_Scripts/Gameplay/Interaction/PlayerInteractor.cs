@@ -18,6 +18,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     public WheelbarrowCargo PushedWheelbarrow { get; set; }
     public IInteractable Target { get; private set; }
     private Object discoveryOwner;
+    private VehicleReset resetTarget;
     public bool DiscoveryBusy => discoveryOwner != null;
     public bool BeginDiscovery(Object owner)
     {
@@ -51,11 +52,16 @@ public sealed class PlayerInteractor : MonoBehaviour
     {
         var prompt = Prompt;
         Target = null;
-        if (!CanInteract) { SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
+        if (!CanInteract) { SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
         var aimedTarget = FindTarget();
+        UpdateResetTarget(aimedTarget);
         InteractionPromptData aimedPrompt = default;
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
-        if (hasAimedPrompt) AddActions(aimedTarget, ref aimedPrompt);
+        if (hasAimedPrompt)
+        {
+            AddActions(aimedTarget, ref aimedPrompt);
+            if (PushedWheelbarrow == null) AddResetAction(ref aimedPrompt);
+        }
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
         if (hasAimedPrompt && aimedPrompt.RequiresFreeHands)
         {
@@ -76,6 +82,7 @@ public sealed class PlayerInteractor : MonoBehaviour
             SetHighlightedTarget(null);
             if (PushedWheelbarrow.TryGetPrompt(this, out var pushPrompt) && prompt != null)
             {
+                AddResetAction(ref pushPrompt);
                 prompt.Show(viewCamera, pushPrompt);
             }
             else HidePrompt();
@@ -166,6 +173,39 @@ public sealed class PlayerInteractor : MonoBehaviour
         data.AdditionalActions = actions.Count > 0 ? actions.ToArray() : null;
     }
 
+    private void SetResetTarget(VehicleReset next)
+    {
+        if (resetTarget == next) return;
+        if (resetTarget != null) resetTarget.CancelHold();
+        resetTarget = next;
+    }
+
+    private void UpdateResetTarget(IInteractable aimedTarget)
+    {
+        VehicleReset next = null;
+        if (PushedWheelbarrow != null) next = PushedWheelbarrow.GetComponent<VehicleReset>();
+        else if ((Items == null || !Items.IsCarrying) && (Bags == null || !Bags.IsCarrying) && aimedTarget is Component component)
+            next = component.GetComponent<VehicleReset>();
+        SetResetTarget(next);
+        if (resetTarget != null) resetTarget.TickHold(Input.GetKey(KeyCode.R), Time.deltaTime);
+    }
+
+    private void AddResetAction(ref InteractionPromptData data)
+    {
+        if (resetTarget == null) return;
+        var existing = data.AdditionalActions;
+        int count = existing != null ? existing.Length : 0;
+        var actions = new InteractionPromptAction[count + 1];
+        if (count > 0) System.Array.Copy(existing, actions, count);
+        actions[count] = new InteractionPromptAction("Hold to reset position", KeyCode.R)
+        {
+            ShowProgress = true,
+            Progress = resetTarget.Progress,
+            ProgressText = $"{resetTarget.HeldSeconds:0.0} / {resetTarget.HoldSeconds:0.0} s"
+        };
+        data.AdditionalActions = actions;
+    }
+
     private IEnumerable<MonoBehaviour> ActionBehaviours(Component primary)
     {
         var origin = actionOrigin != null && actionOrigin.IsChildOf(primary.transform) ? actionOrigin : primary.transform;
@@ -234,5 +274,5 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (GameplayCanvas.Instance != null) GameplayCanvas.Instance.SetFreeHandsWarning(visible);
     }
 
-    private void OnDisable() { Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
+    private void OnDisable() { SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
 }
