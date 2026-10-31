@@ -22,35 +22,30 @@ public class GameSettingsManager : MonoBehaviour
     [Header("VIDEO - Resolution")]
     [SerializeField] private Button previousResolutionButton;
     [SerializeField] private Button nextResolutionButton;
-    [SerializeField] private TMP_Text resolutionValueText;
+    [SerializeField] private Text resolutionValueText;
 
     [Header("VIDEO - Window Mode")]
     [SerializeField] private Button previousWindowModeButton;
     [SerializeField] private Button nextWindowModeButton;
-    [SerializeField] private TMP_Text windowModeValueText;
+    [SerializeField] private Text windowModeValueText;
 
     [Header("VIDEO - Display")]
     [SerializeField] private Button previousDisplayButton;
     [SerializeField] private Button nextDisplayButton;
-    [SerializeField] private TMP_Text displayValueText;
+    [SerializeField] private Text displayValueText;
 
     [Header("VIDEO - VSync")]
-    [SerializeField] private Button vSyncOffButton;
-    [SerializeField] private Button vSyncOnButton;
-    [SerializeField] private Color vSyncSelectedBackground = Color.white;
-    [SerializeField] private Color vSyncUnselectedBackground = new(0.12f, 0.12f, 0.12f, 1f);
-    [SerializeField] private Color vSyncSelectedText = Color.black;
-    [SerializeField] private Color vSyncUnselectedText = Color.gray;
+    [SerializeField] private Toggle vSyncToggle;
 
     [Header("VIDEO - Frame Rate")]
     [SerializeField] private Button previousFrameRateButton;
     [SerializeField] private Button nextFrameRateButton;
-    [SerializeField] private TMP_Text frameRateValueText;
+    [SerializeField] private Text frameRateValueText;
 
     [Header("VIDEO - Quality")]
     [SerializeField] private Button previousQualityButton;
     [SerializeField] private Button nextQualityButton;
-    [SerializeField] private TMP_Text qualityValueText;
+    [SerializeField] private Text qualityValueText;
 
     [SerializeField] private QualityPreset[] qualityPresets =
     {
@@ -109,13 +104,13 @@ public class GameSettingsManager : MonoBehaviour
     [Header("AUDIO")]
     [SerializeField] private Button decreaseMasterVolumeButton;
     [SerializeField] private Button increaseMasterVolumeButton;
-    [SerializeField] private TMP_Text masterVolumeValueText;
+    [SerializeField] private Text masterVolumeValueText;
     [SerializeField] private Button decreaseMusicVolumeButton;
     [SerializeField] private Button increaseMusicVolumeButton;
-    [SerializeField] private TMP_Text musicVolumeValueText;
+    [SerializeField] private Text musicVolumeValueText;
     [SerializeField] private Button decreaseSFXVolumeButton;
     [SerializeField] private Button increaseSFXVolumeButton;
-    [SerializeField] private TMP_Text sfxVolumeValueText;
+    [SerializeField] private Text sfxVolumeValueText;
 
     [Header("Optional Audio Sliders")]
     [SerializeField] private Slider masterSlider;
@@ -123,10 +118,6 @@ public class GameSettingsManager : MonoBehaviour
     [SerializeField] private Slider sfxSlider;
 
     [Header("CONTROLS")]
-    [SerializeField] private Slider aimSensitivitySlider;
-    [SerializeField] private TMP_Text aimSensitivityValueText;
-    [SerializeField] private Button decreaseSensitivityButton;
-    [SerializeField] private Button increaseSensitivityButton;
     [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private ActionBindingButton[] actionsButtons;
     private InputActionRebindingExtensions.RebindingOperation rebindOperation;
@@ -246,7 +237,6 @@ public class GameSettingsManager : MonoBehaviour
         initialized = true;
         UpdateVideoValues();
         UpdateAudioValues();
-        UpdateSensitivityValues();
     }
 
     private void OnDestroy()
@@ -466,7 +456,6 @@ public class GameSettingsManager : MonoBehaviour
 //         SetupDLSSQualityDropdown();
 
         SetupAudioSliders();
-        SetupSensitivitySlider();
     }
 
     private void SetupDisplays()
@@ -613,17 +602,6 @@ public class GameSettingsManager : MonoBehaviour
         }
     }
 
-    private void SetupSensitivitySlider()
-    {
-        if (aimSensitivitySlider == null)
-            return;
-
-        aimSensitivitySlider.minValue = MinSensitivity;
-        aimSensitivitySlider.maxValue = MaxSensitivity;
-        aimSensitivitySlider.wholeNumbers = false;
-        ConfigureButtonControlledSlider(aimSensitivitySlider, decreaseSensitivityButton, increaseSensitivityButton);
-    }
-
     private static void ConfigureButtonControlledSlider(Slider slider, Button decrease, Button increase)
     {
         // The bar remains directly draggable when arrow buttons are also present.
@@ -657,8 +635,6 @@ public class GameSettingsManager : MonoBehaviour
 
     private void RegisterListeners()
     {
-        if (decreaseSensitivityButton) decreaseSensitivityButton.onClick.AddListener(DecreaseSensitivity);
-        if (increaseSensitivityButton) increaseSensitivityButton.onClick.AddListener(IncreaseSensitivity);
         if (decreaseMasterVolumeButton) decreaseMasterVolumeButton.onClick.AddListener(DecreaseMasterVolume);
         if (increaseMasterVolumeButton) increaseMasterVolumeButton.onClick.AddListener(IncreaseMasterVolume);
         if (decreaseMusicVolumeButton) decreaseMusicVolumeButton.onClick.AddListener(DecreaseMusicVolume);
@@ -676,8 +652,7 @@ public class GameSettingsManager : MonoBehaviour
         if (previousQualityButton) previousQualityButton.onClick.AddListener(PreviousQuality);
         if (nextQualityButton) nextQualityButton.onClick.AddListener(NextQuality);
 
-        if (vSyncOffButton) vSyncOffButton.onClick.AddListener(DisableVSync);
-        if (vSyncOnButton) vSyncOnButton.onClick.AddListener(EnableVSync);
+        if (vSyncToggle) vSyncToggle.onValueChanged.AddListener(OnVSyncChanged);
 
 //         if (upscalingDropdown != null)
 //             upscalingDropdown.onValueChanged.AddListener(
@@ -704,17 +679,10 @@ public class GameSettingsManager : MonoBehaviour
                 OnSFXVolumeChanged
             );
 
-        if (aimSensitivitySlider != null)
-            aimSensitivitySlider.onValueChanged.AddListener(
-                OnAimSensitivityChangedInternal
-            );
-
     }
 
     private void UnregisterListeners()
     {
-        if (decreaseSensitivityButton) decreaseSensitivityButton.onClick.RemoveListener(DecreaseSensitivity);
-        if (increaseSensitivityButton) increaseSensitivityButton.onClick.RemoveListener(IncreaseSensitivity);
         if (decreaseMasterVolumeButton) decreaseMasterVolumeButton.onClick.RemoveListener(DecreaseMasterVolume);
         if (increaseMasterVolumeButton) increaseMasterVolumeButton.onClick.RemoveListener(IncreaseMasterVolume);
         if (decreaseMusicVolumeButton) decreaseMusicVolumeButton.onClick.RemoveListener(DecreaseMusicVolume);
@@ -735,8 +703,7 @@ public class GameSettingsManager : MonoBehaviour
         if (previousQualityButton) previousQualityButton.onClick.RemoveListener(PreviousQuality);
         if (nextQualityButton) nextQualityButton.onClick.RemoveListener(NextQuality);
 
-        if (vSyncOffButton) vSyncOffButton.onClick.RemoveListener(DisableVSync);
-        if (vSyncOnButton) vSyncOnButton.onClick.RemoveListener(EnableVSync);
+        if (vSyncToggle) vSyncToggle.onValueChanged.RemoveListener(OnVSyncChanged);
 
 //         if (upscalingDropdown != null)
 //             upscalingDropdown.onValueChanged.RemoveListener(
@@ -756,11 +723,6 @@ public class GameSettingsManager : MonoBehaviour
         if (sfxSlider != null)
             sfxSlider.onValueChanged.RemoveListener(
                 OnSFXVolumeChanged
-            );
-
-        if (aimSensitivitySlider != null)
-            aimSensitivitySlider.onValueChanged.RemoveListener(
-                OnAimSensitivityChangedInternal
             );
 
     }
@@ -916,20 +878,6 @@ public class GameSettingsManager : MonoBehaviour
             settings.vSync ? 1 : 0;
 
         ApplyFrameRate();
-    }
-
-    private void UpdateVSyncButton(Button button, bool selected)
-    {
-        if (!button)
-            return;
-
-        button.interactable = initialized;
-        if (button.targetGraphic)
-            button.targetGraphic.color = selected ? vSyncSelectedBackground : vSyncUnselectedBackground;
-
-        TMP_Text label = button.GetComponentInChildren<TMP_Text>(true);
-        if (label)
-            label.color = selected ? vSyncSelectedText : vSyncUnselectedText;
     }
 
     #endregion
@@ -1284,7 +1232,7 @@ public class GameSettingsManager : MonoBehaviour
             sfxVolumeValueText, sfxSlider);
     }
 
-    private void UpdateVolumeUI(float volume, Button decrease, Button increase, TMP_Text valueText, Slider slider)
+    private void UpdateVolumeUI(float volume, Button decrease, Button increase, Text valueText, Slider slider)
     {
         if (decrease) decrease.interactable = initialized && volume > 0f;
         if (increase) increase.interactable = initialized && volume < 1f;
@@ -1358,21 +1306,6 @@ public class GameSettingsManager : MonoBehaviour
         OnAimSensitivityChangedInternal(value);
     }
 
-    private void UpdateSensitivityValues()
-    {
-        if (settings == null)
-            return;
-
-        if (decreaseSensitivityButton)
-            decreaseSensitivityButton.interactable = initialized && settings.aimSensitivity > MinSensitivity;
-        if (increaseSensitivityButton)
-            increaseSensitivityButton.interactable = initialized && settings.aimSensitivity < MaxSensitivity;
-        if (aimSensitivitySlider)
-            aimSensitivitySlider.SetValueWithoutNotify(settings.aimSensitivity);
-        if (aimSensitivityValueText)
-            aimSensitivityValueText.text = settings.aimSensitivity.ToString("0.00");
-    }
-
     private void OnAimSensitivityChangedInternal(
         float value)
     {
@@ -1394,7 +1327,6 @@ public class GameSettingsManager : MonoBehaviour
     {
         AimSensitivity =
             settings.aimSensitivity;
-        UpdateSensitivityValues();
 
         OnAimSensitivityChanged?.Invoke(
             AimSensitivity
@@ -1590,19 +1522,6 @@ public class GameSettingsManager : MonoBehaviour
             );
         }
 
-        if (aimSensitivitySlider != null)
-        {
-            aimSensitivitySlider.SetValueWithoutNotify(
-                settings.aimSensitivity
-            );
-        }
-
-        if (aimSensitivityValueText != null)
-        {
-            aimSensitivityValueText.text =
-                settings.aimSensitivity.ToString("0.00");
-        }
-
 //         UpdateDLSSUIState(
 //             settings.upscalingMode ==
 //             UpscalingMode.DLSS
@@ -1616,8 +1535,11 @@ public class GameSettingsManager : MonoBehaviour
         if (settings == null)
             return;
 
-        UpdateVSyncButton(vSyncOffButton, !settings.vSync);
-        UpdateVSyncButton(vSyncOnButton, settings.vSync);
+        if (vSyncToggle)
+        {
+            vSyncToggle.SetIsOnWithoutNotify(settings.vSync);
+            vSyncToggle.interactable = initialized;
+        }
 
         int resolutionCount = availableResolutions?.Length ?? 0;
         if (resolutionValueText && settings.resolutionIndex >= 0 && settings.resolutionIndex < resolutionCount)

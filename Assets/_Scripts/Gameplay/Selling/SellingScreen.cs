@@ -22,6 +22,7 @@ public class SellingScreen : MonoBehaviour
     private PlayerInteractor player;
     private CursorLockMode previousCursorLock;
     private bool previousCursorVisible;
+    private bool cursorCaptured;
     private int quotedCash;
     private static SellingScreen current;
     private static int closedFrame = -1;
@@ -37,17 +38,18 @@ public class SellingScreen : MonoBehaviour
         Zone = zone;
         player = interactor;
         current = this;
-        previousCursorLock = Cursor.lockState;
-        previousCursorVisible = Cursor.visible;
         gameObject.SetActive(true);
         Refresh();
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
         return true;
     }
 
     private void OnEnable()
     {
+        previousCursorLock = Cursor.lockState;
+        previousCursorVisible = Cursor.visible;
+        cursorCaptured = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         if (cancelButton != null) cancelButton.onClick.AddListener(Close);
         if (buyButton != null) buyButton.onClick.AddListener(Sell);
     }
@@ -145,6 +147,13 @@ public class SellingScreen : MonoBehaviour
 
     private void OnDisable()
     {
+        if (cursorCaptured)
+        {
+            cursorCaptured = false;
+            bool restore = Application.isFocused && !UIPopups.BasePopupUI.HasActivePopup;
+            Cursor.lockState = restore ? previousCursorLock : CursorLockMode.None;
+            Cursor.visible = restore ? previousCursorVisible : true;
+        }
         if (cancelButton != null) cancelButton.onClick.RemoveListener(Close);
         if (buyButton != null) buyButton.onClick.RemoveListener(Sell);
         ClearElements();
@@ -158,9 +167,6 @@ public class SellingScreen : MonoBehaviour
         Zone = null;
         player = null;
         closedFrame = Time.frameCount;
-        bool restore = Application.isFocused && !UIPopups.BasePopupUI.HasActivePopup;
-        Cursor.lockState = restore ? previousCursorLock : CursorLockMode.None;
-        Cursor.visible = restore ? previousCursorVisible : true;
     }
 }
 

@@ -154,7 +154,8 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (UpgradeManager.BlocksGameplayInput)
+        if (Time.timeScale <= 0f || (Pause.Instance != null && Pause.Instance.paused) ||
+            UpgradeManager.BlocksGameplayInput)
         {
             if (shovelTool != null) shovelTool.CancelAction();
             if (characterController.enabled && Time.deltaTime > 0) HandleMovement(false);

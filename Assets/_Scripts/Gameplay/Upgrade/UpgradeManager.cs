@@ -15,6 +15,7 @@ public class UpgradeManager : MonoBehaviour
     private int openedFrame;
     private CursorLockMode previousCursorLock;
     private bool previousCursorVisible;
+    private bool cursorCaptured;
 
     public bool IsOpen { get; private set; }
     public static bool BlocksGameplayInput => (current != null && current.IsOpen) || closedFrame == Time.frameCount || SellingScreen.BlocksGameplayInput;
@@ -37,8 +38,6 @@ public class UpgradeManager : MonoBehaviour
             UIPopups.BasePopupUI.HasActivePopup ||
             (transform.parent != null && !transform.parent.gameObject.activeInHierarchy)) return false;
         Initialize();
-        previousCursorLock = Cursor.lockState;
-        previousCursorVisible = Cursor.visible;
         openedFrame = Time.frameCount;
         IsOpen = true;
         current = this;
@@ -47,8 +46,6 @@ public class UpgradeManager : MonoBehaviour
         gameObject.SetActive(true);
         upgradeShovelScreen.gameObject.SetActive(true);
         upgradeShovelScreen.Refresh();
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
         return true;
     }
 
@@ -58,8 +55,6 @@ public class UpgradeManager : MonoBehaviour
             UIPopups.BasePopupUI.HasActivePopup ||
             (transform.parent != null && !transform.parent.gameObject.activeInHierarchy)) return false;
         Initialize();
-        previousCursorLock = Cursor.lockState;
-        previousCursorVisible = Cursor.visible;
         openedFrame = Time.frameCount;
         IsOpen = true;
         current = this;
@@ -68,8 +63,6 @@ public class UpgradeManager : MonoBehaviour
         gameObject.SetActive(true);
         upgradeStaminaScreen.gameObject.SetActive(true);
         upgradeStaminaScreen.Refresh();
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
         return true;
     }
 
@@ -79,8 +72,6 @@ public class UpgradeManager : MonoBehaviour
             (current != null && current.IsOpen) || UIPopups.BasePopupUI.HasActivePopup ||
             (transform.parent != null && !transform.parent.gameObject.activeInHierarchy)) return false;
         Initialize();
-        previousCursorLock = Cursor.lockState;
-        previousCursorVisible = Cursor.visible;
         openedFrame = Time.frameCount;
         IsOpen = true;
         current = this;
@@ -89,13 +80,16 @@ public class UpgradeManager : MonoBehaviour
         upgradeVehicleScreen.SetTarget(vehicle);
         gameObject.SetActive(true);
         upgradeVehicleScreen.gameObject.SetActive(true);
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
         return true;
     }
 
     private void OnEnable()
     {
+        previousCursorLock = Cursor.lockState;
+        previousCursorVisible = Cursor.visible;
+        cursorCaptured = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         if (closeButton != null) closeButton.onClick.AddListener(Close);
     }
 
@@ -127,6 +121,13 @@ public class UpgradeManager : MonoBehaviour
 
     private void OnDisable()
     {
+        if (cursorCaptured)
+        {
+            cursorCaptured = false;
+            bool restore = Application.isFocused && !UIPopups.BasePopupUI.HasActivePopup;
+            Cursor.lockState = restore ? previousCursorLock : CursorLockMode.None;
+            Cursor.visible = restore ? previousCursorVisible : true;
+        }
         if (closeButton != null) closeButton.onClick.RemoveListener(Close);
         ReleaseInput();
     }
@@ -138,8 +139,5 @@ public class UpgradeManager : MonoBehaviour
         if (current == this) current = null;
         // Also consume Escape for controllers that update later in this frame.
         closedFrame = Time.frameCount;
-        bool canRestore = Application.isFocused && !UIPopups.BasePopupUI.HasActivePopup;
-        Cursor.lockState = canRestore ? previousCursorLock : CursorLockMode.None;
-        Cursor.visible = canRestore ? previousCursorVisible : true;
     }
 }

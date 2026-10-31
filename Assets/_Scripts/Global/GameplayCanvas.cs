@@ -4,7 +4,10 @@ using UnityEngine.UI;
 public class GameplayCanvas : MonoBehaviour
 {
     public static GameplayCanvas Instance;
-    
+
+    [SerializeField] private GameObject hudObject;
+    private bool hudHiddenByPause;
+    private bool hudActiveBeforePause;
     [Header("Money")]
     [SerializeField] private Text moneyText;
     
@@ -29,6 +32,9 @@ public class GameplayCanvas : MonoBehaviour
 
     private void OnEnable()
     {
+        Pause.PauseOnAction += HideHudForPause;
+        Pause.PauseOffAction += RestoreHudAfterPause;
+        if (Pause.Instance != null && Pause.Instance.paused) HideHudForPause();
         ResetFreeHandsWarning();
         SaveSystem.MoneyChanged += RefreshMoney;
         RefreshMoney(SaveSystem.Money);
@@ -36,8 +42,26 @@ public class GameplayCanvas : MonoBehaviour
 
     private void OnDisable()
     {
+        Pause.PauseOnAction -= HideHudForPause;
+        Pause.PauseOffAction -= RestoreHudAfterPause;
+        RestoreHudAfterPause();
         SaveSystem.MoneyChanged -= RefreshMoney;
         ResetFreeHandsWarning();
+    }
+
+    private void HideHudForPause()
+    {
+        if (hudObject == null || hudHiddenByPause) return;
+        hudActiveBeforePause = hudObject.activeSelf;
+        hudHiddenByPause = true;
+        hudObject.SetActive(false);
+    }
+
+    private void RestoreHudAfterPause()
+    {
+        if (!hudHiddenByPause) return;
+        hudHiddenByPause = false;
+        if (hudObject != null) hudObject.SetActive(hudActiveBeforePause);
     }
 
     public void SetFreeHandsWarning(bool visible)

@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: TableHeader
+  m_Name: SliderBg
   m_Shader: {fileID: 4800000, guid: f879b9597cf7bbb4e814bf1f7fec633b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -18,7 +18,6 @@ Material:
   - _DISABLE_SSR_TRANSPARENT
   - _INDEPENDENTEDGEANIMATION_ON
   - _NORMALMAP_TANGENT_SPACE
-  - _OUTLINE_ON
   - _TORNPAPER_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -31,7 +30,7 @@ Material:
   - TransparentBackface
   - RayTracingPrepass
   - MOTIONVECTORS
-  m_LockedProperties: _UseFill
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -140,7 +139,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TransparencyMaskTex:
-        m_Texture: {fileID: 2800000, guid: af402b689ee24ffaa03b8c1e6b096d88, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -202,13 +201,13 @@ Material:
     - _EnableFogOnTransparent: 1
     - _EnableGeometricSpecularAA: 0
     - _EnergyConservingSpecularColor: 1
-    - _FadeBottomSize: 0.025
+    - _FadeBottomSize: 0.5
     - _FadeBottomSoftness: 1
-    - _FadeLeftSize: 0.003
+    - _FadeLeftSize: 0.05
     - _FadeLeftSoftness: 1
-    - _FadeRightSize: 0.003
+    - _FadeRightSize: 0.05
     - _FadeRightSoftness: 1
-    - _FadeTopSize: 0.1
+    - _FadeTopSize: 0.5
     - _FadeTopSoftness: 1
     - _FadeWaveAmount: 0.004
     - _FadeWaveSpeed: 0.3
@@ -222,7 +221,7 @@ Material:
     - _GradientDirection: 0
     - _HasMainOverlayTex: 0
     - _HasOutlineOverlayTex: 0
-    - _HasTransparencyMaskTex: 1
+    - _HasTransparencyMaskTex: 0
     - _HeightAmplitude: 0.02
     - _HeightCenter: 0.5
     - _HeightMapParametrization: 0
@@ -243,7 +242,7 @@ Material:
     - _MainOverlayBlend: 0
     - _MainOverlayOpacity: 0.833
     - _MainOverlayScale: 1
-    - _MainOverlayUseMaskScale: 1
+    - _MainOverlayUseMaskScale: 0
     - _MaterialID: 1
     - _Metallic: 0
     - _MetallicRemapMax: 1
@@ -251,21 +250,21 @@ Material:
     - _NoiseAnimationSpeed: 0.012
     - _NoisePulseAmount: 0.08
     - _NoisePulseSpeed: 0.45
-    - _NoiseScale: 3.13
+    - _NoiseScale: 0
     - _NoiseStrength: 1
     - _NormalMapSpace: 0
     - _NormalScale: 1
     - _ObjectSpaceUVMapping: 0
     - _ObjectSpaceUVMappingEmissive: 0
     - _OpaqueCullMode: 2
-    - _Outline: 1
+    - _Outline: 0
     - _OutlineMaskChannel: 0
     - _OutlineOverlayBlackTransparent: 0
     - _OutlineOverlayBlend: 0
     - _OutlineOverlayOpacity: 1
     - _OutlineOverlayScale: 1
     - _OutlineOverlayUseMaskScale: 1
-    - _OutlineThickness: 3
+    - _OutlineThickness: 10.7
     - _PPDLodThreshold: 5
     - _PPDMaxSamples: 15
     - _PPDMinSamples: 5
@@ -276,7 +275,7 @@ Material:
     - _ReceivesSSR: 1
     - _ReceivesSSRTransparent: 0
     - _RefractionModel: 0
-    - _RoundCorners: 0
+    - _RoundCorners: 0.909
     - _Saturation: 1
     - _SecondaryNoiseBlend: 0.25
     - _SecondaryNoiseScale: 7
@@ -314,8 +313,8 @@ Material:
     - _TransmissionEnable: 1
     - _TransmissionMask: 1
     - _TransparencyMaskBlackTransparent: 0
-    - _TransparencyMaskIntensity: 0.172
-    - _TransparencyMaskScale: 10
+    - _TransparencyMaskIntensity: 0
+    - _TransparencyMaskScale: 0.1
     - _TransparentBackfaceEnable: 0
     - _TransparentCullMode: 2
     - _TransparentDepthPostpassEnable: 0
@@ -341,7 +340,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.3803922, g: 0.38431376, b: 0.27450982, a: 1}
+    - _Color: {r: 0.39607838, g: 0.29019603, b: 0.10980386, a: 1}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
@@ -356,7 +355,7 @@ Material:
     - _MainOverlayColor: {r: 0.674, g: 0.5289621, b: 0.3327342, a: 1}
     - _NoiseAnimationDirection: {r: 1, g: 0.35, b: 0, a: 0}
     - _NoiseOffset: {r: 0, g: 0, b: 0, a: 0}
-    - _OutlineColor: {r: 0.0046581593, g: 0.3773585, b: 0, a: 1}
+    - _OutlineColor: {r: 0.3962264, g: 0.289145, b: 0.11027056, a: 1}
     - _OutlineOverlayColor: {r: 1, g: 1, b: 1, a: 1}
     - _SecondaryNoiseSpeed: {r: -0.005, g: 0.009, b: 0, a: 0}
     - _ShineColor: {r: 1, g: 1, b: 1, a: 1}

@@ -22,6 +22,7 @@ public class Pause : MonoBehaviour
 
     private CursorLockMode previousCursorLock;
     private bool previousCursorVisible;
+    private float previousTimeScale = 1f;
 
     private void Awake()
     {
@@ -60,13 +61,6 @@ public class Pause : MonoBehaviour
         (settingsScreen && settingsScreen.activeSelf) ||
         (leaveGamePopup && leaveGamePopup.activeSelf);
 
-    private void LateUpdate()
-    {
-        if (!paused) return;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-    }
-
     private void SetActiveScreen(GameObject screen)
     {
         if (mainScreen) mainScreen.SetActive(mainScreen == screen);
@@ -95,6 +89,8 @@ public class Pause : MonoBehaviour
         if (paused || !pauseScreen || !mainScreen || exitToMenu || restarting) return;
         previousCursorLock = Cursor.lockState;
         previousCursorVisible = Cursor.visible;
+        previousTimeScale = Time.timeScale;
+        Time.timeScale = 0f;
         paused = true;
         // Select before enabling the root so stale subpanels do not reopen.
         SetActiveScreen(mainScreen);
@@ -112,6 +108,7 @@ public class Pause : MonoBehaviour
         SetActiveScreen(null);
         if (pauseScreen) pauseScreen.SetActive(false);
         if (!wasPaused) return;
+        Time.timeScale = previousTimeScale;
         Cursor.lockState = previousCursorLock;
         Cursor.visible = previousCursorVisible;
         // A live player's ResumeInput can now restore its normal locked gameplay cursor.
