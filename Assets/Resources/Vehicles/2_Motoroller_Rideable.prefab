@@ -1803,7 +1803,7 @@ MonoBehaviour:
   cargoLocationName: rear rack
   dismountSideDistance: 1.1
   dismountLongitudinalDistance: 1.5
-  maximumSpeed: 12
+  maximumSpeed: 9
   acceleration: 4
   wheelRadius: 0.2471
   wheelbase: 1.29826
@@ -1830,7 +1830,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8e06c634423c841a36065f6808df8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorollerController
-  maximumSpeed: 12
+  maximumSpeed: 9
   acceleration: 4
   brakingDeceleration: 10
   wheelRadius: 0.2471
@@ -1873,6 +1873,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleCargoRack
   surface: {fileID: 8536322281977802862}
   baySpacing: 0.6
+  slotCount: 2
 --- !u!114 &8021453211909120231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1903,7 +1904,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgrade
   settings: {fileID: 11400000, guid: 0b15f2691eb74da684784edf778d5a6b, type: 2}
   vehicleId: motoroller
-  additionalCargoSlots: []
 --- !u!114 &5170628464747333238
 MonoBehaviour:
   m_ObjectHideFlags: 0
