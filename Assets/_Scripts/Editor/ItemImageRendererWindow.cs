@@ -238,10 +238,7 @@ public sealed class ItemImageRendererWindow : EditorWindow
             var visual = new GameObject("Item rendering copy") { hideFlags = HideFlags.HideAndDontSave };
             preview.AddSingleGO(visual);
             visual.transform.rotation = Quaternion.Euler(ItemRotation(entry));
-            CopyMeshes(entry.source, visual.transform, temporaryMeshes,
-                entry.category == "Containers" && entry.source != null &&
-                (entry.source.name.IndexOf("barrel", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                 entry.source.name.IndexOf("crate", StringComparison.OrdinalIgnoreCase) >= 0));
+            CopyMeshes(entry.source, visual.transform, temporaryMeshes, entry.category == "Containers");
             var renderers = visual.GetComponentsInChildren<MeshRenderer>();
             if (renderers.Length == 0) throw new InvalidOperationException("No enabled visual meshes found.");
             var bounds = renderers[0].bounds;
@@ -359,8 +356,11 @@ public sealed class ItemImageRendererWindow : EditorWindow
         finally { if (begun) preview.EndPreview(); RenderTexture.active = previous; }
     }
 
-    private static void CopyMeshes(GameObject source, Transform parent, List<Mesh> temporary, bool hideContents)
+    private static void CopyMeshes(GameObject source, Transform parent, List<Mesh> temporary, bool isContainer)
     {
+        bool hideContents = isContainer &&
+            (source.name.IndexOf("barrel", StringComparison.OrdinalIgnoreCase) >= 0 ||
+             source.name.IndexOf("crate", StringComparison.OrdinalIgnoreCase) >= 0);
         var lowerLods = new HashSet<Renderer>();
         var sourceMeshRenderers = source.GetComponentsInChildren<MeshRenderer>(true)
             .Where(r => r.enabled && r.gameObject.activeInHierarchy).ToArray();
@@ -407,7 +407,14 @@ public sealed class ItemImageRendererWindow : EditorWindow
                 continue;
             }
             copy.shadowCastingMode = ShadowCastingMode.Off;
-            var block = new MaterialPropertyBlock(); renderer.GetPropertyBlock(block); copy.SetPropertyBlock(block);
+            var block = new MaterialPropertyBlock(); renderer.GetPropertyBlock(block);
+            if (isContainer && renderer.sharedMaterials.Length == 1 && renderer.sharedMaterial != null)
+            {
+                string materialName = renderer.sharedMaterial.name;
+                if (materialName == "Sack_Atlas") block.SetColor("_BaseColor", new Color(.42f,.40f,.36f,1f));
+                else if (materialName == "LargeBag") block.SetColor("_BaseColor", new Color(.05f,.05f,.05f,1f));
+            }
+            copy.SetPropertyBlock(block);
         }
     }
 }
