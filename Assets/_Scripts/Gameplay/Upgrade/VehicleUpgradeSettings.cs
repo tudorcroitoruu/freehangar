@@ -5,84 +5,71 @@ using UnityEngine;
 public sealed class VehicleUpgradeSettings : ScriptableObject
 {
     public const string ResourcePath = "Upgrades/VehicleUpgradeSettings";
-    [Serializable]
-    public sealed class Level
-    {
-        public Sprite image;
-        [Min(0f)] public float capacityCubicMeters = .4f;
-        [Min(1)] public int slots = 6;
-        [Min(0), Tooltip("Cost to advance from this level. Zero means Free; ignored at maximum level.")]
-        public int price = 250;
-    }
+
     [Serializable]
     public sealed class VehicleType
     {
         public string id;
         public string displayName;
-        [Tooltip("Prefab path relative to a Resources folder, without extension. Empty uses Vehicles/<id>. The prefab root must have BicycleController.")]
+        public Sprite image;
+        [Tooltip("Presentation only. Actual cargo slots come from the vehicle prefab.")]
+        [Min(0)] public int slots = 2;
+        [Tooltip("Presentation only, in m/s. Actual movement speed comes from the vehicle prefab.")]
+        [Min(0f)] public float movementSpeed = 7f;
+        [Tooltip("Price to unlock this vehicle from the preceding vehicle.")]
+        [Min(0)] public int price = 250;
+        public bool requiresKey;
+        [Tooltip("Collected key ID. Empty uses vehicle.key.<id>. Keys are not consumed.")]
+        public string keyId;
+        public string RequiredKeyId => string.IsNullOrWhiteSpace(keyId) ? "vehicle.key." + id : keyId;
+        [Tooltip("Prefab path relative to Resources, without extension. Empty uses Vehicles/<id>.")]
         public string prefabResourcePath;
         public string PrefabResourcePath => string.IsNullOrWhiteSpace(prefabResourcePath) ? "Vehicles/" + id : prefabResourcePath;
-        [Tooltip("Enable capacity limits and capacity values in the upgrade screen. Disable for upgrades based only on cargo slots.")]
-        public bool upgradeCapacity = true;
-        [Tooltip("Starting stats followed by each miniupgrade. Buying the last miniupgrade unlocks the next vehicle in the vehicles list.")]
-        public Level[] levels = Array.Empty<Level>();
-        public int MaxLevel => Mathf.Max(0, (levels?.Length ?? 0) - 1);
-        public bool IsConfigured
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(id) || levels == null || levels.Length == 0) return false;
-                for (int i = 0; i < levels.Length; i++)
-                {
-                    var level = levels[i];
-                    if (level == null || (upgradeCapacity && (!float.IsFinite(level.capacityCubicMeters) || level.capacityCubicMeters <= 0)) ||
-                        level.slots <= 0 || level.price < 0) return false;
-                    if (i > 0 && ((upgradeCapacity && level.capacityCubicMeters < levels[i - 1].capacityCubicMeters) || level.slots < levels[i - 1].slots)) return false;
-                }
-                return true;
-            }
-        }
-        public Level At(int level) => levels[Mathf.Clamp(level, 0, MaxLevel)];
+        // Only used to recognize completed miniupgrades in saves from the previous progression.
+        [HideInInspector] public int legacyUpgradeCount = 2;
+        public bool IsConfigured => !string.IsNullOrWhiteSpace(id) && slots >= 0 &&
+            float.IsFinite(movementSpeed) && movementSpeed >= 0f && price >= 0;
+        public bool HasRequiredKey(PlayerData data) => !requiresKey ||
+            (data?.foundSecrets != null && Array.IndexOf(data.foundSecrets, RequiredKeyId) >= 0);
     }
-    [Tooltip("Progression order. The first vehicle starts unlocked; completing its miniupgrades unlocks the next vehicle.")]
+
+    [Tooltip("Direct upgrade order. Each purchase unlocks and spawns the next vehicle.")]
     public VehicleType[] vehicles = Array.Empty<VehicleType>();
     public VehicleType Find(string id) => Array.Find(vehicles ?? Array.Empty<VehicleType>(), vehicle => vehicle != null && vehicle.id == id);
-
     public VehicleType Next(string id)
     {
         int index = Array.FindIndex(vehicles ?? Array.Empty<VehicleType>(), vehicle => vehicle != null && vehicle.id == id);
         return index >= 0 && index + 1 < vehicles.Length ? vehicles[index + 1] : null;
     }
-
+    public bool IsUnlocked(string id, PlayerData data)
+    {
+        int index = Array.FindIndex(vehicles ?? Array.Empty<VehicleType>(), vehicle => vehicle != null && vehicle.id == id);
+        if (index < 0 || data == null || !vehicles[index].IsConfigured) return false;
+        if (index == 0 || (data.unlockedVehicles?.Contains(id) ?? false) || data.GetVehicleUpgradeLevel(id) > 0) return true;
+        var previous = vehicles[index - 1];
+        return previous != null && previous.IsConfigured && previous.legacyUpgradeCount > 0 &&
+            data.GetVehicleUpgradeLevel(previous.id) >= previous.legacyUpgradeCount;
+    }
     public VehicleType ResolveSavedVehicle(string id, PlayerData data)
     {
         int index = Array.FindIndex(vehicles ?? Array.Empty<VehicleType>(), vehicle => vehicle != null && vehicle.id == id);
         if (index < 0) return null;
-        while (data != null && index + 1 < vehicles.Length)
-        {
-            var current = vehicles[index];
-            var next = vehicles[index + 1];
-            if (!current.IsConfigured || current.MaxLevel == 0 || next == null || !next.IsConfigured ||
-                data.GetVehicleUpgradeLevel(current.id) < current.MaxLevel) break;
-            index++;
-        }
-        return vehicles[index];
+        var result = vehicles[index];
+        for (int i = index + 1; data != null && i < vehicles.Length; i++)
+            if (vehicles[i] != null && IsUnlocked(vehicles[i].id, data)) result = vehicles[i];
+        return result;
     }
-
-    public bool IsUnlocked(string id, PlayerData data)
+    public bool TryPurchase(PlayerData data, string currentId)
     {
-        int index = Array.FindIndex(vehicles ?? Array.Empty<VehicleType>(), vehicle => vehicle != null && vehicle.id == id);
-        if (index < 0 || data == null) return false;
-        for (int i = index; i >= 0; i--)
-        {
-            var vehicle = vehicles[i];
-            if (vehicle == null || !vehicle.IsConfigured) return false;
-            // Keep vehicles with upgrades from older saves available.
-            if (data.GetVehicleUpgradeLevel(vehicle.id) > 0 || i == 0) return true;
-            var previous = vehicles[i - 1];
-            if (previous == null || !previous.IsConfigured || previous.MaxLevel == 0 ||
-                data.GetVehicleUpgradeLevel(previous.id) < previous.MaxLevel) return false;
-        }
-        return false;
+        var next = Next(currentId);
+        if (data == null || !IsUnlocked(currentId, data) || next == null || !next.IsConfigured ||
+            IsUnlocked(next.id, data) || !next.HasRequiredKey(data)) return false;
+        bool voucher = next.price > 0 && data.freeUpgradeVouchers > 0;
+        if (!voucher && data.cash < next.price) return false;
+        data.unlockedVehicles ??= new System.Collections.Generic.List<string>();
+        data.unlockedVehicles.Add(next.id);
+        if (voucher) data.freeUpgradeVouchers--;
+        else data.cash -= next.price;
+        return true;
     }
 }

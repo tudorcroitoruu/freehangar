@@ -246,12 +246,9 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     {
         if (TryGetComponent<VehicleUpgrade>(out var progression) && progression.IsConfigured && !progression.IsUnlocked) return null;
         if (TryGetComponent<VehicleCargoRack>(out var rack)) return rack.FreeSlot(false);
-        var upgrades = GetComponent<VehicleUpgrade>();
-        bool configured = upgrades != null && upgrades.IsConfigured;
-        if (configured && upgrades.CargoCount >= upgrades.SlotCount) return null;
-        if (!configured && exclusiveBagSlot != null && exclusiveBagSlot.childCount > 0) return null;
+        if (exclusiveBagSlot != null && exclusiveBagSlot.childCount > 0) return null;
         if (cargoSlots == null) return null;
-        int limit = configured ? Mathf.Min(cargoSlots.Length, upgrades.SlotCount) : cargoSlots.Length;
+        int limit = cargoSlots.Length;
         for (int i = 0; i < limit; i++)
             if (cargoSlots[i] != null && cargoSlots[i].childCount == 0) return cargoSlots[i];
         return null;
@@ -260,13 +257,6 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     {
         if (TryGetComponent<VehicleUpgrade>(out var progression) && progression.IsConfigured && !progression.IsUnlocked) return null;
         if (TryGetComponent<VehicleCargoRack>(out var rack)) return rack.FreeSlot(true);
-        var upgrades = GetComponent<VehicleUpgrade>();
-        if (upgrades != null && upgrades.IsConfigured)
-        {
-            if (upgrades.CargoCount >= upgrades.SlotCount) return null;
-            if (upgrades.CargoCount == 0 && exclusiveBagSlot != null && exclusiveBagSlot.childCount == 0) return exclusiveBagSlot;
-            return FreeCargoSlot();
-        }
         if (exclusiveBagSlot == null) return FreeCargoSlot();
         if (exclusiveBagSlot.childCount > 0) return null;
         foreach (var slot in cargoSlots) if (slot != null && slot.childCount > 0) return null;
@@ -295,7 +285,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         if (interactor.Bags != null && interactor.Bags.IsCarrying)
         {
             var upgrades = GetComponent<VehicleUpgrade>();
-            bool available = FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadVolume(interactor.Bags.CarriedVolume, GetComponent<VehicleCargoRack>() != null ? 2 : 1));
+            bool available = FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadCargo(GetComponent<VehicleCargoRack>() != null ? 2 : 1));
             prompt = new InteractionPromptData(transform.position + Vector3.up, available ? "Load bag" : "Vehicle full", available);
             return true;
         }

@@ -15,120 +15,71 @@ MonoBehaviour:
   vehicles:
   - id: bicycle
     displayName: Bicycle
+    image: {fileID: 0}
+    slots: 2
+    movementSpeed: 7
+    price: 300
+    requiresKey: 0
+    keyId: 
     prefabResourcePath: Vehicles/1_Bicycle_Rideable
-    upgradeCapacity: 1
-    levels:
-    - image: {fileID: 0}
-      capacityCubicMeters: 0.4
-      slots: 2
-      price: 300
-    - image: {fileID: 0}
-      capacityCubicMeters: 0.8
-      slots: 2
-      price: 600
-    - image: {fileID: 0}
-      capacityCubicMeters: 1.2
-      slots: 2
-      price: 1000
+    legacyUpgradeCount: 2
   - id: motoroller
     displayName: Motoroller
+    image: {fileID: 0}
+    slots: 2
+    movementSpeed: 12
+    price: 500
+    requiresKey: 0
+    keyId: 
     prefabResourcePath: Vehicles/2_Motoroller_Rideable
-    upgradeCapacity: 1
-    levels:
-    - image: {fileID: 0}
-      capacityCubicMeters: 0.8
-      slots: 4
-      price: 500
-    - image: {fileID: 0}
-      capacityCubicMeters: 1.2
-      slots: 6
-      price: 1000
-    - image: {fileID: 0}
-      capacityCubicMeters: 1.6
-      slots: 8
-      price: 0
+    legacyUpgradeCount: 2
   - id: trike
     displayName: Trike
+    image: {fileID: 0}
+    slots: 4
+    movementSpeed: 10
+    price: 750
+    requiresKey: 0
+    keyId: 
     prefabResourcePath: Vehicles/3_Trike_Driveable
-    upgradeCapacity: 1
-    levels:
-    - image: {fileID: 0}
-      capacityCubicMeters: 1
-      slots: 4
-      price: 750
-    - image: {fileID: 0}
-      capacityCubicMeters: 2
-      slots: 6
-      price: 1500
-    - image: {fileID: 0}
-      capacityCubicMeters: 3
-      slots: 8
-      price: 0
+    legacyUpgradeCount: 2
   - id: lawnmower
     displayName: Lawnmower
+    image: {fileID: 0}
+    slots: 0
+    movementSpeed: 10
+    price: 300
+    requiresKey: 0
+    keyId: 
     prefabResourcePath: Vehicles/4_Lawnmower_With_Trailer
-    upgradeCapacity: 1
-    levels:
-    - image: {fileID: 0}
-      capacityCubicMeters: 0.4
-      slots: 2
-      price: 300
-    - image: {fileID: 0}
-      capacityCubicMeters: 0.8
-      slots: 3
-      price: 600
-    - image: {fileID: 0}
-      capacityCubicMeters: 1.2
-      slots: 4
-      price: 0
+    legacyUpgradeCount: 2
   - id: pickup
     displayName: Pickup
+    image: {fileID: 0}
+    slots: 4
+    movementSpeed: 13
+    price: 1000
+    requiresKey: 0
+    keyId: 
     prefabResourcePath: Vehicles/5_Pick_up_Driveable
-    upgradeCapacity: 1
-    levels:
-    - image: {fileID: 0}
-      capacityCubicMeters: 2
-      slots: 6
-      price: 1000
-    - image: {fileID: 0}
-      capacityCubicMeters: 4
-      slots: 8
-      price: 2000
-    - image: {fileID: 0}
-      capacityCubicMeters: 6
-      slots: 12
-      price: 0
+    legacyUpgradeCount: 2
   - id: pickupBig
     displayName: Pickup Bigger
+    image: {fileID: 0}
+    slots: 4
+    movementSpeed: 15
+    price: 1000
+    requiresKey: 0
+    keyId: 
     prefabResourcePath: Vehicles/6_Pick_Up_Bigger_Driveable
-    upgradeCapacity: 1
-    levels:
-    - image: {fileID: 0}
-      capacityCubicMeters: 2
-      slots: 6
-      price: 1000
-    - image: {fileID: 0}
-      capacityCubicMeters: 4
-      slots: 8
-      price: 2000
-    - image: {fileID: 0}
-      capacityCubicMeters: 6
-      slots: 12
-      price: 0
+    legacyUpgradeCount: 2
   - id: pickupLast
     displayName: Pickup Cargo
+    image: {fileID: 0}
+    slots: 4
+    movementSpeed: 20
+    price: 1000
+    requiresKey: 0
+    keyId: 
     prefabResourcePath: Vehicles/7_Pick_Up_Last_Driveable
-    upgradeCapacity: 1
-    levels:
-    - image: {fileID: 0}
-      capacityCubicMeters: 2
-      slots: 6
-      price: 1000
-    - image: {fileID: 0}
-      capacityCubicMeters: 4
-      slots: 8
-      price: 2000
-    - image: {fileID: 0}
-      capacityCubicMeters: 6
-      slots: 12
-      price: 0
+    legacyUpgradeCount: 2

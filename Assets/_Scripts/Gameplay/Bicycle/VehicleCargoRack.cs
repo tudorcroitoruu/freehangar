@@ -7,10 +7,13 @@ public sealed class VehicleCargoRack : MonoBehaviour
 {
     public Transform surface;
     public float baySpacing = .6f;
+    [Tooltip("Actual cargo slot limit for this prefab. Independent of upgrade presentation values.")]
+    [Min(1)] public int slotCount = 2;
     private BicycleController rig;
     private readonly List<Transform> slots = new List<Transform>();
     private void Awake() => EnsureSlots();
-    private int Limit => GetComponent<VehicleUpgrade>() is VehicleUpgrade upgrade && upgrade.IsConfigured ? upgrade.SlotCount : 2;
+    private int Limit => Mathf.Max(1, slotCount);
+    public int SlotLimit => Limit;
     private void EnsureSlots()
     {
         if (surface == null) return;

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Globalization;
+using UnityEngine.Serialization;
 
 public class UpgradeVehicle : MonoBehaviour
 {
@@ -10,15 +11,18 @@ public class UpgradeVehicle : MonoBehaviour
     
     [Space, Header("Upgrade Data")]
     [SerializeField] private Image[] vehicleImages;
-    [SerializeField] private Text currentLevelCapacity;
-    [SerializeField] private Text nextLevelCapacity;
-    [SerializeField] private Text maxLevelCapacity;
+    [FormerlySerializedAs("currentLevelCapacity")]
+    [SerializeField] private Text currentLevelMovementSpeed;
+    [FormerlySerializedAs("nextLevelCapacity")]
+    [SerializeField] private Text nextLevelMovementSpeed;
+    [FormerlySerializedAs("maxLevelCapacity")]
+    [SerializeField] private Text maxLevelMovementSpeed;
     [SerializeField] private Text currentLevelSlots;
     [SerializeField] private Text nextLevelSlots;
     [SerializeField] private Text maxLevelSlots;
     [SerializeField] private Color nextLevelColor = Color.forestGreen;
-    [Header("Miniupgrades")]
-    [SerializeField] private GameObject[] upgradeDots;
+    [Header("Vehicle presentation")]
+
     [SerializeField] private Text currentLevelText;
     [SerializeField] private Text nextVehicleText;
     
@@ -65,36 +69,28 @@ public class UpgradeVehicle : MonoBehaviour
     public void Refresh()
     {
         bool configured = target != null && target.IsConfigured;
-        bool showCapacity = configured && target.Profile.upgradeCapacity;
-        if (currentLevelCapacity != null) currentLevelCapacity.gameObject.SetActive(showCapacity);
-        if (nextLevelCapacity != null) nextLevelCapacity.gameObject.SetActive(showCapacity);
-        if (maxLevelCapacity != null) maxLevelCapacity.gameObject.SetActive(showCapacity);
         bool maxed = configured && target.IsMaxed;
         bool available = configured && target.IsUnlocked && target.isActiveAndEnabled && !target.HasCargo && SaveSystem.Data != null && !maxed;
         int cost = configured && !target.UsesVoucher ? target.Price : 0;
         int missing = available ? Mathf.Max(0, cost - SaveSystem.Money) : 0;
-        bool affordable = available && missing == 0;
+        bool missingKey = configured && !target.HasRequiredKey;
+        bool affordable = available && missing == 0 && !missingKey;
         if (currentLevelHolder != null) currentLevelHolder.SetActive(configured && !maxed);
         if (nextLevelHolder != null) nextLevelHolder.SetActive(configured && !maxed);
         if (maxLevelHolder != null) maxLevelHolder.SetActive(maxed);
-        if (upgradeDots != null)
-            for (int i = 0; i < upgradeDots.Length; i++)
-                if (upgradeDots[i] != null) upgradeDots[i].SetActive(configured && i < target.Level);
         SetText(currentLevelText, configured ? target.Profile.displayName : "");
         var nextVehicle = configured ? target.NextVehicle : null;
-        SetText(nextVehicleText, nextVehicle == null ? "" : maxed
-            ? $"Unlocked: {nextVehicle.displayName}"
-            : $"Complete all upgrades to unlock {nextVehicle.displayName}");
+        SetText(nextVehicleText, nextVehicle != null ? nextVehicle.displayName : configured ? "MAX" : "");
         if (configured)
         {
-            var current = target.Profile.At(target.Level);
-            var next = target.Profile.At(target.Level + 1);
-            var maximum = target.Profile.At(target.Profile.MaxLevel);
-            SetText(currentLevelCapacity, $"Capacity: <b>{Volume(current.capacityCubicMeters)}</b>");
-            string nextCapacity = Volume(next.capacityCubicMeters);
-            if (next.capacityCubicMeters != current.capacityCubicMeters) nextCapacity = Colored(nextCapacity);
-            SetText(nextLevelCapacity, $"Capacity: <b>{nextCapacity}</b>");
-            SetText(maxLevelCapacity, $"Capacity: <b>{Volume(maximum.capacityCubicMeters)}</b>");
+            var current = target.Profile;
+            var next = nextVehicle ?? current;
+            var maximum = current;
+            SetText(currentLevelMovementSpeed, $"Movement speed: <b>{Speed(current.movementSpeed)}</b>");
+            string nextSpeed = Speed(next.movementSpeed);
+            if (next.movementSpeed != current.movementSpeed) nextSpeed = Colored(nextSpeed);
+            SetText(nextLevelMovementSpeed, $"Movement speed: <b>{nextSpeed}</b>");
+            SetText(maxLevelMovementSpeed, $"Movement speed: <b>{Speed(maximum.movementSpeed)}</b>");
             SetText(currentLevelSlots, $"Slots: <b>{current.slots}</b>");
             string nextSlots = next.slots.ToString();
             if (next.slots != current.slots) nextSlots = Colored(nextSlots);
@@ -108,13 +104,16 @@ public class UpgradeVehicle : MonoBehaviour
                 }
         }
         SetText(price, configured && !target.IsUnlocked ? "Locked" : maxed ? "MAX" : configured ? cost == 0 ? "Free" : $"$ {cost:N0}" : "Unavailable");
-        SetText(notEnoughMoney, missing > 0 ? $"You need ${missing:N0} more." : "");
-        if (notEnoughMoneyPopup != null) notEnoughMoneyPopup.SetActive(missing > 0);
+        string requirements = missing > 0 ? $"You need ${missing:N0} more." : "";
+        if (nextVehicle != null && nextVehicle.requiresKey)
+            requirements += (requirements.Length > 0 ? "\n" : "") + (missingKey ? "Vehicle key required." : "Vehicle key collected.");
+        SetText(notEnoughMoney, requirements);
+        if (notEnoughMoneyPopup != null) notEnoughMoneyPopup.SetActive(missing > 0 || missingKey);
         if (upgradeButton != null) upgradeButton.interactable = affordable;
         if (upgradeButtonCanvas != null) upgradeButtonCanvas.alpha = affordable ? 1f : .5f;
         UpdateButtonMaterial(affordable ? 1f : .5f);
     }
-    private static string Volume(float value) => value.ToString("0.##", CultureInfo.InvariantCulture) + " kg";
+    private static string Speed(float value) => value.ToString("0.##", CultureInfo.InvariantCulture) + " m/s";
     private string Colored(string value) => $"<color=#{ColorUtility.ToHtmlStringRGBA(nextLevelColor)}>{value}</color>";
     private static void SetText(Text label, string value)
     {

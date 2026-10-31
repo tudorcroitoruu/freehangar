@@ -139,7 +139,7 @@ public sealed class BagInteraction : MonoBehaviour
         if (carried == null || slot == null) return false;
         var upgrades = slot.GetComponentInParent<VehicleUpgrade>();
         var rack = slot.GetComponentInParent<VehicleCargoRack>();
-        if (upgrades != null && !upgrades.CanLoadVolume(carriedVolume,rack != null ? 2 : 1)) return false;
+        if (upgrades != null && !upgrades.CanLoadCargo(rack != null ? 2 : 1)) return false;
         var bag = carried;
         bag.transform.SetParent(slot, true);
         bag.transform.localScale = new Vector3(originalWorldScale.x / slot.lossyScale.x, originalWorldScale.y / slot.lossyScale.y, originalWorldScale.z / slot.lossyScale.z);

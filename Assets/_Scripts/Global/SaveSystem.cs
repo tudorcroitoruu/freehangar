@@ -57,6 +57,13 @@ public static class SaveSystem
         return true;
     }
 
+    public static bool TryPurchaseVehicle(VehicleUpgradeSettings settings, string currentId)
+    {
+        if (settings == null || !settings.TryPurchase(Data, currentId)) return false;
+        SaveData();
+        return true;
+    }
+
     public static bool TryPurchaseUpgrade(int price, Func<PlayerData, bool> apply, out bool usedVoucher)
     {
         usedVoucher = false;
@@ -370,6 +377,7 @@ public class PlayerData
     public int shovelUpgradeLevel;
     public int staminaUpgradeLevel;
     public List<VehicleUpgradeSave> vehicleUpgrades = new List<VehicleUpgradeSave>();
+    public List<string> unlockedVehicles = new List<string>();
 
     public int GetVehicleUpgradeLevel(string id)
     {
