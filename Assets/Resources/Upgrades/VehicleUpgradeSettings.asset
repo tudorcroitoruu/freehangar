@@ -15,7 +15,7 @@ MonoBehaviour:
   vehicles:
   - id: bicycle
     displayName: Bicycle
-    image: {fileID: 0}
+    image: {fileID: 21300000, guid: 49c952336ce79ce42961b057e5d38de3, type: 3}
     slots: 2
     movementSpeed: 7
     price: 300
@@ -25,7 +25,7 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: motoroller
     displayName: Motoroller
-    image: {fileID: 0}
+    image: {fileID: 21300000, guid: 935b1c7d7c91fe24b8cf51fdea4f2bc5, type: 3}
     slots: 2
     movementSpeed: 12
     price: 500
@@ -35,7 +35,7 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: trike
     displayName: Trike
-    image: {fileID: 0}
+    image: {fileID: 21300000, guid: 2d41c4c19bd67244aa0d72acd78dbbb4, type: 3}
     slots: 4
     movementSpeed: 10
     price: 750
@@ -45,7 +45,7 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: lawnmower
     displayName: Lawnmower
-    image: {fileID: 0}
+    image: {fileID: 21300000, guid: 33bca422af3ec0440855d6b787c5540c, type: 3}
     slots: 0
     movementSpeed: 10
     price: 300
@@ -55,7 +55,7 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: pickup
     displayName: Pickup
-    image: {fileID: 0}
+    image: {fileID: 21300000, guid: e9a3b38b64eb6734ca26de980c11312e, type: 3}
     slots: 4
     movementSpeed: 13
     price: 1000
@@ -65,7 +65,7 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: pickupBig
     displayName: Pickup Bigger
-    image: {fileID: 0}
+    image: {fileID: 21300000, guid: eff0c89e54fb11b44b85a1498a55fcdc, type: 3}
     slots: 4
     movementSpeed: 15
     price: 1000
@@ -75,7 +75,7 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: pickupLast
     displayName: Pickup Cargo
-    image: {fileID: 0}
+    image: {fileID: 21300000, guid: 99519259f3e04c84e9557d9f98415c52, type: 3}
     slots: 4
     movementSpeed: 20
     price: 1000
