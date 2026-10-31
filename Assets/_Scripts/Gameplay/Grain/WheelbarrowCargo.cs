@@ -20,6 +20,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     private Transform[] wheels;
     private PlayerInteractor pusher;
     private float occupiedVolume;
+    private float nextImpactSound;
     private PlayerController pushingPlayer;
     private bool instrumentWasActive, shovelWasEnabled;
     private readonly List<GameObject> hiddenTools = new List<GameObject>();
@@ -248,6 +249,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         if (pusher == null || dt <= 0) return;
         var controller = pusher.GetComponent<CharacterController>();
         if (controller == null || !controller.enabled) return;
+        Vector3 movementStart = transform.position;
         int steps = Mathf.Max(1, Mathf.CeilToInt(Mathf.Max(Mathf.Abs(input.y * speed * dt) / .06f,
             Mathf.Abs(input.x * 80f * dt) / 3f)));
         float step = dt / steps;
@@ -274,6 +276,14 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
             float roll = Vector3.Dot(target - oldPosition, forward) / (.29f * Mathf.Abs(transform.lossyScale.y)) * Mathf.Rad2Deg;
             foreach (Transform wheel in wheels) if (wheel != null) wheel.Rotate(Vector3.right, roll, Space.Self);
             Physics.SyncTransforms();
+        }
+        float travelled = Vector3.ProjectOnPlane(transform.position - movementStart, Vector3.up).magnitude;
+        GameplayAudio.Instance?.WheelbarrowMoving(transform, travelled > .005f);
+        if (Mathf.Abs(input.y) > .25f && travelled < Mathf.Abs(input.y * speed * dt) * .3f &&
+            Time.time >= nextImpactSound)
+        {
+            GameplayAudio.Instance?.VehicleHit(transform.position);
+            nextImpactSound = Time.time + .8f;
         }
     }
 
@@ -304,6 +314,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
 
     private void StopPushing()
     {
+        GameplayAudio.Instance?.WheelbarrowMoving(transform, false);
         foreach (var pair in ignoredCollisions)
             if (pair.player != null && pair.barrow != null) Physics.IgnoreCollision(pair.player,pair.barrow,false);
         ignoredCollisions.Clear();

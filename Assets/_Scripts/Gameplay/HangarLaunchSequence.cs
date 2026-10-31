@@ -55,7 +55,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     public bool UseDoor()
     {
         if(Running||DoorOpen||!CanOpen||Time.timeScale<=0)return false;
-        DoorOpen=true;StartCoroutine(OpenRoom());return true;
+        DoorOpen=true;GameplayAudio.Instance?.OpenElectricalDoor();StartCoroutine(OpenRoom());return true;
     }
     private IEnumerator OpenRoom(){yield return Animate(.8f,t=>roomDoor.localRotation=doorClosed*Quaternion.Euler(0,-100*t,0));}
     public bool UseSwitch(PlayerInteractor interactor)
@@ -80,10 +80,12 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         Suspend(original);voice=cameraObject.AddComponent<AudioSource>();voice.spatialBlend=0;voice.playOnAwake=false;CreateOverlay();
         yield return MoveCamera(switchView,.75f);
         yield return Animate(.55f,t=>switchHandle.localRotation=leverOff*Quaternion.Euler(125*t,0,0));
+        GameplayAudio.Instance?.SwitchElectrical();
         roomLight.enabled=true;if(lampGlow!=null)lampGlow.enabled=true;
         yield return Animate(.7f,t=>roomLight.intensity=Mathf.Lerp(0,180,t));
         yield return TurnToward(revealView,.8f);
         yield return new WaitForSecondsRealtime(.15f);
+        GameplayAudio.Instance?.OpenRocketDoor();
         yield return Animate(1.4f,t=>revealDoor.localPosition=revealClosed+Vector3.up*revealLift*t);
         // Begin walking as the hatch opens, keeping the movement and door in sync.
         yield return WalkToOpening(revealView,2.1f);
@@ -92,6 +94,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         yield return EnterCabin(cabinView,2.5f);
         // Inspect the controls while the hatch closes behind the player.
         Quaternion cabinLook = cinematic.transform.rotation;
+        GameplayAudio.Instance?.CloseRocketDoor();
         yield return Animate(1.2f,t=>{
             rocketDoor.localRotation=hatchClosed*Quaternion.Euler(0,hatchOpenAngle*(1-t),0);
             cinematic.transform.rotation=cabinLook*Quaternion.Euler(-2f*Mathf.Sin(t*Mathf.PI), -8f*Mathf.Sin(t*Mathf.PI), 0);
@@ -109,6 +112,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
             cinematic.transform.rotation=windowRotation*Quaternion.Euler(-1.5f*t,2.5f*t,0);
         });
         subtitle.text="2...\n<size=25>— No, no, let me out!</size>";Play(twoVoice);if(protestVoice!=null)voice.PlayOneShot(protestVoice);
+        GameplayAudio.Instance?.StartRocket();
         Vector3 closePosition=cinematic.transform.position;
         Quaternion closeRotation=cinematic.transform.rotation;
         yield return Animate(2.2f,t=>{

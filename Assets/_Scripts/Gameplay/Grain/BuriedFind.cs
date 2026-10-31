@@ -161,6 +161,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
             return true;
         }
         if (!CommitReward()) return false;
+        GameplayAudio.Instance?.PerkFound();
         DiscoveryBurst.Play(pickupEffect, VisualBounds().center, Receipt(), interactor != null ? interactor.GetComponentInChildren<Camera>() : null);
         gameObject.SetActive(false);
         return true;
@@ -234,6 +235,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
             {
                 if (!CommitReward()) { CancelPresentation(); yield break; }
                 committed = true;
+                GameplayAudio.Instance?.PerkFound();
                 DiscoveryBurst.Play(pickupEffect, VisualBounds().center + Vector3.up * .4f, Receipt(), view);
             }
             yield return null;
@@ -261,6 +263,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
             {
                 if (!CommitReward()) { CancelPresentation(); yield break; }
                 committed = true;
+                GameplayAudio.Instance?.PerkFound();
                 DiscoveryBurst.Play(pickupEffect, view.transform.position + view.transform.forward * 1.1f, Receipt(), view);
             }
             yield return null;

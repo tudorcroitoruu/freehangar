@@ -123,6 +123,7 @@ public sealed class BagInteraction : MonoBehaviour
         bag.transform.localRotation = uprightRotation;
         bag.transform.localPosition = -(uprightRotation * Vector3.Scale(localCenter, bag.transform.localScale));
         target = null;
+        GameplayAudio.Instance?.PickUp();
         return true;
     }
 
@@ -151,6 +152,7 @@ public sealed class BagInteraction : MonoBehaviour
         carried = null; target = null;
         RestoreShovelIfNeeded();
         Physics.SyncTransforms();
+        GameplayAudio.Instance?.Drop();
         return true;
     }
 
@@ -158,6 +160,7 @@ public sealed class BagInteraction : MonoBehaviour
     {
         if (!FindDropPosition(out Vector3 center)) { blockedUntil = Time.time + 1f; return false; }
         Release(center);
+        GameplayAudio.Instance?.Drop();
         return true;
     }
 

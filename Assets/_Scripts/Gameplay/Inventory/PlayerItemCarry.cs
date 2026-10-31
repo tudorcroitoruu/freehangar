@@ -95,6 +95,7 @@ public sealed class PlayerItemCarry : MonoBehaviour
         item.transform.localScale = new Vector3(worldScale.x / anchorScale.x, worldScale.y / anchorScale.y, worldScale.z / anchorScale.z) * scale;
         item.transform.localRotation = originalRotation;
         item.transform.localPosition = -(item.transform.localRotation * Vector3.Scale(localCenter, item.transform.localScale));
+        GameplayAudio.Instance?.PickUp();
         return true;
     }
 
@@ -113,6 +114,7 @@ public sealed class PlayerItemCarry : MonoBehaviour
         if (!isActiveAndEnabled || !IsCarrying || Time.timeScale <= 0f || view == null) return false;
         if (!FindPosition(out var center)) { blockedUntil = Time.time + 1f; return false; }
         Release(center);
+        GameplayAudio.Instance?.Drop();
         return true;
     }
 

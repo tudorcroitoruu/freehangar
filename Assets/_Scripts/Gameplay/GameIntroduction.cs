@@ -154,6 +154,7 @@ public sealed class GameIntroduction : MonoBehaviour
         // Reposition only under full black; both shots keep moving during their fades.
         openingFadeImage.color = Color.black;
         CurrentShot = "Bicycle approach"; SetBicycleShot(.025f);
+        GameplayAudio.Instance?.VehicleMoving(bicycle, true);
         HDCamera.GetOrCreate(view).Reset();
         float rideDuration = Mathf.Max(.1f, bicycleSeconds - .8f);
         yield return Animate(rideDuration, t => {
@@ -162,6 +163,7 @@ public sealed class GameIntroduction : MonoBehaviour
             float fadeDuration = Mathf.Min(cameraTransitionFadeSeconds, rideDuration / Mathf.Max(.1f, playbackSpeed));
             openingFadeImage.color = new Color(0, 0, 0, 1 - Mathf.SmoothStep(0, 1, elapsed / fadeDuration));
         });
+        GameplayAudio.Instance?.VehicleMoving(bicycle, false);
         Destroy(openingFade.gameObject); openingFade = null; openingFadeImage = null;
         // Rise from the saddle, step sideways, then settle at standing eye height.
         Vector3 riderPosition = view.transform.position;
@@ -186,7 +188,9 @@ public sealed class GameIntroduction : MonoBehaviour
         yield return Animate(arrivalPauseSeconds, _ => { });
         CurrentShot = "Purchase paper";
         paper = Instantiate(purchasePaperPrefab, view.transform, false); paper.transform.localPosition = new Vector3(.02f, -.8f, .7f);
+        bool paperSoundPlayed = false;
         yield return Animate(paperSeconds, t => {
+            if (!paperSoundPlayed && t >= .17f) { paperSoundPlayed = true; GameplayAudio.Instance?.PaperGet(); }
             float lift = Mathf.SmoothStep(0, 1, t / .2f), lower = Mathf.SmoothStep(0, 1, (t - .72f) / .28f);
             paper.transform.localPosition = Vector3.Lerp(new Vector3(.02f, -.8f, .7f), new Vector3(.015f, -.025f, .65f), lift) - Vector3.up * (lower * .8f);
             paper.transform.localRotation = Quaternion.Euler(-8 + Mathf.Sin(t * Mathf.PI * 2) * 1.2f, -4, -3);
@@ -259,6 +263,7 @@ public sealed class GameIntroduction : MonoBehaviour
     private void Restore(bool finished)
     {
         if (!IsPlaying) return;
+        GameplayAudio.Instance?.VehicleMoving(bicycle, false);
         IsPlaying = false; CurrentShot = "Gameplay";
         if (paper != null) Destroy(paper);
         if (openingFade != null) Destroy(openingFade.gameObject);

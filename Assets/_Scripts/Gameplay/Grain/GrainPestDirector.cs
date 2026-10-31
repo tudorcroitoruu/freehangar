@@ -22,6 +22,7 @@ public sealed class GrainPest : MonoBehaviour
     private Vector3 crowWaypoint, crowLandingOffset, previousTargetPosition;
     private bool crowPerched;
     private float targetSpeed;
+    private float nextIdleSound;
     private Vector3 CrowPerchPoint()
     {
         Bounds bounds = Target.WorldBounds;
@@ -91,6 +92,7 @@ public sealed class GrainPest : MonoBehaviour
             if (flying != null) animator.runtimeAnimatorController = flying;
         }
         nextBite = Time.time + 3f;
+        nextIdleSound = Time.time + Random.Range(.5f, 2f);
         var collider = gameObject.AddComponent<SphereCollider>(); collider.radius = .55f;
     }
     private void Update()
@@ -107,6 +109,11 @@ public sealed class GrainPest : MonoBehaviour
             return;
         }
         if (Target == null || !Target.isActiveAndEnabled || Target.Kilograms <= .001f) { ScaredAway(); return; }
+        if (Time.time >= nextIdleSound)
+        {
+            GameplayAudio.Instance?.PestIdle(IsCrow, transform.position);
+            nextIdleSound = Time.time + Random.Range(IsCrow ? 5f : 6f, IsCrow ? 9f : 10f);
+        }
         float dt = Time.deltaTime;
         if (dt > .0001f)
             targetSpeed = Mathf.Min(100f, Vector3.Distance(Target.transform.position,previousTargetPosition) / dt);
@@ -191,9 +198,10 @@ public sealed class GrainPest : MonoBehaviour
             EatFromTarget();
         }
     }
-    public void ScaredAway(Vector3? threatPosition = null)
+    public bool ScaredAway(Vector3? threatPosition = null)
     {
-        if (fleeing) return;
+        if (fleeing) return false;
+        if (IsCrow) StartCoroutine(PlayFlyAwaySound());
         if (IsCrow && animator != null && flying != null) animator.runtimeAnimatorController = flying;
         if (!IsCrow && animator != null)
         {
@@ -209,6 +217,13 @@ public sealed class GrainPest : MonoBehaviour
         if (away.sqrMagnitude < .001f) away = -transform.forward;
         fleeDirection = (away.normalized + (IsCrow ? Vector3.up : Vector3.zero)).normalized;
         GetComponent<Collider>().enabled = false;
+        return true;
+    }
+
+    private IEnumerator PlayFlyAwaySound()
+    {
+        yield return new WaitForSeconds(.15f);
+        GameplayAudio.Instance?.CrowFlyAway(transform.position);
     }
 }
 

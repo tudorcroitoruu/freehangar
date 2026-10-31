@@ -64,6 +64,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     MotorollerController motoroller;
     VehicleGroundAlignment groundAlignment;
     float fallSpeed, wheelAngle, crankAngle;
+    float nextVehicleHitSound, nextScratchSound;
     Quaternion steerRest, frontRest, rearRest, crankRest;
     Vector3 leftOffset, rightOffset;
     Quaternion leftRest, rightRest;
@@ -99,6 +100,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     {
         TickUnoccupied(Time.deltaTime);
         if (!IsRidden && !coasting && groundAlignment != null) groundAlignment.Align(Time.deltaTime);
+        if (!IsRidden && !coasting) GameplayAudio.Instance?.VehicleMoving(this, false);
     }
     public void TickUnoccupied(float dt)
     {
@@ -117,7 +119,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         cargoColliderStates = null;
     }
     void StopCoasting() { coasting = false; Speed = 0; RestoreCargoColliders(); }
-    void OnDisable() { if (coasting) StopCoasting(); }
+    void OnDisable() { if (coasting) StopCoasting(); GameplayAudio.Instance?.VehicleMoving(this, false); }
     public void SetRidden(bool value)
     {
         Initialize(); if (IsRidden == value) return;
@@ -126,6 +128,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         if(value)
         {
             coasting = false;
+            nextScratchSound = Time.time + Random.Range(8f, 18f);
             // Re-entering a rolling vehicle keeps its momentum and original collider states.
             if (wasCoasting) return;
             Speed = 0; fallSpeed = 0;
@@ -137,7 +140,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
             coasting = true;
             coastDeceleration = Mathf.Max(brakingDeceleration, Mathf.Abs(Speed) / exitCoastDuration);
         }
-        else StopCoasting();
+        else { StopCoasting(); GameplayAudio.Instance?.VehicleMoving(this, false); }
     }
     public void Drive(float throttle, float turn, bool brake, float dt, bool boost = false)
     {
@@ -183,14 +186,31 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         Vector3 travelDirection = motor.isGrounded && groundAlignment.HasSupport
             ? Vector3.ProjectOnPlane(transform.forward, groundAlignment.GroundNormal).normalized : transform.forward;
         Vector3 motion = travelDirection * Speed * dt;
+        float impactSpeed = Mathf.Abs(Speed);
         float clearance = Mathf.Max(motor.bounds.extents.x, motor.bounds.extents.z);
         if (HangarVehicleAccess.Blocks(transform.position, transform.position + motion, clearance))
         {
+            PlayVehicleImpact(impactSpeed);
             motion = Vector3.zero;
             Speed = 0f;
         }
-        if (motoroller != null) motion = motoroller.ConstrainMotion(motion);
+        if (motoroller != null)
+        {
+            Vector3 desiredMotion = motion;
+            motion = motoroller.ConstrainMotion(motion);
+            if (motion.sqrMagnitude < desiredMotion.sqrMagnitude * .16f) PlayVehicleImpact(impactSpeed);
+        }
         CollisionFlags hit = motor.Move(motion + Vector3.up * fallSpeed * dt);
+        float actualTravel = Vector3.ProjectOnPlane(transform.position - before, Vector3.up).magnitude;
+        if ((hit & CollisionFlags.Sides) != 0 && actualTravel < impactSpeed * dt * .4f)
+            PlayVehicleImpact(impactSpeed);
+        bool moving = (IsRidden || coasting) && actualTravel > .005f && Mathf.Abs(Speed) > .15f;
+        GameplayAudio.Instance?.VehicleMoving(this, moving);
+        if (moving && !motorDriven && Time.time >= nextScratchSound)
+        {
+            GameplayAudio.Instance?.BicycleScratch(transform.position);
+            nextScratchSound = Time.time + Random.Range(13f, 26f);
+        }
         if (motoroller != null && motion.sqrMagnitude < .000001f && Mathf.Abs(Speed) > .1f) Speed = 0;
         if ((hit & CollisionFlags.Sides) != 0 && Vector3.ProjectOnPlane(transform.position-before,Vector3.up).magnitude < Mathf.Abs(Speed)*dt*.3f) Speed = 0;
         if ((hit & CollisionFlags.Above) != 0) fallSpeed = 0;
@@ -214,6 +234,13 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         leftPedal.position = crank.position + groundAlignment.Pose.TransformVector(rotation * leftOffset);
         rightPedal.position = crank.position + groundAlignment.Pose.TransformVector(rotation * rightOffset);
         leftPedal.localRotation = leftRest; rightPedal.localRotation = rightRest;
+    }
+
+    private void PlayVehicleImpact(float impactSpeed)
+    {
+        if (impactSpeed < 1.5f || Time.time < nextVehicleHitSound) return;
+        GameplayAudio.Instance?.VehicleHit(transform.position);
+        nextVehicleHitSound = Time.time + .8f;
     }
     public Transform FreeCargoSlot()
     {

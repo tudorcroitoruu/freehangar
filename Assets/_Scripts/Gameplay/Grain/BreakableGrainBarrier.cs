@@ -11,7 +11,6 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
     [SerializeField] private Material material;
     [SerializeField, Min(1)] private int hitsRequired = 3;
     [SerializeField] private GrainPile coveringPile;
-    [SerializeField] private AudioClip impactSound;
 
     private BoxCollider blockingCollider;
     private Renderer[] visuals;
@@ -91,7 +90,7 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
         if (!isActiveAndEnabled || !exposed || SaveSystem.Data == null || string.IsNullOrEmpty(barrierId)) return false;
         if (tool != PlayerCombatTools.Tool.Sledgehammer && !(material == Material.Wood && tool == PlayerCombatTools.Tool.Hammer))
             return false;
-        if (impactSound != null) AudioSource.PlayClipAtPoint(impactSound, transform.position, .65f);
+        GameplayAudio.Instance?.BarrierHit(material == Material.Metal);
         if (++hits < hitsRequired) return true;
 
         PlayerData data = SaveSystem.Data;

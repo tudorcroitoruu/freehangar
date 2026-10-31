@@ -41,7 +41,7 @@ AudioSource:
   m_GameObject: {fileID: 1678828730072224590}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 2468999463344295300, guid: e7e4f600f1819854fa9a6201878a493f, type: 2}
+  OutputAudioMixerGroup: {fileID: 3455396778696250076, guid: 2363768d8fc9b624a9219fcc1bf533a6, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -170,7 +170,7 @@ AudioSource:
   m_GameObject: {fileID: 5289554747201793695}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 1980613810587791336, guid: e7e4f600f1819854fa9a6201878a493f, type: 2}
+  OutputAudioMixerGroup: {fileID: -4483742787476771711, guid: 2363768d8fc9b624a9219fcc1bf533a6, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -268,6 +268,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3825506834413062009}
   - component: {fileID: 5678320368604763705}
+  - component: {fileID: 3151480335765265456}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -328,6 +329,59 @@ MonoBehaviour:
   interstellarMusic: {fileID: 8300000, guid: 4c0661ec21967f7479deb141b1d69e04, type: 3}
   pauseChance: 0.35
   pauseSeconds: 15
+--- !u!114 &3151480335765265456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7342166732402030786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fe9c55c0bd961d43944fc1c532b7df1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::GameplayAudio
+  effectsGroup: {fileID: 3455396778696250076, guid: 2363768d8fc9b624a9219fcc1bf533a6, type: 2}
+  crowHits:
+  - {fileID: 8300000, guid: e6cf8774697ada342954f0d946171312, type: 3}
+  - {fileID: 8300000, guid: 28bdf225c012b4b459784bb236e172df, type: 3}
+  crowFlyAway: {fileID: 8300000, guid: 7518811039ac72946a14919f093e91a0, type: 3}
+  crowsIdle: {fileID: 8300000, guid: d5ef29243b3c7c64ea3536e498c8f7ed, type: 3}
+  ratHit: {fileID: 8300000, guid: 4e0e20b5f29e2c8458c1d061d1e2f6e6, type: 3}
+  ratIdle: {fileID: 8300000, guid: 93e09f35498046f4a929c626b303bfdf, type: 3}
+  broomHits:
+  - {fileID: 8300000, guid: e082f30a51261ff48a3c6041752ee521, type: 3}
+  - {fileID: 8300000, guid: 9f371db07fa927f478d40a5568bc6555, type: 3}
+  hammerMetal: {fileID: 8300000, guid: ac7a1ea54f2617c4fbd3f7982b9e3397, type: 3}
+  hammerWood: {fileID: 8300000, guid: 35500a20ec9a8c5469b8289022a564cb, type: 3}
+  pickUp: {fileID: 8300000, guid: 54e22b2c48faaaa4c84b7cf19b03fff5, type: 3}
+  drop: {fileID: 8300000, guid: f0f5d4809cf176b49b807893c2e2e93a, type: 3}
+  openDoor: {fileID: 8300000, guid: 644b2a393168e1e46837c857c6839e68, type: 3}
+  openRocketDoor: {fileID: 8300000, guid: e563f19a4a340c84891acda09168f3a8, type: 3}
+  closeDoor: {fileID: 8300000, guid: badfe749266cf784d8caa63732798a9c, type: 3}
+  rocket: {fileID: 8300000, guid: 66e9e7aad0f70a44b8502ac99a21820f, type: 3}
+  switchElectrical: {fileID: 8300000, guid: 5226d1484aea2ae45907320b72545611, type: 3}
+  lightsOn: {fileID: 8300000, guid: 57f2c643150a23043b2a4b628904ea3d, type: 3}
+  paperGet: {fileID: 8300000, guid: cbc65faa6be27aa4a9e74a926830a27b, type: 3}
+  perkFound: {fileID: 8300000, guid: a5e7ae1d50383c9438d56875bff0ea15, type: 3}
+  shovelGets:
+  - {fileID: 8300000, guid: 8ea9e4bb86faf9d4dbe38f246a67b60e, type: 3}
+  - {fileID: 8300000, guid: 265e72ad8bbdf6348af74134854fa56d, type: 3}
+  - {fileID: 8300000, guid: 76ddf9e404e059a41adcd57f699c999b, type: 3}
+  fillGrain:
+  - {fileID: 8300000, guid: cb5126660611e4d48bac78a30548ab4c, type: 3}
+  - {fileID: 8300000, guid: b87bdcb29e132734592d487eabee2143, type: 3}
+  - {fileID: 8300000, guid: b0e3db8e8f6196a478f3df81c29febe7, type: 3}
+  vacuum: {fileID: 8300000, guid: 22d62c6b4244af94e8ed02060c747a58, type: 3}
+  bicycleMove: {fileID: 8300000, guid: 82cf4d9dce0d75b4f8d730605297fff0, type: 3}
+  bicycleScratch: {fileID: 8300000, guid: 26e039b91e196e24c93fd92db5eb3c19, type: 3}
+  motorollerAndTrike: {fileID: 8300000, guid: 021da535b25777142a3525dace8e34f2, type: 3}
+  pickupMotor: {fileID: 8300000, guid: 46e85c57aa0248d4e9c78116752e4aa2, type: 3}
+  wheelbarrow: {fileID: 8300000, guid: 6ed89dabca1f250478b14194e24cbdff, type: 3}
+  vehicleHits:
+  - {fileID: 8300000, guid: f971dda3bce24cf46b0cd5738183fbbf, type: 3}
+  - {fileID: 8300000, guid: a279dfdf43f631d499cea74afc9f2fd0, type: 3}
+  - {fileID: 8300000, guid: da9c0486e34757048b831b37e8a310ed, type: 3}
 --- !u!1 &7378796319633956887
 GameObject:
   m_ObjectHideFlags: 0
@@ -369,7 +423,7 @@ AudioSource:
   m_GameObject: {fileID: 7378796319633956887}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 2468999463344295300, guid: e7e4f600f1819854fa9a6201878a493f, type: 2}
+  OutputAudioMixerGroup: {fileID: 3455396778696250076, guid: 2363768d8fc9b624a9219fcc1bf533a6, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0

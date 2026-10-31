@@ -21,6 +21,7 @@ public sealed class VacuumTool : MonoBehaviour
     public Vector3 PositionOffset => new Vector3(-.08f * pourPose, .10f * pourPose - .015f * suctionBlend, .07f * suctionBlend);
     public Quaternion RotationOffset => Quaternion.Euler(-55f * pourPose - 3f * suctionBlend, -12f * pourPose, -35f * pourPose + Mathf.Sin(clock * 40) * .18f * suctionBlend);
     private bool requested, initialized, grainMoving;
+    private bool pourSoundPlayed;
     private Camera view;
     private Transform actor;
     private float pourPose;
@@ -88,7 +89,7 @@ public sealed class VacuumTool : MonoBehaviour
         stream.Play();
     }
     public void RequestSuction(Camera camera, Transform player) { view=camera;actor=player;requested=true; }
-    public void BeginEmpty() { Initialize(); Emptying=true;emptyTime=0;requested=false;Sucking=false; }
+    public void BeginEmpty() { Initialize(); Emptying=true;emptyTime=0;requested=false;Sucking=false;pourSoundPlayed=false;GameplayAudio.Instance?.VacuumMoving(transform,false,uprightCylinder); }
     public void Tick(ShovelTool tool,float dt)
     {
         Initialize();clock+=dt;Sucking=false;
@@ -102,6 +103,7 @@ public sealed class VacuumTool : MonoBehaviour
             // Only the lid opens independently; the whole vacuum performs the pour rotation.
             dustTray.localRotation=trayRotation*Quaternion.Euler(uprightCylinder ? trayTilt*pull : Vector3.zero);
             float moved=tool.VacuumEmptyStep(p,dt);
+            if (moved > 0 && !pourSoundPlayed) { pourSoundPlayed = true; tool.PlayPourSound(); }
             if(moved>0)Emit(fillFrame.TransformPoint(uprightCylinder ? Vector3.up*fillLength*.5f : Vector3.forward*fillLength*.5f),tool.VacuumDropPoint,true,Mathf.Clamp(Mathf.CeilToInt(dt*500),1,32));
             if(p>=1){Cancel();tool.CancelAction();}
         }
@@ -112,6 +114,7 @@ public sealed class VacuumTool : MonoBehaviour
             if(Sucking){emission+=dt*180;int n=(int)emission;emission-=n;Emit(point,nozzle.position,false,n);}
         }
         requested=false;
+        GameplayAudio.Instance?.VacuumMoving(transform,Sucking,uprightCylinder);
         suctionBlend=Mathf.MoveTowards(suctionBlend,Sucking?1:0,dt*6);
         shownFill=Emptying ? Mathf.Clamp01(tool.Kilograms/tool.CapacityKg) : Mathf.MoveTowards(shownFill,Mathf.Clamp01(tool.Kilograms/tool.CapacityKg),dt*2);
         UpdateFill(shownFill);appearance.Set(tool.Cargo);fillRenderer.SetPropertyBlock(appearance.Block);UpdateParticles(dt);
@@ -201,6 +204,7 @@ public sealed class VacuumTool : MonoBehaviour
     public void Cancel()
     {
         requested=Sucking=Emptying=false;suctionBlend=0;pourPose=0;
+        GameplayAudio.Instance?.VacuumMoving(transform,false,uprightCylinder);
         if(!initialized)return;
         dustTray.localPosition=trayPosition;dustTray.localRotation=trayRotation;
         for(int i=0;i<ages.Length;i++)ages[i]=1;

@@ -30,6 +30,7 @@ public sealed class ShovelTool : MonoBehaviour
     private GrainPile dropReceiver;
     private readonly GrainCargo dropBatch = new GrainCargo();
     private bool smallPileScoop;
+    private bool pourSoundPlayed;
     private bool dropCommitted;
     private GrainContainer pendingContainer;
     private Vector3 targetPoint, restPosition, tipInHands, gripInHands;
@@ -192,6 +193,7 @@ public sealed class ShovelTool : MonoBehaviour
             pendingContainer = pourHit.collider.GetComponentInParent<GrainContainer>();
             targetPoint = pendingContainer.PourPoint + Vector3.up * .35f + camera.transform.right * .3f;
             dropping = false; dropCommitted = false; queued = false;
+            pourSoundPlayed = false;
             elapsed = transferredFraction = 0; availableAtStart = Kilograms;
             if (grainPhysics != null) grainPhysics.SetPourTarget(pendingContainer.PourPoint, pendingContainer.GetComponent<Collider>());
             IsBusy = true;
@@ -205,6 +207,7 @@ public sealed class ShovelTool : MonoBehaviour
         pendingPile = null; pendingContainer = null;
         targetPoint = hit.point; dropSurface = hit.collider;
         dropping = true; dropCommitted = false; queued = false;
+        pourSoundPlayed = false;
         elapsed = transferredFraction = 0; availableAtStart = Kilograms;
         if (grainPhysics != null) grainPhysics.SetPourTarget(targetPoint, hit.collider);
         IsBusy = true;
@@ -344,7 +347,13 @@ public sealed class ShovelTool : MonoBehaviour
             ? Mathf.InverseLerp(.38f, .56f, phase) : Mathf.InverseLerp(.32f, .67f, phase));
         if (dropping)
         {
-            if (!dropCommitted && phase >= .48f) { dropCommitted = true; CommitDrop(); }
+            if (!dropCommitted && phase >= .48f)
+            {
+                dropCommitted = true;
+                float before = Kilograms;
+                CommitDrop();
+                if (Kilograms < before - .0001f) PlayPourSound();
+            }
             if (phase >= 1f) CancelAction();
             return;
         }
@@ -371,6 +380,7 @@ public sealed class ShovelTool : MonoBehaviour
                 if (collected > 0 && !scoopReported)
                 {
                     scoopReported = true;
+                    GameplayAudio.Instance?.ShovelGet();
                     GrainScooped?.Invoke();
                 }
                 if (collected > 0 && grainPhysics != null)
@@ -381,7 +391,9 @@ public sealed class ShovelTool : MonoBehaviour
                 !pendingContainer.IsClosing && !pendingContainer.IsCarried)
             {
                 if (grainPhysics != null) grainPhysics.SetPourGrain(pendingContainer.HasAssignedGrain ? pendingContainer.AcceptedGrain : cargo.Dominant);
+                float before = Kilograms;
                 cargo.PourInto(pendingContainer, Mathf.Min(amount, Kilograms));
+                if (Kilograms < before - .0001f) PlayPourSound();
                 // Complete floating-point dust through the same capacity/type checks; never discard it.
                 float residue = cargo[pendingContainer.AcceptedGrain];
                 if (fraction >= 1f && residue > 0 && residue < .0001f) cargo.PourInto(pendingContainer, residue);
@@ -396,6 +408,13 @@ public sealed class ShovelTool : MonoBehaviour
             CancelAction();
             if (repeat) TryUse(actionCamera, actor);
         }
+    }
+
+    internal void PlayPourSound()
+    {
+        if (pourSoundPlayed) return;
+        pourSoundPlayed = true;
+        GameplayAudio.Instance?.FillGrain();
     }
 
     internal float VacuumCollect(Camera camera,Transform player,float maximum,out Vector3 point)
