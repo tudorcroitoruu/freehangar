@@ -1,0 +1,1446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="201" result="Failed(Child)" total="201" passed="194" failed="7" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:13Z" duration="1.2070966">
+  <test-suite type="TestSuite" id="1260" name="Project Name" fullname="Project Name" runstate="Runnable" testcasecount="201" result="Failed" site="Child" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:13Z" duration="1.207097" total="201" passed="194" failed="7" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1249" name="Assembly-CSharp-Editor.dll" fullname="D:/Own projects/freehangar/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="201" result="Failed" site="Child" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:13Z" duration="1.193501" total="201" passed="194" failed="7" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="5440" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestFixture" id="1001" name="CentralEconomyTests" fullname="CentralEconomyTests" classname="CentralEconomyTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.065940" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="ParameterizedMethod" id="1011" name="ActualPestBitesUseEconomyAmountsAndInterval" fullname="CentralEconomyTests.ActualPestBitesUseEconomyAmountsAndInterval" classname="CentralEconomyTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.042685" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1008" name="ActualPestBitesUseEconomyAmountsAndInterval(False,False,2.0f)" fullname="CentralEconomyTests.ActualPestBitesUseEconomyAmountsAndInterval(False,False,2.0f)" methodname="ActualPestBitesUseEconomyAmountsAndInterval" classname="CentralEconomyTests" runstate="Runnable" seed="1257700127" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.026066" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1009" name="ActualPestBitesUseEconomyAmountsAndInterval(True,False,6.0f)" fullname="CentralEconomyTests.ActualPestBitesUseEconomyAmountsAndInterval(True,False,6.0f)" methodname="ActualPestBitesUseEconomyAmountsAndInterval" classname="CentralEconomyTests" runstate="Runnable" seed="17851416" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000635" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1010" name="ActualPestBitesUseEconomyAmountsAndInterval(True,True,2.0f)" fullname="CentralEconomyTests.ActualPestBitesUseEconomyAmountsAndInterval(True,True,2.0f)" methodname="ActualPestBitesUseEconomyAmountsAndInterval" classname="CentralEconomyTests" runstate="Runnable" seed="1436910558" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000558" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1003" name="AllUpgradeTotalsReadTheirReferencedAssetsAndDoNotChargeForStartingVehicle" fullname="CentralEconomyTests.AllUpgradeTotalsReadTheirReferencedAssetsAndDoNotChargeForStartingVehicle" methodname="AllUpgradeTotalsReadTheirReferencedAssetsAndDoNotChargeForStartingVehicle" classname="CentralEconomyTests" runstate="Runnable" seed="1946227851" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001575" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1005" name="EditingSellingPriceUpdatesForecastAndSellingZoneWithoutCopyingPrices" fullname="CentralEconomyTests.EditingSellingPriceUpdatesForecastAndSellingZoneWithoutCopyingPrices" methodname="EditingSellingPriceUpdatesForecastAndSellingZoneWithoutCopyingPrices" classname="CentralEconomyTests" runstate="Runnable" seed="445030984" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.002216" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1012" name="ExistingPestsReadEditedBiteSettingsOnTheirNextBite" fullname="CentralEconomyTests.ExistingPestsReadEditedBiteSettingsOnTheirNextBite" methodname="ExistingPestsReadEditedBiteSettingsOnTheirNextBite" classname="CentralEconomyTests" runstate="Runnable" seed="574464842" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000766" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1007" name="ForecastCapsCombinedPestLossAndHandlesInvalidMass" fullname="CentralEconomyTests.ForecastCapsCombinedPestLossAndHandlesInvalidMass" methodname="ForecastCapsCombinedPestLossAndHandlesInvalidMass" classname="CentralEconomyTests" runstate="Runnable" seed="164716714" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000459" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1002" name="NewGameStartsWithNoCashAndCropForecastsSeparateBothPestLosses" fullname="CentralEconomyTests.NewGameStartsWithNoCashAndCropForecastsSeparateBothPestLosses" methodname="NewGameStartsWithNoCashAndCropForecastsSeparateBothPestLosses" classname="CentralEconomyTests" runstate="Runnable" seed="1693862965" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001027" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1004" name="PlanReadsArbitraryUpgradeCountsAndContainerCapacityFromPrefab" fullname="CentralEconomyTests.PlanReadsArbitraryUpgradeCountsAndContainerCapacityFromPrefab" methodname="PlanReadsArbitraryUpgradeCountsAndContainerCapacityFromPrefab" classname="CentralEconomyTests" runstate="Runnable" seed="418728817" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000548" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1006" name="ShopManagerSuppliesLiveContainerPricesToItsProducts" fullname="CentralEconomyTests.ShopManagerSuppliesLiveContainerPricesToItsProducts" methodname="ShopManagerSuppliesLiveContainerPricesToItsProducts" classname="CentralEconomyTests" runstate="Runnable" seed="29935451" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000895" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1013" name="ConsumableFoodTests" fullname="ConsumableFoodTests" classname="ConsumableFoodTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.014460" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1016" name="ExactMoneyEnablesPurchasePrompt" fullname="ConsumableFoodTests.ExactMoneyEnablesPurchasePrompt" methodname="ExactMoneyEnablesPurchasePrompt" classname="ConsumableFoodTests" runstate="Runnable" seed="1328223272" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.003775" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1014" name="InsufficientMoneyShowsPriceAndDoesNotConsumeFood" fullname="ConsumableFoodTests.InsufficientMoneyShowsPriceAndDoesNotConsumeFood" methodname="InsufficientMoneyShowsPriceAndDoesNotConsumeFood" classname="ConsumableFoodTests" runstate="Runnable" seed="1750620720" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.002121" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1015" name="NoHungerDoesNotChargeMoneyOrConsumeFood" fullname="ConsumableFoodTests.NoHungerDoesNotChargeMoneyOrConsumeFood" methodname="NoHungerDoesNotChargeMoneyOrConsumeFood" classname="ConsumableFoodTests" runstate="Runnable" seed="153834283" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000764" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1017" name="ContainerPlacementTests" fullname="ContainerPlacementTests" classname="ContainerPlacementTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.042571" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="ParameterizedMethod" id="1022" name="FlatAndTallContainersCanBePlacedOnClearGround" fullname="ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround" classname="ContainerPlacementTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.017555" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1018" name="FlatAndTallContainersCanBePlacedOnClearGround(True,0.12f)" fullname="ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(True,0.12f)" methodname="FlatAndTallContainersCanBePlacedOnClearGround" classname="ContainerPlacementTests" runstate="Runnable" seed="815064104" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.005075" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1019" name="FlatAndTallContainersCanBePlacedOnClearGround(False,0.12f)" fullname="ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(False,0.12f)" methodname="FlatAndTallContainersCanBePlacedOnClearGround" classname="ContainerPlacementTests" runstate="Runnable" seed="368683088" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001294" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1020" name="FlatAndTallContainersCanBePlacedOnClearGround(True,0.5f)" fullname="ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(True,0.5f)" methodname="FlatAndTallContainersCanBePlacedOnClearGround" classname="ContainerPlacementTests" runstate="Runnable" seed="57610040" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000243" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1021" name="FlatAndTallContainersCanBePlacedOnClearGround(False,0.5f)" fullname="ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(False,0.5f)" methodname="FlatAndTallContainersCanBePlacedOnClearGround" classname="ContainerPlacementTests" runstate="Runnable" seed="1614707216" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000200" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1025" name="WallStillPreventsPlacingBehindIt" fullname="ContainerPlacementTests.WallStillPreventsPlacingBehindIt" classname="ContainerPlacementTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.007932" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1023" name="WallStillPreventsPlacingBehindIt(True)" fullname="ContainerPlacementTests.WallStillPreventsPlacingBehindIt(True)" methodname="WallStillPreventsPlacingBehindIt" classname="ContainerPlacementTests" runstate="Runnable" seed="632565630" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000859" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1024" name="WallStillPreventsPlacingBehindIt(False)" fullname="ContainerPlacementTests.WallStillPreventsPlacingBehindIt(False)" methodname="WallStillPreventsPlacingBehindIt" classname="ContainerPlacementTests" runstate="Runnable" seed="1694142016" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000361" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+      <test-suite type="TestFixture" id="1026" name="FreeHandsWarningTests" fullname="FreeHandsWarningTests" classname="FreeHandsWarningTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.146814" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="ParameterizedMethod" id="1031" name="BlockedPromptHidesPanelAndClearsDescription" fullname="FreeHandsWarningTests.BlockedPromptHidesPanelAndClearsDescription" classname="FreeHandsWarningTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.127023" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1029" name="BlockedPromptHidesPanelAndClearsDescription(True,True)" fullname="FreeHandsWarningTests.BlockedPromptHidesPanelAndClearsDescription(True,True)" methodname="BlockedPromptHidesPanelAndClearsDescription" classname="FreeHandsWarningTests" runstate="Runnable" seed="1446663336" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.026562" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1030" name="BlockedPromptHidesPanelAndClearsDescription(False,True)" fullname="FreeHandsWarningTests.BlockedPromptHidesPanelAndClearsDescription(False,True)" methodname="BlockedPromptHidesPanelAndClearsDescription" classname="FreeHandsWarningTests" runstate="Runnable" seed="1734786968" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000578" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1032" name="PromptShowsSeparateKeyRowsAndRemovesThemForTheNextObject" fullname="FreeHandsWarningTests.PromptShowsSeparateKeyRowsAndRemovesThemForTheNextObject" methodname="PromptShowsSeparateKeyRowsAndRemovesThemForTheNextObject" classname="FreeHandsWarningTests" runstate="Runnable" seed="351971078" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.008938" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1028" name="ResetHidesWarningAndClearsItsRequestedState" fullname="FreeHandsWarningTests.ResetHidesWarningAndClearsItsRequestedState" methodname="ResetHidesWarningAndClearsItsRequestedState" classname="FreeHandsWarningTests" runstate="Runnable" seed="1668309548" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000826" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1027" name="WarningFadesInAndOutWithoutRestartingOnRepeatedRequests" fullname="FreeHandsWarningTests.WarningFadesInAndOutWithoutRestartingOnRepeatedRequests" methodname="WarningFadesInAndOutWithoutRestartingOnRepeatedRequests" classname="FreeHandsWarningTests" runstate="Runnable" seed="153897430" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000726" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1033" name="GoalCheckerTests" fullname="GoalCheckerTests" classname="GoalCheckerTests" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.022633" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1037" name="AnyHangarCountsKnownAndUnknownSources" fullname="GoalCheckerTests.AnyHangarCountsKnownAndUnknownSources" methodname="AnyHangarCountsKnownAndUnknownSources" classname="GoalCheckerTests" runstate="Runnable" seed="301128938" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000960" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1047" name="CurrentStateCanDecreaseBeforeActivationAndRejectsDeltas" fullname="GoalCheckerTests.CurrentStateCanDecreaseBeforeActivationAndRejectsDeltas" methodname="CurrentStateCanDecreaseBeforeActivationAndRejectsDeltas" classname="GoalCheckerTests" runstate="Runnable" seed="1293710106" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000201" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1049" name="CustomActionMustIdentifyItsGoal" fullname="GoalCheckerTests.CustomActionMustIdentifyItsGoal" methodname="CustomActionMustIdentifyItsGoal" classname="GoalCheckerTests" runstate="Runnable" seed="1450602688" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000148" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1045" name="FutureLifetimeGoalRemembersEarlierActions" fullname="GoalCheckerTests.FutureLifetimeGoalRemembersEarlierActions" methodname="FutureLifetimeGoalRemembersEarlierActions" classname="GoalCheckerTests" runstate="Runnable" seed="362403773" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000124" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1044" name="FutureSinceActivationGoalIgnoresEarlierActions" fullname="GoalCheckerTests.FutureSinceActivationGoalIgnoresEarlierActions" methodname="FutureSinceActivationGoalIgnoresEarlierActions" classname="GoalCheckerTests" runstate="Runnable" seed="1654640511" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000146" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1042" name="InvalidIncrementsDoNotCount" fullname="GoalCheckerTests.InvalidIncrementsDoNotCount" classname="GoalCheckerTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.007062" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1038" name="InvalidIncrementsDoNotCount(-1.0f)" fullname="GoalCheckerTests.InvalidIncrementsDoNotCount(-1.0f)" methodname="InvalidIncrementsDoNotCount" classname="GoalCheckerTests" runstate="Runnable" seed="1501494758" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000379" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1039" name="InvalidIncrementsDoNotCount(0.0f)" fullname="GoalCheckerTests.InvalidIncrementsDoNotCount(0.0f)" methodname="InvalidIncrementsDoNotCount" classname="GoalCheckerTests" runstate="Runnable" seed="1491806815" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000054" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1040" name="InvalidIncrementsDoNotCount(float.NaN)" fullname="GoalCheckerTests.InvalidIncrementsDoNotCount(float.NaN)" methodname="InvalidIncrementsDoNotCount" classname="GoalCheckerTests" runstate="Runnable" seed="1424327910" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000038" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1041" name="InvalidIncrementsDoNotCount(float.PositiveInfinity)" fullname="GoalCheckerTests.InvalidIncrementsDoNotCount(float.PositiveInfinity)" methodname="InvalidIncrementsDoNotCount" classname="GoalCheckerTests" runstate="Runnable" seed="9771268" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000035" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1035" name="MixedGrainsContributeWhenFilterIsOff" fullname="GoalCheckerTests.MixedGrainsContributeWhenFilterIsOff" methodname="MixedGrainsContributeWhenFilterIsOff" classname="GoalCheckerTests" runstate="Runnable" seed="1420506789" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000200" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1043" name="ProgressIsCappedAndCompletedGoalsCannotChange" fullname="GoalCheckerTests.ProgressIsCappedAndCompletedGoalsCannotChange" methodname="ProgressIsCappedAndCompletedGoalsCannotChange" classname="GoalCheckerTests" runstate="Runnable" seed="556730434" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000168" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1046" name="SackSnapshotsDoNotSumDifferentPartiallyFilledSacks" fullname="GoalCheckerTests.SackSnapshotsDoNotSumDifferentPartiallyFilledSacks" methodname="SackSnapshotsDoNotSumDifferentPartiallyFilledSacks" classname="GoalCheckerTests" runstate="Runnable" seed="138811981" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000177" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1036" name="SpecificFilterRejectsOtherAndUnknownGrains" fullname="GoalCheckerTests.SpecificFilterRejectsOtherAndUnknownGrains" methodname="SpecificFilterRejectsOtherAndUnknownGrains" classname="GoalCheckerTests" runstate="Runnable" seed="551615580" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000243" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1048" name="UpgradeMustMatch" fullname="GoalCheckerTests.UpgradeMustMatch" methodname="UpgradeMustMatch" classname="GoalCheckerTests" runstate="Runnable" seed="488229347" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000168" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1034" name="WrongActionOrHangarDoesNotCount" fullname="GoalCheckerTests.WrongActionOrHangarDoesNotCount" methodname="WrongActionOrHangarDoesNotCount" classname="GoalCheckerTests" runstate="Runnable" seed="725660296" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000184" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1050" name="GoalsManagerTests" fullname="GoalsManagerTests" classname="GoalsManagerTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.015126" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1054" name="ActionsBeforeSaveLoadAreBuffered" fullname="GoalsManagerTests.ActionsBeforeSaveLoadAreBuffered" methodname="ActionsBeforeSaveLoadAreBuffered" classname="GoalsManagerTests" runstate="Runnable" seed="962247671" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.003662" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1057" name="DuplicateIdsAreRejected" fullname="GoalsManagerTests.DuplicateIdsAreRejected" methodname="DuplicateIdsAreRejected" classname="GoalsManagerTests" runstate="Runnable" seed="1745180676" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001573" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1055" name="FutureStateDoesNotSkipEarlierGoal" fullname="GoalsManagerTests.FutureStateDoesNotSkipEarlierGoal" methodname="FutureStateDoesNotSkipEarlierGoal" classname="GoalsManagerTests" runstate="Runnable" seed="1063493999" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000465" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1056" name="GoalRewardsDoNotCountAsGrainSaleIncome" fullname="GoalsManagerTests.GoalRewardsDoNotCountAsGrainSaleIncome" methodname="GoalRewardsDoNotCountAsGrainSaleIncome" classname="GoalsManagerTests" runstate="Runnable" seed="1784738833" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000272" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1052" name="LifetimeMilestonesAdvanceInOrderAndRewardsAreNotGrantedTwiceAfterReload" fullname="GoalsManagerTests.LifetimeMilestonesAdvanceInOrderAndRewardsAreNotGrantedTwiceAfterReload" methodname="LifetimeMilestonesAdvanceInOrderAndRewardsAreNotGrantedTwiceAfterReload" classname="GoalsManagerTests" runstate="Runnable" seed="1935996892" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001101" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1058" name="MissingOldSaveArrayIsInitialized" fullname="GoalsManagerTests.MissingOldSaveArrayIsInitialized" methodname="MissingOldSaveArrayIsInitialized" classname="GoalsManagerTests" runstate="Runnable" seed="1335238978" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000279" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1051" name="OneActionDoesNotSpillIntoNextSinceActivationGoal" fullname="GoalsManagerTests.OneActionDoesNotSpillIntoNextSinceActivationGoal" methodname="OneActionDoesNotSpillIntoNextSinceActivationGoal" classname="GoalsManagerTests" runstate="Runnable" seed="72091874" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000365" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1053" name="PartialProgressSurvivesJsonRoundTrip" fullname="GoalsManagerTests.PartialProgressSurvivesJsonRoundTrip" methodname="PartialProgressSurvivesJsonRoundTrip" classname="GoalsManagerTests" runstate="Runnable" seed="271031817" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000334" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1059" name="GrainEconomyTests" fullname="GrainEconomyTests" classname="GrainEconomyTests" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.091903" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="ParameterizedMethod" id="1066" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.030017" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1060" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,False)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,False)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="668313992" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.005099" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1061" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,False)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,False)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="1093501602" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.002516" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1062" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,False)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,False)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="493051875" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.002484" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1063" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,True)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,True)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="1641493725" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.004906" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1064" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,True)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,True)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="2057207198" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.004182" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1065" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,True)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,True)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="2080407153" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.004299" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1069" name="DepositingBackIntoAuthoredStockPreservesRecoverableMass" fullname="GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass" classname="GrainEconomyTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.021559" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1067" name="DepositingBackIntoAuthoredStockPreservesRecoverableMass(10.0f)" fullname="GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(10.0f)" methodname="DepositingBackIntoAuthoredStockPreservesRecoverableMass" classname="GrainEconomyTests" runstate="Runnable" seed="1047981436" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.008790" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1068" name="DepositingBackIntoAuthoredStockPreservesRecoverableMass(200.0f)" fullname="GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(200.0f)" methodname="DepositingBackIntoAuthoredStockPreservesRecoverableMass" classname="GrainEconomyTests" runstate="Runnable" seed="722615428" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.006183" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1070" name="DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource" fullname="GrainEconomyTests.DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource" methodname="DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource" classname="GrainEconomyTests" runstate="Runnable" seed="1408951483" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.012050" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1077" name="ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass" fullname="GrainEconomyTests.ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass" methodname="ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass" classname="GrainEconomyTests" runstate="Runnable" seed="1170128894" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.004787" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1076" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.016291" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1071" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(0.0f,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(0.0f,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="1749822676" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.002501" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1072" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(-10.0f,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(-10.0f,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="2105798487" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001981" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1073" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.NaN,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.NaN,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="953115858" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001673" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1074" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.PositiveInfinity,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.PositiveInfinity,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="1000737517" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001637" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1075" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(100000.0f,10000.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(100000.0f,10000.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="1353603014" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001624" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+      <test-suite type="TestFixture" id="1078" name="HangarShopProgressTests" fullname="HangarShopProgressTests" classname="HangarShopProgressTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.020665" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1083" name="ClearingMeasuresRemainingMassRatherThanRepeatedlyMovedGrain" fullname="HangarShopProgressTests.ClearingMeasuresRemainingMassRatherThanRepeatedlyMovedGrain" methodname="ClearingMeasuresRemainingMassRatherThanRepeatedlyMovedGrain" classname="HangarShopProgressTests" runstate="Runnable" seed="1777366142" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.006605" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1079" name="FirstProductUnlocksAtHalfOfFirstHangarAndStaysUnlocked" fullname="HangarShopProgressTests.FirstProductUnlocksAtHalfOfFirstHangarAndStaysUnlocked" methodname="FirstProductUnlocksAtHalfOfFirstHangarAndStaysUnlocked" classname="HangarShopProgressTests" runstate="Runnable" seed="72720942" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000285" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1080" name="LegacySaveImportsOpenedDoorsButNotCollectedKeys" fullname="HangarShopProgressTests.LegacySaveImportsOpenedDoorsButNotCollectedKeys" methodname="LegacySaveImportsOpenedDoorsButNotCollectedKeys" classname="HangarShopProgressTests" runstate="Runnable" seed="587502977" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.002473" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1081" name="OpenHangarsAndHalfClearedMilestoneSurviveSerialization" fullname="HangarShopProgressTests.OpenHangarsAndHalfClearedMilestoneSurviveSerialization" methodname="OpenHangarsAndHalfClearedMilestoneSurviveSerialization" classname="HangarShopProgressTests" runstate="Runnable" seed="486332188" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000340" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1082" name="ShopUsesExactMilestonesAndRefreshesAfterReload" fullname="HangarShopProgressTests.ShopUsesExactMilestonesAndRefreshesAfterReload" methodname="ShopUsesExactMilestonesAndRefreshesAfterReload" classname="HangarShopProgressTests" runstate="Runnable" seed="1008570077" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.002874" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1084" name="InventorySceneLimitTests" fullname="InventorySceneLimitTests" classname="InventorySceneLimitTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.024657" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1089" name="DestroyedInstanceFreesASlotAndNewInstanceGetsNewIdentity" fullname="InventorySceneLimitTests.DestroyedInstanceFreesASlotAndNewInstanceGetsNewIdentity" methodname="DestroyedInstanceFreesASlotAndNewInstanceGetsNewIdentity" classname="InventorySceneLimitTests" runstate="Runnable" seed="1894097007" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.006463" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1088" name="InactiveInstanceStaysTrackedAndCannotReactivateOverTheLimit" fullname="InventorySceneLimitTests.InactiveInstanceStaysTrackedAndCannotReactivateOverTheLimit" methodname="InactiveInstanceStaysTrackedAndCannotReactivateOverTheLimit" classname="InventorySceneLimitTests" runstate="Runnable" seed="522790879" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000620" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1091" name="TwoInventoryEntriesWithSameProductIDShareTheSceneCount" fullname="InventorySceneLimitTests.TwoInventoryEntriesWithSameProductIDShareTheSceneCount" methodname="TwoInventoryEntriesWithSameProductIDShareTheSceneCount" classname="InventorySceneLimitTests" runstate="Runnable" seed="708135330" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000458" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1087" name="UnlimitedStockStillHonorsActiveSceneLimit" fullname="InventorySceneLimitTests.UnlimitedStockStillHonorsActiveSceneLimit" classname="InventorySceneLimitTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.008679" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1085" name="UnlimitedStockStillHonorsActiveSceneLimit(1)" fullname="InventorySceneLimitTests.UnlimitedStockStillHonorsActiveSceneLimit(1)" methodname="UnlimitedStockStillHonorsActiveSceneLimit" classname="InventorySceneLimitTests" runstate="Runnable" seed="517175201" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001449" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1086" name="UnlimitedStockStillHonorsActiveSceneLimit(10)" fullname="InventorySceneLimitTests.UnlimitedStockStillHonorsActiveSceneLimit(10)" methodname="UnlimitedStockStillHonorsActiveSceneLimit" classname="InventorySceneLimitTests" runstate="Runnable" seed="1220558150" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000597" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1090" name="ZeroLimitAllowsMoreThanTenInstancesAndTracksEachOne" fullname="InventorySceneLimitTests.ZeroLimitAllowsMoreThanTenInstancesAndTracksEachOne" methodname="ZeroLimitAllowsMoreThanTenInstancesAndTracksEachOne" classname="InventorySceneLimitTests" runstate="Runnable" seed="1475954212" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000680" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1092" name="LoadingScreenProgressTests" fullname="LoadingScreenProgressTests" classname="LoadingScreenProgressTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.027697" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1097" name="EveryLoadingStartResetsFillAndDestroyRestoresSharedMaterial" fullname="LoadingScreenProgressTests.EveryLoadingStartResetsFillAndDestroyRestoresSharedMaterial" methodname="EveryLoadingStartResetsFillAndDestroyRestoresSharedMaterial" classname="LoadingScreenProgressTests" runstate="Runnable" seed="476209230" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.006643" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1098" name="ProgressAlsoUpdatesTheCachedStencilMaterial" fullname="LoadingScreenProgressTests.ProgressAlsoUpdatesTheCachedStencilMaterial" methodname="ProgressAlsoUpdatesTheCachedStencilMaterial" classname="LoadingScreenProgressTests" runstate="Runnable" seed="845802230" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.004157" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1096" name="ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill" fullname="LoadingScreenProgressTests.ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill" classname="LoadingScreenProgressTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.009845" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1093" name="ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(-1.0f,0.0f)" fullname="LoadingScreenProgressTests.ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(-1.0f,0.0f)" methodname="ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill" classname="LoadingScreenProgressTests" runstate="Runnable" seed="2115571982" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001252" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1094" name="ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(0.25f,0.25f)" fullname="LoadingScreenProgressTests.ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(0.25f,0.25f)" methodname="ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill" classname="LoadingScreenProgressTests" runstate="Runnable" seed="1717209272" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000599" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1095" name="ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(2.0f,1.0f)" fullname="LoadingScreenProgressTests.ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(2.0f,1.0f)" methodname="ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill" classname="LoadingScreenProgressTests" runstate="Runnable" seed="456802579" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000548" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+      <test-suite type="TestFixture" id="1099" name="PlayerInteractorTests" fullname="PlayerInteractorTests" classname="PlayerInteractorTests" runstate="Runnable" testcasecount="13" result="Failed" site="Child" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.024802" total="13" passed="11" failed="2" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1104" name="CargoOnUpgradeVehicleStillUsesItsOwnInteraction" fullname="PlayerInteractorTests.CargoOnUpgradeVehicleStillUsesItsOwnInteraction" methodname="CargoOnUpgradeVehicleStillUsesItsOwnInteraction" classname="PlayerInteractorTests" runstate="Runnable" seed="1780674484" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.004124" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1111" name="DisabledHighlightCannotBeFocused" fullname="PlayerInteractorTests.DisabledHighlightCannotBeFocused" methodname="DisabledHighlightCannotBeFocused" classname="PlayerInteractorTests" runstate="Runnable" seed="1146067461" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001781" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1106" name="DisabledInteractionDoesNotExposeObjectBehindIt" fullname="PlayerInteractorTests.DisabledInteractionDoesNotExposeObjectBehindIt" methodname="DisabledInteractionDoesNotExposeObjectBehindIt" classname="PlayerInteractorTests" runstate="Runnable" seed="1619968168" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000353" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1110" name="DisablingInteractorClearsOutline" fullname="PlayerInteractorTests.DisablingInteractorClearsOutline" methodname="DisablingInteractorClearsOutline" classname="PlayerInteractorTests" runstate="Runnable" seed="1990060351" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000540" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1100" name="FindsInteractionOnColliderParentAndIgnoresPlayerColliders" fullname="PlayerInteractorTests.FindsInteractionOnColliderParentAndIgnoresPlayerColliders" methodname="FindsInteractionOnColliderParentAndIgnoresPlayerColliders" classname="PlayerInteractorTests" runstate="Runnable" seed="496197827" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000445" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1112" name="FocusControlsAllOutlinesAndIgnoresMissingEntries" fullname="PlayerInteractorTests.FocusControlsAllOutlinesAndIgnoresMissingEntries" methodname="FocusControlsAllOutlinesAndIgnoresMissingEntries" classname="PlayerInteractorTests" runstate="Runnable" seed="1854782380" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000461" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1109" name="FocusMovesOutlineToNextObjectAndClearsForObjectsWithoutHighlight" fullname="PlayerInteractorTests.FocusMovesOutlineToNextObjectAndClearsForObjectsWithoutHighlight" methodname="FocusMovesOutlineToNextObjectAndClearsForObjectsWithoutHighlight" classname="PlayerInteractorTests" runstate="Runnable" seed="575945569" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000500" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1107" name="ObjectsOutsideReachCannotBeSelected" fullname="PlayerInteractorTests.ObjectsOutsideReachCannotBeSelected" methodname="ObjectsOutsideReachCannotBeSelected" classname="PlayerInteractorTests" runstate="Runnable" seed="2052667469" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000261" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1103" name="StandaloneUpgradeStationUsesFInsteadOfE" fullname="PlayerInteractorTests.StandaloneUpgradeStationUsesFInsteadOfE" methodname="StandaloneUpgradeStationUsesFInsteadOfE" classname="PlayerInteractorTests" runstate="Runnable" seed="1994006367" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000530" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1108" name="UnavailableEventCannotRunAndCanBeEnabledAgain" fullname="PlayerInteractorTests.UnavailableEventCannotRunAndCanBeEnabledAgain" methodname="UnavailableEventCannotRunAndCanBeEnabledAgain" classname="PlayerInteractorTests" runstate="Runnable" seed="861438470" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000656" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1102" name="UpgradeActionOnChildColliderCoexistsWithTheParentVehicleAction" fullname="PlayerInteractorTests.UpgradeActionOnChildColliderCoexistsWithTheParentVehicleAction" methodname="UpgradeActionOnChildColliderCoexistsWithTheParentVehicleAction" classname="PlayerInteractorTests" runstate="Runnable" seed="1070782804" result="Failed" label="Error" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.005738" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+            <stack-trace><![CDATA[  at PlayerInteractorTests.UpgradeActionOnChildColliderCoexistsWithTheParentVehicleAction () [0x000f3] in D:\Own projects\freehangar\Assets\Tests\Editor\PlayerInteractorTests.cs:84 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <41d29b352f6a475ab1bf7c6628b82790>:0 ]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1105" name="WallBlocksInteractionBehindIt" fullname="PlayerInteractorTests.WallBlocksInteractionBehindIt" methodname="WallBlocksInteractionBehindIt" classname="PlayerInteractorTests" runstate="Runnable" seed="1096497230" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000420" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1101" name="WheelbarrowKeepsEAndAddsASeparateFUpgradeAction" fullname="PlayerInteractorTests.WheelbarrowKeepsEAndAddsASeparateFUpgradeAction" methodname="WheelbarrowKeepsEAndAddsASeparateFUpgradeAction" classname="PlayerInteractorTests" runstate="Runnable" seed="411758338" result="Failed" label="Error" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000737" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+            <stack-trace><![CDATA[  at PlayerInteractorTests.WheelbarrowKeepsEAndAddsASeparateFUpgradeAction () [0x000e3] in D:\Own projects\freehangar\Assets\Tests\Editor\PlayerInteractorTests.cs:58 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <41d29b352f6a475ab1bf7c6628b82790>:0 ]]></stack-trace>
+          </failure>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1113" name="PlayerItemCarryTests" fullname="PlayerItemCarryTests" classname="PlayerItemCarryTests" runstate="Runnable" testcasecount="29" result="Failed" site="Child" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.115261" total="29" passed="24" failed="5" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1146" name="BlockedPlacementKeepsObjectHeldAndShovelUnequipped" fullname="PlayerItemCarryTests.BlockedPlacementKeepsObjectHeldAndShovelUnequipped" methodname="BlockedPlacementKeepsObjectHeldAndShovelUnequipped" classname="PlayerItemCarryTests" runstate="Runnable" seed="1317436296" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.009119" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1115" name="CannotReplaceHeldItemWithAnotherOne" fullname="PlayerItemCarryTests.CannotReplaceHeldItemWithAnotherOne" methodname="CannotReplaceHeldItemWithAnotherOne" classname="PlayerItemCarryTests" runstate="Runnable" seed="524871909" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000843" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1119" name="ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents" fullname="PlayerItemCarryTests.ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents" classname="PlayerItemCarryTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.011476" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1116" name="ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents(0.0f)" fullname="PlayerItemCarryTests.ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents(0.0f)" methodname="ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents" classname="PlayerItemCarryTests" runstate="Runnable" seed="1376183265" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001313" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1117" name="ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents(25.0f)" fullname="PlayerItemCarryTests.ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents(25.0f)" methodname="ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents" classname="PlayerItemCarryTests" runstate="Runnable" seed="1813101283" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000510" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1118" name="ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents(50.0f)" fullname="PlayerItemCarryTests.ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents(50.0f)" methodname="ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents" classname="PlayerItemCarryTests" runstate="Runnable" seed="1771075518" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000502" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1136" name="ContainerPourUsesDropActionInsteadOfScoopAction" fullname="PlayerItemCarryTests.ContainerPourUsesDropActionInsteadOfScoopAction" methodname="ContainerPourUsesDropActionInsteadOfScoopAction" classname="PlayerItemCarryTests" runstate="Runnable" seed="562281806" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.008080" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1142" name="ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo" fullname="PlayerItemCarryTests.ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo" classname="PlayerItemCarryTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.012955" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1137" name="ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(False,2.0f,False,0.0f,False)" fullname="PlayerItemCarryTests.ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(False,2.0f,False,0.0f,False)" methodname="ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo" classname="PlayerItemCarryTests" runstate="Runnable" seed="1250421484" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.003612" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1138" name="ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,0.0f,False,0.0f,False)" fullname="PlayerItemCarryTests.ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,0.0f,False,0.0f,False)" methodname="ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo" classname="PlayerItemCarryTests" runstate="Runnable" seed="1546605480" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000843" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1139" name="ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,2.0f,False,0.0f,True)" fullname="PlayerItemCarryTests.ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,2.0f,False,0.0f,True)" methodname="ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo" classname="PlayerItemCarryTests" runstate="Runnable" seed="1902893202" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000585" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1140" name="ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,2.0f,True,0.0f,False)" fullname="PlayerItemCarryTests.ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,2.0f,True,0.0f,False)" methodname="ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo" classname="PlayerItemCarryTests" runstate="Runnable" seed="1260789625" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000419" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1141" name="ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,2.0f,False,50.0f,False)" fullname="PlayerItemCarryTests.ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,2.0f,False,50.0f,False)" methodname="ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo" classname="PlayerItemCarryTests" runstate="Runnable" seed="782871439" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000406" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1145" name="EquippingShovelPlacesHeldObjectOnGround" fullname="PlayerItemCarryTests.EquippingShovelPlacesHeldObjectOnGround" classname="PlayerItemCarryTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.012289" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1143" name="EquippingShovelPlacesHeldObjectOnGround(True)" fullname="PlayerItemCarryTests.EquippingShovelPlacesHeldObjectOnGround(True)" methodname="EquippingShovelPlacesHeldObjectOnGround" classname="PlayerItemCarryTests" runstate="Runnable" seed="488622525" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.004761" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1144" name="EquippingShovelPlacesHeldObjectOnGround(False)" fullname="PlayerItemCarryTests.EquippingShovelPlacesHeldObjectOnGround(False)" methodname="EquippingShovelPlacesHeldObjectOnGround" classname="PlayerItemCarryTests" runstate="Runnable" seed="1049866907" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000749" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1114" name="HoldingDisablesPhysicsAndToolAndReleaseRestoresThem" fullname="PlayerItemCarryTests.HoldingDisablesPhysicsAndToolAndReleaseRestoresThem" methodname="HoldingDisablesPhysicsAndToolAndReleaseRestoresThem" classname="PlayerItemCarryTests" runstate="Runnable" seed="24541589" result="Failed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.003000" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+            <stack-trace><![CDATA[at PlayerItemCarryTests.HoldingDisablesPhysicsAndToolAndReleaseRestoresThem () [0x000d3] in D:\Own projects\freehangar\Assets\Tests\Editor\PlayerItemCarryTests.cs:57
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1150" name="InventoryAndWorldPickupUseSamePoseAndKeepImportedBagUpright" fullname="PlayerItemCarryTests.InventoryAndWorldPickupUseSamePoseAndKeepImportedBagUpright" methodname="InventoryAndWorldPickupUseSamePoseAndKeepImportedBagUpright" classname="PlayerItemCarryTests" runstate="Runnable" seed="227358434" result="Failed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.002598" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+            <stack-trace><![CDATA[at PlayerItemCarryTests.InventoryAndWorldPickupUseSamePoseAndKeepImportedBagUpright () [0x00238] in D:\Own projects\freehangar\Assets\Tests\Editor\PlayerItemCarryTests.cs:362
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1149" name="InventoryPickupIsAvailableWithShovelAndAutomaticallyPutsItAway" fullname="PlayerItemCarryTests.InventoryPickupIsAvailableWithShovelAndAutomaticallyPutsItAway" classname="PlayerItemCarryTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.009569" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1147" name="InventoryPickupIsAvailableWithShovelAndAutomaticallyPutsItAway(0.0f)" fullname="PlayerItemCarryTests.InventoryPickupIsAvailableWithShovelAndAutomaticallyPutsItAway(0.0f)" methodname="InventoryPickupIsAvailableWithShovelAndAutomaticallyPutsItAway" classname="PlayerItemCarryTests" runstate="Runnable" seed="1417191252" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.002300" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1148" name="InventoryPickupIsAvailableWithShovelAndAutomaticallyPutsItAway(2.0f)" fullname="PlayerItemCarryTests.InventoryPickupIsAvailableWithShovelAndAutomaticallyPutsItAway(2.0f)" methodname="InventoryPickupIsAvailableWithShovelAndAutomaticallyPutsItAway" classname="PlayerItemCarryTests" runstate="Runnable" seed="1382958483" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001019" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1123" name="NonPortableContainerCannotBeCarriedAtAnyFillLevel" fullname="PlayerItemCarryTests.NonPortableContainerCannotBeCarriedAtAnyFillLevel" classname="PlayerItemCarryTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.008396" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1120" name="NonPortableContainerCannotBeCarriedAtAnyFillLevel(0.0f)" fullname="PlayerItemCarryTests.NonPortableContainerCannotBeCarriedAtAnyFillLevel(0.0f)" methodname="NonPortableContainerCannotBeCarriedAtAnyFillLevel" classname="PlayerItemCarryTests" runstate="Runnable" seed="1558564409" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000860" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1121" name="NonPortableContainerCannotBeCarriedAtAnyFillLevel(25.0f)" fullname="PlayerItemCarryTests.NonPortableContainerCannotBeCarriedAtAnyFillLevel(25.0f)" methodname="NonPortableContainerCannotBeCarriedAtAnyFillLevel" classname="PlayerItemCarryTests" runstate="Runnable" seed="1175010011" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000392" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1122" name="NonPortableContainerCannotBeCarriedAtAnyFillLevel(50.0f)" fullname="PlayerItemCarryTests.NonPortableContainerCannotBeCarriedAtAnyFillLevel(50.0f)" methodname="NonPortableContainerCannotBeCarriedAtAnyFillLevel" classname="PlayerItemCarryTests" runstate="Runnable" seed="949654333" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000342" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1131" name="TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease" fullname="PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease" classname="PlayerItemCarryTests" runstate="Runnable" testcasecount="3" result="Failed" site="Child" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.009605" total="3" passed="0" failed="3" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1128" name="TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease(0.0f)" fullname="PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease(0.0f)" methodname="TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease" classname="PlayerItemCarryTests" runstate="Runnable" seed="1676493694" result="Failed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001599" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: False
+  But was:  True
+]]></message>
+              <stack-trace><![CDATA[at PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease (System.Single kilograms) [0x000f5] in D:\Own projects\freehangar\Assets\Tests\Editor\PlayerItemCarryTests.cs:143
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1129" name="TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease(25.0f)" fullname="PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease(25.0f)" methodname="TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease" classname="PlayerItemCarryTests" runstate="Runnable" seed="1228181315" result="Failed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000729" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: False
+  But was:  True
+]]></message>
+              <stack-trace><![CDATA[at PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease (System.Single kilograms) [0x000f5] in D:\Own projects\freehangar\Assets\Tests\Editor\PlayerItemCarryTests.cs:143
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1130" name="TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease(50.0f)" fullname="PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease(50.0f)" methodname="TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease" classname="PlayerItemCarryTests" runstate="Runnable" seed="191918871" result="Failed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000932" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: False
+  But was:  True
+]]></message>
+              <stack-trace><![CDATA[at PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease (System.Single kilograms) [0x000f5] in D:\Own projects\freehangar\Assets\Tests\Editor\PlayerItemCarryTests.cs:143
+]]></stack-trace>
+            </failure>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1127" name="WorldContainerPromptAllowsTakingAtEveryFillLevel" fullname="PlayerItemCarryTests.WorldContainerPromptAllowsTakingAtEveryFillLevel" classname="PlayerItemCarryTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.008399" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1124" name="WorldContainerPromptAllowsTakingAtEveryFillLevel(0.0f)" fullname="PlayerItemCarryTests.WorldContainerPromptAllowsTakingAtEveryFillLevel(0.0f)" methodname="WorldContainerPromptAllowsTakingAtEveryFillLevel" classname="PlayerItemCarryTests" runstate="Runnable" seed="664030468" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000845" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1125" name="WorldContainerPromptAllowsTakingAtEveryFillLevel(25.0f)" fullname="PlayerItemCarryTests.WorldContainerPromptAllowsTakingAtEveryFillLevel(25.0f)" methodname="WorldContainerPromptAllowsTakingAtEveryFillLevel" classname="PlayerItemCarryTests" runstate="Runnable" seed="949488882" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000390" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1126" name="WorldContainerPromptAllowsTakingAtEveryFillLevel(50.0f)" fullname="PlayerItemCarryTests.WorldContainerPromptAllowsTakingAtEveryFillLevel(50.0f)" methodname="WorldContainerPromptAllowsTakingAtEveryFillLevel" classname="PlayerItemCarryTests" runstate="Runnable" seed="570323050" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000365" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1135" name="WorldPickupAutomaticallyPutsShovelAway" fullname="PlayerItemCarryTests.WorldPickupAutomaticallyPutsShovelAway" classname="PlayerItemCarryTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.010183" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1132" name="WorldPickupAutomaticallyPutsShovelAway(0.0f)" fullname="PlayerItemCarryTests.WorldPickupAutomaticallyPutsShovelAway(0.0f)" methodname="WorldPickupAutomaticallyPutsShovelAway" classname="PlayerItemCarryTests" runstate="Runnable" seed="823756953" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.001571" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1133" name="WorldPickupAutomaticallyPutsShovelAway(25.0f)" fullname="PlayerItemCarryTests.WorldPickupAutomaticallyPutsShovelAway(25.0f)" methodname="WorldPickupAutomaticallyPutsShovelAway" classname="PlayerItemCarryTests" runstate="Runnable" seed="499075413" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000651" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1134" name="WorldPickupAutomaticallyPutsShovelAway(50.0f)" fullname="PlayerItemCarryTests.WorldPickupAutomaticallyPutsShovelAway(50.0f)" methodname="WorldPickupAutomaticallyPutsShovelAway" classname="PlayerItemCarryTests" runstate="Runnable" seed="977396194" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000452" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+      <test-suite type="TestFixture" id="1151" name="ShopPurchaseTests" fullname="ShopPurchaseTests" classname="ShopPurchaseTests" runstate="Runnable" testcasecount="28" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:13Z" duration="0.261632" total="28" passed="28" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="ParameterizedMethod" id="1181" name="BlockedShopPurchaseDoesNotChargeOrSpawn" fullname="ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn" classname="ShopPurchaseTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.101591" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1176" name="BlockedShopPurchaseDoesNotChargeOrSpawn(&quot;money&quot;)" fullname="ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn(&quot;money&quot;)" methodname="BlockedShopPurchaseDoesNotChargeOrSpawn" classname="ShopPurchaseTests" runstate="Runnable" seed="2004022687" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.002067" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1177" name="BlockedShopPurchaseDoesNotChargeOrSpawn(&quot;prefab&quot;)" fullname="ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn(&quot;prefab&quot;)" methodname="BlockedShopPurchaseDoesNotChargeOrSpawn" classname="ShopPurchaseTests" runstate="Runnable" seed="1027848139" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000161" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1178" name="BlockedShopPurchaseDoesNotChargeOrSpawn(&quot;point&quot;)" fullname="ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn(&quot;point&quot;)" methodname="BlockedShopPurchaseDoesNotChargeOrSpawn" classname="ShopPurchaseTests" runstate="Runnable" seed="1040689513" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000136" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1179" name="BlockedShopPurchaseDoesNotChargeOrSpawn(&quot;limit&quot;)" fullname="ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn(&quot;limit&quot;)" methodname="BlockedShopPurchaseDoesNotChargeOrSpawn" classname="ShopPurchaseTests" runstate="Runnable" seed="1831305839" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000188" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1180" name="BlockedShopPurchaseDoesNotChargeOrSpawn(&quot;hands&quot;)" fullname="ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn(&quot;hands&quot;)" methodname="BlockedShopPurchaseDoesNotChargeOrSpawn" classname="ShopPurchaseTests" runstate="Runnable" seed="2116024635" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000153" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1162" name="CashAndOwnershipSurviveJsonRoundTrip" fullname="ShopPurchaseTests.CashAndOwnershipSurviveJsonRoundTrip" methodname="CashAndOwnershipSurviveJsonRoundTrip" classname="ShopPurchaseTests" runstate="Runnable" seed="14959803" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000715" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1182" name="FailedDeliveryDoesNotCharge" fullname="ShopPurchaseTests.FailedDeliveryDoesNotCharge" methodname="FailedDeliveryDoesNotCharge" classname="ShopPurchaseTests" runstate="Runnable" seed="2069337379" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000650" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1154" name="InsufficientMoneyDoesNotChangeCashOrOwnership" fullname="ShopPurchaseTests.InsufficientMoneyDoesNotChangeCashOrOwnership" methodname="InsufficientMoneyDoesNotChangeCashOrOwnership" classname="ShopPurchaseTests" runstate="Runnable" seed="1667873560" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000167" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1159" name="InvalidProductOrPriceDoesNotChangeData" fullname="ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData" classname="ShopPurchaseTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.007037" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1155" name="InvalidProductOrPriceDoesNotChangeData(null,10)" fullname="ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData(null,10)" methodname="InvalidProductOrPriceDoesNotChangeData" classname="ShopPurchaseTests" runstate="Runnable" seed="724476296" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000376" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1156" name="InvalidProductOrPriceDoesNotChangeData(&quot;&quot;,10)" fullname="ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData(&quot;&quot;,10)" methodname="InvalidProductOrPriceDoesNotChangeData" classname="ShopPurchaseTests" runstate="Runnable" seed="1424923482" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000039" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1157" name="InvalidProductOrPriceDoesNotChangeData(&quot;   &quot;,10)" fullname="ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData(&quot;   &quot;,10)" methodname="InvalidProductOrPriceDoesNotChangeData" classname="ShopPurchaseTests" runstate="Runnable" seed="812981456" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000031" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1158" name="InvalidProductOrPriceDoesNotChangeData(&quot;crate&quot;,-10)" fullname="ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData(&quot;crate&quot;,-10)" methodname="InvalidProductOrPriceDoesNotChangeData" classname="ShopPurchaseTests" runstate="Runnable" seed="1571554475" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:12Z" duration="0.000029" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1168" name="InventoryPromptReflectsCurrentStock" fullname="ShopPurchaseTests.InventoryPromptReflectsCurrentStock" classname="ShopPurchaseTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 21:16:12Z" end-time="2026-10-31 21:16:13Z" duration="0.099781" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1166" name="InventoryPromptReflectsCurrentStock(0,&quot;Crate\nOwn: 0&quot;,False)" fullname="ShopPurchaseTests.InventoryPromptReflectsCurrentStock(0,&quot;Crate\nOwn: 0&quot;,False)" methodname="InventoryPromptReflectsCurrentStock" classname="ShopPurchaseTests" runstate="Runnable" seed="462826029" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001045" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1167" name="InventoryPromptReflectsCurrentStock(2,&quot;Take 1 Crate\nLeft: 2&quot;,True)" fullname="ShopPurchaseTests.InventoryPromptReflectsCurrentStock(2,&quot;Take 1 Crate\nLeft: 2&quot;,True)" methodname="InventoryPromptReflectsCurrentStock" classname="ShopPurchaseTests" runstate="Runnable" seed="941588893" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000155" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1171" name="MissingCarrierOrSpawnPointDoesNotConsumeStock" fullname="ShopPurchaseTests.MissingCarrierOrSpawnPointDoesNotConsumeStock" classname="ShopPurchaseTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.008824" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1169" name="MissingCarrierOrSpawnPointDoesNotConsumeStock(Hands)" fullname="ShopPurchaseTests.MissingCarrierOrSpawnPointDoesNotConsumeStock(Hands)" methodname="MissingCarrierOrSpawnPointDoesNotConsumeStock" classname="ShopPurchaseTests" runstate="Runnable" seed="1656320609" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001153" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1170" name="MissingCarrierOrSpawnPointDoesNotConsumeStock(AtSpawnPoint)" fullname="ShopPurchaseTests.MissingCarrierOrSpawnPointDoesNotConsumeStock(AtSpawnPoint)" methodname="MissingCarrierOrSpawnPointDoesNotConsumeStock" classname="ShopPurchaseTests" runstate="Runnable" seed="1073768795" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000236" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1165" name="MissingInventoryAndUnknownProductsCannotBeTaken" fullname="ShopPurchaseTests.MissingInventoryAndUnknownProductsCannotBeTaken" methodname="MissingInventoryAndUnknownProductsCannotBeTaken" classname="ShopPurchaseTests" runstate="Runnable" seed="959049281" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000418" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1160" name="OlderSaveWithoutProductListCanPurchase" fullname="ShopPurchaseTests.OlderSaveWithoutProductListCanPurchase" methodname="OlderSaveWithoutProductListCanPurchase" classname="ShopPurchaseTests" runstate="Runnable" seed="1248460254" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000201" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1161" name="ProductCountCannotOverflow" fullname="ShopPurchaseTests.ProductCountCannotOverflow" methodname="ProductCountCannotOverflow" classname="ShopPurchaseTests" runstate="Runnable" seed="1080051689" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000324" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1185" name="ProductsResolveManagerEvenWhenTheOldDepotIsDisabled" fullname="ShopPurchaseTests.ProductsResolveManagerEvenWhenTheOldDepotIsDisabled" classname="ShopPurchaseTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.015185" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1183" name="ProductsResolveManagerEvenWhenTheOldDepotIsDisabled(False)" fullname="ShopPurchaseTests.ProductsResolveManagerEvenWhenTheOldDepotIsDisabled(False)" methodname="ProductsResolveManagerEvenWhenTheOldDepotIsDisabled" classname="ShopPurchaseTests" runstate="Runnable" seed="1204832293" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.005228" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[Saved Data
+]]></output>
+          </test-case>
+          <test-case id="1184" name="ProductsResolveManagerEvenWhenTheOldDepotIsDisabled(True)" fullname="ShopPurchaseTests.ProductsResolveManagerEvenWhenTheOldDepotIsDisabled(True)" methodname="ProductsResolveManagerEvenWhenTheOldDepotIsDisabled" classname="ShopPurchaseTests" runstate="Runnable" seed="2058638752" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001720" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[Saved Data
+]]></output>
+          </test-case>
+        </test-suite>
+        <test-case id="1152" name="PurchaseWithExactMoneyAddsOneProduct" fullname="ShopPurchaseTests.PurchaseWithExactMoneyAddsOneProduct" methodname="PurchaseWithExactMoneyAddsOneProduct" classname="ShopPurchaseTests" runstate="Runnable" seed="548304282" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000231" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1153" name="RepeatPurchaseIncrementsExistingEntryAndOtherProductsRemainSeparate" fullname="ShopPurchaseTests.RepeatPurchaseIncrementsExistingEntryAndOtherProductsRemainSeparate" methodname="RepeatPurchaseIncrementsExistingEntryAndOtherProductsRemainSeparate" classname="ShopPurchaseTests" runstate="Runnable" seed="380437419" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000455" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1175" name="ShopDeliversImmediatelyWithoutAddingPickupStock" fullname="ShopPurchaseTests.ShopDeliversImmediatelyWithoutAddingPickupStock" classname="ShopPurchaseTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.013155" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1173" name="ShopDeliversImmediatelyWithoutAddingPickupStock(False)" fullname="ShopPurchaseTests.ShopDeliversImmediatelyWithoutAddingPickupStock(False)" methodname="ShopDeliversImmediatelyWithoutAddingPickupStock" classname="ShopPurchaseTests" runstate="Runnable" seed="538493726" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.003820" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[Saved Data
+]]></output>
+          </test-case>
+          <test-case id="1174" name="ShopDeliversImmediatelyWithoutAddingPickupStock(True)" fullname="ShopPurchaseTests.ShopDeliversImmediatelyWithoutAddingPickupStock(True)" methodname="ShopDeliversImmediatelyWithoutAddingPickupStock" classname="ShopPurchaseTests" runstate="Runnable" seed="1425908059" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001262" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[Saved Data
+]]></output>
+          </test-case>
+        </test-suite>
+        <test-case id="1163" name="TakingLastProductKeepsZeroCountAndCannotTakeAgain" fullname="ShopPurchaseTests.TakingLastProductKeepsZeroCountAndCannotTakeAgain" methodname="TakingLastProductKeepsZeroCountAndCannotTakeAgain" classname="ShopPurchaseTests" runstate="Runnable" seed="1006338744" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000360" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1164" name="TakingOneProductLeavesOtherProductsUnchanged" fullname="ShopPurchaseTests.TakingOneProductLeavesOtherProductsUnchanged" methodname="TakingOneProductLeavesOtherProductsUnchanged" classname="ShopPurchaseTests" runstate="Runnable" seed="1742927035" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000147" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1172" name="UnlimitedProductIsVisibleAndCanBeTakenRepeatedlyWithoutSave" fullname="ShopPurchaseTests.UnlimitedProductIsVisibleAndCanBeTakenRepeatedlyWithoutSave" methodname="UnlimitedProductIsVisibleAndCanBeTakenRepeatedlyWithoutSave" classname="ShopPurchaseTests" runstate="Runnable" seed="1459104655" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001948" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1186" name="ShovelUpgradeInteractionTests" fullname="ShovelUpgradeInteractionTests" classname="ShovelUpgradeInteractionTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.025740" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1188" name="DisplayLoadsSavedTypeAndSwitchesImmediatelyWhenPurchaseUnlocksNextShovel" fullname="ShovelUpgradeInteractionTests.DisplayLoadsSavedTypeAndSwitchesImmediatelyWhenPurchaseUnlocksNextShovel" methodname="DisplayLoadsSavedTypeAndSwitchesImmediatelyWhenPurchaseUnlocksNextShovel" classname="ShovelUpgradeInteractionTests" runstate="Runnable" seed="1432258620" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.004311" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saved Data
+]]></output>
+        </test-case>
+        <test-case id="1191" name="EscapeClosesMenuBeforeProcessingAnyPurchaseAndConsumesTheGameplayFrame" fullname="ShovelUpgradeInteractionTests.EscapeClosesMenuBeforeProcessingAnyPurchaseAndConsumesTheGameplayFrame" methodname="EscapeClosesMenuBeforeProcessingAnyPurchaseAndConsumesTheGameplayFrame" classname="ShovelUpgradeInteractionTests" runstate="Runnable" seed="864308468" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.002750" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1187" name="StaminaStationOpensOnlyStaminaAndRoutesEToItsOwnSavedProgress" fullname="ShovelUpgradeInteractionTests.StaminaStationOpensOnlyStaminaAndRoutesEToItsOwnSavedProgress" methodname="StaminaStationOpensOnlyStaminaAndRoutesEToItsOwnSavedProgress" classname="ShovelUpgradeInteractionTests" runstate="Runnable" seed="541144807" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.004301" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saved Data
+Saved Data
+]]></output>
+        </test-case>
+        <test-case id="1190" name="SubsequentEPressBuysOneUpgradeAndInsufficientMoneyDoesNothing" fullname="ShovelUpgradeInteractionTests.SubsequentEPressBuysOneUpgradeAndInsufficientMoneyDoesNothing" methodname="SubsequentEPressBuysOneUpgradeAndInsufficientMoneyDoesNothing" classname="ShovelUpgradeInteractionTests" runstate="Runnable" seed="285353482" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001713" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saved Data
+]]></output>
+        </test-case>
+        <test-case id="1189" name="WorkshopShovelOpensInactiveMenuWithoutPurchasingOnTheOpeningEPress" fullname="ShovelUpgradeInteractionTests.WorkshopShovelOpensInactiveMenuWithoutPurchasingOnTheOpeningEPress" methodname="WorkshopShovelOpensInactiveMenuWithoutPurchasingOnTheOpeningEPress" classname="ShovelUpgradeInteractionTests" runstate="Runnable" seed="969747773" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001227" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1192" name="ShovelUpgradeTests" fullname="ShovelUpgradeTests" classname="ShovelUpgradeTests" runstate="Runnable" testcasecount="22" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.060398" total="22" passed="22" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1217" name="FifthHeldModelBecomesVacuumAndSixthModelUsesItsOwnStartingStats" fullname="ShovelUpgradeTests.FifthHeldModelBecomesVacuumAndSixthModelUsesItsOwnStartingStats" methodname="FifthHeldModelBecomesVacuumAndSixthModelUsesItsOwnStartingStats" classname="ShovelUpgradeTests" runstate="Runnable" seed="496742643" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.003381" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1199" name="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots" fullname="ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots" classname="ShovelUpgradeTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.012558" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1193" name="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(0,0,0,6.5f,1.0f)" fullname="ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(0,0,0,6.5f,1.0f)" methodname="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots" classname="ShovelUpgradeTests" runstate="Runnable" seed="1943825170" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000946" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1194" name="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(1,0,1,7.5f,0.95f)" fullname="ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(1,0,1,7.5f,0.95f)" methodname="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots" classname="ShovelUpgradeTests" runstate="Runnable" seed="1298499894" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000299" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1195" name="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(3,0,3,9.5f,0.85f)" fullname="ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(3,0,3,9.5f,0.85f)" methodname="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots" classname="ShovelUpgradeTests" runstate="Runnable" seed="1301302606" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000221" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1196" name="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(4,1,0,10.5f,0.8f)" fullname="ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(4,1,0,10.5f,0.8f)" methodname="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots" classname="ShovelUpgradeTests" runstate="Runnable" seed="486858824" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000212" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1197" name="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(7,1,3,13.5f,0.65f)" fullname="ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(7,1,3,13.5f,0.65f)" methodname="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots" classname="ShovelUpgradeTests" runstate="Runnable" seed="644127496" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000184" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1198" name="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(8,1,4,14.5f,0.6f)" fullname="ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(8,1,4,14.5f,0.6f)" methodname="FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots" classname="ShovelUpgradeTests" runstate="Runnable" seed="402620192" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000156" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1215" name="LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits" fullname="ShovelUpgradeTests.LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits" classname="ShovelUpgradeTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.012651" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1210" name="LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(15,False)" fullname="ShovelUpgradeTests.LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(15,False)" methodname="LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits" classname="ShovelUpgradeTests" runstate="Runnable" seed="802240459" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.002256" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1211" name="LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(16,True)" fullname="ShovelUpgradeTests.LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(16,True)" methodname="LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits" classname="ShovelUpgradeTests" runstate="Runnable" seed="325773122" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001697" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1212" name="LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(17,True)" fullname="ShovelUpgradeTests.LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(17,True)" methodname="LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits" classname="ShovelUpgradeTests" runstate="Runnable" seed="1329877286" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000495" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1213" name="LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(20,True)" fullname="ShovelUpgradeTests.LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(20,True)" methodname="LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits" classname="ShovelUpgradeTests" runstate="Runnable" seed="983296635" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000454" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1214" name="LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(24,True)" fullname="ShovelUpgradeTests.LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(24,True)" methodname="LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits" classname="ShovelUpgradeTests" runstate="Runnable" seed="441750327" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000459" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1202" name="PurchaseChargesExactlyOnceAndRejectsStaleOrUnaffordableRequests" fullname="ShovelUpgradeTests.PurchaseChargesExactlyOnceAndRejectsStaleOrUnaffordableRequests" methodname="PurchaseChargesExactlyOnceAndRejectsStaleOrUnaffordableRequests" classname="ShovelUpgradeTests" runstate="Runnable" seed="803736372" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000418" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1209" name="ScreenTracksMissingMoneyDotsTypeAndMaximumWithoutChangingSharedMaterial" fullname="ShovelUpgradeTests.ScreenTracksMissingMoneyDotsTypeAndMaximumWithoutChangingSharedMaterial" methodname="ScreenTracksMissingMoneyDotsTypeAndMaximumWithoutChangingSharedMaterial" classname="ShovelUpgradeTests" runstate="Runnable" seed="1325844158" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.004900" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1200" name="SharedRuntimeSettingsAssetHasACompleteUpgradeConfiguration" fullname="ShovelUpgradeTests.SharedRuntimeSettingsAssetHasACompleteUpgradeConfiguration" methodname="SharedRuntimeSettingsAssetHasACompleteUpgradeConfiguration" classname="ShovelUpgradeTests" runstate="Runnable" seed="2115123798" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000285" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1208" name="ShovelWeightScalesStaminaConsumption" fullname="ShovelUpgradeTests.ShovelWeightScalesStaminaConsumption" classname="ShovelUpgradeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.013426" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1205" name="ShovelWeightScalesStaminaConsumption(0.5f,95.0f)" fullname="ShovelUpgradeTests.ShovelWeightScalesStaminaConsumption(0.5f,95.0f)" methodname="ShovelWeightScalesStaminaConsumption" classname="ShovelUpgradeTests" runstate="Runnable" seed="186819929" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000822" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1206" name="ShovelWeightScalesStaminaConsumption(1.0f,90.0f)" fullname="ShovelUpgradeTests.ShovelWeightScalesStaminaConsumption(1.0f,90.0f)" methodname="ShovelWeightScalesStaminaConsumption" classname="ShovelUpgradeTests" runstate="Runnable" seed="25615219" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000220" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1207" name="ShovelWeightScalesStaminaConsumption(2.0f,80.0f)" fullname="ShovelUpgradeTests.ShovelWeightScalesStaminaConsumption(2.0f,80.0f)" methodname="ShovelWeightScalesStaminaConsumption" classname="ShovelUpgradeTests" runstate="Runnable" seed="662178559" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000169" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1204" name="ToolReadsSavedCapacityAndWeightEvenWithoutAnOpenUpgradeScreen" fullname="ShovelUpgradeTests.ToolReadsSavedCapacityAndWeightEvenWithoutAnOpenUpgradeScreen" methodname="ToolReadsSavedCapacityAndWeightEvenWithoutAnOpenUpgradeScreen" classname="ShovelUpgradeTests" runstate="Runnable" seed="889385343" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000468" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1203" name="UpgradeProgressSurvivesSaveSerializationAndOldSavesStartAtZero" fullname="ShovelUpgradeTests.UpgradeProgressSurvivesSaveSerializationAndOldSavesStartAtZero" methodname="UpgradeProgressSurvivesSaveSerializationAndOldSavesStartAtZero" classname="ShovelUpgradeTests" runstate="Runnable" seed="1729981224" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000314" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1216" name="VacuumReadsSavedStatsAndPurchasesApplyCapacityAndSuctionImmediately" fullname="ShovelUpgradeTests.VacuumReadsSavedStatsAndPurchasesApplyCapacityAndSuctionImmediately" methodname="VacuumReadsSavedStatsAndPurchasesApplyCapacityAndSuctionImmediately" classname="ShovelUpgradeTests" runstate="Runnable" seed="2060582122" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001794" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saved Data
+]]></output>
+        </test-case>
+        <test-case id="1201" name="ZeroPriceShowsFreeAndAllowsUpgradeWithNoMoney" fullname="ShovelUpgradeTests.ZeroPriceShowsFreeAndAllowsUpgradeWithNoMoney" methodname="ZeroPriceShowsFreeAndAllowsUpgradeWithNoMoney" classname="ShovelUpgradeTests" runstate="Runnable" seed="1021607340" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000911" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1218" name="StaminaManagerTests" fullname="StaminaManagerTests" classname="StaminaManagerTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.124436" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="ParameterizedMethod" id="1225" name="BackgroundWidthUsesOriginalSizeAndFillFollowsIt" fullname="StaminaManagerTests.BackgroundWidthUsesOriginalSizeAndFillFollowsIt" classname="StaminaManagerTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.103709" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1223" name="BackgroundWidthUsesOriginalSizeAndFillFollowsIt(True)" fullname="StaminaManagerTests.BackgroundWidthUsesOriginalSizeAndFillFollowsIt(True)" methodname="BackgroundWidthUsesOriginalSizeAndFillFollowsIt" classname="StaminaManagerTests" runstate="Runnable" seed="513805465" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.004341" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1224" name="BackgroundWidthUsesOriginalSizeAndFillFollowsIt(False)" fullname="StaminaManagerTests.BackgroundWidthUsesOriginalSizeAndFillFollowsIt(False)" methodname="BackgroundWidthUsesOriginalSizeAndFillFollowsIt" classname="StaminaManagerTests" runstate="Runnable" seed="1437293178" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000472" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1222" name="CompleteHungerHasZeroCapacityWithoutInvalidFillValues" fullname="StaminaManagerTests.CompleteHungerHasZeroCapacityWithoutInvalidFillValues" methodname="CompleteHungerHasZeroCapacityWithoutInvalidFillValues" classname="StaminaManagerTests" runstate="Runnable" seed="1299762106" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000323" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1227" name="EatingImmediatelyRestoresCapacityAndBackgroundWidth" fullname="StaminaManagerTests.EatingImmediatelyRestoresCapacityAndBackgroundWidth" methodname="EatingImmediatelyRestoresCapacityAndBackgroundWidth" classname="StaminaManagerTests" runstate="Runnable" seed="1291581779" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000541" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1228" name="FoodCannotReduceHungerBelowZeroOrBeUsedWhenAlreadyFull" fullname="StaminaManagerTests.FoodCannotReduceHungerBelowZeroOrBeUsedWhenAlreadyFull" methodname="FoodCannotReduceHungerBelowZeroOrBeUsedWhenAlreadyFull" classname="StaminaManagerTests" runstate="Runnable" seed="1586207904" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000240" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1220" name="HungerGrowsAtConfiguredRateAndRejectsInvalidTime" fullname="StaminaManagerTests.HungerGrowsAtConfiguredRateAndRejectsInvalidTime" methodname="HungerGrowsAtConfiguredRateAndRejectsInvalidTime" classname="StaminaManagerTests" runstate="Runnable" seed="1450132453" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000347" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1219" name="HungerReducesCapacityAndCurrentStaminaWithoutChangingBaseMaximum" fullname="StaminaManagerTests.HungerReducesCapacityAndCurrentStaminaWithoutChangingBaseMaximum" methodname="HungerReducesCapacityAndCurrentStaminaWithoutChangingBaseMaximum" classname="StaminaManagerTests" runstate="Runnable" seed="64209586" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000543" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1226" name="InfiniteStaminaRefillsOnlyToHungerAdjustedCapacity" fullname="StaminaManagerTests.InfiniteStaminaRefillsOnlyToHungerAdjustedCapacity" methodname="InfiniteStaminaRefillsOnlyToHungerAdjustedCapacity" classname="StaminaManagerTests" runstate="Runnable" seed="2010329840" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000278" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1233" name="InvalidFoodValueDoesNotChangeHunger" fullname="StaminaManagerTests.InvalidFoodValueDoesNotChangeHunger" classname="StaminaManagerTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.008611" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1229" name="InvalidFoodValueDoesNotChangeHunger(-10.0f)" fullname="StaminaManagerTests.InvalidFoodValueDoesNotChangeHunger(-10.0f)" methodname="InvalidFoodValueDoesNotChangeHunger" classname="StaminaManagerTests" runstate="Runnable" seed="904323026" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000598" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1230" name="InvalidFoodValueDoesNotChangeHunger(0.0f)" fullname="StaminaManagerTests.InvalidFoodValueDoesNotChangeHunger(0.0f)" methodname="InvalidFoodValueDoesNotChangeHunger" classname="StaminaManagerTests" runstate="Runnable" seed="1233622252" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000180" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1231" name="InvalidFoodValueDoesNotChangeHunger(float.NaN)" fullname="StaminaManagerTests.InvalidFoodValueDoesNotChangeHunger(float.NaN)" methodname="InvalidFoodValueDoesNotChangeHunger" classname="StaminaManagerTests" runstate="Runnable" seed="479095753" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000133" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1232" name="InvalidFoodValueDoesNotChangeHunger(float.PositiveInfinity)" fullname="StaminaManagerTests.InvalidFoodValueDoesNotChangeHunger(float.PositiveInfinity)" methodname="InvalidFoodValueDoesNotChangeHunger" classname="StaminaManagerTests" runstate="Runnable" seed="1521001179" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000166" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1221" name="ReducingHungerRestoresCapacityAndAllowsStaminaToRecover" fullname="StaminaManagerTests.ReducingHungerRestoresCapacityAndAllowsStaminaToRecover" methodname="ReducingHungerRestoresCapacityAndAllowsStaminaToRecover" classname="StaminaManagerTests" runstate="Runnable" seed="1971512809" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000591" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1234" name="StaminaUpgradeTests" fullname="StaminaUpgradeTests" classname="StaminaUpgradeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.012002" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1236" name="PurchasesRejectInsufficientMoneyStaleLevelsNegativePricesAndMaximum" fullname="StaminaUpgradeTests.PurchasesRejectInsufficientMoneyStaleLevelsNegativePricesAndMaximum" methodname="PurchasesRejectInsufficientMoneyStaleLevelsNegativePricesAndMaximum" classname="StaminaUpgradeTests" runstate="Runnable" seed="1271848949" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001097" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1235" name="SavedUpgradeIncreasesActualCapacityAndStillAppliesHunger" fullname="StaminaUpgradeTests.SavedUpgradeIncreasesActualCapacityAndStillAppliesHunger" methodname="SavedUpgradeIncreasesActualCapacityAndStillAppliesHunger" classname="StaminaUpgradeTests" runstate="Runnable" seed="868052943" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000834" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1238" name="SharedSettingsAssetLoadsForRuntimeAndScreen" fullname="StaminaUpgradeTests.SharedSettingsAssetLoadsForRuntimeAndScreen" methodname="SharedSettingsAssetLoadsForRuntimeAndScreen" classname="StaminaUpgradeTests" runstate="Runnable" seed="1073171506" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000234" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1237" name="UIShowsShortfallFreeAndMaximumAndRestoresAffordableButtonAppearance" fullname="StaminaUpgradeTests.UIShowsShortfallFreeAndMaximumAndRestoresAffordableButtonAppearance" methodname="UIShowsShortfallFreeAndMaximumAndRestoresAffordableButtonAppearance" classname="StaminaUpgradeTests" runstate="Runnable" seed="1908142643" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001892" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1239" name="VehicleUpgradeTests" fullname="VehicleUpgradeTests" classname="VehicleUpgradeTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.085663" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1247" name="DefaultVehicleProfilesAndResourcesAreValid" fullname="VehicleUpgradeTests.DefaultVehicleProfilesAndResourcesAreValid" methodname="DefaultVehicleProfilesAndResourcesAreValid" classname="VehicleUpgradeTests" runstate="Runnable" seed="587904666" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.061590" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1244" name="DisplayStatsNeverOverrideAuthoredSlotsOrSpeed" fullname="VehicleUpgradeTests.DisplayStatsNeverOverrideAuthoredSlotsOrSpeed" methodname="DisplayStatsNeverOverrideAuthoredSlotsOrSpeed" classname="VehicleUpgradeTests" runstate="Runnable" seed="1540214845" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.002843" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1240" name="EachPurchaseUnlocksExactlyOneNextVehicleAndSurvivesReload" fullname="VehicleUpgradeTests.EachPurchaseUnlocksExactlyOneNextVehicleAndSurvivesReload" methodname="EachPurchaseUnlocksExactlyOneNextVehicleAndSurvivesReload" classname="VehicleUpgradeTests" runstate="Runnable" seed="1682363758" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001465" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1241" name="KeyRequiredNeedsBothMoneyAndMatchingCollectedKey" fullname="VehicleUpgradeTests.KeyRequiredNeedsBothMoneyAndMatchingCollectedKey" methodname="KeyRequiredNeedsBothMoneyAndMatchingCollectedKey" classname="VehicleUpgradeTests" runstate="Runnable" seed="613870929" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.001042" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1243" name="LegacyCompletedMiniupgradesRestoreDirectlyToSavedDestination" fullname="VehicleUpgradeTests.LegacyCompletedMiniupgradesRestoreDirectlyToSavedDestination" methodname="LegacyCompletedMiniupgradesRestoreDirectlyToSavedDestination" classname="VehicleUpgradeTests" runstate="Runnable" seed="1555103063" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000876" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1246" name="MissingPrefabDoesNotChargeOrUnlockNextVehicle" fullname="VehicleUpgradeTests.MissingPrefabDoesNotChargeOrUnlockNextVehicle" methodname="MissingPrefabDoesNotChargeOrUnlockNextVehicle" classname="VehicleUpgradeTests" runstate="Runnable" seed="1535814836" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.002654" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Cannot upgrade vehicle: Resources/Tests/VehiclePrefabThatDoesNotExist must be a prefab containing BicycleController.
+]]></output>
+        </test-case>
+        <test-case id="1245" name="ScreenShowsCurrentAndNextVehicleSpeedAndSlotsAndBlocksMissingKey" fullname="VehicleUpgradeTests.ScreenShowsCurrentAndNextVehicleSpeedAndSlotsAndBlocksMissingKey" methodname="ScreenShowsCurrentAndNextVehicleSpeedAndSlotsAndBlocksMissingKey" classname="VehicleUpgradeTests" runstate="Runnable" seed="1743515923" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.002093" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1248" name="TrailerVehicleReplacementKeepsTheAssemblyAndCanAdvanceToPickup" fullname="VehicleUpgradeTests.TrailerVehicleReplacementKeepsTheAssemblyAndCanAdvanceToPickup" methodname="TrailerVehicleReplacementKeepsTheAssemblyAndCanAdvanceToPickup" classname="VehicleUpgradeTests" runstate="Runnable" seed="1302554026" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.002736" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1242" name="VoucherPaysPriceButNeverBypassesRequiredKey" fullname="VehicleUpgradeTests.VoucherPaysPriceButNeverBypassesRequiredKey" methodname="VoucherPaysPriceButNeverBypassesRequiredKey" classname="VehicleUpgradeTests" runstate="Runnable" seed="1589263073" result="Passed" start-time="2026-10-31 21:16:13Z" end-time="2026-10-31 21:16:13Z" duration="0.000291" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: C:/Users/Liviu Tataru/AppData/LocalLow/Account Name/Project Name\TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

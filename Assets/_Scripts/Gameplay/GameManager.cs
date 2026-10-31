@@ -87,7 +87,7 @@ public class GameManager : MonoBehaviour
         if (Instance != this || !Input.GetKeyDown(KeyCode.Keypad1) ||
             !(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))) return;
 
-        var settings = Resources.Load<ShovelUpgradeSettings>(ShovelUpgradeSettings.ResourcePath);
+        var settings = GrainEconomySettings.ResolveShovel(null);
         if (SaveSystem.Data == null || settings == null || !settings.IsConfigured) return;
         int level = SaveSystem.Data.shovelUpgradeLevel;
         if (level < 0 || level >= settings.MaxUpgrades) return;

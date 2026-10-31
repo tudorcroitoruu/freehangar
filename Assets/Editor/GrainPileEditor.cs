@@ -9,7 +9,21 @@ public sealed class GrainPileEditor : Editor
     {
         EditorGUILayout.HelpBox("Scale X/Z to widen the pile and Y to raise it. Kernels keep their world size. Wall Bank rises toward local +Z (blue arrow); place that edge against a wall and rotate around Y. Mound centers and radii use -1..1 footprint coordinates.", MessageType.Info);
         if (Application.isPlaying) EditorGUILayout.HelpBox("Edit shape and scale outside Play Mode. Shape changes regenerate the pile; gameplay excavation is preserved during play.", MessageType.Info);
+        foreach (Object item in targets)
+        {
+            var pile = (GrainPile)item;
+            pile.Initialize();
+            _ = pile.Kilograms;
+        }
         serializedObject.Update();
+        using (new EditorGUI.DisabledScope(true))
+            EditorGUILayout.TextField("Kilograms", EconomyNumberFormat.Accounting(((GrainPile)target).Kilograms));
+        if (targets.Length == 1)
+        {
+            var inventory = (GrainPile)target;
+            using (new EditorGUI.DisabledScope(true))
+                EditorGUILayout.TextField("Collectible Kilograms", EconomyNumberFormat.Accounting(inventory.CollectibleKilograms));
+        }
         bool spatial = serializedObject.FindProperty("useSpatialLayout").boolValue;
         if (spatial) DrawPropertiesExcluding(serializedObject, "m_Script", "grainLayers", "previewHarvestedKg");
         else DrawPropertiesExcluding(serializedObject, "m_Script", "regions", "arrangement", "regionWaviness", "grainLayoutSeed", "sectionCenter", "sectionRotation", "previewClearedPercent");
@@ -44,7 +58,7 @@ public sealed class GrainPileEditor : Editor
             {
                 double kg = inventory.GrainKilograms((GrainType)type);
                 if (kg > .001) EditorGUILayout.LabelField(GrainNames.Display((GrainType)type),
-                    (100 * kg / System.Math.Max(.001, inventory.Kilograms)).ToString("0.##") + "%  ·  " + kg.ToString("N1") + " kg");
+                    EconomyNumberFormat.Accounting(100 * kg / System.Math.Max(.001, inventory.Kilograms)) + "%  ·  " + EconomyNumberFormat.Accounting(kg) + " kg");
             }
         }
         var detail = ((GrainPile)target).GetComponent<CornSurfaceKernels>();

@@ -14,8 +14,9 @@ public class SellGrainElement : MonoBehaviour
     {
         if (grainImage != null) grainImage.sprite = settings.grainSprite;
         if (grainName != null) grainName.text = settings.grainType.ToString();
-        if (grainQuantity != null) grainQuantity.text = $"{kilograms:0.#} kg";
-        if (grainPrice != null) grainPrice.text = $"$ {settings.grainPrice:0.##} / kg";
-        if (grainValue != null) grainValue.text = $"$ {kilograms * (double)settings.grainPrice:0.##}";
+        if (grainQuantity != null) grainQuantity.text = $"{EconomyNumberFormat.Accounting(kilograms)} kg";
+        // Unit rates retain their configured precision; sale proceeds are whole dollars.
+        if (grainPrice != null) grainPrice.text = "$ " + settings.grainPrice.ToString("N2", System.Globalization.CultureInfo.InvariantCulture) + " / kg";
+        if (grainValue != null) grainValue.text = $"$ {EconomyNumberFormat.Accounting(EconomyNumberFormat.SaleCash(EconomyNumberFormat.CropValue(kilograms, settings.grainPrice)))}";
     }
 }

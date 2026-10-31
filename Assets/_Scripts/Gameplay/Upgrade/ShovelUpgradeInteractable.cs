@@ -15,7 +15,7 @@ public sealed class ShovelUpgradeInteractable : MonoBehaviour, IKeyedInteractabl
 
     private void OnEnable()
     {
-        if (settings == null) settings = Resources.Load<ShovelUpgradeSettings>(ShovelUpgradeSettings.ResourcePath);
+        settings = GrainEconomySettings.ResolveShovel(settings);
         SaveSystem.MoneyChanged += OnProgressChanged;
         RefreshDisplay();
     }
@@ -26,6 +26,7 @@ public sealed class ShovelUpgradeInteractable : MonoBehaviour, IKeyedInteractabl
 
     public void RefreshDisplay()
     {
+        if (Application.isPlaying) settings = GrainEconomySettings.ResolveShovel(settings);
         if (settings == null || !settings.IsConfigured || shovelModels == null) return;
         int type = settings.TypeIndex(SaveSystem.Data?.shovelUpgradeLevel ?? 0);
         for (int i = 0; i < shovelModels.Length; i++)

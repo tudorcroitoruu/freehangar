@@ -11,6 +11,8 @@ public sealed class VehicleUpgrade : MonoBehaviour
     [Tooltip("Stable settings/save ID. Leave empty to detect the existing vehicle type. New vehicle types can use their own ID.")]
     [SerializeField] private string vehicleId;
     private BicycleController bicycle;
+    private GameObject spawnedAssembly;
+    private GameObject AssemblyRoot => spawnedAssembly != null ? spawnedAssembly : gameObject;
     public VehicleUpgrade Replacement { get; private set; }
     public static event Action<VehicleUpgrade, VehicleUpgrade> VehicleReplaced;
 
@@ -30,15 +32,22 @@ public sealed class VehicleUpgrade : MonoBehaviour
     {
         get
         {
-            if (settings == null) settings = Resources.Load<VehicleUpgradeSettings>(VehicleUpgradeSettings.ResourcePath);
+            settings = GrainEconomySettings.ResolveVehicle(settings);
             return settings != null ? settings.Find(VehicleId) : null;
         }
     }
     public bool IsConfigured => Profile != null && Profile.IsConfigured;
     public bool IsUnlocked => IsConfigured && settings.IsUnlocked(VehicleId, SaveSystem.Data);
     public VehicleUpgradeSettings.VehicleType NextVehicle => IsConfigured ? settings.Next(VehicleId) : null;
-    public int SlotCount => bicycle != null && bicycle.TryGetComponent<VehicleCargoRack>(out var rack)
-        ? rack.SlotLimit : bicycle != null ? Mathf.Max(bicycle.cargoSlots?.Length ?? 0, bicycle.exclusiveBagSlot != null ? 1 : 0) : 0;
+    public int SlotCount
+    {
+        get
+        {
+            if (bicycle == null) bicycle = GetComponent<BicycleController>();
+            return bicycle != null && bicycle.TryGetComponent<VehicleCargoRack>(out var rack)
+                ? rack.SlotLimit : bicycle != null ? Mathf.Max(bicycle.cargoSlots?.Length ?? 0, bicycle.exclusiveBagSlot != null ? 1 : 0) : 0;
+        }
+    }
     public bool IsMaxed => IsConfigured && NextVehicle == null;
     public int Price => NextVehicle?.price ?? 0;
     public bool HasRequiredKey => NextVehicle == null || NextVehicle.HasRequiredKey(SaveSystem.Data);
@@ -85,7 +94,7 @@ public sealed class VehicleUpgrade : MonoBehaviour
         if (!TryCreateReplacement(out var next)) return false;
         if (!SaveSystem.TryPurchaseVehicle(settings, VehicleId))
         {
-            if (next != null) Destroy(next.gameObject);
+            if (next != null) ReleaseObject(next.AssemblyRoot);
             return false;
         }
         if (next != null) ActivateReplacement(next);
@@ -111,9 +120,9 @@ public sealed class VehicleUpgrade : MonoBehaviour
         if (profile == Profile) return false;
         if (profile == null || !profile.IsConfigured) return false;
         var prefab = Resources.Load<GameObject>(profile.PrefabResourcePath);
-        if (prefab == null || prefab.GetComponent<BicycleController>() == null)
+        if (prefab == null || prefab.GetComponentInChildren<BicycleController>(true) == null)
         {
-            Debug.LogWarning($"Cannot upgrade vehicle: Resources/{profile.PrefabResourcePath} must be a prefab with BicycleController on its root.", this);
+            Debug.LogWarning($"Cannot upgrade vehicle: Resources/{profile.PrefabResourcePath} must be a prefab containing BicycleController.", this);
             return false;
         }
 
@@ -122,28 +131,34 @@ public sealed class VehicleUpgrade : MonoBehaviour
         staging.SetActive(false);
         var instance = Instantiate(prefab, transform.position, transform.rotation, staging.transform);
         instance.SetActive(false);
-        next = instance.GetComponent<VehicleUpgrade>();
-        if (next == null) next = instance.AddComponent<VehicleUpgrade>();
+        var rideable = instance.GetComponentInChildren<BicycleController>(true);
+        next = rideable.GetComponent<VehicleUpgrade>();
+        if (next == null) next = rideable.gameObject.AddComponent<VehicleUpgrade>();
         next.settings = settings;
         next.vehicleId = profile.id;
+        next.spawnedAssembly = instance;
         next.enabled = true;
-        if (GetComponent<VehicleUpgradeInteractable>() != null && instance.GetComponent<VehicleUpgradeInteractable>() == null)
-            instance.AddComponent<VehicleUpgradeInteractable>();
-        instance.transform.SetParent(transform.parent, true);
-        Destroy(staging);
+        if (GetComponent<VehicleUpgradeInteractable>() != null && rideable.GetComponent<VehicleUpgradeInteractable>() == null)
+            rideable.gameObject.AddComponent<VehicleUpgradeInteractable>();
+        instance.transform.SetParent(AssemblyRoot.transform.parent, true);
+        ReleaseObject(staging);
         return true;
     }
 
     private void ActivateReplacement(VehicleUpgrade next)
     {
         Replacement = next;
-        next.gameObject.SetActive(true);
+        next.AssemblyRoot.SetActive(true);
         foreach (var rider in FindObjectsByType<PlayerBicycleInteraction>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             if (bicycle != null && rider.bicycle == bicycle) rider.bicycle = next.GetComponent<BicycleController>();
         VehicleUpgradeInteractable.ReplaceTargets(this, next);
         VehicleReplaced?.Invoke(this, next);
-        gameObject.SetActive(false);
-        Destroy(gameObject);
+        AssemblyRoot.SetActive(false);
+        ReleaseObject(AssemblyRoot);
+    }
+    private static void ReleaseObject(GameObject target)
+    {
+        if (Application.isPlaying) Destroy(target); else DestroyImmediate(target);
     }
     public bool OpenMenu()
     {

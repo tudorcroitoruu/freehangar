@@ -56,7 +56,7 @@ public sealed class BagInteraction : MonoBehaviour
         data.RequiresFreeHands = bag != carried && bag.CanCarry && !canFinish && !data.ShowPrimaryButton &&
             interactor != null && interactor.HandsOccupied;
         data.Progress = bag.CapacityKg > 0f ? Mathf.Clamp01(bag.Kilograms / bag.CapacityKg) : 0f;
-        data.ProgressText = $"{bag.Kilograms:0.##} / {bag.CapacityKg:0.##} kg";
+        data.ProgressText = $"{EconomyNumberFormat.Accounting(bag.Kilograms)} / {EconomyNumberFormat.Accounting(bag.CapacityKg)} kg";
         return true;
     }
 

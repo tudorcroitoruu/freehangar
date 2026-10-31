@@ -21,7 +21,7 @@ MonoBehaviour:
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
-    prices: 64000000c80000002c01000090010000
+    prices: 320000004b0000006400000096000000
   - name: Medium Shovel
     image: {fileID: 21300000, guid: cfb9e0579b9c03c478557593242d6265, type: 3}
     capacityKg: 76.5
@@ -30,7 +30,7 @@ MonoBehaviour:
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
-    prices: f4010000ee020000e8030000dc050000
+    prices: 96000000c8000000fa0000005e010000
   - name: Improved Shovel
     image: {fileID: 21300000, guid: 0a8be3e409bce994db21f8a3dfac12c6, type: 3}
     capacityKg: 130.5
@@ -39,7 +39,7 @@ MonoBehaviour:
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
-    prices: d0070000c4090000b80b0000a00f0000
+    prices: c20100008a020000520300004c040000
   - name: Expert Shovel
     image: {fileID: 21300000, guid: ac885e9cb306d8b489498a0fdcc580b1, type: 3}
     capacityKg: 180
@@ -48,7 +48,7 @@ MonoBehaviour:
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
-    prices: 88130000641900003421000010270000
+    prices: 7805000008070000fc080000b80b0000
   - name: Grain Vacuum
     image: {fileID: 21300000, guid: f7bcd5512510643429df95879b8e2f2a, type: 3}
     capacityKg: 1350
@@ -57,7 +57,7 @@ MonoBehaviour:
     weightReductionPerUpgrade: 0.02
     suctionKgPerSecond: 540
     suctionPerUpgrade: 135
-    prices: e02e0000983a000050460000f0550000
+    prices: ac0d0000a00f00008813000064190000
   - name: High Capacity Vacuum
     image: {fileID: 21300000, guid: a1d9ed617fe4b7048971f33e9d8e230e, type: 3}
     capacityKg: 2700
@@ -66,4 +66,4 @@ MonoBehaviour:
     weightReductionPerUpgrade: 0.02
     suctionKgPerSecond: 1080
     suctionPerUpgrade: 270
-    prices: a861000030750000b8880000409c0000
+    prices: e02e0000983a0000384a0000c05d0000

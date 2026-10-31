@@ -35,7 +35,7 @@ public sealed class StaminaManager : MonoBehaviour
     {
         get
         {
-            if (upgradeSettings == null) upgradeSettings = Resources.Load<StaminaUpgradeSettings>(StaminaUpgradeSettings.ResourcePath);
+            upgradeSettings = GrainEconomySettings.ResolveStamina(upgradeSettings);
             return upgradeSettings;
         }
     }

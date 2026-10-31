@@ -428,7 +428,7 @@ public class PlayerData
     public bool tutorialPassed;
     public bool newGameDone;
     [Space, Header("Career")]
-    public int cash = 150000;
+    public int cash = 0;
     public int currentCarFromOwnedSelected;
 
     [Space, Header("Owned products")]

@@ -41,7 +41,7 @@ public sealed class InteractionPrompt : MonoBehaviour
         if (bag != null)
         {
             data.Progress = bag.CapacityKg > 0f ? Mathf.Clamp01(bag.Kilograms / bag.CapacityKg) : 0f;
-            data.ProgressText = $"{bag.Kilograms:0.##} / {bag.CapacityKg:0.##} kg";
+            data.ProgressText = $"{EconomyNumberFormat.Accounting(bag.Kilograms)} / {EconomyNumberFormat.Accounting(bag.CapacityKg)} kg";
         }
         Show(camera, data);
     }

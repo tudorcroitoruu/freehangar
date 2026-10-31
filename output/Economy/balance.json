@@ -1,0 +1,422 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  1466,
+                   "executeMs":  41,
+                   "assemblyName":  "PipelineRunScript_ValidateBalance_61d454c7be3345acb2713f3b6aea06b5",
+                   "success":  true,
+                   "result":  {
+                                  "rows":  [
+                                               {
+                                                   "name":  "Corn pile - scoop with left click",
+                                                   "physicalKg":  116955.57161192046,
+                                                   "collectibleKg":  584.77785805960229,
+                                                   "multiplier":  200.0,
+                                                   "crops":  [
+                                                                 {
+                                                                     "crop":  "Corn",
+                                                                     "kg":  584.77785805960229,
+                                                                     "price":  2.0,
+                                                                     "gross":  1169.5557161192046
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Wheat",
+                                                                     "kg":  0.0,
+                                                                     "price":  2.4,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Barley",
+                                                                     "kg":  0.0,
+                                                                     "price":  2.2,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Oats",
+                                                                     "kg":  0.0,
+                                                                     "price":  2.6,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Rye",
+                                                                     "kg":  0.0,
+                                                                     "price":  2.0,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Rice",
+                                                                     "kg":  0.0,
+                                                                     "price":  3.4,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Peas",
+                                                                     "kg":  0.0,
+                                                                     "price":  3.6,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Soybeans",
+                                                                     "kg":  0.0,
+                                                                     "price":  4.0,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "SunflowerSeeds",
+                                                                     "kg":  0.0,
+                                                                     "price":  4.2,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Buckwheat",
+                                                                     "kg":  0.0,
+                                                                     "price":  3.8,
+                                                                     "gross":  0.0
+                                                                 }
+                                                             ],
+                                                   "gross":  1169.5557161192046
+                                               },
+                                               {
+                                                   "name":  "Hangar 2 - Almost full grain bank",
+                                                   "physicalKg":  2164968.0337805687,
+                                                   "collectibleKg":  10824.840168902843,
+                                                   "multiplier":  200.0,
+                                                   "crops":  [
+                                                                 {
+                                                                     "crop":  "Corn",
+                                                                     "kg":  7577.38811823199,
+                                                                     "price":  2.0,
+                                                                     "gross":  15154.77623646398
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Wheat",
+                                                                     "kg":  3247.4520506708527,
+                                                                     "price":  2.4,
+                                                                     "gross":  7793.8852313112084
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Barley",
+                                                                     "kg":  0.0,
+                                                                     "price":  2.2,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Oats",
+                                                                     "kg":  0.0,
+                                                                     "price":  2.6,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Rye",
+                                                                     "kg":  0.0,
+                                                                     "price":  2.0,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Rice",
+                                                                     "kg":  0.0,
+                                                                     "price":  3.4,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Peas",
+                                                                     "kg":  0.0,
+                                                                     "price":  3.6,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Soybeans",
+                                                                     "kg":  0.0,
+                                                                     "price":  4.0,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "SunflowerSeeds",
+                                                                     "kg":  0.0,
+                                                                     "price":  4.2,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Buckwheat",
+                                                                     "kg":  0.0,
+                                                                     "price":  3.8,
+                                                                     "gross":  0.0
+                                                                 }
+                                                             ],
+                                                   "gross":  22948.66146777519
+                                               },
+                                               {
+                                                   "name":  "Hangar 3 - Almost full grain bank",
+                                                   "physicalKg":  2166146.1191651155,
+                                                   "collectibleKg":  10830.730595825578,
+                                                   "multiplier":  200.0,
+                                                   "crops":  [
+                                                                 {
+                                                                     "crop":  "Corn",
+                                                                     "kg":  0.0,
+                                                                     "price":  2.0,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Wheat",
+                                                                     "kg":  2166.1461191651156,
+                                                                     "price":  2.4,
+                                                                     "gross":  5198.7508925760694
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Barley",
+                                                                     "kg":  2166.1461191651156,
+                                                                     "price":  2.2,
+                                                                     "gross":  4765.52156545315
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Oats",
+                                                                     "kg":  2166.1461191651156,
+                                                                     "price":  2.6,
+                                                                     "gross":  5631.9797032495089
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Rye",
+                                                                     "kg":  0.0,
+                                                                     "price":  2.0,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Rice",
+                                                                     "kg":  2166.1461191651156,
+                                                                     "price":  3.4,
+                                                                     "gross":  7364.8970117411845
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Peas",
+                                                                     "kg":  0.0,
+                                                                     "price":  3.6,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Soybeans",
+                                                                     "kg":  2166.1461191651156,
+                                                                     "price":  4.0,
+                                                                     "gross":  8664.5844766604623
+                                                                 },
+                                                                 {
+                                                                     "crop":  "SunflowerSeeds",
+                                                                     "kg":  0.0,
+                                                                     "price":  4.2,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Buckwheat",
+                                                                     "kg":  0.0,
+                                                                     "price":  3.8,
+                                                                     "gross":  0.0
+                                                                 }
+                                                             ],
+                                                   "gross":  31625.733649680376
+                                               },
+                                               {
+                                                   "name":  "Hangar 4 - Grain bank to entrance",
+                                                   "physicalKg":  5515284.1775357006,
+                                                   "collectibleKg":  27576.4208876785,
+                                                   "multiplier":  200.0,
+                                                   "crops":  [
+                                                                 {
+                                                                     "crop":  "Corn",
+                                                                     "kg":  1378.8210443839282,
+                                                                     "price":  2.0,
+                                                                     "gross":  2757.6420887678564
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Wheat",
+                                                                     "kg":  5515.2841775357,
+                                                                     "price":  2.4,
+                                                                     "gross":  13236.682552064167
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Barley",
+                                                                     "kg":  5515.2841775357,
+                                                                     "price":  2.2,
+                                                                     "gross":  12133.625453567784
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Oats",
+                                                                     "kg":  4136.4631331517749,
+                                                                     "price":  2.6,
+                                                                     "gross":  10754.80375171075
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Rye",
+                                                                     "kg":  0.0,
+                                                                     "price":  2.0,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Rice",
+                                                                     "kg":  5515.2841775357,
+                                                                     "price":  3.4,
+                                                                     "gross":  18751.966729599866
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Peas",
+                                                                     "kg":  0.0,
+                                                                     "price":  3.6,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Soybeans",
+                                                                     "kg":  5515.2841775357,
+                                                                     "price":  4.0,
+                                                                     "gross":  22061.1367101428
+                                                                 },
+                                                                 {
+                                                                     "crop":  "SunflowerSeeds",
+                                                                     "kg":  0.0,
+                                                                     "price":  4.2,
+                                                                     "gross":  0.0
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Buckwheat",
+                                                                     "kg":  0.0,
+                                                                     "price":  3.8,
+                                                                     "gross":  0.0
+                                                                 }
+                                                             ],
+                                                   "gross":  79695.857285853228
+                                               },
+                                               {
+                                                   "name":  "Hangar 5 - Grain bank to entrance",
+                                                   "physicalKg":  5518543.4631554009,
+                                                   "collectibleKg":  27592.717315777005,
+                                                   "multiplier":  200.0,
+                                                   "crops":  [
+                                                                 {
+                                                                     "crop":  "Corn",
+                                                                     "kg":  1379.63586578885,
+                                                                     "price":  2.0,
+                                                                     "gross":  2759.2717315777
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Wheat",
+                                                                     "kg":  1379.63586578885,
+                                                                     "price":  2.4,
+                                                                     "gross":  3311.126209465569
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Barley",
+                                                                     "kg":  1379.63586578885,
+                                                                     "price":  2.2,
+                                                                     "gross":  3035.1989705216347
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Oats",
+                                                                     "kg":  2759.2717315777,
+                                                                     "price":  2.6,
+                                                                     "gross":  7174.1062389573617
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Rye",
+                                                                     "kg":  2759.2717315777,
+                                                                     "price":  2.0,
+                                                                     "gross":  5518.5434631554
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Rice",
+                                                                     "kg":  6898.1793289442512,
+                                                                     "price":  3.4,
+                                                                     "gross":  23453.8103762721
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Peas",
+                                                                     "kg":  2759.2717315777,
+                                                                     "price":  3.6,
+                                                                     "gross":  9933.37797053506
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Soybeans",
+                                                                     "kg":  4138.90759736655,
+                                                                     "price":  4.0,
+                                                                     "gross":  16555.6303894662
+                                                                 },
+                                                                 {
+                                                                     "crop":  "SunflowerSeeds",
+                                                                     "kg":  2759.2717315777,
+                                                                     "price":  4.2,
+                                                                     "gross":  11588.940746337023
+                                                                 },
+                                                                 {
+                                                                     "crop":  "Buckwheat",
+                                                                     "kg":  1379.63586578885,
+                                                                     "price":  3.8,
+                                                                     "gross":  5242.6162242114651
+                                                                 }
+                                                             ],
+                                                   "gross":  88572.6223204995
+                                               }
+                                           ],
+                                  "stages":  [
+                                                 {
+                                                     "hangar":  1,
+                                                     "collectibleKg":  584.77785805960229,
+                                                     "gross":  1169.5557161192046,
+                                                     "containerCost":  96.0,
+                                                     "upgradeCost":  650,
+                                                     "balance":  483.55571611920459,
+                                                     "stressBalance":  249.64457289536369
+                                                 },
+                                                 {
+                                                     "hangar":  2,
+                                                     "collectibleKg":  10824.840168902843,
+                                                     "gross":  22948.66146777519,
+                                                     "containerCost":  1519.0,
+                                                     "upgradeCost":  15000,
+                                                     "balance":  6913.2171838943941,
+                                                     "stressBalance":  2089.5737471155167
+                                                 },
+                                                 {
+                                                     "hangar":  3,
+                                                     "collectibleKg":  10830.730595825578,
+                                                     "gross":  31625.733649680376,
+                                                     "containerCost":  1400.0,
+                                                     "upgradeCost":  25300,
+                                                     "balance":  11838.950833574771,
+                                                     "stressBalance":  690.16066685981923
+                                                 },
+                                                 {
+                                                     "hangar":  4,
+                                                     "collectibleKg":  27576.4208876785,
+                                                     "gross":  79695.857285853228,
+                                                     "containerCost":  3234.0,
+                                                     "upgradeCost":  42000,
+                                                     "balance":  46300.808119427995,
+                                                     "stressBalance":  19212.846495542406
+                                                 },
+                                                 {
+                                                     "hangar":  5,
+                                                     "collectibleKg":  27592.717315777005,
+                                                     "gross":  88572.6223204995,
+                                                     "containerCost":  2655.0,
+                                                     "upgradeCost":  61000,
+                                                     "balance":  71218.4304399275,
+                                                     "stressBalance":  26415.944351942009
+                                                 }
+                                             ],
+                                  "upgradeTotal":  143950,
+                                  "totalGross":  224012.4304399275,
+                                  "containerTotal":  8904.0,
+                                  "finalBalance":  71218.4304399275,
+                                  "finalBalanceWith20PercentCropLoss":  26415.944351942009,
+                                  "inventories":  [
+                                                      {
+                                                          "name":  "Freebags",
+                                                          "ProductID":  "freeBags",
+                                                          "UnlimitedCount":  true,
+                                                          "active":  true,
+                                                          "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::InventoryProduct\",\"productID\":\"freeBags\",\"productName\":\"Free Bags\",\"visual\":[{\"instanceID\":0}],\"unlimitedCount\":true,\"maxActiveInScene\":10,\"objectPrefab\":{\"fileID\":1551148478017631140,\"guid\":\"6e20d490c6f359e498058c3c322daa95\",\"type\":3},\"deliveryMode\":0,\"spawnPoint\":{\"instanceID\":0}}}"
+                                                      }
+                                                  ]
+                              }
+               }
+}

@@ -120,6 +120,10 @@ public sealed class GrainPile : MonoBehaviour
         new Mound(new Vector2(.18f, -.36f), new Vector2(.6f, .53f), .62f)
     };
     [SerializeField, Min(1f)] private float kilogramsPerCubicMetre = 720f;
+    [SerializeField, Tooltip("Shared economy for authored hangar stock. Leave empty for dropped grain (1:1 recovery).")]
+    private GrainEconomySettings economySettings;
+    public float GrainConsumeMultiplier => economySettings != null ? economySettings.ConsumeMultiplier : 1f;
+    public double CollectibleKilograms => Kilograms / GrainConsumeMultiplier;
     [SerializeField, Range(5f, 60f)] private float reposeAngle = 32f;
     [SerializeField, Min(0f)] private float settlingMargin = .45f;
     [SerializeField, Range(1f, 30f)] private float simulationRate = 15f;
@@ -158,7 +162,9 @@ public sealed class GrainPile : MonoBehaviour
     }
 
     private float VolumeScale => Mathf.Abs(transform.localToWorldMatrix.determinant);
-    public double Kilograms => field == null ? 0 : field.Volume * kilogramsPerCubicMetre * VolumeScale;
+    [SerializeField, HideInInspector, Tooltip("Calculated remaining mass in kg; updated from the pile volume.")]
+    private double kilograms;
+    public double Kilograms => kilograms = field == null ? 0 : field.Volume * kilogramsPerCubicMetre * VolumeScale;
     public float SurfaceHeight(Vector3 worldPoint)
     {
         Initialize();
@@ -283,10 +289,13 @@ public sealed class GrainPile : MonoBehaviour
         // Reject a stale hit well above/below the actual surface.
         Vector3 scale = WorldScale;
         if (Mathf.Abs(p.y - field.Sample(p.x, p.z)) * scale.y > depth + .15f) return 0;
-        float density = kilogramsPerCubicMetre * VolumeScale;
+        float multiplier = GrainConsumeMultiplier;
+        float density = kilogramsPerCubicMetre * VolumeScale / multiplier;
+        // Excavate more of the authored pile without slowing the tool's cargo throughput.
+        float excavationScale = Mathf.Pow(multiplier, 1f / 3f);
         if (spatial != null) spatial.BeginCollection(destination, density);
         float removed;
-        try { removed = field.Scoop(p.x, p.z, radius, depth / scale.y, capacityKg / density, settlingMargin, scale); }
+        try { removed = field.Scoop(p.x, p.z, radius * excavationScale, depth * excavationScale / scale.y, capacityKg / density, settlingMargin, scale); }
         finally { if (spatial != null) spatial.EndCollection(); }
         if (removed > 0)
         {
@@ -325,7 +334,7 @@ public sealed class GrainPile : MonoBehaviour
         {
             // Convert the remaining legacy recipe into local strata before covering it.
             var layers = new List<GrainStratum>();
-            double skip = harvestedKg, remaining = Kilograms;
+            double skip = harvestedKg, remaining = CollectibleKilograms;
             foreach (var layer in grainLayers)
             {
                 double amount = layer == grainLayers[grainLayers.Length - 1] ? remaining : System.Math.Min(remaining, System.Math.Max(0, layer.kilograms - skip));
@@ -339,7 +348,8 @@ public sealed class GrainPile : MonoBehaviour
         }
         var mixture = new float[GrainCargo.TypeCount];
         for (int t = 0; t < mixture.Length; t++) mixture[t] = cargo.Weight(t);
-        double volume = cargo.Total / (kilogramsPerCubicMetre * VolumeScale);
+        // Returning cargo restores the same collectible mass, including on an authored pile.
+        double volume = cargo.Total * (double)GrainConsumeMultiplier / (kilogramsPerCubicMetre * VolumeScale);
         for (int i = 0; i < weights.Length; i++)
         {
             if (weights[i] <= 0) continue;
@@ -402,6 +412,7 @@ public sealed class GrainPile : MonoBehaviour
 
     private void RefreshSurface()
     {
+        kilograms = Kilograms;
         SurfaceRevision++;
         if (DetectedWallCount > 0)
         {

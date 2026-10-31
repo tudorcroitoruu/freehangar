@@ -103,8 +103,8 @@ public class UpgradeVehicle : MonoBehaviour
                     if (vehicleImages[i] != null && image != null) vehicleImages[i].sprite = image;
                 }
         }
-        SetText(price, configured && !target.IsUnlocked ? "Locked" : maxed ? "MAX" : configured ? cost == 0 ? "Free" : $"$ {cost:N0}" : "Unavailable");
-        string requirements = missing > 0 ? $"You need ${missing:N0} more." : "";
+        SetText(price, configured && !target.IsUnlocked ? "Locked" : maxed ? "MAX" : configured ? cost == 0 ? "Free" : $"$ {EconomyNumberFormat.Accounting(cost)}" : "Unavailable");
+        string requirements = missing > 0 ? $"You need ${EconomyNumberFormat.Accounting(missing)} more." : "";
         if (nextVehicle != null && nextVehicle.requiresKey)
             requirements += (requirements.Length > 0 ? "\n" : "") + (missingKey ? "Vehicle key required." : "Vehicle key collected.");
         SetText(notEnoughMoney, requirements);

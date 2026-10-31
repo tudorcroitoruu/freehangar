@@ -22,8 +22,8 @@ public sealed class GrainSortingHUD : MonoBehaviour
         text.Clear();
         if (progression != null)
         {
-            text.Append(progression.StageTitle).Append("  •  ").Append(progression.BaggedKilograms.ToString("0.0")).Append(" kg bagged");
-            if (progression.NextThreshold >= 0) text.Append(" / ").Append(progression.NextThreshold.ToString("0")).Append(" kg next crop");
+            text.Append(progression.StageTitle).Append("  •  ").Append(EconomyNumberFormat.Accounting(progression.BaggedKilograms)).Append(" kg bagged");
+            if (progression.NextThreshold >= 0) text.Append(" / ").Append(EconomyNumberFormat.Accounting(progression.NextThreshold)).Append(" kg next crop");
         }
         if (tool != null && tool.Kilograms > .00001f)
         {
@@ -34,7 +34,7 @@ public sealed class GrainSortingHUD : MonoBehaviour
                 float kg = tool.Cargo[(GrainType)i];
                 if (kg <= .00001f) continue;
                 if (!first) text.Append("  ·  "); first = false;
-                text.Append(GrainNames.Display((GrainType)i)).Append(' ').Append(kg.ToString("0.00")).Append(" kg");
+                text.Append(GrainNames.Display((GrainType)i)).Append(' ').Append(EconomyNumberFormat.Accounting(kg)).Append(" kg");
             }
             text.Append("\nRight-click a bag to pour its crop. Other crops stay on the shovel. Right-click ground to drop the load.");
         }

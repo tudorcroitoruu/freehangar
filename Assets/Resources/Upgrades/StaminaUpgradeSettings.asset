@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StaminaUpgradeSettings
   baseStamina: 100
   staminaPerUpgrade: 25
-  prices: 64000000fa000000f4010000e8030000
+  prices: 4b000000900100000807000070170000

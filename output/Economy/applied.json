@@ -1,0 +1,21 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  229,
+                   "executeMs":  1140,
+                   "assemblyName":  "PipelineRunScript_ApplyBalance_bf55d7312be14345b812a65657941cfe",
+                   "success":  true,
+                   "result":  {
+                                  "multiplier":  200.0,
+                                  "startingCash":  60,
+                                  "shovelCost":  101875,
+                                  "staminaCost":  8275,
+                                  "vehicleCost":  33800,
+                                  "disabledCashFinds":  7,
+                                  "sceneSaved":  true
+                              }
+               }
+}

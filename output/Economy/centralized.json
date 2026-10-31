@@ -1,0 +1,28 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  2306,
+                   "executeMs":  2532,
+                   "assemblyName":  "PipelineRunScript_CentralizeEconomy_26b581f2b9854062b7e3ca654babe6f8",
+                   "success":  true,
+                   "result":  {
+                                  "economy":  "Assets/Resources/Economy/GrainEconomySettings.asset",
+                                  "startingCash":  0,
+                                  "TotalGrossRevenue":  224012.4304399275,
+                                  "TotalExpectedRevenue":  205604.2957968082,
+                                  "ShovelUpgradeCost":  101875,
+                                  "StaminaUpgradeCost":  8275,
+                                  "VehicleUpgradeCost":  33800,
+                                  "TotalUpgradeCost":  143950,
+                                  "TotalContainerAllowance":  8904.0,
+                                  "ExpectedBalance":  52750.295796808205,
+                                  "stocks":  5,
+                                  "grainPrices":  10,
+                                  "containerPrices":  5,
+                                  "shops":  1
+                              }
+               }
+}

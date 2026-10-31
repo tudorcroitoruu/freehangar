@@ -1,0 +1,15 @@
+{
+    "success":  true,
+    "result":  {
+                   "output":  null,
+                   "diagnostics":  [
+
+                                   ],
+                   "success":  true,
+                   "result":  {
+                                  "scene":  "Assets/Scenes/Gameplay.unity",
+                                  "dirty":  false,
+                                  "report":  "# Grain economy budget\n\nGenerated from the open scene. Currency is fictional game dollars. All five hangars are cleared once; no vouchers or extra starting cargo are counted. Container costs include a partial final container for each crop. Sales round down to whole dollars; leave a small rounding reserve.\r\n\n| Hangar | Physical kg | Collectible kg | Gross $ | Containers $ | Upgrades $ | Cash left $ | Cash left with 20% grain loss $ |\n|---|---:|---:|---:|---:|---:|---:|---:|\r\n| 1 | 116,956 | 585 | 1,170 | 96 | 650 | 484 | 250 |\r\n| 2 | 2,164,968 | 10,825 | 22,949 | 1,519 | 15,000 | 6,913 | 2,090 |\r\n| 3 | 2,166,146 | 10,831 | 31,626 | 1,400 | 25,300 | 11,839 | 690 |\r\n| 4 | 5,515,284 | 27,576 | 79,696 | 3,234 | 42,000 | 46,301 | 19,213 |\r\n| 5 | 5,518,543 | 27,593 | 88,573 | 2,655 | 61,000 | 71,218 | 26,416 |\r\n\nStarting cash: $60. Gross income: $224,012. Containers: $8,904. All upgrades: $143,950. Remaining cash: $71,218. With 20% crop loss: $26,416.\r\n\nThis is an affordability model, not a measured completion time. Use Docs/AI/EconomyBalance.md for the purchase route, timing assumptions, and persistence limits.\r\n"
+                              }
+               }
+}

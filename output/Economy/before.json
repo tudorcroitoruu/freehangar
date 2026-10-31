@@ -1,0 +1,431 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  2378,
+                   "executeMs":  49,
+                   "assemblyName":  "PipelineRunScript_Inspect_e396e82878ee400b9abaeb3117da8a3d",
+                   "success":  true,
+                   "result":  {
+                                  "scene":  "Assets/Scenes/Gameplay.unity",
+                                  "dirty":  false,
+                                  "piles":  [
+                                                {
+                                                    "path":  "New_Map/11_Five_Hangar_Farm/Interactive grain stockpiles/Hangar 5 - Grain bank to entrance",
+                                                    "kg":  5518543.4631554009,
+                                                    "crops":  [
+                                                                  {
+                                                                      "type":  "Corn",
+                                                                      "kg":  275927.17315777
+                                                                  },
+                                                                  {
+                                                                      "type":  "Wheat",
+                                                                      "kg":  275927.17315777
+                                                                  },
+                                                                  {
+                                                                      "type":  "Barley",
+                                                                      "kg":  275927.17315777
+                                                                  },
+                                                                  {
+                                                                      "type":  "Oats",
+                                                                      "kg":  551854.34631554
+                                                                  },
+                                                                  {
+                                                                      "type":  "Rye",
+                                                                      "kg":  551854.34631554
+                                                                  },
+                                                                  {
+                                                                      "type":  "Rice",
+                                                                      "kg":  1379635.8657888502
+                                                                  },
+                                                                  {
+                                                                      "type":  "Peas",
+                                                                      "kg":  551854.34631554
+                                                                  },
+                                                                  {
+                                                                      "type":  "Soybeans",
+                                                                      "kg":  827781.51947331009
+                                                                  },
+                                                                  {
+                                                                      "type":  "SunflowerSeeds",
+                                                                      "kg":  551854.34631554
+                                                                  },
+                                                                  {
+                                                                      "type":  "Buckwheat",
+                                                                      "kg":  275927.17315777
+                                                                  }
+                                                              ]
+                                                },
+                                                {
+                                                    "path":  "New_Map/11_Five_Hangar_Farm/Interactive grain stockpiles/Hangar 2 - Almost full grain bank",
+                                                    "kg":  2164968.0337805687,
+                                                    "crops":  [
+                                                                  {
+                                                                      "type":  "Corn",
+                                                                      "kg":  1515477.6236463981
+                                                                  },
+                                                                  {
+                                                                      "type":  "Wheat",
+                                                                      "kg":  649490.41013417055
+                                                                  },
+                                                                  {
+                                                                      "type":  "Barley",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Oats",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Rye",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Rice",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Peas",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Soybeans",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "SunflowerSeeds",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Buckwheat",
+                                                                      "kg":  0.0
+                                                                  }
+                                                              ]
+                                                },
+                                                {
+                                                    "path":  "Grain Prototype/Corn pile - scoop with left click",
+                                                    "kg":  116955.57161192046,
+                                                    "crops":  [
+                                                                  {
+                                                                      "type":  "Corn",
+                                                                      "kg":  116955.57161192046
+                                                                  },
+                                                                  {
+                                                                      "type":  "Wheat",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Barley",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Oats",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Rye",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Rice",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Peas",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Soybeans",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "SunflowerSeeds",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Buckwheat",
+                                                                      "kg":  0.0
+                                                                  }
+                                                              ]
+                                                },
+                                                {
+                                                    "path":  "New_Map/11_Five_Hangar_Farm/Interactive grain stockpiles/Hangar 3 - Almost full grain bank",
+                                                    "kg":  2166146.1191651155,
+                                                    "crops":  [
+                                                                  {
+                                                                      "type":  "Corn",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Wheat",
+                                                                      "kg":  433229.2238330231
+                                                                  },
+                                                                  {
+                                                                      "type":  "Barley",
+                                                                      "kg":  433229.2238330231
+                                                                  },
+                                                                  {
+                                                                      "type":  "Oats",
+                                                                      "kg":  433229.2238330231
+                                                                  },
+                                                                  {
+                                                                      "type":  "Rye",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Rice",
+                                                                      "kg":  433229.2238330231
+                                                                  },
+                                                                  {
+                                                                      "type":  "Peas",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Soybeans",
+                                                                      "kg":  433229.2238330231
+                                                                  },
+                                                                  {
+                                                                      "type":  "SunflowerSeeds",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Buckwheat",
+                                                                      "kg":  0.0
+                                                                  }
+                                                              ]
+                                                },
+                                                {
+                                                    "path":  "New_Map/11_Five_Hangar_Farm/Interactive grain stockpiles/Hangar 4 - Grain bank to entrance",
+                                                    "kg":  5515284.1775357006,
+                                                    "crops":  [
+                                                                  {
+                                                                      "type":  "Corn",
+                                                                      "kg":  275764.20887678565
+                                                                  },
+                                                                  {
+                                                                      "type":  "Wheat",
+                                                                      "kg":  1103056.83550714
+                                                                  },
+                                                                  {
+                                                                      "type":  "Barley",
+                                                                      "kg":  1103056.83550714
+                                                                  },
+                                                                  {
+                                                                      "type":  "Oats",
+                                                                      "kg":  827292.626630355
+                                                                  },
+                                                                  {
+                                                                      "type":  "Rye",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Rice",
+                                                                      "kg":  1103056.83550714
+                                                                  },
+                                                                  {
+                                                                      "type":  "Peas",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Soybeans",
+                                                                      "kg":  1103056.83550714
+                                                                  },
+                                                                  {
+                                                                      "type":  "SunflowerSeeds",
+                                                                      "kg":  0.0
+                                                                  },
+                                                                  {
+                                                                      "type":  "Buckwheat",
+                                                                      "kg":  0.0
+                                                                  }
+                                                              ]
+                                                }
+                                            ],
+                                  "products":  [
+                                                   {
+                                                       "path":  "PlayerBase/ContainersShop/Crate",
+                                                       "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::ShopProduct\",\"productID\":\"crate\",\"productName\":\"Crate\",\"productPrice\":1000,\"toBuy\":true,\"toRent\":false,\"objectPrefab\":{\"fileID\":7210842097477428087,\"guid\":\"eb731e91ae410754ebc5f7596c6cbf2e\",\"type\":3},\"deliveryMode\":0,\"spawnPoint\":{\"instanceID\":0},\"inventoryManager\":{\"instanceID\":0},\"maxActiveInScene\":10}}"
+                                                   },
+                                                   {
+                                                       "path":  "PlayerBase/ContainersShop/BigBag",
+                                                       "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::ShopProduct\",\"productID\":\"bigBag\",\"productName\":\"Big Bag\",\"productPrice\":5000,\"toBuy\":true,\"toRent\":false,\"objectPrefab\":{\"fileID\":1521085326205624577,\"guid\":\"e081f75f0718b8f418e7a58f44bd497e\",\"type\":3},\"deliveryMode\":0,\"spawnPoint\":{\"instanceID\":0},\"inventoryManager\":{\"instanceID\":0},\"maxActiveInScene\":10}}"
+                                                   },
+                                                   {
+                                                       "path":  "PlayerBase/ContainersShop/SmallBag",
+                                                       "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::ShopProduct\",\"productID\":\"smallBag\",\"productName\":\"Small bag\",\"productPrice\":100,\"toBuy\":true,\"toRent\":false,\"objectPrefab\":{\"fileID\":30410232912704535,\"guid\":\"ab8b6d4aaac96504497dff8c04cb7891\",\"type\":3},\"deliveryMode\":0,\"spawnPoint\":{\"instanceID\":0},\"inventoryManager\":{\"instanceID\":0},\"maxActiveInScene\":10}}"
+                                                   },
+                                                   {
+                                                       "path":  "PlayerBase/ContainersShop/Barrel",
+                                                       "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::ShopProduct\",\"productID\":\"barrel\",\"productName\":\"Barrel\",\"productPrice\":2500,\"toBuy\":true,\"toRent\":false,\"objectPrefab\":{\"fileID\":6691740664109452445,\"guid\":\"0e1bd387d12bf994e93017e2686bb315\",\"type\":3},\"deliveryMode\":0,\"spawnPoint\":{\"instanceID\":0},\"inventoryManager\":{\"instanceID\":0},\"maxActiveInScene\":10}}"
+                                                   },
+                                                   {
+                                                       "path":  "PlayerBase/ContainersShop/LargeBag",
+                                                       "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::ShopProduct\",\"productID\":\"largeBag\",\"productName\":\"Large Bag\",\"productPrice\":250,\"toBuy\":true,\"toRent\":false,\"objectPrefab\":{\"fileID\":6347959474882097887,\"guid\":\"74ea987079d2f16479c245f3ebeddb46\",\"type\":3},\"deliveryMode\":0,\"spawnPoint\":{\"instanceID\":0},\"inventoryManager\":{\"instanceID\":0},\"maxActiveInScene\":10}}"
+                                                   }
+                                               ],
+                                  "containers":  [
+                                                     {
+                                                         "path":  "Grain Prototype/Sorting sack 2",
+                                                         "active":  false,
+                                                         "kg":  0.0,
+                                                         "capacity":  50.0
+                                                     },
+                                                     {
+                                                         "path":  "SmallBag",
+                                                         "active":  true,
+                                                         "kg":  0.0,
+                                                         "capacity":  25.0
+                                                     },
+                                                     {
+                                                         "path":  "FreeBag",
+                                                         "active":  true,
+                                                         "kg":  0.0,
+                                                         "capacity":  10.0
+                                                     },
+                                                     {
+                                                         "path":  "BigBag",
+                                                         "active":  true,
+                                                         "kg":  0.0,
+                                                         "capacity":  500.0
+                                                     },
+                                                     {
+                                                         "path":  "Grain Prototype/Sorting sack 3",
+                                                         "active":  false,
+                                                         "kg":  0.0,
+                                                         "capacity":  50.0
+                                                     },
+                                                     {
+                                                         "path":  "Sack",
+                                                         "active":  false,
+                                                         "kg":  0.0,
+                                                         "capacity":  50.0
+                                                     },
+                                                     {
+                                                         "path":  "Grain Prototype/50 kg sack - fill with loaded shovel",
+                                                         "active":  false,
+                                                         "kg":  0.0,
+                                                         "capacity":  50.0
+                                                     },
+                                                     {
+                                                         "path":  "Barrel",
+                                                         "active":  true,
+                                                         "kg":  0.0,
+                                                         "capacity":  120.0
+                                                     },
+                                                     {
+                                                         "path":  "LargeBag",
+                                                         "active":  true,
+                                                         "kg":  0.0,
+                                                         "capacity":  50.0
+                                                     },
+                                                     {
+                                                         "path":  "Crate",
+                                                         "active":  true,
+                                                         "kg":  0.0,
+                                                         "capacity":  80.0
+                                                     }
+                                                 ],
+                                  "zones":  [
+                                                {
+                                                    "path":  "WeightZone_2",
+                                                    "active":  true,
+                                                    "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::SellingZone\",\"allGrainsSettings\":[{\"grainType\":0,\"grainSprite\":{\"fileID\":21300000,\"guid\":\"9057bd186e305944784add1033ad478c\",\"type\":3},\"grainPrice\":3.0},{\"grainType\":1,\"grainSprite\":{\"fileID\":21300000,\"guid\":\"398606d448333e646a035b1521566bb0\",\"type\":3},\"grainPrice\":2.4000000953674318},{\"grainType\":2,\"grainSprite\":{\"fileID\":21300000,\"guid\":\"53677c641a71e45488d7b38fd23103e1\",\"type\":3},\"grainPrice\":2.5999999046325685},{\"grainType\":3,\"grainSprite\":{\"fileID\":21300000,\"guid\":\"f3ba358bccb6d25468ecba6b510dbf57\",\"type\":3},\"grainPrice\":3.4000000953674318},{\"grainType\":4,\"grainSprite\":{\"fileID\":21300000,\"guid\":\"845fde5250efb084db9ef82febd28f57\",\"type\":3},\"grainPrice\":2.200000047683716},{\"grainType\":5,\"grainSprite\":{\"fileID\":21300000,\"guid\":\"4e352425ae62d594e86659de10aeddd5\",\"type\":3},\"grainPrice\":3.0},{\"grainType\":6,\"grainSprite\":{\"fileID\":21300000,\"guid\":\"a2a29bca3facba2489cfe7b5fbcd3090\",\"type\":3},\"grainPrice\":4.400000095367432},{\"grainType\":7,\"grainSprite\":{\"fileID\":21300000,\"guid\":\"d0c3cc5736ea27a4e9a060b59c809a96\",\"type\":3},\"grainPrice\":5.0},{\"grainType\":8,\"grainSprite\":{\"fileID\":21300000,\"guid\":\"d46c242bc5751d54bbd12f1dd32b0b18\",\"type\":3},\"grainPrice\":4.800000190734863},{\"grainType\":9,\"grainSprite\":{\"fileID\":21300000,\"guid\":\"06847a95de18d9242a9ac229c900ce40\",\"type\":3},\"grainPrice\":3.200000047683716}],\"sellingScreen\":{\"instanceID\":0}}}"
+                                                }
+                                            ],
+                                  "oldZones":  [
+                                                   {
+                                                       "path":  "WeightZone_2/Weigh Station/Selling scale",
+                                                       "active":  true
+                                                   }
+                                               ],
+                                  "rewards":  [
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Blue key - HANGAR 3",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":7,\"findId\":\"farm.hangar.key.3\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":500,\"staminaDurationSeconds\":300,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":3587902637107084988,\"guid\":\"c4635ea9fbdef604d9ceb771e8cbcc5c\",\"type\":3},\"targetHangar\":3}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Hangar 3 cash cache",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":4,\"findId\":\"farm.cache.h3\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":250,\"staminaDurationSeconds\":3600,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":5460359843850336834,\"guid\":\"0489995431ab4aa4ca30aa2246736b7b\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Starter stamina tonic",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":3,\"findId\":\"farm.stamina.starter\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":1,\"staminaDurationSeconds\":300,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":7241767482859861083,\"guid\":\"6a36cf528b1a7284591ffcd9d34f397e\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Copper key - starter grain",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":0,\"findId\":\"farm.key.copper\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":0,\"staminaDurationSeconds\":3600,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":false,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":5460359843850336834,\"guid\":\"0489995431ab4aa4ca30aa2246736b7b\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Free wheelbarrow upgrade voucher",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":2,\"findId\":\"farm.perk.free-upgrade\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":500,\"staminaDurationSeconds\":3600,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":false,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":5460359843850336834,\"guid\":\"0489995431ab4aa4ca30aa2246736b7b\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Mystery chest - Hangar 2",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":1,\"findId\":\"farm.chest.h2\",\"requiredKeyId\":\"farm.key.copper\",\"matchingHangarKeyId\":\"farm.hangar.key.2\",\"matchingKeyColor\":\"orange\",\"matchingKeyMaterial\":{\"fileID\":2100000,\"guid\":\"0e3661a240bdc4b4783f9fbe9f48f557\",\"type\":2},\"cashReward\":500,\"staminaDurationSeconds\":3600,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":false,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"fileID\":3421434001205870697,\"guid\":\"7c3e9c8a2c0aae240911290bc783147e\",\"type\":3},\"pickupEffect\":{\"fileID\":6466931985844204484,\"guid\":\"6fc2374341ad80e4b80c92ffac892886\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/02_Hangar_Props/Wall side farm storage and ladders/TFP_Broom_01A",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":8,\"findId\":\"farm.tool.broom\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":500,\"staminaDurationSeconds\":300,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":false,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"instanceID\":0},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Hangar 4 cash cache",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":4,\"findId\":\"farm.cache.h4\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":350,\"staminaDurationSeconds\":3600,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":5460359843850336834,\"guid\":\"0489995431ab4aa4ca30aa2246736b7b\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Hangar 2 cash cache",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":4,\"findId\":\"farm.cache.h2\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":180,\"staminaDurationSeconds\":3600,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":5460359843850336834,\"guid\":\"0489995431ab4aa4ca30aa2246736b7b\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Buried hammer - key 2",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":5,\"findId\":\"farm.tool.hammer\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":500,\"staminaDurationSeconds\":300,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":5460359843850336834,\"guid\":\"0489995431ab4aa4ca30aa2246736b7b\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Hangar 5 cash cache",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":4,\"findId\":\"farm.cache.h5\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":400,\"staminaDurationSeconds\":3600,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":5460359843850336834,\"guid\":\"0489995431ab4aa4ca30aa2246736b7b\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Iron key - Hangar 3",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":0,\"findId\":\"farm.key.iron\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":0,\"staminaDurationSeconds\":3600,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":false,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":5460359843850336834,\"guid\":\"0489995431ab4aa4ca30aa2246736b7b\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Mystery chest - Hangar 4",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":1,\"findId\":\"farm.chest.h4\",\"requiredKeyId\":\"farm.key.iron\",\"matchingHangarKeyId\":\"farm.hangar.key.3\",\"matchingKeyColor\":\"blue\",\"matchingKeyMaterial\":{\"fileID\":2100000,\"guid\":\"168384517f0a90a4ba158d5045df0c62\",\"type\":2},\"cashReward\":900,\"staminaDurationSeconds\":3600,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":false,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"fileID\":3421434001205870697,\"guid\":\"7c3e9c8a2c0aae240911290bc783147e\",\"type\":3},\"pickupEffect\":{\"fileID\":6466931985844204484,\"guid\":\"6fc2374341ad80e4b80c92ffac892886\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Hangar 4 stamina tonic",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":3,\"findId\":\"farm.stamina.h4\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":1,\"staminaDurationSeconds\":300,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":7241767482859861083,\"guid\":\"6a36cf528b1a7284591ffcd9d34f397e\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Buried sledgehammer - key 3",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":6,\"findId\":\"farm.tool.sledgehammer\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":500,\"staminaDurationSeconds\":300,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":5460359843850336834,\"guid\":\"0489995431ab4aa4ca30aa2246736b7b\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Gold key - HANGAR 5",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":7,\"findId\":\"farm.hangar.key.5\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":500,\"staminaDurationSeconds\":300,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":3587902637107084988,\"guid\":\"c4635ea9fbdef604d9ceb771e8cbcc5c\",\"type\":3},\"targetHangar\":5}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Infinite stamina bottle - 5 minutes",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":3,\"findId\":\"farm.perk.stamina-hour\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":500,\"staminaDurationSeconds\":300,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":false,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":7241767482859861083,\"guid\":\"6a36cf528b1a7284591ffcd9d34f397e\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Orange key - HANGAR 2",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":7,\"findId\":\"farm.hangar.key.2\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":500,\"staminaDurationSeconds\":300,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":3587902637107084988,\"guid\":\"c4635ea9fbdef604d9ceb771e8cbcc5c\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Hangar 3 upgrade voucher",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":2,\"findId\":\"farm.voucher.h3\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":1,\"staminaDurationSeconds\":3600,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":5460359843850336834,\"guid\":\"0489995431ab4aa4ca30aa2246736b7b\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Starter cash cache",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":4,\"findId\":\"farm.cache.starter\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":120,\"staminaDurationSeconds\":3600,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":5460359843850336834,\"guid\":\"0489995431ab4aa4ca30aa2246736b7b\",\"type\":3},\"targetHangar\":2}}"
+                                                  },
+                                                  {
+                                                      "path":  "New_Map/15_Buried_Finds/Green key - HANGAR 4",
+                                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::BuriedFind\",\"kind\":7,\"findId\":\"farm.hangar.key.4\",\"requiredKeyId\":\"\",\"matchingHangarKeyId\":\"\",\"matchingKeyColor\":\"\",\"matchingKeyMaterial\":{\"instanceID\":0},\"cashReward\":500,\"staminaDurationSeconds\":300,\"coveringPile\":{\"instanceID\":0},\"settleOnReveal\":true,\"lidPivot\":{\"instanceID\":0},\"lidOpenDegrees\":-110.0,\"keySocket\":{\"instanceID\":0},\"insertionKeyPrefab\":{\"instanceID\":0},\"pickupEffect\":{\"fileID\":3587902637107084988,\"guid\":\"c4635ea9fbdef604d9ceb771e8cbcc5c\",\"type\":3},\"targetHangar\":4}}"
+                                                  }
+                                              ]
+                              }
+               }
+}

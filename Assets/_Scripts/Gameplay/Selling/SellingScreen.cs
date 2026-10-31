@@ -12,7 +12,7 @@ public class SellingScreen : MonoBehaviour
     [SerializeField] private Text totalValue;
     [SerializeField] private Text totalValueButton;
     [Space] [SerializeField] private Button cancelButton;
-    [SerializeField] private Button buyButton;
+    [SerializeField] private Button sellButton;
     private readonly List<SellGrainElement> elements = new List<SellGrainElement>();
     private readonly List<GrainContainer> containers = new List<GrainContainer>();
     private readonly List<GrainContainer> currentContainers = new List<GrainContainer>();
@@ -51,7 +51,7 @@ public class SellingScreen : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         if (cancelButton != null) cancelButton.onClick.AddListener(Close);
-        if (buyButton != null) buyButton.onClick.AddListener(Sell);
+        if (sellButton != null) sellButton.onClick.AddListener(Sell);
     }
 
     private void Update()
@@ -61,7 +61,7 @@ public class SellingScreen : MonoBehaviour
         if (!Application.isFocused || UIPopups.BasePopupUI.HasActivePopup) return;
         if (Input.GetKeyDown(KeyCode.Escape)) Close();
         else if (!QuoteMatches()) Refresh();
-        else if (buyButton != null) buyButton.interactable = CanPay();
+        else if (sellButton != null) sellButton.interactable = CanPay();
     }
 
     private void Refresh()
@@ -72,7 +72,8 @@ public class SellingScreen : MonoBehaviour
         quotedTypes.Clear();
         quotedPrices.Clear();
         var quantities = new SortedDictionary<GrainType, float>();
-        double weight = 0, value = 0;
+        double weight = 0;
+        var cropValues = new List<double>();
         foreach (var container in containers)
         {
             var grain = container.AcceptedGrain;
@@ -90,14 +91,14 @@ public class SellingScreen : MonoBehaviour
             element.SetData(settings, entry.Value);
             elements.Add(element);
             weight += entry.Value;
-            value += entry.Value * (double)settings.grainPrice;
+            cropValues.Add(EconomyNumberFormat.CropValue(entry.Value, settings.grainPrice));
         }
-        // The wallet stores whole dollars; round down once after summing all crops.
-        quotedCash = value >= 1 && value < (double)int.MaxValue + 1 ? (int)Math.Floor(value) : 0;
-        if (totalWeight != null) totalWeight.text = $"{weight:0.#} kg";
-        if (totalValue != null) totalValue.text = $"$ {quotedCash:N2}";
-        if (totalValueButton != null) totalValueButton.text = $"SELL ALL - ${quotedCash:N2}";
-        if (buyButton != null) buyButton.interactable = CanPay();
+        // Add the same whole-dollar amounts shown in the crop rows, without a hidden fractional remainder.
+        quotedCash = EconomyNumberFormat.SaleTotal(cropValues);
+        if (totalWeight != null) totalWeight.text = $"{EconomyNumberFormat.Accounting(weight)} kg";
+        if (totalValue != null) totalValue.text = $"$ {EconomyNumberFormat.Accounting(quotedCash)}";
+        if (totalValueButton != null) totalValueButton.text = $"SELL ALL - ${EconomyNumberFormat.Accounting(quotedCash)}";
+        if (sellButton != null) sellButton.interactable = CanPay();
     }
 
     private bool CanPay() => containers.Count > 0 && quotedCash > 0 && SaveSystem.Data != null && SaveSystem.Money <= int.MaxValue - quotedCash;
@@ -119,7 +120,7 @@ public class SellingScreen : MonoBehaviour
         if (!IsOpen || !Zone.CanWeigh(player) || UIPopups.BasePopupUI.HasActivePopup) return;
         if (!QuoteMatches()) { Refresh(); return; }
         if (!CanPay() || !SaveSystem.AddMoney(quotedCash)) return;
-        if (buyButton != null) buyButton.interactable = false;
+        if (sellButton != null) sellButton.interactable = false;
         foreach (var container in containers)
         {
             var wheelbarrow = container.GetComponentInParent<WheelbarrowCargo>();
@@ -155,7 +156,7 @@ public class SellingScreen : MonoBehaviour
             Cursor.visible = restore ? previousCursorVisible : true;
         }
         if (cancelButton != null) cancelButton.onClick.RemoveListener(Close);
-        if (buyButton != null) buyButton.onClick.RemoveListener(Sell);
+        if (sellButton != null) sellButton.onClick.RemoveListener(Sell);
         ClearElements();
         ReleaseInput();
     }

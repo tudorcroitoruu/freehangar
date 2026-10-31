@@ -4,8 +4,10 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider))]
 public class SellingZone : MonoBehaviour
 {
-    [SerializeField] private GrainElementSettings[] allGrainsSettings;
+    [SerializeField, Tooltip("Legacy fallback used only when Economy Settings is not assigned.")]
+    private GrainElementSettings[] allGrainsSettings;
     [SerializeField] private SellingScreen sellingScreen;
+    [SerializeField] private GrainEconomySettings economySettings;
     private BoxCollider area;
     private readonly HashSet<BicycleController> parkedBicycles = new HashSet<BicycleController>();
 
@@ -46,6 +48,8 @@ public class SellingZone : MonoBehaviour
 
     public bool TryGetSettings(GrainType grain, out GrainElementSettings settings)
     {
+        if (economySettings != null)
+            return economySettings.TryGetGrain(grain, out settings) && settings.grainPrice > 0;
         if (allGrainsSettings != null)
             foreach (var entry in allGrainsSettings)
                 if (entry != null && entry.grainType == grain && float.IsFinite(entry.grainPrice) && entry.grainPrice > 0)

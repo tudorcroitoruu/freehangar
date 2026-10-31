@@ -1,0 +1,55 @@
+{
+  "status": "completed",
+  "duration": 0.24,
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "EconomyNumberFormatTests.AccountingUsesCommaThousandsAndNoDecimalsRegardlessOfLocale(\"ro-RO\")",
+      "Status": "Passed",
+      "Duration": 0.0127885,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "EconomyNumberFormatTests.AccountingUsesCommaThousandsAndNoDecimalsRegardlessOfLocale(\"de-DE\")",
+      "Status": "Passed",
+      "Duration": 0.0002917,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "EconomyNumberFormatTests.AccountingUsesCommaThousandsAndNoDecimalsRegardlessOfLocale(\"fr-FR\")",
+      "Status": "Passed",
+      "Duration": 4.13E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "EconomyNumberFormatTests.InvalidOrOverflowingQuotesCannotBePartiallyPaid",
+      "Status": "Passed",
+      "Duration": 0.0015055,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "EconomyNumberFormatTests.SaleTotalEqualsTheWholeDollarCropRowsWithoutHiddenFractionalCarry",
+      "Status": "Passed",
+      "Duration": 0.0013543,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "EconomyNumberFormatTests.SellingRowUsesAccountingAndTheActualWholeDollarPayout",
+      "Status": "Passed",
+      "Duration": 0.0020597,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

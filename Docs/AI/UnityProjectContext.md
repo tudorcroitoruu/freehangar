@@ -1,5 +1,42 @@
 # Unity project context
 
+2026-10-31 accounting display: economy calculated totals, captured stock, pile
+mass, grain HUD/bag prompts, wallet, shop/upgrade costs and sale totals use comma
+thousands grouping with no decimals, independently of OS locale. Configured unit
+prices retain precision. Selling truncates proceeds per crop to whole dollars,
+then sums those exact invoice rows; float multiplication noise is removed before
+conversion. All six accounting tests pass; full suite 200/207, same seven
+existing interaction/carry failures. See EconomyBalance.md.
+
+2026-10-31 central economy: New PlayerData starts with $0. The shared
+Resources/Economy/GrainEconomySettings asset now owns grain prices/sprites,
+container IDs/prices/prefabs, references to all three upgrade SOs, actual rat/bird
+feeding rates and interval, per-hangar stock snapshots/loss estimates/purchase
+targets, and a stress loss percentage. Its custom Inspector shows read-only
+per-crop income, loss kg, total revenue, category/total upgrade spending,
+container allowance and stage balances, and can edit the linked upgrade SOs
+inline. Capture stock again after changing the five scene piles; multiplier or
+price edits update forecasts without recapture. ShopManager/ShopProduct and the
+single SellingZone read directly from the SO. Runtime upgrade consumers resolve
+its referenced upgrade settings. Expected revenue after configured pests is
+$205,604; all upgrades $143,950; container allowance $8,904; expected balance
+$52,750. Pest loss percentages are forecast assumptions, not extra runtime
+damage. See EconomyBalance.md and output/Economy/current-balance.md.
+Compilation and 93 relevant tests pass; full suite 194/201, with the same seven
+existing interaction/carry failures as before this centralization.
+
+2026-10-31 initial economy baseline (superseded by central economy above): Gameplay's five authored GrainPile components share
+Resources/Economy/GrainEconomySettings (grainConsumeMultiplier=200). Physical kg
+still drive clearance; collectible cargo is physical mass / multiplier. Dropped
+grain remains 1:1; depositing back restores equivalent collectible mass. One
+SellingZone pays for grain; legacy automatic scale and seven cash discoveries
+are disabled, goal cash rewards are zero. Fresh saves now start with $0. Rebalanced
+container and upgrade costs leave a positive stage budget even with 20% crop
+loss. Tools > Grain > Write Economy Report recomputes affordability. Fixed vehicle
+replacement through the nested mower/trailer prefab. See EconomyBalance.md for
+prices, purchase route, tests (184/191 overall, 83 relevant cases pass), unmeasured
+4–6 hour pacing target and existing session-only stock/cargo persistence limit.
+
 2026-10-27 spatial correction: all five Gameplay piles now store local crop
 regions and optional buried percentage layers in GrainSpatialField. The original
 hangar is always 100% corn; hangars 4 and 5 are exactly 5% corn by starting mass.

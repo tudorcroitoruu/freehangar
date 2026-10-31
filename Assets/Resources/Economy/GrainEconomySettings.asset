@@ -1,0 +1,165 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1128b7336ce1a0646aab0dcbaea6fa77, type: 3}
+  m_Name: GrainEconomySettings
+  m_EditorClassIdentifier: Assembly-CSharp::GrainEconomySettings
+  grainConsumeMultiplier: 200
+  shovelSettings: {fileID: 11400000, guid: b3f738209dfb4dbaae0e5f2a556884ec, type: 2}
+  staminaSettings: {fileID: 11400000, guid: 4e2e8d54983b4dfd9ef56f179553f573, type: 2}
+  vehicleSettings: {fileID: 11400000, guid: 0b15f2691eb74da684784edf778d5a6b, type: 2}
+  grains:
+  - grainType: 0
+    grainSprite: {fileID: 21300000, guid: 9057bd186e305944784add1033ad478c, type: 3}
+    grainPrice: 2
+  - grainType: 1
+    grainSprite: {fileID: 21300000, guid: 398606d448333e646a035b1521566bb0, type: 3}
+    grainPrice: 2.4
+  - grainType: 2
+    grainSprite: {fileID: 21300000, guid: 53677c641a71e45488d7b38fd23103e1, type: 3}
+    grainPrice: 2.2
+  - grainType: 3
+    grainSprite: {fileID: 21300000, guid: f3ba358bccb6d25468ecba6b510dbf57, type: 3}
+    grainPrice: 2.6
+  - grainType: 4
+    grainSprite: {fileID: 21300000, guid: 845fde5250efb084db9ef82febd28f57, type: 3}
+    grainPrice: 2
+  - grainType: 5
+    grainSprite: {fileID: 21300000, guid: 4e352425ae62d594e86659de10aeddd5, type: 3}
+    grainPrice: 3.4
+  - grainType: 6
+    grainSprite: {fileID: 21300000, guid: a2a29bca3facba2489cfe7b5fbcd3090, type: 3}
+    grainPrice: 3.6
+  - grainType: 7
+    grainSprite: {fileID: 21300000, guid: d0c3cc5736ea27a4e9a060b59c809a96, type: 3}
+    grainPrice: 4
+  - grainType: 8
+    grainSprite: {fileID: 21300000, guid: d46c242bc5751d54bbd12f1dd32b0b18, type: 3}
+    grainPrice: 4.2
+  - grainType: 9
+    grainSprite: {fileID: 21300000, guid: 06847a95de18d9242a9ac229c900ce40, type: 3}
+    grainPrice: 3.8
+  containers:
+  - productId: barrel
+    prefab: {fileID: 6691740664109452445, guid: 0e1bd387d12bf994e93017e2686bb315, type: 3}
+    price: 14
+  - productId: largeBag
+    prefab: {fileID: 6347959474882097887, guid: 74ea987079d2f16479c245f3ebeddb46, type: 3}
+    price: 7
+  - productId: bigBag
+    prefab: {fileID: 1521085326205624577, guid: e081f75f0718b8f418e7a58f44bd497e, type: 3}
+    price: 45
+  - productId: smallBag
+    prefab: {fileID: 30410232912704535, guid: ab8b6d4aaac96504497dff8c04cb7891, type: 3}
+    price: 4
+  - productId: crate
+    prefab: {fileID: 7210842097477428087, guid: eb731e91ae410754ebc5f7596c6cbf2e, type: 3}
+    price: 10
+  pestBiteIntervalSeconds: 3
+  ratGroupKgPerBite: 1
+  birdGroupKgPerBite: 1
+  hangars:
+  - hangarId: 1
+    pileName: Corn pile - scoop with left click
+    physicalGrainKg:
+    - 116955.57161192046
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    ratLossPercent: 0
+    birdLossPercent: 0
+    containerProductId: smallBag
+    targetShovelLevel: 4
+    targetStaminaLevel: 1
+    targetVehicleId: motoroller
+  - hangarId: 2
+    pileName: Hangar 2 - Almost full grain bank
+    physicalGrainKg:
+    - 1515477.623646398
+    - 649490.4101341706
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    ratLossPercent: 0
+    birdLossPercent: 0
+    containerProductId: largeBag
+    targetShovelLevel: 16
+    targetStaminaLevel: 2
+    targetVehicleId: lawnmower
+  - hangarId: 3
+    pileName: Hangar 3 - Almost full grain bank
+    physicalGrainKg:
+    - 0
+    - 433229.2238330231
+    - 433229.2238330231
+    - 433229.2238330231
+    - 0
+    - 433229.2238330231
+    - 0
+    - 433229.2238330231
+    - 0
+    - 0
+    ratLossPercent: 5
+    birdLossPercent: 0
+    containerProductId: crate
+    targetShovelLevel: 20
+    targetStaminaLevel: 3
+    targetVehicleId: pickup
+  - hangarId: 4
+    pileName: Hangar 4 - Grain bank to entrance
+    physicalGrainKg:
+    - 275764.20887678565
+    - 1103056.83550714
+    - 1103056.83550714
+    - 827292.626630355
+    - 0
+    - 1103056.83550714
+    - 0
+    - 1103056.83550714
+    - 0
+    - 0
+    ratLossPercent: 5
+    birdLossPercent: 5
+    containerProductId: barrel
+    targetShovelLevel: 22
+    targetStaminaLevel: 4
+    targetVehicleId: pickupBig
+  - hangarId: 5
+    pileName: Hangar 5 - Grain bank to entrance
+    physicalGrainKg:
+    - 275927.17315777
+    - 275927.17315777
+    - 275927.17315777
+    - 551854.34631554
+    - 551854.34631554
+    - 1379635.8657888502
+    - 551854.34631554
+    - 827781.5194733101
+    - 551854.34631554
+    - 275927.17315777
+    ratLossPercent: 5
+    birdLossPercent: 5
+    containerProductId: bigBag
+    targetShovelLevel: 24
+    targetStaminaLevel: 4
+    targetVehicleId: pickupLast
+  stressLossPercent: 20

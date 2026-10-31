@@ -161,7 +161,7 @@ public class VehicleUpgradeTests
         SetField(target, "settings", settings);
         SetField(target, "vehicleId", "first");
         LogAssert.Expect(LogType.Warning,
-            "Cannot upgrade vehicle: Resources/Tests/VehiclePrefabThatDoesNotExist must be a prefab with BicycleController on its root.");
+            "Cannot upgrade vehicle: Resources/Tests/VehiclePrefabThatDoesNotExist must be a prefab containing BicycleController.");
         Assert.IsFalse(target.TryUpgrade());
         Assert.AreEqual(100, SaveSystem.Data.cash);
         Assert.IsFalse(settings.IsUnlocked("second", SaveSystem.Data));
@@ -178,7 +178,44 @@ public class VehicleUpgradeTests
             Assert.IsTrue(profile.IsConfigured, profile.id);
             var prefab = Resources.Load<GameObject>(profile.PrefabResourcePath);
             Assert.IsNotNull(prefab, profile.PrefabResourcePath);
-            Assert.IsNotNull(prefab.GetComponent<BicycleController>(), profile.id);
+            Assert.IsNotNull(prefab.GetComponentInChildren<BicycleController>(true), profile.id);
+        }
+    }
+    [Test]
+    public void TrailerVehicleReplacementKeepsTheAssemblyAndCanAdvanceToPickup()
+    {
+        settings.vehicles[1].prefabResourcePath = "Vehicles/4_Lawnmower_With_Trailer";
+        settings.vehicles[2].prefabResourcePath = "Vehicles/5_Pick_up_Driveable";
+        var source = root.AddComponent<VehicleUpgrade>();
+        SetField(source, "settings", settings);
+        SetField(source, "vehicleId", "first");
+        var create = typeof(VehicleUpgrade).GetMethod("TryCreateReplacement", BindingFlags.Instance | BindingFlags.NonPublic);
+        GameObject assembly = null, pickup = null;
+        try
+        {
+            object[] result = { null };
+            Assert.IsTrue((bool)create.Invoke(source, result));
+            var next = (VehicleUpgrade)result[0];
+            Assert.IsNotNull(next.GetComponent<BicycleController>());
+            Assert.IsNotNull(next.GetComponent<LawnmowerController>());
+            assembly = next.transform.parent.gameObject;
+            Assert.IsFalse(assembly.activeSelf);
+            Assert.Greater(assembly.GetComponentsInChildren<Transform>(true).Length, 2);
+            Assert.IsNotNull(next.GetComponent<LawnmowerController>().trailerJoint);
+            Assert.AreEqual("second", next.VehicleId);
+            SaveSystem.Data.unlockedVehicles.Add("second");
+            result[0] = null;
+            Assert.IsTrue((bool)create.Invoke(next, result));
+            var last = (VehicleUpgrade)result[0];
+            pickup = last.gameObject;
+            Assert.IsNotNull(last.GetComponent<PickupController>());
+            Assert.AreEqual(assembly.transform.parent, pickup.transform.parent);
+            Assert.AreEqual("last", last.VehicleId);
+        }
+        finally
+        {
+            Object.DestroyImmediate(pickup);
+            Object.DestroyImmediate(assembly);
         }
     }
     private GameObject Child(string name)

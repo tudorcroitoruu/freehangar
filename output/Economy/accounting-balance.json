@@ -1,0 +1,72 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  1891,
+                   "executeMs":  47,
+                   "assemblyName":  "PipelineRunScript_ValidateBalance_63dcd0765dd345ce8159787988e78058",
+                   "success":  true,
+                   "result":  {
+                                  "startingCash":  0,
+                                  "stages":  [
+                                                 {
+                                                     "hangarId":  1,
+                                                     "gross":  1169.5557161192046,
+                                                     "expected":  1169.5557161192046,
+                                                     "containers":  96.0,
+                                                     "upgrades":  650,
+                                                     "balance":  423.55571611920459,
+                                                     "stress":  189.64457289536369
+                                                 },
+                                                 {
+                                                     "hangarId":  2,
+                                                     "gross":  22948.66146777519,
+                                                     "expected":  22948.66146777519,
+                                                     "containers":  1519.0,
+                                                     "upgrades":  15000,
+                                                     "balance":  6853.2171838943941,
+                                                     "stress":  2029.5737471155167
+                                                 },
+                                                 {
+                                                     "hangarId":  3,
+                                                     "gross":  31625.733649680376,
+                                                     "expected":  30044.44696719636,
+                                                     "containers":  1400.0,
+                                                     "upgrades":  25300,
+                                                     "balance":  10197.664151090754,
+                                                     "stress":  630.16066685981923
+                                                 },
+                                                 {
+                                                     "hangarId":  4,
+                                                     "gross":  79695.857285853228,
+                                                     "expected":  71726.2715572679,
+                                                     "containers":  3234.0,
+                                                     "upgrades":  42000,
+                                                     "balance":  36689.935708358651,
+                                                     "stress":  19152.846495542406
+                                                 },
+                                                 {
+                                                     "hangarId":  5,
+                                                     "gross":  88572.6223204995,
+                                                     "expected":  79715.360088449554,
+                                                     "containers":  2655.0,
+                                                     "upgrades":  61000,
+                                                     "balance":  52750.295796808205,
+                                                     "stress":  26355.944351942009
+                                                 }
+                                             ],
+                                  "TotalGrossRevenue":  224012.4304399275,
+                                  "TotalExpectedRevenue":  205604.2957968082,
+                                  "ShovelUpgradeCost":  101875,
+                                  "StaminaUpgradeCost":  8275,
+                                  "VehicleUpgradeCost":  33800,
+                                  "TotalUpgradeCost":  143950,
+                                  "TotalContainerAllowance":  8904.0,
+                                  "ExpectedBalance":  52750.295796808205,
+                                  "stressBalance":  26355.944351942009,
+                                  "freeBagRecovery":  "Freebags"
+                              }
+               }
+}

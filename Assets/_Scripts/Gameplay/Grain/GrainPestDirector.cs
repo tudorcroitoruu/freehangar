@@ -22,6 +22,11 @@ public sealed class GrainPest : MonoBehaviour
     private Vector3 crowWaypoint, crowLandingOffset, previousTargetPosition;
     private bool crowPerched;
     private float targetSpeed;
+    private GrainEconomySettings economy;
+    public void ConfigureEconomy(GrainEconomySettings settings) => economy = settings;
+    private float BiteInterval => economy != null ? economy.BiteInterval : 3f;
+    private float RatGroupBite => economy != null ? economy.RatBiteKg : 1f;
+    private float BirdGroupBite => economy != null ? economy.BirdBiteKg : 1f;
     private float nextIdleSound;
     private Vector3 CrowPerchPoint()
     {
@@ -42,9 +47,9 @@ public sealed class GrainPest : MonoBehaviour
     private void EatFromTarget()
     {
         if (Time.time < nextBite) return;
-        Target.ConsumeByPest(biteAmount);
+        Target.ConsumeByPest(biteAmount * (IsCrow ? BirdGroupBite : RatGroupBite));
         if (!IsCrow && animator != null) animator.SetTrigger("IdleBreak");
-        nextBite = Time.time + 3f;
+        nextBite = Time.time + BiteInterval;
         if (!IsCrow) restUntil = Time.time + Random.Range(.15f, .75f);
     }
     public void ConfigureCrowArrival(Vector3 start, Vector3 doorway, int index)
@@ -81,6 +86,7 @@ public sealed class GrainPest : MonoBehaviour
     public void Initialize(GrainContainer target, bool crow, RuntimeAnimatorController fly, RuntimeAnimatorController eat)
     {
         Target = target; previousTargetPosition = target.transform.position; IsCrow = crow; speed = crow ? 7f : Random.Range(1.8f, 2.6f);
+        biteAmount = 1f;
         beginAt = Time.time + Random.Range(.1f, 1.5f);
         climbDuration = 1.45f;
         animator = GetComponentInChildren<Animator>(); flying = fly; feeding = eat;
@@ -91,7 +97,7 @@ public sealed class GrainPest : MonoBehaviour
             animator.speed = Random.Range(.88f, 1.12f);
             if (flying != null) animator.runtimeAnimatorController = flying;
         }
-        nextBite = Time.time + 3f;
+        nextBite = Time.time + BiteInterval;
         nextIdleSound = Time.time + Random.Range(.5f, 2f);
         var collider = gameObject.AddComponent<SphereCollider>(); collider.radius = .55f;
     }
@@ -147,7 +153,7 @@ public sealed class GrainPest : MonoBehaviour
                 transform.position = p;
                 Vector3 inward = Target.WorldBounds.center - p; inward.y = 0;
                 if (inward.sqrMagnitude > .001f) transform.rotation = Quaternion.LookRotation(inward) * Quaternion.Euler(-35f * Mathf.Sin(Mathf.PI*t),0,0);
-                if (t >= 1) { climbing = false; onBag = true; feedingNow = false; nextBite = Time.time + 3f; }
+                if (t >= 1) { climbing = false; onBag = true; feedingNow = false; nextBite = Time.time + BiteInterval; }
                 return;
             }
             if (wantsToClimb && !onBag && Time.time >= climbDelay && Vector3.Distance(transform.position,destination) < .2f)
@@ -176,7 +182,7 @@ public sealed class GrainPest : MonoBehaviour
             Vector3 dir = step - transform.position;
             if (dir.sqrMagnitude > .0001f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.ProjectOnPlane(dir, Vector3.up).sqrMagnitude > .001f ? Vector3.ProjectOnPlane(dir, Vector3.up) : transform.forward), Time.deltaTime * 5f);
             transform.position = step;
-            nextBite = Time.time + 3f;
+            nextBite = Time.time + BiteInterval;
         }
         else
         {
@@ -188,7 +194,7 @@ public sealed class GrainPest : MonoBehaviour
             if (!feedingNow)
             {
                 feedingNow = true;
-                if (IsCrow) { crowPerched = true; crowApproaching = false; nextBite = Time.time + 3f; }
+                if (IsCrow) { crowPerched = true; crowApproaching = false; nextBite = Time.time + BiteInterval; }
                 if (animator != null)
                 {
                     if (IsCrow && feeding != null) animator.runtimeAnimatorController = feeding;
@@ -229,6 +235,7 @@ public sealed class GrainPest : MonoBehaviour
 
 public sealed class GrainPestDirector : MonoBehaviour
 {
+    [SerializeField] private GrainEconomySettings economySettings;
     public GameObject ratPrefab, crowPrefab;
     public GrainContainer tutorialBagTemplate;
     public Material tutorialBagMaterial;
@@ -358,6 +365,7 @@ public sealed class GrainPestDirector : MonoBehaviour
         if (!crow) go.transform.localScale *= 1.5f;
         foreach (var c in go.GetComponentsInChildren<Collider>()) c.enabled = false;
         var pest = go.AddComponent<GrainPest>();
+        pest.ConfigureEconomy(economySettings);
         pest.Initialize(target, crow, crow ? crowFlyAnimation : ratAnimation, crow ? crowEatAnimation : ratAnimation);
         if (!encounterActive)
         {

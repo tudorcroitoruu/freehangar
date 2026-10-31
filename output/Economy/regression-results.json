@@ -1,0 +1,1350 @@
+{
+  "status": "completed",
+  "duration": 1.08,
+  "summary": {
+    "total": 191,
+    "passed": 184,
+    "failed": 7,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "ConsumableFoodTests.ExactMoneyEnablesPurchasePrompt",
+      "Status": "Passed",
+      "Duration": 0.030017,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ConsumableFoodTests.InsufficientMoneyShowsPriceAndDoesNotConsumeFood",
+      "Status": "Passed",
+      "Duration": 0.0034373,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ConsumableFoodTests.NoHungerDoesNotChargeMoneyOrConsumeFood",
+      "Status": "Passed",
+      "Duration": 0.0006366,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(True,0.12f)",
+      "Status": "Passed",
+      "Duration": 0.005476,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(False,0.12f)",
+      "Status": "Passed",
+      "Duration": 0.001701,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(True,0.5f)",
+      "Status": "Passed",
+      "Duration": 0.0002552,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(False,0.5f)",
+      "Status": "Passed",
+      "Duration": 0.0001986,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ContainerPlacementTests.WallStillPreventsPlacingBehindIt(True)",
+      "Status": "Passed",
+      "Duration": 0.0008771,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ContainerPlacementTests.WallStillPreventsPlacingBehindIt(False)",
+      "Status": "Passed",
+      "Duration": 0.0003676,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "FreeHandsWarningTests.BlockedPromptHidesPanelAndClearsDescription(True,True)",
+      "Status": "Passed",
+      "Duration": 0.020396,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "FreeHandsWarningTests.BlockedPromptHidesPanelAndClearsDescription(False,True)",
+      "Status": "Passed",
+      "Duration": 0.0005253,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "FreeHandsWarningTests.PromptShowsSeparateKeyRowsAndRemovesThemForTheNextObject",
+      "Status": "Passed",
+      "Duration": 0.0085465,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "FreeHandsWarningTests.ResetHidesWarningAndClearsItsRequestedState",
+      "Status": "Passed",
+      "Duration": 0.000916,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "FreeHandsWarningTests.WarningFadesInAndOutWithoutRestartingOnRepeatedRequests",
+      "Status": "Passed",
+      "Duration": 0.0008344,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.AnyHangarCountsKnownAndUnknownSources",
+      "Status": "Passed",
+      "Duration": 0.0012559,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.CurrentStateCanDecreaseBeforeActivationAndRejectsDeltas",
+      "Status": "Passed",
+      "Duration": 0.0002516,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.CustomActionMustIdentifyItsGoal",
+      "Status": "Passed",
+      "Duration": 0.0001723,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.FutureLifetimeGoalRemembersEarlierActions",
+      "Status": "Passed",
+      "Duration": 0.0001336,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.FutureSinceActivationGoalIgnoresEarlierActions",
+      "Status": "Passed",
+      "Duration": 0.0001511,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.InvalidIncrementsDoNotCount(-1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0004688,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.InvalidIncrementsDoNotCount(0.0f)",
+      "Status": "Passed",
+      "Duration": 7.8E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.InvalidIncrementsDoNotCount(float.NaN)",
+      "Status": "Passed",
+      "Duration": 6.88E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.InvalidIncrementsDoNotCount(float.PositiveInfinity)",
+      "Status": "Passed",
+      "Duration": 6.81E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.MixedGrainsContributeWhenFilterIsOff",
+      "Status": "Passed",
+      "Duration": 0.0002495,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.ProgressIsCappedAndCompletedGoalsCannotChange",
+      "Status": "Passed",
+      "Duration": 0.0002527,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.SackSnapshotsDoNotSumDifferentPartiallyFilledSacks",
+      "Status": "Passed",
+      "Duration": 0.0002623,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.SpecificFilterRejectsOtherAndUnknownGrains",
+      "Status": "Passed",
+      "Duration": 0.0003942,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.UpgradeMustMatch",
+      "Status": "Passed",
+      "Duration": 0.0002573,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalCheckerTests.WrongActionOrHangarDoesNotCount",
+      "Status": "Passed",
+      "Duration": 0.0002641,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalsManagerTests.ActionsBeforeSaveLoadAreBuffered",
+      "Status": "Passed",
+      "Duration": 0.0033811,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalsManagerTests.DuplicateIdsAreRejected",
+      "Status": "Passed",
+      "Duration": 0.0015801,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalsManagerTests.FutureStateDoesNotSkipEarlierGoal",
+      "Status": "Passed",
+      "Duration": 0.00042039999999999997,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalsManagerTests.GoalRewardsDoNotCountAsGrainSaleIncome",
+      "Status": "Passed",
+      "Duration": 0.0002824,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalsManagerTests.LifetimeMilestonesAdvanceInOrderAndRewardsAreNotGrantedTwiceAfterReload",
+      "Status": "Passed",
+      "Duration": 0.0008789,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalsManagerTests.MissingOldSaveArrayIsInitialized",
+      "Status": "Passed",
+      "Duration": 0.0002736,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalsManagerTests.OneActionDoesNotSpillIntoNextSinceActivationGoal",
+      "Status": "Passed",
+      "Duration": 0.0002738,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GoalsManagerTests.PartialProgressSurvivesJsonRoundTrip",
+      "Status": "Passed",
+      "Duration": 0.0003137,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,False)",
+      "Status": "Passed",
+      "Duration": 0.0060673,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,False)",
+      "Status": "Passed",
+      "Duration": 0.0021926,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,False)",
+      "Status": "Passed",
+      "Duration": 0.0021332,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,True)",
+      "Status": "Passed",
+      "Duration": 0.0051149,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,True)",
+      "Status": "Passed",
+      "Duration": 0.0046948,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,True)",
+      "Status": "Passed",
+      "Duration": 0.0042581,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(10.0f)",
+      "Status": "Passed",
+      "Duration": 0.0084163,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(200.0f)",
+      "Status": "Passed",
+      "Duration": 0.0057413,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource",
+      "Status": "Passed",
+      "Duration": 0.0129368,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass",
+      "Status": "Passed",
+      "Duration": 0.0047805,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(0.0f,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0028521,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(-10.0f,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0017414,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.NaN,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0018167,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.PositiveInfinity,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0018162,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(100000.0f,10000.0f)",
+      "Status": "Passed",
+      "Duration": 0.0016357,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "HangarShopProgressTests.ClearingMeasuresRemainingMassRatherThanRepeatedlyMovedGrain",
+      "Status": "Passed",
+      "Duration": 0.0050296,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "HangarShopProgressTests.FirstProductUnlocksAtHalfOfFirstHangarAndStaysUnlocked",
+      "Status": "Passed",
+      "Duration": 0.0002542,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "HangarShopProgressTests.LegacySaveImportsOpenedDoorsButNotCollectedKeys",
+      "Status": "Passed",
+      "Duration": 0.0024497,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "HangarShopProgressTests.OpenHangarsAndHalfClearedMilestoneSurviveSerialization",
+      "Status": "Passed",
+      "Duration": 0.0005313,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "HangarShopProgressTests.ShopUsesExactMilestonesAndRefreshesAfterReload",
+      "Status": "Passed",
+      "Duration": 0.0029433,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "InventorySceneLimitTests.DestroyedInstanceFreesASlotAndNewInstanceGetsNewIdentity",
+      "Status": "Passed",
+      "Duration": 0.0075054,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "InventorySceneLimitTests.InactiveInstanceStaysTrackedAndCannotReactivateOverTheLimit",
+      "Status": "Passed",
+      "Duration": 0.0006523,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "InventorySceneLimitTests.TwoInventoryEntriesWithSameProductIDShareTheSceneCount",
+      "Status": "Passed",
+      "Duration": 0.0005087,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "InventorySceneLimitTests.UnlimitedStockStillHonorsActiveSceneLimit(1)",
+      "Status": "Passed",
+      "Duration": 0.001795,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "InventorySceneLimitTests.UnlimitedStockStillHonorsActiveSceneLimit(10)",
+      "Status": "Passed",
+      "Duration": 0.0005941,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "InventorySceneLimitTests.ZeroLimitAllowsMoreThanTenInstancesAndTracksEachOne",
+      "Status": "Passed",
+      "Duration": 0.0008119,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LoadingScreenProgressTests.EveryLoadingStartResetsFillAndDestroyRestoresSharedMaterial",
+      "Status": "Passed",
+      "Duration": 0.0060486,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LoadingScreenProgressTests.ProgressAlsoUpdatesTheCachedStencilMaterial",
+      "Status": "Passed",
+      "Duration": 0.0035937,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LoadingScreenProgressTests.ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(-1.0f,0.0f)",
+      "Status": "Passed",
+      "Duration": 0.001299,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LoadingScreenProgressTests.ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(0.25f,0.25f)",
+      "Status": "Passed",
+      "Duration": 0.0007001,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LoadingScreenProgressTests.ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(2.0f,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0005425,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.CargoOnUpgradeVehicleStillUsesItsOwnInteraction",
+      "Status": "Passed",
+      "Duration": 0.0038198,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.DisabledHighlightCannotBeFocused",
+      "Status": "Passed",
+      "Duration": 0.0016715,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.DisabledInteractionDoesNotExposeObjectBehindIt",
+      "Status": "Passed",
+      "Duration": 0.000394,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.DisablingInteractorClearsOutline",
+      "Status": "Passed",
+      "Duration": 0.0005889,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.FindsInteractionOnColliderParentAndIgnoresPlayerColliders",
+      "Status": "Passed",
+      "Duration": 0.0004695,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.FocusControlsAllOutlinesAndIgnoresMissingEntries",
+      "Status": "Passed",
+      "Duration": 0.000469,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.FocusMovesOutlineToNextObjectAndClearsForObjectsWithoutHighlight",
+      "Status": "Passed",
+      "Duration": 0.0005399,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.ObjectsOutsideReachCannotBeSelected",
+      "Status": "Passed",
+      "Duration": 0.0002674,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.StandaloneUpgradeStationUsesFInsteadOfE",
+      "Status": "Passed",
+      "Duration": 0.0006497,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.UnavailableEventCannotRunAndCanBeEnabledAgain",
+      "Status": "Passed",
+      "Duration": 0.000659,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.UpgradeActionOnChildColliderCoexistsWithTheParentVehicleAction",
+      "Status": "Failed",
+      "Duration": 0.0068168,
+      "Message": "System.NullReferenceException : Object reference not set to an instance of an object",
+      "StackTrace": "  at PlayerInteractorTests.UpgradeActionOnChildColliderCoexistsWithTheParentVehicleAction () [0x000f3] in D:\\Own projects\\freehangar\\Assets\\Tests\\Editor\\PlayerInteractorTests.cs:84 \r\n  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)\r\n  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <41d29b352f6a475ab1bf7c6628b82790>:0 "
+    },
+    {
+      "FullName": "PlayerInteractorTests.WallBlocksInteractionBehindIt",
+      "Status": "Passed",
+      "Duration": 0.0004524,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerInteractorTests.WheelbarrowKeepsEAndAddsASeparateFUpgradeAction",
+      "Status": "Failed",
+      "Duration": 0.0008017,
+      "Message": "System.NullReferenceException : Object reference not set to an instance of an object",
+      "StackTrace": "  at PlayerInteractorTests.WheelbarrowKeepsEAndAddsASeparateFUpgradeAction () [0x000e3] in D:\\Own projects\\freehangar\\Assets\\Tests\\Editor\\PlayerInteractorTests.cs:58 \r\n  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)\r\n  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <41d29b352f6a475ab1bf7c6628b82790>:0 "
+    },
+    {
+      "FullName": "PlayerItemCarryTests.BlockedPlacementKeepsObjectHeldAndShovelUnequipped",
+      "Status": "Passed",
+      "Duration": 0.0069414,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.CannotReplaceHeldItemWithAnotherOne",
+      "Status": "Passed",
+      "Duration": 0.0006088,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents(0.0f)",
+      "Status": "Passed",
+      "Duration": 0.0013187,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents(25.0f)",
+      "Status": "Passed",
+      "Duration": 0.000531,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.ContainerCanBeCarriedAtEveryFillLevelWithoutLosingContents(50.0f)",
+      "Status": "Passed",
+      "Duration": 0.0005728,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.ContainerPourUsesDropActionInsteadOfScoopAction",
+      "Status": "Passed",
+      "Duration": 0.0104136,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(False,2.0f,False,0.0f,False)",
+      "Status": "Passed",
+      "Duration": 0.0034027,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,0.0f,False,0.0f,False)",
+      "Status": "Passed",
+      "Duration": 0.0005894,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,2.0f,False,0.0f,True)",
+      "Status": "Passed",
+      "Duration": 0.0004191,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,2.0f,True,0.0f,False)",
+      "Status": "Passed",
+      "Duration": 0.0004238,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.ContainerPromptChoosesOneInputBasedOnAcceptedShovelCargo(True,2.0f,False,50.0f,False)",
+      "Status": "Passed",
+      "Duration": 0.0004047,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.EquippingShovelPlacesHeldObjectOnGround(True)",
+      "Status": "Passed",
+      "Duration": 0.0042286,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.EquippingShovelPlacesHeldObjectOnGround(False)",
+      "Status": "Passed",
+      "Duration": 0.0007227,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.HoldingDisablesPhysicsAndToolAndReleaseRestoresThem",
+      "Status": "Failed",
+      "Duration": 0.0021932,
+      "Message": "  Expected: True\r\n  But was:  False\r\n",
+      "StackTrace": "at PlayerItemCarryTests.HoldingDisablesPhysicsAndToolAndReleaseRestoresThem () [0x000d3] in D:\\Own projects\\freehangar\\Assets\\Tests\\Editor\\PlayerItemCarryTests.cs:57\r\n"
+    },
+    {
+      "FullName": "PlayerItemCarryTests.InventoryAndWorldPickupUseSamePoseAndKeepImportedBagUpright",
+      "Status": "Failed",
+      "Duration": 0.0026652,
+      "Message": "  Expected: True\r\n  But was:  False\r\n",
+      "StackTrace": "at PlayerItemCarryTests.InventoryAndWorldPickupUseSamePoseAndKeepImportedBagUpright () [0x00238] in D:\\Own projects\\freehangar\\Assets\\Tests\\Editor\\PlayerItemCarryTests.cs:362\r\n"
+    },
+    {
+      "FullName": "PlayerItemCarryTests.InventoryPickupIsAvailableWithShovelAndAutomaticallyPutsItAway(0.0f)",
+      "Status": "Passed",
+      "Duration": 0.0023504,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.InventoryPickupIsAvailableWithShovelAndAutomaticallyPutsItAway(2.0f)",
+      "Status": "Passed",
+      "Duration": 0.0007851,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.NonPortableContainerCannotBeCarriedAtAnyFillLevel(0.0f)",
+      "Status": "Passed",
+      "Duration": 0.0008814,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.NonPortableContainerCannotBeCarriedAtAnyFillLevel(25.0f)",
+      "Status": "Passed",
+      "Duration": 0.0004469,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.NonPortableContainerCannotBeCarriedAtAnyFillLevel(50.0f)",
+      "Status": "Passed",
+      "Duration": 0.0004126,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease(0.0f)",
+      "Status": "Failed",
+      "Duration": 0.0017092,
+      "Message": "  Expected: False\r\n  But was:  True\r\n",
+      "StackTrace": "at PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease (System.Single kilograms) [0x000f5] in D:\\Own projects\\freehangar\\Assets\\Tests\\Editor\\PlayerItemCarryTests.cs:143\r\n"
+    },
+    {
+      "FullName": "PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease(25.0f)",
+      "Status": "Failed",
+      "Duration": 0.0007613,
+      "Message": "  Expected: False\r\n  But was:  True\r\n",
+      "StackTrace": "at PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease (System.Single kilograms) [0x000f5] in D:\\Own projects\\freehangar\\Assets\\Tests\\Editor\\PlayerItemCarryTests.cs:143\r\n"
+    },
+    {
+      "FullName": "PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease(50.0f)",
+      "Status": "Failed",
+      "Duration": 0.000706,
+      "Message": "  Expected: False\r\n  But was:  True\r\n",
+      "StackTrace": "at PlayerItemCarryTests.TakingContainerPutsShovelAwayAndKeepsItUnequippedAfterRelease (System.Single kilograms) [0x000f5] in D:\\Own projects\\freehangar\\Assets\\Tests\\Editor\\PlayerItemCarryTests.cs:143\r\n"
+    },
+    {
+      "FullName": "PlayerItemCarryTests.WorldContainerPromptAllowsTakingAtEveryFillLevel(0.0f)",
+      "Status": "Passed",
+      "Duration": 0.0012104,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.WorldContainerPromptAllowsTakingAtEveryFillLevel(25.0f)",
+      "Status": "Passed",
+      "Duration": 0.0005398,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.WorldContainerPromptAllowsTakingAtEveryFillLevel(50.0f)",
+      "Status": "Passed",
+      "Duration": 0.000381,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.WorldPickupAutomaticallyPutsShovelAway(0.0f)",
+      "Status": "Passed",
+      "Duration": 0.0012451,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.WorldPickupAutomaticallyPutsShovelAway(25.0f)",
+      "Status": "Passed",
+      "Duration": 0.0005254,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "PlayerItemCarryTests.WorldPickupAutomaticallyPutsShovelAway(50.0f)",
+      "Status": "Passed",
+      "Duration": 0.0004315,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn(\"money\")",
+      "Status": "Passed",
+      "Duration": 0.0019776,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn(\"prefab\")",
+      "Status": "Passed",
+      "Duration": 0.0001536,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn(\"point\")",
+      "Status": "Passed",
+      "Duration": 0.0001345,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn(\"limit\")",
+      "Status": "Passed",
+      "Duration": 0.0001852,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn(\"hands\")",
+      "Status": "Passed",
+      "Duration": 0.0001625,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.CashAndOwnershipSurviveJsonRoundTrip",
+      "Status": "Passed",
+      "Duration": 0.0007362,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.FailedDeliveryDoesNotCharge",
+      "Status": "Passed",
+      "Duration": 0.0006178,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.InsufficientMoneyDoesNotChangeCashOrOwnership",
+      "Status": "Passed",
+      "Duration": 0.0001711,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData(null,10)",
+      "Status": "Passed",
+      "Duration": 0.0003993,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData(\"\",10)",
+      "Status": "Passed",
+      "Duration": 5.94E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData(\"   \",10)",
+      "Status": "Passed",
+      "Duration": 4.88E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData(\"crate\",-10)",
+      "Status": "Passed",
+      "Duration": 5.07E-05,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.InventoryPromptReflectsCurrentStock(0,\"Crate\\nOwn: 0\",False)",
+      "Status": "Passed",
+      "Duration": 0.0011649,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.InventoryPromptReflectsCurrentStock(2,\"Take 1 Crate\\nLeft: 2\",True)",
+      "Status": "Passed",
+      "Duration": 0.0001612,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.MissingCarrierOrSpawnPointDoesNotConsumeStock(Hands)",
+      "Status": "Passed",
+      "Duration": 0.0010716,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.MissingCarrierOrSpawnPointDoesNotConsumeStock(AtSpawnPoint)",
+      "Status": "Passed",
+      "Duration": 0.0002234,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.MissingInventoryAndUnknownProductsCannotBeTaken",
+      "Status": "Passed",
+      "Duration": 0.0004157,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.OlderSaveWithoutProductListCanPurchase",
+      "Status": "Passed",
+      "Duration": 0.0001772,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.ProductCountCannotOverflow",
+      "Status": "Passed",
+      "Duration": 0.0002341,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.ProductsResolveManagerEvenWhenTheOldDepotIsDisabled(False)",
+      "Status": "Passed",
+      "Duration": 0.0048526,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.ProductsResolveManagerEvenWhenTheOldDepotIsDisabled(True)",
+      "Status": "Passed",
+      "Duration": 0.0015467,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.PurchaseWithExactMoneyAddsOneProduct",
+      "Status": "Passed",
+      "Duration": 0.0001835,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.RepeatPurchaseIncrementsExistingEntryAndOtherProductsRemainSeparate",
+      "Status": "Passed",
+      "Duration": 0.0002901,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.ShopDeliversImmediatelyWithoutAddingPickupStock(False)",
+      "Status": "Passed",
+      "Duration": 0.0035443,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.ShopDeliversImmediatelyWithoutAddingPickupStock(True)",
+      "Status": "Passed",
+      "Duration": 0.0010291,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.TakingLastProductKeepsZeroCountAndCannotTakeAgain",
+      "Status": "Passed",
+      "Duration": 0.0003177,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.TakingOneProductLeavesOtherProductsUnchanged",
+      "Status": "Passed",
+      "Duration": 0.0002396,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShopPurchaseTests.UnlimitedProductIsVisibleAndCanBeTakenRepeatedlyWithoutSave",
+      "Status": "Passed",
+      "Duration": 0.0020301,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeInteractionTests.DisplayLoadsSavedTypeAndSwitchesImmediatelyWhenPurchaseUnlocksNextShovel",
+      "Status": "Passed",
+      "Duration": 0.0050562,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeInteractionTests.EscapeClosesMenuBeforeProcessingAnyPurchaseAndConsumesTheGameplayFrame",
+      "Status": "Passed",
+      "Duration": 0.0022339,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeInteractionTests.StaminaStationOpensOnlyStaminaAndRoutesEToItsOwnSavedProgress",
+      "Status": "Passed",
+      "Duration": 0.0036254,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeInteractionTests.SubsequentEPressBuysOneUpgradeAndInsufficientMoneyDoesNothing",
+      "Status": "Passed",
+      "Duration": 0.0013215,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeInteractionTests.WorkshopShovelOpensInactiveMenuWithoutPurchasingOnTheOpeningEPress",
+      "Status": "Passed",
+      "Duration": 0.0009579,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.FifthHeldModelBecomesVacuumAndSixthModelUsesItsOwnStartingStats",
+      "Status": "Passed",
+      "Duration": 0.0033795,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(0,0,0,6.5f,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0008434,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(1,0,1,7.5f,0.95f)",
+      "Status": "Passed",
+      "Duration": 0.0002345,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(3,0,3,9.5f,0.85f)",
+      "Status": "Passed",
+      "Duration": 0.0001904,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(4,1,0,10.5f,0.8f)",
+      "Status": "Passed",
+      "Duration": 0.0001894,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(7,1,3,13.5f,0.65f)",
+      "Status": "Passed",
+      "Duration": 0.000173,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.FourPurchasesAdvanceShovelTypeAndFinalTypeKeepsFourDots(8,1,4,14.5f,0.6f)",
+      "Status": "Passed",
+      "Duration": 0.0001575,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(15,False)",
+      "Status": "Passed",
+      "Duration": 0.0021179,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(16,True)",
+      "Status": "Passed",
+      "Duration": 0.00143,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(17,True)",
+      "Status": "Passed",
+      "Duration": 0.0004558,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(20,True)",
+      "Status": "Passed",
+      "Duration": 0.0004391,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.LevelFiveSwitchesToVacuumPanelWithCapacityAndSuctionUnits(24,True)",
+      "Status": "Passed",
+      "Duration": 0.0004427,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.PurchaseChargesExactlyOnceAndRejectsStaleOrUnaffordableRequests",
+      "Status": "Passed",
+      "Duration": 0.0003833,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.ScreenTracksMissingMoneyDotsTypeAndMaximumWithoutChangingSharedMaterial",
+      "Status": "Passed",
+      "Duration": 0.0039081,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.SharedRuntimeSettingsAssetHasACompleteUpgradeConfiguration",
+      "Status": "Passed",
+      "Duration": 0.0002294,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.ShovelWeightScalesStaminaConsumption(0.5f,95.0f)",
+      "Status": "Passed",
+      "Duration": 0.0007709,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.ShovelWeightScalesStaminaConsumption(1.0f,90.0f)",
+      "Status": "Passed",
+      "Duration": 0.000246,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.ShovelWeightScalesStaminaConsumption(2.0f,80.0f)",
+      "Status": "Passed",
+      "Duration": 0.0001616,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.ToolReadsSavedCapacityAndWeightEvenWithoutAnOpenUpgradeScreen",
+      "Status": "Passed",
+      "Duration": 0.0005892,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.UpgradeProgressSurvivesSaveSerializationAndOldSavesStartAtZero",
+      "Status": "Passed",
+      "Duration": 0.000296,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.VacuumReadsSavedStatsAndPurchasesApplyCapacityAndSuctionImmediately",
+      "Status": "Passed",
+      "Duration": 0.0015296,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeTests.ZeroPriceShowsFreeAndAllowsUpgradeWithNoMoney",
+      "Status": "Passed",
+      "Duration": 0.0007502,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.BackgroundWidthUsesOriginalSizeAndFillFollowsIt(True)",
+      "Status": "Passed",
+      "Duration": 0.0027125,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.BackgroundWidthUsesOriginalSizeAndFillFollowsIt(False)",
+      "Status": "Passed",
+      "Duration": 0.0003772,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.CompleteHungerHasZeroCapacityWithoutInvalidFillValues",
+      "Status": "Passed",
+      "Duration": 0.0003287,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.EatingImmediatelyRestoresCapacityAndBackgroundWidth",
+      "Status": "Passed",
+      "Duration": 0.0005144,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.FoodCannotReduceHungerBelowZeroOrBeUsedWhenAlreadyFull",
+      "Status": "Passed",
+      "Duration": 0.0002497,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.HungerGrowsAtConfiguredRateAndRejectsInvalidTime",
+      "Status": "Passed",
+      "Duration": 0.0003473,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.HungerReducesCapacityAndCurrentStaminaWithoutChangingBaseMaximum",
+      "Status": "Passed",
+      "Duration": 0.0005178,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.InfiniteStaminaRefillsOnlyToHungerAdjustedCapacity",
+      "Status": "Passed",
+      "Duration": 0.0003162,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.InvalidFoodValueDoesNotChangeHunger(-10.0f)",
+      "Status": "Passed",
+      "Duration": 0.0005081,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.InvalidFoodValueDoesNotChangeHunger(0.0f)",
+      "Status": "Passed",
+      "Duration": 0.0001983,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.InvalidFoodValueDoesNotChangeHunger(float.NaN)",
+      "Status": "Passed",
+      "Duration": 0.0002098,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.InvalidFoodValueDoesNotChangeHunger(float.PositiveInfinity)",
+      "Status": "Passed",
+      "Duration": 0.0002211,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaManagerTests.ReducingHungerRestoresCapacityAndAllowsStaminaToRecover",
+      "Status": "Passed",
+      "Duration": 0.0004261,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaUpgradeTests.PurchasesRejectInsufficientMoneyStaleLevelsNegativePricesAndMaximum",
+      "Status": "Passed",
+      "Duration": 0.0007337,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaUpgradeTests.SavedUpgradeIncreasesActualCapacityAndStillAppliesHunger",
+      "Status": "Passed",
+      "Duration": 0.0007648,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaUpgradeTests.SharedSettingsAssetLoadsForRuntimeAndScreen",
+      "Status": "Passed",
+      "Duration": 0.0003063,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "StaminaUpgradeTests.UIShowsShortfallFreeAndMaximumAndRestoresAffordableButtonAppearance",
+      "Status": "Passed",
+      "Duration": 0.0018509,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.DefaultVehicleProfilesAndResourcesAreValid",
+      "Status": "Passed",
+      "Duration": 0.0640754,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.DisplayStatsNeverOverrideAuthoredSlotsOrSpeed",
+      "Status": "Passed",
+      "Duration": 0.0025042,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.EachPurchaseUnlocksExactlyOneNextVehicleAndSurvivesReload",
+      "Status": "Passed",
+      "Duration": 0.0010812,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.KeyRequiredNeedsBothMoneyAndMatchingCollectedKey",
+      "Status": "Passed",
+      "Duration": 0.0007894,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.LegacyCompletedMiniupgradesRestoreDirectlyToSavedDestination",
+      "Status": "Passed",
+      "Duration": 0.000695,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.MissingPrefabDoesNotChargeOrUnlockNextVehicle",
+      "Status": "Passed",
+      "Duration": 0.0023632,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.ScreenShowsCurrentAndNextVehicleSpeedAndSlotsAndBlocksMissingKey",
+      "Status": "Passed",
+      "Duration": 0.0021151,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.TrailerVehicleReplacementKeepsTheAssemblyAndCanAdvanceToPickup",
+      "Status": "Passed",
+      "Duration": 0.0039358,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.VoucherPaysPriceButNeverBypassesRequiredKey",
+      "Status": "Passed",
+      "Duration": 0.0002878,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

@@ -68,7 +68,7 @@ public sealed class ShovelTool : MonoBehaviour
     {
         get
         {
-            if (upgradeSettings == null) upgradeSettings = Resources.Load<ShovelUpgradeSettings>(ShovelUpgradeSettings.ResourcePath);
+            upgradeSettings = GrainEconomySettings.ResolveShovel(upgradeSettings);
             return upgradeSettings;
         }
     }

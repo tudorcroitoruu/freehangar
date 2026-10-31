@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="15" result="Passed" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-31 20:56:29Z" end-time="2026-10-31 20:56:30Z" duration="0.1904264">
+  <test-suite type="TestSuite" id="1247" name="Project Name" fullname="Project Name" runstate="Runnable" testcasecount="190" result="Passed" start-time="2026-10-31 20:56:29Z" end-time="2026-10-31 20:56:30Z" duration="0.190426" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1236" name="Assembly-CSharp-Editor.dll" fullname="D:/Own projects/freehangar/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="190" result="Passed" start-time="2026-10-31 20:56:29Z" end-time="2026-10-31 20:56:30Z" duration="0.161301" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="5440" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestFixture" id="1047" name="GrainEconomyTests" fullname="GrainEconomyTests" classname="GrainEconomyTests" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-31 20:56:29Z" end-time="2026-10-31 20:56:30Z" duration="0.151482" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="ParameterizedMethod" id="1054" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-31 20:56:29Z" end-time="2026-10-31 20:56:30Z" duration="0.053451" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1048" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,False)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,False)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="1087590325" result="Passed" start-time="2026-10-31 20:56:29Z" end-time="2026-10-31 20:56:29Z" duration="0.019550" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1049" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,False)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,False)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="569289828" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.002651" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1050" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,False)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,False)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="54540041" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.002298" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1051" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,True)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,True)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="1721929038" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.005130" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1052" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,True)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,True)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="2081597510" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.004269" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1053" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,True)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,True)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="1764100481" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.004342" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1057" name="DepositingBackIntoAuthoredStockPreservesRecoverableMass" fullname="GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass" classname="GrainEconomyTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.026614" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1055" name="DepositingBackIntoAuthoredStockPreservesRecoverableMass(10.0f)" fullname="GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(10.0f)" methodname="DepositingBackIntoAuthoredStockPreservesRecoverableMass" classname="GrainEconomyTests" runstate="Runnable" seed="124083841" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.008352" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1056" name="DepositingBackIntoAuthoredStockPreservesRecoverableMass(200.0f)" fullname="GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(200.0f)" methodname="DepositingBackIntoAuthoredStockPreservesRecoverableMass" classname="GrainEconomyTests" runstate="Runnable" seed="1815661704" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.005685" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1058" name="DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource" fullname="GrainEconomyTests.DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource" methodname="DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource" classname="GrainEconomyTests" runstate="Runnable" seed="1791246756" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.014313" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1065" name="ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass" fullname="GrainEconomyTests.ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass" methodname="ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass" classname="GrainEconomyTests" runstate="Runnable" seed="1142283140" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.008420" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1064" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.024410" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1059" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(0.0f,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(0.0f,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="875876736" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.002652" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1060" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(-10.0f,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(-10.0f,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="622597493" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.002128" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1061" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.NaN,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.NaN,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="115828484" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.001942" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1062" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.PositiveInfinity,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.PositiveInfinity,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="804334041" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.001821" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1063" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(100000.0f,10000.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(100000.0f,10000.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="1990945245" result="Passed" start-time="2026-10-31 20:56:30Z" end-time="2026-10-31 20:56:30Z" duration="0.001891" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[Saving results to: C:/Users/Liviu Tataru/AppData/LocalLow/Account Name/Project Name\TestResults.xml
+]]></output>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

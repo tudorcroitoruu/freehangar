@@ -1,0 +1,72 @@
+[
+    {
+        "FullName":  "CentralEconomyTests.ActualPestBitesUseEconomyAmountsAndInterval(False,False,2.0f)",
+        "Status":  "Passed",
+        "Duration":  0.0260659,
+        "Message":  null,
+        "StackTrace":  null
+    },
+    {
+        "FullName":  "CentralEconomyTests.ActualPestBitesUseEconomyAmountsAndInterval(True,False,6.0f)",
+        "Status":  "Passed",
+        "Duration":  0.0006345,
+        "Message":  null,
+        "StackTrace":  null
+    },
+    {
+        "FullName":  "CentralEconomyTests.ActualPestBitesUseEconomyAmountsAndInterval(True,True,2.0f)",
+        "Status":  "Passed",
+        "Duration":  0.0005583,
+        "Message":  null,
+        "StackTrace":  null
+    },
+    {
+        "FullName":  "CentralEconomyTests.AllUpgradeTotalsReadTheirReferencedAssetsAndDoNotChargeForStartingVehicle",
+        "Status":  "Passed",
+        "Duration":  0.0015754,
+        "Message":  null,
+        "StackTrace":  null
+    },
+    {
+        "FullName":  "CentralEconomyTests.EditingSellingPriceUpdatesForecastAndSellingZoneWithoutCopyingPrices",
+        "Status":  "Passed",
+        "Duration":  0.0022164,
+        "Message":  null,
+        "StackTrace":  null
+    },
+    {
+        "FullName":  "CentralEconomyTests.ExistingPestsReadEditedBiteSettingsOnTheirNextBite",
+        "Status":  "Passed",
+        "Duration":  0.0007655,
+        "Message":  null,
+        "StackTrace":  null
+    },
+    {
+        "FullName":  "CentralEconomyTests.ForecastCapsCombinedPestLossAndHandlesInvalidMass",
+        "Status":  "Passed",
+        "Duration":  0.0004592,
+        "Message":  null,
+        "StackTrace":  null
+    },
+    {
+        "FullName":  "CentralEconomyTests.NewGameStartsWithNoCashAndCropForecastsSeparateBothPestLosses",
+        "Status":  "Passed",
+        "Duration":  0.0010267,
+        "Message":  null,
+        "StackTrace":  null
+    },
+    {
+        "FullName":  "CentralEconomyTests.PlanReadsArbitraryUpgradeCountsAndContainerCapacityFromPrefab",
+        "Status":  "Passed",
+        "Duration":  0.0005479,
+        "Message":  null,
+        "StackTrace":  null
+    },
+    {
+        "FullName":  "CentralEconomyTests.ShopManagerSuppliesLiveContainerPricesToItsProducts",
+        "Status":  "Passed",
+        "Duration":  0.0008948,
+        "Message":  null,
+        "StackTrace":  null
+    }
+]

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="9" result="Passed" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.099008">
+  <test-suite type="TestSuite" id="1259" name="Project Name" fullname="Project Name" runstate="Runnable" testcasecount="200" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.099008" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1248" name="Assembly-CSharp-Editor.dll" fullname="D:/Own projects/freehangar/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="200" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.085415" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="5440" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestFixture" id="1001" name="CentralEconomyTests" fullname="CentralEconomyTests" classname="CentralEconomyTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.078168" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="ParameterizedMethod" id="1011" name="ActualPestBitesUseEconomyAmountsAndInterval" fullname="CentralEconomyTests.ActualPestBitesUseEconomyAmountsAndInterval" classname="CentralEconomyTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.046130" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1008" name="ActualPestBitesUseEconomyAmountsAndInterval(False,False,2.0f)" fullname="CentralEconomyTests.ActualPestBitesUseEconomyAmountsAndInterval(False,False,2.0f)" methodname="ActualPestBitesUseEconomyAmountsAndInterval" classname="CentralEconomyTests" runstate="Runnable" seed="621035751" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.027795" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1009" name="ActualPestBitesUseEconomyAmountsAndInterval(True,False,6.0f)" fullname="CentralEconomyTests.ActualPestBitesUseEconomyAmountsAndInterval(True,False,6.0f)" methodname="ActualPestBitesUseEconomyAmountsAndInterval" classname="CentralEconomyTests" runstate="Runnable" seed="1590647081" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.001145" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1010" name="ActualPestBitesUseEconomyAmountsAndInterval(True,True,2.0f)" fullname="CentralEconomyTests.ActualPestBitesUseEconomyAmountsAndInterval(True,True,2.0f)" methodname="ActualPestBitesUseEconomyAmountsAndInterval" classname="CentralEconomyTests" runstate="Runnable" seed="680323789" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.000692" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1003" name="AllUpgradeTotalsReadTheirReferencedAssetsAndDoNotChargeForStartingVehicle" fullname="CentralEconomyTests.AllUpgradeTotalsReadTheirReferencedAssetsAndDoNotChargeForStartingVehicle" methodname="AllUpgradeTotalsReadTheirReferencedAssetsAndDoNotChargeForStartingVehicle" classname="CentralEconomyTests" runstate="Runnable" seed="143751127" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.001968" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1005" name="EditingSellingPriceUpdatesForecastAndSellingZoneWithoutCopyingPrices" fullname="CentralEconomyTests.EditingSellingPriceUpdatesForecastAndSellingZoneWithoutCopyingPrices" methodname="EditingSellingPriceUpdatesForecastAndSellingZoneWithoutCopyingPrices" classname="CentralEconomyTests" runstate="Runnable" seed="973175839" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.002394" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1007" name="ForecastCapsCombinedPestLossAndHandlesInvalidMass" fullname="CentralEconomyTests.ForecastCapsCombinedPestLossAndHandlesInvalidMass" methodname="ForecastCapsCombinedPestLossAndHandlesInvalidMass" classname="CentralEconomyTests" runstate="Runnable" seed="52174686" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.000891" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1002" name="NewGameStartsWithNoCashAndCropForecastsSeparateBothPestLosses" fullname="CentralEconomyTests.NewGameStartsWithNoCashAndCropForecastsSeparateBothPestLosses" methodname="NewGameStartsWithNoCashAndCropForecastsSeparateBothPestLosses" classname="CentralEconomyTests" runstate="Runnable" seed="1621261934" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.001406" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1004" name="PlanReadsArbitraryUpgradeCountsAndContainerCapacityFromPrefab" fullname="CentralEconomyTests.PlanReadsArbitraryUpgradeCountsAndContainerCapacityFromPrefab" methodname="PlanReadsArbitraryUpgradeCountsAndContainerCapacityFromPrefab" classname="CentralEconomyTests" runstate="Runnable" seed="1615725852" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.000908" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1006" name="ShopManagerSuppliesLiveContainerPricesToItsProducts" fullname="CentralEconomyTests.ShopManagerSuppliesLiveContainerPricesToItsProducts" methodname="ShopManagerSuppliesLiveContainerPricesToItsProducts" classname="CentralEconomyTests" runstate="Runnable" seed="326777182" result="Passed" start-time="2026-10-31 21:12:31Z" end-time="2026-10-31 21:12:31Z" duration="0.001294" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: C:/Users/Liviu Tataru/AppData/LocalLow/Account Name/Project Name\TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

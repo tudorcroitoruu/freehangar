@@ -24,7 +24,7 @@ public class UpgradeStamina : MonoBehaviour
 
     private void OnEnable()
     {
-        if (settings == null) settings = Resources.Load<StaminaUpgradeSettings>(StaminaUpgradeSettings.ResourcePath);
+        settings = GrainEconomySettings.ResolveStamina(settings);
         if (upgradeButton != null) upgradeButton.onClick.AddListener(Upgrade);
         SaveSystem.MoneyChanged += OnMoneyChanged;
         Refresh();
@@ -41,6 +41,7 @@ public class UpgradeStamina : MonoBehaviour
 
     public bool TryUpgrade()
     {
+        if (Application.isPlaying) settings = GrainEconomySettings.ResolveStamina(settings);
         if (!isActiveAndEnabled || SaveSystem.Data == null || settings == null || !settings.IsConfigured) return false;
         int level = SaveSystem.Data.staminaUpgradeLevel;
         if (level < 0 || level >= settings.MaxUpgrades) return false;
@@ -51,6 +52,7 @@ public class UpgradeStamina : MonoBehaviour
 
     public void Refresh()
     {
+        if (Application.isPlaying) settings = GrainEconomySettings.ResolveStamina(settings);
         bool configured = settings != null && settings.IsConfigured;
         int level = configured ? settings.ClampLevel(SaveSystem.Data?.staminaUpgradeLevel ?? 0) : 0;
         bool maxed = configured && level >= settings.MaxUpgrades;
@@ -70,8 +72,8 @@ public class UpgradeStamina : MonoBehaviour
                     $"{current}  \u279c  <color=#{ColorUtility.ToHtmlStringRGBA(nextLevelColor)}>{next}</color>";
             }
         }
-        if (price != null) price.text = maxed ? "MAX" : configured ? cost == 0 ? "Free" : $"$ {cost:N0}" : "Unavailable";
-        if (notEnoughMoney != null) notEnoughMoney.text = missing > 0 ? $"You need ${missing:N0} more." : "";
+        if (price != null) price.text = maxed ? "MAX" : configured ? cost == 0 ? "Free" : $"$ {EconomyNumberFormat.Accounting(cost)}" : "Unavailable";
+        if (notEnoughMoney != null) notEnoughMoney.text = missing > 0 ? $"You need ${EconomyNumberFormat.Accounting(missing)} more." : "";
         if (notEnoughMoneyPopup != null) notEnoughMoneyPopup.SetActive(missing > 0);
         if (upgradeButton != null) upgradeButton.interactable = affordable;
         if (upgradeButtonCanvas != null) upgradeButtonCanvas.alpha = affordable ? 1f : .5f;

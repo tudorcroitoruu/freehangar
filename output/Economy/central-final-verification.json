@@ -1,0 +1,17 @@
+{
+    "success":  true,
+    "result":  {
+                   "output":  null,
+                   "diagnostics":  [
+
+                                   ],
+                   "success":  true,
+                   "result":  {
+                                  "selected":  "Assets/Resources/Economy/GrainEconomySettings.asset",
+                                  "scene":  "Assets/Scenes/Gameplay.unity",
+                                  "dirty":  false,
+                                  "startingCash":  0,
+                                  "ExpectedBalance":  52750.295796808205
+                              }
+               }
+}

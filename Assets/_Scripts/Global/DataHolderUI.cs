@@ -95,7 +95,7 @@ public class DataHolderUI : MonoBehaviour
     private void SetCoinsText(int value)
     {
         if (coinText != null)
-            coinText.text = value.ToString();
+            coinText.text = EconomyNumberFormat.Accounting(value);
     }
 
 //     private void RefreshHearts()
