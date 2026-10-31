@@ -489,7 +489,6 @@ GameObject:
   - component: {fileID: 5134002194186033744}
   - component: {fileID: 4321138386814208357}
   - component: {fileID: 5101229268082183894}
-  - component: {fileID: 3010444855913063471}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -577,27 +576,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &3010444855913063471
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 346424914782727577}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c0fedcfd98644045965fd4f04deff87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIPopups.FadePopupUI
-  useHapticFeedback: 1
-  initialHided: 1
-  disableOnHide: 1
-  easeType: 3
-  animationTime: 0.15
-  useScaledTime: 1
-  targetCanvasGroup: {fileID: 5101229268082183894}
-  opacityHided: 0
-  opacityShowed: 1
 --- !u!1 &347994780639442596
 GameObject:
   m_ObjectHideFlags: 0
@@ -685,8 +663,6 @@ GameObject:
   - component: {fileID: 268162811415341127}
   - component: {fileID: 2034446220355129917}
   - component: {fileID: 3475896875329939482}
-  - component: {fileID: 245311591788923260}
-  - component: {fileID: 3201991136608214266}
   m_Layer: 0
   m_Name: NoAds Bought
   m_TagString: Untagged
@@ -776,50 +752,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &245311591788923260
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379388507504988845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c0fedcfd98644045965fd4f04deff87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIPopups.FadePopupUI
-  useHapticFeedback: 1
-  initialHided: 1
-  disableOnHide: 1
-  easeType: 3
-  animationTime: 0.15
-  useScaledTime: 1
-  targetCanvasGroup: {fileID: 3475896875329939482}
-  opacityHided: 0
-  opacityShowed: 1
---- !u!114 &3201991136608214266
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379388507504988845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f20203203573dd5479a923bd17e22275, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TiredofAds
-  beesImages:
-  - {fileID: 4603366534058853746}
-  - {fileID: 2789996506559667781}
-  - {fileID: 3198431283851112951}
-  - {fileID: 1693345941377382901}
-  - {fileID: 8787269914776940965}
-  - {fileID: 3945039332472545318}
-  - {fileID: 6184398077615629955}
-  beeFramesPerSecond: 12
-  beeHoverHeight: 10
-  beeHoverPeriod: 2.4
 --- !u!1 &388540134050082805
 GameObject:
   m_ObjectHideFlags: 0
@@ -1561,22 +1493,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlobalManager
   currentPlayerData:
-    currentLevel: 1
-    coins: 1000
-    musicOn: 0
+    openedHangars: 01000000
+    firstHangarHalfCleared: 0
+    grainBaggedKilograms: 0
+    foundSecrets: []
+    freeUpgradeVouchers: 0
+    infiniteStaminaUntilUtc: 0
+    wheelbarrowTier: 0
+    wheelbarrowUpgradeLevels: 000000000000000000000000
+    shovelUpgradeLevel: 0
+    staminaUpgradeLevel: 0
+    vehicleUpgrades: []
+    playerName: 
+    tutorialPassed: 0
+    newGameDone: 0
+    cash: 150000
+    currentCarFromOwnedSelected: 0
+    ownedProducts: []
+    goals: []
     haptics: 0
-    sfxOn: 0
-    lives: 5
-    infiniteHeart: 0
-    infiniteHeartForever: 0
-    infiniteHeartUntilUnix: 0
-    lastHeartRegenUnix: 0
-    lastTrustedUnix: 0
-    realtimeAtLastSync: -1
-    perk1: 1
-    perk2: 1
-    perk3: 1
-    perk4: 1
+    autoGear: 1
+    dlss: 0
+  currentSettingsData:
+    resolutionIndex: -1
+    resolutionWidth: 0
+    resolutionHeight: 0
+    windowModeIndex: 0
+    displayIndex: -1
+    displayName: 
+    vSync: 0
+    frameRateIndex: 3
+    qualityIndex: -1
+    masterVolume: 1
+    musicVolume: 1
+    effectsVolume: 1
+    aimSensitivity: 1
+    inputBindingOverrides: 
   noInternetConnection: {fileID: 3578380712463591449}
   noInternet: 0
   savesLoaded: 0
@@ -2085,7 +2037,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5004276613577303238}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: NoHeartsPopup, Assembly-CSharp
         m_MethodName: TryBuyHeart
         m_Mode: 1
@@ -3217,9 +3169,6 @@ GameObject:
   - component: {fileID: 1784747400595313346}
   - component: {fileID: 593132164109732326}
   - component: {fileID: 3996113685292046103}
-  - component: {fileID: 2618408220619249842}
-  - component: {fileID: 5004276613577303238}
-  - component: {fileID: 2044338163701167130}
   m_Layer: 0
   m_Name: No Hearts
   m_TagString: Untagged
@@ -3312,61 +3261,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &2618408220619249842
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1381879130391211064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c0fedcfd98644045965fd4f04deff87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIPopups.FadePopupUI
-  useHapticFeedback: 1
-  initialHided: 1
-  disableOnHide: 1
-  easeType: 3
-  animationTime: 0.15
-  useScaledTime: 1
-  targetCanvasGroup: {fileID: 3996113685292046103}
-  opacityHided: 0
-  opacityShowed: 1
---- !u!114 &5004276613577303238
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1381879130391211064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78b1dd2c19f879a45b15a7d6024cf19b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NoHeartsPopup
-  basePopupUI: {fileID: 2618408220619249842}
-  priceHeart: 2500
-  priceText: {fileID: 6761048029114882855}
---- !u!114 &2044338163701167130
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1381879130391211064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f20203203573dd5479a923bd17e22275, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TiredofAds
-  beesImages:
-  - {fileID: 1018114879826662737}
-  - {fileID: 3276757548619438819}
-  - {fileID: 8170954798481515670}
-  beeFramesPerSecond: 12
-  beeHoverHeight: 10
-  beeHoverPeriod: 2.4
 --- !u!1 &1426659339904340814
 GameObject:
   m_ObjectHideFlags: 0
@@ -3604,7 +3498,6 @@ GameObject:
   - component: {fileID: 5684426421200665165}
   - component: {fileID: 3738359397913970902}
   - component: {fileID: 8732519730593306216}
-  - component: {fileID: 4001379731234577695}
   m_Layer: 0
   m_Name: Rewards Screen
   m_TagString: Untagged
@@ -3682,7 +3575,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aabbc263ccf78bf4ca73ca8ee9bcfe8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RewardedScreen
-  basePopupUI: {fileID: 3010444855913063471}
+  basePopupUI: {fileID: 0}
   rewardItemPrefab: {fileID: 3781946449501090917, guid: c84b250a0e5a0dd498fd6d82226b4e9b, type: 3}
   rewardItemsParent: {fileID: 4650256300469210145}
   addonsImages:
@@ -3691,25 +3584,6 @@ MonoBehaviour:
   perk2Icon: {fileID: 21300000, guid: c056b1ced28637942aef2bae1856a788, type: 3}
   perk3Icon: {fileID: 21300000, guid: 1d96d485045bb4649b663707d556fb9b, type: 3}
   perk4Icon: {fileID: 21300000, guid: 27e122c50c63c504abedf40494423895, type: 3}
---- !u!114 &4001379731234577695
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1677546605348885739}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f20203203573dd5479a923bd17e22275, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TiredofAds
-  beesImages:
-  - {fileID: 1765866160740828348}
-  - {fileID: 7993957900319053399}
-  - {fileID: 7934660724550879175}
-  beeFramesPerSecond: 12
-  beeHoverHeight: 10
-  beeHoverPeriod: 2.4
 --- !u!1 &1681981400898561580
 GameObject:
   m_ObjectHideFlags: 0
@@ -4358,7 +4232,6 @@ GameObject:
   - component: {fileID: 2780325563554433254}
   - component: {fileID: 278989137561393663}
   - component: {fileID: 8326692761719485148}
-  - component: {fileID: 4784996473962628258}
   m_Layer: 0
   m_Name: Background
   m_TagString: Untagged
@@ -4467,22 +4340,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &4784996473962628258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2117808846322680424}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc2814abd9777c14abe9cc6c5b734e3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonBuy
-  priceText: {fileID: 0}
-  takePriceFromStore: 0
-  disableGameObjectWhenPurchased: 0
-  gameObjectToDisable: {fileID: 0}
 --- !u!1 &2136765706941719415
 GameObject:
   m_ObjectHideFlags: 0
@@ -4850,14 +4707,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5698571230553992172}
-  - component: {fileID: 8162357080858102937}
   m_Layer: 0
   m_Name: HeartSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5698571230553992172
 Transform:
   m_ObjectHideFlags: 0
@@ -4873,18 +4729,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3109969752999845503}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8162357080858102937
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2509742038094196182}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e482759a96ddb444b9c0f1d50ba16931, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HeartSystem
 --- !u!1 &2517306254497246484
 GameObject:
   m_ObjectHideFlags: 0
@@ -6572,7 +6416,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5771113786252683926}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PopupController, Assembly-CSharp
         m_MethodName: CloseCurrentPopup
         m_Mode: 1
@@ -6584,7 +6428,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 7570727431117587787}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIPopups.FadePopupUI, Assembly-CSharp
         m_MethodName: Show
         m_Mode: 6
@@ -6737,8 +6581,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DataHolderUI
   coinText: {fileID: 1020453862144040910}
-  heartText: {fileID: 5232079652790347712}
-  heartTimer: {fileID: 3156166184272864460}
   coinAnimDuration: 0.6
   coinEase: 9
 --- !u!114 &6611325414557072755
@@ -7169,7 +7011,6 @@ GameObject:
   - component: {fileID: 6402201977245939804}
   - component: {fileID: 1819643238299094807}
   - component: {fileID: 8434138470465215589}
-  - component: {fileID: 2452966380921087564}
   m_Layer: 0
   m_Name: Chances
   m_TagString: Untagged
@@ -7238,27 +7079,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2452966380921087564
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3257186194131066965}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f911b97eeb1629744881792384922fa8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIPopups.ScalePopupUI
-  useHapticFeedback: 1
-  initialHided: 1
-  disableOnHide: 1
-  easeType: 3
-  animationTime: 0.15
-  useScaledTime: 1
-  targetTransform: {fileID: 6402201977245939804}
-  scaleHided: 0
-  scaleShowed: 1
 --- !u!1 &3271300473006405860
 GameObject:
   m_ObjectHideFlags: 0
@@ -7271,7 +7091,6 @@ GameObject:
   - component: {fileID: 5834102823577599353}
   - component: {fileID: 8710816819050284470}
   - component: {fileID: 6719499629467402859}
-  - component: {fileID: 2488323956680862886}
   m_Layer: 0
   m_Name: Buy Button
   m_TagString: Untagged
@@ -7381,22 +7200,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &2488323956680862886
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3271300473006405860}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc2814abd9777c14abe9cc6c5b734e3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonBuy
-  priceText: {fileID: 4128179162960867760}
-  takePriceFromStore: 1
-  disableGameObjectWhenPurchased: 1
-  gameObjectToDisable: {fileID: 273917037186396963}
 --- !u!1 &3288616362209993450
 GameObject:
   m_ObjectHideFlags: 0
@@ -8311,7 +8114,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5771113786252683926}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PopupController, Assembly-CSharp
         m_MethodName: CloseCurrentPopup
         m_Mode: 1
@@ -8323,7 +8126,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 2618408220619249842}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIPopups.FadePopupUI, Assembly-CSharp
         m_MethodName: Show
         m_Mode: 6
@@ -8335,7 +8138,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 5004276613577303238}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: NoHeartsPopup, Assembly-CSharp
         m_MethodName: Close
         m_Mode: 1
@@ -8434,7 +8237,6 @@ GameObject:
   - component: {fileID: 1840535549056279528}
   - component: {fileID: 7131673375723092072}
   - component: {fileID: 2916944682648912511}
-  - component: {fileID: 5928292343506203362}
   m_Layer: 0
   m_Name: Background (1)
   m_TagString: Untagged
@@ -8543,22 +8345,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &5928292343506203362
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3462805989679370620}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc2814abd9777c14abe9cc6c5b734e3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonBuy
-  priceText: {fileID: 0}
-  takePriceFromStore: 0
-  disableGameObjectWhenPurchased: 0
-  gameObjectToDisable: {fileID: 0}
 --- !u!1 &3463649216195733228
 GameObject:
   m_ObjectHideFlags: 0
@@ -8702,7 +8488,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5771113786252683926}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PopupController, Assembly-CSharp
         m_MethodName: CloseCurrentPopup
         m_Mode: 1
@@ -8714,7 +8500,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 7570727431117587787}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIPopups.FadePopupUI, Assembly-CSharp
         m_MethodName: Show
         m_Mode: 6
@@ -9780,7 +9566,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5771113786252683926}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PopupController, Assembly-CSharp
         m_MethodName: CloseCurrentPopup
         m_Mode: 1
@@ -9792,7 +9578,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 960706836075394467}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIPopups.FadePopupUI, Assembly-CSharp
         m_MethodName: Show
         m_Mode: 6
@@ -10610,7 +10396,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5771113786252683926}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PopupController, Assembly-CSharp
         m_MethodName: CloseCurrentPopup
         m_Mode: 1
@@ -10622,7 +10408,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 245311591788923260}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIPopups.FadePopupUI, Assembly-CSharp
         m_MethodName: Show
         m_Mode: 6
@@ -11101,7 +10887,6 @@ GameObject:
   - component: {fileID: 8887651011015740943}
   - component: {fileID: 191790617576612415}
   - component: {fileID: 3369285210538063021}
-  - component: {fileID: 8105808637343736808}
   m_Layer: 0
   m_Name: Background
   m_TagString: Untagged
@@ -11210,22 +10995,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &8105808637343736808
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4529952940641556821}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc2814abd9777c14abe9cc6c5b734e3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonBuy
-  priceText: {fileID: 0}
-  takePriceFromStore: 0
-  disableGameObjectWhenPurchased: 1
-  gameObjectToDisable: {fileID: 273917037186396963}
 --- !u!1 &4548652646856626991
 GameObject:
   m_ObjectHideFlags: 0
@@ -11596,8 +11365,6 @@ GameObject:
   - component: {fileID: 3911466802511826371}
   - component: {fileID: 3387888318382516130}
   - component: {fileID: 4561194732525043982}
-  - component: {fileID: 7570727431117587787}
-  - component: {fileID: 7100908076064295963}
   m_Layer: 0
   m_Name: NotEnoughCoins
   m_TagString: Untagged
@@ -11686,39 +11453,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &7570727431117587787
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4824974603514224137}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c0fedcfd98644045965fd4f04deff87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIPopups.FadePopupUI
-  useHapticFeedback: 1
-  initialHided: 1
-  disableOnHide: 1
-  easeType: 3
-  animationTime: 0.15
-  useScaledTime: 1
-  targetCanvasGroup: {fileID: 4561194732525043982}
-  opacityHided: 0
-  opacityShowed: 1
---- !u!114 &7100908076064295963
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4824974603514224137}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c685486e7569578498e14b8fc67d7ab8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NotEnoughCoins
 --- !u!1 &4827764466310660553
 GameObject:
   m_ObjectHideFlags: 0
@@ -13995,7 +13729,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5771113786252683926}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PopupController, Assembly-CSharp
         m_MethodName: CloseCurrentPopup
         m_Mode: 1
@@ -14007,7 +13741,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 245311591788923260}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIPopups.FadePopupUI, Assembly-CSharp
         m_MethodName: Show
         m_Mode: 6
@@ -14464,7 +14198,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2452966380921087564}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UIPopups.ScalePopupUI, Assembly-CSharp
         m_MethodName: Show
         m_Mode: 6
@@ -17146,7 +16880,6 @@ GameObject:
   - component: {fileID: 4024847354431878112}
   - component: {fileID: 4831025625589902100}
   - component: {fileID: 299285890560229305}
-  - component: {fileID: 1167290200546252185}
   - component: {fileID: 9007097344259401940}
   m_Layer: 5
   m_Name: Loading Curtain
@@ -17250,27 +16983,6 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
---- !u!114 &1167290200546252185
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7149667272668642676}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c0fedcfd98644045965fd4f04deff87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIPopups.FadePopupUI
-  useHapticFeedback: 1
-  initialHided: 0
-  disableOnHide: 1
-  easeType: 3
-  animationTime: 0.5
-  useScaledTime: 0
-  targetCanvasGroup: {fileID: 299285890560229305}
-  opacityHided: 0
-  opacityShowed: 1
 --- !u!114 &9007097344259401940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17283,8 +16995,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2912c4d3bf08c34e86dbaf122f889d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LoadingScreen
-  popupUI: {fileID: 1167290200546252185}
+  popupUI: {fileID: 0}
   animating: 0
+  loadingImage: {fileID: 0}
 --- !u!1 &7199597317043929800
 GameObject:
   m_ObjectHideFlags: 0
@@ -17372,8 +17085,6 @@ GameObject:
   - component: {fileID: 8179018334152912170}
   - component: {fileID: 3298795806488559806}
   - component: {fileID: 1450088080402312953}
-  - component: {fileID: 960706836075394467}
-  - component: {fileID: 6540063335724996953}
   m_Layer: 0
   m_Name: NoAds
   m_TagString: Untagged
@@ -17462,50 +17173,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &960706836075394467
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7287166008783008590}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c0fedcfd98644045965fd4f04deff87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIPopups.FadePopupUI
-  useHapticFeedback: 1
-  initialHided: 1
-  disableOnHide: 1
-  easeType: 3
-  animationTime: 0.15
-  useScaledTime: 1
-  targetCanvasGroup: {fileID: 1450088080402312953}
-  opacityHided: 0
-  opacityShowed: 1
---- !u!114 &6540063335724996953
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7287166008783008590}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f20203203573dd5479a923bd17e22275, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TiredofAds
-  beesImages:
-  - {fileID: 8604960904295957291}
-  - {fileID: 6796530665333446849}
-  - {fileID: 3414554230147704040}
-  - {fileID: 1424815241045407646}
-  - {fileID: 733721634737573883}
-  - {fileID: 2699219760953385859}
-  - {fileID: 5253178071547329957}
-  beeFramesPerSecond: 12
-  beeHoverHeight: 10
-  beeHoverPeriod: 2.4
 --- !u!1 &7300325374631200825
 GameObject:
   m_ObjectHideFlags: 0
@@ -19534,7 +19201,6 @@ GameObject:
   - component: {fileID: 4436178885539653261}
   - component: {fileID: 9124874686487041948}
   - component: {fileID: 4243569371321614211}
-  - component: {fileID: 8295479227339813103}
   m_Layer: 0
   m_Name: Buy Button
   m_TagString: Untagged
@@ -19644,22 +19310,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &8295479227339813103
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8099882585989980382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc2814abd9777c14abe9cc6c5b734e3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonBuy
-  priceText: {fileID: 757394129424498803}
-  takePriceFromStore: 1
-  disableGameObjectWhenPurchased: 0
-  gameObjectToDisable: {fileID: 0}
 --- !u!1 &8122796748563506984
 GameObject:
   m_ObjectHideFlags: 0
@@ -21510,7 +21160,6 @@ GameObject:
   - component: {fileID: 5819252706128218651}
   - component: {fileID: 2904496637822357735}
   - component: {fileID: 7901619264666828647}
-  - component: {fileID: 5771113786252683926}
   m_Layer: 0
   m_Name: Global Popups
   m_TagString: Untagged
@@ -21580,27 +21229,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &5771113786252683926
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9060784921818949843}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51dcbe3fb18583141a053d53f827e65a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PopupController
-  popups:
-  - id: noAds
-    popup: {fileID: 960706836075394467}
-  - id: noAdsBought
-    popup: {fileID: 245311591788923260}
-  - id: noHearts
-    popup: {fileID: 2618408220619249842}
-  - id: noCoins
-    popup: {fileID: 7570727431117587787}
 --- !u!1 &9067883312267991328
 GameObject:
   m_ObjectHideFlags: 0

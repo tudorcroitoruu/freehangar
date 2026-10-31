@@ -318,13 +318,14 @@ MonoBehaviour:
   loseClip: {fileID: 8300000, guid: 053cb6a59f375784fbd361fc4b2242a0, type: 3}
   winClip: {fileID: 8300000, guid: 73e95dc13d8132b44be03fb91dd8b7ff, type: 3}
   musicClips:
-  - {fileID: 8300000, guid: c1be010053d265b469ebccb577c2aa86, type: 3}
-  - {fileID: 8300000, guid: 1e5850c47b1ec264ca5aec829da2dd89, type: 3}
-  - {fileID: 8300000, guid: 626233a37d661a64887722101416208f, type: 3}
-  - {fileID: 8300000, guid: 3895f674c48d8cc4599c75defff6b285, type: 3}
-  introMusic: {fileID: 8300000, guid: efaaae43fc57fb3418278c4404cc5691, type: 3}
-  attackMusic: {fileID: 8300000, guid: d3ecf9199bc66f143b6f5e5425333653, type: 3}
-  interstellarMusic: {fileID: 8300000, guid: 29ddca6acf4419b489e5b188e02b311a, type: 3}
+  - {fileID: 8300000, guid: d4a4c2b55fbc3cc4cbcec431762a8620, type: 3}
+  - {fileID: 8300000, guid: 70d9fce8758b4ec45a1d6148c0ac8487, type: 3}
+  - {fileID: 8300000, guid: b3371553220817b48aec813a1b151e3f, type: 3}
+  - {fileID: 8300000, guid: b0fe2bd1ab502b445ae44f107bd8c4e9, type: 3}
+  - {fileID: 8300000, guid: f34fe41a1cc5c8746b1ff3535824138f, type: 3}
+  introMusic: {fileID: 8300000, guid: 201cff4a0d37f8b45b84a277df5be044, type: 3}
+  attackMusic: {fileID: 8300000, guid: f34fe41a1cc5c8746b1ff3535824138f, type: 3}
+  interstellarMusic: {fileID: 8300000, guid: 4c0661ec21967f7479deb141b1d69e04, type: 3}
   pauseChance: 0.35
   pauseSeconds: 15
 --- !u!1 &7378796319633956887
