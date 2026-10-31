@@ -362,7 +362,7 @@ MonoBehaviour:
   rocket: {fileID: 8300000, guid: 66e9e7aad0f70a44b8502ac99a21820f, type: 3}
   switchElectrical: {fileID: 8300000, guid: 5226d1484aea2ae45907320b72545611, type: 3}
   lightsOn: {fileID: 8300000, guid: 57f2c643150a23043b2a4b628904ea3d, type: 3}
-  paperGet: {fileID: 8300000, guid: cbc65faa6be27aa4a9e74a926830a27b, type: 3}
+  paperGet: {fileID: 8300000, guid: 55d4f94bfd5bfa24fa2176f1d9862a0e, type: 3}
   perkFound: {fileID: 8300000, guid: a5e7ae1d50383c9438d56875bff0ea15, type: 3}
   shovelGets:
   - {fileID: 8300000, guid: 8ea9e4bb86faf9d4dbe38f246a67b60e, type: 3}

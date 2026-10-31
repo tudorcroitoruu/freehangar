@@ -188,9 +188,8 @@ public sealed class GameIntroduction : MonoBehaviour
         yield return Animate(arrivalPauseSeconds, _ => { });
         CurrentShot = "Purchase paper";
         paper = Instantiate(purchasePaperPrefab, view.transform, false); paper.transform.localPosition = new Vector3(.02f, -.8f, .7f);
-        bool paperSoundPlayed = false;
+        GameplayAudio.Instance?.PaperGet();
         yield return Animate(paperSeconds, t => {
-            if (!paperSoundPlayed && t >= .17f) { paperSoundPlayed = true; GameplayAudio.Instance?.PaperGet(); }
             float lift = Mathf.SmoothStep(0, 1, t / .2f), lower = Mathf.SmoothStep(0, 1, (t - .72f) / .28f);
             paper.transform.localPosition = Vector3.Lerp(new Vector3(.02f, -.8f, .7f), new Vector3(.015f, -.025f, .65f), lift) - Vector3.up * (lower * .8f);
             paper.transform.localRotation = Quaternion.Euler(-8 + Mathf.Sin(t * Mathf.PI * 2) * 1.2f, -4, -3);
