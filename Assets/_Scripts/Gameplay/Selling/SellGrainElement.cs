@@ -14,7 +14,7 @@ public class SellGrainElement : MonoBehaviour
     {
         if (grainImage != null) grainImage.sprite = settings.grainSprite;
         if (grainName != null) grainName.text = settings.grainType.ToString();
-        if (grainQuantity != null) grainQuantity.text = $"{kilograms:0.###} kg";
+        if (grainQuantity != null) grainQuantity.text = $"{kilograms:0.#} kg";
         if (grainPrice != null) grainPrice.text = $"$ {settings.grainPrice:0.##} / kg";
         if (grainValue != null) grainValue.text = $"$ {kilograms * (double)settings.grainPrice:0.##}";
     }

@@ -10,6 +10,7 @@ public class SellingScreen : MonoBehaviour
     [SerializeField] private Transform elementsParent;
     [Space] [SerializeField] private Text totalWeight;
     [SerializeField] private Text totalValue;
+    [SerializeField] private Text totalValueButton;
     [Space] [SerializeField] private Button cancelButton;
     [SerializeField] private Button buyButton;
     private readonly List<SellGrainElement> elements = new List<SellGrainElement>();
@@ -91,8 +92,9 @@ public class SellingScreen : MonoBehaviour
         }
         // The wallet stores whole dollars; round down once after summing all crops.
         quotedCash = value >= 1 && value < (double)int.MaxValue + 1 ? (int)Math.Floor(value) : 0;
-        if (totalWeight != null) totalWeight.text = $"{weight:0.###} kg";
-        if (totalValue != null) totalValue.text = $"$ {quotedCash:N0}";
+        if (totalWeight != null) totalWeight.text = $"{weight:0.#} kg";
+        if (totalValue != null) totalValue.text = $"$ {quotedCash:N2}";
+        if (totalValueButton != null) totalValueButton.text = $"SELL ALL - ${quotedCash:N2}";
         if (buyButton != null) buyButton.interactable = CanPay();
     }
 
