@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +15,8 @@ public sealed class VehicleUpgrade : MonoBehaviour
     private Transform[] originalSlots;
     private readonly List<Transform> generatedSlots = new List<Transform>();
     private BicycleController bicycle;
+    public VehicleUpgrade Replacement { get; private set; }
+    public static event Action<VehicleUpgrade, VehicleUpgrade> VehicleReplaced;
 
     public string VehicleId
     {
@@ -35,6 +39,8 @@ public sealed class VehicleUpgrade : MonoBehaviour
         }
     }
     public bool IsConfigured => Profile != null && Profile.IsConfigured;
+    public bool IsUnlocked => IsConfigured && settings.IsUnlocked(VehicleId, SaveSystem.Data);
+    public VehicleUpgradeSettings.VehicleType NextVehicle => IsConfigured ? settings.Next(VehicleId) : null;
     public int Level => IsConfigured ? Mathf.Clamp(SaveSystem.Data?.GetVehicleUpgradeLevel(VehicleId) ?? 0, 0, Profile.MaxLevel) : 0;
     public float CapacityVolume => IsConfigured && Profile.upgradeCapacity ? Profile.At(Level).capacityCubicMeters : float.PositiveInfinity;
     public int SlotCount => IsConfigured ? Profile.At(Level).slots : int.MaxValue;
@@ -46,6 +52,14 @@ public sealed class VehicleUpgrade : MonoBehaviour
     {
         bicycle = GetComponent<BicycleController>();
         if (bicycle != null) originalSlots = bicycle.cargoSlots ?? new Transform[0];
+    }
+    private IEnumerator Start()
+    {
+        if (!SaveSystem.savesLoaded)
+            yield return new WaitUntil(() => SaveSystem.savesLoaded);
+        // Resolve the saved destination before instantiating, skipping intermediate prefabs.
+        if (IsConfigured && IsUnlocked && IsMaxed && NextVehicle != null)
+            TryAdvanceToUnlockedVehicle();
     }
     private void OnEnable()
     {
@@ -108,6 +122,7 @@ public sealed class VehicleUpgrade : MonoBehaviour
     public bool HasCargo => CargoCount > 0;
     public bool CanLoadVolume(float volume, int slotCost = 1)
     {
+        if (IsConfigured && !IsUnlocked) return false;
         if (GetComponent<VehicleCargoRack>() is VehicleCargoRack rack)
             // Rack bays are authored for one sack or two boxes. Closing a sack changes its
             // collider volume, but must not make it too large for an otherwise empty bay.
@@ -136,9 +151,71 @@ public sealed class VehicleUpgrade : MonoBehaviour
 
     public bool TryUpgrade()
     {
-        if (!isActiveAndEnabled || !IsConfigured || HasCargo || IsMaxed || SaveSystem.Data == null) return false;
+        if (!isActiveAndEnabled || !IsConfigured || !IsUnlocked || HasCargo || IsMaxed || SaveSystem.Data == null) return false;
+        if (bicycle != null && bicycle.IsRidden) return false;
         int level = SaveSystem.Data.GetVehicleUpgradeLevel(VehicleId);
-        return SaveSystem.TryPurchaseVehicleUpgrade(VehicleId, Price, level, Profile.MaxLevel);
+        bool advancesVehicle = Level + 1 == Profile.MaxLevel && NextVehicle != null;
+        VehicleUpgrade next = null;
+        if (advancesVehicle && !TryCreateReplacement(out next)) return false;
+        if (!SaveSystem.TryPurchaseVehicleUpgrade(VehicleId, Price, level, Profile.MaxLevel))
+        {
+            if (next != null) Destroy(next.gameObject);
+            return false;
+        }
+        if (next != null) ActivateReplacement(next);
+        return true;
+    }
+
+    public bool TryAdvanceToUnlockedVehicle()
+    {
+        if (Replacement != null) return true;
+        if (!isActiveAndEnabled || !IsConfigured || !IsUnlocked || !IsMaxed || HasCargo ||
+            NextVehicle == null || (bicycle != null && bicycle.IsRidden)) return false;
+        if (!TryCreateReplacement(out var next)) return false;
+        ActivateReplacement(next);
+        return true;
+    }
+
+    private bool TryCreateReplacement(out VehicleUpgrade next)
+    {
+        next = null;
+        var profile = IsMaxed ? settings.ResolveSavedVehicle(VehicleId, SaveSystem.Data) : NextVehicle;
+        if (profile == Profile) return false;
+        if (profile == null || !profile.IsConfigured) return false;
+        var prefab = Resources.Load<GameObject>(profile.PrefabResourcePath);
+        if (prefab == null || prefab.GetComponent<BicycleController>() == null)
+        {
+            Debug.LogWarning($"Cannot upgrade vehicle: Resources/{profile.PrefabResourcePath} must be a prefab with BicycleController on its root.", this);
+            return false;
+        }
+
+        // Configure the save ID before the new vehicle's Awake/OnEnable can run.
+        var staging = new GameObject("Vehicle upgrade staging") { hideFlags = HideFlags.DontSave };
+        staging.SetActive(false);
+        var instance = Instantiate(prefab, transform.position, transform.rotation, staging.transform);
+        instance.SetActive(false);
+        next = instance.GetComponent<VehicleUpgrade>();
+        if (next == null) next = instance.AddComponent<VehicleUpgrade>();
+        next.settings = settings;
+        next.vehicleId = profile.id;
+        next.enabled = true;
+        if (GetComponent<VehicleUpgradeInteractable>() != null && instance.GetComponent<VehicleUpgradeInteractable>() == null)
+            instance.AddComponent<VehicleUpgradeInteractable>();
+        instance.transform.SetParent(transform.parent, true);
+        Destroy(staging);
+        return true;
+    }
+
+    private void ActivateReplacement(VehicleUpgrade next)
+    {
+        Replacement = next;
+        next.gameObject.SetActive(true);
+        foreach (var rider in FindObjectsByType<PlayerBicycleInteraction>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            if (bicycle != null && rider.bicycle == bicycle) rider.bicycle = next.GetComponent<BicycleController>();
+        VehicleUpgradeInteractable.ReplaceTargets(this, next);
+        VehicleReplaced?.Invoke(this, next);
+        gameObject.SetActive(false);
+        Destroy(gameObject);
     }
     public bool OpenMenu()
     {

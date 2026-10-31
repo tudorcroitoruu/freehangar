@@ -1213,7 +1213,7 @@ GameObject:
   - component: {fileID: 2367393513769071940}
   - component: {fileID: 7190962342836331866}
   m_Layer: 0
-  m_Name: Pick_Up_Bigger_Driveable
+  m_Name: 6_Pick_Up_Bigger_Driveable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

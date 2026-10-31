@@ -68,7 +68,7 @@ public class UpgradeManager : MonoBehaviour
 
     public bool OpenVehicle(VehicleUpgrade vehicle)
     {
-        if (!enabled || upgradeVehicleScreen == null || vehicle == null || !vehicle.isActiveAndEnabled || !vehicle.IsConfigured || vehicle.HasCargo ||
+        if (!enabled || upgradeVehicleScreen == null || vehicle == null || !vehicle.isActiveAndEnabled || !vehicle.IsConfigured || !vehicle.IsUnlocked || vehicle.HasCargo ||
             (current != null && current.IsOpen) || UIPopups.BasePopupUI.HasActivePopup ||
             (transform.parent != null && !transform.parent.gameObject.activeInHierarchy)) return false;
         Initialize();

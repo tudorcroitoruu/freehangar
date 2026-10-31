@@ -550,7 +550,7 @@ GameObject:
   - component: {fileID: 8100725137279754956}
   - component: {fileID: 2386800258260687751}
   m_Layer: 0
-  m_Name: Pick_Up_Last_Driveable
+  m_Name: 7_Pick_Up_Last_Driveable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

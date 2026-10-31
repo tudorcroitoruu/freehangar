@@ -15,6 +15,7 @@ MonoBehaviour:
   vehicles:
   - id: bicycle
     displayName: Bicycle
+    prefabResourcePath: Vehicles/1_Bicycle_Rideable
     upgradeCapacity: 1
     levels:
     - image: {fileID: 0}
@@ -31,6 +32,7 @@ MonoBehaviour:
       price: 1000
   - id: motoroller
     displayName: Motoroller
+    prefabResourcePath: Vehicles/2_Motoroller_Rideable
     upgradeCapacity: 1
     levels:
     - image: {fileID: 0}
@@ -47,6 +49,7 @@ MonoBehaviour:
       price: 0
   - id: trike
     displayName: Trike
+    prefabResourcePath: Vehicles/3_Trike_Driveable
     upgradeCapacity: 1
     levels:
     - image: {fileID: 0}
@@ -63,6 +66,7 @@ MonoBehaviour:
       price: 0
   - id: lawnmower
     displayName: Lawnmower
+    prefabResourcePath: Vehicles/4_Lawnmower_With_Trailer
     upgradeCapacity: 1
     levels:
     - image: {fileID: 0}
@@ -79,6 +83,7 @@ MonoBehaviour:
       price: 0
   - id: pickup
     displayName: Pickup
+    prefabResourcePath: Vehicles/5_Pick_up_Driveable
     upgradeCapacity: 1
     levels:
     - image: {fileID: 0}
@@ -95,6 +100,7 @@ MonoBehaviour:
       price: 0
   - id: pickupBig
     displayName: Pickup Bigger
+    prefabResourcePath: Vehicles/6_Pick_Up_Bigger_Driveable
     upgradeCapacity: 1
     levels:
     - image: {fileID: 0}
@@ -111,6 +117,7 @@ MonoBehaviour:
       price: 0
   - id: pickupLast
     displayName: Pickup Cargo
+    prefabResourcePath: Vehicles/7_Pick_Up_Last_Driveable
     upgradeCapacity: 1
     levels:
     - image: {fileID: 0}

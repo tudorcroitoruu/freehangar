@@ -32,6 +32,7 @@ public sealed class VehicleCargoRack : MonoBehaviour
     }
     public Transform FreeSlot(bool bag)
     {
+        if (TryGetComponent<VehicleUpgrade>(out var upgrade) && upgrade.IsConfigured && !upgrade.IsUnlocked) return null;
         EnsureSlots();
         if (UsedSlots + (bag?2:1) > Limit) return null;
         for(int i=0;i<slots.Count;i+=2)

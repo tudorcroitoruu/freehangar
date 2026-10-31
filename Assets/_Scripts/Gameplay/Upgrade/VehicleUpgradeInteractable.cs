@@ -10,6 +10,12 @@ public sealed class VehicleUpgradeInteractable : MonoBehaviour, IKeyedInteractab
     [SerializeField] private Transform promptAnchor;
     [SerializeField] private Vector3 promptOffset = Vector3.up * .3f;
 
+    internal static void ReplaceTargets(VehicleUpgrade previous, VehicleUpgrade next)
+    {
+        foreach (var station in FindObjectsByType<VehicleUpgradeInteractable>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            if (station.targetVehicle == previous.gameObject) station.targetVehicle = next.gameObject;
+    }
+
     public static VehicleUpgradeInteractable FindForHit(Collider hit, PlayerInteractor interactor)
     {
         if (hit == null || (interactor != null && interactor.Bags != null && interactor.Bags.IsCarrying) ||
@@ -35,7 +41,7 @@ public sealed class VehicleUpgradeInteractable : MonoBehaviour, IKeyedInteractab
         prompt.InteractionKey = InteractionKey;
         if (upgradeManager == null) upgradeManager = FindFirstObjectByType<UpgradeManager>(FindObjectsInactive.Include);
         var target = Target;
-        return isActiveAndEnabled && interactor != null && target != null && target.isActiveAndEnabled && target.IsConfigured && !target.HasCargo &&
+        return isActiveAndEnabled && interactor != null && target != null && target.isActiveAndEnabled && target.IsConfigured && target.IsUnlocked && !target.HasCargo &&
             upgradeManager != null && !UpgradeManager.BlocksGameplayInput && !UIPopups.BasePopupUI.HasActivePopup;
     }
     public bool TryInteract(PlayerInteractor interactor)

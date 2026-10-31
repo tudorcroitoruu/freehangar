@@ -244,6 +244,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     }
     public Transform FreeCargoSlot()
     {
+        if (TryGetComponent<VehicleUpgrade>(out var progression) && progression.IsConfigured && !progression.IsUnlocked) return null;
         if (TryGetComponent<VehicleCargoRack>(out var rack)) return rack.FreeSlot(false);
         var upgrades = GetComponent<VehicleUpgrade>();
         bool configured = upgrades != null && upgrades.IsConfigured;
@@ -257,6 +258,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     }
     public Transform FreeBagCargoSlot()
     {
+        if (TryGetComponent<VehicleUpgrade>(out var progression) && progression.IsConfigured && !progression.IsUnlocked) return null;
         if (TryGetComponent<VehicleCargoRack>(out var rack)) return rack.FreeSlot(true);
         var upgrades = GetComponent<VehicleUpgrade>();
         if (upgrades != null && upgrades.IsConfigured)
@@ -281,6 +283,11 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     {
         prompt = default;
         if (!isActiveAndEnabled || IsRidden || interactor == null) return false;
+        if (TryGetComponent<VehicleUpgrade>(out var progression) && progression.IsConfigured && !progression.IsUnlocked)
+        {
+            prompt = new InteractionPromptData(transform.position + Vector3.up, "Vehicle locked", false);
+            return true;
+        }
         var rider = interactor.GetComponent<PlayerBicycleInteraction>();
         var actor = interactor.GetComponent<PlayerController>();
         if (rider == null || rider.IsRiding || actor == null || actor.characterCamera == null ||

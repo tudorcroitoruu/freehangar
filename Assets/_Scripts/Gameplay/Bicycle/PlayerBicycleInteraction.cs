@@ -158,6 +158,8 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     public bool TryMount()
     {
         CacheReferences();
+        if (bicycle != null && bicycle.TryGetComponent<VehicleUpgrade>(out var upgrades) &&
+            upgrades.IsConfigured && !upgrades.IsUnlocked) return false;
         if(view == null || player == null || player.characterController == null || riding || bicycle==null || !bicycle.isActiveAndEnabled || bicycle.IsRidden || bicycle.riderView==null || player.IsCarrying ||
             GetComponent<PlayerInteractor>()?.PushedWheelbarrow != null || Vector3.Distance(transform.position,bicycle.transform.position)>interactionDistance) return false;
         motoroller = bicycle.GetComponent<MotorollerController>();

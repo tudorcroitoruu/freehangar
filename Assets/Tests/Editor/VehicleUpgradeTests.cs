@@ -335,6 +335,136 @@ public class VehicleUpgradeTests
         Assert.IsFalse(station.TryInteract(interactor));
         Assert.IsNull(root.GetComponent<VehicleUpgrade>());
     }
+    [Test]
+    public void LastMiniupgradeUnlocksNextVehicleAndSurvivesReload()
+    {
+        var first = settings.vehicles[0];
+        first.levels = new[]
+        {
+            new VehicleUpgradeSettings.Level { slots = 1, price = 20 },
+            new VehicleUpgradeSettings.Level { slots = 2, price = 30 },
+            new VehicleUpgradeSettings.Level { slots = 3 }
+        };
+        var second = new VehicleUpgradeSettings.VehicleType
+        {
+            id = "next", displayName = "Next vehicle",
+            levels = new[] { new VehicleUpgradeSettings.Level(), new VehicleUpgradeSettings.Level() }
+        };
+        var last = new VehicleUpgradeSettings.VehicleType
+        {
+            id = "last", levels = new[] { new VehicleUpgradeSettings.Level(), new VehicleUpgradeSettings.Level() }
+        };
+        settings.vehicles = new[] { first, second, last };
+        var data = SaveSystem.Data;
+        Assert.IsTrue(settings.IsUnlocked(first.id, data));
+        Assert.IsFalse(settings.IsUnlocked(second.id, data));
+        Assert.AreSame(second, settings.Next(first.id));
+        Assert.IsTrue(data.TryUpgradeVehicle(first.id, 20, 0, first.MaxLevel));
+        Assert.IsFalse(settings.IsUnlocked(second.id, data));
+        Assert.IsFalse(data.TryUpgradeVehicle(first.id, 30, 0, first.MaxLevel));
+        Assert.IsFalse(settings.IsUnlocked(second.id, data));
+        Assert.IsTrue(data.TryUpgradeVehicle(first.id, 30, 1, first.MaxLevel));
+        Assert.AreEqual(50, data.cash);
+        Assert.IsTrue(settings.IsUnlocked(first.id, data));
+        Assert.IsTrue(settings.IsUnlocked(second.id, data));
+        Assert.IsFalse(settings.IsUnlocked(last.id, data));
+        Assert.AreEqual(0, data.GetVehicleUpgradeLevel(second.id));
+        var loaded = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(data));
+        Assert.IsTrue(settings.IsUnlocked(second.id, loaded));
+        Assert.IsFalse(settings.IsUnlocked(last.id, loaded));
+        Assert.IsNull(settings.Next(last.id));
+    }
+
+    [Test]
+    public void LockedVehicleRejectsLoadingAndUpgradesWhileOldProgressRemainsAvailable()
+    {
+        var second = new VehicleUpgradeSettings.VehicleType
+        {
+            id = "next", levels = new[]
+            {
+                new VehicleUpgradeSettings.Level(), new VehicleUpgradeSettings.Level(), new VehicleUpgradeSettings.Level()
+            }
+        };
+        settings.vehicles = new[] { settings.vehicles[0], second };
+        var upgrades = root.AddComponent<VehicleUpgrade>();
+        SetField(upgrades, "settings", settings);
+        SetField(upgrades, "vehicleId", second.id);
+        Assert.IsFalse(upgrades.IsUnlocked);
+        Assert.IsFalse(upgrades.CanLoadVolume(.1f));
+        Assert.IsFalse(upgrades.TryUpgrade());
+        Assert.AreEqual(100, SaveSystem.Data.cash);
+        Assert.IsTrue(SaveSystem.Data.TryUpgradeVehicle(second.id, 0, 0, second.MaxLevel));
+        Assert.IsTrue(upgrades.IsUnlocked);
+        Assert.IsTrue(upgrades.CanLoadVolume(.1f));
+    }
+
+    [Test]
+    public void LastMiniupgradeDoesNotChargeOrAdvanceWhenNextPrefabIsMissing()
+    {
+        var first = settings.vehicles[0];
+        var next = new VehicleUpgradeSettings.VehicleType
+        {
+            id = "missing-prefab-test", prefabResourcePath = "Tests/VehiclePrefabThatDoesNotExist",
+            levels = new[] { new VehicleUpgradeSettings.Level(), new VehicleUpgradeSettings.Level() }
+        };
+        settings.vehicles = new[] { first, next };
+        var upgrades = root.AddComponent<VehicleUpgrade>();
+        SetField(upgrades, "settings", settings);
+        SetField(upgrades, "vehicleId", first.id);
+        UnityEngine.TestTools.LogAssert.Expect(LogType.Warning,
+            "Cannot upgrade vehicle: Resources/Tests/VehiclePrefabThatDoesNotExist must be a prefab with BicycleController on its root.");
+        Assert.IsFalse(upgrades.TryUpgrade());
+        Assert.AreEqual(100, SaveSystem.Data.cash);
+        Assert.AreEqual(0, SaveSystem.Data.GetVehicleUpgradeLevel(first.id));
+        Assert.IsFalse(settings.IsUnlocked(next.id, SaveSystem.Data));
+        Assert.IsNull(upgrades.Replacement);
+        Assert.IsTrue(root.activeSelf);
+        Assert.AreEqual("Vehicles/test", first.PrefabResourcePath);
+        Assert.AreEqual(next.prefabResourcePath, next.PrefabResourcePath);
+    }
+
+    [Test]
+    public void SavedVehicleResolutionSkipsCompletedTypesAndKeepsPartialMiniupgrades()
+    {
+        var first = settings.vehicles[0];
+        var middle = new VehicleUpgradeSettings.VehicleType
+        {
+            id = "middle", levels = new[] { new VehicleUpgradeSettings.Level(), new VehicleUpgradeSettings.Level() }
+        };
+        var final = new VehicleUpgradeSettings.VehicleType
+        {
+            id = "final", levels = new[]
+            {
+                new VehicleUpgradeSettings.Level(), new VehicleUpgradeSettings.Level(), new VehicleUpgradeSettings.Level()
+            }
+        };
+        settings.vehicles = new[] { first, middle, final };
+        var data = SaveSystem.Data;
+        Assert.AreSame(first, settings.ResolveSavedVehicle(first.id, data));
+        Assert.IsTrue(data.TryUpgradeVehicle(first.id, 0, 0, first.MaxLevel));
+        Assert.AreSame(middle, settings.ResolveSavedVehicle(first.id, data));
+        Assert.IsTrue(data.TryUpgradeVehicle(middle.id, 0, 0, middle.MaxLevel));
+        Assert.IsTrue(data.TryUpgradeVehicle(final.id, 0, 0, final.MaxLevel));
+        Assert.AreSame(final, settings.ResolveSavedVehicle(first.id, data));
+        Assert.AreSame(final, settings.ResolveSavedVehicle(middle.id, data));
+        Assert.AreEqual(1, data.GetVehicleUpgradeLevel(final.id));
+        Assert.IsTrue(data.TryUpgradeVehicle(final.id, 0, 1, final.MaxLevel));
+        Assert.AreSame(final, settings.ResolveSavedVehicle(first.id, data));
+        Assert.AreSame(first, settings.ResolveSavedVehicle(first.id, null));
+        Assert.IsNull(settings.ResolveSavedVehicle("unknown", data));
+
+        // Restoration must request only the destination prefab, even if intermediate prefabs are absent.
+        final.prefabResourcePath = "Tests/SavedDestinationVehicleThatDoesNotExist";
+        var upgrades = root.AddComponent<VehicleUpgrade>();
+        SetField(upgrades, "settings", settings);
+        SetField(upgrades, "vehicleId", first.id);
+        UnityEngine.TestTools.LogAssert.Expect(LogType.Warning,
+            "Cannot upgrade vehicle: Resources/Tests/SavedDestinationVehicleThatDoesNotExist must be a prefab with BicycleController on its root.");
+        Assert.IsFalse(upgrades.TryAdvanceToUnlockedVehicle());
+        Assert.IsNull(upgrades.Replacement);
+        Assert.AreEqual(100, data.cash);
+    }
+
     private GameObject Child(string name)
     {
         var child = new GameObject(name, typeof(RectTransform));

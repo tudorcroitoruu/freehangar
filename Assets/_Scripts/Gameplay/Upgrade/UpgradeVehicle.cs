@@ -17,6 +17,10 @@ public class UpgradeVehicle : MonoBehaviour
     [SerializeField] private Text nextLevelSlots;
     [SerializeField] private Text maxLevelSlots;
     [SerializeField] private Color nextLevelColor = Color.forestGreen;
+    [Header("Miniupgrades")]
+    [SerializeField] private GameObject[] upgradeDots;
+    [SerializeField] private Text currentLevelText;
+    [SerializeField] private Text nextVehicleText;
     
     [Space, Header("Price")]
     [SerializeField] private Text price;
@@ -36,14 +40,20 @@ public class UpgradeVehicle : MonoBehaviour
     {
         if (upgradeButton != null) upgradeButton.onClick.AddListener(Upgrade);
         SaveSystem.MoneyChanged += OnMoneyChanged;
+        VehicleUpgrade.VehicleReplaced += OnVehicleReplaced;
         Refresh();
     }
     private void OnDisable()
     {
         if (upgradeButton != null) upgradeButton.onClick.RemoveListener(Upgrade);
         SaveSystem.MoneyChanged -= OnMoneyChanged;
+        VehicleUpgrade.VehicleReplaced -= OnVehicleReplaced;
     }
     private void OnMoneyChanged(int _) => Refresh();
+    private void OnVehicleReplaced(VehicleUpgrade previous, VehicleUpgrade next)
+    {
+        if (target == previous) SetTarget(next);
+    }
     public void Upgrade() => TryUpgrade();
     public bool TryUpgrade()
     {
@@ -60,13 +70,21 @@ public class UpgradeVehicle : MonoBehaviour
         if (nextLevelCapacity != null) nextLevelCapacity.gameObject.SetActive(showCapacity);
         if (maxLevelCapacity != null) maxLevelCapacity.gameObject.SetActive(showCapacity);
         bool maxed = configured && target.IsMaxed;
-        bool available = configured && target.isActiveAndEnabled && !target.HasCargo && SaveSystem.Data != null && !maxed;
+        bool available = configured && target.IsUnlocked && target.isActiveAndEnabled && !target.HasCargo && SaveSystem.Data != null && !maxed;
         int cost = configured && !target.UsesVoucher ? target.Price : 0;
         int missing = available ? Mathf.Max(0, cost - SaveSystem.Money) : 0;
         bool affordable = available && missing == 0;
         if (currentLevelHolder != null) currentLevelHolder.SetActive(configured && !maxed);
         if (nextLevelHolder != null) nextLevelHolder.SetActive(configured && !maxed);
         if (maxLevelHolder != null) maxLevelHolder.SetActive(maxed);
+        if (upgradeDots != null)
+            for (int i = 0; i < upgradeDots.Length; i++)
+                if (upgradeDots[i] != null) upgradeDots[i].SetActive(configured && i < target.Level);
+        SetText(currentLevelText, configured ? target.Profile.displayName : "");
+        var nextVehicle = configured ? target.NextVehicle : null;
+        SetText(nextVehicleText, nextVehicle == null ? "" : maxed
+            ? $"Unlocked: {nextVehicle.displayName}"
+            : $"Complete all upgrades to unlock {nextVehicle.displayName}");
         if (configured)
         {
             var current = target.Profile.At(target.Level);
@@ -89,7 +107,7 @@ public class UpgradeVehicle : MonoBehaviour
                     if (vehicleImages[i] != null && image != null) vehicleImages[i].sprite = image;
                 }
         }
-        SetText(price, maxed ? "MAX" : configured ? cost == 0 ? "Free" : $"$ {cost:N0}" : "Unavailable");
+        SetText(price, configured && !target.IsUnlocked ? "Locked" : maxed ? "MAX" : configured ? cost == 0 ? "Free" : $"$ {cost:N0}" : "Unavailable");
         SetText(notEnoughMoney, missing > 0 ? $"You need ${missing:N0} more." : "");
         if (notEnoughMoneyPopup != null) notEnoughMoneyPopup.SetActive(missing > 0);
         if (upgradeButton != null) upgradeButton.interactable = affordable;
