@@ -59,6 +59,7 @@ public sealed class GameIntroduction : MonoBehaviour
             landscapeStart == null || landscapeEnd == null || arrival == null || grainLook == null || shovelLook == null || bicycleRoute.Length < 2 || purchasePaperPrefab == null)
             return false;
         IsPlaying = true; view = player.characterCamera;
+        AudioManager.Instance?.PlayIntroOnce();
         cameraParent = view.transform.parent; cameraLocalPosition = view.transform.localPosition; cameraLocalRotation = view.transform.localRotation;
         originalFov = view.fieldOfView; playerPosition = player.transform.position; playerRotation = player.transform.rotation;
         bikePosition = bicycle.transform.position; bikeRotation = bicycle.transform.rotation;

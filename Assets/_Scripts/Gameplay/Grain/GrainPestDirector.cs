@@ -359,6 +359,7 @@ public sealed class GrainPestDirector : MonoBehaviour
         crowLesson = false;
         if (player == null || playerCamera == null || tutorialBagTemplate == null || !player.BeginDiscovery(this))
         { introRunning = false; yield break; }
+        AudioManager.Instance?.PlayAttackMusic();
         introController = player.GetComponent<PlayerController>();
         introControllerWasEnabled = introController != null && introController.enabled;
         if (introControllerWasEnabled) introController.enabled = false;
@@ -414,6 +415,7 @@ public sealed class GrainPestDirector : MonoBehaviour
         introRunning = true; crowLesson = true;
         if (player == null || playerCamera == null || tutorialBagTemplate == null || !player.BeginDiscovery(this))
         { introRunning = false; yield break; }
+        AudioManager.Instance?.PlayAttackMusic();
         introController = player.GetComponent<PlayerController>();
         introControllerWasEnabled = introController != null && introController.enabled;
         if (introControllerWasEnabled) introController.enabled = false;

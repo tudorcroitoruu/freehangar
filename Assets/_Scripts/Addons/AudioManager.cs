@@ -1,20 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class AudioManager : MonoBehaviour
 {
-    private const float ShootVolumeScale = 1f / 3f / 1.4f;
-    private const float PopVolumeScale = 1f / 1.5f;
-    private const float ShootPlaybackInterval = 0.06f;
-    private const float FailedPlaybackInterval = 0.15f;
-    private const float PopPlaybackInterval = 0.1f;
-    private const int MaximumQueuedPopSounds = 4;
-    private const int TransientAudioPriority = 192;
-
     public bool inGame;
     public Coroutine coroutine;
 
@@ -34,54 +25,20 @@ public class AudioManager : MonoBehaviour
     [FormerlySerializedAs("levelWinClip")]
     [SerializeField] private AudioClip winClip;
 
-    [Header("Bee Jam Gameplay Sound Effects")]
-    [SerializeField] private AudioClip beeClickClip;
-    [SerializeField] private AudioClip beeGetOutClip;
-    [SerializeField] private AudioClip beeWrongClip;
-    [SerializeField] private AudioClip flowerPopClip;
-
-    [Header("Toy Factory Gameplay Sound Effects")]
-    [SerializeField] private AudioClip enterOnBoxClip;
-    [SerializeField] private AudioClip lockedToyClip;
-    [SerializeField] private AudioClip putOnConveyorClip;
-    [SerializeField] private AudioClip revivePopupClip;
-    [SerializeField] private AudioClip winToyPingClip;
-
-    [Header("Color Sculpt Gameplay Sound Effects")]
-    [SerializeField] private AudioClip failedClip;
-    [SerializeField] private AudioClip shootClip;
-    [SerializeField] private AudioClip[] destroyCubeClips;
-    [SerializeField] private AudioClip placeGunClip;
-    [SerializeField] private AudioClip destroyGunClip;
-
-    [Header("Color Lizard Gameplay Sound Effects")]
-    [SerializeField] private AudioClip destroyObstacleClip;
-    [SerializeField] private AudioClip freezeClip;
-    [SerializeField] private AudioClip releaseLizardClip;
-    [SerializeField] private AudioClip successLizardClip;
-    [SerializeField] private AudioClip takeLizardClip;
-    [SerializeField] private AudioClip timerClip;
-    private AudioSource timerAudioSource;
-    private bool applicationPaused;
-    [SerializeField] private AudioClip[] lizardSolvePopClips;
-    
-
     [Header("Music")]
     [SerializeField] private AudioClip[] musicClips;
+    [SerializeField] private AudioClip introMusic;
+    [SerializeField] private AudioClip attackMusic;
+    [SerializeField] private AudioClip interstellarMusic;
+    [SerializeField, Range(0f, 1f)] private float pauseChance = .35f;
+    [SerializeField, Min(0f)] private float pauseSeconds = 15f;
 
     public static AudioManager Instance;
-
+    private enum MusicMode { None, Regular, Intro, Attack, Ending }
+    private MusicMode musicMode;
     private int lastMusicNumber = -1;
-    private int lastDestroyCubeClipIndex = -1;
-    private int lastLizardSolvePopClipIndex = -1;
-    private int pendingDestroyCubeSounds;
-    private readonly HashSet<Object> beaverFootstepOwners = new HashSet<Object>();
-    private AudioSource destroyCubeAudioSource;
-    private AudioSource shootAudioSource;
-    private AudioSource beaverFootstepsAudioSource;
-    private Coroutine destroyCubePlaybackCoroutine;
-    private float lastShootPlaybackTime = float.NegativeInfinity;
-    private float lastFailedPlaybackTime = float.NegativeInfinity;
+    private float musicVolume = 1f;
+    private bool introPlayed;
 
     private void Awake()
     {
@@ -92,7 +49,19 @@ public class AudioManager : MonoBehaviour
         }
 
         Instance = this;
-        PreloadGameplayAudio();
+        if (musicAudioSource != null) musicVolume = musicAudioSource.volume;
+        PreloadResultAudio();
+    }
+
+    private void OnEnable()
+    {
+        if (Instance == this) SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        StopMusic();
     }
 
     private void OnDestroy()
@@ -103,95 +72,49 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        if (musicAudioSource != null && musicClips != null && musicClips.Length > 0)
-            PlayNextRandomMusic();
+        if (musicMode != MusicMode.None) return;
+        if (SceneManager.GetActiveScene().name == "Last Scene") PlayInterstellar();
+        else PlayRegularMusic();
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "Last Scene") PlayInterstellar();
+        else if (musicMode == MusicMode.Ending || musicMode == MusicMode.None) PlayRegularMusic();
+    }
+
+    public void PlayIntroOnce()
+    {
+        if (introPlayed || introMusic == null || musicAudioSource == null) return;
+        introPlayed = true;
+        StopMusic();
+        musicMode = MusicMode.Intro;
+        musicAudioSource.clip = introMusic;
+        musicAudioSource.Play();
+        coroutine = StartCoroutine(ResumeRegularMusicAfterSpecial(MusicMode.Intro));
+    }
+
+    public void PlayAttackMusic()
+    {
+        if (attackMusic == null || musicAudioSource == null || musicMode == MusicMode.Ending) return;
+        StopMusic();
+        musicMode = MusicMode.Attack;
+        musicAudioSource.clip = attackMusic;
+        musicAudioSource.Play();
+        coroutine = StartCoroutine(ResumeRegularMusicAfterSpecial(MusicMode.Attack));
+    }
+
+    private void PlayInterstellar()
+    {
+        StopMusic();
+        musicMode = MusicMode.Ending;
+        if (musicAudioSource == null || interstellarMusic == null) return;
+        musicAudioSource.clip = interstellarMusic;
+        musicAudioSource.Play();
     }
 
     public void PlayLose() => PlayGameplayClip(loseClip);
     public void PlayWin() => PlayGameplayClip(winClip);
-    public void PlayBeeClick() => PlayGameplayClip(beeClickClip);
-    public void PlayBeeGetOut() => PlayGameplayClip(beeGetOutClip);
-    public void PlayBeeWrong() => PlayGameplayClip(beeWrongClip);
-    public void PlayFlowerPop() => PlayGameplayClip(flowerPopClip);
-    public void PlayEnterOnBox() => PlayGameplayClip(enterOnBoxClip);
-    public void PlayLockedToy() => PlayGameplayClip(lockedToyClip);
-    public void PlayPutOnConveyor() => PlayGameplayClip(putOnConveyorClip);
-    public void PlayRevivePopup() => PlayGameplayClip(revivePopupClip);
-    public void PlayWinToyPing() => PlayGameplayClip(winToyPingClip);
-    public void PlayFailed()
-    {
-        if (Time.unscaledTime - lastFailedPlaybackTime < FailedPlaybackInterval)
-            return;
-
-        lastFailedPlaybackTime = Time.unscaledTime;
-        PlayGameplayClip(failedClip);
-    }
-    public void PlayShoot()
-    {
-        if (shootClip == null ||
-            Time.unscaledTime - lastShootPlaybackTime < ShootPlaybackInterval)
-        {
-            return;
-        }
-
-        shootAudioSource = EnsureTransientAudioSource(
-            shootAudioSource,
-            "Shoot Audio",
-            ShootVolumeScale);
-        if (shootAudioSource == null)
-            return;
-
-        lastShootPlaybackTime = Time.unscaledTime;
-        shootAudioSource.clip = shootClip;
-        shootAudioSource.Play();
-    }
-    public void PlayDestroyCube() => PlayPop();
-    public void PlayPop()
-    {
-        if (!HasPlayableClip(destroyCubeClips))
-            return;
-
-        pendingDestroyCubeSounds = Mathf.Min(
-            pendingDestroyCubeSounds + 1,
-            MaximumQueuedPopSounds);
-        if (destroyCubePlaybackCoroutine == null)
-            destroyCubePlaybackCoroutine = StartCoroutine(PlayQueuedDestroyCubeSounds());
-    }
-    public void PlayPlaceGun() => PlayGameplayClip(placeGunClip);
-    public void PlayDestroyGun() => PlayGameplayClip(destroyGunClip);
-    public void PlayDestroyObstacle() => PlayGameplayClip(destroyObstacleClip);
-    public void PlayFreeze() => PlayGameplayClip(freezeClip);
-    public void PlayReleaseLizard() => PlayGameplayClip(releaseLizardClip);
-    public void PlaySuccessLizard() => PlayGameplayClip(successLizardClip);
-    // Hole-entry animation supplies the 0.1-second cadence and stops on exit.
-    // Play directly so no queued pops continue after the lizard disappears.
-    public void PlayLizardSolvePop() =>
-        PlayRandomGameplayClip(destroyCubeClips, ref lastLizardSolvePopClipIndex);
-    public void PlayTakeLizard() => PlayGameplayClip(takeLizardClip);
-
-    public void SetTimerWarningActive(bool active)
-    {
-        if (!active || applicationPaused || timerClip == null || SaveSystem.settingsData == null || SaveSystem.settingsData.effectsVolume <= 0f)
-        {
-            if (timerAudioSource != null && timerAudioSource.isPlaying) timerAudioSource.Stop();
-            return;
-        }
-        timerAudioSource = EnsureTransientAudioSource(timerAudioSource, "Timer Warning Audio", 1f);
-        if (timerAudioSource.isPlaying) return;
-        timerAudioSource.clip = timerClip;
-        timerAudioSource.loop = true;
-        timerAudioSource.spatialBlend = 0f;
-        timerAudioSource.Play();
-    }
-
-    private void OnApplicationPause(bool paused)
-    {
-        applicationPaused = paused;
-        if (paused) SetTimerWarningActive(false);
-    }
-
-    private void OnDisable() => SetTimerWarningActive(false);
-
 
     public void PlaySelectStandard(int index, bool randomClip = false)
     {
@@ -218,197 +141,17 @@ public class AudioManager : MonoBehaviour
         PlayClip(otherAudioSource, cancelClips, 0);
     }
 
-    private void PreloadGameplayAudio()
+    private void PreloadResultAudio()
     {
-        PreloadAudioClip(loseClip);
-        PreloadAudioClip(winClip);
-        PreloadAudioClip(beeClickClip);
-        PreloadAudioClip(beeGetOutClip);
-        PreloadAudioClip(beeWrongClip);
-        PreloadAudioClip(flowerPopClip);
-        PreloadAudioClip(enterOnBoxClip);
-        PreloadAudioClip(lockedToyClip);
-        PreloadAudioClip(putOnConveyorClip);
-        PreloadAudioClip(revivePopupClip);
-        PreloadAudioClip(winToyPingClip);
-        PreloadAudioClip(failedClip);
-        PreloadAudioClip(shootClip);
-        PreloadAudioClips(destroyCubeClips);
-        PreloadAudioClip(placeGunClip);
-        PreloadAudioClip(destroyGunClip);
-        PreloadAudioClip(destroyObstacleClip);
-        PreloadAudioClip(freezeClip);
-        PreloadAudioClip(releaseLizardClip);
-        PreloadAudioClip(successLizardClip);
-        PreloadAudioClip(takeLizardClip);
-        PreloadAudioClip(timerClip);
-        PreloadAudioClips(lizardSolvePopClips);
+        if (loseClip != null) loseClip.LoadAudioData();
+        if (winClip != null) winClip.LoadAudioData();
     }
 
-    private static void PreloadAudioClips(AudioClip[] clips)
-    {
-        if (clips == null)
-            return;
-
-        for (int index = 0; index < clips.Length; index++)
-            PreloadAudioClip(clips[index]);
-    }
-
-    private static void PreloadAudioClip(AudioClip clip)
-    {
-        if (clip != null)
-            clip.LoadAudioData();
-    }
-
-    private void PlayGameplayClip(AudioClip clip, float volumeScale = 1f)
+    private void PlayGameplayClip(AudioClip clip)
     {
         AudioSource source = otherAudioSource != null ? otherAudioSource : soundEffectsAudioSource;
         if (source != null && clip != null)
-            source.PlayOneShot(clip, Mathf.Clamp01(volumeScale));
-    }
-
-    private void PlayRandomGameplayClip(AudioClip[] clips, ref int lastClipIndex)
-    {
-        AudioClip clip = GetRandomClipNotSameAsLast(clips, ref lastClipIndex);
-        PlayGameplayClip(clip);
-    }
-
-
-
-    private IEnumerator PlayQueuedDestroyCubeSounds()
-    {
-        AudioSource source = EnsureDestroyCubeAudioSource();
-        while (pendingDestroyCubeSounds > 0)
-        {
-            pendingDestroyCubeSounds--;
-            AudioClip clip = GetNextDestroyCubeClip();
-            if (source != null && clip != null)
-            {
-                source.clip = clip;
-                source.Play();
-            }
-
-            yield return new WaitForSecondsRealtime(PopPlaybackInterval);
-        }
-
-        destroyCubePlaybackCoroutine = null;
-    }
-
-    private AudioSource EnsureDestroyCubeAudioSource()
-    {
-        destroyCubeAudioSource = EnsureTransientAudioSource(
-            destroyCubeAudioSource,
-            "Pop Audio",
-            PopVolumeScale);
-        return destroyCubeAudioSource;
-    }
-
-    private AudioSource EnsureTransientAudioSource(
-        AudioSource source,
-        string sourceName,
-        float volumeScale)
-    {
-        if (source != null)
-            return source;
-
-        var sourceObject = new GameObject(sourceName);
-        sourceObject.transform.SetParent(transform, false);
-        source = sourceObject.AddComponent<AudioSource>();
-        source.playOnAwake = false;
-        source.loop = false;
-
-        AudioSource template = otherAudioSource != null ? otherAudioSource : soundEffectsAudioSource;
-        if (template != null)
-        {
-            source.outputAudioMixerGroup = template.outputAudioMixerGroup;
-            source.volume = template.volume * Mathf.Clamp01(volumeScale);
-            source.mute = template.mute;
-            source.priority = Mathf.Max(template.priority, TransientAudioPriority);
-            source.panStereo = template.panStereo;
-            source.spatialBlend = template.spatialBlend;
-            source.reverbZoneMix = template.reverbZoneMix;
-        }
-
-        return source;
-    }
-
-    private AudioClip GetNextDestroyCubeClip()
-    {
-        int selectedIndex = -1;
-        int candidateCount = 0;
-        for (int index = 0; index < destroyCubeClips.Length; index++)
-        {
-            if (destroyCubeClips[index] == null || index == lastDestroyCubeClipIndex)
-                continue;
-
-            candidateCount++;
-            if (Random.Range(0, candidateCount) == 0)
-                selectedIndex = index;
-        }
-
-        if (selectedIndex < 0)
-        {
-            for (int index = 0; index < destroyCubeClips.Length; index++)
-            {
-                if (destroyCubeClips[index] == null)
-                    continue;
-                selectedIndex = index;
-                break;
-            }
-        }
-
-        if (selectedIndex < 0)
-            return null;
-
-        lastDestroyCubeClipIndex = selectedIndex;
-        return destroyCubeClips[selectedIndex];
-    }
-
-    private static AudioClip GetRandomClipNotSameAsLast(
-        AudioClip[] clips,
-        ref int lastClipIndex)
-    {
-        if (!HasPlayableClip(clips))
-            return null;
-
-        int selectedIndex = -1;
-        int candidateCount = 0;
-        for (int index = 0; index < clips.Length; index++)
-        {
-            if (clips[index] == null || index == lastClipIndex)
-                continue;
-
-            candidateCount++;
-            if (Random.Range(0, candidateCount) == 0)
-                selectedIndex = index;
-        }
-
-        if (selectedIndex < 0)
-        {
-            for (int index = 0; index < clips.Length; index++)
-            {
-                if (clips[index] == null)
-                    continue;
-                selectedIndex = index;
-                break;
-            }
-        }
-
-        lastClipIndex = selectedIndex;
-        return selectedIndex >= 0 ? clips[selectedIndex] : null;
-    }
-
-    private static bool HasPlayableClip(AudioClip[] clips)
-    {
-        if (clips == null)
-            return false;
-
-        for (int index = 0; index < clips.Length; index++)
-        {
-            if (clips[index] != null)
-                return true;
-        }
-        return false;
+            source.PlayOneShot(clip);
     }
 
     private static void PlayClip(AudioSource source, AudioClip[] clips, int index, bool randomClip = false)
@@ -423,59 +166,75 @@ public class AudioManager : MonoBehaviour
             source.PlayOneShot(clips[index]);
     }
 
-    private void PlayNextRandomMusic()
+    private void PlayRegularMusic()
     {
-        if (musicAudioSource == null || musicClips == null || musicClips.Length == 0)
-            return;
-
-        int nextIndex = GetRandomMusicIndexNotSameAsLast();
-        lastMusicNumber = nextIndex;
-        StartPlayingRandomMusic(musicClips[nextIndex]);
+        StopMusic();
+        musicMode = MusicMode.Regular;
+        if (musicAudioSource != null && musicClips != null && musicClips.Length > 0)
+            coroutine = StartCoroutine(PlayRegularPlaylist());
     }
 
-    private int GetRandomMusicIndexNotSameAsLast()
+    private IEnumerator ResumeRegularMusicAfterSpecial(MusicMode special)
     {
-        if (musicClips.Length <= 1)
-            return 0;
-
-        int index = Random.Range(0, musicClips.Length);
-        return index == lastMusicNumber ? (index + 1) % musicClips.Length : index;
-    }
-
-    private async void StartPlayingRandomMusic(AudioClip musicClip)
-    {
-        StartNewMusicCoroutine();
-        float targetVolume = musicAudioSource.volume;
-        musicAudioSource.volume = 0f;
-        musicAudioSource.Stop();
-        musicAudioSource.clip = musicClip;
-        musicAudioSource.Play();
-
-        for (int i = 0; i < 10; i++)
-        {
-            if (musicAudioSource == null)
-                return;
-            musicAudioSource.volume = targetVolume * ((i + 1) / 10f);
-            await Task.Delay(100);
-        }
-        if (musicAudioSource != null)
-            musicAudioSource.volume = targetVolume;
-    }
-
-    private IEnumerator PlayRandomMusicCoroutine()
-    {
-        while (musicAudioSource != null && musicAudioSource.isPlaying)
+        while (musicMode == special && musicAudioSource != null && musicAudioSource.isPlaying)
             yield return null;
-
-        yield return null;
-        PlayNextRandomMusic();
+        if (musicMode != special) yield break;
+        coroutine = null;
+        PlayRegularMusic();
     }
 
-    private void StartNewMusicCoroutine()
+    private IEnumerator PlayRegularPlaylist()
     {
-        if (coroutine != null)
-            StopCoroutine(coroutine);
+        while (musicMode == MusicMode.Regular)
+        {
+            AudioClip next = GetNextRegularClip();
+            if (next == null) yield break;
 
-        coroutine = StartCoroutine(PlayRandomMusicCoroutine());
+            musicAudioSource.clip = next;
+            musicAudioSource.volume = 0f;
+            musicAudioSource.Play();
+            float fade = 0f;
+            while (musicMode == MusicMode.Regular && musicAudioSource.isPlaying && fade < 1f)
+            {
+                fade += Time.unscaledDeltaTime;
+                musicAudioSource.volume = musicVolume * Mathf.Clamp01(fade);
+                yield return null;
+            }
+            musicAudioSource.volume = musicVolume;
+            while (musicMode == MusicMode.Regular && musicAudioSource.isPlaying)
+                yield return null;
+            if (musicMode != MusicMode.Regular) yield break;
+            if (Random.value < pauseChance && pauseSeconds > 0f)
+                yield return new WaitForSecondsRealtime(pauseSeconds);
+            else yield return null;
+        }
+    }
+
+    private AudioClip GetNextRegularClip()
+    {
+        int chosen = -1, candidates = 0;
+        for (int i = 0; i < musicClips.Length; i++)
+        {
+            AudioClip clip = musicClips[i];
+            if (clip == null || clip == introMusic || clip == attackMusic || clip == interstellarMusic || i == lastMusicNumber) continue;
+            if (Random.Range(0, ++candidates) == 0) chosen = i;
+        }
+        if (chosen < 0)
+            for (int i = 0; i < musicClips.Length; i++)
+                if (musicClips[i] != null && musicClips[i] != introMusic && musicClips[i] != attackMusic && musicClips[i] != interstellarMusic)
+                { chosen = i; break; }
+        if (chosen < 0) return null;
+        lastMusicNumber = chosen;
+        return musicClips[chosen];
+    }
+
+    private void StopMusic()
+    {
+        if (coroutine != null) StopCoroutine(coroutine);
+        coroutine = null;
+        if (musicAudioSource == null) return;
+        musicAudioSource.Stop();
+        musicAudioSource.loop = false;
+        musicAudioSource.volume = musicVolume;
     }
 }

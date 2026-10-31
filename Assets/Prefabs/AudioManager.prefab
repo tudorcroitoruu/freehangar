@@ -172,11 +172,11 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 1980613810587791336, guid: e7e4f600f1819854fa9a6201878a493f, type: 2}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 56ac66add0e5b194493c563b807b8073, type: 3}
-  m_PlayOnAwake: 1
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -317,35 +317,16 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3208b36c10b438b4d993a09a25025067, type: 3}
   loseClip: {fileID: 8300000, guid: 053cb6a59f375784fbd361fc4b2242a0, type: 3}
   winClip: {fileID: 8300000, guid: 73e95dc13d8132b44be03fb91dd8b7ff, type: 3}
-  beeClickClip: {fileID: 8300000, guid: 893c6a45357582e41820b40e81b257a4, type: 3}
-  beeGetOutClip: {fileID: 8300000, guid: c32e4aef922a9d240893495b59a36f3a, type: 3}
-  beeWrongClip: {fileID: 8300000, guid: 9867c17b783a4cf49be11c2f65963158, type: 3}
-  flowerPopClip: {fileID: 8300000, guid: 8e6f39c258c88404f8c66973dd140f0d, type: 3}
-  enterOnBoxClip: {fileID: 8300000, guid: e14a66d6d5172734f8f7c455d5629998, type: 3}
-  lockedToyClip: {fileID: 8300000, guid: 21bbac10c98c0cf4cb9674d4b90dc142, type: 3}
-  putOnConveyorClip: {fileID: 8300000, guid: 4131e468e9f062b44871326cc7ba1ea8, type: 3}
-  revivePopupClip: {fileID: 8300000, guid: c663c58d0cb9ea24589e358a3ac13a92, type: 3}
-  winToyPingClip: {fileID: 8300000, guid: f2f05281d06ea4f40ac4c222cf125ed1, type: 3}
-  failedClip: {fileID: 8300000, guid: efab7acdceace974ca6fefadb0bb67bb, type: 3}
-  shootClip: {fileID: 8300000, guid: a7aeee1da99c7b0479e371a5b469c18d, type: 3}
-  destroyCubeClips:
-  - {fileID: 8300000, guid: e37a1d13456431e40866c3a26f53374f, type: 3}
-  - {fileID: 8300000, guid: b1896d24920de6d4bae262860ce13e8d, type: 3}
-  - {fileID: 8300000, guid: 5107dbd6316a03f40a0c641ef1d604f6, type: 3}
-  placeGunClip: {fileID: 8300000, guid: 6f374a2213559de488cd09203d1df478, type: 3}
-  destroyGunClip: {fileID: 8300000, guid: cf42a2bafe2587448a795d0851742469, type: 3}
-  destroyObstacleClip: {fileID: 8300000, guid: 95b00a6663c10994eb437b07d45672d3, type: 3}
-  freezeClip: {fileID: 8300000, guid: 4149f25438fe8cf47ae0e5a3cb9adaf2, type: 3}
-  releaseLizardClip: {fileID: 8300000, guid: ac4fbf8c0eb97ab43bfe8dec31954524, type: 3}
-  successLizardClip: {fileID: 8300000, guid: 97c792ee330adaf418bdb74f42aaa0e5, type: 3}
-  takeLizardClip: {fileID: 8300000, guid: 1b98897fb8aaf07428348de4efc31989, type: 3}
-  timerClip: {fileID: 8300000, guid: d6fa465cf4859384ebb425e0c2c29bda, type: 3}
-  lizardSolvePopClips:
-  - {fileID: 8300000, guid: 81b12852de7d5dd4b915d9740e6e04ff, type: 3}
-  - {fileID: 8300000, guid: 2602cc610d3fb3b4b8697c9de2cbd9a6, type: 3}
-  - {fileID: 8300000, guid: 674f313cbcb244c44a2ebed3abccbd7a, type: 3}
   musicClips:
-  - {fileID: 8300000, guid: c4fd7c4956333a94e98fd43593cd1454, type: 3}
+  - {fileID: 8300000, guid: c1be010053d265b469ebccb577c2aa86, type: 3}
+  - {fileID: 8300000, guid: 1e5850c47b1ec264ca5aec829da2dd89, type: 3}
+  - {fileID: 8300000, guid: 626233a37d661a64887722101416208f, type: 3}
+  - {fileID: 8300000, guid: 3895f674c48d8cc4599c75defff6b285, type: 3}
+  introMusic: {fileID: 8300000, guid: efaaae43fc57fb3418278c4404cc5691, type: 3}
+  attackMusic: {fileID: 8300000, guid: d3ecf9199bc66f143b6f5e5425333653, type: 3}
+  interstellarMusic: {fileID: 8300000, guid: 29ddca6acf4419b489e5b188e02b311a, type: 3}
+  pauseChance: 0.35
+  pauseSeconds: 15
 --- !u!1 &7378796319633956887
 GameObject:
   m_ObjectHideFlags: 0
