@@ -118,6 +118,7 @@ public sealed class GameplayAudio : MonoBehaviour
         AudioClip clip = pickup ? pickupMotor : motor ? motorollerAndTrike : bicycleMove;
         float pitch = pickup ? vehicle.name.Contains("Last") ? 1.1f : vehicle.name.Contains("Bigger") ? 1f : .9f :
             motor ? vehicle.GetComponent<TrikeController>() != null ? .88f : 1.08f : 1f;
+        if(vehicle.TryGetComponent<ForkliftController>(out var forklift)) pitch *= forklift.EnginePitchMultiplier;
         SetLoop(vehicle.transform, clip, moving, pitch, motor ? .55f : .45f);
     }
 }

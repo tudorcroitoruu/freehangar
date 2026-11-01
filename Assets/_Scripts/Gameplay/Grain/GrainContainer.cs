@@ -48,8 +48,10 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     public bool IsFinished => sack != null && sack.Close >= .999f;
     public bool IsClosing { get; private set; }
     public bool IsCarried { get; private set; }
-    public bool CanBeCarried => canBeCarried;
-    public bool CanCarry => canBeCarried && isActiveAndEnabled && !IsCarried && !IsClosing;
+    public bool IsBigBag => string.Equals(cargoTypeId,"BigBag",System.StringComparison.OrdinalIgnoreCase);
+    public bool RequiresForklift => IsBigBag && kilograms > .001f;
+    public bool CanBeCarried => (canBeCarried || IsBigBag) && !RequiresForklift;
+    public bool CanCarry => CanBeCarried && isActiveAndEnabled && !IsCarried && !IsClosing;
     public bool CanHandle => isActiveAndEnabled && sack != null && IsFull && !IsCarried;
 
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)

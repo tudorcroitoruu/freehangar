@@ -1,0 +1,1 @@
+PASS rig forward aligned to front/rear wheel centers. Direction dot=1.00000. Width=2.43, length=4.92; camera, fork contact and colliders realigned. Model world pose preserved.
