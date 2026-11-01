@@ -161,6 +161,20 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
         {
             DrawProperty(materialEditor, properties, "_OutlineThickness");
             DrawProperty(materialEditor, properties, "_OutlineColor");
+            MaterialProperty outlineFill = FindOptionalProperty("_UseOutlineFill", properties);
+            DrawProperty(materialEditor, outlineFill);
+            if (outlineFill != null && (outlineFill.hasMixedValue || outlineFill.floatValue > 0.5f))
+            {
+                DrawProperty(materialEditor, properties, "_OutlineFillAmount");
+                DrawProperty(materialEditor, properties, "_OutlineFillDirection");
+                MaterialProperty direction = FindOptionalProperty("_OutlineFillDirection", properties);
+                if (direction != null && (direction.hasMixedValue || direction.floatValue > 3.5f))
+                {
+                    DrawProperty(materialEditor, properties, "_OutlineFillOrigin");
+                    DrawProperty(materialEditor, properties, "_OutlineFillClockwise");
+                    DrawProperty(materialEditor, properties, "_OutlineFillFollowPerimeter");
+                }
+            }
             DrawMaskProperties(materialEditor, properties, "_OutlineOverlayTex", "_OutlineOverlayOpacity");
             EditorGUILayout.HelpBox("Disable Outline to enable Noise Animation. Static noise and Torn Paper remain available.", MessageType.Info);
         }
@@ -389,6 +403,18 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
                 return "Outline width in local UI units, drawn inward. Scales with the UI and Canvas Scaler to preserve proportions across resolutions and camera zoom.";
             case "_OutlineColor":
                 return "Outline color and blend opacity. Preserves sprite, Image, and CanvasGroup transparency.";
+            case "_UseOutlineFill":
+                return "Reveals only part of the outline without changing the base image or main overlay. The main Fill still clips the complete element.";
+            case "_OutlineFillAmount":
+                return "Visible outline amount: 0 hides the outline, 1 shows it fully. Uses the full image coordinates, independently of the main Fill amount.";
+            case "_OutlineFillDirection":
+                return "Reveal the outline left to right, right to left, bottom to top, top to bottom, or radially through 360 degrees around the image center.";
+            case "_OutlineFillOrigin":
+                return "Starting side for Radial 360 outline fill: top, right, bottom, or left.";
+            case "_OutlineFillClockwise":
+                return "Enabled fills clockwise from the selected origin; disabled fills counterclockwise. Applies to Radial 360 only.";
+            case "_OutlineFillFollowPerimeter":
+                return "Enabled: fill travels along the rectangular perimeter, with a straight cap perpendicular to each side. Disabled: fill sweeps radially from the center with an angled cap. Applies to Radial 360 only.";
             case "_FadeLeftSize":
                 return "Width of the left fade band in normalized sprite UVs. Set to 0 to disable the left fade.";
             case "_RoundCorners":

@@ -134,6 +134,29 @@ public sealed class PlayerCombatTools : MonoBehaviour
         if (wall != null) wall.TryHit(equipped);
     }
 
+    // Carrying temporarily hides the shovel without changing the selected tool.
+    public static bool SetShovelEquipped(PlayerController player, bool equip)
+    {
+        if (player == null || !player.isActiveAndEnabled || player.Shovel == null || Time.timeScale <= 0f ||
+            UIPopups.BasePopupUI.HasActivePopup || UpgradeManager.BlocksGameplayInput ||
+            (player.characterController != null && !player.characterController.enabled)) return false;
+        var bicycle = player.GetComponent<PlayerBicycleInteraction>();
+        var interactor = player.GetComponent<PlayerInteractor>();
+        if ((bicycle != null && bicycle.IsRiding) || (interactor != null && interactor.PushedWheelbarrow != null)) return false;
+        if (equip)
+        {
+            var bags = player.GetComponent<BagInteraction>();
+            if (bags != null && bags.IsCarrying && !bags.TryInteract()) return false;
+            if (interactor != null && interactor.Items != null && interactor.Items.IsCarrying && !interactor.Items.TryPlace()) return false;
+            var tools = player.GetComponent<PlayerCombatTools>();
+            if (tools != null && !tools.TryEquip(Tool.Shovel)) return false;
+        }
+        else player.Shovel.CancelAction();
+        if (player.HeldInstrument != null) player.HeldInstrument.gameObject.SetActive(equip);
+        player.Shovel.enabled = equip;
+        return true;
+    }
+
     public bool TryEquip(Tool tool)
     {
         if(!IsUnlocked(tool) || (interactor!=null && interactor.DiscoveryBusy))return false;

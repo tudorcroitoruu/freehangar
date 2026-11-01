@@ -80,11 +80,11 @@ public sealed class BagInteraction : MonoBehaviour
         if (restoreShovel)
         {
             var player = GetComponent<PlayerController>();
-            if (player == null || !player.ToggleShovel()) return false;
+            if (!PlayerCombatTools.SetShovelEquipped(player, false)) return false;
         }
         bool taken = Take(target);
         if (taken) shovelWasActive = restoreShovel;
-        else if (restoreShovel) GetComponent<PlayerController>()?.ToggleShovel();
+        else if (restoreShovel) PlayerCombatTools.SetShovelEquipped(GetComponent<PlayerController>(), true);
         return taken;
     }
 
@@ -237,7 +237,7 @@ public sealed class BagInteraction : MonoBehaviour
         if (!shovelWasActive || carried != null) return;
         var player = GetComponent<PlayerController>();
         if (player == null || !player.isActiveAndEnabled || player.IsCarrying) return;
-        if (player.IsShovelEquipped || player.ToggleShovel()) shovelWasActive = false;
+        if (player.IsShovelEquipped || PlayerCombatTools.SetShovelEquipped(player, true)) shovelWasActive = false;
     }
 
     private void OnDisable()

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,10 +21,28 @@ public class GameplayCanvas : MonoBehaviour
     [Space, Header("Hints")]
     [SerializeField] private GameObject[] walkingHints;
     [SerializeField] private GameObject[] drivingHints;
-    [SerializeField] private GameObject bicycleBoostHint;
 
     [Space, Header("Tools Equip Hints")] 
-    [SerializeField] private GameObject hintsParent;
+    [SerializeField] private CanvasGroup hintsParent;
+    [SerializeField] private SelectedUI shovelEquipped;
+    [SerializeField] private SelectedUI broomEquipped;
+    [SerializeField] private SelectedUI axeEquipped;
+    [SerializeField] private SelectedUI hammerEquipped;
+    [SerializeField, Min(0f)] private float toolHintsFadeSeconds = .25f;
+    private PlayerCombatTools playerTools;
+    private int displayedTools = -1;
+    private PlayerCombatTools.Tool displayedEquipped;
+    private bool fadingToolHints;
+
+    [Space, Header("Boosters")]
+    [SerializeField] private Transform boostersParent;
+    [SerializeField] private BoosterStatusHandler boosterHandlerPrefab;
+    private readonly Dictionary<ChestReward, BoosterStatusHandler> boosterHandlers = new Dictionary<ChestReward, BoosterStatusHandler>();
+    private PlayerData boosterProfile;
+    private static readonly ChestReward[] TimedBoosters =
+    {
+        ChestReward.InfiniteStamina, ChestReward.NoAttacks, ChestReward.Mobility, ChestReward.DoubleSellCash
+    };
 
     private void Awake()
     {
@@ -36,6 +55,7 @@ public class GameplayCanvas : MonoBehaviour
     {
         if (Instance == this)
             Instance = null;
+        ClearBoosters();
     }
 
     private void OnEnable()
@@ -48,6 +68,10 @@ public class GameplayCanvas : MonoBehaviour
         RefreshMoney(SaveSystem.Money);
         var rider = FindFirstObjectByType<PlayerBicycleInteraction>();
         SetDrivingHints(rider != null && rider.IsRiding);
+        playerTools = FindFirstObjectByType<PlayerCombatTools>(FindObjectsInactive.Include);
+        // Rebuild hint visibility from saved discoveries whenever the HUD opens.
+        displayedTools = -1;
+        RefreshCollectibleUI();
     }
 
     private void OnDisable()
@@ -95,7 +119,109 @@ public class GameplayCanvas : MonoBehaviour
                 if (hint != null) hint.SetActive(driving);
     }
 
-    private void Update() => FadeFreeHandsWarning(Time.unscaledDeltaTime);
+    private void Update()
+    {
+        FadeFreeHandsWarning(Time.unscaledDeltaTime);
+        RefreshCollectibleUI();
+        if (fadingToolHints && hintsParent != null)
+        {
+            hintsParent.alpha = toolHintsFadeSeconds > 0f
+                ? Mathf.MoveTowards(hintsParent.alpha, 1f, Time.unscaledDeltaTime / toolHintsFadeSeconds) : 1f;
+            fadingToolHints = hintsParent.alpha < 1f;
+        }
+    }
+
+    private void RefreshCollectibleUI()
+    {
+        int tools = 1;
+        if (IsToolUnlocked(PlayerCombatTools.Tool.Broom)) tools |= 2;
+        if (IsToolUnlocked(PlayerCombatTools.Tool.Axe)) tools |= 4;
+        if (IsToolUnlocked(PlayerCombatTools.Tool.Hammer)) tools |= 8;
+        var equipped = playerTools != null ? playerTools.Equipped : PlayerCombatTools.Tool.Shovel;
+        if (tools != displayedTools || equipped != displayedEquipped)
+        {
+            bool showNewTool = displayedTools < 0 || (tools & ~displayedTools) != 0;
+            SetToolHint(shovelEquipped, true, equipped == PlayerCombatTools.Tool.Shovel);
+            SetToolHint(broomEquipped, (tools & 2) != 0, equipped == PlayerCombatTools.Tool.Broom);
+            SetToolHint(axeEquipped, (tools & 4) != 0, equipped == PlayerCombatTools.Tool.Axe);
+            SetToolHint(hammerEquipped, (tools & 8) != 0, equipped == PlayerCombatTools.Tool.Hammer);
+            displayedTools = tools;
+            displayedEquipped = equipped;
+            if (hintsParent != null && tools == 1)
+            {
+                // The shovel is available from the start; show equipment hints
+                // only after another tool has been discovered.
+                hintsParent.gameObject.SetActive(false);
+                hintsParent.alpha = 0f;
+                fadingToolHints = false;
+            }
+            else if (showNewTool && hintsParent != null)
+            {
+                hintsParent.gameObject.SetActive(true);
+                hintsParent.alpha = toolHintsFadeSeconds > 0f ? 0f : 1f;
+                fadingToolHints = toolHintsFadeSeconds > 0f;
+            }
+        }
+
+        var data = SaveSystem.Data;
+        if (boosterProfile != data)
+        {
+            ClearBoosters();
+            boosterProfile = data;
+        }
+        foreach (var reward in TimedBoosters)
+        {
+            long until = BoosterStatusHandler.Expiry(data, reward);
+            boosterHandlers.TryGetValue(reward, out var handler);
+            if (until <= PlayerPerks.Now)
+            {
+                if (handler != null)
+                {
+                    if (Application.isPlaying) Destroy(handler.gameObject);
+                    else DestroyImmediate(handler.gameObject);
+                }
+                boosterHandlers.Remove(reward);
+                continue;
+            }
+            if (handler == null)
+            {
+                if (boosterHandlerPrefab == null || boostersParent == null) continue;
+                handler = Instantiate(boosterHandlerPrefab, boostersParent, false);
+                handler.Initialize(reward, until);
+                handler.gameObject.SetActive(true);
+                boosterHandlers[reward] = handler;
+            }
+            else handler.SetExpiry(until);
+        }
+    }
+
+    private bool IsToolUnlocked(PlayerCombatTools.Tool tool)
+    {
+        if (playerTools != null) return playerTools.IsUnlocked(tool);
+        var data = SaveSystem.Data;
+        return tool == PlayerCombatTools.Tool.Broom ? BuriedFind.WasFound(data, PlayerCombatTools.BroomFindId)
+            : tool == PlayerCombatTools.Tool.Axe ? BuriedFind.WasFound(data, PlayerCombatTools.AxeFindId) || BuriedFind.WasFound(data, PlayerCombatTools.LegacyAxeFindId)
+            : BuriedFind.WasFound(data, PlayerCombatTools.HammerFindId);
+    }
+
+    private static void SetToolHint(SelectedUI hint, bool available, bool selected)
+    {
+        if (hint == null) return;
+        hint.gameObject.SetActive(available);
+        if (available && selected) hint.Select();
+        else hint.Deselect();
+    }
+
+    private void ClearBoosters()
+    {
+        foreach (var handler in boosterHandlers.Values)
+            if (handler != null)
+            {
+                if (Application.isPlaying) Destroy(handler.gameObject);
+                else DestroyImmediate(handler.gameObject);
+            }
+        boosterHandlers.Clear();
+    }
 
     private void FadeFreeHandsWarning(float deltaTime)
     {

@@ -56,7 +56,7 @@ public sealed class PlayerItemCarry : MonoBehaviour
         Vector3 anchorScale = carryAnchor.lossyScale;
         if (Mathf.Abs(anchorScale.x * anchorScale.y * anchorScale.z) < .000001f) return false;
         bool restoreShovel = player.IsShovelEquipped;
-        if (restoreShovel && !player.ToggleShovel()) return false;
+        if (restoreShovel && !PlayerCombatTools.SetShovelEquipped(player, false)) return false;
 
         carried = item;
         instrumentWasActive = restoreShovel;
@@ -186,7 +186,7 @@ public sealed class PlayerItemCarry : MonoBehaviour
     {
         if (IsCarrying || !instrumentWasActive) return;
         if (player == null || !player.isActiveAndEnabled || player.IsCarrying) return;
-        if (player.IsShovelEquipped || player.ToggleShovel()) instrumentWasActive = false;
+        if (player.IsShovelEquipped || PlayerCombatTools.SetShovelEquipped(player, true)) instrumentWasActive = false;
     }
 
     private void LateUpdate() => RestoreInstrument();

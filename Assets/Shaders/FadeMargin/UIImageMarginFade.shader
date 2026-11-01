@@ -35,6 +35,12 @@ Shader "UI/Image Margin Fade"
         [Toggle] _Outline ("Outline", Float) = 0
         _OutlineThickness ("Outline Thickness (UI Units)", Range(0, 32)) = 2
         _OutlineColor ("Outline Color", Color) = (0,0,0,1)
+        [ToggleUI] _UseOutlineFill ("Use Outline Fill", Float) = 0
+        _OutlineFillAmount ("Outline Fill Amount", Range(0,1)) = 1
+        [Enum(Left To Right,0,Right To Left,1,Bottom To Top,2,Top To Bottom,3,Radial 360,4)] _OutlineFillDirection ("Outline Fill Direction", Float) = 0
+        [Enum(Top,0,Right,1,Bottom,2,Left,3)] _OutlineFillOrigin ("Outline Fill Origin", Float) = 0
+        [ToggleUI] _OutlineFillClockwise ("Outline Fill Clockwise", Float) = 1
+        [ToggleUI] _OutlineFillFollowPerimeter ("Follow Perimeter", Float) = 0
         _OutlineOverlayTex ("Outline Overlay Texture", 2D) = "white" {}
         [HideInInspector] _HasOutlineOverlayTex ("Has Outline Overlay Texture", Float) = 0
         _OutlineOverlayColor ("Outline Overlay Color", Color) = (1,1,1,1)
@@ -201,6 +207,12 @@ Shader "UI/Image Margin Fade"
             float _GlowPadding;
             half _Outline;
             float _OutlineThickness;
+            float _UseOutlineFill;
+            float _OutlineFillAmount;
+            float _OutlineFillDirection;
+            float _OutlineFillOrigin;
+            float _OutlineFillClockwise;
+            float _OutlineFillFollowPerimeter;
             fixed4 _TextureSampleAdd;
             float4 _ClipRect;
             float4 _NoiseOffset;
@@ -703,6 +715,62 @@ Shader "UI/Image Margin Fade"
                     float roundedInset = _OutlineThickness * length(localRoundedGradient);
                     half innerShape = saturate(0.5 - (roundedDistance + roundedInset) / roundedAntialias);
                     half outlineMask = saturate((1.0 - edgeFade) * outerShape - (1.0 - innerFade) * innerShape);
+                    if (_UseOutlineFill > 0.5 && _OutlineFillAmount < 1.0)
+                    {
+                        // Reveal only the outline on the full image coordinates;
+                        // the base image and overlay keep their existing appearance.
+                        float coordinate = _OutlineFillDirection < 0.5 ? shapeUV.x
+                            : _OutlineFillDirection < 1.5 ? 1.0 - shapeUV.x
+                            : _OutlineFillDirection < 2.5 ? shapeUV.y : 1.0 - shapeUV.y;
+                        float fillAntialias = max(fwidth(coordinate), 0.000001);
+                        if (_OutlineFillDirection > 3.5)
+                        {
+                            float2 radialPosition = (shapeUV - 0.5) * imageAspect;
+                            // Clockwise angle from the top, with selectable origin.
+                            float angle = atan2(radialPosition.x, radialPosition.y) / 6.28318530718
+                                - _OutlineFillOrigin * 0.25;
+                            coordinate = frac((_OutlineFillClockwise > 0.5 ? angle : -angle) + 1.0);
+                            // Differentiate the angle analytically to avoid the
+                            // frac seam producing a wide translucent strip.
+                            float2 radialDx = ddx(radialPosition);
+                            float2 radialDy = ddy(radialPosition);
+                            fillAntialias = max((abs(radialPosition.y * radialDx.x - radialPosition.x * radialDx.y)
+                                + abs(radialPosition.y * radialDy.x - radialPosition.x * radialDy.y))
+                                / max(dot(radialPosition, radialPosition) * 6.28318530718, 0.000001), 0.000001);
+                            if (_OutlineFillFollowPerimeter > 0.5)
+                            {
+                                // Measure distance along the nearest rectangle edge
+                                // instead of sweeping a ray from the center. On each
+                                // straight side the moving cap is perpendicular to it.
+                                float2 size = imageAspect;
+                                float2 halfSize = size * 0.5;
+                                float2 position = clamp(radialPosition, -halfSize, halfSize);
+                                float2 edgeDistance = halfSize - abs(position);
+                                float perimeter = 2.0 * (size.x + size.y);
+                                float distanceAlongEdge;
+                                if (edgeDistance.x < edgeDistance.y)
+                                    distanceAlongEdge = position.x >= 0.0
+                                        ? size.x + halfSize.y - position.y
+                                        : 2.0 * size.x + size.y + position.y + halfSize.y;
+                                else
+                                    distanceAlongEdge = position.y >= 0.0
+                                        ? position.x + halfSize.x
+                                        : size.x + size.y + halfSize.x - position.x;
+                                float origin = _OutlineFillOrigin < 0.5 ? halfSize.x
+                                    : _OutlineFillOrigin < 1.5 ? size.x + halfSize.y
+                                    : _OutlineFillOrigin < 2.5 ? size.x + size.y + halfSize.x
+                                    : 2.0 * size.x + size.y + halfSize.y;
+                                float progress = (distanceAlongEdge - origin) / perimeter;
+                                coordinate = frac((_OutlineFillClockwise > 0.5 ? progress : -progress) + 1.0);
+                                // Take derivatives before wrapping to keep the start
+                                // seam sharp instead of widening it across the image.
+                                fillAntialias = max(fwidth(distanceAlongEdge) / perimeter, 0.000001);
+                            }
+                        }
+                        float outlineFill = _OutlineFillAmount <= 0.0 ? 0.0
+                            : saturate((_OutlineFillAmount - coordinate) / fillAntialias + 0.5);
+                        outlineMask *= outlineFill;
+                    }
                     half3 outlineColor = _OutlineColor.rgb;
                     if (_HasOutlineOverlayTex > 0.5 && _OutlineOverlayOpacity > 0.0)
                     {

@@ -1686,6 +1686,14 @@ MonoBehaviour:
   - {fileID: 21898303859492186}
   - {fileID: 776254385692682722}
   - {fileID: 8236621728335235999}
+  hintsParent: {fileID: 459435849332738037}
+  shovelEquipped: {fileID: 8353208135329761499}
+  broomEquipped: {fileID: 2955780447568988104}
+  axeEquipped: {fileID: 3673603886812667257}
+  hammerEquipped: {fileID: 6773735668008262282}
+  toolHintsFadeSeconds: 0.25
+  boostersParent: {fileID: 8887181608423940080}
+  boosterHandlerPrefab: {fileID: 109275875164959317, guid: d7532332d1202dd4a908cff5ad23bb7e, type: 3}
 --- !u!114 &7200805050012345678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1966,7 +1974,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7f9754ada3a81674cb545a36917b3a87, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1d45ae3aa619aba44a526421b5cd7923, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3685,6 +3693,7 @@ RectTransform:
   - {fileID: 2361098720760704435}
   - {fileID: 179623726325237430}
   - {fileID: 4403882118267338398}
+  - {fileID: 8887181608423940080}
   - {fileID: 5599353438197605149}
   - {fileID: 5681441617593288026}
   - {fileID: 1101242863612282866}
@@ -5762,6 +5771,7 @@ GameObject:
   - component: {fileID: 869676244355228200}
   - component: {fileID: 525480509428591078}
   - component: {fileID: 4422144888067263033}
+  - component: {fileID: 3673603886812667257}
   m_Layer: 0
   m_Name: AxeHint
   m_TagString: Untagged
@@ -5830,6 +5840,43 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3673603886812667257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798111207099582506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 826003845edb84f4db72c71261620004, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedUI
+  selectOnHover: 0
+  useDifferentHover: 0
+  hoverImage: {fileID: 0}
+  showHoverWhenSelected: 0
+  canvasGroup: {fileID: 0}
+  selectedAlpha: 1
+  unselectedAlpha: 0.5
+  onHoverOn:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverOff:
+    m_PersistentCalls:
+      m_Calls: []
+  buttonText: {fileID: 0}
+  selectedImage: {fileID: 48282343475145370}
+  unselectedImage: {fileID: 5663372588311984560}
+  shouldScale: 0
+  scaleTarget: {fileID: 0}
+  scaleSize: 1.1
+  moveSelected: 0
+  selectedImageRect: {fileID: 0}
+  moveSelectedPos: {x: 0, y: 0}
+  resizeObject: {fileID: 0}
+  originalSize: {x: 0, y: 0}
+  newSize: {x: 0, y: 0}
 --- !u!1 &1848519036564939089
 GameObject:
   m_ObjectHideFlags: 0
@@ -5965,15 +6012,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.95686275, g: 0.72156864, b: 0.24705882, a: 1}
+  m_Material: {fileID: 2100000, guid: f88aa10a0b743ae4985f5475c728d35d, type: 2}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 922b2f6dfb2d52e4987c108730532d43, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6041,15 +6088,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.2, g: 0.17254902, b: 0.14509805, a: 1}
+  m_Material: {fileID: 2100000, guid: 01d3d8c42739dbd44b4440e101787164, type: 2}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 922b2f6dfb2d52e4987c108730532d43, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -9121,7 +9168,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 126.1001, y: -197.09998}
+  m_AnchoredPosition: {x: 126.1001, y: -260.7}
   m_SizeDelta: {x: 228.59998, y: 60.799988}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6066302657086199799
@@ -10010,13 +10057,14 @@ GameObject:
   - component: {fileID: 7329147289778050961}
   - component: {fileID: 2765522095766300225}
   - component: {fileID: 5737861532259171475}
+  - component: {fileID: 2955780447568988104}
   m_Layer: 0
   m_Name: BroomHint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7329147289778050961
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10078,6 +10126,43 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2955780447568988104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3174021603028529854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 826003845edb84f4db72c71261620004, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedUI
+  selectOnHover: 0
+  useDifferentHover: 0
+  hoverImage: {fileID: 0}
+  showHoverWhenSelected: 0
+  canvasGroup: {fileID: 0}
+  selectedAlpha: 1
+  unselectedAlpha: 0.5
+  onHoverOn:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverOff:
+    m_PersistentCalls:
+      m_Calls: []
+  buttonText: {fileID: 0}
+  selectedImage: {fileID: 1496802259746690463}
+  unselectedImage: {fileID: 7943658855602646732}
+  shouldScale: 0
+  scaleTarget: {fileID: 0}
+  scaleSize: 1.1
+  moveSelected: 0
+  selectedImageRect: {fileID: 0}
+  moveSelectedPos: {x: 0, y: 0}
+  resizeObject: {fileID: 0}
+  originalSize: {x: 0, y: 0}
+  newSize: {x: 0, y: 0}
 --- !u!1 &3185343004384084917
 GameObject:
   m_ObjectHideFlags: 0
@@ -11803,6 +11888,136 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &3749724923049832871
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8887181608423940080}
+  - component: {fileID: 5879992637785436411}
+  - component: {fileID: 6807890549289331074}
+  - component: {fileID: 1898003353512886119}
+  - component: {fileID: 8770273179719831408}
+  - component: {fileID: 6259113958748459712}
+  m_Layer: 0
+  m_Name: Boosters
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &8887181608423940080
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3749724923049832871}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8513946829808345699}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 41.1, y: -162.7}
+  m_SizeDelta: {x: 0, y: 60}
+  m_Pivot: {x: 0, y: 0.5}
+--- !u!222 &5879992637785436411
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3749724923049832871}
+  m_CullTransparentMesh: 1
+--- !u!114 &6807890549289331074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3749724923049832871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1898003353512886119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3749724923049832871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 11.69
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!114 &8770273179719831408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3749724923049832871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 2
+  m_VerticalFit: 0
+--- !u!225 &6259113958748459712
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3749724923049832871}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &3799014501140761606
 GameObject:
   m_ObjectHideFlags: 0
@@ -16766,7 +16981,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3852681289689791922
 RectTransform:
   m_ObjectHideFlags: 0
@@ -19148,6 +19363,7 @@ GameObject:
   - component: {fileID: 8454061942352448699}
   - component: {fileID: 4826369853583623890}
   - component: {fileID: 7409728076762777816}
+  - component: {fileID: 8353208135329761499}
   m_Layer: 0
   m_Name: ShovelHint
   m_TagString: Untagged
@@ -19216,6 +19432,43 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8353208135329761499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5895932717040058197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 826003845edb84f4db72c71261620004, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedUI
+  selectOnHover: 0
+  useDifferentHover: 0
+  hoverImage: {fileID: 0}
+  showHoverWhenSelected: 0
+  canvasGroup: {fileID: 0}
+  selectedAlpha: 1
+  unselectedAlpha: 0.5
+  onHoverOn:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverOff:
+    m_PersistentCalls:
+      m_Calls: []
+  buttonText: {fileID: 0}
+  selectedImage: {fileID: 5236218939270750099}
+  unselectedImage: {fileID: 9145857497751499510}
+  shouldScale: 0
+  scaleTarget: {fileID: 0}
+  scaleSize: 1.1
+  moveSelected: 0
+  selectedImageRect: {fileID: 0}
+  moveSelectedPos: {x: 0, y: 0}
+  resizeObject: {fileID: 0}
+  originalSize: {x: 0, y: 0}
+  newSize: {x: 0, y: 0}
 --- !u!1 &5912090507507623621
 GameObject:
   m_ObjectHideFlags: 0
@@ -20153,6 +20406,7 @@ GameObject:
   - component: {fileID: 2626415295000462646}
   - component: {fileID: 8226796312497599458}
   - component: {fileID: 1593813755447026858}
+  - component: {fileID: 6773735668008262282}
   m_Layer: 0
   m_Name: HammerHint
   m_TagString: Untagged
@@ -20221,6 +20475,43 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6773735668008262282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6584640361296788436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 826003845edb84f4db72c71261620004, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedUI
+  selectOnHover: 0
+  useDifferentHover: 0
+  hoverImage: {fileID: 0}
+  showHoverWhenSelected: 0
+  canvasGroup: {fileID: 0}
+  selectedAlpha: 1
+  unselectedAlpha: 0.5
+  onHoverOn:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverOff:
+    m_PersistentCalls:
+      m_Calls: []
+  buttonText: {fileID: 0}
+  selectedImage: {fileID: 1036713694200126452}
+  unselectedImage: {fileID: 2455218537045455171}
+  shouldScale: 0
+  scaleTarget: {fileID: 0}
+  scaleSize: 1.1
+  moveSelected: 0
+  selectedImageRect: {fileID: 0}
+  moveSelectedPos: {x: 0, y: 0}
+  resizeObject: {fileID: 0}
+  originalSize: {x: 0, y: 0}
+  newSize: {x: 0, y: 0}
 --- !u!1 &6641369680906709609
 GameObject:
   m_ObjectHideFlags: 0
@@ -22927,7 +23218,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 44, y: 193.52972}
-  m_SizeDelta: {x: 171.69, y: 87.5337}
+  m_SizeDelta: {x: 0, y: 87.5337}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &5861970700739988025
 CanvasRenderer:

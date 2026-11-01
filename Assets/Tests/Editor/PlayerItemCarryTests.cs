@@ -138,12 +138,12 @@ public class PlayerItemCarryTests
         Assert.IsFalse(player.IsShovelEquipped);
         Assert.IsFalse(shovel.enabled);
         Assert.IsFalse(instrument.gameObject.activeSelf);
-        Assert.IsFalse(player.ToggleShovel());
+        Assert.IsFalse(PlayerCombatTools.SetShovelEquipped(player, true));
         carrier.CancelTake(item);
         Assert.IsFalse(player.IsShovelEquipped);
         Assert.IsFalse(instrument.gameObject.activeSelf);
         Assert.AreEqual(kilograms, container.Kilograms);
-        Assert.IsTrue(player.ToggleShovel());
+        Assert.IsTrue(PlayerCombatTools.SetShovelEquipped(player, true));
         Assert.IsTrue(player.IsShovelEquipped);
     }
 
@@ -243,7 +243,7 @@ public class PlayerItemCarryTests
         else Assert.IsTrue(carrier.TryTake(item));
 
         Assert.IsTrue(player.IsCarrying);
-        Assert.IsTrue(player.ToggleShovel());
+        Assert.IsTrue(PlayerCombatTools.SetShovelEquipped(player, true));
         Assert.IsFalse(player.IsCarrying);
         Assert.IsFalse(container.IsCarried);
         Assert.IsNull(item.transform.parent);
@@ -262,7 +262,7 @@ public class PlayerItemCarryTests
         wall.AddComponent<BoxCollider>();
         Assert.IsTrue(carrier.TryTake(item));
         Physics.SyncTransforms();
-        Assert.IsFalse(player.ToggleShovel());
+        Assert.IsFalse(PlayerCombatTools.SetShovelEquipped(player, true));
         Assert.IsTrue(carrier.IsCarrying);
         Assert.IsFalse(player.IsShovelEquipped);
     }
@@ -278,7 +278,7 @@ public class PlayerItemCarryTests
         var interactor = actor.AddComponent<PlayerInteractor>();
         typeof(PlayerInteractor).GetProperty("Items").SetValue(interactor, carrier);
         SetField(player, "interactor", interactor);
-        Assert.IsTrue(player.ToggleShovel());
+        Assert.IsTrue(PlayerCombatTools.SetShovelEquipped(player, true));
         ground = new GameObject("Placement ground");
         ground.transform.position = actor.transform.position + Vector3.down * .05f;
         ground.transform.localScale = new Vector3(20, .1f, 20);

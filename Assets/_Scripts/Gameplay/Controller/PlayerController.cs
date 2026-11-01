@@ -188,7 +188,6 @@ public class PlayerController : MonoBehaviour
             return;
 
         bool acceptInput = Application.isFocused && Cursor.lockState == CursorLockMode.Locked && !UIPopups.BasePopupUI.HasActivePopup;
-        if (acceptInput && Input.GetKeyDown(KeyCode.G)) ToggleShovel();
         lookInput = Vector2.zero;
         if (acceptInput)
             HandleCamera();
@@ -225,27 +224,6 @@ public class PlayerController : MonoBehaviour
         cameraRotationX = smoothedPitch = Mathf.DeltaAngle(0, characterCamera.transform.localEulerAngles.x);
         verticalVelocity = 0;
         sprintCameraBlend = sprintCameraPhase = 0;
-    }
-
-    public bool ToggleShovel()
-    {
-        if (!isActiveAndEnabled || shovelTool == null || Time.timeScale <= 0f || UIPopups.BasePopupUI.HasActivePopup || UpgradeManager.BlocksGameplayInput ||
-            (characterController != null && !characterController.enabled) ||
-            (bicycleInteraction != null && bicycleInteraction.IsRiding) ||
-            (interactor != null && interactor.PushedWheelbarrow != null)) return false;
-
-        bool equip = IsCarrying || !IsShovelEquipped;
-        if (equip)
-        {
-            if (bagInteraction != null && bagInteraction.IsCarrying && !bagInteraction.TryInteract()) return false;
-            if (interactor != null && interactor.Items != null && interactor.Items.IsCarrying &&
-                !interactor.Items.TryPlace()) return false;
-            if (combatTools != null && !combatTools.TryEquip(PlayerCombatTools.Tool.Shovel)) return false;
-        }
-        if (!equip) shovelTool.CancelAction();
-        if (heldInstrument != null) heldInstrument.gameObject.SetActive(equip);
-        shovelTool.enabled = equip;
-        return true;
     }
 
     public void ClearSprintCameraMotion()
