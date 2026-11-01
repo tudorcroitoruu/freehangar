@@ -24,6 +24,7 @@ public class SellingScreen : MonoBehaviour
     private bool previousCursorVisible;
     private bool cursorCaptured;
     private int quotedCash;
+    private int quotedSellMultiplier = 1;
     private static SellingScreen current;
     private static int closedFrame = -1;
     public SellingZone Zone { get; private set; }
@@ -71,6 +72,7 @@ public class SellingScreen : MonoBehaviour
         quotedWeights.Clear();
         quotedTypes.Clear();
         quotedPrices.Clear();
+        quotedSellMultiplier=PlayerPerks.SellMultiplier;
         var quantities = new SortedDictionary<GrainType, float>();
         double weight = 0;
         var cropValues = new List<double>();
@@ -88,10 +90,10 @@ public class SellingScreen : MonoBehaviour
             quotedPrices[entry.Key] = settings.grainPrice;
             var element = Instantiate(elementPrefab, elementsParent);
             element.gameObject.SetActive(true);
-            element.SetData(settings, entry.Value);
+            element.SetData(settings, entry.Value, quotedSellMultiplier);
             elements.Add(element);
             weight += entry.Value;
-            cropValues.Add(EconomyNumberFormat.CropValue(entry.Value, settings.grainPrice));
+            cropValues.Add(PlayerPerks.SellCash(EconomyNumberFormat.CropValue(entry.Value, settings.grainPrice),quotedSellMultiplier));
         }
         // Add the same whole-dollar amounts shown in the crop rows, without a hidden fractional remainder.
         quotedCash = EconomyNumberFormat.SaleTotal(cropValues);
@@ -105,6 +107,7 @@ public class SellingScreen : MonoBehaviour
 
     private bool QuoteMatches()
     {
+        if(quotedSellMultiplier!=PlayerPerks.SellMultiplier)return false;
         Zone.CollectContainers(currentContainers);
         if (currentContainers.Count != containers.Count) return false;
         foreach (var container in currentContainers)

@@ -94,6 +94,8 @@ public class AudioManager : MonoBehaviour
         coroutine = StartCoroutine(ResumeRegularMusicAfterSpecial(MusicMode.Intro));
     }
 
+    public void StopAttackMusic() { if(musicMode==MusicMode.Attack) PlayRegularMusic(); }
+
     public void PlayAttackMusic()
     {
         if (attackMusic == null || musicAudioSource == null || musicMode == MusicMode.Ending) return;

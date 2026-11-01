@@ -474,7 +474,7 @@ public sealed class GrainPile : MonoBehaviour
         if (DetectedWallCount > 0)
         {
             boundary.UpdateHeights(field, 0);
-            if (collisionVertexMap == null || collisionVertexMap.Length != boundary.Positions.Count)
+            if (collisionVertexMap == null || collisionVertexMap.Length != boundary.Positions.Count || collisionVertices.Count == 0)
             {
                 // The render skin splits every triangle for flat shading. Physics needs
                 // only one vertex at each X/Z location on this continuous height field.

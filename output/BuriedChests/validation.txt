@@ -1,0 +1,3 @@
+PASS Copper key farm.key.copper -> Copper chest - HANGAR 2 - key farm.key.copper; repaired existing; 4 mesh renderers; 42 % from doorway.
+PASS Iron key farm.key.iron -> Iron chest - HANGAR 4 - key farm.key.iron; repaired existing; 4 mesh renderers; 42 % from doorway.
+Matched 2 chests to 2 chest keys. Hangar door keys and vehicle keys are separate.

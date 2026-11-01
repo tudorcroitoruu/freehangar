@@ -1,0 +1,7 @@
+PASS Vehicle key - Trike - HANGAR 2 (25 % from door): 2.94 m of grain above key; pile=Hangar 2 - Almost full grain bank; mesh=258 vertices; saved ID=vehicle.key.trike.
+PASS Vehicle key - Lawnmower - HANGAR 2 (75 % from door): 4.08 m of grain above key; pile=Hangar 2 - Almost full grain bank; mesh=258 vertices; saved ID=vehicle.key.lawnmower.
+PASS Vehicle key - Pickup - HANGAR 3 (25 % from door): 2.83 m of grain above key; pile=Hangar 3 - Almost full grain bank; mesh=258 vertices; saved ID=vehicle.key.pickup.
+PASS Vehicle key - Pickup Bigger - HANGAR 3 (75 % from door): 4.08 m of grain above key; pile=Hangar 3 - Almost full grain bank; mesh=258 vertices; saved ID=vehicle.key.pickupBig.
+PASS Vehicle key - Pickup Cargo - HANGAR 4 (65 % from door): 5.21 m of grain above key; pile=Hangar 4 - Grain bank to entrance; mesh=258 vertices; saved ID=vehicle.key.pickupLast.
+Key bow audit: removed 64 unused empty objects; retained 0 geometry/anchors/referenced key parts.
+Gameplay already had unsaved edits; keys added to the open scene. Save Gameplay to persist them with those edits.

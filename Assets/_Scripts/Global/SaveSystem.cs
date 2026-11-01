@@ -372,6 +372,9 @@ public class PlayerData
     public string[] foundSecrets = Array.Empty<string>();
     public int freeUpgradeVouchers;
     public long infiniteStaminaUntilUtc;
+    public long noAttacksUntilUtc;
+    public long mobilityUntilUtc;
+    public long doubleSellCashUntilUtc;
     public int wheelbarrowTier;
     public int[] wheelbarrowUpgradeLevels = new int[3];
     public int shovelUpgradeLevel;

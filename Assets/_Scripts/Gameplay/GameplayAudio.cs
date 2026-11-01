@@ -15,6 +15,7 @@ public sealed class GameplayAudio : MonoBehaviour
     [SerializeField] private AudioClip crowFlyAway, crowsIdle, ratHit, ratIdle;
     [Header("Controller")]
     [SerializeField] private AudioClip[] broomHits;
+    [SerializeField] private AudioClip[] axeWoodHits;
     [SerializeField] private AudioClip hammerMetal, hammerWood, pickUp, drop;
     [Header("Last scene")]
     [SerializeField] private AudioClip openDoor, openRocketDoor, closeDoor, rocket, switchElectrical, lightsOn;
@@ -67,7 +68,7 @@ public sealed class GameplayAudio : MonoBehaviour
     public void PestHit(bool crow, Vector3 point) => PlayAt(crow ? Choose(crowHits) : ratHit, point, .8f);
     public void CrowFlyAway(Vector3 point) => PlayAt(crowFlyAway, point, .65f);
     public void BroomHit() => Play(Choose(broomHits), .75f);
-    public void BarrierHit(bool metal) => Play(metal ? hammerMetal : hammerWood, .8f);
+    public void BarrierHit(bool metal) => Play(metal ? hammerMetal : (Choose(axeWoodHits) ?? hammerWood), .8f);
     public void PickUp() => Play(pickUp, .7f);
     public void Drop() => Play(drop, .7f);
     public void OpenElectricalDoor() => Play(openDoor, .8f);

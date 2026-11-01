@@ -292,6 +292,7 @@ public class PlayerController : MonoBehaviour
             canSprint ? Mathf.Lerp(sprintSpeed, speed, bagWeight) : speed;
         if (!pushingWheelbarrow && carriedBag != null)
             currentSpeed *= Mathf.Lerp(1f, bagCarrySpeedMultiplier, bagWeight);
+        if(!pushingWheelbarrow) currentSpeed *= PlayerPerks.MobilityMultiplier;
         Vector3 velocity = (transform.right * input.x + transform.forward * input.y) * currentSpeed;
 
         if (characterController.isGrounded && verticalVelocity < 0f)

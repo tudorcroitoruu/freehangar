@@ -6,11 +6,21 @@ using UnityEngine;
 [DisallowMultipleComponent, RequireComponent(typeof(BoxCollider))]
 public sealed class BuriedFind : MonoBehaviour, IInteractable
 {
-    public enum Kind { Key, CashChest, UpgradeVoucher, InfiniteStamina, CashCache, Hammer, Axe, HangarKey, Broom, VehicleKey }
+    // Explicit values preserve existing scene, prefab and save assignments when renaming tools.
+    public enum Kind { Key = 0, CashChest = 1, UpgradeVoucher = 2, InfiniteStamina = 3, CashCache = 4, Axe = 5, Hammer = 6, HangarKey = 7, Broom = 8, VehicleKey = 9 }
 
     [SerializeField] private Kind kind;
     [SerializeField] private string findId;
     [SerializeField] private string vehicleKeyName;
+    [SerializeField] private string chestKeyLabel;
+    public string RequiredChestKeyId => requiredKeyId;
+    public void ConfigureChestKey(string id,string label) { kind=Kind.Key;findId=id;chestKeyLabel=label; }
+    public void ConfigureMatchingChest(string id,string keyId,string label,GrainPile pile,Material keyMaterial)
+    {
+        kind=Kind.CashChest;findId=id;requiredKeyId=keyId;matchingKeyColor=label;
+        coveringPile=pile;matchingHangarKeyId="";matchingKeyMaterial=keyMaterial;settleOnReveal=false;
+        variedChestRewards=true;chestPerkSeconds=PlayerPerks.DefaultDurationSeconds;
+    }
     public void ConfigureVehicleKey(string id, string displayName, GrainPile pile)
     {
         kind = Kind.VehicleKey; findId = id; vehicleKeyName = displayName; coveringPile = pile;
@@ -20,6 +30,10 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     [SerializeField] private string matchingKeyColor;
     [SerializeField] private Material matchingKeyMaterial;
     [SerializeField, Min(1)] private int cashReward = 500;
+    [SerializeField] private bool variedChestRewards = true;
+    [SerializeField, Min(1)] private int chestPerkSeconds = PlayerPerks.DefaultDurationSeconds;
+    private bool chestRewardRolled;
+    private ChestReward rolledChestReward;
     [SerializeField, Min(1)] private int staminaDurationSeconds = 300;
     [SerializeField] private GrainPile coveringPile;
     [SerializeField] private bool settleOnReveal;
@@ -127,15 +141,15 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         bool hasKey = kind != Kind.CashChest || WasFound(SaveSystem.Data, requiredKeyId) || (!string.IsNullOrEmpty(matchingHangarKeyId) && WasFound(SaveSystem.Data, matchingHangarKeyId));
         string action = !hasProfile ? "Load save to collect" : !hasKey ? (string.IsNullOrEmpty(matchingKeyColor) ? "Requires chest key" : $"Requires {matchingKeyColor} key") :
             kind == Kind.VehicleKey ? $"Take {vehicleKeyName} key" :
-            kind == Kind.Key ? "Take CHEST key" :
+            kind == Kind.Key ? $"Take {(string.IsNullOrEmpty(chestKeyLabel) ? "chest" : chestKeyLabel)} key" :
             kind == Kind.HangarKey ? $"Take HANGAR {targetHangar} key" :
-            kind == Kind.Broom ? "Take broom (equip with 2)" :
+            kind == Kind.Broom ? "Take broom (equip with 4)" :
+            kind == Kind.Axe ? "Take axe (equip with 2)" :
             kind == Kind.Hammer ? "Take hammer (equip with 3)" :
-            kind == Kind.Axe ? "Take axe (equip with 4)" :
             kind == Kind.UpgradeVoucher ? "Take free upgrade voucher" :
             kind == Kind.InfiniteStamina ? $"Drink stamina tonic ({staminaDurationSeconds / 60} min)" :
             kind == Kind.CashCache ? $"Take cash cache (+${cashReward})" :
-            $"Open mystery chest (+${cashReward})";
+            kind == Kind.CashChest && variedChestRewards ? $"Open {matchingKeyColor} chest (cash, upgrade or perk)" : $"Open mystery chest (+${cashReward})";
         Bounds bounds = VisualBounds();
         prompt = new InteractionPromptData(new Vector3(bounds.center.x, bounds.max.y + .15f, bounds.center.z),
             action, hasProfile && hasKey);
@@ -177,7 +191,12 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     {
         PlayerData data = SaveSystem.Data;
         if (data == null || WasFound(data, findId)) return false;
-        if (kind == Kind.CashChest || kind == Kind.CashCache)
+        if (kind == Kind.CashChest && variedChestRewards)
+        {
+            if(!chestRewardRolled) { rolledChestReward=PlayerPerks.Roll(UnityEngine.Random.value);chestRewardRolled=true; }
+            if(!PlayerPerks.Grant(data,rolledChestReward,cashReward,chestPerkSeconds,PlayerPerks.Now))return false;
+        }
+        else if (kind == Kind.CashChest || kind == Kind.CashCache)
         {
             if (cashReward <= 0 || data.cash > int.MaxValue - cashReward) return false;
             data.cash += cashReward;
@@ -203,10 +222,10 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         return true;
     }
 
-    private string Receipt() => kind == Kind.VehicleKey ? $"{vehicleKeyName.ToUpperInvariant()} KEY FOUND" : kind == Kind.HangarKey ? $"HANGAR {targetHangar} KEY\nUse at Hangar {targetHangar}" :
-        kind == Kind.Broom ? "BROOM FOUND\nPress 2 to equip" : kind == Kind.Key ? "CHEST KEY FOUND" : kind == Kind.InfiniteStamina ? "INFINITE STAMINA!" :
+    private string Receipt() => kind == Kind.CashChest && variedChestRewards && chestRewardRolled ? PlayerPerks.Receipt(rolledChestReward,cashReward,chestPerkSeconds) : kind == Kind.VehicleKey ? $"{vehicleKeyName.ToUpperInvariant()} KEY FOUND" : kind == Kind.HangarKey ? $"HANGAR {targetHangar} KEY\nUse at Hangar {targetHangar}" :
+        kind == Kind.Broom ? "BROOM FOUND\nPress 4 to equip" : kind == Kind.Key ? $"{(string.IsNullOrEmpty(chestKeyLabel) ? "CHEST" : chestKeyLabel.ToUpperInvariant())} KEY FOUND" : kind == Kind.InfiniteStamina ? "INFINITE STAMINA!" :
         kind == Kind.CashChest || kind == Kind.CashCache ? $"+${cashReward}" :
-        kind == Kind.UpgradeVoucher ? "FREE UPGRADE!" : kind == Kind.Hammer ? "HAMMER FOUND" : "SLEDGEHAMMER FOUND";
+        kind == Kind.UpgradeVoucher ? "FREE UPGRADE!" : kind == Kind.Axe ? "AXE FOUND\nPress 2 to equip" : "HAMMER FOUND\nPress 3 to equip";
 
     private bool PresentationValid => actor != null && actor.isActiveAndEnabled && view != null &&
         view.isActiveAndEnabled && SaveSystem.Data == animationProfile;
@@ -217,7 +236,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         {
             Quaternion facing = Quaternion.LookRotation(-keySocket.forward, keySocket.up);
             insertionKey = Instantiate(insertionKeyPrefab, keySocket.position + keySocket.forward * .45f, facing);
-            if (matchingKeyMaterial != null && WasFound(SaveSystem.Data, matchingHangarKeyId))
+            if (matchingKeyMaterial != null)
                 foreach (var renderer in insertionKey.GetComponentsInChildren<Renderer>()) renderer.sharedMaterial = matchingKeyMaterial;
             float keyTime = 0;
             while (keyTime < 1.05f)

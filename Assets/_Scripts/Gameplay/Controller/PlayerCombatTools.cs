@@ -1,14 +1,16 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>Equips the buried hand tools and drives short first-person barrier strikes.</summary>
 [DisallowMultipleComponent]
 public sealed class PlayerCombatTools : MonoBehaviour
 {
-    public enum Tool { Shovel = 1, Hammer = 2, Sledgehammer = 3, Broom = 4 }
+    public enum Tool { Shovel = 1, Axe = 2, Hammer = 3, Broom = 4 }
 
     public const string BroomFindId = "farm.tool.broom";
-    public const string HammerFindId = "farm.tool.hammer";
-    public const string SledgehammerFindId = "farm.tool.sledgehammer";
+    public const string LegacyAxeFindId = "farm.tool.hammer"; // Keep the old axe discovery ID for existing saves.
+    public const string AxeFindId = "farm.tool.axe";
+    public const string HammerFindId = "farm.tool.sledgehammer";
 
     [SerializeField] private Camera viewCamera;
     [SerializeField] private Transform shovelHands;
@@ -16,15 +18,17 @@ public sealed class PlayerCombatTools : MonoBehaviour
     [SerializeField] private BagInteraction bags;
     [SerializeField] private Transform heldBroom;
     [SerializeField] private GameObject dustEffect;
-    [SerializeField] private Transform heldHammer;
-    [SerializeField] private Transform heldSledgehammer;
+    [FormerlySerializedAs("heldHammer"), SerializeField] private Transform heldAxe;
+    [SerializeField, InspectorName("Held Hammer")] private Transform heldSledgehammer;
     [SerializeField, Min(.5f)] private float strikeReach = 3f;
     [SerializeField, Min(.1f)] private float strikeDuration = .55f;
 
     private PlayerInteractor interactor;
     private Tool equipped = Tool.Shovel;
     private float strikeStart = -10f;
-    private bool broomImpactPending;
+    private bool impactPending;
+    private readonly RaycastHit[] strikeHits = new RaycastHit[32];
+    private float ImpactPhase => equipped == Tool.Broom ? .45f : equipped == Tool.Axe ? .42f : .5f;
     private float StrikeDuration => equipped == Tool.Broom ? .56f : strikeDuration;
     private float broomImpactTime = -10f;
     public Quaternion BroomCameraKick
@@ -48,48 +52,70 @@ public sealed class PlayerCombatTools : MonoBehaviour
         interactor = GetComponent<PlayerInteractor>();
         if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
         if (bags == null) bags = GetComponent<BagInteraction>();
+        if (viewCamera != null)
+            foreach(var node in viewCamera.GetComponentsInChildren<Transform>(true))
+            {
+                if(heldAxe==null && node.name=="Axe") heldAxe=node;
+                if(heldBroom==null && node.name=="Broom grip pivot") heldBroom=node;
+                if(heldSledgehammer==null && node.name=="Held sledgehammer") heldSledgehammer=node;
+            }
         if (heldBroom != null) { broomRestPosition = heldBroom.localPosition; broomRestRotation = heldBroom.localRotation; }
-        if (heldHammer != null) { hammerRestPosition = heldHammer.localPosition; hammerRestRotation = heldHammer.localRotation; }
+        if (heldAxe != null) { hammerRestPosition = heldAxe.localPosition; hammerRestRotation = heldAxe.localRotation; }
         if (heldSledgehammer != null) { sledgeRestPosition = heldSledgehammer.localPosition; sledgeRestRotation = heldSledgehammer.localRotation; }
         ApplyVisuals();
     }
 
     public void Tick(bool acceptInput, bool wasLocked)
     {
-        if (!acceptInput) { broomImpactPending = false; return; }
-        if (broomImpactPending && equipped == Tool.Broom && Time.time >= strikeStart + StrikeDuration * .45f)
+        if(!IsUnlocked(equipped)) { equipped=Tool.Shovel;CancelStrike();ApplyVisuals(); }
+        if (!acceptInput || (interactor != null && interactor.DiscoveryBusy)) { CancelStrike(); return; }
+        AdvanceStrike();
+        if (Input.GetKeyDown(KeyCode.Alpha1)) TryEquip(Tool.Shovel);
+        else if (Input.GetKeyDown(KeyCode.Alpha2)) TryEquip(Tool.Axe);
+        else if (Input.GetKeyDown(KeyCode.Alpha3)) TryEquip(Tool.Hammer);
+        else if (Input.GetKeyDown(KeyCode.Alpha4)) TryEquip(Tool.Broom);
+
+        if (wasLocked && Input.GetMouseButtonDown(0)) TryStartStrike();
+    }
+
+    private void AdvanceStrike()
+    {
+        if (impactPending && Time.time >= strikeStart + StrikeDuration * ImpactPhase)
         {
-            broomImpactPending = false;
-            broomImpactTime = Time.time;
+            impactPending = false;
+            if (equipped == Tool.Broom) broomImpactTime = Time.time;
             PerformStrike();
         }
-        if (Input.GetKeyDown(KeyCode.Alpha1)) TryEquip(Tool.Shovel);
-        else if (Input.GetKeyDown(KeyCode.Alpha2)) TryEquip(Tool.Broom);
-        else if (Input.GetKeyDown(KeyCode.Alpha3)) TryEquip(Tool.Hammer);
-        else if (Input.GetKeyDown(KeyCode.Alpha4)) TryEquip(Tool.Sledgehammer);
-
-        if (equipped == Tool.Shovel || !wasLocked || !Input.GetMouseButtonDown(0) ||
-            Time.time < strikeStart + StrikeDuration || viewCamera == null ||
-            (bags != null && bags.IsCarrying) || (interactor != null && interactor.PushedWheelbarrow != null)) return;
-
-        strikeStart = Time.time;
-        if (equipped == Tool.Broom) { broomImpactPending = true; return; }
-        PerformStrike();
     }
+
+    public bool IsUnlocked(Tool tool) => tool == Tool.Shovel ||
+        (tool == Tool.Broom && BuriedFind.WasFound(SaveSystem.Data,BroomFindId)) ||
+        (tool == Tool.Axe && (BuriedFind.WasFound(SaveSystem.Data,AxeFindId) || BuriedFind.WasFound(SaveSystem.Data,LegacyAxeFindId))) ||
+        (tool == Tool.Hammer && BuriedFind.WasFound(SaveSystem.Data,HammerFindId));
+
+    public bool TryStartStrike()
+    {
+        if (!isActiveAndEnabled || !IsUnlocked(equipped) || equipped == Tool.Shovel || viewCamera == null ||
+            Time.timeScale<=0 || Time.time < strikeStart + StrikeDuration ||
+            (bags!=null && bags.IsCarrying) || (interactor!=null && (interactor.HandsOccupied || interactor.DiscoveryBusy))) return false;
+        strikeStart=Time.time;impactPending=true;return true;
+    }
+    private void CancelStrike() { impactPending=false;strikeStart=-10f; }
+    private void OnDisable() => CancelStrike();
 
     private void PerformStrike()
     {
         var ray = PlayerAim.CenterRay(viewCamera);
-        var hits = equipped == Tool.Broom
-            ? Physics.SphereCastAll(ray, .22f, strikeReach, ~0, QueryTriggerInteraction.Ignore)
-            : Physics.RaycastAll(ray, strikeReach, ~0, QueryTriggerInteraction.Ignore);
-        System.Array.Sort(hits, (a,b) => a.distance.CompareTo(b.distance));
-        RaycastHit hit = default;
-        bool found = false;
-        foreach (var candidate in hits)
+        int count=equipped==Tool.Broom
+            ? Physics.SphereCastNonAlloc(ray,.22f,strikeHits,strikeReach,~0,QueryTriggerInteraction.Ignore)
+            : Physics.RaycastNonAlloc(ray,strikeHits,strikeReach,~0,QueryTriggerInteraction.Ignore);
+        if(count==strikeHits.Length) return;
+        RaycastHit hit=default;bool found=false;float nearest=float.PositiveInfinity;
+        for(int i=0;i<count;i++)
         {
-            if (candidate.transform.IsChildOf(transform)) continue;
-            hit = candidate; found = true; break;
+            var candidate=strikeHits[i];
+            if(candidate.transform.IsChildOf(transform) || candidate.distance>=nearest)continue;
+            nearest=candidate.distance;hit=candidate;found=true;
         }
         if (!found) return;
         if (equipped == Tool.Broom)
@@ -107,19 +133,17 @@ public sealed class PlayerCombatTools : MonoBehaviour
 
     public bool TryEquip(Tool tool)
     {
-        if (tool == equipped) return true;
-        if (tool == Tool.Broom && !BuriedFind.WasFound(SaveSystem.Data, BroomFindId)) return false;
-        if (tool == Tool.Hammer && !BuriedFind.WasFound(SaveSystem.Data, HammerFindId)) return false;
-        if (tool == Tool.Sledgehammer && !BuriedFind.WasFound(SaveSystem.Data, SledgehammerFindId)) return false;
+        if(!IsUnlocked(tool) || (interactor!=null && interactor.DiscoveryBusy))return false;
         if (bags != null && bags.IsCarrying && !bags.TryInteract()) return false;
         if (interactor != null && interactor.Items != null && interactor.Items.IsCarrying && !interactor.Items.TryPlace()) return false;
         if (interactor != null && interactor.PushedWheelbarrow != null) return false;
         if (shovelTool != null && (shovelTool.Kilograms > 0f || shovelTool.IsBusy)) return false;
-        if (tool != Tool.Shovel && (tool == Tool.Broom ? heldBroom : tool == Tool.Hammer ? heldHammer : heldSledgehammer) == null) return false;
+        if (tool != Tool.Shovel && (tool == Tool.Broom ? heldBroom : tool == Tool.Axe ? heldAxe : heldSledgehammer) == null) return false;
+        if(tool==equipped) { ApplyVisuals();return true; }
         if (shovelTool != null) shovelTool.CancelAction();
         equipped = tool;
         strikeStart = -10f;
-        broomImpactPending = false;
+        impactPending = false;
         ApplyVisuals();
         return true;
     }
@@ -127,22 +151,23 @@ public sealed class PlayerCombatTools : MonoBehaviour
     public void HideForPushing(System.Collections.Generic.List<GameObject> hidden)
     {
         strikeStart = -10f;
-        broomImpactPending = false;
-        foreach (var tool in new[] { heldBroom, heldHammer, heldSledgehammer })
+        impactPending = false;
+        foreach (var tool in new[] { heldBroom, heldAxe, heldSledgehammer })
             if (tool != null && tool.gameObject.activeSelf) { hidden.Add(tool.gameObject); tool.gameObject.SetActive(false); }
     }
 
     private void ApplyVisuals()
     {
+        if (shovelTool != null) shovelTool.enabled=equipped==Tool.Shovel;
         if (shovelHands != null) shovelHands.gameObject.SetActive(equipped == Tool.Shovel);
         if (heldBroom != null) heldBroom.gameObject.SetActive(equipped == Tool.Broom);
-        if (heldHammer != null) heldHammer.gameObject.SetActive(equipped == Tool.Hammer);
-        if (heldSledgehammer != null) heldSledgehammer.gameObject.SetActive(equipped == Tool.Sledgehammer);
+        if (heldAxe != null) heldAxe.gameObject.SetActive(equipped == Tool.Axe);
+        if (heldSledgehammer != null) heldSledgehammer.gameObject.SetActive(equipped == Tool.Hammer);
     }
 
     private void LateUpdate()
     {
-        Transform held = equipped == Tool.Broom ? heldBroom : equipped == Tool.Hammer ? heldHammer : equipped == Tool.Sledgehammer ? heldSledgehammer : null;
+        Transform held = equipped == Tool.Broom ? heldBroom : equipped == Tool.Axe ? heldAxe : equipped == Tool.Hammer ? heldSledgehammer : null;
         if (held == null) return;
         float phase = Mathf.Clamp01((Time.time - strikeStart) / StrikeDuration);
         if (equipped == Tool.Broom)
@@ -170,10 +195,20 @@ public sealed class PlayerCombatTools : MonoBehaviour
             held.localRotation = broomRestRotation * Quaternion.Euler(angles);
             return;
         }
-        float swing = phase >= 1f ? 0f : Mathf.Sin(phase * Mathf.PI);
-        Vector3 restPosition = equipped == Tool.Broom ? broomRestPosition : equipped == Tool.Hammer ? hammerRestPosition : sledgeRestPosition;
-        Quaternion restRotation = equipped == Tool.Broom ? broomRestRotation : equipped == Tool.Hammer ? hammerRestRotation : sledgeRestRotation;
-        held.localPosition = restPosition + new Vector3(0f, -.12f * swing, .18f * swing);
-        held.localRotation = restRotation * Quaternion.Euler(55f * swing, 0f, -12f * swing);
+        float contact=ImpactPhase;
+        Vector3 restPosition=equipped==Tool.Axe?hammerRestPosition:sledgeRestPosition;
+        Quaternion restRotation=equipped==Tool.Axe?hammerRestRotation:sledgeRestRotation;
+        float windupEnd=contact*.65f;
+        float windup=phase<windupEnd?Mathf.SmoothStep(0,1,phase/windupEnd):1;
+        float impact=phase<windupEnd?0:Mathf.SmoothStep(0,1,(phase-windupEnd)/(contact-windupEnd));
+        float recovery=phase<=contact?0:Mathf.SmoothStep(0,1,(phase-contact)/(1-contact));
+        Vector3 pull=new Vector3(.025f,.08f,-.07f);
+        Vector3 hitOffset=new Vector3(-.035f,-.12f,.2f);
+        Vector3 strikeOffset=phase<windupEnd?pull*windup:Vector3.Lerp(pull,hitOffset,impact);
+        Vector3 pullAngles=equipped==Tool.Axe?new Vector3(-38,-8,10):new Vector3(-58,0,7);
+        Vector3 hitAngles=equipped==Tool.Axe?new Vector3(58,8,-14):new Vector3(72,0,-8);
+        Vector3 strikeAngles=phase<windupEnd?pullAngles*windup:Vector3.Lerp(pullAngles,hitAngles,impact);
+        held.localPosition=restPosition+Vector3.Lerp(strikeOffset,Vector3.zero,recovery);
+        held.localRotation=restRotation*Quaternion.Euler(Vector3.Lerp(strikeAngles,Vector3.zero,recovery));
     }
 }

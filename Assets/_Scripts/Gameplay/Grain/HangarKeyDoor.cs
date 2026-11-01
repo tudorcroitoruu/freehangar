@@ -15,6 +15,7 @@ public sealed class HangarKeyDoor : MonoBehaviour, IInteractable
     private PlayerData loadedProfile;
     private float progress;
     public int HangarNumber => hangarNumber;
+    public Vector3 EntrancePosition => leftDoor != null && rightDoor != null ? (leftDoor.position + rightDoor.position) * .5f : transform.position;
     public bool IsUnlocked { get; private set; }
     public string KeyId => KeyFor(hangarNumber);
     public static string KeyFor(int number) => "farm.hangar.key." + number;

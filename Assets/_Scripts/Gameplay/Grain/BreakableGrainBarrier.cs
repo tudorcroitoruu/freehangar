@@ -76,7 +76,7 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
     {
         prompt = default;
         if (!isActiveAndEnabled || !exposed || BuriedFind.WasFound(SaveSystem.Data, barrierId)) return false;
-        string tool = material == Material.Wood ? "hammer or sledgehammer" : "sledgehammer";
+        string tool = material == Material.Wood ? "axe (2)" : "hammer (3)";
         string label = $"{material} wall: {tool}, left click ({HitsRemaining} hits)";
         Bounds bounds = VisualBounds();
         prompt = new InteractionPromptData(new Vector3(bounds.center.x, bounds.max.y + .15f, bounds.center.z), label, false);
@@ -85,10 +85,12 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
 
     public bool TryInteract(PlayerInteractor interactor) => false;
 
+    public bool AcceptsTool(PlayerCombatTools.Tool tool) => material == Material.Wood ? tool == PlayerCombatTools.Tool.Axe : tool == PlayerCombatTools.Tool.Hammer;
+
     public bool TryHit(PlayerCombatTools.Tool tool)
     {
         if (!isActiveAndEnabled || !exposed || SaveSystem.Data == null || string.IsNullOrEmpty(barrierId)) return false;
-        if (tool != PlayerCombatTools.Tool.Sledgehammer && !(material == Material.Wood && tool == PlayerCombatTools.Tool.Hammer))
+        if (!AcceptsTool(tool))
             return false;
         GameplayAudio.Instance?.BarrierHit(material == Material.Metal);
         if (++hits < hitsRequired) return true;

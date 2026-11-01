@@ -46,7 +46,7 @@ public sealed class GrainPest : MonoBehaviour
     }
     private void EatFromTarget()
     {
-        if (Time.time < nextBite) return;
+        if (PlayerPerks.NoAttacksActive || Time.time < nextBite) return;
         Target.ConsumeByPest(biteAmount * (IsCrow ? BirdGroupBite : RatGroupBite));
         if (!IsCrow && animator != null) animator.SetTrigger("IdleBreak");
         nextBite = Time.time + BiteInterval;
@@ -103,6 +103,7 @@ public sealed class GrainPest : MonoBehaviour
     }
     private void Update()
     {
+        if(PlayerPerks.NoAttacksActive && !fleeing) ScaredAway();
         if (fleeing)
         {
             Vector3 flat = Vector3.ProjectOnPlane(fleeDirection, Vector3.up);
@@ -289,6 +290,11 @@ public sealed class GrainPestDirector : MonoBehaviour
     {
         if (LoadingScreen.IsLoading || (GameManager.Instance != null && GameManager.Instance.IsIntroPlaying)) return;
         if (!SaveSystem.savesLoaded || SaveSystem.Data == null) return;
+        if(PlayerPerks.NoAttacksActive)
+        {
+            if(encounterActive) { EndEncounter();AudioManager.Instance?.StopAttackMusic(); }
+            return;
+        }
         if (player == null) player = FindFirstObjectByType<PlayerInteractor>();
         if (playerCamera == null && player != null)
         {
@@ -507,7 +513,7 @@ public sealed class GrainPestDirector : MonoBehaviour
         if (introRunning || showBroomHint)
         {
             var hintStyle = new GUIStyle(GUI.skin.box) { fontSize = Mathf.Clamp(Screen.height / 35, 16, 28), wordWrap = true, alignment = TextAnchor.MiddleCenter };
-            GUI.Box(new Rect(Screen.width*.15f, Screen.height*.76f, Screen.width*.7f, 75), (crowLesson ? "Crows are stealing your grain! Press 2 for the broom, then left-click to scare them away." : "Rats are eating your grain! Press 2 to equip the broom, then left-click to scare them away."), hintStyle);
+            GUI.Box(new Rect(Screen.width*.15f, Screen.height*.76f, Screen.width*.7f, 75), (crowLesson ? "Crows are stealing your grain! Press 4 for the broom, then left-click to scare them away." : "Rats are eating your grain! Press 4 to equip the broom, then left-click to scare them away."), hintStyle);
         }
         if (playerCamera == null) return;
         if (markerTexture == null) return;

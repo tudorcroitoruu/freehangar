@@ -352,6 +352,11 @@ MonoBehaviour:
   broomHits:
   - {fileID: 8300000, guid: e082f30a51261ff48a3c6041752ee521, type: 3}
   - {fileID: 8300000, guid: 9f371db07fa927f478d40a5568bc6555, type: 3}
+  axeWoodHits:
+  - {fileID: 8300000, guid: 63723b0a5ce1c944a8080c8127b06455, type: 3}
+  - {fileID: 8300000, guid: 730a23b026b6c0840a50cf4176b8670c, type: 3}
+  - {fileID: 8300000, guid: 3bac4257bd943d34ab9d584deb66d0c7, type: 3}
+  - {fileID: 8300000, guid: 7850111e348c5b1449f7dc0b1d5995c7, type: 3}
   hammerMetal: {fileID: 8300000, guid: ac7a1ea54f2617c4fbd3f7982b9e3397, type: 3}
   hammerWood: {fileID: 8300000, guid: 35500a20ec9a8c5469b8289022a564cb, type: 3}
   pickUp: {fileID: 8300000, guid: 54e22b2c48faaaa4c84b7cf19b03fff5, type: 3}
