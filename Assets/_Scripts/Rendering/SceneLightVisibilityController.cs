@@ -93,9 +93,14 @@ public sealed class SceneLightVisibilityController : MonoBehaviour
 
     private bool ShouldManage(Light light)
     {
-        if (!light || light.gameObject.scene != gameObject.scene ||
-            light.type == LightType.Directional || light.lightmapBakeType != LightmapBakeType.Realtime)
+        if (!light || light.gameObject.scene != gameObject.scene || light.type == LightType.Directional)
             return false;
+#if UNITY_EDITOR
+        // The authored bake type is editor-only; retain it for unbaked editor scenes.
+        if (light.lightmapBakeType != LightmapBakeType.Realtime) return false;
+#else
+        if (light.bakingOutput.lightmapBakeType != LightmapBakeType.Realtime) return false;
+#endif
         for (int i = 0; i < excludedLights.Length; i++)
             if (excludedLights[i] == light) return false;
         return true;
