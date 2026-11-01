@@ -70,7 +70,11 @@ public sealed class InteractionPrompt : MonoBehaviour
             var row = actionRows[i];
             bool active = i < extraCount;
             row.panel.gameObject.SetActive(active);
-            if (!active) continue;
+            if (!active)
+            {
+                if (row.progress != null) row.progress.SetActive(false);
+                continue;
+            }
             var action = data.AdditionalActions[i];
             if (row.description != null) row.description.text = action.Action;
             if (row.key != null) { row.key.text = KeyLabel(action.Key); row.key.gameObject.SetActive(true); }
@@ -132,8 +136,15 @@ public sealed class InteractionPrompt : MonoBehaviour
 
     public void Hide()
     {
+        if (bagSliderFill != null) bagSliderFill.SetActive(false);
+        if (bagFill != null) bagFill.fillAmount = 0;
+        if (bagFillStatus != null) bagFillStatus.text = "";
         if (panel != null && panel.gameObject.activeSelf) panel.gameObject.SetActive(false);
-        foreach (var row in actionRows) if (row.panel != null) row.panel.gameObject.SetActive(false);
+        foreach (var row in actionRows)
+        {
+            if (row.progress != null) row.progress.SetActive(false);
+            if (row.panel != null) row.panel.gameObject.SetActive(false);
+        }
         CurrentText = "";
         if (description != null && description.text.Length > 0) description.text = "";
     }

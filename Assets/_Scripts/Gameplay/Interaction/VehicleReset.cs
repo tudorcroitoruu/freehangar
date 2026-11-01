@@ -15,6 +15,16 @@ public sealed class VehicleReset : MonoBehaviour
     public float HoldSeconds => Mathf.Max(.1f, holdSeconds);
     public float HeldSeconds => heldSeconds;
     public float Progress => Mathf.Clamp01(heldSeconds / HoldSeconds);
+    public bool CanReset
+    {
+        get
+        {
+            if (vehicle == null) vehicle = GetComponent<BicycleController>();
+            if (wheelbarrow == null) wheelbarrow = GetComponent<WheelbarrowCargo>();
+            return (vehicle != null && vehicle.isActiveAndEnabled && vehicle.IsRidden) ||
+                (wheelbarrow != null && wheelbarrow.isActiveAndEnabled && wheelbarrow.IsBeingPushed);
+        }
+    }
 
     private void Awake()
     {
@@ -41,7 +51,7 @@ public sealed class VehicleReset : MonoBehaviour
             CancelHold();
             return false;
         }
-        if (!isActiveAndEnabled || Time.timeScale <= 0f || deltaTime <= 0f || requireRelease)
+        if (!isActiveAndEnabled || !CanReset || Time.timeScale <= 0f || deltaTime <= 0f || requireRelease)
         {
             CancelHold();
             return false;
@@ -56,7 +66,7 @@ public sealed class VehicleReset : MonoBehaviour
 
     private void Update()
     {
-        if (Time.timeScale <= 0f || !Application.isFocused || Cursor.lockState != CursorLockMode.Locked ||
+        if (!CanReset || Time.timeScale <= 0f || !Application.isFocused || Cursor.lockState != CursorLockMode.Locked ||
             UpgradeManager.BlocksGameplayInput || UIPopups.BasePopupUI.HasActivePopup) CancelHold();
     }
 

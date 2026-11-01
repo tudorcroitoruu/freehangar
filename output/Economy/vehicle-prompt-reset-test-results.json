@@ -1,0 +1,48 @@
+{
+  "status": "completed",
+  "duration": 0.26,
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "VehiclePromptResetTests.LookingAtAnUnoperatedVehicleNeverOffersOrPerformsReset(False)",
+      "Status": "Passed",
+      "Duration": 0.0208922,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehiclePromptResetTests.LookingAtAnUnoperatedVehicleNeverOffersOrPerformsReset(True)",
+      "Status": "Passed",
+      "Duration": 0.0006203,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehiclePromptResetTests.PushedWheelbarrowKeepsResetButNeverUsesBagFillProgress",
+      "Status": "Passed",
+      "Duration": 0.0012373,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehiclePromptResetTests.ResetHoldRequiresDrivingAndIsCancelledWhenLeavingTheVehicle",
+      "Status": "Passed",
+      "Duration": 0.008022,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehiclePromptResetTests.VehiclePromptAndItsExtraActionsClearPreviouslyVisibleBagFill",
+      "Status": "Passed",
+      "Duration": 0.0107944,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

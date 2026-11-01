@@ -60,7 +60,6 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (hasAimedPrompt)
         {
             AddActions(aimedTarget, ref aimedPrompt);
-            if (PushedWheelbarrow == null) AddResetAction(ref aimedPrompt);
         }
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
         if (hasAimedPrompt && aimedPrompt.RequiresFreeHands)
@@ -183,26 +182,24 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void UpdateResetTarget(IInteractable aimedTarget)
     {
         VehicleReset next = null;
-        if (PushedWheelbarrow != null) next = PushedWheelbarrow.GetComponent<VehicleReset>();
-        else if ((Items == null || !Items.IsCarrying) && (Bags == null || !Bags.IsCarrying) && aimedTarget is Component component)
-            next = component.GetComponent<VehicleReset>();
+        // Looking at an object never grants reset control. Driving handles R in PlayerBicycleInteraction.
+        if (PushedWheelbarrow != null && PushedWheelbarrow.IsBeingPushed) next = PushedWheelbarrow.GetComponent<VehicleReset>();
         SetResetTarget(next);
         if (resetTarget != null) resetTarget.TickHold(Input.GetKey(KeyCode.R), Time.deltaTime);
     }
 
     private void AddResetAction(ref InteractionPromptData data)
     {
-        if (resetTarget == null) return;
+        if (resetTarget == null || !resetTarget.CanReset) return;
         var existing = data.AdditionalActions;
         int count = existing != null ? existing.Length : 0;
         var actions = new InteractionPromptAction[count + 1];
         if (count > 0) System.Array.Copy(existing, actions, count);
-        actions[count] = new InteractionPromptAction("Hold to reset position", KeyCode.R)
-        {
-            ShowProgress = true,
-            Progress = resetTarget.Progress,
-            ProgressText = $"{resetTarget.HeldSeconds:0.0} / {resetTarget.HoldSeconds:0.0} s"
-        };
+        string action = resetTarget.Progress > 0
+            ? $"Resetting {resetTarget.HeldSeconds:0.0} / {resetTarget.HoldSeconds:0.0} s"
+            : "Hold to reset position";
+        // Reset feedback is text; bagSliderFill is reserved for grain-container filling.
+        actions[count] = new InteractionPromptAction(action, KeyCode.R);
         data.AdditionalActions = actions;
     }
 

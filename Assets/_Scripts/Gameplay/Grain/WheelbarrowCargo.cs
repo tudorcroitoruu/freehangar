@@ -19,6 +19,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     private float handleDistance;
     private Transform[] wheels;
     private PlayerInteractor pusher;
+    public bool IsBeingPushed => pusher != null;
     private float occupiedVolume;
     private float nextImpactSound;
     private PlayerController pushingPlayer;

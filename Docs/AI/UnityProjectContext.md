@@ -1,5 +1,13 @@
 # Unity project context
 
+2026-11-01 vehicle reset/prompt correction: looking at a parked vehicle no longer
+selects VehicleReset or adds an R action. Driving retains R through
+PlayerBicycleInteraction; pushed wheelbarrows retain R through PlayerInteractor.
+VehicleReset.CanReset also prevents reset holds without a ridden vehicle or
+actively pushed wheelbarrow and cancels progress when control ends. Wheelbarrow
+reset feedback is text, never the bag fill slider. InteractionPrompt.Hide clears
+bag progress and disables cloned progress rows to prevent stale UI on vehicles.
+
 2026-11-01 container prompt positioning: GrainContainer now exposes serialized
 promptAnchor/promptOffset and a shared PromptPosition used by BagInteraction.
 Default placement is still container bounds top + 0.12 m; carried prompts use
