@@ -127,7 +127,7 @@ public sealed class GameAchievements : MonoBehaviour
     public static void GrainSold(int paidCash)
     {
         var self=Instance;if(self==null || !self.Ready() || paidCash<=0)return;
-        var state=AchievementRules.State(self.profile);if(state.grainSaleCash>=50000)return;state.grainSaleCash=System.Math.Min(50000,state.grainSaleCash+(long)paidCash);
+        var state=AchievementRules.State(self.profile);if(state.grainSaleCash>=100000)return;state.grainSaleCash=System.Math.Min(100000,state.grainSaleCash+(long)paidCash);
         self.MarkDirty();self.Evaluate();self.Flush();
     }
     public static void ForkliftDelivered(GrainContainer bag)
@@ -139,6 +139,12 @@ public sealed class GameAchievements : MonoBehaviour
             if(AchievementRules.AddUnique(AchievementRules.State(self.profile).forkliftDeliveries,bag.AchievementIdentity,13)){self.MarkDirty();self.Evaluate();}
             break;
         }
+    }
+    public static void ElectricalRoomPowered()
+    {
+        var self=Instance;if(self==null || !self.Ready())return;
+        var state=AchievementRules.State(self.profile);if(state.electricalRoomPowered)return;
+        state.electricalRoomPowered=true;self.MarkDirty();self.Evaluate();self.Flush();
     }
     public static void ImportSteamUnlock(int index)
     {

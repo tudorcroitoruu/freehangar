@@ -4,7 +4,7 @@ using UnityEngine;
 public class GameAchievementTests
 {
     [TestCase(0)][TestCase(1)][TestCase(2)][TestCase(3)][TestCase(4)]
-    [TestCase(5)][TestCase(6)][TestCase(7)][TestCase(8)][TestCase(9)]
+    [TestCase(5)][TestCase(6)][TestCase(7)][TestCase(8)][TestCase(9)][TestCase(10)]
     public void EachRuleUnlocksOnlyAtItsThresholdAndOnlyOnce(int index)
     {
         var data=new PlayerData();var state=AchievementRules.State(data);
@@ -21,7 +21,7 @@ public class GameAchievementTests
             case 6:state.crowsScared=24;break;
             case 7:state.ratsScared=49;break;
             case 8:for(int i=0;i<12;i++)AchievementRules.AddUnique(state.forkliftDeliveries,"delivery"+i,25);break;
-            case 9:state.grainSaleCash=49999;break;
+            case 9:state.grainSaleCash=99999;break;
         }
         Assert.IsFalse(AchievementRules.TryUnlock(data,index));
         switch(index)
@@ -30,7 +30,8 @@ public class GameAchievementTests
             case 2:state.clearedHangars.Add(2);break;case 3:state.clearedHangars.Add(3);break;
             case 4:data.foundSecrets=new[]{"vehicle.key","v2","v3"};break;case 5:data.foundSecrets=new[]{"chest","c2","c3"};break;
             case 6:state.crowsScared=25;break;case 7:state.ratsScared=50;break;
-            case 8:AchievementRules.AddUnique(state.forkliftDeliveries,"last",25);break;case 9:state.grainSaleCash=50000;break;
+            case 8:AchievementRules.AddUnique(state.forkliftDeliveries,"last",25);break;case 9:state.grainSaleCash=100000;break;
+            case 10:state.electricalRoomPowered=true;break;
         }
         Assert.IsTrue(AchievementRules.TryUnlock(data,index));Assert.IsFalse(AchievementRules.TryUnlock(data,index));
         var restored=JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(data));
@@ -58,8 +59,8 @@ public class GameAchievementTests
         try
         {
             Assert.IsFalse(settings.HasRealAppId);settings.appId=480;Assert.IsFalse(settings.HasRealAppId);
-            for(int i=0;i<10;i++){Assert.AreEqual(i,AchievementRules.Definitions[i].index);Assert.AreEqual("ACH_"+i,settings.ApiName(i));}
-            Assert.IsNull(settings.ApiName(-1));Assert.IsNull(settings.ApiName(10));
+            for(int i=0;i<11;i++){Assert.AreEqual(i,AchievementRules.Definitions[i].index);Assert.AreEqual("ACH_"+i,settings.ApiName(i));}
+            Assert.IsNull(settings.ApiName(-1));Assert.IsNull(settings.ApiName(11));
         }
         finally{Object.DestroyImmediate(settings);}
     }

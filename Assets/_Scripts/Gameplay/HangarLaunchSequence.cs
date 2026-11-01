@@ -83,6 +83,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         GameplayAudio.Instance?.SwitchElectrical();
         roomLight.enabled=true;if(lampGlow!=null)lampGlow.enabled=true;
         yield return Animate(.7f,t=>roomLight.intensity=Mathf.Lerp(0,180,t));
+        GameAchievements.ElectricalRoomPowered();
         yield return TurnToward(revealView,.8f);
         yield return new WaitForSecondsRealtime(.15f);
         GameplayAudio.Instance?.OpenRocketDoor();

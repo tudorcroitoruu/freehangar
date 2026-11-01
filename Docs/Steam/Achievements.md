@@ -1,6 +1,6 @@
 # Achievements and Steam setup
 
-All ten achievements are tracked locally in `PlayerData.achievementProgress`, independent of the current tutorial goal. Successful unlocks print a green `[Achievement DONE] [index] Name (ACH_index)` Console message once. Open **Tools > Freehangar > Achievements** for live counters and green DONE rows. **Tools > Freehangar > Validate achievements** runs the EditMode rule tests.
+All eleven achievements are tracked locally in `PlayerData.achievementProgress`, independent of the current tutorial goal. Successful unlocks print a green `[Achievement DONE] [index] Name (ACH_index)` Console message once. Open **Tools > Freehangar > Achievements** for live counters and green DONE rows. **Tools > Freehangar > Validate achievements** runs the EditMode rule tests.
 
 Stable indexes / Steam API names:
 
@@ -15,13 +15,14 @@ Stable indexes / Steam API names:
 | 6 | ACH_6 | Crow Control | Scare away 25 crows with successful broom hits. |
 | 7 | ACH_7 | Rat Patrol | Scare away 50 rats with successful broom hits. |
 | 8 | ACH_8 | Heavy Lifter | Deliver 13 distinct full big bags by forklift into a selling/weigh zone. |
-| 9 | ACH_9 | Grain Tycoon | Receive $50,000 total from successful grain sales. |
+| 9 | ACH_9 | Grain Tycoon | Receive $100,000 total from successful grain sales. |
+| 10 | ACH_10 | Electric | Find the electrical room switch and turn on its lights. |
 
 ## Enable Steam later
 
 Steamworks.NET 2025.165.0 / SDK 1.65 is already installed. No second SDK or SteamManager is added. Steam syncing reuses the existing SteamManager callback loop.
 
-1. In Steamworks App Admin, define and publish achievement API names **ACH_0** through **ACH_9** for the real game App ID. Configure their displayed names, descriptions and icons there. `achievement-definitions.csv` is a configuration reference; follow Steamworks' current import/export format if importing it.
+1. In Steamworks App Admin, define and publish achievement API names **ACH_0** through **ACH_10** for the real game App ID. Configure their displayed names, descriptions and icons there. `achievement-definitions.csv` is a configuration reference; follow Steamworks' current import/export format if importing it.
 2. Select `Assets/Resources/SteamAchievementSettings.asset` and set **App Id** to the real game App ID. Zero and test App ID 480 never submit these achievements. The API-name array may be adjusted if existing backend names differ; preserve index meaning.
 3. For local development, replace the `480` in root `steam_appid.txt` with the real App ID and run Steam under an account licensed for that game. Remove the development `steam_appid.txt` from released Steam depots. The existing SteamManager also reads the configured App ID for RestartAppIfNecessary.
 4. Editor Steam syncing is off by default. Enable **Sync In Editor** only when intentional live account unlocks are desired. Local debug counters and green completion messages work with this disabled.

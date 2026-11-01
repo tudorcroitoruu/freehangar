@@ -5,7 +5,7 @@ using UnityEngine;
 public enum GameAchievementId
 {
     GrainMountain=0, PackingProfessional=1, CleanSweep=2, MasterCleaner=3, KeyCollector=4,
-    BuriedTreasure=5, CrowControl=6, RatPatrol=7, HeavyLifter=8, GrainTycoon=9
+    BuriedTreasure=5, CrowControl=6, RatPatrol=7, HeavyLifter=8, GrainTycoon=9, Electric=10
 }
 public readonly struct GameAchievementDefinition
 {
@@ -20,6 +20,7 @@ public sealed class AchievementProgress
     public double collectedKilograms;
     public long grainSaleCash;
     public int crowsScared,ratsScared;
+    public bool electricalRoomPowered;
     public List<string> closedBags=new List<string>();
     public List<string> forkliftDeliveries=new List<string>();
     public List<int> clearedHangars=new List<int>();
@@ -46,7 +47,8 @@ public static class AchievementRules
         new GameAchievementDefinition(6,"Crow Control","Scare away 25 crows with the broom."),
         new GameAchievementDefinition(7,"Rat Patrol","Scare away 50 rats with the broom."),
         new GameAchievementDefinition(8,"Heavy Lifter","Deliver 13 different full big bags to a weigh station using a forklift."),
-        new GameAchievementDefinition(9,"Grain Tycoon","Earn $50,000 total from grain sales.")
+        new GameAchievementDefinition(9,"Grain Tycoon","Earn $100,000 total from grain sales."),
+        new GameAchievementDefinition(10,"Electric","Find the electrical room switch and turn on the lights.")
     };
     public static AchievementProgress State(PlayerData data)
     {
@@ -59,7 +61,7 @@ public static class AchievementRules
         {
             case 0:return 5000;case 1:return 50;case 2:return 2;case 3:return (state.requiredHangars.Count+1)/2;
             case 4:return (state.requiredVehicleKeys.Count+1)/2;case 5:return (state.requiredChests.Count+1)/2;
-            case 6:return 25;case 7:return 50;case 8:return 13;case 9:return 50000;default:return 0;
+            case 6:return 25;case 7:return 50;case 8:return 13;case 9:return 100000;case 10:return 1;default:return 0;
         }
     }
     public static double Current(PlayerData data,int index)
@@ -70,7 +72,7 @@ public static class AchievementRules
             case 0:return state.collectedKilograms;case 1:return state.closedBags.Count;case 2:return state.clearedHangars.Count;
             case 3:int cleared=0;foreach(int id in state.requiredHangars)if(state.clearedHangars.Contains(id))cleared++;return cleared;
             case 4:return Matches(state.requiredVehicleKeys,data.foundSecrets);case 5:return Matches(state.requiredChests,data.foundSecrets);
-            case 6:return state.crowsScared;case 7:return state.ratsScared;case 8:return state.forkliftDeliveries.Count;case 9:return state.grainSaleCash;default:return 0;
+            case 6:return state.crowsScared;case 7:return state.ratsScared;case 8:return state.forkliftDeliveries.Count;case 9:return state.grainSaleCash;case 10:return state.electricalRoomPowered?1:0;default:return 0;
         }
     }
     private static int Matches(List<string> required,string[] found)
