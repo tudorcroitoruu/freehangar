@@ -85,7 +85,18 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         }
         if (Application.isPlaying && samples != null && previousHeights != null &&
             sampledScale == pile.WorldScale && lastTransform == transform.localToWorldMatrix)
-        { UpdateChangedCells(); return; }
+        {
+            // Settling after a deposit can expand the footprint. The incremental cache
+            // only contains samples that were visible when it was built, so moving those
+            // samples alone leaves holes wherever grain flows onto previously bare ground.
+            bool expanded = false;
+            var heights = pile.HeightField.Heights;
+            for (int i = 0; i < heights.Length; i++)
+                if (previousHeights[i] < .001f && heights[i] >= .001f)
+                { expanded = true; break; }
+            if (!expanded) { UpdateChangedCells(); return; }
+            samples = null;
+        }
         float actualSpacing = Mathf.Max(.025f, spacing);
         Vector3 worldScale = pile.WorldScale;
         if (worldScale.x <= 0 || worldScale.y <= 0 || worldScale.z <= 0 || Vector3.Dot(pile.transform.up, Vector3.up) < .9999f)

@@ -6,6 +6,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+    [Header("Gameplay")]
     [Tooltip("Bypass the introductory cutscene and start normal gameplay immediately.")]
     public bool skipTutorial = false;
     [Tooltip("Skip the arrival intro cutscene and start gameplay immediately.")]

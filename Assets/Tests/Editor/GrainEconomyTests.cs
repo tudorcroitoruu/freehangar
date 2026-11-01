@@ -31,6 +31,21 @@ public class GrainEconomyTests
     private void Set(string name, object value) => typeof(GrainPile)
         .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(pile, value);
 
+    [TestCase(200f)]
+    [TestCase(900f)]
+    [TestCase(3000f)]
+    public void ScoopDoesNotRemoveGrainOutsideToolRadius(float multiplier)
+    {
+        economy.grainConsumeMultiplier = multiplier;
+        Vector3 remote = new Vector3(1.5f, 0, 0);
+        float before = pile.SurfaceHeight(remote);
+        Vector3 contact = new Vector3(0, pile.SurfaceHeight(Vector3.zero), 0);
+        float collected = pile.Scoop(contact, .4f, .18f, 2.5f, new GrainCargo());
+        Assert.Greater(collected, 0);
+        Assert.Less(pile.SurfaceHeight(Vector3.zero), contact.y);
+        Assert.AreEqual(before, pile.SurfaceHeight(remote));
+    }
+
     [TestCase(1f, false)]
     [TestCase(10f, false)]
     [TestCase(200f, false)]
@@ -80,16 +95,22 @@ public class GrainEconomyTests
         var dropped = GrainPile.CreateDroppedPile(new Vector3(100, 0, 100), pile, 10);
         try
         {
-            Assert.That(dropped.GrainConsumeMultiplier, Is.EqualTo(1));
+            Assert.That(dropped.GrainConsumeMultiplier, Is.EqualTo(pile.GrainConsumeMultiplier));
             var cargo = new GrainCargo();
-            cargo.Add(GrainType.Rice, 10);
+            double before = pile.Kilograms / 720.0;
+            pile.Scoop(new Vector3(0, pile.SurfaceHeight(Vector3.zero), 0), 100, 10, 10, cargo);
+            double removedVolume = before - pile.Kilograms / 720.0;
+            var expected = new float[GrainCargo.TypeCount];
+            for (int i = 0; i < expected.Length; i++) expected[i] = cargo[(GrainType)i];
             Assert.IsTrue(dropped.Deposit(dropped.transform.position, cargo));
-            Assert.That(dropped.Kilograms, Is.EqualTo(10).Within(.002));
+            Assert.That(dropped.Kilograms / 720.0, Is.EqualTo(removedVolume).Within(.002));
+            Assert.That(dropped.CollectibleKilograms, Is.EqualTo(10).Within(.002));
             Vector3 point = dropped.transform.position;
             point.y = dropped.SurfaceHeight(point);
             float collected = dropped.Scoop(point, 100, 10, 10, cargo);
             Assert.That(collected, Is.EqualTo(10).Within(.002));
-            Assert.That(cargo[GrainType.Rice], Is.EqualTo(10).Within(.002));
+            for (int i = 0; i < expected.Length; i++)
+                Assert.That(cargo[(GrainType)i], Is.EqualTo(expected[i]).Within(.002));
         }
         finally { Object.DestroyImmediate(dropped.gameObject); }
     }
@@ -145,9 +166,9 @@ public class GrainEconomyTests
                     Is.EqualTo(previousLoads[type] + dot).Within(.001));
         Assert.That(settings.Capacity(16), Is.EqualTo(150));
         Assert.That(settings.Capacity(24), Is.EqualTo(600));
-        Assert.That(GrainEconomySettings.Default.ConsumeMultiplier, Is.EqualTo(3000));
+        Assert.That(GrainEconomySettings.Default.ConsumeMultiplier, Is.EqualTo(900));
         Assert.That(settings.Capacity(0) * GrainEconomySettings.Default.ConsumeMultiplier,
-            Is.EqualTo(7.5f * 200f * 5f));
+            Is.EqualTo(7.5f * 200f * 1.5f));
     }
 
     [Test]

@@ -63,7 +63,7 @@ public sealed class ShovelTool : MonoBehaviour
             return Mathf.Clamp(Mathf.Pow(CapacityKg / Mathf.Max(.01f, startingCapacity), 1f / 3f), 1f, 2.4f);
         }
     }
-    // Cube-root scaling expands the excavation volume 3x alongside the larger load.
+    // World-space contact dimensions; the pile must not multiply this radius again.
     private float EffectiveScoopRadius => scoopRadius * ScoopScale * 3f;
     private float EffectiveScoopDepth => scoopDepth * Mathf.Sqrt(ScoopScale) * 3f;
     public bool IsVacuum => ActiveVacuum != null;
@@ -164,7 +164,7 @@ public sealed class ShovelTool : MonoBehaviour
                 float nearest = .45f;
                 foreach (var candidate in FindObjectsByType<GrainPile>(FindObjectsSortMode.None))
                 {
-                    if (candidate.Size * Mathf.Max(candidate.WorldScale.x, candidate.WorldScale.z) > 2f ||
+                    if ((!candidate.IsDroppedPile && candidate.Size * Mathf.Max(candidate.WorldScale.x, candidate.WorldScale.z) > 2f) ||
                         !candidate.TryNearestSurface(hit.point, nearest, out var point) ||
                         !CanReachPoint(camera, player, point, reach, candidate.GetComponent<Collider>())) continue;
                     nearest = Vector3.Distance(hit.point, point); pile = candidate; scoopPoint = point;
@@ -175,7 +175,7 @@ public sealed class ShovelTool : MonoBehaviour
             {
                 pendingPile = pile;
                 targetPoint = scoopPoint;
-                smallPileScoop = pile.Size * Mathf.Max(pile.WorldScale.x, pile.WorldScale.z) <= 2f;
+                smallPileScoop = pile.IsDroppedPile || pile.Size * Mathf.Max(pile.WorldScale.x, pile.WorldScale.z) <= 2f;
                 targetPoint.y = pile.SurfaceHeight(targetPoint);
                 scoopDirection = Vector3.ProjectOnPlane(camera.transform.forward, Vector3.up).normalized;
                 if (scoopDirection.sqrMagnitude < .001f) scoopDirection = player.forward;
@@ -374,15 +374,23 @@ public sealed class ShovelTool : MonoBehaviour
         float amount = (fraction - transferredFraction) * availableAtStart;
         if (pendingPile == null) transferredFraction = fraction;
         RaycastHit hit = default;
-        bool scrapeTarget = smallPileScoop && pendingPile != null && pendingPile.isActiveAndEnabled &&
+        // Once contact has collected grain, the excavation itself lowers the surface
+        // below the animated blade. Finish this stroke at the same reachable point.
+        bool scrapeTarget = (smallPileScoop || scoopReported) && pendingPile != null && pendingPile.isActiveAndEnabled &&
             CanReachPoint(actionCamera, actor, targetPoint, reach, pendingPile.GetComponent<Collider>());
         if (amount > 0 && actionCamera != null && actor != null && (scrapeTarget || FindHit(actionCamera, actor, out hit)))
         {
-            if (pendingPile != null && phase <= .58f && (scrapeTarget || (hit.collider.GetComponentInParent<GrainPile>() == pendingPile && HasScoopContact())))
+            if (pendingPile != null && phase <= .67f && (scrapeTarget || (hit.collider.GetComponentInParent<GrainPile>() == pendingPile && HasScoopContact())))
             {
                 Vector3 point = targetPoint; point.y = pendingPile.SurfaceHeight(point);
                 scoopCargo.Clear();
-                float collected = pendingPile.Scoop(point, smallPileScoop ? Mathf.Max(.65f, EffectiveScoopRadius) : EffectiveScoopRadius, smallPileScoop ? Mathf.Max(.3f, EffectiveScoopDepth) : EffectiveScoopDepth, Mathf.Min(amount, CapacityKg - Kilograms), scoopCargo);
+                // A spilled heap can be wider than the old 2m "small pile" cutoff.
+                // Scrape its remaining footprint without waiting for grain to settle
+                // back into the empty contact cell. Authored hangar piles stay local.
+                float radius = pendingPile.IsDroppedPile
+                    ? Mathf.Max(EffectiveScoopRadius, pendingPile.Size * Mathf.Max(pendingPile.WorldScale.x, pendingPile.WorldScale.z) * 1.5f)
+                    : smallPileScoop ? Mathf.Max(.65f, EffectiveScoopRadius) : EffectiveScoopRadius;
+                float collected = pendingPile.Scoop(point, radius, smallPileScoop ? Mathf.Max(.3f, EffectiveScoopDepth) : EffectiveScoopDepth, Mathf.Min(amount, CapacityKg - Kilograms), scoopCargo);
                 GoalContext.Resolve(pendingPile, out int hangar, out _);
                 for (int type = 0; type < GrainCargo.TypeCount; type++)
                 {
@@ -390,7 +398,9 @@ public sealed class ShovelTool : MonoBehaviour
                     cargo.Add((GrainType)type, kg);
                     if (kg > 0) GoalChecker.ReportProgress(GoalType.GrainCollected, kg, hangar, (GrainType)type);
                 }
-                transferredFraction = fraction;
+                // A partial removal is not a completed transfer. Retry the remainder
+                // within this stroke instead of losing it to animation progress.
+                transferredFraction += collected / Mathf.Max(.0001f, availableAtStart);
                 if (collected > 0 && !scoopReported)
                 {
                     scoopReported = true;

@@ -344,6 +344,7 @@ public static class SaveSystem
 [Serializable]
 public class PlayerData
 {
+    public bool introductionCompleted;
     [Header("Hangar progression")]
     public List<int> openedHangars = new List<int> { 1 };
     public bool firstHangarHalfCleared;

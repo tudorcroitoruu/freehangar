@@ -28,7 +28,12 @@ public sealed class GameIntroduction : MonoBehaviour
     [Tooltip("Actual seconds for stepping off the bike; independent of cutscene playback speed.")]
     [SerializeField, Min(.1f)] private float dismountSeconds = 1.8f;
     public bool IsPlaying { get; private set; }
-    public bool Completed { get; private set; }
+    private bool completed;
+    public bool Completed
+    {
+        get => completed || (SaveSystem.Data != null && SaveSystem.Data.introductionCompleted);
+        private set => completed = value;
+    }
     public string CurrentShot { get; private set; } = "Gameplay";
     private Camera view;
     private Transform cameraParent;
@@ -273,7 +278,12 @@ public sealed class GameIntroduction : MonoBehaviour
     }
     public void Cancel()
     {
-        if (!IsPlaying) { RemoveOpeningFade(); return; }
+        if (!IsPlaying)
+        {
+            RemoveOpeningFade();
+            if (Completed && worldShovel != null) worldShovel.SetActive(false);
+            return;
+        }
         StopAllCoroutines(); Restore(false);
     }
     private void RemoveOpeningFade()
@@ -285,7 +295,16 @@ public sealed class GameIntroduction : MonoBehaviour
         }
         openingFade = null; openingFadeImage = null;
     }
-    private void Finish() { Completed = true; Restore(true); }
+    private void Finish()
+    {
+        Completed = true;
+        Restore(true);
+        if (SaveSystem.savesLoaded && SaveSystem.Data != null)
+        {
+            SaveSystem.Data.introductionCompleted = true;
+            SaveSystem.SaveData();
+        }
+    }
     private void Restore(bool finished)
     {
         if (!IsPlaying) return;

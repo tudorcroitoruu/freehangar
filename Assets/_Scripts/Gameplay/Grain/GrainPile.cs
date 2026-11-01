@@ -120,9 +120,10 @@ public sealed class GrainPile : MonoBehaviour
         new Mound(new Vector2(.18f, -.36f), new Vector2(.6f, .53f), .62f)
     };
     [SerializeField, Min(1f)] private float kilogramsPerCubicMetre = 720f;
-    [SerializeField, Tooltip("Shared economy for authored hangar stock. Leave empty for dropped grain (1:1 recovery).")]
+    [SerializeField, Tooltip("Shared conversion between visible pile volume and collectible cargo. Dropped piles inherit it so pouring preserves volume and cargo.")]
     private GrainEconomySettings economySettings;
     public float GrainConsumeMultiplier => economySettings != null ? economySettings.ConsumeMultiplier : 1f;
+    public bool IsDroppedPile { get; private set; }
     public double CollectibleKilograms => Kilograms / GrainConsumeMultiplier;
     [SerializeField, Range(5f, 60f)] private float reposeAngle = 32f;
     [SerializeField, Min(0f)] private float settlingMargin = .45f;
@@ -291,11 +292,12 @@ public sealed class GrainPile : MonoBehaviour
         if (Mathf.Abs(p.y - field.Sample(p.x, p.z)) * scale.y > depth + .15f) return 0;
         float multiplier = GrainConsumeMultiplier;
         float density = kilogramsPerCubicMetre * VolumeScale / multiplier;
-        // Excavate more of the authored pile without slowing the tool's cargo throughput.
+        // Keep the tool's contact footprint local. Scaling the radius by the economy
+        // multiplier made a single shovel reach across an entire hangar pile.
         float excavationScale = Mathf.Pow(multiplier, 1f / 3f);
         if (spatial != null) spatial.BeginCollection(destination, density);
         float removed;
-        try { removed = field.Scoop(p.x, p.z, radius * excavationScale, depth * excavationScale / scale.y, capacityKg / density, settlingMargin, scale); }
+        try { removed = field.Scoop(p.x, p.z, radius, depth * excavationScale / scale.y, capacityKg / density, settlingMargin, scale); }
         finally { if (spatial != null) spatial.EndCollection(); }
         if (removed > 0)
         {
@@ -379,8 +381,15 @@ public sealed class GrainPile : MonoBehaviour
         go.SetActive(false);
         go.transform.position = position;
         var pile = go.AddComponent<GrainPile>();
+        pile.IsDroppedPile = true;
+        if (appearanceSource != null)
+        {
+            pile.economySettings = appearanceSource.economySettings;
+            pile.kilogramsPerCubicMetre = appearanceSource.kilogramsPerCubicMetre;
+        }
+        float visualScale = Mathf.Pow(pile.GrainConsumeMultiplier, 1f / 3f);
         // Small spilled heaps need a fraction of the grid used by an entire hangar.
-        pile.initialHeight = 0; pile.size = Mathf.Max(1.5f, DropRadius(expectedKg) * 2f + .5f); pile.resolution = 33;
+        pile.initialHeight = 0; pile.size = Mathf.Max(1.5f, DropRadius(expectedKg) * visualScale * 2f + .5f); pile.resolution = 33;
         pile.fitToWalls = true; pile.useSpatialLayout = true;
         if (appearanceSource != null)
         {
