@@ -21,7 +21,7 @@ public sealed class VehicleReset : MonoBehaviour
         {
             if (vehicle == null) vehicle = GetComponent<BicycleController>();
             if (wheelbarrow == null) wheelbarrow = GetComponent<WheelbarrowCargo>();
-            return (vehicle != null && vehicle.isActiveAndEnabled && vehicle.IsRidden) ||
+            return (vehicle != null && vehicle.isActiveAndEnabled) ||
                 (wheelbarrow != null && wheelbarrow.isActiveAndEnabled && wheelbarrow.IsBeingPushed);
         }
     }

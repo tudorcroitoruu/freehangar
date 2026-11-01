@@ -20,38 +20,43 @@ public class VehiclePromptResetTests
     [TearDown]
     public void TearDown(){Object.DestroyImmediate(root);Time.timeScale=previousTimeScale;}
 
-    [TestCase(false)]
-    [TestCase(true)]
-    public void LookingAtAnUnoperatedVehicleNeverOffersOrPerformsReset(bool wheelbarrow)
-    {
-        Component target=wheelbarrow?(Component)Child("Idle barrow").AddComponent<WheelbarrowCargo>():CreateBike();
-        var reset=target.gameObject.AddComponent<VehicleReset>();reset.SetHomePose();
-        target.transform.position+=Vector3.right*5;
-        Vector3 position=target.transform.position;
-        CallResetTarget((IInteractable)target);
-        Assert.IsNull(typeof(PlayerInteractor).GetField("resetTarget",Private).GetValue(interactor));
-        var data=ResetPrompt();
-        Assert.IsNull(data.AdditionalActions);
-        Assert.IsFalse(data.ShowProgress);
-        Assert.IsFalse(reset.CanReset);
-        Assert.IsFalse(reset.TickHold(true,reset.HoldSeconds+1));
-        Assert.That(target.transform.position,Is.EqualTo(position));
-        Assert.That(reset.Progress,Is.Zero);
-    }
-
     [Test]
-    public void ResetHoldRequiresDrivingAndIsCancelledWhenLeavingTheVehicle()
+    public void AimedParkedVehicleOffersResetAndLosingTargetCancelsHold()
     {
         var bike=CreateBike();
         var reset=bike.gameObject.AddComponent<VehicleReset>();reset.SetHomePose();
         Vector3 home=bike.transform.position;
         bike.transform.position+=Vector3.right*5;
-        bike.SetRidden(true);
-        Assert.IsTrue(reset.CanReset);
+        CallResetTarget(bike);
+        var data=ResetPrompt();
+        Assert.AreEqual(1,data.AdditionalActions.Length);
+        Assert.That(data.AdditionalActions[0].Key,Is.EqualTo(KeyCode.R));
         Assert.IsFalse(reset.TickHold(true,reset.HoldSeconds*.5f));
         Assert.Greater(reset.Progress,0);
-        bike.SetRidden(false);
-        Assert.IsFalse(reset.TickHold(true,.1f));Assert.That(reset.Progress,Is.Zero);
+        CallResetTarget(null);
+        Assert.That(reset.Progress,Is.Zero);
+        CallResetTarget(bike);
+        Assert.IsTrue(reset.TickHold(true,reset.HoldSeconds));
+        Assert.That(Vector3.Distance(bike.transform.position,home),Is.LessThan(.001f));
+    }
+
+    [Test]
+    public void IdleWheelbarrowDoesNotOfferOrPerformReset()
+    {
+        var barrow=Child("Idle barrow").AddComponent<WheelbarrowCargo>();
+        var reset=barrow.gameObject.AddComponent<VehicleReset>();reset.SetHomePose();
+        CallResetTarget(barrow);
+        Assert.IsNull(ResetPrompt().AdditionalActions);
+        Assert.IsFalse(reset.TickHold(true,reset.HoldSeconds+1));
+    }
+
+    [Test]
+    public void RiddenVehicleCanStillReset()
+    {
+        var bike=CreateBike();
+        var reset=bike.gameObject.AddComponent<VehicleReset>();reset.SetHomePose();
+        Vector3 home=bike.transform.position;
+        bike.transform.position+=Vector3.right*5;
         bike.SetRidden(true);
         Assert.IsTrue(reset.TickHold(true,reset.HoldSeconds));
         Assert.That(Vector3.Distance(bike.transform.position,home),Is.LessThan(.001f));

@@ -54,12 +54,13 @@ public sealed class PlayerInteractor : MonoBehaviour
         Target = null;
         if (!CanInteract) { SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
         var aimedTarget = FindTarget();
-        UpdateResetTarget(aimedTarget);
         InteractionPromptData aimedPrompt = default;
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
+        UpdateResetTarget(hasAimedPrompt && aimedPrompt.ShowKey && !aimedPrompt.RequiresFreeHands ? aimedTarget : null);
         if (hasAimedPrompt)
         {
             AddActions(aimedTarget, ref aimedPrompt);
+            if (aimedTarget is BicycleController) AddResetAction(ref aimedPrompt);
         }
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
         if (hasAimedPrompt && aimedPrompt.RequiresFreeHands)
@@ -182,8 +183,9 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void UpdateResetTarget(IInteractable aimedTarget)
     {
         VehicleReset next = null;
-        // Looking at an object never grants reset control. Driving handles R in PlayerBicycleInteraction.
         if (PushedWheelbarrow != null && PushedWheelbarrow.IsBeingPushed) next = PushedWheelbarrow.GetComponent<VehicleReset>();
+        else if (!HandsOccupied && aimedTarget is BicycleController vehicle && !vehicle.IsRidden)
+            next = vehicle.GetComponent<VehicleReset>();
         SetResetTarget(next);
         if (resetTarget != null) resetTarget.TickHold(Input.GetKey(KeyCode.R), Time.deltaTime);
     }

@@ -34,11 +34,12 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private float[] previousHeights;
     private bool[] dirtyCells;
     private int[] sampleCells, sampleBatches, sampleSlots;
+    private int[] cellSampleHeads, nextCellSample;
     private Bounds[] batchBounds, surfaceBounds;
     private bool[] dirtyBatches, liveBatches;
     private int[] drawOrder;
     private readonly Plane[] cameraPlanes = new Plane[6];
-    private Mesh mediumMesh, distantMesh;
+    private Mesh nearMesh, mediumMesh, distantMesh;
     private readonly GrainAppearance grainAppearance = new GrainAppearance();
     public int LastUpdatedKernels { get; private set; }
     public int LastDrawTriangles { get; private set; }
@@ -153,6 +154,9 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         previousHeights = (float[])field.Heights.Clone();
         dirtyCells = new bool[previousHeights.Length];
         sampleCells = new int[samples.Length]; sampleBatches = new int[samples.Length]; sampleSlots = new int[samples.Length];
+        cellSampleHeads = new int[previousHeights.Length];
+        nextCellSample = new int[samples.Length];
+        for (int cell = 0; cell < cellSampleHeads.Length; cell++) cellSampleHeads[cell] = -1;
         batchBounds = new Bounds[batches.Length];
         surfaceBounds = new Bounds[batches.Length];
         dirtyBatches = new bool[batches.Length]; liveBatches = new bool[batches.Length];
@@ -168,6 +172,9 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             if (!pile.IsInsideBoundary(pile.transform.TransformPoint(new Vector3(p.x, 0, p.y)), .04f) || field.Sample(p.x, p.y) < .001f) continue;
             int color = paletteIndices[i], batch = color * batchesPerColor + paletteCounts[color] / 1023, slot = paletteCounts[color]++ % 1023;
             sampleBatches[i] = batch; sampleSlots[i] = slot;
+            int cell = sampleCells[i];
+            nextCellSample[i] = cellSampleHeads[cell];
+            cellSampleHeads[cell] = i;
             Vector3 position = batches[batch][slot].GetColumn(3);
             if (slot == 0) batchBounds[batch] = new Bounds(position, Vector3.one * .1f);
             else batchBounds[batch].Encapsulate(position);
@@ -202,20 +209,24 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         Quaternion yaw = Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up);
         LastUpdatedKernels = 0;
         Array.Clear(dirtyBatches, 0, dirtyBatches.Length);
-        for (int i = 0; i < samples.Length; i++)
+        // Walk only samples in changed cells; large piles can contain hundreds of thousands.
+        for (int cell = 0; cell < dirtyCells.Length; cell++)
         {
-            int batch = sampleBatches[i];
-            if (batch < 0 || !dirtyCells[sampleCells[i]]) continue;
-            Vector2 p = samples[i];
-            float h = field.Sample(p.x, p.y);
-            float dx = field.Sample(p.x + .03f, p.y) - field.Sample(p.x - .03f, p.y);
-            float dz = field.Sample(p.x, p.y + .03f) - field.Sample(p.x, p.y - .03f);
-            Vector3 normal = normalMatrix.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
-            batches[batch][sampleSlots[i]] = Matrix4x4.TRS(localToWorld.MultiplyPoint3x4(new Vector3(p.x, h, p.y)) + Vector3.up * .003f,
-                Quaternion.FromToRotation(Vector3.up, normal) * yaw * rotations[i],
-                new Vector3(.0255f, .014f, .029f) * (h < .001f ? 0 : sizes[i]));
-            LastUpdatedKernels++;
-            dirtyBatches[batch] = true;
+            if (!dirtyCells[cell]) continue;
+            for (int i = cellSampleHeads[cell]; i >= 0; i = nextCellSample[i])
+            {
+                int batch = sampleBatches[i];
+                Vector2 p = samples[i];
+                float h = field.Sample(p.x, p.y);
+                float dx = field.Sample(p.x + .03f, p.y) - field.Sample(p.x - .03f, p.y);
+                float dz = field.Sample(p.x, p.y + .03f) - field.Sample(p.x, p.y - .03f);
+                Vector3 normal = normalMatrix.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
+                batches[batch][sampleSlots[i]] = Matrix4x4.TRS(localToWorld.MultiplyPoint3x4(new Vector3(p.x, h, p.y)) + Vector3.up * .003f,
+                    Quaternion.FromToRotation(Vector3.up, normal) * yaw * rotations[i],
+                    new Vector3(.0255f, .014f, .029f) * (h < .001f ? 0 : sizes[i]));
+                LastUpdatedKernels++;
+                dirtyBatches[batch] = true;
+            }
         }
         for (int b = 0; b < batches.Length; b++)
         {
@@ -300,7 +311,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         if (batches == null || kernelMesh == null || kernelMaterial == null || camera.cameraType == CameraType.Preview) return;
         var renderer = pile.GetComponent<MeshRenderer>();
         if (renderer != null && (renderer.bounds.ClosestPoint(camera.transform.position) - camera.transform.position).sqrMagnitude > drawDistance * drawDistance) return;
-        if (mediumMesh == null) { mediumMesh = CreateLodMesh(8); distantMesh = CreateLodMesh(4); }
+        if (nearMesh == null) { nearMesh = CreateLodMesh(8); mediumMesh = CreateLodMesh(4); distantMesh = CreateLodMesh(4); }
         GeometryUtility.CalculateFrustumPlanes(camera, cameraPlanes);
         grainAppearance.Set(pile.SurfaceGrain);
         pile.ApplySpatialAppearance(grainAppearance.Block);
@@ -310,7 +321,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             {
                 float distance = Vector3.Distance(camera.transform.position, surfaceBounds[i].ClosestPoint(camera.transform.position));
                 if (distance > drawDistance) continue;
-                Mesh lod = distance < fullDetailDistance ? kernelMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
+                Mesh lod = distance < fullDetailDistance ? nearMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
                 LastDrawTriangles += counts[i] * (int)(lod.GetIndexCount(0) / 3);
                 Graphics.DrawMeshInstanced(lod, 0,
                     colorVariants != null && colorVariants.Length == colorCount && colorVariants[i / batchesPerColor] != null
@@ -328,7 +339,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         return (value | value << 1) & 0x55555555;
     }
 
-    private static Mesh CreateLodMesh(int sides)
+    internal static Mesh CreateLodMesh(int sides)
     {
         var vertices = new Vector3[sides + 2]; var normals = new Vector3[sides + 2];
         var indices = new int[sides * 6];
@@ -349,6 +360,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (nearMesh != null) { if (Application.isPlaying) Destroy(nearMesh); else DestroyImmediate(nearMesh); }
         if (mediumMesh != null) { if (Application.isPlaying) Destroy(mediumMesh); else DestroyImmediate(mediumMesh); }
         if (distantMesh != null) { if (Application.isPlaying) Destroy(distantMesh); else DestroyImmediate(distantMesh); }
     }

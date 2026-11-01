@@ -17,6 +17,7 @@ public sealed class BagCornSurface : MonoBehaviour
     private readonly List<int> triangles = new List<int>(1200);
     private readonly Matrix4x4[] first = new Matrix4x4[1023], second = new Matrix4x4[1023];
     private float lastFill = -1, lastClose = -1;
+    private float nextSurfaceUpdate;
     private Matrix4x4 lastTransform;
     private uint randomState;
     private GrainContainer container;
@@ -37,6 +38,11 @@ public sealed class BagCornSurface : MonoBehaviour
     {
         if (sack == null || grainSurface == null || kernelMesh == null || kernelMaterial == null) return;
         if (lastFill == sack.Fill && lastClose == sack.Close && lastTransform == grainSurface.transform.localToWorldMatrix) return;
+        // Filling animates every frame, but surface baking and triangle sampling need not.
+        // Empty/closed bags still hide their kernels immediately.
+        bool hide = sack.Fill < .0001f || sack.Close >= .4f;
+        if (Application.isPlaying && !hide && Time.unscaledTime < nextSurfaceUpdate) return;
+        nextSurfaceUpdate = Time.unscaledTime + .05f;
         Rebuild();
     }
 

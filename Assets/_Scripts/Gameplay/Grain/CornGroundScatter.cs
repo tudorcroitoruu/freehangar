@@ -15,6 +15,9 @@ public sealed class CornGroundScatter : MonoBehaviour
     private Matrix4x4 lastTransform;
     private int revision = -1;
     private float nextRefresh;
+    private Mesh nearMesh, distantMesh;
+    private Bounds scatterBounds;
+    private readonly Plane[] cameraPlanes = new Plane[6];
     private readonly GrainAppearance grainAppearance = new GrainAppearance();
     public int KernelCount { get; private set; }
 
@@ -87,15 +90,32 @@ public sealed class CornGroundScatter : MonoBehaviour
                     new Vector3(.0255f, .014f, .029f) * variation);
             }
         }
+        if (KernelCount > 0)
+        {
+            scatterBounds = new Bounds(matrices[0].GetColumn(3), Vector3.zero);
+            for (int i = 1; i < KernelCount; i++) scatterBounds.Encapsulate((Vector3)matrices[i].GetColumn(3));
+            scatterBounds.Expand(.12f);
+        }
         revision = pile.SurfaceRevision; lastTransform = transform.localToWorldMatrix; nextRefresh = Time.time + 1f;
     }
+    private void OnDestroy()
+    {
+        if (nearMesh != null) { if (Application.isPlaying) Destroy(nearMesh); else DestroyImmediate(nearMesh); }
+        if (distantMesh != null) { if (Application.isPlaying) Destroy(distantMesh); else DestroyImmediate(distantMesh); }
+    }
+
     private void Draw(ScriptableRenderContext context, Camera camera)
     {
         if (KernelCount == 0 || kernelMesh == null || kernelMaterial == null || camera.cameraType == CameraType.Preview) return;
         if ((camera.transform.position - transform.position).sqrMagnitude > 35f * 35f) return;
+        GeometryUtility.CalculateFrustumPlanes(camera, cameraPlanes);
+        if (!GeometryUtility.TestPlanesAABB(cameraPlanes, scatterBounds)) return;
+        if (nearMesh == null) { nearMesh = CornSurfaceKernels.CreateLodMesh(8); distantMesh = CornSurfaceKernels.CreateLodMesh(4); }
+        float distance = Vector3.Distance(camera.transform.position, scatterBounds.ClosestPoint(camera.transform.position));
+        Mesh lod = distance < 1.5f ? nearMesh : distantMesh;
         grainAppearance.Set(pile.SurfaceGrain);
         pile.ApplySpatialAppearance(grainAppearance.Block);
-        Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, matrices, KernelCount, grainAppearance.Block,
+        Graphics.DrawMeshInstanced(lod, 0, kernelMaterial, matrices, KernelCount, grainAppearance.Block,
             ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
     }
 }
