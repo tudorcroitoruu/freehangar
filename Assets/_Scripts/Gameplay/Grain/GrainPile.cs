@@ -318,14 +318,18 @@ public sealed class GrainPile : MonoBehaviour
         if (Mathf.Abs(local.x) > size * .5f || Mathf.Abs(local.z) > size * .5f) return false;
         var weights = new float[field.Heights.Length];
         double sum = 0;
-        float radius = Mathf.Max(spreadRadius, Mathf.Max(.25f, field.Spacing * Mathf.Max(WorldScale.x, WorldScale.z) * 1.5f));
+        // Match the volume expansion used by Scoop: mass scales cubically, radius linearly.
+        float depositScale = Mathf.Pow(GrainConsumeMultiplier, 1f / 3f);
+        float radius = Mathf.Max(spreadRadius * depositScale, Mathf.Max(.25f * depositScale,
+            field.Spacing * Mathf.Max(WorldScale.x, WorldScale.z) * 3f));
         for (int i = 0; i < weights.Length; i++)
         {
             Vector3 point = new Vector3(i % field.Resolution * field.Spacing - size * .5f, 0,
                 i / field.Resolution * field.Spacing - size * .5f);
             if (field.AreaAt(i) <= 0 || !IsInsideBoundary(transform.TransformPoint(point))) continue;
             float distance = Vector3.Scale(point - new Vector3(local.x, 0, local.z), WorldScale).magnitude;
-            weights[i] = Mathf.Max(0, 1 - distance / radius);
+            float falloff = Mathf.Clamp01(1 - distance * distance / (radius * radius));
+            weights[i] = falloff * falloff;
             sum += weights[i] * field.AreaAt(i);
         }
         if (sum <= 0) return false;

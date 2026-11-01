@@ -226,6 +226,8 @@ public sealed class ShovelTool : MonoBehaviour
 
     private void CommitDrop(float maximumKg = float.MaxValue)
     {
+        // Follow the growing surface so later portions do not target a point buried inside it.
+        if (dropReceiver != null) targetPoint.y = dropReceiver.SurfaceHeight(targetPoint);
         if (dropSurface == null || !dropSurface.enabled || !dropSurface.gameObject.activeInHierarchy ||
             !CanReachPoint(actionCamera, actor, targetPoint, pourReach, dropSurface)) return;
         GrainPile receiver = dropReceiver != null ? dropReceiver : dropSurface.GetComponentInParent<GrainPile>();
@@ -356,11 +358,14 @@ public sealed class ShovelTool : MonoBehaviour
             ? Mathf.InverseLerp(.38f, .56f, phase) : Mathf.InverseLerp(.32f, .67f, phase));
         if (dropping)
         {
-            if (!dropCommitted && phase >= .48f)
+            // Bound mesh rebuilds while distributing the load over the pouring motion.
+            float dropFraction = Mathf.Floor(fraction * 6f) / 6f;
+            if (!dropCommitted && dropFraction > transferredFraction)
             {
-                dropCommitted = true;
                 float before = Kilograms;
-                CommitDrop();
+                CommitDrop((dropFraction - transferredFraction) * availableAtStart);
+                transferredFraction += (before - Kilograms) / Mathf.Max(.0001f, availableAtStart);
+                dropCommitted = Kilograms <= .0001f;
                 if (Kilograms < before - .0001f) PlayPourSound();
             }
             if (phase >= 1f) CancelAction();

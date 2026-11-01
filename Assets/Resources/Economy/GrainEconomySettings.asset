@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1128b7336ce1a0646aab0dcbaea6fa77, type: 3}
   m_Name: GrainEconomySettings
   m_EditorClassIdentifier: Assembly-CSharp::GrainEconomySettings
-  grainConsumeMultiplier: 200
+  grainConsumeMultiplier: 3000
   shovelSettings: {fileID: 11400000, guid: b3f738209dfb4dbaae0e5f2a556884ec, type: 2}
   staminaSettings: {fileID: 11400000, guid: 4e2e8d54983b4dfd9ef56f179553f573, type: 2}
   vehicleSettings: {fileID: 11400000, guid: 0b15f2691eb74da684784edf778d5a6b, type: 2}

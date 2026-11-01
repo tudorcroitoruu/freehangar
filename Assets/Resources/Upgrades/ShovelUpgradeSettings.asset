@@ -15,36 +15,36 @@ MonoBehaviour:
   shovels:
   - name: Basic Shovel
     image: {fileID: 21300000, guid: 9fd2b7424aeb41f42b2f226feda2ef14, type: 3}
-    capacityKg: 7.5
+    capacityKg: 2.5
     weightKg: 1
-    capacityPerUpgrade: 3
+    capacityPerUpgrade: 1
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
     prices: 320000004b0000006400000096000000
   - name: Medium Shovel
     image: {fileID: 21300000, guid: cfb9e0579b9c03c478557593242d6265, type: 3}
-    capacityKg: 25.5
+    capacityKg: 8.5
     weightKg: 0.8
-    capacityPerUpgrade: 3
+    capacityPerUpgrade: 1
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
     prices: 96000000c8000000fa0000005e010000
   - name: Improved Shovel
     image: {fileID: 21300000, guid: 0a8be3e409bce994db21f8a3dfac12c6, type: 3}
-    capacityKg: 43.5
+    capacityKg: 14.5
     weightKg: 0.6
-    capacityPerUpgrade: 3
+    capacityPerUpgrade: 1
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
     prices: c20100008a020000520300004c040000
   - name: Expert Shovel
     image: {fileID: 21300000, guid: ac885e9cb306d8b489498a0fdcc580b1, type: 3}
-    capacityKg: 60
+    capacityKg: 20
     weightKg: 0.4
-    capacityPerUpgrade: 3
+    capacityPerUpgrade: 1
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
