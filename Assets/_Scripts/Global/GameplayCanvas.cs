@@ -95,7 +95,7 @@ public class GameplayCanvas : MonoBehaviour
 
     private void RefreshMoney(int amount)
     {
-        if (moneyText != null) moneyText.text = "$ " + amount.ToString("N0");
+        if (moneyText != null) moneyText.text = "$ " + EconomyNumberFormat.Accounting(amount);
     }
 
     public bool AddMoney(int amount) => SaveSystem.AddMoney(amount);

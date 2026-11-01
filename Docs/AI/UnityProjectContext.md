@@ -1,5 +1,14 @@
 # Unity project context
 
+2026-11-01 containers-only scale flow (supersedes earlier parked-vehicle flow):
+SellingZone.CanWeigh requires unloaded grain containers and a clear scale.
+Any vehicle collider overlapping the area blocks weighing, even with its origin
+outside or controller disabled. Wheelbarrows, players and non-container rigidbodies
+(including trailers) also block it. Loaded/carried containers are excluded from
+quotes. SellingWeighButton/StartWeight and GrainWeighStation now instruct unloading,
+moving the vehicle away and stepping off. SellingScreen already rechecks CanWeigh
+on open/update/sale, preventing payment if a vehicle returns during the quote.
+
 2026-11-01 vehicle reset/prompt correction: looking at a parked vehicle no longer
 selects VehicleReset or adds an R action. Driving retains R through
 PlayerBicycleInteraction; pushed wheelbarrows retain R through PlayerInteractor.

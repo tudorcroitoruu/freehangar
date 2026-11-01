@@ -37,7 +37,8 @@ public class GrainWeighStationStatusTests
         {
             Vector3 position=cargo.transform.position,scale=cargo.transform.localScale;
             for(int i=0;i<20;i++)station.RefreshStatus();
-            StringAssert.Contains("READY TO WEIGH",station.StatusMessage);
+            StringAssert.Contains("move the vehicle off the scale",station.StatusMessage);
+            Assert.IsFalse(zone.CanWeigh(actor.GetComponent<PlayerInteractor>()));
             StringAssert.Contains(GrainWeighStation.RedButtonInstruction,station.StatusMessage);
             Assert.That(SaveSystem.Money,Is.EqualTo(37));
             Assert.That(cargo.Kilograms,Is.EqualTo(10));
@@ -51,13 +52,15 @@ public class GrainWeighStationStatusTests
     [Test]
     public void GuidanceMatchesManualSellingFlowForPlayerVehicleAndEmptyCargo()
     {
+        station.RefreshStatus();StringAssert.Contains("move the vehicle off the scale",station.StatusMessage);
+        cargo.transform.SetParent(root.transform,true);vehicle.transform.localPosition=Vector3.forward*20;
         actor.transform.localPosition=Vector3.zero;Physics.SyncTransforms();station.RefreshStatus();
         StringAssert.Contains("Step off the scale",station.StatusMessage);
-        StringAssert.Contains("Leave your vehicle parked",station.StatusMessage);
+        StringAssert.Contains("Only containers may remain",station.StatusMessage);
         actor.transform.localPosition=Vector3.right*20;cargo.SetDemonstrationFill(0);Physics.SyncTransforms();station.RefreshStatus();
-        StringAssert.Contains("Load filled grain containers",station.StatusMessage);
-        vehicle.transform.localPosition=Vector3.forward*20;Physics.SyncTransforms();station.RefreshStatus();
-        StringAssert.Contains("Park your vehicle",station.StatusMessage);
+        StringAssert.Contains("Place filled grain containers",station.StatusMessage);
+        cargo.SetDemonstrationFill(10);station.RefreshStatus();
+        StringAssert.Contains("READY TO WEIGH",station.StatusMessage);
         StringAssert.Contains(GrainWeighStation.RedButtonInstruction,station.StatusMessage);
     }
 

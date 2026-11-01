@@ -14,9 +14,17 @@ public sealed class SellingWeighButton : MonoBehaviour, IInteractable
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
     {
         bool ready = sellingZone != null && sellingZone.CanWeigh(interactor);
+        string action = ready ? "Start weighing" : "Place filled containers on the scale and step off";
+        if (!ready && sellingZone != null)
+        {
+            if (sellingZone.HasVehicleOnScale) action = "Unload containers and move the vehicle off the scale";
+            else if (interactor != null && sellingZone.Contains(interactor)) action = "Step off the scale";
+            else if (sellingZone.HasBlockingOccupants) action = "Clear the scale: containers only";
+            else if (interactor != null && interactor.HandsOccupied) action = "Free your hands before weighing";
+        }
         prompt = new InteractionPromptData(
             PromptPosition,
-            ready ? "Weighs" : "Park vehicle on scale and step off", ready);
+            action, ready);
         prompt.RequiresFreeHands = interactor != null && interactor.HandsOccupied;
         return isActiveAndEnabled && sellingZone != null && interactor != null &&
             !UpgradeManager.BlocksGameplayInput && !UIPopups.BasePopupUI.HasActivePopup;

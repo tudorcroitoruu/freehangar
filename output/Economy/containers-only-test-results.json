@@ -1,0 +1,76 @@
+{
+  "status": "completed",
+  "duration": 0.14,
+  "summary": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "SellingZoneContainersOnlyTests.BagInASiblingTrailerSlotMustBeUnloadedBeforeItCanBeSold",
+      "Status": "Passed",
+      "Duration": 0.0211057,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "SellingZoneContainersOnlyTests.BoxLoadedOntoASiblingTrailerSlotMustBeUnloadedBeforeItCanBeSold",
+      "Status": "Passed",
+      "Duration": 0.0015509,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "SellingZoneContainersOnlyTests.ContainersStillOnVehicleAreNeverIncludedInTheSale",
+      "Status": "Passed",
+      "Duration": 0.0009695,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "SellingZoneContainersOnlyTests.PlayersAndEmptyOrCarriedContainersCannotStartWeighing",
+      "Status": "Passed",
+      "Duration": 0.000859,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "SellingZoneContainersOnlyTests.TrailerWithoutItsTowingVehicleStillBlocksTheScale",
+      "Status": "Passed",
+      "Duration": 0.0008775,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "SellingZoneContainersOnlyTests.UnloadedContainersEnableStartOnlyWhileTheVehicleIsCompletelyOutside",
+      "Status": "Passed",
+      "Duration": 0.0057443,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "SellingZoneContainersOnlyTests.VehicleColliderAtTheEdgeBlocksEvenWithOriginOutsideOrControllerDisabled(True)",
+      "Status": "Passed",
+      "Duration": 0.0012225,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "SellingZoneContainersOnlyTests.VehicleColliderAtTheEdgeBlocksEvenWithOriginOutsideOrControllerDisabled(False)",
+      "Status": "Passed",
+      "Duration": 0.000674,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "SellingZoneContainersOnlyTests.WheelbarrowMustLeaveTheScale",
+      "Status": "Passed",
+      "Duration": 0.0011675,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

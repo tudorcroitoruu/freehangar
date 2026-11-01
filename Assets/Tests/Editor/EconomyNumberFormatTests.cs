@@ -22,6 +22,15 @@ public class EconomyNumberFormatTests
     }
 
     [Test]
+    public void DisplayNeverRoundsAnIncompleteBagOrFractionalCashUp()
+    {
+        Assert.That(EconomyNumberFormat.Accounting(9.999f),Is.EqualTo("9"));
+        Assert.That(EconomyNumberFormat.Accounting(10),Is.EqualTo("10"));
+        Assert.That(EconomyNumberFormat.Accounting(12500.99),Is.EqualTo("12,500"));
+        Assert.That(EconomyNumberFormat.Accounting(.99),Is.EqualTo("0"));
+    }
+
+    [Test]
     public void SaleTotalEqualsTheWholeDollarCropRowsWithoutHiddenFractionalCarry()
     {
         double first=EconomyNumberFormat.CropValue(12,2.4f),second=EconomyNumberFormat.CropValue(6,2.6f);
@@ -55,6 +64,10 @@ public class EconomyNumberFormatTests
             Assert.That(quantity.text,Is.EqualTo("1,000 kg"));
             Assert.That(price.text,Is.EqualTo("$ 2.60 / kg"));
             Assert.That(value.text,Is.EqualTo("$ 2,600"));
+            row.SetData(new GrainElementSettings{grainType=GrainType.Corn,grainPrice=2.6f},9.9f);
+            Assert.That(quantity.text,Is.EqualTo("9 kg"));
+            Assert.That(price.text,Is.EqualTo("$ 2.60 / kg"));
+            Assert.That(value.text,Is.EqualTo("$ 25"));
         }
         finally { Object.DestroyImmediate(root); }
     }

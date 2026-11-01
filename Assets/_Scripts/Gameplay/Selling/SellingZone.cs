@@ -9,10 +9,35 @@ public class SellingZone : MonoBehaviour
     [SerializeField] private SellingScreen sellingScreen;
     [SerializeField] private GrainEconomySettings economySettings;
     private BoxCollider area;
-    private readonly HashSet<BicycleController> parkedBicycles = new HashSet<BicycleController>();
-    public bool HasParkedVehicle
+    private readonly List<GrainContainer> weighableContainers = new List<GrainContainer>();
+    public bool HasVehicleOnScale
     {
-        get { FindParkedBicycles(); return parkedBicycles.Count > 0; }
+        get
+        {
+            foreach (var hit in Overlaps()) if (IsVehicleCollider(hit)) return true;
+            return false;
+        }
+    }
+    public bool HasParkedVehicle => HasVehicleOnScale;
+    public bool HasBlockingOccupants
+    {
+        get
+        {
+            foreach (var hit in Overlaps())
+            {
+                if (IsVehicleCollider(hit) || hit is CharacterController ||
+                    hit.GetComponentInParent<PlayerController>() != null || hit.GetComponentInParent<PlayerInteractor>() != null) return true;
+                var container = hit.GetComponentInParent<GrainContainer>();
+                if (container != null)
+                {
+                    if (!IsUnloaded(container)) return true;
+                    continue;
+                }
+                // Trailers and other movable objects must leave the scale as well.
+                if (!hit.isTrigger && hit.attachedRigidbody != null) return true;
+            }
+            return false;
+        }
     }
 
     private void Reset() => GetComponent<BoxCollider>().isTrigger = true;
@@ -39,8 +64,9 @@ public class SellingZone : MonoBehaviour
         if (!isActiveAndEnabled || interactor == null || interactor.HandsOccupied || Contains(interactor)) return false;
         var rider = interactor.GetComponent<PlayerBicycleInteraction>();
         if (rider != null && rider.IsRiding) return false;
-        FindParkedBicycles();
-        return parkedBicycles.Count > 0;
+        if (HasBlockingOccupants) return false;
+        CollectContainers(weighableContainers);
+        return weighableContainers.Count > 0;
     }
 
     public bool TryOpen(PlayerInteractor interactor)
@@ -65,37 +91,31 @@ public class SellingZone : MonoBehaviour
     public void CollectContainers(List<GrainContainer> containers)
     {
         containers.Clear();
-        FindParkedBicycles();
-        // Include all cargo on parked vehicles, including containers whose colliders are disabled.
-        foreach (var bicycle in parkedBicycles)
-            foreach (var container in bicycle.GetComponentsInChildren<GrainContainer>())
-                AddContainer(containers, container);
         foreach (var hit in Overlaps())
             AddContainer(containers, hit.GetComponentInParent<GrainContainer>());
     }
 
     private void AddContainer(List<GrainContainer> containers, GrainContainer container)
     {
-        if (container != null && container.isActiveAndEnabled && !container.IsCarried && !container.IsClosing &&
+        if (container != null && container.isActiveAndEnabled && IsUnloaded(container) && !container.IsClosing &&
             float.IsFinite(container.Kilograms) && container.Kilograms > 0 &&
             TryGetSettings(container.AcceptedGrain, out _) && !containers.Contains(container))
             containers.Add(container);
     }
 
-    private void FindParkedBicycles()
+    private static bool IsVehicleCollider(Collider hit) =>
+        hit.GetComponentInParent<BicycleController>() != null || hit.GetComponentInParent<WheelbarrowCargo>() != null;
+
+    private static bool IsUnloaded(GrainContainer container)
     {
-        parkedBicycles.Clear();
-        foreach (var hit in Overlaps())
-        {
-            var bicycle = hit.GetComponentInParent<BicycleController>();
-            if (bicycle == null || !bicycle.isActiveAndEnabled || bicycle.IsRidden || bicycle.IsCoasting || Mathf.Abs(bicycle.Speed) > .01f) continue;
-            var controller = bicycle.GetComponent<CharacterController>();
-            Vector3 point = controller != null ? controller.bounds.center : bicycle.transform.position;
-            Vector3 local = transform.InverseTransformPoint(point) - area.center;
-            Vector3 half = area.size * .5f;
-            if (Mathf.Abs(local.x) <= half.x && Mathf.Abs(local.y) <= half.y && Mathf.Abs(local.z) <= half.z)
-                parkedBicycles.Add(bicycle);
-        }
+        if (container.IsCarried || container.GetComponentInParent<BicycleController>() != null ||
+            container.GetComponentInParent<WheelbarrowCargo>() != null) return false;
+        var box = container.GetComponentInParent<BicycleCargoBox>();
+        if (box != null && box.IsLoaded) return false;
+        // Trailer slots can be siblings of the vehicle controller in the prefab.
+        foreach (var vehicle in FindObjectsByType<BicycleController>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            if (vehicle.HasCargo(container.transform)) return false;
+        return true;
     }
 
     private Collider[] Overlaps()

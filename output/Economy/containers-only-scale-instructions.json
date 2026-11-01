@@ -1,0 +1,18 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  1615,
+                   "executeMs":  1278,
+                   "assemblyName":  "PipelineRunScript_RefreshScaleInstructions_5a558789030f4c489150b56471df28c3",
+                   "success":  true,
+                   "result":  [
+                                  {
+                                      "StatusMessage":  "Place filled grain containers on the scale.\nPress on red weight button on left side of the weighting machine",
+                                      "textOverflow":  false
+                                  }
+                              ]
+               }
+}

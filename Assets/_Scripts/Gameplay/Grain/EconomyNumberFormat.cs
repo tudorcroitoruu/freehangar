@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>Stable comma thousands grouping, independent of the machine's regional settings.</summary>
 public static class EconomyNumberFormat
 {
-    public static string Accounting(double value) => value.ToString("N0", CultureInfo.InvariantCulture);
+    public static string Accounting(double value) => Math.Floor(value).ToString("N0", CultureInfo.InvariantCulture);
 
     /// <summary>The integer amount credited by a sale; fractions of a dollar are discarded.</summary>
     public static int SaleCash(double value) => !double.IsNaN(value) && !double.IsInfinity(value) &&

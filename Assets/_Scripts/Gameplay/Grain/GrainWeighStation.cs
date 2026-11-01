@@ -32,14 +32,19 @@ public sealed class GrainWeighStation : MonoBehaviour
             SetStatus("WEIGHING UNAVAILABLE", Color.yellow);
             return;
         }
-        if (!sellingZone.HasParkedVehicle)
+        if (sellingZone.HasVehicleOnScale)
         {
-            SetStatus("Park your vehicle on the scale and step off.\n" + RedButtonInstruction, Color.white);
+            SetStatus("Unload the containers, then move the vehicle off the scale.\n" + RedButtonInstruction, new Color(1, .55f, .15f));
             return;
         }
         if (player != null && sellingZone.Contains(player))
         {
-            SetStatus("Step off the scale. Leave your vehicle parked.\n" + RedButtonInstruction, new Color(1, .55f, .15f));
+            SetStatus("Step off the scale. Only containers may remain.\n" + RedButtonInstruction, new Color(1, .55f, .15f));
+            return;
+        }
+        if (sellingZone.HasBlockingOccupants)
+        {
+            SetStatus("Remove people and other objects. Only containers may remain.\n" + RedButtonInstruction, new Color(1, .55f, .15f));
             return;
         }
         if (player != null && player.HandsOccupied)
@@ -50,7 +55,7 @@ public sealed class GrainWeighStation : MonoBehaviour
         sellingZone.CollectContainers(containers);
         if (containers.Count == 0)
         {
-            SetStatus("Load filled grain containers onto the parked vehicle.\n" + RedButtonInstruction, Color.white);
+            SetStatus("Place filled grain containers on the scale.\n" + RedButtonInstruction, Color.white);
             return;
         }
         SetStatus("READY TO WEIGH\n" + RedButtonInstruction, new Color(.5f, 1, .65f));
