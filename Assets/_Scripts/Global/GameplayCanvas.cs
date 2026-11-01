@@ -11,6 +11,11 @@ public class GameplayCanvas : MonoBehaviour
     private bool hudActiveBeforePause;
     [Header("Money")]
     [SerializeField] private Text moneyText;
+    [SerializeField, Min(0f)] private float moneyAnimationSeconds = .4f;
+    private bool moneyInitialized;
+    private double displayedMoney, moneyAnimationStart;
+    private int targetMoney;
+    private float moneyAnimationElapsed;
     
     [Space, Header("Interactor")]
     public InteractionPrompt interactionPrompt;
@@ -65,6 +70,8 @@ public class GameplayCanvas : MonoBehaviour
         if (Pause.Instance != null && Pause.Instance.paused) HideHudForPause();
         ResetFreeHandsWarning();
         SaveSystem.MoneyChanged += RefreshMoney;
+        // Opening the HUD shows the saved balance immediately; only later changes animate.
+        moneyInitialized = false;
         RefreshMoney(SaveSystem.Money);
         var rider = FindFirstObjectByType<PlayerBicycleInteraction>();
         SetDrivingHints(rider != null && rider.IsRiding);
@@ -121,6 +128,7 @@ public class GameplayCanvas : MonoBehaviour
 
     private void Update()
     {
+        AnimateMoney(Time.unscaledDeltaTime);
         FadeFreeHandsWarning(Time.unscaledDeltaTime);
         RefreshCollectibleUI();
         if (fadingToolHints && hintsParent != null)
@@ -241,7 +249,34 @@ public class GameplayCanvas : MonoBehaviour
 
     private void RefreshMoney(int amount)
     {
-        if (moneyText != null) moneyText.text = "$ " + EconomyNumberFormat.Accounting(amount);
+        if (moneyInitialized && amount == targetMoney) return;
+        targetMoney = amount;
+        moneyAnimationStart = displayedMoney;
+        moneyAnimationElapsed = 0f;
+        if (!moneyInitialized || moneyAnimationSeconds <= 0f)
+        {
+            displayedMoney = amount;
+            moneyInitialized = true;
+            RenderMoney();
+        }
+    }
+
+    private void AnimateMoney(float deltaTime)
+    {
+        if (!moneyInitialized || displayedMoney == targetMoney) return;
+        moneyAnimationElapsed += Mathf.Max(0f, deltaTime);
+        float progress = moneyAnimationSeconds > 0f ? Mathf.Clamp01(moneyAnimationElapsed / moneyAnimationSeconds) : 1f;
+        // Keep the interpolated value in double precision, including large balances.
+        // New transactions restart from the current display rather than the old target.
+        displayedMoney = progress >= 1f ? targetMoney
+            : moneyAnimationStart + (targetMoney - moneyAnimationStart) * Mathf.SmoothStep(0f, 1f, progress);
+        RenderMoney();
+    }
+
+    private void RenderMoney()
+    {
+        if (moneyText != null)
+            moneyText.text = "$ " + EconomyNumberFormat.Accounting((int)System.Math.Round(displayedMoney));
     }
 
     public bool AddMoney(int amount) => SaveSystem.AddMoney(amount);
