@@ -1,0 +1,54 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  2282,
+                   "executeMs":  181,
+                   "assemblyName":  "PipelineRunScript_ScaleToolCapacities_8090dbd6d88a406499ad7c943d2f13a0",
+                   "success":  true,
+                   "result":  {
+                                  "tools":  [
+                                                {
+                                                    "name":  "Basic Shovel",
+                                                    "capacityKg":  2.5,
+                                                    "capacityPerUpgrade":  1.0,
+                                                    "lastInTier":  5.5
+                                                },
+                                                {
+                                                    "name":  "Medium Shovel",
+                                                    "capacityKg":  8.5,
+                                                    "capacityPerUpgrade":  1.0,
+                                                    "lastInTier":  11.5
+                                                },
+                                                {
+                                                    "name":  "Improved Shovel",
+                                                    "capacityKg":  14.5,
+                                                    "capacityPerUpgrade":  1.0,
+                                                    "lastInTier":  17.5
+                                                },
+                                                {
+                                                    "name":  "Expert Shovel",
+                                                    "capacityKg":  20.0,
+                                                    "capacityPerUpgrade":  1.0,
+                                                    "lastInTier":  23.0
+                                                },
+                                                {
+                                                    "name":  "Grain Vacuum",
+                                                    "capacityKg":  150.0,
+                                                    "capacityPerUpgrade":  37.5,
+                                                    "lastInTier":  262.5
+                                                },
+                                                {
+                                                    "name":  "High Capacity Vacuum",
+                                                    "capacityKg":  300.0,
+                                                    "capacityPerUpgrade":  75.0,
+                                                    "lastInTier":  525.0
+                                                }
+                                            ],
+                                  "finalCapacityKg":  600.0,
+                                  "monotonic":  true
+                              }
+               }
+}

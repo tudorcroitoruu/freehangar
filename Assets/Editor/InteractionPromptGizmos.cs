@@ -16,6 +16,9 @@ public static class InteractionPromptGizmos
     [DrawGizmo(GizmoType.Selected)]
     private static void DrawEvent(EventInteractable target, GizmoType _) => Draw(target, "Event prompt");
 
+    [DrawGizmo(GizmoType.Selected)]
+    private static void DrawContainer(GrainContainer target, GizmoType _) => Draw(target, "Container prompt");
+
     private static void Draw(MonoBehaviour target, string label)
     {
         using (var data = new SerializedObject(target))
@@ -23,6 +26,12 @@ public static class InteractionPromptGizmos
             var anchor = data.FindProperty("promptAnchor").objectReferenceValue as Transform;
             Vector3 origin = anchor != null ? anchor.position : target.transform.position;
             Vector3 position = origin + data.FindProperty("promptOffset").vector3Value;
+            if (target is GrainContainer container)
+            {
+                Bounds bounds = container.WorldBounds;
+                origin = container.IsCarried ? bounds.center : anchor != null ? anchor.position : new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
+                position = container.PromptPosition;
+            }
             Color previous = Gizmos.color;
             Gizmos.color = Color.yellow;
             Gizmos.DrawLine(origin, position);

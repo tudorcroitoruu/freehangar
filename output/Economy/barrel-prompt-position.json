@@ -1,0 +1,23 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  1780,
+                   "executeMs":  1859,
+                   "assemblyName":  "PipelineRunScript_LowerBarrelPrompt_0ae198e187944dc498b7fc6191bde6c6",
+                   "success":  true,
+                   "result":  {
+                                  "prefab":  "Assets/Prefabs/Gameplay/Containers/Barrel.prefab",
+                                  "barrels":  [
+                                                  {
+                                                      "name":  "Barrel",
+                                                      "top":  1.95084727,
+                                                      "promptY":  1.75084722,
+                                                      "loweredBy":  0.32
+                                                  }
+                                              ]
+                              }
+               }
+}

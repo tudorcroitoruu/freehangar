@@ -1,0 +1,125 @@
+{
+  "status": "completed",
+  "duration": 0.37,
+  "summary": {
+    "total": 16,
+    "passed": 16,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,False)",
+      "Status": "Passed",
+      "Duration": 0.0061604,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,False)",
+      "Status": "Passed",
+      "Duration": 0.0022831,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,False)",
+      "Status": "Passed",
+      "Duration": 0.0022175,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,True)",
+      "Status": "Passed",
+      "Duration": 0.00507,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,True)",
+      "Status": "Passed",
+      "Duration": 0.0044861,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,True)",
+      "Status": "Passed",
+      "Duration": 0.00436,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(10.0f)",
+      "Status": "Passed",
+      "Duration": 0.0086813,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(200.0f)",
+      "Status": "Passed",
+      "Duration": 0.0061136,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource",
+      "Status": "Passed",
+      "Duration": 0.0115367,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass",
+      "Status": "Passed",
+      "Duration": 0.0066529,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.FourFullStartingShovelLoadsFillTheTenKilogramFreeBag",
+      "Status": "Passed",
+      "Duration": 0.0111206,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(0.0f,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0027775,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(-10.0f,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.002068,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.NaN,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0019421,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.PositiveInfinity,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0018515,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(100000.0f,10000.0f)",
+      "Status": "Passed",
+      "Duration": 0.0016803,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

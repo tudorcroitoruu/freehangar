@@ -192,8 +192,8 @@ SkinnedMeshRenderer:
   - 0
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: 0.000043183565, y: -0.0028746426, z: 0.43577054}
-    m_Extent: {x: 1.5347195, y: 1.5336137, z: 1.6416235}
+    m_Center: {x: -0.0000089854, y: 0.000043854117, z: 0.45244044}
+    m_Extent: {x: 1.3914218, y: 1.3914545, z: 1.4884069}
   m_DirtyAABB: 0
 --- !u!1 &6691740664109452445
 GameObject:
@@ -276,6 +276,8 @@ MonoBehaviour:
     m_Center: {x: 0.0027515292, y: 0.002769649, z: 0.5049948}
     m_Extent: {x: 0.3501143, y: 0.3016718, z: 0.50499487}
   closeDuration: 0.65
+  promptAnchor: {fileID: 0}
+  promptOffset: {x: 0, y: -0.2, z: 0}
 --- !u!114 &6843274559680828797
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,0 +1,19 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  2245,
+                   "executeMs":  149,
+                   "assemblyName":  "PipelineRunScript_SetStartingShovelCapacity_69bcd0b9462c47ef893f930f4b77a760",
+                   "success":  true,
+                   "result":  {
+                                  "shovel":  "Basic Shovel",
+                                  "startingKg":  2.5,
+                                  "freeBagKg":  10.0,
+                                  "fullScoops":  4.0,
+                                  "nextUpgradeKg":  11.5
+                              }
+               }
+}

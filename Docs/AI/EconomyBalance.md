@@ -30,6 +30,19 @@ Use **Read starting stock from the five open-scene piles** after changing pile s
 
 Physical `GrainPile.Kilograms` still drives clearance and the final launch. `CollectibleKilograms` is physical kg divided by the multiplier. At multiplier 10, collecting 10 kg consumes 100 authored kg. Scoop geometry scales to excavate the extra authored volume. Dropped piles recover cargo at 1:1; returning cargo to an authored pile restores equivalent collectible mass.
 
+The starting Basic Shovel capacity is **2.5 kg**, so four full loads fill a **10 kg FreeBag**. With consumption multiplier 200, that bag represents 2,000 authored kg removed. Initial capacity and capacity per upgrade for all six tool tiers are scaled to one ninth of the original progression:
+
+| Tool | Initial kg | Added kg per capacity upgrade |
+|---|---:|---:|
+| Basic Shovel | 2.5 | 1 |
+| Medium Shovel | 8.5 | 1 |
+| Improved Shovel | 14.5 | 1 |
+| Expert Shovel | 20 | 1 |
+| Grain Vacuum | 150 | 37.5 |
+| High Capacity Vacuum | 300 | 75 |
+
+All 24 purchases increase capacity; the final fully upgraded vacuum holds **600 kg**. The fourth purchase advances to the next tier except at the final tier. Shovel excavation-size scaling now uses the configured starting capacity, preserving relative scoop sizes across the rescaled tiers. Vacuum suction rates, prices and the consumption multiplier retain their existing values. Smaller capacities change loading time, so pacing needs another playtest.
+
 Expected rat and bird losses are separately configurable per hangar. They are additive shares of collectible kg, capped at 100%. They are **planning assumptions about exposure during play**, not a second automatic removal of grain. Actual losses depend on attacks, exposed cargo and how quickly the player scares pests away.
 
 Current assumptions: no pests in hangars 1–2, rats 5% in hangar 3, rats 5% plus birds 5% in hangars 4–5. Actual damage retains the previous baseline: one kg per rat-group bite every three seconds; a single attacking bird eats one kg per bite, while the three introductory birds share that one kg. Rats divide the group amount between the attacking group members.

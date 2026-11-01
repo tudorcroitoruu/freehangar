@@ -39,8 +39,7 @@ public sealed class BagInteraction : MonoBehaviour
         if (!isActiveAndEnabled || bag == null || !bag.isActiveAndEnabled ||
             bag.IsClosing || (bag.IsCarried && bag != carried) || (shovel != null && shovel.IsBusy)) return false;
         if (carried == null) target = bag;
-        Bounds bounds = bag.WorldBounds;
-        Vector3 position = bag == carried ? bounds.center : new Vector3(bounds.center.x, bounds.max.y + .12f, bounds.center.z);
+        Vector3 position = bag.PromptPosition;
         bool blocked = Time.time < blockedUntil;
         bool shovelEquipped = IsShovelEquipped;
         bool canFinish = shovelEquipped && bag.CanHandle && !bag.IsFinished;

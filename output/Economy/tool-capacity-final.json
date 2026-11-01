@@ -1,0 +1,48 @@
+{
+    "success":  true,
+    "result":  {
+                   "output":  null,
+                   "diagnostics":  [
+
+                                   ],
+                   "success":  true,
+                   "result":  {
+                                  "configured":  true,
+                                  "initial":  2.5,
+                                  "firstUpgrade":  3.5,
+                                  "maximum":  600.0,
+                                  "tiers":  [
+                                                {
+                                                    "name":  "Basic Shovel",
+                                                    "capacityKg":  2.5,
+                                                    "capacityPerUpgrade":  1.0
+                                                },
+                                                {
+                                                    "name":  "Medium Shovel",
+                                                    "capacityKg":  8.5,
+                                                    "capacityPerUpgrade":  1.0
+                                                },
+                                                {
+                                                    "name":  "Improved Shovel",
+                                                    "capacityKg":  14.5,
+                                                    "capacityPerUpgrade":  1.0
+                                                },
+                                                {
+                                                    "name":  "Expert Shovel",
+                                                    "capacityKg":  20.0,
+                                                    "capacityPerUpgrade":  1.0
+                                                },
+                                                {
+                                                    "name":  "Grain Vacuum",
+                                                    "capacityKg":  150.0,
+                                                    "capacityPerUpgrade":  37.5
+                                                },
+                                                {
+                                                    "name":  "High Capacity Vacuum",
+                                                    "capacityKg":  300.0,
+                                                    "capacityPerUpgrade":  75.0
+                                                }
+                                            ]
+                              }
+               }
+}

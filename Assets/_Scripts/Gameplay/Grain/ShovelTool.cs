@@ -54,7 +54,15 @@ public sealed class ShovelTool : MonoBehaviour
             return null;
         }
     }
-    private float ScoopScale => Mathf.Clamp(Mathf.Pow(CapacityKg / 22.5f, 1f / 3f), 1f, 2.4f);
+    private float ScoopScale
+    {
+        get
+        {
+            var settings = UpgradeSettings;
+            float startingCapacity = settings != null && settings.IsConfigured ? settings.Capacity(0) : capacityKg;
+            return Mathf.Clamp(Mathf.Pow(CapacityKg / Mathf.Max(.01f, startingCapacity), 1f / 3f), 1f, 2.4f);
+        }
+    }
     private float EffectiveScoopRadius => scoopRadius * ScoopScale * 2.08008382f;
     private float EffectiveScoopDepth => scoopDepth * Mathf.Sqrt(ScoopScale) * 2.08008382f;
     public bool IsVacuum => ActiveVacuum != null;

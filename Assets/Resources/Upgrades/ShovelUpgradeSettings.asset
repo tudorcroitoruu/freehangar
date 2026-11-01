@@ -15,54 +15,54 @@ MonoBehaviour:
   shovels:
   - name: Basic Shovel
     image: {fileID: 21300000, guid: 9fd2b7424aeb41f42b2f226feda2ef14, type: 3}
-    capacityKg: 22.5
+    capacityKg: 2.5
     weightKg: 1
-    capacityPerUpgrade: 9
+    capacityPerUpgrade: 1
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
     prices: 320000004b0000006400000096000000
   - name: Medium Shovel
     image: {fileID: 21300000, guid: cfb9e0579b9c03c478557593242d6265, type: 3}
-    capacityKg: 76.5
+    capacityKg: 8.5
     weightKg: 0.8
-    capacityPerUpgrade: 9
+    capacityPerUpgrade: 1
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
     prices: 96000000c8000000fa0000005e010000
   - name: Improved Shovel
     image: {fileID: 21300000, guid: 0a8be3e409bce994db21f8a3dfac12c6, type: 3}
-    capacityKg: 130.5
+    capacityKg: 14.5
     weightKg: 0.6
-    capacityPerUpgrade: 9
+    capacityPerUpgrade: 1
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
     prices: c20100008a020000520300004c040000
   - name: Expert Shovel
     image: {fileID: 21300000, guid: ac885e9cb306d8b489498a0fdcc580b1, type: 3}
-    capacityKg: 180
+    capacityKg: 20
     weightKg: 0.4
-    capacityPerUpgrade: 9
+    capacityPerUpgrade: 1
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
     prices: 7805000008070000fc080000b80b0000
   - name: Grain Vacuum
     image: {fileID: 21300000, guid: f7bcd5512510643429df95879b8e2f2a, type: 3}
-    capacityKg: 1350
+    capacityKg: 150
     weightKg: 0.35
-    capacityPerUpgrade: 337.5
+    capacityPerUpgrade: 37.5
     weightReductionPerUpgrade: 0.02
     suctionKgPerSecond: 540
     suctionPerUpgrade: 135
     prices: ac0d0000a00f00008813000064190000
   - name: High Capacity Vacuum
     image: {fileID: 21300000, guid: a1d9ed617fe4b7048971f33e9d8e230e, type: 3}
-    capacityKg: 2700
+    capacityKg: 300
     weightKg: 0.3
-    capacityPerUpgrade: 675
+    capacityPerUpgrade: 75
     weightReductionPerUpgrade: 0.02
     suctionKgPerSecond: 1080
     suctionPerUpgrade: 270

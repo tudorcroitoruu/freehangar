@@ -16,7 +16,22 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     [SerializeField] private Bounds fullBounds;
     [SerializeField] private Bounds closedBounds;
     [SerializeField, Min(.1f)] private float closeDuration = .65f;
+    [Header("Interaction prompt")]
+    [SerializeField, Tooltip("Optional custom prompt origin. Without an anchor, the top of the container bounds is used.")]
+    private Transform promptAnchor;
+    [SerializeField, Tooltip("World-space offset from the anchor or container top. Negative Y lowers the prompt.")]
+    private Vector3 promptOffset = Vector3.up * .12f;
     private BoxCollider fillCollider;
+    public Vector3 PromptPosition
+    {
+        get
+        {
+            Bounds bounds = WorldBounds;
+            if (IsCarried) return bounds.center;
+            Vector3 origin = promptAnchor != null ? promptAnchor.position : new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
+            return origin + promptOffset;
+        }
+    }
     public float Kilograms => kilograms;
     public float CapacityKg => capacityKg;
     public bool HasAssignedGrain => restrictGrain || kilograms > .000001f;

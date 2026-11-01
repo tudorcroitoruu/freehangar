@@ -106,6 +106,34 @@ public class GrainEconomyTests
     }
 
     [Test]
+    public void FourFullStartingShovelLoadsFillTheTenKilogramFreeBag()
+    {
+        var settings=GrainEconomySettings.Default.shovelSettings;
+        var prefab=UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/FreeBag.prefab");
+        var bag=Object.Instantiate(prefab).GetComponent<GrainContainer>();
+        try
+        {
+            Assert.That(settings.Capacity(0),Is.EqualTo(2.5f));
+            Assert.That(bag.CapacityKg,Is.EqualTo(10f));
+            economy.grainConsumeMultiplier=200;
+            double before=pile.Kilograms;
+            var cargo=new GrainCargo();
+            for(int i=0;i<4;i++)
+            {
+                Vector3 point=new Vector3(0,pile.SurfaceHeight(Vector3.zero),0);
+                float collected=pile.Scoop(point,100,10,settings.Capacity(0),cargo);
+                Assert.That(collected,Is.EqualTo(2.5f).Within(.002));
+                cargo.PourInto(bag,settings.Capacity(0));
+                if(i<3)Assert.IsFalse(bag.IsFull);
+            }
+            Assert.That(bag.Kilograms,Is.EqualTo(10).Within(.002));
+            Assert.IsTrue(bag.IsFull);
+            Assert.That(before-pile.Kilograms,Is.EqualTo(2000).Within(.2));
+        }
+        finally { Object.DestroyImmediate(bag.gameObject); }
+    }
+
+    [Test]
     public void ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass()
     {
         economy.grainConsumeMultiplier = 200;
