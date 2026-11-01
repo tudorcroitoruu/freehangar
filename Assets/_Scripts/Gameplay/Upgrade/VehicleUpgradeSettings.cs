@@ -11,6 +11,7 @@ public sealed class VehicleUpgradeSettings : ScriptableObject
     {
         public string id;
         public string displayName;
+        [Min(1), Tooltip("Highest container transport level this vehicle accepts.")] public int maximumCargoLevel = 2;
         public Sprite image;
         [Tooltip("Presentation only. Actual cargo slots come from the vehicle prefab.")]
         [Min(0)] public int slots = 2;

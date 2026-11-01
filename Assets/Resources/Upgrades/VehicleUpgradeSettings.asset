@@ -15,6 +15,7 @@ MonoBehaviour:
   vehicles:
   - id: bicycle
     displayName: Bicycle
+    maximumCargoLevel: 2
     image: {fileID: 21300000, guid: 49c952336ce79ce42961b057e5d38de3, type: 3}
     slots: 2
     movementSpeed: 7
@@ -26,66 +27,72 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: motoroller
     displayName: Motoroller
+    maximumCargoLevel: 3
     image: {fileID: 21300000, guid: 935b1c7d7c91fe24b8cf51fdea4f2bc5, type: 3}
     slots: 2
     movementSpeed: 12
     price: 200
-    requiresKey: 1
+    requiresKey: 0
     keySprite: {fileID: 21300000, guid: 1212dffbc42c5d343bfc5376b120c46d, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/2_Motoroller_Rideable
     legacyUpgradeCount: 2
   - id: trike
     displayName: Trike
+    maximumCargoLevel: 4
     image: {fileID: 21300000, guid: 2d41c4c19bd67244aa0d72acd78dbbb4, type: 3}
     slots: 4
     movementSpeed: 10
     price: 600
-    requiresKey: 0
+    requiresKey: 1
     keySprite: {fileID: 21300000, guid: 184e54c1f478c714fb98a917c70dc157, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/3_Trike_Driveable
     legacyUpgradeCount: 2
   - id: lawnmower
     displayName: Lawnmower
+    maximumCargoLevel: 5
     image: {fileID: 21300000, guid: 33bca422af3ec0440855d6b787c5540c, type: 3}
     slots: 0
     movementSpeed: 10
     price: 1500
-    requiresKey: 0
+    requiresKey: 1
     keySprite: {fileID: 21300000, guid: 1c98a8b71a1719449a689568d486cd85, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/4_Lawnmower_With_Trailer
     legacyUpgradeCount: 2
   - id: pickup
     displayName: Pickup
+    maximumCargoLevel: 6
     image: {fileID: 21300000, guid: e9a3b38b64eb6734ca26de980c11312e, type: 3}
     slots: 4
     movementSpeed: 13
     price: 4500
-    requiresKey: 0
+    requiresKey: 1
     keySprite: {fileID: 21300000, guid: 26c86e214126b8144b46e008e3d9240f, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/5_Pick_up_Driveable
     legacyUpgradeCount: 2
   - id: pickupBig
     displayName: Pickup Bigger
+    maximumCargoLevel: 6
     image: {fileID: 21300000, guid: eff0c89e54fb11b44b85a1498a55fcdc, type: 3}
     slots: 4
     movementSpeed: 15
     price: 9000
-    requiresKey: 0
+    requiresKey: 1
     keySprite: {fileID: 21300000, guid: b3c73cc21cba98d46928b223514f63ca, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/6_Pick_Up_Bigger_Driveable
     legacyUpgradeCount: 2
   - id: pickupLast
     displayName: Pickup Cargo
+    maximumCargoLevel: 6
     image: {fileID: 21300000, guid: 99519259f3e04c84e9557d9f98415c52, type: 3}
     slots: 4
     movementSpeed: 20
     price: 18000
-    requiresKey: 0
+    requiresKey: 1
     keySprite: {fileID: 21300000, guid: 791b7223b8cdac64c90bfd468afcaaeb, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/7_Pick_Up_Last_Driveable

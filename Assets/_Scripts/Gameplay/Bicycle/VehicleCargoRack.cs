@@ -49,6 +49,7 @@ public sealed class VehicleCargoRack : MonoBehaviour
     private void LateUpdate() => Reflow();
     public void Reflow()
     {
+        if (TryGetComponent<VehicleReset>(out var reset) && reset.IsResetting) return;
         for(int i=0;i+1<slots.Count;i+=2)
         {
             int bay=i/2;

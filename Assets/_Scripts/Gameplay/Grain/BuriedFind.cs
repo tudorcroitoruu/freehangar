@@ -6,10 +6,15 @@ using UnityEngine;
 [DisallowMultipleComponent, RequireComponent(typeof(BoxCollider))]
 public sealed class BuriedFind : MonoBehaviour, IInteractable
 {
-    public enum Kind { Key, CashChest, UpgradeVoucher, InfiniteStamina, CashCache, Hammer, Sledgehammer, HangarKey, Broom }
+    public enum Kind { Key, CashChest, UpgradeVoucher, InfiniteStamina, CashCache, Hammer, Sledgehammer, HangarKey, Broom, VehicleKey }
 
     [SerializeField] private Kind kind;
     [SerializeField] private string findId;
+    [SerializeField] private string vehicleKeyName;
+    public void ConfigureVehicleKey(string id, string displayName, GrainPile pile)
+    {
+        kind = Kind.VehicleKey; findId = id; vehicleKeyName = displayName; coveringPile = pile;
+    }
     [SerializeField] private string requiredKeyId;
     [SerializeField] private string matchingHangarKeyId;
     [SerializeField] private string matchingKeyColor;
@@ -121,6 +126,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         bool hasProfile = SaveSystem.savesLoaded && SaveSystem.Data != null;
         bool hasKey = kind != Kind.CashChest || WasFound(SaveSystem.Data, requiredKeyId) || (!string.IsNullOrEmpty(matchingHangarKeyId) && WasFound(SaveSystem.Data, matchingHangarKeyId));
         string action = !hasProfile ? "Load save to collect" : !hasKey ? (string.IsNullOrEmpty(matchingKeyColor) ? "Requires chest key" : $"Requires {matchingKeyColor} key") :
+            kind == Kind.VehicleKey ? $"Take {vehicleKeyName} key" :
             kind == Kind.Key ? "Take CHEST key" :
             kind == Kind.HangarKey ? $"Take HANGAR {targetHangar} key" :
             kind == Kind.Broom ? "Take broom (equip with 2)" :
@@ -197,7 +203,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         return true;
     }
 
-    private string Receipt() => kind == Kind.HangarKey ? $"HANGAR {targetHangar} KEY\nUse at Hangar {targetHangar}" :
+    private string Receipt() => kind == Kind.VehicleKey ? $"{vehicleKeyName.ToUpperInvariant()} KEY FOUND" : kind == Kind.HangarKey ? $"HANGAR {targetHangar} KEY\nUse at Hangar {targetHangar}" :
         kind == Kind.Broom ? "BROOM FOUND\nPress 2 to equip" : kind == Kind.Key ? "CHEST KEY FOUND" : kind == Kind.InfiniteStamina ? "INFINITE STAMINA!" :
         kind == Kind.CashChest || kind == Kind.CashCache ? $"+${cashReward}" :
         kind == Kind.UpgradeVoucher ? "FREE UPGRADE!" : kind == Kind.Hammer ? "HAMMER FOUND" : "SLEDGEHAMMER FOUND";

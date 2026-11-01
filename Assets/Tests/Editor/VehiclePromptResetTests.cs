@@ -37,7 +37,35 @@ public class VehiclePromptResetTests
         Assert.That(reset.Progress,Is.Zero);
         CallResetTarget(bike);
         Assert.IsTrue(reset.TickHold(true,reset.HoldSeconds));
+        Assert.IsTrue(reset.IsResetting);
+        typeof(VehicleReset).GetMethod("AdvanceReset",Private).Invoke(reset,new object[]{.6f});
+        Assert.IsFalse(reset.IsResetting);
+        Assert.That(bike.transform.localScale,Is.EqualTo(Vector3.one));
         Assert.That(Vector3.Distance(bike.transform.position,home),Is.LessThan(.001f));
+    }
+
+    [Test]
+    public void AnimatedResetKeepsPhysicsScaleAndRestoresVisualScaleOnRepeatedResets()
+    {
+        var bike=CreateBike();
+        bike.transform.localScale=new Vector3(1.2f,1.2f,1.2f);
+        var reset=bike.gameObject.AddComponent<VehicleReset>();reset.SetHomePose();
+        for(int i=0;i<3;i++)
+        {
+            reset.TickHold(false,.01f);
+            Assert.IsTrue(reset.TickHold(true,reset.HoldSeconds));
+            var pose=bike.GetComponent<VehicleGroundAlignment>().Pose;
+            Vector3 normalPoseScale=pose.localScale;
+            typeof(VehicleReset).GetMethod("AdvanceReset",Private).Invoke(reset,new object[]{.24f});
+            Assert.That(bike.transform.localScale,Is.EqualTo(Vector3.one*1.2f));
+            Vector3 position=pose.localPosition;
+            bike.GetComponent<VehicleGroundAlignment>().Align(1f);
+            Assert.That(pose.localPosition,Is.EqualTo(position));
+            typeof(VehicleReset).GetMethod("AdvanceReset",Private).Invoke(reset,new object[]{.4f});
+            Assert.That(pose.localScale,Is.EqualTo(normalPoseScale));
+            Assert.That(bike.transform.localScale,Is.EqualTo(Vector3.one*1.2f));
+            Assert.IsFalse(reset.IsResetting);
+        }
     }
 
     [Test]
@@ -51,15 +79,19 @@ public class VehiclePromptResetTests
     }
 
     [Test]
-    public void RiddenVehicleCanStillReset()
+    public void RiddenVehicleCannotResetAndCancelsAnExistingHold()
     {
         var bike=CreateBike();
         var reset=bike.gameObject.AddComponent<VehicleReset>();reset.SetHomePose();
-        Vector3 home=bike.transform.position;
         bike.transform.position+=Vector3.right*5;
+        Vector3 parkedPosition=bike.transform.position;
+        Assert.IsFalse(reset.TickHold(true,reset.HoldSeconds*.5f));
         bike.SetRidden(true);
-        Assert.IsTrue(reset.TickHold(true,reset.HoldSeconds));
-        Assert.That(Vector3.Distance(bike.transform.position,home),Is.LessThan(.001f));
+        Assert.IsFalse(reset.CanReset);
+        Assert.IsFalse(reset.TickHold(true,reset.HoldSeconds));
+        Assert.That(reset.Progress,Is.Zero);
+        Assert.IsFalse(reset.IsResetting);
+        Assert.That(bike.transform.position,Is.EqualTo(parkedPosition));
     }
 
     [Test]

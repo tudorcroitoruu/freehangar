@@ -4,6 +4,8 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class GrainContainer : MonoBehaviour, IInteractable
 {
+    [SerializeField, Min(1), Tooltip("Minimum vehicle cargo level required to transport this container.")] private int transportLevel = 1;
+    public int TransportLevel => Mathf.Max(1, transportLevel);
     [SerializeField, Min(.01f)] private float capacityKg = 50f;
     [SerializeField, Min(0f)] private float kilograms;
     [SerializeField, Tooltip("Whether the player can carry this container, regardless of its fill level. Disable for Big Bag.")]

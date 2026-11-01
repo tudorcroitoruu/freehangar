@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteAlways, DisallowMultipleComponent]
+[ExecuteAlways, DisallowMultipleComponent, DefaultExecutionOrder(-50)]
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public sealed class GrainPile : MonoBehaviour
 {
@@ -302,10 +302,9 @@ public sealed class GrainPile : MonoBehaviour
             float kg = removed * density;
             if (destination != null && spatial == null) CollectRecipe(harvestedKg, kg, destination);
             harvestedKg += kg;
-            RefreshGrainAppearance();
             settling = true;
-            RefreshSurface();
-            if (Time.time >= nextCollider) RefreshCollider();
+            if (Application.isPlaying) surfaceRefreshPending = true;
+            else { RefreshGrainAppearance(); RefreshSurface(); RefreshCollider(); }
         }
         return removed * density;
     }
@@ -385,6 +384,17 @@ public sealed class GrainPile : MonoBehaviour
         return pile;
     }
 
+    private bool surfaceRefreshPending;
+
+    private void LateUpdate()
+    {
+        if (!surfaceRefreshPending || field == null) return;
+        surfaceRefreshPending = false;
+        RefreshSurface();
+        RefreshGrainAppearance();
+        if (colliderDirty && Time.time >= nextCollider) RefreshCollider();
+    }
+
     private void Update()
     {
         RefreshGrainAppearance();
@@ -405,9 +415,9 @@ public sealed class GrainPile : MonoBehaviour
         {
             nextStep = Time.time + 1f / simulationRate;
             settling = field.Settle(reposeAngle, .45f, WorldScale);
-            if (settling) RefreshSurface();
+            if (settling) surfaceRefreshPending = true;
         }
-        if (colliderDirty && Time.time >= nextCollider) RefreshCollider();
+        if (!surfaceRefreshPending && colliderDirty && Time.time >= nextCollider) RefreshCollider();
     }
 
     private void RefreshSurface()
@@ -450,27 +460,65 @@ public sealed class GrainPile : MonoBehaviour
         Initialize();
     }
 
+    private int[] collisionVertexMap;
+    private readonly List<Vector3> collisionVertices = new List<Vector3>();
+    private readonly List<int> collisionIndices = new List<int>();
+    private readonly List<Vector3> cookedVertices = new List<Vector3>();
+    private readonly List<int> cookedIndices = new List<int>();
+
     private void RefreshCollider()
     {
-        meshCollider.sharedMesh = null;
+        nextCollider = Time.time + 1f / colliderRate;
+        colliderDirty = false;
+        collisionIndices.Clear();
         if (DetectedWallCount > 0)
         {
             boundary.UpdateHeights(field, 0);
-            collisionMesh.Clear(); collisionMesh.SetVertices(boundary.Positions); collisionMesh.SetTriangles(boundary.Triangles, 0); collisionMesh.RecalculateBounds();
-            meshCollider.enabled = boundary.Triangles.Count > 0;
-            if (meshCollider.enabled) meshCollider.sharedMesh = collisionMesh;
-            nextCollider = Time.time + 1f / colliderRate; colliderDirty = false;
-            return;
+            if (collisionVertexMap == null || collisionVertexMap.Length != boundary.Positions.Count)
+            {
+                // The render skin splits every triangle for flat shading. Physics needs
+                // only one vertex at each X/Z location on this continuous height field.
+                collisionVertexMap = new int[boundary.Positions.Count];
+                collisionVertices.Clear();
+                var unique = new Dictionary<Vector2Int, int>();
+                for (int i = 0; i < boundary.Positions.Count; i++)
+                {
+                    Vector3 point = boundary.Positions[i];
+                    var key = new Vector2Int(Mathf.RoundToInt(point.x * 100000f), Mathf.RoundToInt(point.z * 100000f));
+                    if (!unique.TryGetValue(key, out int index))
+                    {
+                        index = collisionVertices.Count; unique.Add(key, index); collisionVertices.Add(point);
+                    }
+                    collisionVertexMap[i] = index;
+                }
+            }
+            for (int i = 0; i < boundary.Positions.Count; i++) collisionVertices[collisionVertexMap[i]] = boundary.Positions[i];
+            foreach (int index in boundary.Triangles) collisionIndices.Add(collisionVertexMap[index]);
         }
-        // Collision and mass use the actual surface, never the recessed visual skin.
-        for (int i = 0; i < vertices.Length; i++) vertices[i].y = field.Heights[i];
-        collisionMesh.vertices = vertices;
-        collisionMesh.SetTriangles(activeTriangles, 0);
+        else
+        {
+            collisionVertices.Clear();
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                Vector3 point = vertices[i]; point.y = field.Heights[i]; collisionVertices.Add(point);
+            }
+            collisionIndices.AddRange(activeTriangles);
+        }
+        bool changed = cookedVertices.Count != collisionVertices.Count || cookedIndices.Count != collisionIndices.Count;
+        float tolerance = .001f / Mathf.Max(.0001f, WorldScale.y);
+        for (int i = 0; i < collisionVertices.Count && !changed; i++)
+            changed = Mathf.Abs(collisionVertices[i].y - cookedVertices[i].y) >= tolerance ||
+                collisionVertices[i].x != cookedVertices[i].x || collisionVertices[i].z != cookedVertices[i].z;
+        for (int i = 0; i < collisionIndices.Count && !changed; i++) changed = collisionIndices[i] != cookedIndices[i];
+        if (!changed) return;
+        meshCollider.sharedMesh = null;
+        collisionMesh.Clear();
+        collisionMesh.SetVertices(collisionVertices); collisionMesh.SetTriangles(collisionIndices, 0);
         collisionMesh.RecalculateBounds();
-        meshCollider.enabled = activeTriangles.Count > 0;
+        meshCollider.enabled = collisionIndices.Count > 0;
         if (meshCollider.enabled) meshCollider.sharedMesh = collisionMesh;
-        nextCollider = Time.time + 1f / colliderRate;
-        colliderDirty = false;
+        cookedVertices.Clear(); cookedVertices.AddRange(collisionVertices);
+        cookedIndices.Clear(); cookedIndices.AddRange(collisionIndices);
     }
 
     private void OnDestroy() => ReleaseMeshes();
@@ -487,6 +535,7 @@ public sealed class GrainPile : MonoBehaviour
         if (mesh != null) { if (Application.isPlaying) Destroy(mesh); else DestroyImmediate(mesh); }
         if (collisionMesh != null) { if (Application.isPlaying) Destroy(collisionMesh); else DestroyImmediate(collisionMesh); }
         mesh = collisionMesh = null;
+        collisionVertexMap = null; cookedVertices.Clear(); cookedIndices.Clear();
     }
 
     private void OnDrawGizmosSelected()

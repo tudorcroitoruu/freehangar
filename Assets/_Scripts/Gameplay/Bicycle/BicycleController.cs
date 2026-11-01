@@ -160,6 +160,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     }
     public void Drive(float throttle, float turn, bool brake, float dt, bool boost = false)
     {
+        if (TryGetComponent<VehicleReset>(out var reset) && reset.IsResetting) return;
         if (!IsRidden || dt <= 0 || !float.IsFinite(dt)) return;
         pedalingInput = Mathf.Abs(throttle) > .01f && !brake;
         float topSpeed = maximumSpeed * (boost && throttle > 0 && !brake ? Mathf.Max(1, boostSpeedMultiplier) : 1);
@@ -301,8 +302,9 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         if (interactor.Bags != null && interactor.Bags.IsCarrying)
         {
             var upgrades = GetComponent<VehicleUpgrade>();
-            bool available = FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadCargo(GetComponent<VehicleCargoRack>() != null ? 2 : 1));
-            prompt = new InteractionPromptData(transform.position + Vector3.up, available ? "Load bag" : "Vehicle full", available);
+            bool compatible = !TryGetComponent<VehicleUpgrade>(out var cargoUpgrade) || cargoUpgrade.AcceptsContainer(interactor.Bags.CarriedBag);
+            bool available = compatible && FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadCargo(GetComponent<VehicleCargoRack>() != null ? 2 : 1));
+            prompt = new InteractionPromptData(transform.position + Vector3.up, available ? "Load bag" : !compatible ? "Container level too high" : "Vehicle full", available);
             return true;
         }
         if (actor.IsCarrying) return false;

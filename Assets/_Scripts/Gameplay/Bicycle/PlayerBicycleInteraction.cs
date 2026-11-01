@@ -41,12 +41,11 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if (riding)
         {
             if (input && Input.GetKeyDown(KeyCode.E)) { TryDismount(); return true; }
-            bool resetting = input && Input.GetKey(KeyCode.R);
-            if (vehicleReset != null) vehicleReset.TickHold(resetting, Time.deltaTime);
-            DriveRiding(input && !resetting ? Input.GetAxisRaw("Vertical") : 0,
-                input && !resetting ? Input.GetAxisRaw("Horizontal") : 0,
-                !input || resetting || Input.GetKey(KeyCode.Space),
-                input && !resetting && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)), Time.deltaTime);
+            if (vehicleReset != null) vehicleReset.CancelHold();
+            DriveRiding(input ? Input.GetAxisRaw("Vertical") : 0,
+                input ? Input.GetAxisRaw("Horizontal") : 0,
+                !input || Input.GetKey(KeyCode.Space),
+                input && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)), Time.deltaTime);
             if(input) UpdateRidingLook(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"), Time.deltaTime);
             ApplyRidingView();
             return true;
@@ -72,7 +71,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             if (bags != null && bags.IsCarrying)
             {
                 var upgrades = bicycle.GetComponent<VehicleUpgrade>();
-                bool canLoad = bicycle.FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadCargo(bicycle.GetComponent<VehicleCargoRack>() != null ? 2 : 1));
+                bool canLoad = (upgrades == null || upgrades.AcceptsContainer(bags.CarriedBag)) && bicycle.FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadCargo(bicycle.GetComponent<VehicleCargoRack>() != null ? 2 : 1));
                 hint=canLoad ? "E Secure bag on " + bicycle.cargoLocationName : bicycle.cargoLocationName + " is full";
                 if (Input.GetKeyDown(KeyCode.E)) { TryLoadBag(); return true; }
                 return false;
@@ -179,7 +178,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         view.transform.SetParent(bicycle.riderView,false);view.transform.localPosition=Vector3.zero;view.transform.localRotation=Quaternion.identity;
         yaw=pitch=lookIdleTime=yawReturnVelocity=pitchReturnVelocity=0;riding=true;bicycle.SetRidden(true);ApplyRidingView();
         hint="";
-        GameplayCanvas.Instance?.SetDrivingHints(true);
+        GameplayCanvas.Instance?.SetDrivingHints(true, bicycle != null && !bicycle.motorDriven);
         return true;
     }
     public bool TryDismount()
@@ -224,15 +223,5 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             GameplayCanvas.Instance.interactionPrompt != null && GameplayCanvas.Instance.interactionPrompt.IsVisible;
         if (!string.IsNullOrEmpty(hint) && !promptVisible)
             GUI.Box(new Rect(Mathf.Max(8, Screen.width/2-340),Screen.height-85,Mathf.Min(680, Screen.width-16),36),hint);
-        if (!riding || vehicleReset == null || vehicleReset.Progress <= 0f) return;
-        Rect bar = new Rect(Mathf.Max(8, Screen.width / 2 - 170), Screen.height - 44, Mathf.Min(340, Screen.width - 16), 24);
-        GUI.Box(bar, GUIContent.none);
-        Rect fill = new Rect(bar.x + 3, bar.y + 3, (bar.width - 6) * vehicleReset.Progress, bar.height - 6);
-        Color previousColor = GUI.color;
-        GUI.color = new Color(.95f, .72f, .26f);
-        GUI.DrawTexture(fill, Texture2D.whiteTexture);
-        GUI.color = previousColor;
-        GUI.Label(bar, $"Resetting  {vehicleReset.HeldSeconds:0.0} / {vehicleReset.HoldSeconds:0.0} s",
-            new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
     }
 }

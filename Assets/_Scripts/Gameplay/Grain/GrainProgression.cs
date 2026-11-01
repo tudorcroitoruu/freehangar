@@ -47,7 +47,7 @@ public sealed class GrainProgression : MonoBehaviour
         if (!float.IsFinite(kg) || kg <= 0) return;
         sessionKg += kg;
         if (loadedData == null) pendingKg += kg;
-        else { loadedData.grainBaggedKilograms = sessionKg; if (!dirty) saveAt = Time.unscaledTime + 1; dirty = true; }
+        else { loadedData.grainBaggedKilograms = sessionKg; saveAt = Time.unscaledTime + 3f; dirty = true; }
     }
     private void Update()
     {

@@ -68,11 +68,14 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     private MeshRenderer loadRenderer;
     private Vector3[] loadVertices, loadNormals, sourceVertices, sourceNormals;
     private int indicesPerKernel;
+    private Matrix4x4[] uploadedLoadMatrices;
+    private int uploadedLoadCount = -1;
 
     private void BuildLoadRenderer()
     {
         if (kernelMesh == null || kernelMaterial == null) return;
         int capacity = maximumKernels + PackedCapacity;
+        uploadedLoadMatrices = new Matrix4x4[capacity];
         sourceVertices = kernelMesh.vertices; sourceNormals = kernelMesh.normals;
         var sourceUV = kernelMesh.uv; var sourceIndices = kernelMesh.triangles;
         indicesPerKernel = sourceIndices.Length;
@@ -100,11 +103,16 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         if (visibleLoad == null) BuildLoadRenderer();
         if (loadRenderer == null) return;
         loadRenderer.enabled = amount > 0;
-        if (amount == 0) return;
-        Matrix4x4 inverse = transform.worldToLocalMatrix;
+        if (amount == 0) { uploadedLoadCount = 0; return; }
+        loadRenderer.SetPropertyBlock(loadAppearance.Block);
+        bool changed = amount != uploadedLoadCount;
+        for (int k = 0; k < amount && !changed; k++) changed = uploadedLoadMatrices[k] != matrices[k];
+        if (!changed) return;
+        uploadedLoadCount = amount;
         for (int k = 0; k < amount; k++)
         {
-            Matrix4x4 matrix = inverse * matrices[k];
+            Matrix4x4 matrix = matrices[k];
+            uploadedLoadMatrices[k] = matrix;
             Matrix4x4 normal = matrix.inverse.transpose;
             for (int j = 0; j < sourceVertices.Length; j++)
             {
@@ -114,7 +122,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
             }
         }
         visibleLoad.vertices = loadVertices; visibleLoad.normals = loadNormals;
-        visibleLoad.SetSubMesh(0, new SubMeshDescriptor(0, amount * indicesPerKernel));
+        visibleLoad.SetSubMesh(0, new SubMeshDescriptor(0, amount * indicesPerKernel), MeshUpdateFlags.DontRecalculateBounds);
         visibleLoad.RecalculateBounds(); loadRenderer.SetPropertyBlock(loadAppearance.Block);
     }
 
@@ -204,7 +212,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         HighestLoadPoint = 0;
         for (int i = 0; i < count; i++)
         {
-            matrices[i] = transform.localToWorldMatrix * Matrix4x4.TRS(positions[i], rotations[i], new Vector3(.013f, .009f, .017f));
+            matrices[i] = Matrix4x4.TRS(positions[i], rotations[i], new Vector3(.013f, .009f, .017f));
             HighestLoadPoint = Mathf.Max(HighestLoadPoint, positions[i].y + .018f);
         }
         PackedKernelCount = 0;
@@ -216,7 +224,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
             p.y += SampleFloor(0, p.z);
             if (p.y < Floor(p.x, p.z) + .008f || p.y + .02f > maximumLoadHeight) continue;
             HighestLoadPoint = Mathf.Max(HighestLoadPoint, p.y + .02f);
-            matrices[count + PackedKernelCount++] = transform.localToWorldMatrix * Matrix4x4.TRS(p, packedRotations[i],
+            matrices[count + PackedKernelCount++] = Matrix4x4.TRS(p, packedRotations[i],
                 new Vector3(.016f, .011f, .019f) * reveal);
         }
         if (tool != null) loadAppearance.Set(tool.Cargo); else loadAppearance.Set(GrainType.Corn);

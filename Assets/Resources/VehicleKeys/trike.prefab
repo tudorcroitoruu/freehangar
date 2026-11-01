@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1000
+GameObject:
+  m_ObjectHideFlags: 0
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4000}
+  - component: {fileID: 3300}
+  - component: {fileID: 2300}
+  - component: {fileID: 6500}
+  - component: {fileID: 11400}
+  m_Layer: 0
+  m_Name: trike buried vehicle key
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &4000
+Transform:
+  m_GameObject: {fileID: 1000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+--- !u!33 &3300
+MeshFilter:
+  m_GameObject: {fileID: 1000}
+  m_Mesh: {fileID: 4300000, guid: 521a6c266561c734d99cf23aaaa726a3, type: 2}
+--- !u!23 &2300
+MeshRenderer:
+  m_GameObject: {fileID: 1000}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_Materials:
+  - {fileID: 2100000, guid: f738292eb538ed74eef6c628e22028b7, type: 2}
+  m_RenderingLayerMask: 1
+--- !u!65 &6500
+BoxCollider:
+  m_GameObject: {fileID: 1000}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.34, y: 0.04, z: 0.42}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &11400
+MonoBehaviour:
+  m_GameObject: {fileID: 1000}
+  m_Enabled: 1
+  m_Script: {fileID: 11500000, guid: 9e953992af4286a48902ae0bb6c42048, type: 3}
+  m_EditorClassIdentifier: Assembly-CSharp::BuriedFind
+  kind: 9
+  findId: vehicle.key.trike
+  vehicleKeyName: trike
+  coveringPile: {fileID: 0}
+  settleOnReveal: 1

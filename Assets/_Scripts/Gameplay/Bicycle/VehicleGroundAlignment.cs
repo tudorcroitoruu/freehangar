@@ -79,6 +79,7 @@ public sealed class VehicleGroundAlignment : MonoBehaviour
     }
     public void Align(float dt)
     {
+        if (TryGetComponent<VehicleReset>(out var reset) && reset.IsResetting) return;
         HasSupport = false;
         if (Pose == null || dt <= 0) return;
         int count = 0; Vector3 mean = Vector3.zero, meanNormal = Vector3.zero;

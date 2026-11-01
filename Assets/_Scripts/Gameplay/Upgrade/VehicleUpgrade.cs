@@ -79,6 +79,8 @@ public sealed class VehicleUpgrade : MonoBehaviour
     }
     public int CargoCount => CargoRoots().Count;
     public bool HasCargo => CargoCount > 0;
+    public bool AcceptsContainer(GrainContainer container) => container != null && container.TransportLevel <= (Profile?.maximumCargoLevel ?? 2);
+
     public bool CanLoadCargo(int slotCost = 1)
     {
         if (slotCost <= 0 || (IsConfigured && !IsUnlocked)) return false;
