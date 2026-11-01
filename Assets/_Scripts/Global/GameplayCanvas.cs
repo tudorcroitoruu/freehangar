@@ -247,6 +247,8 @@ public class GameplayCanvas : MonoBehaviour
         freeHandsWarning.blocksRaycasts = false;
     }
 
+    public void RefreshMoneyFromSave() => RefreshMoney(SaveSystem.Money);
+
     private void RefreshMoney(int amount)
     {
         if (moneyInitialized && amount == targetMoney) return;

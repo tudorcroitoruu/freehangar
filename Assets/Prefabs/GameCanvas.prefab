@@ -1672,6 +1672,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameplayCanvas
   hudObject: {fileID: 1090845036283441939}
   moneyText: {fileID: 2321670133962752958}
+  moneyAnimationSeconds: 0.4
   interactionPrompt: {fileID: 3029976341701256075}
   freeHandsWarning: {fileID: 271625853017273318}
   freeHandsFadeDuration: 0.5
@@ -4199,7 +4200,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 2
+  m_Text: 4
 --- !u!1 &1331036753476965787
 GameObject:
   m_ObjectHideFlags: 0
@@ -23210,9 +23211,9 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8454061942352448699}
-  - {fileID: 7329147289778050961}
   - {fileID: 869676244355228200}
   - {fileID: 2626415295000462646}
+  - {fileID: 7329147289778050961}
   m_Father: {fileID: 8513946829808345699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -25997,7 +25998,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 4
+  m_Text: 3
 --- !u!1 &8611591340901569316
 GameObject:
   m_ObjectHideFlags: 0
@@ -27042,7 +27043,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 3
+  m_Text: 2
 --- !u!1 &8838307917806929890
 GameObject:
   m_ObjectHideFlags: 0

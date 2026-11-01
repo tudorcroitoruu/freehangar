@@ -30,6 +30,7 @@ public class UpgradeShovel : MonoBehaviour
     [SerializeField] private CanvasGroup upgradeButtonCanvas;
     [SerializeField] private Image upgradeButtonImage;
     private Material originalButtonMaterial, buttonMaterial;
+    private bool waitingForUpgrade;
     private static readonly int SaturationId = Shader.PropertyToID("_Saturation");
 
     private void OnEnable()
@@ -48,12 +49,17 @@ public class UpgradeShovel : MonoBehaviour
 
     private void OnMoneyChanged(int _) => Refresh();
 
+    private void Update()
+    {
+        if (waitingForUpgrade && !SaveSystem.UpgradePurchaseLocked) Refresh();
+    }
+
     public void Upgrade() => TryUpgrade();
 
     public bool TryUpgrade()
     {
         if (Application.isPlaying) settings = GrainEconomySettings.ResolveShovel(settings);
-        if (!isActiveAndEnabled || SaveSystem.Data == null || settings == null || !settings.IsConfigured) return false;
+        if (!isActiveAndEnabled || SaveSystem.UpgradePurchaseLocked || SaveSystem.Data == null || settings == null || !settings.IsConfigured) return false;
         int level = SaveSystem.Data.shovelUpgradeLevel;
         if (level < 0 || level >= settings.MaxUpgrades) return false;
         int cost = settings.Price(level);
@@ -69,9 +75,12 @@ public class UpgradeShovel : MonoBehaviour
         int level = configured ? settings.ClampLevel(SaveSystem.Data?.shovelUpgradeLevel ?? 0) : 0;
         bool maxed = configured && level >= settings.MaxUpgrades;
         int cost = configured ? settings.Price(level) : 0;
+        bool usesVoucher = cost > 0 && (SaveSystem.Data?.freeUpgradeVouchers ?? 0) > 0;
         bool available = configured && SaveSystem.Data != null && !maxed && cost >= 0;
-        int missing = available ? Mathf.Max(0, cost - SaveSystem.Money) : 0;
+        int missing = available && !usesVoucher ? Mathf.Max(0, cost - SaveSystem.Money) : 0;
         bool affordable = available && missing == 0;
+        waitingForUpgrade = SaveSystem.UpgradePurchaseLocked;
+        bool canUpgrade = affordable && !waitingForUpgrade;
         bool vacuum = configured && settings.IsVacuum(level);
         if (shovelModifications != null)
             foreach (var item in shovelModifications)
@@ -100,12 +109,12 @@ public class UpgradeShovel : MonoBehaviour
                 SetModification(weightModification, settings.Weight(level), settings.Weight(next), maxed);
             }
         }
-        if (price != null) price.text = maxed ? "MAX" : configured ? cost == 0 ? "Free" : $"$ {EconomyNumberFormat.Accounting(cost)}" : "Unavailable";
+        if (price != null) price.text = maxed ? "MAX" : configured ? cost == 0 || usesVoucher ? "Free" : $"$ {EconomyNumberFormat.Accounting(cost)}" : "Unavailable";
         if (notEnoughMoney != null) notEnoughMoney.text = missing > 0 ? $"You need ${EconomyNumberFormat.Accounting(missing)} more." : "";
         if (notEnoughMoneyPopup != null) notEnoughMoneyPopup.SetActive(missing > 0);
-        if (upgradeButton != null) upgradeButton.interactable = affordable;
-        if (upgradeButtonCanvas != null) upgradeButtonCanvas.alpha = affordable ? 1f : .5f;
-        UpdateButtonMaterial(affordable ? 1f : .5f);
+        if (upgradeButton != null) upgradeButton.interactable = canUpgrade;
+        if (upgradeButtonCanvas != null) upgradeButtonCanvas.alpha = canUpgrade ? 1f : .5f;
+        UpdateButtonMaterial(canUpgrade ? 1f : .5f);
     }
 
     private void SetModification(Text label, float current, float next, bool maxed, string unit = "kg")

@@ -5,6 +5,111 @@ using System.Reflection;
 
 public class PlayerPerksTests
 {
+    [TestCase(true)]
+    [TestCase(false)]
+    public void VoucherPaysForOnlyOneSuccessfulToolUpgrade(bool shovel)
+    {
+        var data = new PlayerData { cash = 500 };
+        Assert.IsTrue(PlayerPerks.Grant(data, ChestReward.FreeUpgrade, 0, 0, 0));
+        Assert.IsFalse(shovel ? data.TryUpgradeShovel(-1, 0, 4) : data.TryUpgradeStamina(-1, 0, 4));
+        Assert.AreEqual(1, data.freeUpgradeVouchers);
+        Assert.IsTrue(shovel ? data.TryUpgradeShovel(100, 0, 4) : data.TryUpgradeStamina(100, 0, 4));
+        Assert.AreEqual(500, data.cash);
+        Assert.AreEqual(0, data.freeUpgradeVouchers);
+        Assert.IsFalse(shovel ? data.TryUpgradeShovel(100, 0, 4) : data.TryUpgradeStamina(100, 0, 4));
+        Assert.IsTrue(shovel ? data.TryUpgradeShovel(200, 1, 4) : data.TryUpgradeStamina(200, 1, 4));
+        Assert.AreEqual(300, data.cash);
+        var restored = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(data));
+        Assert.AreEqual(0, restored.freeUpgradeVouchers);
+        Assert.AreEqual(2, shovel ? restored.shovelUpgradeLevel : restored.staminaUpgradeLevel);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void VoucherMakesUpgradeScreenFreeWithoutRequiringCash(bool shovel)
+    {
+        var previousData = SaveSystem.Data;
+        var root = new GameObject("Voucher price test");
+        ScriptableObject settings = null;
+        try
+        {
+            SaveSystem.Data = new PlayerData { freeUpgradeVouchers = 1 };
+            MonoBehaviour screen;
+            if (shovel)
+            {
+                var configuration = ScriptableObject.CreateInstance<ShovelUpgradeSettings>();
+                configuration.shovels = new[] { new ShovelUpgradeSettings.ShovelType() };
+                settings = configuration;
+                screen = root.AddComponent<UpgradeShovel>();
+            }
+            else
+            {
+                settings = ScriptableObject.CreateInstance<StaminaUpgradeSettings>();
+                screen = root.AddComponent<UpgradeStamina>();
+            }
+            var label = new GameObject("Price", typeof(RectTransform), typeof(Text));
+            label.transform.SetParent(root.transform, false);
+            var buttonRoot = new GameObject("Upgrade", typeof(RectTransform), typeof(Button));
+            buttonRoot.transform.SetParent(root.transform, false);
+            var button = buttonRoot.GetComponent<Button>();
+            SetPrivate(screen, "settings", settings);
+            SetPrivate(screen, "price", label.GetComponent<Text>());
+            SetPrivate(screen, "upgradeButton", button);
+            screen.GetType().GetMethod("Refresh").Invoke(screen, null);
+            Assert.AreEqual("Free", label.GetComponent<Text>().text);
+            Assert.IsTrue(button.interactable);
+            SaveSystem.Data.freeUpgradeVouchers = 0;
+            screen.GetType().GetMethod("Refresh").Invoke(screen, null);
+            StringAssert.StartsWith("$ ", label.GetComponent<Text>().text);
+            Assert.IsFalse(button.interactable);
+        }
+        finally
+        {
+            Object.DestroyImmediate(root);
+            Object.DestroyImmediate(settings);
+            SaveSystem.Data = previousData;
+        }
+    }
+
+    [Test]
+    public void UpgradePurchaseBlocksReentryAndRapidPurchasesAcrossScreens()
+    {
+        var previousData = SaveSystem.Data;
+        string[] keys = { "/save", "/save_Settings", "levelsCompleted" };
+        var values = new string[keys.Length];
+        var existed = new bool[keys.Length];
+        for (int i = 0; i < keys.Length; i++)
+        {
+            existed[i] = PlayerPrefs.HasKey(keys[i]);
+            values[i] = PlayerPrefs.GetString(keys[i]);
+        }
+        bool reentered = false;
+        System.Action<int> onMoneyChanged = _ => reentered |= SaveSystem.TryPurchaseStaminaUpgrade(100, 0, 4);
+        try
+        {
+            SaveSystem.Data = new PlayerData { cash = 500, freeUpgradeVouchers = 1 };
+            SaveSystem.MoneyChanged += onMoneyChanged;
+            Assert.IsTrue(SaveSystem.TryPurchaseShovelUpgrade(100, 0, 4));
+            Assert.IsFalse(reentered);
+            Assert.IsTrue(SaveSystem.UpgradePurchaseLocked);
+            Assert.IsFalse(SaveSystem.TryPurchaseShovelUpgrade(200, 1, 4));
+            Assert.IsFalse(SaveSystem.TryPurchaseStaminaUpgrade(100, 0, 4));
+            Assert.AreEqual(1, SaveSystem.Data.shovelUpgradeLevel);
+            Assert.AreEqual(0, SaveSystem.Data.staminaUpgradeLevel);
+            Assert.AreEqual(0, SaveSystem.Data.freeUpgradeVouchers);
+            Assert.AreEqual(500, SaveSystem.Money);
+        }
+        finally
+        {
+            SaveSystem.MoneyChanged -= onMoneyChanged;
+            SaveSystem.Data = previousData;
+            for (int i = 0; i < keys.Length; i++)
+                if (existed[i]) PlayerPrefs.SetString(keys[i], values[i]);
+                else PlayerPrefs.DeleteKey(keys[i]);
+            PlayerPrefs.Save();
+        }
+    }
+
     [TestCase(.1f, ChestReward.Cash)]
     [TestCase(.5f, ChestReward.FreeUpgrade)]
     [TestCase(.65f, ChestReward.NoAttacks)]
@@ -102,6 +207,8 @@ public class PlayerPerksTests
             handler.SetExpiry(PlayerPerks.Now + 600);
             InvokePrivate(handler, "UpdateTimer");
             Assert.That(runtime.GetFloat("_OutlineFillAmount"), Is.GreaterThan(.99f));
+            // Edit-mode components without Awake do not receive runtime teardown.
+            InvokePrivate(handler, "OnDestroy");
             Object.DestroyImmediate(handler);
             Assert.AreSame(shared, background.material);
             Assert.IsTrue(runtime == null);

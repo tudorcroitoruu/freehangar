@@ -19,6 +19,29 @@ public static class SaveSystem
     public static event Action OwnedProductsChanged;
     public static event Action HangarProgressChanged;
     public static int Money => Data != null ? Data.cash : 0;
+    private static bool upgradePurchaseInProgress;
+    private static PlayerData upgradeCooldownProfile;
+    private static double nextUpgradeAllowedAt;
+    public static bool UpgradePurchaseLocked => upgradePurchaseInProgress ||
+        (upgradeCooldownProfile == Data && Time.realtimeSinceStartupAsDouble < nextUpgradeAllowedAt);
+
+    private static bool ApplyUpgradePurchase(Func<PlayerData, bool> purchase)
+    {
+        if (Data == null || UpgradePurchaseLocked) return false;
+        // Lock before changing data or publishing MoneyChanged: event callbacks
+        // must not reenter a purchase or spend the same voucher a second time.
+        upgradePurchaseInProgress = true;
+        try
+        {
+            if (!purchase(Data)) return false;
+            upgradeCooldownProfile = Data;
+            nextUpgradeAllowedAt = Time.realtimeSinceStartupAsDouble + .4d;
+            SaveData();
+            nextUpgradeAllowedAt = Time.realtimeSinceStartupAsDouble + .4d;
+            return true;
+        }
+        finally { upgradePurchaseInProgress = false; }
+    }
 
     public static bool TryOpenHangar(int number)
     {
@@ -38,30 +61,22 @@ public static class SaveSystem
 
     public static bool TryPurchaseShovelUpgrade(int price, int expectedLevel, int maxLevel)
     {
-        if (Data == null || !Data.TryUpgradeShovel(price, expectedLevel, maxLevel)) return false;
-        SaveData();
-        return true;
+        return ApplyUpgradePurchase(data => data.TryUpgradeShovel(price, expectedLevel, maxLevel));
     }
 
     public static bool TryPurchaseStaminaUpgrade(int price, int expectedLevel, int maxLevel)
     {
-        if (Data == null || !Data.TryUpgradeStamina(price, expectedLevel, maxLevel)) return false;
-        SaveData();
-        return true;
+        return ApplyUpgradePurchase(data => data.TryUpgradeStamina(price, expectedLevel, maxLevel));
     }
 
     public static bool TryPurchaseVehicleUpgrade(string id, int price, int expectedLevel, int maxLevel)
     {
-        if (Data == null || !Data.TryUpgradeVehicle(id, price, expectedLevel, maxLevel)) return false;
-        SaveData();
-        return true;
+        return ApplyUpgradePurchase(data => data.TryUpgradeVehicle(id, price, expectedLevel, maxLevel));
     }
 
     public static bool TryPurchaseVehicle(VehicleUpgradeSettings settings, string currentId)
     {
-        if (settings == null || !settings.TryPurchase(Data, currentId)) return false;
-        SaveData();
-        return true;
+        return settings != null && ApplyUpgradePurchase(data => settings.TryPurchase(data, currentId));
     }
 
     public static bool TryPurchaseUpgrade(int price, Func<PlayerData, bool> apply, out bool usedVoucher)
@@ -412,18 +427,22 @@ public class PlayerData
 
     public bool TryUpgradeStamina(int price, int expectedLevel, int maxLevel)
     {
-        if (price < 0 || cash < price || expectedLevel < 0 || staminaUpgradeLevel != expectedLevel ||
+        bool voucher = price > 0 && freeUpgradeVouchers > 0;
+        if (price < 0 || (!voucher && cash < price) || expectedLevel < 0 || staminaUpgradeLevel != expectedLevel ||
             staminaUpgradeLevel >= maxLevel) return false;
-        cash -= price;
+        if (voucher) freeUpgradeVouchers--;
+        else cash -= price;
         staminaUpgradeLevel++;
         return true;
     }
 
     public bool TryUpgradeShovel(int price, int expectedLevel, int maxLevel)
     {
-        if (price < 0 || cash < price || expectedLevel < 0 || shovelUpgradeLevel != expectedLevel ||
+        bool voucher = price > 0 && freeUpgradeVouchers > 0;
+        if (price < 0 || (!voucher && cash < price) || expectedLevel < 0 || shovelUpgradeLevel != expectedLevel ||
             shovelUpgradeLevel >= maxLevel) return false;
-        cash -= price;
+        if (voucher) freeUpgradeVouchers--;
+        else cash -= price;
         shovelUpgradeLevel++;
         return true;
     }

@@ -38,6 +38,7 @@ public class UpgradeVehicle : MonoBehaviour
     [SerializeField] private CanvasGroup upgradeButtonCanvas;
     [SerializeField] private Image upgradeButtonImage;
     private VehicleUpgrade target;
+    private bool waitingForUpgrade;
     private Material originalButtonMaterial, buttonMaterial;
     private static readonly int SaturationId = Shader.PropertyToID("_Saturation");
     public void SetTarget(VehicleUpgrade vehicle) { target = vehicle; Refresh(); }
@@ -56,6 +57,10 @@ public class UpgradeVehicle : MonoBehaviour
         VehicleUpgrade.VehicleReplaced -= OnVehicleReplaced;
     }
     private void OnMoneyChanged(int _) => Refresh();
+    private void Update()
+    {
+        if (waitingForUpgrade && !SaveSystem.UpgradePurchaseLocked) Refresh();
+    }
     private void OnVehicleReplaced(VehicleUpgrade previous, VehicleUpgrade next)
     {
         if (target == previous) SetTarget(next);
@@ -63,7 +68,7 @@ public class UpgradeVehicle : MonoBehaviour
     public void Upgrade() => TryUpgrade();
     public bool TryUpgrade()
     {
-        if (!isActiveAndEnabled || target == null) return false;
+        if (!isActiveAndEnabled || SaveSystem.UpgradePurchaseLocked || target == null) return false;
         bool purchased = target.TryUpgrade();
         Refresh();
         return purchased;
@@ -77,6 +82,8 @@ public class UpgradeVehicle : MonoBehaviour
         int missing = available ? Mathf.Max(0, cost - SaveSystem.Money) : 0;
         bool missingKey = configured && !target.HasRequiredKey;
         bool affordable = available && missing == 0 && !missingKey;
+        waitingForUpgrade = SaveSystem.UpgradePurchaseLocked;
+        bool canUpgrade = affordable && !waitingForUpgrade;
         if (currentLevelHolder != null) currentLevelHolder.SetActive(configured && !maxed);
         if (nextLevelHolder != null) nextLevelHolder.SetActive(configured && !maxed);
         if (maxLevelHolder != null) maxLevelHolder.SetActive(maxed);
@@ -123,9 +130,9 @@ public class UpgradeVehicle : MonoBehaviour
         if (notEnoughMoneyTitle != null) notEnoughMoneyTitle.gameObject.SetActive(missing > 0 || missingKey);
         if (notEnoughMoney != null) notEnoughMoney.gameObject.SetActive(missing > 0);
         if (notEnoughMoneyPopup != null) notEnoughMoneyPopup.SetActive(missing > 0 || missingKey);
-        if (upgradeButton != null) upgradeButton.interactable = affordable;
-        if (upgradeButtonCanvas != null) upgradeButtonCanvas.alpha = affordable ? 1f : .5f;
-        UpdateButtonMaterial(affordable ? 1f : .5f);
+        if (upgradeButton != null) upgradeButton.interactable = canUpgrade;
+        if (upgradeButtonCanvas != null) upgradeButtonCanvas.alpha = canUpgrade ? 1f : .5f;
+        UpdateButtonMaterial(canUpgrade ? 1f : .5f);
     }
     private static string Speed(float value) => EconomyNumberFormat.Accounting(value * 3.6f) + " km/h";
     private string Colored(string value) => $"<color=#{ColorUtility.ToHtmlStringRGBA(nextLevelColor)}>{value}</color>";

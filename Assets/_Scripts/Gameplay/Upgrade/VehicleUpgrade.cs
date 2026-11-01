@@ -93,7 +93,7 @@ public sealed class VehicleUpgrade : MonoBehaviour
 
     public bool TryUpgrade()
     {
-        if (!isActiveAndEnabled || !IsConfigured || !IsUnlocked || !HasRequiredKey || HasCargo || IsMaxed || SaveSystem.Data == null) return false;
+        if (!isActiveAndEnabled || SaveSystem.UpgradePurchaseLocked || Replacement != null || !IsConfigured || !IsUnlocked || !HasRequiredKey || HasCargo || IsMaxed || SaveSystem.Data == null) return false;
         if (bicycle != null && bicycle.IsRidden) return false;
         if (!TryCreateReplacement(out var next)) return false;
         if (!SaveSystem.TryPurchaseVehicle(settings, VehicleId))

@@ -201,6 +201,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     {
         PlayerData data = SaveSystem.Data;
         if (data == null || WasFound(data, findId)) return false;
+        int previousCash = data.cash;
         if (kind == Kind.CashChest && variedChestRewards)
         {
             if(!chestRewardRolled) { rolledChestReward=PlayerPerks.Roll(UnityEngine.Random.value);chestRewardRolled=true; }
@@ -225,6 +226,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         Array.Resize(ref data.foundSecrets, index + 1);
         data.foundSecrets[index] = findId;
         SaveSystem.SaveData();
+        if (data.cash != previousCash) GameplayCanvas.Instance?.RefreshMoneyFromSave();
         if (kind == Kind.HangarKey) GoalChecker.ReportProgress(GoalType.HangarKeyCollected, 1, targetHangar);
         if ((kind == Kind.CashChest || kind == Kind.CashCache) && DataHolderUI.Instance != null) DataHolderUI.Instance.RefreshDataPlayer();
         return true;
