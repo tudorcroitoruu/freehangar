@@ -1,0 +1,8 @@
+PASS farm.chest.bonus.1 in Hangar 2, matching key farm.key.copper.bonus.1 at (59.07, 0.18, -4.28), chest at (46.05, 0.16, -17.64)
+PASS Stamina bottle: farm.perk.bottle.infinitestamina, Hangar 2, shared E prompt, drinking animation and colored stamina-style burst.
+PASS farm.chest.bonus.2 in Hangar 3, matching key farm.key.iron.bonus.2 at (-49.66, 0.18, -0.84), chest at (-36.38, 0.16, -14.21)
+PASS Mobility bottle: farm.perk.bottle.mobility, Hangar 3, shared E prompt, drinking animation and colored stamina-style burst.
+PASS farm.chest.bonus.3 in Hangar 4, matching key farm.key.copper.bonus.3 at (-89.31, 0.18, 38.12), chest at (-84.67, 0.16, 54.86)
+PASS Protection bottle: farm.perk.bottle.noattacks, Hangar 4, shared E prompt, drinking animation and colored stamina-style burst.
+PASS farm.chest.bonus.4 in Hangar 5, matching key farm.key.iron.bonus.4 at (94.62, 0.18, 33.93), chest at (99.50, 0.16, 35.09)
+PASS Double sell cash bottle: farm.perk.bottle.doublesellcash, Hangar 5, shared E prompt, drinking animation and colored stamina-style burst.

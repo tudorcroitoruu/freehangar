@@ -7,7 +7,7 @@ using UnityEngine;
 public sealed class BuriedFind : MonoBehaviour, IInteractable
 {
     // Explicit values preserve existing scene, prefab and save assignments when renaming tools.
-    public enum Kind { Key = 0, CashChest = 1, UpgradeVoucher = 2, InfiniteStamina = 3, CashCache = 4, Axe = 5, Hammer = 6, HangarKey = 7, Broom = 8, VehicleKey = 9 }
+    public enum Kind { Key = 0, CashChest = 1, UpgradeVoucher = 2, InfiniteStamina = 3, CashCache = 4, Axe = 5, Hammer = 6, HangarKey = 7, Broom = 8, VehicleKey = 9, PerkBottle = 10 }
 
     [SerializeField] private Kind kind;
     [SerializeField] private string findId;
@@ -25,6 +25,15 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     {
         kind = Kind.VehicleKey; findId = id; vehicleKeyName = displayName; coveringPile = pile;
     }
+    public void ConfigurePerkBottle(string id, ChestReward perk, GrainPile pile)
+    {
+        kind=Kind.PerkBottle;findId=id;bottlePerk=perk;coveringPile=pile;
+        staminaDurationSeconds=PlayerPerks.DefaultDurationSeconds;settleOnReveal=false;
+    }
+    [SerializeField] private ChestReward bottlePerk = ChestReward.InfiniteStamina;
+    private bool IsBottle => kind==Kind.InfiniteStamina || kind==Kind.PerkBottle;
+    private ChestReward BottleReward => kind==Kind.InfiniteStamina ? ChestReward.InfiniteStamina : bottlePerk;
+    private string BottleName => BottleReward==ChestReward.Mobility ? "mobility" : BottleReward==ChestReward.NoAttacks ? "protection" : BottleReward==ChestReward.DoubleSellCash ? "double sell cash" : "stamina";
     [SerializeField] private string requiredKeyId;
     [SerializeField] private string matchingHangarKeyId;
     [SerializeField] private string matchingKeyColor;
@@ -146,14 +155,15 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
             kind == Kind.Broom ? "Take broom (equip with 4)" :
             kind == Kind.Axe ? "Take axe (equip with 2)" :
             kind == Kind.Hammer ? "Take hammer (equip with 3)" :
-            kind == Kind.UpgradeVoucher ? "Take free upgrade voucher" :
-            kind == Kind.InfiniteStamina ? $"Drink stamina tonic ({staminaDurationSeconds / 60} min)" :
+            kind == Kind.UpgradeVoucher ? "Pick up free upgrade" :
+            IsBottle ? $"Drink {BottleName} tonic ({staminaDurationSeconds / 60} min)" :
             kind == Kind.CashCache ? $"Take cash cache (+${cashReward})" :
-            kind == Kind.CashChest && variedChestRewards ? $"Open {matchingKeyColor} chest (cash, upgrade or perk)" : $"Open mystery chest (+${cashReward})";
+            kind == Kind.CashChest ? (string.IsNullOrEmpty(matchingKeyColor) ? "Open chest" : $"Open {matchingKeyColor.ToLowerInvariant()} chest") : "Pick up perk";
         Bounds bounds = VisualBounds();
         prompt = new InteractionPromptData(new Vector3(bounds.center.x, bounds.max.y + .15f, bounds.center.z),
             action, hasProfile && hasKey);
-        if (interactor != null && (kind == Kind.CashChest || kind == Kind.InfiniteStamina))
+        prompt.InteractionKey = KeyCode.E;
+        if (interactor != null && (kind == Kind.CashChest || IsBottle))
             prompt.RequiresFreeHands = (interactor.Bags != null && interactor.Bags.IsCarrying) ||
                 (interactor.Items != null && interactor.Items.IsCarrying) || interactor.PushedWheelbarrow != null;
         return true;
@@ -162,7 +172,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     public bool TryInteract(PlayerInteractor interactor)
     {
         if (!TryGetPrompt(interactor, out var prompt) || !prompt.ShowKey || prompt.RequiresFreeHands || Time.timeScale <= 0) return false;
-        if (kind == Kind.CashChest || kind == Kind.InfiniteStamina)
+        if (kind == Kind.CashChest || IsBottle)
         {
             if (interactor == null || interactor.DiscoveryBusy) return false;
             var player = interactor.GetComponent<PlayerController>();
@@ -206,11 +216,9 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
             if (data.freeUpgradeVouchers == int.MaxValue) return false;
             data.freeUpgradeVouchers++;
         }
-        else if (kind == Kind.InfiniteStamina)
+        else if (IsBottle)
         {
-            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            long start = Math.Max(now, data.infiniteStaminaUntilUtc);
-            data.infiniteStaminaUntilUtc = Math.Min(long.MaxValue - staminaDurationSeconds, start) + staminaDurationSeconds;
+            if(!PlayerPerks.Grant(data,BottleReward,0,staminaDurationSeconds,PlayerPerks.Now))return false;
         }
         if (data.foundSecrets == null) data.foundSecrets = Array.Empty<string>();
         int index = data.foundSecrets.Length;
@@ -223,7 +231,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     }
 
     private string Receipt() => kind == Kind.CashChest && variedChestRewards && chestRewardRolled ? PlayerPerks.Receipt(rolledChestReward,cashReward,chestPerkSeconds) : kind == Kind.VehicleKey ? $"{vehicleKeyName.ToUpperInvariant()} KEY FOUND" : kind == Kind.HangarKey ? $"HANGAR {targetHangar} KEY\nUse at Hangar {targetHangar}" :
-        kind == Kind.Broom ? "BROOM FOUND\nPress 4 to equip" : kind == Kind.Key ? $"{(string.IsNullOrEmpty(chestKeyLabel) ? "CHEST" : chestKeyLabel.ToUpperInvariant())} KEY FOUND" : kind == Kind.InfiniteStamina ? "INFINITE STAMINA!" :
+        kind == Kind.Broom ? "BROOM FOUND\nPress 4 to equip" : kind == Kind.Key ? $"{(string.IsNullOrEmpty(chestKeyLabel) ? "CHEST" : chestKeyLabel.ToUpperInvariant())} KEY FOUND" : IsBottle ? PlayerPerks.Receipt(BottleReward,0,staminaDurationSeconds) :
         kind == Kind.CashChest || kind == Kind.CashCache ? $"+${cashReward}" :
         kind == Kind.UpgradeVoucher ? "FREE UPGRADE!" : kind == Kind.Axe ? "AXE FOUND\nPress 2 to equip" : "HAMMER FOUND\nPress 3 to equip";
 
@@ -243,12 +251,16 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
             {
                 if (!PresentationValid) { CancelPresentation(); yield break; }
                 keyTime += Time.deltaTime;
+                // A small unlocking rattle settles before the lid lifts.
+                float rattle = Mathf.Clamp01((keyTime - .65f) / .15f) * (1f - Mathf.Clamp01((keyTime - .9f) / .15f));
+                transform.position = originalPosition + transform.right * (Mathf.Sin(keyTime * 65f) * .012f * rattle);
                 float slide = Mathf.SmoothStep(0, 1, keyTime / .6f);
                 insertionKey.transform.position = keySocket.position + keySocket.forward * Mathf.Lerp(.45f, .015f, slide);
                 insertionKey.transform.rotation = facing * Quaternion.Euler(0, 0, Mathf.SmoothStep(0, 90, (keyTime - .65f) / .4f));
                 yield return null;
             }
         }
+        transform.position = originalPosition;
         float elapsed = 0f;
         while (elapsed < .85f)
         {
@@ -256,12 +268,13 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
             elapsed += Time.deltaTime;
             float t = Mathf.SmoothStep(0f, 1f, elapsed / .85f);
             if (lidPivot != null) lidPivot.localRotation = closedLid * Quaternion.Euler(lidOpenDegrees * t, 0, 0);
-            if (!committed && elapsed >= .28f)
+            if (!committed && elapsed >= .52f)
             {
                 if (!CommitReward()) { CancelPresentation(); yield break; }
                 committed = true;
                 GameplayAudio.Instance?.PerkFound();
-                DiscoveryBurst.Play(pickupEffect, VisualBounds().center + Vector3.up * .4f, Receipt(), view);
+                // Spawn above the body, where the open lid cannot hide the treasure burst.
+                DiscoveryBurst.Play(pickupEffect, originalPosition + Vector3.up * Mathf.Max(.45f, VisualBounds().size.y * .65f), Receipt(), view);
             }
             yield return null;
         }

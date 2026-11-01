@@ -17,7 +17,9 @@ public sealed class InfiniteStaminaVolume : MonoBehaviour
     private void Update()
     {
         if (staminaVolume == null) return;
-        bool active = SaveSystem.Data != null && SaveSystem.Data.infiniteStaminaUntilUtc > DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var data=SaveSystem.Data;
+        long now=DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        bool active=data!=null && (data.infiniteStaminaUntilUtc>now || data.mobilityUntilUtc>now || data.noAttacksUntilUtc>now || data.doubleSellCashUntilUtc>now);
         staminaVolume.weight = Mathf.MoveTowards(staminaVolume.weight, active ? 1 : 0, Time.unscaledDeltaTime / transitionSeconds);
     }
     private void OnDisable() { if (staminaVolume != null) staminaVolume.weight = 0; }

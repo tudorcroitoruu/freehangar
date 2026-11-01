@@ -12,7 +12,7 @@ public static class BuriedChestSetup
     [InitializeOnLoadMethod] private static void AutoSetup() => EditorApplication.delayCall+=()=>
     {
         if(EditorApplication.isPlayingOrWillChangePlaymode || SceneManager.GetActiveScene().name!="Gameplay")return;
-        foreach(var root in SceneManager.GetActiveScene().GetRootGameObjects())if(root.name==GroupName){EnableRewardPool();return;}
+        foreach(var root in SceneManager.GetActiveScene().GetRootGameObjects())if(root.name==GroupName){EnableRewardPool();ApplyPresentation();return;}
         Apply();
     };
     [MenuItem("Tools/Grain/Place matching buried key chests")]
@@ -72,6 +72,7 @@ public static class BuriedChestSetup
             PrefabUtility.RecordPrefabInstancePropertyModifications(chest);PrefabUtility.RecordPrefabInstancePropertyModifications(chest.transform);
             report.AppendLine($"PASS {label} key {id} -> {chest.name}; {(created?"created":"repaired existing")}; {chest.GetComponentsInChildren<Renderer>(true).Length} mesh renderers; {progress:P0} from doorway.");
         }
+        ApplyPresentation();
         EditorSceneManager.MarkSceneDirty(scene);
         if(!wasDirty)EditorSceneManager.SaveScene(scene);
         report.AppendLine($"Matched {usedChests.Count} chests to {keys.Count} chest keys. Hangar door keys and vehicle keys are separate.");
@@ -98,14 +99,55 @@ public static class BuriedChestSetup
         Directory.CreateDirectory("output/BuriedChests");
         File.WriteAllText("output/BuriedChests/rewards.txt",$"Enabled randomized cash / upgrade / 300-second perks on {count} chests. Placement preserved.");
     }
+    [MenuItem("Tools/Grain/Texture chests and connect opening effects")]
+    public static void ApplyPresentation()
+    {
+        if(EditorApplication.isPlayingOrWillChangePlaymode)return;
+        int count=0;
+        var effect=AssetDatabase.LoadAssetAtPath<DiscoveryBurst>("Assets/NewMap/Discoveries/Chest treasure burst.prefab");
+        var report=new System.Text.StringBuilder();
+        foreach(var chest in UnityEngine.Object.FindObjectsByType<BuriedFind>(FindObjectsInactive.Include,FindObjectsSortMode.None))
+        {
+            if(chest.FindKind!=BuriedFind.Kind.CashChest || chest.gameObject.scene!=SceneManager.GetActiveScene())continue;
+            string label=chest.RequiredChestKeyId.Contains("iron")?"Iron":"Copper";
+            var material=ChestMaterial(label);
+            foreach(var renderer in chest.GetComponentsInChildren<Renderer>(true))
+            {
+                if(renderer is ParticleSystemRenderer)continue;
+                Undo.RecordObject(renderer,"Texture buried chest");renderer.sharedMaterial=material;
+                EditorUtility.SetDirty(renderer);PrefabUtility.RecordPrefabInstancePropertyModifications(renderer);
+            }
+            var data=new SerializedObject(chest);
+            data.FindProperty("pickupEffect").objectReferenceValue=effect;
+            data.ApplyModifiedProperties();PrefabUtility.RecordPrefabInstancePropertyModifications(chest);
+            bool lid=data.FindProperty("lidPivot").objectReferenceValue!=null;
+            bool textured=material.GetTexture("_BaseColorMap")!=null;
+            report.AppendLine($"{(lid && textured && effect!=null?"PASS":"FAIL")} {chest.name}: texture={textured}, animated lid={lid}, treasure VFX={effect!=null}, shared E interaction.");
+            EditorSceneManager.MarkSceneDirty(chest.gameObject.scene);count++;
+        }
+        Directory.CreateDirectory("output/BuriedChests");File.WriteAllText("output/BuriedChests/presentation.txt",report.ToString());
+    }
     private static Material ChestMaterial(string label)
     {
         const string folder="Assets/NewMap/Discoveries";
         string path=folder+"/"+label+" matching chest.mat";
-        var material=AssetDatabase.LoadAssetAtPath<Material>(path);if(material!=null)return material;
-        material=new Material(Shader.Find("HDRP/Lit")){name=label+" matching chest"};
-        material.SetColor("_BaseColor",label=="Copper"?new Color(.68f,.29f,.11f):label=="Iron"?new Color(.32f,.38f,.44f):new Color(.55f,.59f,.64f));
-        material.SetFloat("_Metallic",.65f);material.SetFloat("_Smoothness",.36f);AssetDatabase.CreateAsset(material,path);return material;
+        var material=AssetDatabase.LoadAssetAtPath<Material>(path);
+        if(material==null)
+        {
+            material=new Material(Shader.Find("HDRP/Lit")){name=label+" matching chest"};
+            AssetDatabase.CreateAsset(material,path);
+        }
+        // These meshes were authored against the items1 atlas; unrelated chest textures have different UVs.
+        var source=AssetDatabase.LoadAssetAtPath<Material>("Assets/Models/Models New/materials/items1.mat");
+        if(source!=null)
+        {
+            material.SetTexture("_BaseColorMap",source.GetTexture("_BaseColorMap"));
+            material.SetTextureScale("_BaseColorMap",source.GetTextureScale("_BaseColorMap"));
+            material.SetTextureOffset("_BaseColorMap",source.GetTextureOffset("_BaseColorMap"));
+        }
+        material.SetColor("_BaseColor",label=="Copper"?new Color(1f,.68f,.43f):new Color(.68f,.79f,.9f));
+        material.SetFloat("_Metallic",label=="Copper"?.55f:.75f);material.SetFloat("_Smoothness",.32f);
+        EditorUtility.SetDirty(material);AssetDatabase.SaveAssetIfDirty(material);return material;
     }
     private static void EnsureGeometry(BuriedFind chest,Material tint)
     {
