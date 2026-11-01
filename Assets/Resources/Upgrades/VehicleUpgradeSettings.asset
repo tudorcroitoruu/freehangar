@@ -15,9 +15,22 @@ MonoBehaviour:
   vehicles:
   - id: bicycle
     displayName: Bicycle
+    cargoPoses:
+    - containerId: FreeBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: -0.18, y: 0, z: -0.06}
+      rotation: {x: 0, y: 90, z: -90}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: SmallBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: -0.18, y: 0, z: -0.06}
+      rotation: {x: 0, y: 90, z: -90}
+      scale: {x: 1, y: 1, z: 1}
     maximumCargoLevel: 2
     image: {fileID: 21300000, guid: 49c952336ce79ce42961b057e5d38de3, type: 3}
-    slots: 2
+    slots: 1
     movementSpeed: 7
     price: 0
     requiresKey: 0
@@ -27,6 +40,43 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: motoroller
     displayName: Motoroller
+    cargoPoses:
+    - containerId: SmallBag
+      slotIndex: 0
+      applyToAllSlots: 0
+      position: {x: -0.35, y: -0.2, z: 0.1}
+      rotation: {x: 0, y: 90, z: -90}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: FreeBag
+      slotIndex: 0
+      applyToAllSlots: 0
+      position: {x: -0.25, y: -0.2, z: 0.1}
+      rotation: {x: 0, y: 90, z: -90}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: LargeBag
+      slotIndex: 0
+      applyToAllSlots: 0
+      position: {x: 0.4, y: -0.2, z: 0}
+      rotation: {x: 0, y: -90, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: FreeBag
+      slotIndex: 1
+      applyToAllSlots: 1
+      position: {x: 0.3, y: 0.28, z: -0.4}
+      rotation: {x: 0, y: -90, z: -90}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: SmallBag
+      slotIndex: 1
+      applyToAllSlots: 1
+      position: {x: 0.3, y: 0.28, z: -0.3}
+      rotation: {x: 0, y: -90, z: -90}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: LargeBag
+      slotIndex: 1
+      applyToAllSlots: 1
+      position: {x: -0.4, y: 0.5, z: -0.5}
+      rotation: {x: 0, y: 90, z: -90}
+      scale: {x: 1, y: 1, z: 1}
     maximumCargoLevel: 3
     image: {fileID: 21300000, guid: 935b1c7d7c91fe24b8cf51fdea4f2bc5, type: 3}
     slots: 2
@@ -39,6 +89,31 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: trike
     displayName: Trike
+    cargoPoses:
+    - containerId: FreeBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: -0.3, z: -0.1}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: SmallBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: -0.3, z: -0.1}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: LargeBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: -0.3, z: -0.1}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 0.9, y: 0.9, z: 1}
+    - containerId: Crate
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: -0.15, z: -0.1}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 0.9, z: 1}
     maximumCargoLevel: 4
     image: {fileID: 21300000, guid: 2d41c4c19bd67244aa0d72acd78dbbb4, type: 3}
     slots: 4
@@ -51,9 +126,34 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: lawnmower
     displayName: Lawnmower
+    cargoPoses:
+    - containerId: FreeBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: 0.25}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: LargeBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: 0.27}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 0.9, y: 0.9, z: 1}
+    - containerId: Crate
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: 0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: Barrel
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: 0.4}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
     maximumCargoLevel: 5
     image: {fileID: 21300000, guid: 33bca422af3ec0440855d6b787c5540c, type: 3}
-    slots: 0
+    slots: 5
     movementSpeed: 10
     price: 1500
     requiresKey: 1
@@ -63,9 +163,46 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: pickup
     displayName: Pickup
+    cargoPoses:
+    - containerId: FreeBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: 0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: SmallBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: 0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: LargeBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: 0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 0.8, y: 0.8, z: 0.8}
+    - containerId: Crate
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0.2, z: 0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: Barrel
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: 0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 0.9, y: 0.9, z: 0.95}
+    - containerId: BigBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: 0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 0.65, y: 0.65, z: 0.65}
     maximumCargoLevel: 6
     image: {fileID: 21300000, guid: e9a3b38b64eb6734ca26de980c11312e, type: 3}
-    slots: 4
+    slots: 10
     movementSpeed: 13
     price: 4500
     requiresKey: 1
@@ -75,9 +212,16 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: pickupBig
     displayName: Pickup Bigger
+    cargoPoses:
+    - containerId: BigBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: -0.1}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
     maximumCargoLevel: 6
     image: {fileID: 21300000, guid: eff0c89e54fb11b44b85a1498a55fcdc, type: 3}
-    slots: 4
+    slots: 12
     movementSpeed: 15
     price: 9000
     requiresKey: 1
@@ -87,9 +231,46 @@ MonoBehaviour:
     legacyUpgradeCount: 2
   - id: pickupLast
     displayName: Pickup Cargo
+    cargoPoses:
+    - containerId: BigBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: -0.3}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: FreeBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: -0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: SmallBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: -0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: LargeBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: -0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: Crate
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: -0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: Barrel
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0, z: -0.2}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
     maximumCargoLevel: 6
     image: {fileID: 21300000, guid: 99519259f3e04c84e9557d9f98415c52, type: 3}
-    slots: 4
+    slots: 16
     movementSpeed: 20
     price: 18000
     requiresKey: 1

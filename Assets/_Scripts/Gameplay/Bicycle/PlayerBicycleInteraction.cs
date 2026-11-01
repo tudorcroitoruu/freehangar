@@ -55,10 +55,10 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if (!input || Time.timeScale <= 0) return false;
         if(!Physics.Raycast(view.transform.position,view.transform.forward,out var hit,interactionDistance,~0,QueryTriggerInteraction.Ignore)) return false;
         // Select the aimed vehicle, keeping the existing serialized bicycle as the default.
-        var aimedVehicle = hit.collider.GetComponentInParent<BicycleController>();
+        var aimedVehicle = VehicleCargoOwner.Resolve(hit.collider);
         if (aimedVehicle != null) bicycle = aimedVehicle;
         if (bicycle == null || !bicycle.isActiveAndEnabled) return false;
-        if (Vector3.Distance(view.transform.position,bicycle.transform.position)>interactionDistance+1) return false;
+        if ((bags == null || !bags.IsCarrying || aimedVehicle != bicycle) && Vector3.Distance(view.transform.position,bicycle.transform.position)>interactionDistance+1) return false;
         var cargoBox = hit.collider.GetComponentInParent<BicycleCargoBox>();
         if(cargoBox != null && cargoBox.IsLoaded)
         {
@@ -66,12 +66,12 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             if(Input.GetKeyDown(KeyCode.E)) { TryUnloadBox(cargoBox); return true; }
             return false;
         }
-        if(hit.transform.IsChildOf(bicycle.transform))
+        if(hit.transform.IsChildOf(bicycle.transform) || aimedVehicle == bicycle)
         {
             if (bags != null && bags.IsCarrying)
             {
                 var upgrades = bicycle.GetComponent<VehicleUpgrade>();
-                bool canLoad = (upgrades == null || upgrades.AcceptsContainer(bags.CarriedBag)) && bicycle.FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadCargo(bicycle.GetComponent<VehicleCargoRack>() != null ? 2 : 1));
+                bool canLoad = (upgrades == null || upgrades.AcceptsContainer(bags.CarriedBag)) && bicycle.FreeBagCargoSlot(bags.CarriedBag) != null && (upgrades == null || upgrades.CanLoadCargo(bicycle.GetComponent<VehicleCargoRack>() is VehicleCargoRack cargoRack ? cargoRack.BagSlotCost : 1));
                 hint=canLoad ? "E Secure bag on " + bicycle.cargoLocationName : bicycle.cargoLocationName + " is full";
                 if (Input.GetKeyDown(KeyCode.E)) { TryLoadBag(); return true; }
                 return false;
@@ -157,7 +157,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         }
         hint="Make room to unload";return false;
     }
-    public bool TryLoadBag() => !riding && bags != null && bicycle != null && bags.TryStow(bicycle.FreeBagCargoSlot());
+    public bool TryLoadBag() => !riding && bags != null && bicycle != null && bags.TryStow(bicycle.FreeBagCargoSlot(bags.CarriedBag));
     public bool TryMount()
     {
         CacheReferences();

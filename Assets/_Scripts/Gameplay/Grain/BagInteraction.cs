@@ -91,9 +91,10 @@ public sealed class BagInteraction : MonoBehaviour
     private bool Take(GrainContainer bag)
     {
         if (!bag.CanCarry || IsShovelEquipped) return false;
+        if (bag.TryGetComponent<VehicleCargoPlacement>(out var placement)) placement.ReleaseScale();
         var sourceWheelbarrow = bag.GetComponentInParent<WheelbarrowCargo>();
         carried = bag;
-        originalParent = bag.GetComponentInParent<BicycleController>() != null ||
+        originalParent = VehicleCargoOwner.Resolve(bag) != null ||
             sourceWheelbarrow != null ? null : bag.transform.parent;
         originalScale = bag.transform.localScale;
         originalWorldScale = bag.transform.lossyScale;
@@ -136,15 +137,19 @@ public sealed class BagInteraction : MonoBehaviour
     public bool TryStow(Transform slot)
     {
         if (carried == null || slot == null) return false;
-        var upgrades = slot.GetComponentInParent<VehicleUpgrade>();
-        var rack = slot.GetComponentInParent<VehicleCargoRack>();
-        if (upgrades != null && !upgrades.CanLoadCargo(rack != null ? 2 : 1)) return false;
+        var upgrades = VehicleCargoOwner.Upgrade(slot);
+        var rack = VehicleCargoOwner.Rack(slot);
+        var layout = VehicleCargoOwner.Resolve(slot)?.GetComponent<PickupCargoLayout>();
+        if (layout != null && !layout.CanLoadAt(slot, carried)) return false;
+        int cost = layout != null ? PickupCargoLayout.Units(carried) : rack != null ? rack.BagSlotCost : 1;
+        if (upgrades != null && (!upgrades.AcceptsContainer(carried) || !upgrades.CanLoadCargo(cost))) return false;
         var bag = carried;
         bag.transform.SetParent(slot, true);
         bag.transform.localScale = new Vector3(originalWorldScale.x / slot.lossyScale.x, originalWorldScale.y / slot.lossyScale.y, originalWorldScale.z / slot.lossyScale.z);
         bag.transform.rotation = Quaternion.AngleAxis(slot.eulerAngles.y, Vector3.up) * uprightRotation;
         bag.transform.position += slot.position - bag.WorldBounds.center;
-        if (rack != null) VehicleCargoRack.Seat(bag.transform,slot);
+        if (rack != null) VehicleCargoRack.SeatBase(bag.transform,slot);
+        VehicleCargoPlacement.Attach(bag.transform, slot, rack != null);
         for (int i = 0; i < carriedColliders.Length; i++) if (carriedColliders[i] != null) carriedColliders[i].enabled = colliderStates[i];
         carriedBody.isKinematic = true;
         bag.SetCarried(false);

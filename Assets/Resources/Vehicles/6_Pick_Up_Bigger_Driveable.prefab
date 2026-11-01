@@ -927,7 +927,7 @@ Transform:
   m_GameObject: {fileID: 2654524422189344851}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.45, y: 1.38, z: -3}
+  m_LocalPosition: {x: -0.45, y: 1.38, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1212,6 +1212,7 @@ GameObject:
   - component: {fileID: 3596320462466267655}
   - component: {fileID: 2367393513769071940}
   - component: {fileID: 7190962342836331866}
+  - component: {fileID: 918700000000000001}
   m_Layer: 0
   m_Name: 6_Pick_Up_Bigger_Driveable
   m_TagString: Untagged
@@ -1232,6 +1233,8 @@ Transform:
   m_LocalScale: {x: 1.2596, y: 1.2596, z: 1.2596}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 919000000000000611}
+  - {fileID: 919000000000000609}
   - {fileID: 6991948008654751904}
   - {fileID: 5985502934130175815}
   - {fileID: 2311591274848005131}
@@ -1293,6 +1296,8 @@ MonoBehaviour:
   - {fileID: 5210430992428386839}
   - {fileID: 6995432824954231504}
   - {fileID: 5696342977859272041}
+  - {fileID: 919000000000000609}
+  - {fileID: 919000000000000611}
   exclusiveBagSlot: {fileID: 0}
   cargoLocationName: pickup bed
   dismountSideDistance: 2.4301329
@@ -2169,7 +2174,7 @@ Transform:
   m_GameObject: {fileID: 6294396678350191014}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.45, y: 1.38, z: -3}
+  m_LocalPosition: {x: 0.45, y: 1.38, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3051,3 +3056,54 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &919000000000000608
+GameObject:
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919000000000000609}
+  m_Layer: 0
+  m_Name: Cargo slot 5
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &919000000000000609
+Transform:
+  m_GameObject: {fileID: 919000000000000608}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.45, y: 1.38, z: -3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4864935783232807285}
+--- !u!1 &919000000000000610
+GameObject:
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919000000000000611}
+  m_Layer: 0
+  m_Name: Cargo slot 6
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &919000000000000611
+Transform:
+  m_GameObject: {fileID: 919000000000000610}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.45, y: 1.38, z: -3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4864935783232807285}
+--- !u!114 &918700000000000001
+MonoBehaviour:
+  m_GameObject: {fileID: 3283712932405695332}
+  m_Enabled: 1
+  m_Script: {fileID: 11500000, guid: f36297bf3d2e8770701f4a22b2e8caf8, type: 3}
+  m_EditorClassIdentifier: Assembly-CSharp::PickupCargoLayout
+  largeSlots:
+  - {fileID: 1297713410213828831}
+  - {fileID: 5210430992428386839}
+  - {fileID: 6995432824954231504}
+  - {fileID: 5696342977859272041}
+  - {fileID: 919000000000000609}
+  - {fileID: 919000000000000611}
+  smallContainerSeparation: 0.42
+  splitAlongLength: 1

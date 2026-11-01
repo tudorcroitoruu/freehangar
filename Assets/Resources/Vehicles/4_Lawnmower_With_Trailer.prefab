@@ -560,6 +560,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &918600000000000003
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 918600000000000004}
+  m_Layer: 0
+  m_Name: Trailer cargo center
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &918600000000000004
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918600000000000003}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.66, z: -2.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7263256357499585390}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1149228075486371026
 GameObject:
   m_ObjectHideFlags: 0
@@ -899,6 +930,7 @@ GameObject:
   - component: {fileID: 528298647463979128}
   - component: {fileID: 6426863785060812347}
   - component: {fileID: 6921285605859018695}
+  - component: {fileID: 918600000000000001}
   m_Layer: 0
   m_Name: Lawnmower - driveable
   m_TagString: Untagged
@@ -975,7 +1007,7 @@ MonoBehaviour:
   riderView: {fileID: 1659264328804595464}
   cargoSlots: []
   exclusiveBagSlot: {fileID: 0}
-  cargoLocationName: rear rack
+  cargoLocationName: trailer
   dismountSideDistance: 1.5
   dismountLongitudinalDistance: 2.5
   maximumSpeed: 11
@@ -1083,6 +1115,28 @@ MonoBehaviour:
   outlines:
   - {fileID: 6438921747412504248}
   - {fileID: 7587566637297336118}
+--- !u!114 &918600000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1809697905676644171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc1d4e79176b51a4796e49cf591adb85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleCargoRack
+  surface: {fileID: 918600000000000004}
+  baySpacing: 0.6
+  slotCount: 5
+  oneContainerPerSlot: 1
+  slotPositions:
+  - {x: 0, y: 0, z: 0}
+  - {x: -0.48, y: 0, z: -0.95}
+  - {x: 0.48, y: 0, z: -0.95}
+  - {x: -0.48, y: 0, z: 0.95}
+  - {x: 0.48, y: 0, z: 0.95}
 --- !u!1 &2446899966131049833
 GameObject:
   m_ObjectHideFlags: 0
@@ -1469,6 +1523,7 @@ GameObject:
   - component: {fileID: 7263256357499585390}
   - component: {fileID: 4503794054173689871}
   - component: {fileID: 173908207397354631}
+  - component: {fileID: 918600000000000002}
   m_Layer: 0
   m_Name: Tow_Trailer - jointed
   m_TagString: Untagged
@@ -1485,10 +1540,11 @@ Transform:
   m_GameObject: {fileID: 3496599990372679572}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.083563805, y: -0.0031393643, z: -1.5879288}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0.05, z: -1.5879288}
+  m_LocalScale: {x: 0.90277, y: 0.90277, z: 0.90277}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 918600000000000004}
   - {fileID: 9129883750790251059}
   - {fileID: 6567274808580815734}
   - {fileID: 7928126948935954024}
@@ -1631,6 +1687,19 @@ ConfigurableJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!114 &918600000000000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3496599990372679572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e2934621b21c5245a5caea99a25e3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleCargoOwner
+  vehicle: {fileID: 5852841650967405454}
 --- !u!1 &3529013340836650194
 GameObject:
   m_ObjectHideFlags: 0

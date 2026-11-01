@@ -44,6 +44,7 @@ public sealed class VehicleUpgrade : MonoBehaviour
         get
         {
             if (bicycle == null) bicycle = GetComponent<BicycleController>();
+            if (bicycle != null && bicycle.TryGetComponent<PickupCargoLayout>(out var pickupLayout)) return pickupLayout.LargeCapacity;
             return bicycle != null && bicycle.TryGetComponent<VehicleCargoRack>(out var rack)
                 ? rack.SlotLimit : bicycle != null ? Mathf.Max(bicycle.cargoSlots?.Length ?? 0, bicycle.exclusiveBagSlot != null ? 1 : 0) : 0;
         }
@@ -84,6 +85,7 @@ public sealed class VehicleUpgrade : MonoBehaviour
     public bool CanLoadCargo(int slotCost = 1)
     {
         if (slotCost <= 0 || (IsConfigured && !IsUnlocked)) return false;
+        if (GetComponent<PickupCargoLayout>() is PickupCargoLayout layout) return layout.FreeSlotByUnits(slotCost) != null;
         if (GetComponent<VehicleCargoRack>() is VehicleCargoRack rack)
             return rack.UsedSlots + slotCost <= rack.SlotLimit;
         return bicycle != null && CargoCount + slotCost <= SlotCount;

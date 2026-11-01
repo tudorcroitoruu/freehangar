@@ -231,6 +231,13 @@ public sealed class PlayerInteractor : MonoBehaviour
         }
         // Resolve only the first obstruction, including interactables on a collider's parent.
         if (closest == null) return null;
+        var cargoOwner = closest.GetComponentInParent<VehicleCargoOwner>();
+        if (cargoOwner != null && cargoOwner.vehicle != null && cargoOwner.vehicle.isActiveAndEnabled &&
+            closest.GetComponentInParent<GrainContainer>() == null && closest.GetComponentInParent<BicycleCargoBox>() == null)
+        {
+            actionOrigin = cargoOwner.vehicle.transform;
+            return cargoOwner.vehicle;
+        }
         actionOrigin = closest.transform;
         // Prefer E on the nearest interaction host; other keys are shown beside it.
         // Never skip an obstruction to reach an interaction farther behind it.

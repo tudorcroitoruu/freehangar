@@ -9,6 +9,16 @@ public sealed class VehicleCargoRack : MonoBehaviour
     public float baySpacing = .6f;
     [Tooltip("Actual cargo slot limit for this prefab. Independent of upgrade presentation values.")]
     [Min(1)] public int slotCount = 2;
+    public bool oneContainerPerSlot;
+    public Vector3[] slotPositions = System.Array.Empty<Vector3>();
+    public int BagSlotCost => oneContainerPerSlot ? 1 : 2;
+    public int ContainerSlotCount => oneContainerPerSlot ? Limit : Limit / 2;
+    public int ContainerSlotIndex(int ordinal) => oneContainerPerSlot ? ordinal : ordinal * 2;
+    public Vector3 SlotPosition(int ordinal)
+    {
+        if(oneContainerPerSlot && slotPositions!=null && ordinal<slotPositions.Length) return slotPositions[ordinal];
+        return new Vector3(ordinal==0?0:(ordinal%2==1?1:-1)*((ordinal+1)/2)*baySpacing,0,0);
+    }
     private BicycleController rig;
     private readonly List<Transform> slots = new List<Transform>();
     private void Awake() => EnsureSlots();
@@ -18,7 +28,7 @@ public sealed class VehicleCargoRack : MonoBehaviour
     {
         if (surface == null) return;
         if (rig == null) rig = GetComponent<BicycleController>();
-        int required = Mathf.CeilToInt(Limit/2f)*2;
+        int required = oneContainerPerSlot ? Limit : Mathf.CeilToInt(Limit/2f)*2;
         while (slots.Count < required)
         {
             var slot = new GameObject("Rack contact " + slots.Count).transform;
@@ -31,13 +41,14 @@ public sealed class VehicleCargoRack : MonoBehaviour
     private static bool Bag(Transform slot) => Occupied(slot) && slot.GetChild(0).GetComponent<GrainContainer>() != null;
     public int UsedSlots
     {
-        get { int total=0; foreach(var s in slots) if(Occupied(s)) total += Bag(s)?2:1; return total; }
+        get { int total=0; foreach(var s in slots) if(Occupied(s)) total += Bag(s)?BagSlotCost:1; return total; }
     }
     public Transform FreeSlot(bool bag)
     {
         if (TryGetComponent<VehicleUpgrade>(out var upgrade) && upgrade.IsConfigured && !upgrade.IsUnlocked) return null;
         EnsureSlots();
-        if (UsedSlots + (bag?2:1) > Limit) return null;
+        if (UsedSlots + (bag?BagSlotCost:1) > Limit) return null;
+        if(oneContainerPerSlot) { foreach(var slot in slots) if(!Occupied(slot)) return slot; return null; }
         for(int i=0;i<slots.Count;i+=2)
         {
             if(Bag(slots[i]) || Bag(slots[i+1]))continue;
@@ -50,6 +61,15 @@ public sealed class VehicleCargoRack : MonoBehaviour
     public void Reflow()
     {
         if (TryGetComponent<VehicleReset>(out var reset) && reset.IsResetting) return;
+        if(oneContainerPerSlot)
+        {
+            for(int i=0;i<slots.Count;i++)
+            {
+                slots[i].localPosition=SlotPosition(i);
+                if(Occupied(slots[i])) Seat(slots[i].GetChild(0),slots[i]);
+            }
+            return;
+        }
         for(int i=0;i+1<slots.Count;i+=2)
         {
             int bay=i/2;
@@ -62,6 +82,11 @@ public sealed class VehicleCargoRack : MonoBehaviour
         }
     }
     public static void Seat(Transform item,Transform support)
+    {
+        if (item.TryGetComponent<VehicleCargoPlacement>(out var placement) && placement.enabled) { placement.Apply(); return; }
+        SeatBase(item, support);
+    }
+    public static void SeatBase(Transform item,Transform support)
     {
         var bounds=ContactBounds(item,support);
         item.position += support.TransformVector(new Vector3(-bounds.center.x,-bounds.min.y,-bounds.center.z));

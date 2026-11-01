@@ -5,6 +5,10 @@ using UnityEngine;
 public sealed class GrainContainer : MonoBehaviour, IInteractable
 {
     [SerializeField, Min(1), Tooltip("Minimum vehicle cargo level required to transport this container.")] private int transportLevel = 1;
+    [SerializeField] private string cargoTypeId;
+    public string CargoTypeId => cargoTypeId;
+    [SerializeField, Range(1,2), Tooltip("Pickup bay space: 1 for a small container, 2 for a full Big Bag bay.")] private int pickupSpaceUnits = 1;
+    public int PickupSpaceUnits => Mathf.Clamp(pickupSpaceUnits,1,2);
     public int TransportLevel => Mathf.Max(1, transportLevel);
     [SerializeField, Min(.01f)] private float capacityKg = 50f;
     [SerializeField, Min(0f)] private float kilograms;

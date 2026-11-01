@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 71766751289759679}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.45, y: 1.38, z: -3}
+  m_LocalPosition: {x: -0.45, y: 1.38, z: -1.6666666666666665}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -549,6 +549,7 @@ GameObject:
   - component: {fileID: 5576942702687815804}
   - component: {fileID: 8100725137279754956}
   - component: {fileID: 2386800258260687751}
+  - component: {fileID: 918700000000000001}
   m_Layer: 0
   m_Name: 7_Pick_Up_Last_Driveable
   m_TagString: Untagged
@@ -569,6 +570,10 @@ Transform:
   m_LocalScale: {x: 1.2652, y: 1.2652, z: 1.2652}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 919000000000000815}
+  - {fileID: 919000000000000813}
+  - {fileID: 919000000000000811}
+  - {fileID: 919000000000000809}
   - {fileID: 8768714446308072322}
   - {fileID: 4479539762129277379}
   - {fileID: 7706284634964904849}
@@ -630,6 +635,10 @@ MonoBehaviour:
   - {fileID: 5974329585191613145}
   - {fileID: 9193201203047440344}
   - {fileID: 7618495435870191372}
+  - {fileID: 919000000000000809}
+  - {fileID: 919000000000000811}
+  - {fileID: 919000000000000813}
+  - {fileID: 919000000000000815}
   exclusiveBagSlot: {fileID: 0}
   cargoLocationName: pickup bed
   dismountSideDistance: 2.5621216
@@ -1421,7 +1430,7 @@ Transform:
   m_GameObject: {fileID: 3451013571839344227}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.45, y: 1.38, z: -3}
+  m_LocalPosition: {x: 0.45, y: 1.38, z: -1.6666666666666665}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3051,3 +3060,92 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &919000000000000808
+GameObject:
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919000000000000809}
+  m_Layer: 0
+  m_Name: Cargo slot 5
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &919000000000000809
+Transform:
+  m_GameObject: {fileID: 919000000000000808}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.45, y: 1.38, z: -2.333333333333333}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7152650088946448521}
+--- !u!1 &919000000000000810
+GameObject:
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919000000000000811}
+  m_Layer: 0
+  m_Name: Cargo slot 6
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &919000000000000811
+Transform:
+  m_GameObject: {fileID: 919000000000000810}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.45, y: 1.38, z: -2.333333333333333}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7152650088946448521}
+--- !u!1 &919000000000000812
+GameObject:
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919000000000000813}
+  m_Layer: 0
+  m_Name: Cargo slot 7
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &919000000000000813
+Transform:
+  m_GameObject: {fileID: 919000000000000812}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.45, y: 1.38, z: -3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7152650088946448521}
+--- !u!1 &919000000000000814
+GameObject:
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919000000000000815}
+  m_Layer: 0
+  m_Name: Cargo slot 8
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &919000000000000815
+Transform:
+  m_GameObject: {fileID: 919000000000000814}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.45, y: 1.38, z: -3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7152650088946448521}
+--- !u!114 &918700000000000001
+MonoBehaviour:
+  m_GameObject: {fileID: 1850182445453681032}
+  m_Enabled: 1
+  m_Script: {fileID: 11500000, guid: f36297bf3d2e8770701f4a22b2e8caf8, type: 3}
+  m_EditorClassIdentifier: Assembly-CSharp::PickupCargoLayout
+  largeSlots:
+  - {fileID: 5096869187546813843}
+  - {fileID: 5974329585191613145}
+  - {fileID: 9193201203047440344}
+  - {fileID: 7618495435870191372}
+  - {fileID: 919000000000000809}
+  - {fileID: 919000000000000811}
+  - {fileID: 919000000000000813}
+  - {fileID: 919000000000000815}
+  smallContainerSeparation: 0.42
+  splitAlongLength: 1

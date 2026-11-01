@@ -7,10 +7,26 @@ public sealed class VehicleUpgradeSettings : ScriptableObject
     public const string ResourcePath = "Upgrades/VehicleUpgradeSettings";
 
     [Serializable]
+    public sealed class CargoPose
+    {
+        public string containerId;
+        [Min(0)] public int slotIndex;
+        public bool applyToAllSlots = true;
+        public Vector3 position;
+        public Vector3 rotation;
+        public Vector3 scale = Vector3.one;
+        public Vector3 EffectiveScale => scale == Vector3.zero ? Vector3.one : new Vector3(Mathf.Max(.01f,scale.x),Mathf.Max(.01f,scale.y),Mathf.Max(.01f,scale.z));
+    }
+
+    [Serializable]
     public sealed class VehicleType
     {
         public string id;
         public string displayName;
+        public CargoPose[] cargoPoses = Array.Empty<CargoPose>();
+        public CargoPose FindCargoPoseExact(string containerId, int slotIndex) => Array.Find(cargoPoses ?? Array.Empty<CargoPose>(), p => p != null && p.containerId == containerId && p.slotIndex == slotIndex);
+        public bool UsesFirstSlotForAll(string containerId) => FindCargoPoseExact(containerId, 0)?.applyToAllSlots ?? true;
+        public CargoPose FindCargoPose(string containerId, int slotIndex) => FindCargoPoseExact(containerId, UsesFirstSlotForAll(containerId) ? 0 : slotIndex);
         [Min(1), Tooltip("Highest container transport level this vehicle accepts.")] public int maximumCargoLevel = 2;
         public Sprite image;
         [Tooltip("Presentation only. Actual cargo slots come from the vehicle prefab.")]

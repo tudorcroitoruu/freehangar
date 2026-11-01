@@ -1,0 +1,7 @@
+PASS 5_Pick_up_Driveable: lengthwise pairs and mixed BigBag/FreeBag/SmallBag/LargeBag/Crate/Barrel allocation.
+PASS 5_Pick_up_Driveable: 10 FreeBag positions / 5 BigBag positions; empty serialized cache rebuilt.
+PASS 6_Pick_Up_Bigger_Driveable: lengthwise pairs and mixed BigBag/FreeBag/SmallBag/LargeBag/Crate/Barrel allocation.
+PASS 6_Pick_Up_Bigger_Driveable: 12 FreeBag positions / 6 BigBag positions; empty serialized cache rebuilt.
+PASS 7_Pick_Up_Last_Driveable: lengthwise pairs and mixed BigBag/FreeBag/SmallBag/LargeBag/Crate/Barrel allocation.
+PASS 7_Pick_Up_Last_Driveable: 16 FreeBag positions / 8 BigBag positions; empty serialized cache rebuilt.
+PASS neutral material-color preview shader: no compiler errors.

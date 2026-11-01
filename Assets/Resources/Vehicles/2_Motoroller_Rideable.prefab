@@ -837,7 +837,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8827275512104639835
 Transform:
   m_ObjectHideFlags: 0
@@ -1874,6 +1874,10 @@ MonoBehaviour:
   surface: {fileID: 8536322281977802862}
   baySpacing: 0.6
   slotCount: 2
+  oneContainerPerSlot: 1
+  slotPositions:
+  - {x: 0, y: 0, z: -0.25}
+  - {x: 0, y: 0, z: 0.25}
 --- !u!114 &8021453211909120231
 MonoBehaviour:
   m_ObjectHideFlags: 0

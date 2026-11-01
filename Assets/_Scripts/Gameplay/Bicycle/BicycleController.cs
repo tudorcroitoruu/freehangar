@@ -262,6 +262,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     public Transform FreeCargoSlot()
     {
         if (TryGetComponent<VehicleUpgrade>(out var progression) && progression.IsConfigured && !progression.IsUnlocked) return null;
+        if (TryGetComponent<PickupCargoLayout>(out var pickupLayout)) return pickupLayout.FreeSlot(null);
         if (TryGetComponent<VehicleCargoRack>(out var rack)) return rack.FreeSlot(false);
         if (exclusiveBagSlot != null && exclusiveBagSlot.childCount > 0) return null;
         if (cargoSlots == null) return null;
@@ -270,9 +271,10 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
             if (cargoSlots[i] != null && cargoSlots[i].childCount == 0) return cargoSlots[i];
         return null;
     }
-    public Transform FreeBagCargoSlot()
+    public Transform FreeBagCargoSlot(GrainContainer container = null)
     {
         if (TryGetComponent<VehicleUpgrade>(out var progression) && progression.IsConfigured && !progression.IsUnlocked) return null;
+        if (TryGetComponent<PickupCargoLayout>(out var pickupLayout)) return pickupLayout.FreeSlot(container);
         if (TryGetComponent<VehicleCargoRack>(out var rack)) return rack.FreeSlot(true);
         if (exclusiveBagSlot == null) return FreeCargoSlot();
         if (exclusiveBagSlot.childCount > 0) return null;
@@ -298,13 +300,14 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         var rider = interactor.GetComponent<PlayerBicycleInteraction>();
         var actor = interactor.GetComponent<PlayerController>();
         if (rider == null || rider.IsRiding || actor == null || actor.characterCamera == null ||
-            Vector3.Distance(actor.transform.position, transform.position) > rider.interactionDistance) return false;
+            Vector3.Distance(actor.transform.position, interactor.Bags != null && interactor.Bags.IsCarrying && GetComponent<VehicleCargoRack>() is VehicleCargoRack promptRack && promptRack.surface != null ? promptRack.surface.position : transform.position) > rider.interactionDistance) return false;
         if (interactor.Bags != null && interactor.Bags.IsCarrying)
         {
             var upgrades = GetComponent<VehicleUpgrade>();
             bool compatible = !TryGetComponent<VehicleUpgrade>(out var cargoUpgrade) || cargoUpgrade.AcceptsContainer(interactor.Bags.CarriedBag);
-            bool available = compatible && FreeBagCargoSlot() != null && (upgrades == null || upgrades.CanLoadCargo(GetComponent<VehicleCargoRack>() != null ? 2 : 1));
-            prompt = new InteractionPromptData(transform.position + Vector3.up, available ? "Load bag" : !compatible ? "Container level too high" : "Vehicle full", available);
+            bool available = compatible && FreeBagCargoSlot(interactor.Bags.CarriedBag) != null && (upgrades == null || upgrades.CanLoadCargo(GetComponent<VehicleCargoRack>() is VehicleCargoRack cargoRack ? cargoRack.BagSlotCost : 1));
+            Vector3 loadPosition = GetComponent<VehicleCargoRack>() is VehicleCargoRack loadingRack && loadingRack.surface != null ? loadingRack.surface.position + Vector3.up * .3f : transform.position + Vector3.up;
+            prompt = new InteractionPromptData(loadPosition, available ? "Load bag" : !compatible ? "Container level too high" : "Vehicle full", available);
             return true;
         }
         if (actor.IsCarrying) return false;
