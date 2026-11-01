@@ -34,7 +34,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField, Min(0f)] private float pauseSeconds = 15f;
 
     public static AudioManager Instance;
-    private enum MusicMode { None, Regular, Intro, Attack, Ending }
+    private enum MusicMode { None, Regular, Intro, Attack, Ending, Menu }
     private MusicMode musicMode;
     private int lastMusicNumber = -1;
     private float musicVolume = 1f;
@@ -70,17 +70,47 @@ public class AudioManager : MonoBehaviour
             Instance = null;
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
-        if (musicMode != MusicMode.None) return;
-        if (SceneManager.GetActiveScene().name == "Last Scene") PlayInterstellar();
-        else PlayRegularMusic();
+        while (GlobalManager.Instance != null && !SaveSystem.savesLoaded) yield return null;
+        SoundManager.instance?.ApplySavedVolumes(SaveSystem.settingsData);
+        if (musicMode != MusicMode.None) yield break;
+        PlaySceneMusic(SceneManager.GetActiveScene().name);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name == "Last Scene") PlayInterstellar();
-        else if (musicMode == MusicMode.Ending || musicMode == MusicMode.None) PlayRegularMusic();
+        if (GlobalManager.Instance != null && !SaveSystem.savesLoaded) return;
+        PlaySceneMusic(scene.name);
+    }
+
+    private void PlaySceneMusic(string sceneName)
+    {
+        if (sceneName == "Last Scene") PlayInterstellar();
+        else if (sceneName == "Menu" || sceneName == "Bootstrap") PlayMenuMusic();
+        else if (sceneName == "LoadingScene") PlayLoadingMusic();
+        else if (musicMode == MusicMode.Ending || musicMode == MusicMode.None || musicMode == MusicMode.Menu) PlayRegularMusic();
+    }
+
+    public void PlayLoadingMusic()
+    {
+        // Keep the current track through scene unloading, including the menu's looping intro.
+        // Fill a playlist pause immediately instead of carrying silence into loading.
+        if (musicAudioSource != null && musicAudioSource.isPlaying &&
+            (musicMode == MusicMode.Menu || musicMode == MusicMode.Intro || musicMode == MusicMode.Regular)) return;
+        PlayMenuMusic();
+    }
+
+    private void PlayMenuMusic()
+    {
+        if (introMusic == null || musicAudioSource == null) { PlayRegularMusic(); return; }
+        if (musicMode == MusicMode.Menu && musicAudioSource.isPlaying) return;
+        StopMusic();
+        musicMode = MusicMode.Menu;
+        musicAudioSource.clip = introMusic;
+        musicAudioSource.loop = true;
+        musicAudioSource.Play();
+        // Menu playback does not consume the gameplay introduction's once-only cue.
     }
 
     public void PlayIntroOnce()

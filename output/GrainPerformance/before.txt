@@ -1,0 +1,6 @@
+Editor CPU microbenchmarks (not standalone frame times)
+Bag bake/sample Rebuild: mean=8.864 ms, p95=9.129 ms, max=9.129 ms, managed=0 B/call
+Bag visible kernels=455
+Loaded shovel constant walking Simulate: mean=1.609 ms, p95=1.662 ms, max=1.996 ms, managed=0 B/call
+Loaded shovel sleeping during uniform walking=False, kernels=192
+Three scoops settle steps=7, total=0.489 ms, still active=False

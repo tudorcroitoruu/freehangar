@@ -1,0 +1,21 @@
+Movement image investigation
+
+Observed report: blur/lag appearance when walking straight, with no mouse motion required.
+
+Confirmed configuration chain:
+- QualitySettings selects Assets/HDRPDefaultResources/HDRenderPipelineAsset.asset.
+- That asset defaults dynamicResolutionSettings.advancedUpscalerNames to STP.
+- GameSettingsManager.ApplyQuality previously enabled dynamic resolution for every preset, including 100% render scale, and forced a fixed resolution.
+- GameSettingsManager.EnableDynamicResolution opts Game cameras into dynamic resolution.
+- Installed HDRP HDRenderPipeline.SetupUpscalerData accepts STP when software resolution is forced, and runs advanced upscalers at full resolution too.
+- Player camera uses FXAA, not TAA; no scene instance antialiasing override was found.
+- HDRP default MotionBlur intensity is zero. Gameplay Post, Gameplay Post Stamina and Sky and Fog Game do not supply MotionBlur overrides.
+- Player CharacterController movement runs every Update, with zero minimum move distance on its prefab; camera mouse smoothing does not explain straight walking with no mouse input.
+
+Correction:
+- Runtime quality overrides replace advancedUpscalerNames with an empty list, preventing STP/DLSS/FSR2 temporal reconstruction from being selected by this preset path.
+- Native-resolution High/Ultra presets disable dynamic resolution.
+- Low/Medium retain 65%/85% render scaling using the existing spatial Catmull-Rom filter.
+- No camera smoothing, movement speed, physics timestep, saved graphics preference or project HDRP asset changes.
+
+Verification: Assembly-CSharp-Editor.csproj builds with zero errors. The HDRP selection branch was checked against the installed package source. This establishes the unwanted temporal path and removes it; no new standalone build was rendered or timed in this investigation. A rebuilt standalone is required to confirm the reported visual symptom. Actual CPU/GPU frame-time spikes have not been measured, so this does not establish that every source of stutter is fixed.

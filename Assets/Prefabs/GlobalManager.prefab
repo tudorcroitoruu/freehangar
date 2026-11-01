@@ -1514,10 +1514,6 @@ PrefabInstance:
       propertyPath: loseClip
       value: 
       objectReference: {fileID: 8300000, guid: 053cb6a59f375784fbd361fc4b2242a0, type: 3}
-    - target: {fileID: 5678320368604763705, guid: 5034261988e101143a9baef4f2c69cae, type: 3}
-      propertyPath: musicClips.Array.size
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7009086249980102958, guid: 5034261988e101143a9baef4f2c69cae, type: 3}
       propertyPath: OutputAudioMixerGroup
       value: 

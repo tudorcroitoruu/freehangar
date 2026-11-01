@@ -1,0 +1,73 @@
+Cargo parity: Passed; passed=24; failed=0
+CargoPreviewParityTests.FullClosedPreviewUsesTheSameContactBoundsAsGameplay("FreeBag"): Passed
+
+
+CargoPreviewParityTests.FullClosedPreviewUsesTheSameContactBoundsAsGameplay("SmallBag"): Passed
+
+
+CargoPreviewParityTests.FullClosedPreviewUsesTheSameContactBoundsAsGameplay("LargeBag"): Passed
+
+
+CargoPreviewParityTests.FullClosedPreviewUsesTheSameContactBoundsAsGameplay("BigBag"): Passed
+
+
+CargoPreviewParityTests.FullClosedPreviewUsesTheSameContactBoundsAsGameplay("Crate"): Passed
+
+
+CargoPreviewParityTests.FullClosedPreviewUsesTheSameContactBoundsAsGameplay("Barrel"): Passed
+
+
+CargoPreviewParityTests.LegacyBagStowMatchesPreviewAndRemainsStableAfterPickupAndReload: Passed
+
+
+CargoPreviewParityTests.LegacyContainersResolveTheSameCargoPoseAsTheirShopType(1,"FreeBag"): Passed
+
+
+CargoPreviewParityTests.LegacyContainersResolveTheSameCargoPoseAsTheirShopType(2,"SmallBag"): Passed
+
+
+CargoPreviewParityTests.LegacyContainersResolveTheSameCargoPoseAsTheirShopType(3,"LargeBag"): Passed
+
+
+CargoPreviewParityTests.LegacyContainersResolveTheSameCargoPoseAsTheirShopType(4,"Crate"): Passed
+
+
+CargoPreviewParityTests.LegacyContainersResolveTheSameCargoPoseAsTheirShopType(5,"Barrel"): Passed
+
+
+CargoPreviewParityTests.LegacyContainersResolveTheSameCargoPoseAsTheirShopType(6,"BigBag"): Passed
+
+
+ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(True,0.12f): Passed
+
+
+ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(False,0.12f): Passed
+
+
+ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(True,0.5f): Passed
+
+
+ContainerPlacementTests.FlatAndTallContainersCanBePlacedOnClearGround(False,0.5f): Passed
+
+
+ContainerPlacementTests.WallStillPreventsPlacingBehindIt(True): Passed
+
+
+ContainerPlacementTests.WallStillPreventsPlacingBehindIt(False): Passed
+
+
+VehicleCargoPlacementTests.FirstSlotValuesAreSharedByDefaultAndIndependentValuesSurviveToggle: Passed
+
+
+VehicleCargoPlacementTests.JointedTrailerResolvesItsDrivingVehicle: Passed
+
+
+VehicleCargoPlacementTests.RepeatedPlacementDoesNotAccumulateScaleAndDifferentSlotsStayIndependent: Passed
+
+
+VehicleCargoPlacementTests.SingleContainerSlotsHoldExactlyTheConfiguredNumberOfBags(2): Passed
+
+
+VehicleCargoPlacementTests.SingleContainerSlotsHoldExactlyTheConfiguredNumberOfBags(5): Passed
+
+

@@ -53,11 +53,20 @@ public sealed class GameIntroduction : MonoBehaviour
     private Transform heldShovelPose;
     private Vector3 worldShovelScale;
 
+    private bool CanPlay => !Completed && isActiveAndEnabled && player != null && player.characterCamera != null && bicycle != null &&
+        landscapeStart != null && landscapeEnd != null && arrival != null && grainLook != null && shovelLook != null && bicycleRoute.Length >= 2 && purchasePaperPrefab != null;
+
+    /// <summary>Cover the player camera before waiting for scene loading to finish.</summary>
+    public bool PrepareOpening()
+    {
+        if (IsPlaying || !CanPlay) return false;
+        CreateOpeningFade();
+        return true;
+    }
+
     public bool Play()
     {
-        if (IsPlaying || Completed || !isActiveAndEnabled || player == null || player.characterCamera == null || bicycle == null ||
-            landscapeStart == null || landscapeEnd == null || arrival == null || grainLook == null || shovelLook == null || bicycleRoute.Length < 2 || purchasePaperPrefab == null)
-            return false;
+        if (IsPlaying || !CanPlay) return false;
         IsPlaying = true; view = player.characterCamera;
         AudioManager.Instance?.PlayIntroOnce();
         cameraParent = view.transform.parent; cameraLocalPosition = view.transform.localPosition; cameraLocalRotation = view.transform.localRotation;
@@ -112,7 +121,14 @@ public sealed class GameIntroduction : MonoBehaviour
     private void LateUpdate() { if (IsPlaying) HideHud(); }
     private void CreateOpeningFade()
     {
+        if (openingFade != null)
+        {
+            openingFade.enabled = true;
+            openingFadeImage.color = Color.black;
+            return;
+        }
         var root = new GameObject("Introduction opening fade", typeof(Canvas));
+        UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(root, gameObject.scene);
         openingFade = root.GetComponent<Canvas>();
         openingFade.renderMode = RenderMode.ScreenSpaceOverlay;
         openingFade.sortingOrder = 32760;
@@ -255,8 +271,17 @@ public sealed class GameIntroduction : MonoBehaviour
     }
     public void Cancel()
     {
-        if (!IsPlaying) return;
+        if (!IsPlaying) { RemoveOpeningFade(); return; }
         StopAllCoroutines(); Restore(false);
+    }
+    private void RemoveOpeningFade()
+    {
+        if (openingFade != null)
+        {
+            if (Application.isPlaying) Destroy(openingFade.gameObject);
+            else DestroyImmediate(openingFade.gameObject);
+        }
+        openingFade = null; openingFadeImage = null;
     }
     private void Finish() { Completed = true; Restore(true); }
     private void Restore(bool finished)
@@ -265,8 +290,7 @@ public sealed class GameIntroduction : MonoBehaviour
         GameplayAudio.Instance?.VehicleMoving(bicycle, false);
         IsPlaying = false; CurrentShot = "Gameplay";
         if (paper != null) Destroy(paper);
-        if (openingFade != null) Destroy(openingFade.gameObject);
-        openingFade = null; openingFadeImage = null;
+        RemoveOpeningFade();
         if (view != null)
         {
             Quaternion finalLook = view.transform.rotation;

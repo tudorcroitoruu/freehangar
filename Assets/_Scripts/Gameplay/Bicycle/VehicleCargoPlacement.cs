@@ -36,6 +36,9 @@ public sealed class VehicleCargoPlacement : MonoBehaviour
     public void ReleaseScale()
     {
         if(support==null) return;
+        // Remove the rack's pose before the carrier derives the bag's upright orientation.
+        // Otherwise picking up a sideways bag makes that sideways pose its new baseline.
+        transform.rotation=support.rotation*baseRotation;
         Vector3 parentScale=transform.parent!=null?transform.parent.lossyScale:Vector3.one;
         transform.localScale=new Vector3(baseWorldScale.x/parentScale.x,baseWorldScale.y/parentScale.y,baseWorldScale.z/parentScale.z);
         support=null; enabled=false;

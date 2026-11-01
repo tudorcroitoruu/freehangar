@@ -296,7 +296,9 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         Vector3 gravity = transform.InverseTransformDirection(Physics.gravity - acceleration * .3f);
         previousPosition = transform.position; previousVelocity = teleported ? Vector3.zero : worldVelocity;
         previousRotation = transform.rotation;
-        bool disturbed = teleported || angularSpeed > 25f || worldVelocity.sqrMagnitude > .16f || rawAcceleration.sqrMagnitude > 16f;
+        // Uniform translation does not disturb grain relative to the bowl. Keeping it awake
+        // for walking velocity alone ran the pair solver and rebuilt the load every frame.
+        bool disturbed = teleported || angularSpeed > 25f || rawAcceleration.sqrMagnitude > 16f;
         if (disturbed || count != desired || Mathf.Abs(displayedFill - requestedFill) > .0001f)
         {
             quietTime = 0;

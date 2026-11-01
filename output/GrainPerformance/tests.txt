@@ -1,0 +1,19 @@
+Grain interaction tests: Passed; passed=6; failed=0
+GrainInteractionPerformanceTests.LoadedShovelSleepsDuringUniformWalkingButWakesForAccelerationAndTurning: Passed
+
+
+GrainInteractionPerformanceTests.MovingAndRotatingBagReusesBakedSurfaceAndKeepsKernelsAttached: Passed
+
+
+GrainInteractionPerformanceTests.ScalingBagStillResamplesItsWorldSpaceKernelDensity: Passed
+
+
+GrainInteractionPerformanceTests.SpatialSamplingMatchesEveryTriangleReferenceAcrossTheBag(0.2f): Passed
+
+
+GrainInteractionPerformanceTests.SpatialSamplingMatchesEveryTriangleReferenceAcrossTheBag(0.75f): Passed
+
+
+GrainInteractionPerformanceTests.SpatialSamplingMatchesEveryTriangleReferenceAcrossTheBag(1.0f): Passed
+
+

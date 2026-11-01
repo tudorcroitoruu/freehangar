@@ -29,14 +29,16 @@ public class GameManager : MonoBehaviour
         if (settingsManager == null)
             settingsManager = FindFirstObjectByType<GameSettingsManager>(FindObjectsInactive.Include);
         if (settingsManager != null) settingsManager.Init();
+        if (!skipTutorial && !skipIntroCutscene && introduction != null)
+            introduction.PrepareOpening();
     }
 
     private IEnumerator Start()
     {
         // Cutscene timing and audio start only after the loading curtain is gone.
         while (LoadingScreen.IsLoading) yield return null;
-        if (Instance != this || skipTutorial || skipIntroCutscene || introduction == null) yield break;
-        introduction.Play();
+        if (Instance != this || introduction == null) yield break;
+        if (skipTutorial || skipIntroCutscene || !introduction.Play()) introduction.Cancel();
     }
 
 #if UNITY_EDITOR

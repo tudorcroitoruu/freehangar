@@ -264,6 +264,20 @@ public sealed class VehicleCargoPreview : EditorWindow
             renderer.SetPropertyBlock(null);
         }
     }
+    public static void PrepareContainer(GameObject item,float fill,float closure)
+    {
+        foreach(var sack in item.GetComponentsInChildren<SackController>(true))
+        {
+            sack.RefreshBindings();sack.Fill=fill;sack.Close=closure;
+        }
+        foreach(var cargo in item.GetComponentsInChildren<GrainContainer>(true))
+        {
+            var data=new SerializedObject(cargo);
+            data.FindProperty("kilograms").floatValue=cargo.CapacityKg*Mathf.Clamp01(fill);
+            data.ApplyModifiedPropertiesWithoutUndo();
+            cargo.RefreshFillPresentation();
+        }
+    }
     private void Build()
     {
         preview?.Cleanup();
@@ -322,7 +336,7 @@ public sealed class VehicleCargoPreview : EditorWindow
             int supportIndex=supports.IndexOf(support);
             if(!fillRack && supportIndex!=Mathf.Clamp(selectedSlot,0,supports.Count-1)) continue;
             var item=Copy(cargoPrefab,assembly.transform);
-            foreach(var sack in item.GetComponentsInChildren<SackController>(true)) { sack.RefreshBindings(); sack.Fill=cargoFill; sack.Close=cargoClosure; }
+            PrepareContainer(item,cargoFill,cargoClosure);
             item.transform.position=support.position; item.transform.rotation=Quaternion.AngleAxis(support.eulerAngles.y,Vector3.up)*cargoPrefab.transform.rotation;
             Quaternion baseRotation=Quaternion.Inverse(support.rotation)*item.transform.rotation;
             VehicleCargoPlacement.Place(item.transform,support,profile,container.CargoTypeId,usesRack?supportIndex*slotStride:supportIndex,baseRotation,usesRack,item.transform.localScale);
@@ -358,7 +372,7 @@ public sealed class VehicleCargoPreview : EditorWindow
                     mixedPoseIndices.Add(-1);rejected++;continue;
                 }
                 var item=Copy(source,assembly.transform);
-                foreach(var sack in item.GetComponentsInChildren<SackController>(true)) { sack.RefreshBindings();sack.Fill=cargoFill;sack.Close=cargoClosure; }
+                PrepareContainer(item,cargoFill,cargoClosure);
                 item.transform.SetParent(slot,true); // Reserve the actual bay for the next mixed item.
                 item.transform.rotation=Quaternion.AngleAxis(slot.eulerAngles.y,Vector3.up)*source.transform.rotation;
                 Quaternion relative=Quaternion.Inverse(slot.rotation)*item.transform.rotation;

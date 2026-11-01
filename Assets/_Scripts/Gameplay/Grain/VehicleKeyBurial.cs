@@ -14,9 +14,9 @@ public sealed class VehicleKeyBurial : MonoBehaviour
     }
     public static readonly Placement[] Plan =
     {
-        new Placement("trike",2,.25f), new Placement("lawnmower",2,.75f),
-        new Placement("pickup",3,.25f), new Placement("pickupBig",3,.75f),
-        new Placement("pickupLast",4,.65f)
+        new Placement("trike",2,.15f), new Placement("lawnmower",2,.52f),
+        new Placement("pickup",3,.36f), new Placement("pickupBig",4,.27f),
+        new Placement("pickupLast",4,.69f)
     };
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Register()

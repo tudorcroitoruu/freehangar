@@ -96,8 +96,9 @@ public sealed class BagInteraction : MonoBehaviour
         carried = bag;
         originalParent = VehicleCargoOwner.Resolve(bag) != null ||
             sourceWheelbarrow != null ? null : bag.transform.parent;
-        originalScale = bag.transform.localScale;
         originalWorldScale = bag.transform.lossyScale;
+        // Rack/trailer pickups are dropped into the world, not back under their scaled slot.
+        originalScale = originalParent != null ? bag.transform.localScale : originalWorldScale;
         worldExtents = bag.WorldBounds.extents;
         var box = bag.GetComponent<BoxCollider>();
         localCenter = box != null ? box.center : bag.transform.InverseTransformPoint(bag.WorldBounds.center);

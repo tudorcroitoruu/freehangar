@@ -1,0 +1,2 @@
+Opening presentation: Passed; passed=6; failed=0
+

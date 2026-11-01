@@ -6,7 +6,11 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
 {
     [SerializeField, Min(1), Tooltip("Minimum vehicle cargo level required to transport this container.")] private int transportLevel = 1;
     [SerializeField] private string cargoTypeId;
-    public string CargoTypeId => cargoTypeId;
+    // Early scene sacks predate cargo IDs. Resolve them through the same levels as shop prefabs.
+    public string CargoTypeId => !string.IsNullOrWhiteSpace(cargoTypeId) ? cargoTypeId : TransportLevel switch
+    {
+        1 => "FreeBag", 2 => "SmallBag", 3 => "LargeBag", 4 => "Crate", 5 => "Barrel", 6 => "BigBag", _ => string.Empty
+    };
     [SerializeField, Range(1,2), Tooltip("Pickup bay space: 1 for a small container, 2 for a full Big Bag bay.")] private int pickupSpaceUnits = 1;
     public int PickupSpaceUnits => Mathf.Clamp(pickupSpaceUnits,1,2);
     public int TransportLevel => Mathf.Max(1, transportLevel);
@@ -50,7 +54,7 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     public bool IsFinished => sack != null && sack.Close >= .999f;
     public bool IsClosing { get; private set; }
     public bool IsCarried { get; private set; }
-    public bool IsBigBag => string.Equals(cargoTypeId,"BigBag",System.StringComparison.OrdinalIgnoreCase);
+    public bool IsBigBag => string.Equals(CargoTypeId,"BigBag",System.StringComparison.OrdinalIgnoreCase);
     public bool RequiresForklift => IsBigBag && kilograms > .001f;
     public bool CanBeCarried => (canBeCarried || IsBigBag) && !RequiresForklift;
     public bool CanCarry => CanBeCarried && isActiveAndEnabled && !IsCarried && !IsClosing;
@@ -100,7 +104,10 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
         }
     }
 
-    private void Awake()
+    private void Awake() => RefreshFillPresentation();
+
+    /// <summary>Refresh visuals and contact bounds together without depositing grain or awarding progress.</summary>
+    public void RefreshFillPresentation()
     {
         if (sack == null) sack = GetComponent<SackController>();
         fillCollider = GetComponent<BoxCollider>();
