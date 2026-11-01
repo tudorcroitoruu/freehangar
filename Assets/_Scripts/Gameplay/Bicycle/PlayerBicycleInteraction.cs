@@ -49,8 +49,6 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
                 input && !resetting && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)), Time.deltaTime);
             if(input) UpdateRidingLook(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"), Time.deltaTime);
             ApplyRidingView();
-            hint=(motoroller != null ? "W/S Drive / Reverse   A/D Steer   Space Brake   E Get off" :
-                "W/S Pedal   A/D Steer   Shift Faster   Space Brake   E Get off") + "   Hold R Reset";
             return true;
         }
         hint="";
@@ -179,7 +177,10 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         instrumentActive=instrument!=null && instrument.gameObject.activeSelf;
         if(instrument!=null)instrument.gameObject.SetActive(false);
         view.transform.SetParent(bicycle.riderView,false);view.transform.localPosition=Vector3.zero;view.transform.localRotation=Quaternion.identity;
-        yaw=pitch=lookIdleTime=yawReturnVelocity=pitchReturnVelocity=0;riding=true;bicycle.SetRidden(true);ApplyRidingView();return true;
+        yaw=pitch=lookIdleTime=yawReturnVelocity=pitchReturnVelocity=0;riding=true;bicycle.SetRidden(true);ApplyRidingView();
+        hint="";
+        GameplayCanvas.Instance?.SetDrivingHints(true);
+        return true;
     }
     public bool TryDismount()
     {
@@ -203,6 +204,8 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     {
         if (vehicleReset != null) vehicleReset.CancelHold();
         riding=false;IsBoosting=false;boostExhausted=false;bicycle.SetRidden(false);
+        hint="";
+        GameplayCanvas.Instance?.SetDrivingHints(false);
         if (pickup != null) pickup.ResetRoadCamera();
         view.transform.SetParent(cameraParent,false);view.transform.localPosition=cameraPosition;view.transform.localRotation=cameraRotation;
         transform.SetPositionAndRotation(exit,Quaternion.Euler(0,bicycle.transform.eulerAngles.y+yaw,0));
@@ -216,10 +219,11 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     void OnGUI()
     {
         HangarVehicleAccess.DrawHint();
-        if(string.IsNullOrEmpty(hint) || Cursor.lockState!=CursorLockMode.Locked)return;
-        if (!riding && hint.StartsWith("E ") && GameplayCanvas.Instance != null &&
-            GameplayCanvas.Instance.interactionPrompt != null && GameplayCanvas.Instance.interactionPrompt.IsVisible) return;
-        GUI.Box(new Rect(Mathf.Max(8, Screen.width/2-340),Screen.height-85,Mathf.Min(680, Screen.width-16),36),hint);
+        if(Cursor.lockState!=CursorLockMode.Locked)return;
+        bool promptVisible = !riding && hint.StartsWith("E ") && GameplayCanvas.Instance != null &&
+            GameplayCanvas.Instance.interactionPrompt != null && GameplayCanvas.Instance.interactionPrompt.IsVisible;
+        if (!string.IsNullOrEmpty(hint) && !promptVisible)
+            GUI.Box(new Rect(Mathf.Max(8, Screen.width/2-340),Screen.height-85,Mathf.Min(680, Screen.width-16),36),hint);
         if (!riding || vehicleReset == null || vehicleReset.Progress <= 0f) return;
         Rect bar = new Rect(Mathf.Max(8, Screen.width / 2 - 170), Screen.height - 44, Mathf.Min(340, Screen.width - 16), 24);
         GUI.Box(bar, GUIContent.none);

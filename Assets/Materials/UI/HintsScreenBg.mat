@@ -73,6 +73,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MainOverlayTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -90,6 +94,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapOS:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OutlineOverlayTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -118,6 +126,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TransmittanceColorMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TransparencyMaskTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -190,6 +202,17 @@ Material:
     - _FadeTopSoftness: 1
     - _FadeWaveAmount: 0.004
     - _FadeWaveSpeed: 0.3
+    - _FillAmount: 1
+    - _FillDirection: 0
+    - _FillRoundCorners: 0
+    - _GlowIntensity: 1
+    - _GlowPadding: 12
+    - _GlowSize: 8
+    - _GlowSoftness: 0.7
+    - _GradientDirection: 0
+    - _HasMainOverlayTex: 0
+    - _HasOutlineOverlayTex: 0
+    - _HasTransparencyMaskTex: 0
     - _HeightAmplitude: 0.02
     - _HeightCenter: 0.5
     - _HeightMapParametrization: 0
@@ -205,6 +228,11 @@ Material:
     - _IridescenceMask: 1
     - _IridescenceThickness: 1
     - _LinkDetailsWithBase: 1
+    - _MainOverlayBlackTransparent: 0
+    - _MainOverlayBlend: 0
+    - _MainOverlayOpacity: 0
+    - _MainOverlayScale: 1
+    - _MainOverlayUseMaskScale: 1
     - _MaterialID: 1
     - _Metallic: 0
     - _MetallicRemapMax: 1
@@ -220,6 +248,11 @@ Material:
     - _ObjectSpaceUVMappingEmissive: 0
     - _OpaqueCullMode: 2
     - _Outline: 0
+    - _OutlineOverlayBlackTransparent: 0
+    - _OutlineOverlayBlend: 0
+    - _OutlineOverlayOpacity: 0
+    - _OutlineOverlayScale: 1
+    - _OutlineOverlayUseMaskScale: 1
     - _OutlineThickness: 0
     - _PPDLodThreshold: 5
     - _PPDMaxSamples: 15
@@ -231,10 +264,12 @@ Material:
     - _ReceivesSSR: 1
     - _ReceivesSSRTransparent: 0
     - _RefractionModel: 0
-    - _RoundCorners: 0.294
+    - _RoundCorners: 0.1
     - _Saturation: 1
     - _SecondaryNoiseBlend: 0.25
     - _SecondaryNoiseScale: 7
+    - _ShineIntensity: 1
+    - _ShinePosition: 0.7
     - _Smoothness: 0.5
     - _SmoothnessRemapMax: 1
     - _SmoothnessRemapMin: 0
@@ -266,6 +301,9 @@ Material:
     - _TornPaperStretch: 9.67
     - _TransmissionEnable: 1
     - _TransmissionMask: 1
+    - _TransparencyMaskBlackTransparent: 1
+    - _TransparencyMaskIntensity: 0
+    - _TransparencyMaskScale: 1
     - _TransparentBackfaceEnable: 0
     - _TransparentCullMode: 2
     - _TransparentDepthPostpassEnable: 0
@@ -273,10 +311,14 @@ Material:
     - _TransparentSortPriority: 0
     - _TransparentWritingMotionVec: 0
     - _TransparentZWrite: 0
+    - _UISmoothness: 0
     - _UVBase: 0
     - _UVDetail: 0
     - _UVEmissive: 0
     - _UseEmissiveIntensity: 0
+    - _UseFill: 0
+    - _UseGlow: 0
+    - _UseGradient: 0
     - _UseNoise: 0
     - _UseSecondaryNoise: 1
     - _UseShadowThreshold: 0
@@ -294,12 +336,18 @@ Material:
     - _EmissiveColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissiveColorLDR: {r: 0, g: 0, b: 0, a: 1}
     - _FadeColor: {r: 0, g: 0, b: 0, a: 0}
+    - _GlowColor: {r: 1, g: 0.7, b: 0.19999996, a: 1}
+    - _GradientEndColor: {r: 1, g: 0.5, b: 0, a: 1}
+    - _GradientStartColor: {r: 1, g: 1, b: 1, a: 1}
     - _InvPrimScale: {r: 1, g: 1, b: 0, a: 0}
     - _IridescenceThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
+    - _MainOverlayColor: {r: 1, g: 1, b: 1, a: 1}
     - _NoiseAnimationDirection: {r: 1, g: 0.35, b: 0, a: 0}
     - _NoiseOffset: {r: 0, g: 0, b: 0, a: 0}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
+    - _OutlineOverlayColor: {r: 1, g: 1, b: 1, a: 1}
     - _SecondaryNoiseSpeed: {r: -0.005, g: 0.009, b: 0, a: 0}
+    - _ShineColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _ThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _TransmittanceColor: {r: 1, g: 1, b: 1, a: 1}
