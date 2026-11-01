@@ -269,7 +269,10 @@ public class PlayerController : MonoBehaviour
         float currentSpeed = pushingWheelbarrow ? (canSprint ? Mathf.Min(sprintSpeed, 6f) : speed) : isCrouching ? crouchSpeed :
             canSprint ? Mathf.Lerp(sprintSpeed, speed, bagWeight) : speed;
         if (!pushingWheelbarrow && carriedBag != null)
+        {
             currentSpeed *= Mathf.Lerp(1f, bagCarrySpeedMultiplier, bagWeight);
+            if (carriedBag.Kilograms > .0001f) currentSpeed *= 1.3f;
+        }
         if(!pushingWheelbarrow) currentSpeed *= PlayerPerks.MobilityMultiplier;
         Vector3 velocity = (transform.right * input.x + transform.forward * input.y) * currentSpeed;
 

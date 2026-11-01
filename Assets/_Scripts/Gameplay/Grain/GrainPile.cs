@@ -360,6 +360,9 @@ public sealed class GrainPile : MonoBehaviour
         field.WakeNeighborhood(local.x, local.z, radius + settlingMargin, WorldScale);
         settling = true;
         RefreshGrainAppearance(); RefreshSurface(); RefreshCollider();
+        // The incremental kernel cache tracks excavation of existing samples only.
+        // Deposits can introduce surface where no samples existed (especially a new spill).
+        GetComponent<CornSurfaceKernels>()?.Rebuild();
         return true;
     }
 
