@@ -1,0 +1,29 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  2081,
+                   "executeMs":  1396,
+                   "assemblyName":  "PipelineRunScript_RestoreSeparateGameplayScene_d23fe25afd5f479aa2e53402554d9230",
+                   "success":  true,
+                   "result":  {
+                                  "scene":  "Assets/Scenes/Gameplay.unity",
+                                  "restored":  [
+                                                   "Player",
+                                                   "GameCanvas",
+                                                   "GameManager",
+                                                   "Audio Game",
+                                                   "Grain pests and broom tutorial"
+                                               ],
+                                  "menuObjects":  "Retained inactive in Gameplay for copying into the separate menu scene",
+                                  "buildScenes":  [
+                                                      "Assets/Scenes/ExampleScene.unity",
+                                                      "Assets/Scenes/Gameplay.unity",
+                                                      "Assets/Scenes/Last Scene.unity",
+                                                      "Assets/Scenes/Menu.unity"
+                                                  ]
+                              }
+               }
+}

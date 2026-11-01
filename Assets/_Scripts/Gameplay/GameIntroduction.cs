@@ -104,7 +104,7 @@ public sealed class GameIntroduction : MonoBehaviour
     {
         foreach (var canvas in FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (canvas == openingFade) continue;
+            if (canvas == openingFade || canvas.GetComponentInParent<LoadingScreen>(true) != null) continue;
             if (!hud.ContainsKey(canvas)) hud.Add(canvas, canvas.enabled);
             canvas.enabled = false;
         }

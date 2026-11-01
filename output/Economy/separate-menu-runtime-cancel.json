@@ -1,0 +1,39 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  33,
+                   "executeMs":  3,
+                   "assemblyName":  "PipelineRunScript_ProbeSeparateMenu_d279beda3817420e9ee377e58a88bb42",
+                   "success":  true,
+                   "result":  {
+                                  "action":  "back",
+                                  "scene":  "Assets/Scenes/Menu.unity",
+                                  "menu":  true,
+                                  "loading":  false,
+                                  "saved":  true,
+                                  "screens":  [
+                                                  {
+                                                      "name":  "MenuScreen",
+                                                      "active":  true
+                                                  },
+                                                  {
+                                                      "name":  "SettingsScreen",
+                                                      "active":  false
+                                                  },
+                                                  {
+                                                      "name":  "QuitGamePopup",
+                                                      "active":  false
+                                                  }
+                                              ],
+                                  "cameras":  [
+                                                  {
+                                                      "name":  "MenuCamera (2)",
+                                                      "target":  false
+                                                  }
+                                              ]
+                              }
+               }
+}

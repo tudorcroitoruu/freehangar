@@ -34,12 +34,12 @@ public class Pause : MonoBehaviour
 
     private void OnEnable()
     {
-        if (confirmLeaveGameButton) confirmLeaveGameButton.onClick.AddListener(QuitGame);
+        if (confirmLeaveGameButton) confirmLeaveGameButton.onClick.AddListener(GoToMenu);
     }
 
     private void OnDisable()
     {
-        if (confirmLeaveGameButton) confirmLeaveGameButton.onClick.RemoveListener(QuitGame);
+        if (confirmLeaveGameButton) confirmLeaveGameButton.onClick.RemoveListener(GoToMenu);
         if (paused) Unpause();
     }
 
@@ -50,7 +50,7 @@ public class Pause : MonoBehaviour
 
     private void Update()
     {
-        if (exitToMenu || restarting || GameSettingsManager.IsRebindingInputCaptured || LoadingScreen.isLoadingOn ||
+        if (MenuManager.IsMenuOpen || exitToMenu || restarting || GameSettingsManager.IsRebindingInputCaptured || LoadingScreen.IsLoading ||
             !Input.GetKeyDown(KeyCode.Escape)) return;
         if (!paused) PauseOn();
         else if (IsSubScreenOpen()) ShowMainScreen();
@@ -82,6 +82,16 @@ public class Pause : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+    public void GoToMenu()
+    {
+        if (LoadingScreen.isLoadingOn || !LoadingScreen.CanLoadScene(SceneName.Menu.ToString())) return;
+        var loading = LoadingScreen.Instance != null ? LoadingScreen.Instance :
+            FindFirstObjectByType<LoadingScreen>(FindObjectsInactive.Include);
+        if (loading == null) { Debug.LogError("A persistent LoadingScreen is required to return to the menu.", this); return; }
+        if (SaveSystem.savesLoaded) SaveSystem.SaveData();
+        loading.LoadScene(SceneName.Menu.ToString());
     }
 
     public void PauseOn()

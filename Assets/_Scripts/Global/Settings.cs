@@ -192,7 +192,10 @@ public class Settings : MonoBehaviour
         {
             transitionRequested = true;
             Close();
-            LoadingScene.LoadScene(SceneName.Gameplay);
+            var loading = LoadingScreen.Instance != null ? LoadingScreen.Instance :
+                FindFirstObjectByType<LoadingScreen>(FindObjectsInactive.Include);
+            if (loading != null) loading.LoadScene(SceneName.Gameplay.ToString());
+            else LoadingScene.LoadScene(SceneName.Gameplay);
         }
         // else
         // {
@@ -203,6 +206,17 @@ public class Settings : MonoBehaviour
 
     public void GoToMenu()
     {
+        if (LoadingScreen.isLoadingOn) return;
+        var loading = LoadingScreen.Instance != null ? LoadingScreen.Instance :
+            FindFirstObjectByType<LoadingScreen>(FindObjectsInactive.Include);
+        if (loading != null)
+        {
+            if (!LoadingScreen.CanLoadScene(SceneName.Menu.ToString())) return;
+            if (SaveSystem.savesLoaded) SaveSystem.SaveData();
+            Close();
+            loading.LoadScene(SceneName.Menu.ToString());
+            return;
+        }
         if (transitionRequested)
             return;
 

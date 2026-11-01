@@ -1,0 +1,69 @@
+{
+  "status": "completed",
+  "duration": 0.1,
+  "summary": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "MenuSessionTests.ContinueKeepsTheSaveAndSchedulesASceneLoadRatherThanActivatingGameplayObjects",
+      "Status": "Passed",
+      "Duration": 0.0181053,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "MenuSessionTests.LeavingMenuBeforeCameraInitializationStillDisablesEveryAssignedCamera",
+      "Status": "Passed",
+      "Duration": 0.0035167,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "MenuSessionTests.LoadingBlocksMenuNavigation",
+      "Status": "Passed",
+      "Duration": 0.0004508,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "MenuSessionTests.MissingGameplaySceneRejectsTheRequestBeforeChangingTheSave(False)",
+      "Status": "Passed",
+      "Duration": 0.0039694,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "MenuSessionTests.MissingGameplaySceneRejectsTheRequestBeforeChangingTheSave(True)",
+      "Status": "Passed",
+      "Duration": 0.0011462,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "MenuSessionTests.OpeningMenuAlwaysStartsOnTheMainScreen",
+      "Status": "Passed",
+      "Duration": 0.0004826,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "MenuSessionTests.OpeningSeparateMenuUnlocksCursorWithoutDisablingSceneObjectsOrPausingAnimations",
+      "Status": "Passed",
+      "Duration": 0.0025796,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "MenuSessionTests.SettingsQuitAndBackKeepTheCorrectPagesVisible",
+      "Status": "Passed",
+      "Duration": 0.0006857,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

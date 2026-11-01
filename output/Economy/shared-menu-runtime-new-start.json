@@ -1,0 +1,43 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  30,
+                   "executeMs":  3,
+                   "assemblyName":  "PipelineRunScript_ProbeSharedMenu_da1b06b25c254a569eace60082cc7225",
+                   "success":  true,
+                   "result":  {
+                                  "action":  "new",
+                                  "menu":  true,
+                                  "player":  false,
+                                  "hud":  false,
+                                  "game":  false,
+                                  "timeScale":  0.0,
+                                  "loading":  true,
+                                  "saved":  true,
+                                  "cash":  20,
+                                  "cameras":  [
+                                                  {
+                                                      "name":  "MenuCamera",
+                                                      "active":  true,
+                                                      "enabled":  false,
+                                                      "target":  false
+                                                  },
+                                                  {
+                                                      "name":  "MenuCamera (1)",
+                                                      "active":  true,
+                                                      "enabled":  true,
+                                                      "target":  false
+                                                  },
+                                                  {
+                                                      "name":  "MenuCamera (2)",
+                                                      "active":  true,
+                                                      "enabled":  false,
+                                                      "target":  false
+                                                  }
+                                              ]
+                              }
+               }
+}

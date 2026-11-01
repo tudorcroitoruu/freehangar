@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 [DefaultExecutionOrder(-200)]
@@ -24,9 +25,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
-        if (Instance != this || skipTutorial || skipIntroCutscene || introduction == null) return;
+        // Cutscene timing and audio start only after the loading curtain is gone.
+        while (LoadingScreen.IsLoading) yield return null;
+        if (Instance != this || skipTutorial || skipIntroCutscene || introduction == null) yield break;
         introduction.Play();
     }
 

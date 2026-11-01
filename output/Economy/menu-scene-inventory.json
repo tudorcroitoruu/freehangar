@@ -1,0 +1,326 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  2045,
+                   "executeMs":  4,
+                   "assemblyName":  "PipelineRunScript_InspectSharedSceneMenu_059c7ad507c14ad4966bcbee6fe7389e",
+                   "success":  true,
+                   "result":  {
+                                  "scene":  "Assets/Scenes/Menu.unity",
+                                  "playing":  false,
+                                  "roots":  [
+                                                {
+                                                    "name":  "= Menu",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "MenuCamera",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform",
+                                                                       "Camera",
+                                                                       "AudioListener",
+                                                                       "HDAdditionalCameraData"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "MenuCamera (1)",
+                                                    "active":  false,
+                                                    "components":  [
+                                                                       "Transform",
+                                                                       "Camera",
+                                                                       "AudioListener",
+                                                                       "HDAdditionalCameraData"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "MenuCamera (2)",
+                                                    "active":  false,
+                                                    "components":  [
+                                                                       "Transform",
+                                                                       "Camera",
+                                                                       "AudioListener",
+                                                                       "HDAdditionalCameraData"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "MenuCanvas",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "RectTransform",
+                                                                       "Canvas",
+                                                                       "CanvasScaler",
+                                                                       "GraphicRaycaster",
+                                                                       "MenuManager"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "= GAMEPLAY",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "Audio Game",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform",
+                                                                       "AudioSource"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "Introduction staging",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "Scene Light Visibility",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform",
+                                                                       "SceneLightVisibilityController"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "EventSystem",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform",
+                                                                       "EventSystem",
+                                                                       "InputSystemUIInputModule"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "PlayerBase",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "New_Map",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "Planes",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "Graphics",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "Grain Prototype",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "Bicycle - red rideable",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform",
+                                                                       "CharacterController",
+                                                                       "BicycleController",
+                                                                       "VehicleCargoRack",
+                                                                       "VehicleUpgradeInteractable",
+                                                                       "VehicleUpgrade",
+                                                                       "InteractionHighlight"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "TFP_Wind_Pump_01A",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform",
+                                                                       "LODGroup",
+                                                                       "Animator",
+                                                                       "MeshCollider"
+                                                                   ]
+                                                },
+                                                {
+                                                    "name":  "WeightZone_2",
+                                                    "active":  true,
+                                                    "components":  [
+                                                                       "Transform",
+                                                                       "BoxCollider"
+                                                                   ]
+                                                }
+                                            ],
+                                  "buttons":  [
+                                                  {
+                                                      "name":  "ConfirmLeavingGame",
+                                                      "parent":  "QuitGamePopup",
+                                                      "calls":  [
+                                                                    {
+                                                                        "target":  "MISSING",
+                                                                        "method":  "QuitGame"
+                                                                    }
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "Audio",
+                                                      "parent":  "SectionsButtons",
+                                                      "calls":  [
+                                                                    {
+                                                                        "target":  "SettingsScreen",
+                                                                        "method":  "ShowSection"
+                                                                    }
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "PreviousQuality",
+                                                      "parent":  "ValueBg",
+                                                      "calls":  [
+
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "NextResolution",
+                                                      "parent":  "ValueBg",
+                                                      "calls":  [
+
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "PreviousResolution",
+                                                      "parent":  "ValueBg",
+                                                      "calls":  [
+
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "NextDisplay",
+                                                      "parent":  "ValueBg",
+                                                      "calls":  [
+
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "PreviousDisplay",
+                                                      "parent":  "ValueBg",
+                                                      "calls":  [
+
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "Controls",
+                                                      "parent":  "SectionsButtons",
+                                                      "calls":  [
+                                                                    {
+                                                                        "target":  "SettingsScreen",
+                                                                        "method":  "ShowSection"
+                                                                    }
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "Continue",
+                                                      "parent":  "Buttons",
+                                                      "calls":  [
+                                                                    {
+                                                                        "target":  "MISSING",
+                                                                        "method":  "Unpause"
+                                                                    }
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "Video",
+                                                      "parent":  "SectionsButtons",
+                                                      "calls":  [
+                                                                    {
+                                                                        "target":  "SettingsScreen",
+                                                                        "method":  "ShowSection"
+                                                                    }
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "NewGame",
+                                                      "parent":  "Buttons",
+                                                      "calls":  [
+                                                                    {
+                                                                        "target":  "MISSING",
+                                                                        "method":  "Unpause"
+                                                                    }
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "Settings",
+                                                      "parent":  "Buttons",
+                                                      "calls":  [
+                                                                    {
+                                                                        "target":  "MISSING",
+                                                                        "method":  "ShowSettingsScreen"
+                                                                    }
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "PreviousResolution",
+                                                      "parent":  "ValueBg",
+                                                      "calls":  [
+
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "QuitGame",
+                                                      "parent":  "Buttons",
+                                                      "calls":  [
+                                                                    {
+                                                                        "target":  "MISSING",
+                                                                        "method":  "ShowLeaveGamePopup"
+                                                                    }
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "CancelLeavingGame",
+                                                      "parent":  "QuitGamePopup",
+                                                      "calls":  [
+                                                                    {
+                                                                        "target":  "QuitGamePopup",
+                                                                        "method":  "SetActive"
+                                                                    },
+                                                                    {
+                                                                        "target":  "MISSING",
+                                                                        "method":  "Unpause"
+                                                                    }
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "NextQuality",
+                                                      "parent":  "ValueBg",
+                                                      "calls":  [
+
+                                                                ]
+                                                  },
+                                                  {
+                                                      "name":  "NextResolution",
+                                                      "parent":  "ValueBg",
+                                                      "calls":  [
+
+                                                                ]
+                                                  }
+                                              ],
+                                  "loading":  [
+
+                                              ]
+                              }
+               }
+}

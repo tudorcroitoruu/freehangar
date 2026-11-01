@@ -1,0 +1,5 @@
+using System.Linq;using UnityEngine;using UnityEngine.UI;
+public static class InspectMenuScreens{
+static string Path(Transform t)=>t.parent==null?t.name:Path(t.parent)+"/"+t.name;
+public static object Main(){var menu=Object.FindObjectsByType<MenuManager>(FindObjectsInactive.Include,FindObjectsSortMode.None).Single();return new{children=menu.transform.GetComponentsInChildren<Transform>(true).Where(t=>t==menu.transform||t.parent==menu.transform||t.name.Contains("Screen")||t.name.Contains("Popup")||t.name=="Menu").Select(t=>new{path=Path(t),active=t.gameObject.activeSelf,components=t.GetComponents<Component>().Select(c=>c==null?"MISSING":c.GetType().Name).ToArray()}).ToArray(),buttons=menu.GetComponentsInChildren<Button>(true).Where(b=>b.name.ToLower().Contains("back")||b.name.ToLower().Contains("close")||b.name.ToLower().Contains("cancel")).Select(b=>new{path=Path(b.transform),calls=Enumerable.Range(0,b.onClick.GetPersistentEventCount()).Select(i=>b.onClick.GetPersistentMethodName(i)).ToArray()}).ToArray()};}
+}

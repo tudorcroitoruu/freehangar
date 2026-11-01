@@ -1,0 +1,27 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  206,
+                   "executeMs":  983,
+                   "assemblyName":  "PipelineRunScript_ConfigureSharedSceneMenu_eb208711d13d4edd87f2cdd5be857862",
+                   "success":  true,
+                   "result":  {
+                                  "scene":  "Assets/Scenes/Gameplay.unity",
+                                  "player":  "Player",
+                                  "hud":  "GameCanvas",
+                                  "gameManager":  "GameManager",
+                                  "extras":  [
+                                                 "Audio Game",
+                                                 "Grain pests and broom tutorial"
+                                             ],
+                                  "loading":  "Loading Curtain",
+                                  "buttons":  [
+                                                  "Continue",
+                                                  "NewGame"
+                                              ]
+                              }
+               }
+}

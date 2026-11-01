@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,6 +55,82 @@ public class LoadingScreenProgressTests
         Assert.AreEqual(.4f, shared.GetFloat("_FillAmount"));
         Assert.AreEqual(0, shared.GetFloat("_UseFill"));
         Assert.IsNull(image.sprite);
+    }
+
+    [Test]
+    public void SharedSceneSwitchWaitsForTheCurtainAndKeepsItVisibleUntilCompletion()
+    {
+        bool switched=false;
+        screen.LoadingOn();
+        var transition=(IEnumerator)typeof(LoadingScreen).GetMethod("RunCoveredTransition",Private)
+            .Invoke(screen,new object[]{Switch(()=>switched=true),0f});
+        Assert.IsTrue(transition.MoveNext());Assert.IsInstanceOf<WaitForEndOfFrame>(transition.Current);
+        Assert.IsFalse(switched);Assert.IsTrue(LoadingScreen.isLoadingOn);
+        Assert.IsTrue(transition.MoveNext());Assert.IsTrue(switched);Assert.IsTrue(LoadingScreen.isLoadingOn);
+        while(transition.MoveNext()){}
+        Assert.IsFalse(LoadingScreen.isLoadingOn);Assert.That(screen.GetComponent<CanvasGroup>().alpha,Is.Zero);
+    }
+
+    [Test]
+    public void FailedSharedSceneSwitchStillClosesTheLoadingCurtain()
+    {
+        screen.LoadingOn();
+        var transition=(IEnumerator)typeof(LoadingScreen).GetMethod("RunCoveredTransition",Private)
+            .Invoke(screen,new object[]{Fail(),0f});
+        UnityEngine.TestTools.LogAssert.Expect(LogType.Exception,new System.Text.RegularExpressions.Regex("Test transition failure"));
+        while(transition.MoveNext()){}
+        Assert.IsFalse(LoadingScreen.isLoadingOn);Assert.That(screen.GetComponent<CanvasGroup>().alpha,Is.Zero);
+    }
+
+    private static IEnumerator Switch(System.Action action){action();yield return null;}
+    private static IEnumerator Fail(){yield return null;throw new System.InvalidOperationException("Test transition failure");}
+
+    [Test]
+    public void LoadingProgressMovesGraduallyAndNeverRegresses()
+    {
+        screen.LoadingOn();
+        screen.SetProgress(.8f);
+        Assert.That(image.material.GetFloat("_FillAmount"), Is.Zero);
+
+        var advance = typeof(LoadingScreen).GetMethod("AdvanceProgress", Private);
+        advance.Invoke(screen, new object[] { .02f });
+        float firstFrame = image.material.GetFloat("_FillAmount");
+        Assert.That(firstFrame, Is.GreaterThan(0f).And.LessThan(.8f));
+
+        screen.SetProgress(.1f);
+        for (int frame = 0; frame < 60; frame++) advance.Invoke(screen, new object[] { .02f });
+        Assert.That(image.material.GetFloat("_FillAmount"), Is.EqualTo(.8f).Within(.001f));
+    }
+
+    [Test]
+    public void SlowActivationFrameDoesNotSkipTheVisibleProgressAnimation()
+    {
+        screen.LoadingOn();
+        screen.SetProgress(1f);
+        typeof(LoadingScreen).GetMethod("AdvanceProgress", Private).Invoke(screen, new object[] { 5f });
+        Assert.That(image.material.GetFloat("_FillAmount"), Is.GreaterThan(0f).And.LessThan(1f));
+        Assert.IsFalse(screen.IsProgressComplete);
+        Assert.IsTrue(LoadingScreen.IsLoading);
+    }
+
+    [Test]
+    public void RevealWaitsForTheVisibleBarAndKeepsGameplayBlocked()
+    {
+        screen.LoadingOn();
+        var reveal = (IEnumerator)typeof(LoadingScreen).GetMethod("FadeOut", Private)
+            .Invoke(screen, new object[] { .35f });
+        Assert.IsTrue(reveal.MoveNext());
+        Assert.IsNull(reveal.Current);
+        Assert.IsTrue(LoadingScreen.IsLoading);
+        Assert.That(screen.GetComponent<CanvasGroup>().alpha, Is.EqualTo(1f));
+
+        var advance = typeof(LoadingScreen).GetMethod("AdvanceProgress", Private);
+        for (int frame = 0; frame < 60; frame++) advance.Invoke(screen, new object[] { .02f });
+        Assert.That(image.material.GetFloat("_FillAmount"), Is.EqualTo(1f));
+        Assert.IsTrue(screen.IsProgressComplete);
+        Assert.IsTrue(reveal.MoveNext());
+        Assert.IsInstanceOf<WaitForSecondsRealtime>(reveal.Current);
+        Assert.IsTrue(LoadingScreen.IsLoading);
     }
 
     [Test]

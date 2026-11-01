@@ -154,6 +154,12 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (LoadingScreen.IsLoading)
+        {
+            lookInput = Vector2.zero;
+            if (shovelTool != null) shovelTool.CancelAction();
+            return;
+        }
         if (Time.timeScale <= 0f || (Pause.Instance != null && Pause.Instance.paused) ||
             UpgradeManager.BlocksGameplayInput)
         {

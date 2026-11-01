@@ -1,0 +1,30 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  1498,
+                   "executeMs":  7265,
+                   "assemblyName":  "PipelineRunScript_ConfigureSeparateMenuScene_7a903ea863f14f7c8469d2eecccd057a",
+                   "success":  true,
+                   "result":  {
+                                  "scene":  "Assets/Scenes/Menu.unity",
+                                  "screens":  [
+                                                  "MenuScreen",
+                                                  "SettingsScreen",
+                                                  "QuitGamePopup"
+                                              ],
+                                  "backButton":  "BackToMenu",
+                                  "bootstrap":  "[Bootstraper]",
+                                  "loading":  "Loading Curtain",
+                                  "cameras":  [
+                                                  "MenuCamera",
+                                                  "MenuCamera (1)",
+                                                  "MenuCamera (2)"
+                                              ],
+                                  "buttons":  "Continue/New Game/Settings/Quit/Confirm/Cancel/Back connected",
+                                  "firstBuildScene":  "Assets/Scenes/Menu.unity"
+                              }
+               }
+}

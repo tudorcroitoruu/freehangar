@@ -1,0 +1,48 @@
+{
+  "status": "completed",
+  "duration": 0.07,
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "MenuSessionTests.AnAccidentalAncestorEntryCannotDisableTheMenuItself",
+      "Status": "Passed",
+      "Duration": 0.0129843,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "MenuSessionTests.ContinuePreservesSessionAndRestoresGameplayAfterHidingTheMenu",
+      "Status": "Passed",
+      "Duration": 0.0092696,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "MenuSessionTests.LeavingMenuBeforeCameraInitializationStillDisablesEveryAssignedCamera",
+      "Status": "Passed",
+      "Duration": 0.0012832,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "MenuSessionTests.OpeningMenuHidesEveryGameplayObjectAndPausesSimulation",
+      "Status": "Passed",
+      "Duration": 0.0009546,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "MenuSessionTests.ReopeningMenuDisablesGameplayAgainWithoutMovingThePlayer",
+      "Status": "Passed",
+      "Duration": 0.0009856,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

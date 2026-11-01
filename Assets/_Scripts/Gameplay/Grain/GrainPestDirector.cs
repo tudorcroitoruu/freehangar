@@ -287,6 +287,7 @@ public sealed class GrainPestDirector : MonoBehaviour
     }
     private void Update()
     {
+        if (LoadingScreen.IsLoading || (GameManager.Instance != null && GameManager.Instance.IsIntroPlaying)) return;
         if (!SaveSystem.savesLoaded || SaveSystem.Data == null) return;
         if (player == null) player = FindFirstObjectByType<PlayerInteractor>();
         if (playerCamera == null && player != null)

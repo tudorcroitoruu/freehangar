@@ -63,6 +63,8 @@ public class LoadingScene : MonoBehaviour
         while (instance == null)
             yield return null;
 
+        // Let Single-mode activation finish destroying outgoing objects first.
+        yield return null;
         yield return UnloadOldScene();
     }
 
@@ -113,7 +115,7 @@ public class LoadingScene : MonoBehaviour
         // transition active before that wait so outgoing gameplay cannot emit effects
         // (notably loose-brick collision haptics) into the incoming level.
         // SDKManager.StopHaptics();
-        LoadingScreen.Instance?.LoadingOn();
+        if (!LoadingScreen.isLoadingOn) LoadingScreen.Instance?.LoadingOn();
         return true;
     }
 
@@ -142,7 +144,7 @@ public class LoadingScene : MonoBehaviour
 
     private static void StartLoadingSceneAsync()
     {
-        AsyncOperation loadOperation = SceneManager.LoadSceneAsync(currentScene);
+        AsyncOperation loadOperation = SceneManager.LoadSceneAsync(currentScene, LoadSceneMode.Single);
         if (loadOperation == null)
             AbortSceneLoad("Failed to start loading scene: " + currentScene);
     }
@@ -177,16 +179,14 @@ public class LoadingScene : MonoBehaviour
         }
 
         asyncCompleted = true;
+        LoadingScreen.Instance?.SetProgress(.1f);
 
-        /*
-        if (ShouldUnloadUnusedAssetsBeforeLoad())
-        {
-            AsyncOperation unloadOperation = Resources.UnloadUnusedAssets();
-            while (!unloadOperation.isDone)
-                yield return null;
-        }*/
+        // Release unused assets after unloading the old scene and before
+        // allocating the next one, reducing peak memory usage.
+        yield return Resources.UnloadUnusedAssets();
+        LoadingScreen.Instance?.SetProgress(.2f);
         
-        AsyncOperation loadOperation = SceneManager.LoadSceneAsync(TargetScene);
+        AsyncOperation loadOperation = SceneManager.LoadSceneAsync(TargetScene, LoadSceneMode.Single);
         if (loadOperation == null)
         {
             AbortSceneLoad("Failed to start loading scene: " + TargetScene);
@@ -208,7 +208,7 @@ public class LoadingScene : MonoBehaviour
         while (!loadOperation.isDone)
         {
             progress = Mathf.Clamp01(loadOperation.progress / 0.9f);
-            LoadingScreen.Instance?.SetProgress(progress);
+            LoadingScreen.Instance?.SetProgress(.2f + .7f * progress);
 
             if (instance.loadingImage != null)
             {
@@ -235,7 +235,7 @@ public class LoadingScene : MonoBehaviour
         while (loadOperation.progress < 0.9f)
         {
             progress = Mathf.Clamp01(loadOperation.progress / 0.9f);
-            LoadingScreen.Instance?.SetProgress(progress);
+            LoadingScreen.Instance?.SetProgress(.2f + .7f * progress);
 
             if (instance != null)
             {
@@ -250,7 +250,7 @@ public class LoadingScene : MonoBehaviour
         }
 
         progress = 1f;
-        LoadingScreen.Instance?.SetProgress(progress);
+        LoadingScreen.Instance?.SetProgress(1f);
         if (instance != null)
         {
             if (instance.loadingImage != null)
@@ -260,6 +260,13 @@ public class LoadingScene : MonoBehaviour
                 instance.loadingText.text = "100%";
 
         }
+
+        // Stay in LoadingScene until the visible bar finishes, even when the
+        // destination is already loaded in the background and ready to activate.
+        while (LoadingScreen.Instance != null && LoadingScreen.Instance.isActiveAndEnabled &&
+               !LoadingScreen.Instance.IsProgressComplete)
+            yield return null;
+        yield return new WaitForSecondsRealtime(.1f);
 
         loadOperation.allowSceneActivation = true;
 
@@ -322,7 +329,7 @@ public class LoadingScene : MonoBehaviour
         gameplayRevealScheduled = false;
         activeLoading = false;
         asyncCompleted = false;
-        LoadingScreen.Instance?.LoadingOff();
+        LoadingScreen.Instance?.LoadingOff(.35f);
     }
 
     private static void AbortSceneLoad(string message)

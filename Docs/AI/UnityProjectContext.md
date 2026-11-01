@@ -1,5 +1,20 @@
 # Unity project context
 
+2026-11-01 separate menu scene (supersedes the shared-scene implementation):
+Menu.unity is the first Build Settings scene. MenuCanvas/MenuManager manages
+MenuScreen, SettingsScreen and QuitGamePopup. Settings hides the main page;
+QuitGamePopup overlays the main page; Back/Cancel and Escape return to MenuScreen.
+Escape on the main page opens quit confirmation, except while rebinding/loading.
+ContinueGame preserves PlayerData and loads Gameplay; NewGame resets PlayerData
+before loading Gameplay. Both use the persistent LoadingScreen curtain and async
+scene loading. Pause.GoToMenu/Settings.GoToMenu save and load Menu. Boot targets
+Menu; Settings.Retry uses the same persistent loading API for Gameplay.
+The three menu cameras still crossfade using a RenderTexture, with menu UI above.
+MenuManager no longer references or toggles gameplay objects. Gameplay roots were
+reactivated; its copied menu objects remain inactive. Menu has a copy of the
+persistent GlobalManager bootstrap with loading/save/audio services. Navigation
+buttons and the Settings BackToMenu button are wired in the Menu scene.
+
 2026-11-01 containers-only scale flow (supersedes earlier parked-vehicle flow):
 SellingZone.CanWeigh requires unloaded grain containers and a clear scale.
 Any vehicle collider overlapping the area blocks weighing, even with its origin

@@ -1,0 +1,2 @@
+using System.Linq;using UnityEngine;using UnityEditor;using UnityEngine.UI;
+public static class InspectPauseReturn { public static object Main()=>Object.FindObjectsByType<Pause>(FindObjectsInactive.Include,FindObjectsSortMode.None).Select(p=>{var so=new SerializedObject(p);var b=so.FindProperty("confirmLeaveGameButton").objectReferenceValue as Button;return new {p.name,button=b!=null?b.name:"MISSING",calls=b==null?new string[0]:Enumerable.Range(0,b.onClick.GetPersistentEventCount()).Select(i=>b.onClick.GetPersistentMethodName(i)).ToArray()};}).ToArray();}

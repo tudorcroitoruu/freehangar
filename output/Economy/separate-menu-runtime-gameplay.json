@@ -1,0 +1,28 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  81,
+                   "executeMs":  2,
+                   "assemblyName":  "PipelineRunScript_ProbeSeparateMenu_5940380a84b049089e45d6531d09fe22",
+                   "success":  true,
+                   "result":  {
+                                  "action":  "inspect",
+                                  "scene":  "Assets/Scenes/Gameplay.unity",
+                                  "menu":  false,
+                                  "loading":  false,
+                                  "saved":  true,
+                                  "screens":  [
+
+                                              ],
+                                  "cameras":  [
+                                                  {
+                                                      "name":  "Main Camera",
+                                                      "target":  false
+                                                  }
+                                              ]
+                              }
+               }
+}

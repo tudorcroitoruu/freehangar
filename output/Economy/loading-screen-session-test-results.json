@@ -1,0 +1,62 @@
+{
+  "status": "completed",
+  "duration": 0.04,
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "LoadingScreenProgressTests.EveryLoadingStartResetsFillAndDestroyRestoresSharedMaterial",
+      "Status": "Passed",
+      "Duration": 0.0037367,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LoadingScreenProgressTests.FailedSharedSceneSwitchStillClosesTheLoadingCurtain",
+      "Status": "Passed",
+      "Duration": 0.0061816,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LoadingScreenProgressTests.ProgressAlsoUpdatesTheCachedStencilMaterial",
+      "Status": "Passed",
+      "Duration": 0.0055642,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LoadingScreenProgressTests.ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(-1.0f,0.0f)",
+      "Status": "Passed",
+      "Duration": 0.0015862,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LoadingScreenProgressTests.ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(0.25f,0.25f)",
+      "Status": "Passed",
+      "Duration": 0.0006517,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LoadingScreenProgressTests.ProgressUpdatesOnlyTheBarsMaterialAndEnablesShaderFill(2.0f,1.0f)",
+      "Status": "Passed",
+      "Duration": 0.0005671,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "LoadingScreenProgressTests.SharedSceneSwitchWaitsForTheCurtainAndKeepsItVisibleUntilCompletion",
+      "Status": "Passed",
+      "Duration": 0.0058914,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}
