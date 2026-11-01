@@ -78,8 +78,8 @@ public static class ApplyGrainEconomyBalance
             if(array.arraySize!=GrainCargo.TypeCount)throw new Exception("Missing crop selling settings");
             for(int i=0;i<array.arraySize;i++){var entry=array.GetArrayElementAtIndex(i);entry.FindPropertyRelative("grainPrice").floatValue=cropPrices[entry.FindPropertyRelative("grainType").enumValueIndex];}
         });
-        // Retain the scale's scenery but remove its separate automatic cash payout.
-        foreach(var old in UnityEngine.Object.FindObjectsByType<GrainWeighStation>(FindObjectsInactive.Include,FindObjectsSortMode.None).Where(z=>z.gameObject.scene==scene))Edit(old,so=>so.FindProperty("m_Enabled").boolValue=false);
+        // The station now displays instructions only; SellingScreen owns every payout.
+        foreach(var old in UnityEngine.Object.FindObjectsByType<GrainWeighStation>(FindObjectsInactive.Include,FindObjectsSortMode.None).Where(z=>z.gameObject.scene==scene))Edit(old,so=>so.FindProperty("m_Enabled").boolValue=true);
         int disabledCashFinds=0;
         foreach(var find in UnityEngine.Object.FindObjectsByType<BuriedFind>(FindObjectsInactive.Include,FindObjectsSortMode.None).Where(f=>f.gameObject.scene==scene))
         {

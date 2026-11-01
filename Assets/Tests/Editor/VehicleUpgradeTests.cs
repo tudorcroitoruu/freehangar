@@ -135,23 +135,92 @@ public class VehicleUpgradeTests
         var nextSpeed = Child("Next speed").AddComponent<Text>();
         var currentSlots = Child("Current slots").AddComponent<Text>();
         var message = Child("Requirements").AddComponent<Text>();
+        var title = Child("Requirements title").AddComponent<Text>();
         var button = Child("Upgrade").AddComponent<Button>();
         SetField(screen, "currentLevelMovementSpeed", currentSpeed);
         SetField(screen, "nextLevelMovementSpeed", nextSpeed);
         SetField(screen, "currentLevelSlots", currentSlots);
         SetField(screen, "notEnoughMoney", message);
+        SetField(screen, "notEnoughMoneyTitle", title);
         SetField(screen, "upgradeButton", button);
         settings.vehicles[1].requiresKey = true;
         screen.SetTarget(target);
-        Assert.AreEqual("Movement speed: <b>7 m/s</b>", currentSpeed.text);
-        StringAssert.Contains("12 m/s", nextSpeed.text);
+        Assert.AreEqual("Move speed: <b>25 km/h</b>", currentSpeed.text);
+        StringAssert.Contains("43 km/h", nextSpeed.text);
         Assert.AreEqual("Slots: <b>1</b>", currentSlots.text);
-        StringAssert.Contains("key required", message.text);
+        StringAssert.Contains("key required", title.text);
+        Assert.IsFalse(message.gameObject.activeSelf);
         Assert.IsFalse(button.interactable);
         SaveSystem.Data.foundSecrets = new[] { "vehicle.key.second" };
         screen.Refresh();
         Assert.IsTrue(button.interactable);
     }
+    [Test]
+    [TestCase(100, false, "Vehicle key required.", "")]
+    [TestCase(99, false, "Requirements not met.", "Not enough money and vehicle key missing.")]
+    [TestCase(99, true, "Not enough money", "$ 1")]
+    [TestCase(100, true, "", "")]
+    public void ScreenExplainsWhichPurchaseRequirementsAreMissing(int cash, bool hasKey, string expectedTitle, string expectedDetails)
+    {
+        var target=root.AddComponent<VehicleUpgrade>();
+        SetField(target,"settings",settings);SetField(target,"vehicleId","first");
+        var screen=Child("Requirement screen").AddComponent<UpgradeVehicle>();
+        var message=Child("Requirement message").AddComponent<Text>();
+        var title=Child("Requirement title").AddComponent<Text>();
+        var popup=Child("Requirement popup");
+        var button=Child("Requirement button").AddComponent<Button>();
+        SetField(screen,"notEnoughMoney",message);SetField(screen,"notEnoughMoneyTitle",title);SetField(screen,"notEnoughMoneyPopup",popup);SetField(screen,"upgradeButton",button);
+        settings.vehicles[1].requiresKey=true;
+        SaveSystem.Data.cash=cash;
+        SaveSystem.Data.foundSecrets=hasKey?new[]{settings.vehicles[1].RequiredKeyId}:new string[0];
+        screen.SetTarget(target);
+        Assert.That(title.text,Is.EqualTo(expectedTitle));
+        Assert.That(message.text,Is.EqualTo(expectedDetails));
+        Assert.That(message.gameObject.activeSelf,Is.EqualTo(cash<100));
+        Assert.That(popup.activeSelf,Is.EqualTo(expectedTitle.Length>0));
+        Assert.That(button.interactable,Is.EqualTo(cash>=100&&hasKey));
+        SaveSystem.Data.cash=0;screen.Refresh();Assert.IsTrue(message.gameObject.activeSelf);
+        SaveSystem.Data.cash=100;screen.Refresh();Assert.IsFalse(message.gameObject.activeSelf);
+    }
+
+    [Test]
+    public void ScreenShowsTheNextVehiclesKeyAndClearsItWhenNoKeyIsRequiredOrMaxed()
+    {
+        var texture=new Texture2D(1,1);
+        var currentKey=Sprite.Create(texture,new Rect(0,0,1,1),Vector2.one*.5f);
+        var nextKey=Sprite.Create(texture,new Rect(0,0,1,1),Vector2.one*.5f);
+        var lastKey=Sprite.Create(texture,new Rect(0,0,1,1),Vector2.one*.5f);
+        try
+        {
+            var target=root.AddComponent<VehicleUpgrade>();SetField(target,"settings",settings);SetField(target,"vehicleId","first");
+            var screen=Child("Key upgrade screen").AddComponent<UpgradeVehicle>();
+            var keyParent=Child("Key parent");
+            var image=Child("Key image").AddComponent<Image>();image.transform.SetParent(keyParent.transform);
+            var button=Child("Key purchase button").AddComponent<Button>();
+            SetField(screen,"keyParent",keyParent);SetField(screen,"keyImage",image);SetField(screen,"upgradeButton",button);
+            settings.vehicles[0].keySprite=currentKey;
+            settings.vehicles[1].requiresKey=true;settings.vehicles[1].keySprite=nextKey;
+            screen.SetTarget(target);
+            Assert.IsTrue(keyParent.activeSelf);Assert.IsTrue(image.enabled);Assert.AreSame(nextKey,image.sprite);Assert.IsFalse(button.interactable);
+            SaveSystem.Data.foundSecrets=new[]{settings.vehicles[1].RequiredKeyId};
+            SaveSystem.Data.cash=99;screen.Refresh();Assert.IsFalse(button.interactable);
+            SaveSystem.Data.cash=100;screen.Refresh();Assert.IsTrue(button.interactable);Assert.IsTrue(keyParent.activeSelf);
+            settings.vehicles[1].requiresKey=false;screen.Refresh();
+            Assert.IsFalse(keyParent.activeSelf);Assert.IsNull(image.sprite);Assert.IsFalse(image.enabled);
+            SaveSystem.Data.unlockedVehicles.Add("second");SetField(target,"vehicleId","second");
+            settings.vehicles[2].requiresKey=true;settings.vehicles[2].keySprite=lastKey;
+            screen.SetTarget(target);Assert.IsTrue(keyParent.activeSelf);Assert.AreSame(lastKey,image.sprite);
+            settings.vehicles[2].keySprite=null;screen.Refresh();Assert.IsTrue(keyParent.activeSelf);Assert.IsNull(image.sprite);Assert.IsFalse(image.enabled);
+            SetField(target,"vehicleId","last");screen.SetTarget(target);
+            Assert.IsFalse(keyParent.activeSelf);Assert.IsNull(image.sprite);
+            screen.SetTarget(null);Assert.IsFalse(keyParent.activeSelf);
+        }
+        finally
+        {
+            Object.DestroyImmediate(currentKey);Object.DestroyImmediate(nextKey);Object.DestroyImmediate(lastKey);Object.DestroyImmediate(texture);
+        }
+    }
+
     [Test]
     public void MissingPrefabDoesNotChargeOrUnlockNextVehicle()
     {

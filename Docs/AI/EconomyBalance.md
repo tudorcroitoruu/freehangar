@@ -62,7 +62,7 @@ Change multiplier, feeding amounts and balance inputs before a new run. Editing 
 
 Containers are destroyed on sale, so the budget pays for new containers repeatedly. Container allowances round up separately for each crop and hangar, using the configured stage container and its actual prefab capacity. Allowances use the full original collectible mass even if pests reduce sales, which keeps this expense conservative. The first hangar is charged Small Bags for all grain despite free bags being available. Repeatedly selling tiny loads or abandoning containers can exceed this allowance. Whole-dollar sale rounding and optional consumables are excluded.
 
-Only `WeightZone_2`'s SellingZone pays cash. The legacy automatic scale is disabled, scene goal cash rewards are zero, and seven cash chest/cache objects are disabled. Other keys, tools, stamina finds and vouchers remain; vouchers and pre-existing sample containers are not needed by this budget.
+Only `WeightZone_2`'s SellingZone / SellingScreen flow pays cash. GrainWeighStation is enabled as an instruction display only: park the vehicle, step off, load grain and press the red weigh button on the left. It has no automatic sale, payout, cargo animation or container removal. Scene goal cash rewards are zero, and seven cash chest/cache objects are disabled. Other keys, tools, stamina finds and vouchers remain; vouchers and pre-existing sample containers are not needed by this budget.
 
 ## Upgrade prices and route
 
@@ -78,6 +78,8 @@ Only `WeightZone_2`'s SellingZone pays cash. The legacy automatic scale is disab
 Stamina: **75 / 400 / 1,800 / 6,000** = **$8,275**.
 
 Vehicles after the free bicycle: **Motoroller 200 / Trike 600 / Lawnmower 1,500 / Pickup 4,500 / Pickup Bigger 9,000 / Pickup Cargo 18,000** = **$33,800**. The nested mower/trailer prefab is supported by vehicle replacement.
+
+Each destination vehicle can independently require a collected key in addition to its price: set `requiresKey`, `keyId` and `keySprite` in VehicleUpgradeSettings. Empty key IDs use `vehicle.key.<vehicle id>`; possession is checked in PlayerData.foundSecrets, and keys are not consumed. A voucher covers the price but never bypasses the key. UpgradeVehicle shows `keyParent` whenever the next vehicle requires a key, and assigns that destination vehicle's sprite to `keyImage`. The UI clears the image and hides the holder for upgrades without keys, no target and maximum level. The six matching existing vehicle key sprites are assigned; existing requiresKey choices are retained.
 
 All 24 tool purchases cost **$101,875**; all upgrade categories together cost **$143,950**. These are calculated from referenced SO prices, not copied totals.
 

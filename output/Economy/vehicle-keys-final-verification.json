@@ -1,0 +1,36 @@
+{
+    "success":  true,
+    "result":  {
+                   "output":  null,
+                   "diagnostics":  [
+
+                                   ],
+                   "success":  true,
+                   "result":  [
+                                  {
+                                      "id":  "motoroller",
+                                      "spriteAssigned":  true
+                                  },
+                                  {
+                                      "id":  "trike",
+                                      "spriteAssigned":  true
+                                  },
+                                  {
+                                      "id":  "lawnmower",
+                                      "spriteAssigned":  true
+                                  },
+                                  {
+                                      "id":  "pickup",
+                                      "spriteAssigned":  true
+                                  },
+                                  {
+                                      "id":  "pickupBig",
+                                      "spriteAssigned":  true
+                                  },
+                                  {
+                                      "id":  "pickupLast",
+                                      "spriteAssigned":  true
+                                  }
+                              ]
+               }
+}

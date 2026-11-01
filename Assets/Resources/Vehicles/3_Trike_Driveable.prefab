@@ -775,7 +775,7 @@ MonoBehaviour:
   upgradeManager: {fileID: 0}
   targetVehicle: {fileID: 2786117080285503785}
   promptAnchor: {fileID: 607370857106447789}
-  promptOffset: {x: 0, y: 0.3, z: 0}
+  promptOffset: {x: 0, y: 1.68, z: 0.76}
 --- !u!114 &2522856616409821835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -790,7 +790,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgrade
   settings: {fileID: 11400000, guid: 0b15f2691eb74da684784edf778d5a6b, type: 2}
   vehicleId: trike
-  additionalCargoSlots: []
 --- !u!114 &5793851107354065778
 MonoBehaviour:
   m_ObjectHideFlags: 0

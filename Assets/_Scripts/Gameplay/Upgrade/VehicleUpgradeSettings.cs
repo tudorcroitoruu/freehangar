@@ -19,6 +19,8 @@ public sealed class VehicleUpgradeSettings : ScriptableObject
         [Tooltip("Price to unlock this vehicle from the preceding vehicle.")]
         [Min(0)] public int price = 250;
         public bool requiresKey;
+        [Tooltip("Key icon shown when this vehicle is the next upgrade and requires a key.")]
+        public Sprite keySprite;
         [Tooltip("Collected key ID. Empty uses vehicle.key.<id>. Keys are not consumed.")]
         public string keyId;
         public string RequiredKeyId => string.IsNullOrWhiteSpace(keyId) ? "vehicle.key." + id : keyId;

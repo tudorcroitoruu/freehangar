@@ -20,6 +20,7 @@ MonoBehaviour:
     movementSpeed: 7
     price: 0
     requiresKey: 0
+    keySprite: {fileID: 0}
     keyId: 
     prefabResourcePath: Vehicles/1_Bicycle_Rideable
     legacyUpgradeCount: 2
@@ -29,7 +30,8 @@ MonoBehaviour:
     slots: 2
     movementSpeed: 12
     price: 200
-    requiresKey: 0
+    requiresKey: 1
+    keySprite: {fileID: 21300000, guid: 1212dffbc42c5d343bfc5376b120c46d, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/2_Motoroller_Rideable
     legacyUpgradeCount: 2
@@ -40,6 +42,7 @@ MonoBehaviour:
     movementSpeed: 10
     price: 600
     requiresKey: 0
+    keySprite: {fileID: 21300000, guid: 184e54c1f478c714fb98a917c70dc157, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/3_Trike_Driveable
     legacyUpgradeCount: 2
@@ -50,6 +53,7 @@ MonoBehaviour:
     movementSpeed: 10
     price: 1500
     requiresKey: 0
+    keySprite: {fileID: 21300000, guid: 1c98a8b71a1719449a689568d486cd85, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/4_Lawnmower_With_Trailer
     legacyUpgradeCount: 2
@@ -60,6 +64,7 @@ MonoBehaviour:
     movementSpeed: 13
     price: 4500
     requiresKey: 0
+    keySprite: {fileID: 21300000, guid: 26c86e214126b8144b46e008e3d9240f, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/5_Pick_up_Driveable
     legacyUpgradeCount: 2
@@ -70,6 +75,7 @@ MonoBehaviour:
     movementSpeed: 15
     price: 9000
     requiresKey: 0
+    keySprite: {fileID: 21300000, guid: b3c73cc21cba98d46928b223514f63ca, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/6_Pick_Up_Bigger_Driveable
     legacyUpgradeCount: 2
@@ -80,6 +86,7 @@ MonoBehaviour:
     movementSpeed: 20
     price: 18000
     requiresKey: 0
+    keySprite: {fileID: 21300000, guid: 791b7223b8cdac64c90bfd468afcaaeb, type: 3}
     keyId: 
     prefabResourcePath: Vehicles/7_Pick_Up_Last_Driveable
     legacyUpgradeCount: 2

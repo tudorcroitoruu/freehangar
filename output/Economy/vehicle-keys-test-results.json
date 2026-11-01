@@ -1,0 +1,83 @@
+{
+  "status": "completed",
+  "duration": 0.34,
+  "summary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "VehicleUpgradeTests.DefaultVehicleProfilesAndResourcesAreValid",
+      "Status": "Passed",
+      "Duration": 0.0865925,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.DisplayStatsNeverOverrideAuthoredSlotsOrSpeed",
+      "Status": "Passed",
+      "Duration": 0.0112053,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.EachPurchaseUnlocksExactlyOneNextVehicleAndSurvivesReload",
+      "Status": "Passed",
+      "Duration": 0.0019994,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.KeyRequiredNeedsBothMoneyAndMatchingCollectedKey",
+      "Status": "Passed",
+      "Duration": 0.0016412,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.LegacyCompletedMiniupgradesRestoreDirectlyToSavedDestination",
+      "Status": "Passed",
+      "Duration": 0.0011782,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.MissingPrefabDoesNotChargeOrUnlockNextVehicle",
+      "Status": "Passed",
+      "Duration": 0.0049226,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.ScreenShowsCurrentAndNextVehicleSpeedAndSlotsAndBlocksMissingKey",
+      "Status": "Passed",
+      "Duration": 0.0055372,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.ScreenShowsTheNextVehiclesKeyAndClearsItWhenNoKeyIsRequiredOrMaxed",
+      "Status": "Passed",
+      "Duration": 0.0037428,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.TrailerVehicleReplacementKeepsTheAssemblyAndCanAdvanceToPickup",
+      "Status": "Passed",
+      "Duration": 0.0058507,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.VoucherPaysPriceButNeverBypassesRequiredKey",
+      "Status": "Passed",
+      "Duration": 0.0003262,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

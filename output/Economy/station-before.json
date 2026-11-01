@@ -1,0 +1,20 @@
+{
+    "success":  true,
+    "result":  {
+                   "output":  null,
+                   "diagnostics":  [
+
+                                   ],
+                   "success":  true,
+                   "result":  [
+                                  {
+                                      "name":  "Selling scale",
+                                      "enabled":  true,
+                                      "parent":  "Weigh Station",
+                                      "zone":  true,
+                                      "json":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Assembly-CSharp::GrainWeighStation\",\"platformSize\":{\"x\":7.0,\"y\":4.0,\"z\":12.0},\"dropSize\":{\"x\":3.799999952316284,\"y\":4.800000190734863},\"cashPerKg\":2,\"clearDelay\":1.25,\"saleDuration\":0.800000011920929,\"statusText\":{\"instanceID\":0}}}",
+                                      "text":  "{\"MonoBehaviour\":{\"m_Enabled\":true,\"m_EditorHideFlags\":0,\"m_Name\":\"\",\"m_EditorClassIdentifier\":\"Unity.TextMeshPro::TMPro.TextMeshPro\",\"m_Material\":{\"instanceID\":0},\"m_Color\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"m_RaycastTarget\":true,\"m_RaycastPadding\":{\"x\":0.0,\"y\":0.0,\"z\":0.0,\"w\":0.0},\"m_Maskable\":true,\"m_OnCullStateChanged\":{\"m_PersistentCalls\":{\"m_Calls\":[]}},\"m_text\":\"DROP FILLED BAGS / BOXES\\nCenter only a?? step off to sell\",\"m_isRightToLeft\":false,\"m_fontAsset\":{\"fileID\":11400000,\"guid\":\"fd7581fbb7c43a64592b28c206862f0d\",\"type\":2},\"m_sharedMaterial\":{\"fileID\":-1400682523365752988,\"guid\":\"fd7581fbb7c43a64592b28c206862f0d\",\"type\":2},\"m_fontSharedMaterials\":[],\"m_fontMaterial\":{\"instanceID\":0},\"m_fontMaterials\":[],\"m_fontColor32\":{\"r\":255,\"g\":224,\"b\":115,\"a\":255},\"m_fontColor\":{\"r\":1.0,\"g\":0.8799999952316284,\"b\":0.44999998807907107,\"a\":1.0},\"m_enableVertexGradient\":false,\"m_colorMode\":3,\"m_fontColorGradient\":{\"topLeft\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"topRight\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"bottomLeft\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"bottomRight\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0}},\"m_fontColorGradientPreset\":{\"instanceID\":0},\"m_spriteAsset\":{\"instanceID\":0},\"m_tintAllSprites\":false,\"m_StyleSheet\":{\"instanceID\":0},\"m_TextStyleHashCode\":-1183493901,\"m_overrideHtmlColors\":false,\"m_faceColor\":{\"r\":255,\"g\":255,\"b\":255,\"a\":255},\"m_fontSize\":2.9000000953674318,\"m_fontSizeBase\":2.9000000953674318,\"m_fontWeight\":400,\"m_enableAutoSizing\":false,\"m_fontSizeMin\":18.0,\"m_fontSizeMax\":72.0,\"m_fontStyle\":0,\"m_HorizontalAlignment\":2,\"m_VerticalAlignment\":512,\"m_textAlignment\":65535,\"m_characterSpacing\":0.0,\"m_characterHorizontalScale\":1.0,\"m_wordSpacing\":0.0,\"m_lineSpacing\":-53.41999816894531,\"m_lineSpacingMax\":0.0,\"m_paragraphSpacing\":0.0,\"m_charWidthMaxAdj\":0.0,\"m_TextWrappingMode\":1,\"m_wordWrappingRatios\":0.4000000059604645,\"m_overflowMode\":0,\"m_linkedTextComponent\":{\"instanceID\":0},\"parentLinkedComponent\":{\"instanceID\":0},\"m_enableKerning\":false,\"m_ActiveFontFeatures\":[1801810542],\"m_enableExtraPadding\":false,\"checkPaddingRequired\":false,\"m_isRichText\":true,\"m_EmojiFallbackSupport\":true,\"m_parseCtrlCharacters\":true,\"m_isOrthographic\":false,\"m_isCullingEnabled\":false,\"m_horizontalMapping\":0,\"m_verticalMapping\":0,\"m_uvLineOffset\":0.0,\"m_geometrySortingOrder\":0,\"m_IsTextObjectScaleStatic\":false,\"m_VertexBufferAutoSizeReduction\":false,\"m_useMaxVisibleDescender\":true,\"m_pageToDisplay\":1,\"m_margin\":{\"x\":0.0,\"y\":0.0,\"z\":0.0,\"w\":0.0},\"m_isUsingLegacyAnimationComponent\":false,\"m_isVolumetricText\":false,\"_SortingLayer\":0,\"_SortingLayerID\":0,\"_SortingOrder\":0,\"m_hasFontAssetChanged\":false,\"m_renderer\":{\"instanceID\":0},\"m_maskType\":0}}"
+                                  }
+                              ]
+               }
+}

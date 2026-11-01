@@ -43,6 +43,7 @@ public class UpgradeManager : MonoBehaviour
         current = this;
         if (upgradeStaminaScreen != null) upgradeStaminaScreen.gameObject.SetActive(false);
         if (upgradeVehicleScreen != null) upgradeVehicleScreen.gameObject.SetActive(false);
+        if (closeButton != null) closeButton.gameObject.SetActive(true);
         gameObject.SetActive(true);
         upgradeShovelScreen.gameObject.SetActive(true);
         upgradeShovelScreen.Refresh();
@@ -60,6 +61,7 @@ public class UpgradeManager : MonoBehaviour
         current = this;
         if (upgradeShovelScreen != null) upgradeShovelScreen.gameObject.SetActive(false);
         if (upgradeVehicleScreen != null) upgradeVehicleScreen.gameObject.SetActive(false);
+        if (closeButton != null) closeButton.gameObject.SetActive(true);
         gameObject.SetActive(true);
         upgradeStaminaScreen.gameObject.SetActive(true);
         upgradeStaminaScreen.Refresh();
@@ -78,6 +80,7 @@ public class UpgradeManager : MonoBehaviour
         if (upgradeShovelScreen != null) upgradeShovelScreen.gameObject.SetActive(false);
         if (upgradeStaminaScreen != null) upgradeStaminaScreen.gameObject.SetActive(false);
         upgradeVehicleScreen.SetTarget(vehicle);
+        if (closeButton != null) closeButton.gameObject.SetActive(true);
         gameObject.SetActive(true);
         upgradeVehicleScreen.gameObject.SetActive(true);
         return true;
@@ -114,7 +117,8 @@ public class UpgradeManager : MonoBehaviour
 
     public void Close()
     {
-        if (!IsOpen) return;
+        foreach (Transform child in transform)
+            if (child.gameObject.activeSelf) child.gameObject.SetActive(false);
         gameObject.SetActive(false);
         ReleaseInput();
     }

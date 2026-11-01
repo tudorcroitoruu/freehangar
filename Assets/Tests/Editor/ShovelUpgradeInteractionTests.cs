@@ -81,6 +81,26 @@ public class ShovelUpgradeInteractionTests
     }
 
     [Test]
+    public void ClosingDisablesChildPanelsAndReopeningRestoresTheCloseButton()
+    {
+        var closeObject=new GameObject("Close button",typeof(RectTransform),typeof(UnityEngine.UI.Button));
+        closeObject.transform.SetParent(root.transform);
+        SetField(manager,"closeButton",closeObject.GetComponent<UnityEngine.UI.Button>());
+        Assert.IsTrue(manager.OpenShovel());
+        manager.Close();
+        Assert.IsFalse(root.activeSelf);
+        foreach(Transform child in root.transform)Assert.IsFalse(child.gameObject.activeSelf,child.name);
+        Assert.IsTrue(manager.OpenStamina());
+        Assert.IsTrue(staminaScreen.gameObject.activeSelf);
+        Assert.IsFalse(screen.gameObject.activeSelf);
+        Assert.IsTrue(closeObject.activeSelf);
+        manager.Close();
+        closeObject.SetActive(true);
+        manager.Close();
+        Assert.IsFalse(closeObject.activeSelf);
+    }
+
+    [Test]
     public void StaminaStationOpensOnlyStaminaAndRoutesEToItsOwnSavedProgress()
     {
         var interactable = station.AddComponent<StaminaUpgradeInteractable>();

@@ -723,7 +723,7 @@ MonoBehaviour:
   upgradeManager: {fileID: 0}
   targetVehicle: {fileID: 1850182445453681032}
   promptAnchor: {fileID: 7152650088946448521}
-  promptOffset: {x: 0, y: 0.3, z: 0}
+  promptOffset: {x: 0, y: 1.75, z: 1}
 --- !u!114 &8100725137279754956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -738,7 +738,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgrade
   settings: {fileID: 11400000, guid: 0b15f2691eb74da684784edf778d5a6b, type: 2}
   vehicleId: pickupLast
-  additionalCargoSlots: []
 --- !u!114 &2386800258260687751
 MonoBehaviour:
   m_ObjectHideFlags: 0

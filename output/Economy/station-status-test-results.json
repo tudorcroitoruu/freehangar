@@ -1,0 +1,27 @@
+{
+  "status": "completed",
+  "duration": 0.07,
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "GrainWeighStationStatusTests.GuidanceMatchesManualSellingFlowForPlayerVehicleAndEmptyCargo",
+      "Status": "Passed",
+      "Duration": 0.0161727,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "GrainWeighStationStatusTests.ParkedCargoOnlyShowsRedButtonInstructionsWithoutSellingOrChangingCargo",
+      "Status": "Passed",
+      "Duration": 0.0070088,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Globalization;
 using UnityEngine.Serialization;
 
 public class UpgradeVehicle : MonoBehaviour
@@ -28,8 +27,11 @@ public class UpgradeVehicle : MonoBehaviour
     
     [Space, Header("Price")]
     [SerializeField] private Text price;
+    [SerializeField] private Text notEnoughMoneyTitle;
     [SerializeField] private Text notEnoughMoney;
     [SerializeField] private GameObject notEnoughMoneyPopup;
+    [SerializeField] private GameObject keyParent;
+    [SerializeField] private Image keyImage;
     
     [Space, Header("Upgrade Button")]
     [SerializeField] private Button upgradeButton;
@@ -80,17 +82,24 @@ public class UpgradeVehicle : MonoBehaviour
         if (maxLevelHolder != null) maxLevelHolder.SetActive(maxed);
         SetText(currentLevelText, configured ? target.Profile.displayName : "");
         var nextVehicle = configured ? target.NextVehicle : null;
+        bool showKey = nextVehicle != null && nextVehicle.requiresKey;
+        if (keyParent != null) keyParent.SetActive(showKey);
+        if (keyImage != null)
+        {
+            keyImage.sprite = showKey ? nextVehicle.keySprite : null;
+            keyImage.enabled = showKey && nextVehicle.keySprite != null;
+        }
         SetText(nextVehicleText, nextVehicle != null ? nextVehicle.displayName : configured ? "MAX" : "");
         if (configured)
         {
             var current = target.Profile;
             var next = nextVehicle ?? current;
             var maximum = current;
-            SetText(currentLevelMovementSpeed, $"Movement speed: <b>{Speed(current.movementSpeed)}</b>");
+            SetText(currentLevelMovementSpeed, $"Move speed: <b>{Speed(current.movementSpeed)}</b>");
             string nextSpeed = Speed(next.movementSpeed);
             if (next.movementSpeed != current.movementSpeed) nextSpeed = Colored(nextSpeed);
-            SetText(nextLevelMovementSpeed, $"Movement speed: <b>{nextSpeed}</b>");
-            SetText(maxLevelMovementSpeed, $"Movement speed: <b>{Speed(maximum.movementSpeed)}</b>");
+            SetText(nextLevelMovementSpeed, $"Move speed: <b>{nextSpeed}</b>");
+            SetText(maxLevelMovementSpeed, $"Move speed: <b>{Speed(maximum.movementSpeed)}</b>");
             SetText(currentLevelSlots, $"Slots: <b>{current.slots}</b>");
             string nextSlots = next.slots.ToString();
             if (next.slots != current.slots) nextSlots = Colored(nextSlots);
@@ -104,16 +113,21 @@ public class UpgradeVehicle : MonoBehaviour
                 }
         }
         SetText(price, configured && !target.IsUnlocked ? "Locked" : maxed ? "MAX" : configured ? cost == 0 ? "Free" : $"$ {EconomyNumberFormat.Accounting(cost)}" : "Unavailable");
-        string requirements = missing > 0 ? $"You need ${EconomyNumberFormat.Accounting(missing)} more." : "";
-        if (nextVehicle != null && nextVehicle.requiresKey)
-            requirements += (requirements.Length > 0 ? "\n" : "") + (missingKey ? "Vehicle key required." : "Vehicle key collected.");
-        SetText(notEnoughMoney, requirements);
+        string requirementsTitle = missingKey && missing > 0 ? "Requirements not met."
+            : missingKey ? "Vehicle key required."
+            : missing > 0 ? "Not enough money" : "";
+        string requirementsDetails = missingKey && missing > 0 ? "Not enough money and vehicle key missing."
+            : missing > 0 ? $"$ {EconomyNumberFormat.Accounting(missing)}" : "";
+        SetText(notEnoughMoneyTitle, requirementsTitle);
+        SetText(notEnoughMoney, requirementsDetails);
+        if (notEnoughMoneyTitle != null) notEnoughMoneyTitle.gameObject.SetActive(missing > 0 || missingKey);
+        if (notEnoughMoney != null) notEnoughMoney.gameObject.SetActive(missing > 0);
         if (notEnoughMoneyPopup != null) notEnoughMoneyPopup.SetActive(missing > 0 || missingKey);
         if (upgradeButton != null) upgradeButton.interactable = affordable;
         if (upgradeButtonCanvas != null) upgradeButtonCanvas.alpha = affordable ? 1f : .5f;
         UpdateButtonMaterial(affordable ? 1f : .5f);
     }
-    private static string Speed(float value) => value.ToString("0.##", CultureInfo.InvariantCulture) + " m/s";
+    private static string Speed(float value) => EconomyNumberFormat.Accounting(value * 3.6f) + " km/h";
     private string Colored(string value) => $"<color=#{ColorUtility.ToHtmlStringRGBA(nextLevelColor)}>{value}</color>";
     private static void SetText(Text label, string value)
     {

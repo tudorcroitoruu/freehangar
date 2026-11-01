@@ -1,0 +1,111 @@
+{
+  "status": "completed",
+  "duration": 0.34,
+  "summary": {
+    "total": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "VehicleUpgradeTests.DefaultVehicleProfilesAndResourcesAreValid",
+      "Status": "Passed",
+      "Duration": 0.0808092,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.DisplayStatsNeverOverrideAuthoredSlotsOrSpeed",
+      "Status": "Passed",
+      "Duration": 0.0087201,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.EachPurchaseUnlocksExactlyOneNextVehicleAndSurvivesReload",
+      "Status": "Passed",
+      "Duration": 0.0013763,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.KeyRequiredNeedsBothMoneyAndMatchingCollectedKey",
+      "Status": "Passed",
+      "Duration": 0.0013317,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.LegacyCompletedMiniupgradesRestoreDirectlyToSavedDestination",
+      "Status": "Passed",
+      "Duration": 0.0009845,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.MissingPrefabDoesNotChargeOrUnlockNextVehicle",
+      "Status": "Passed",
+      "Duration": 0.0035544,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.ScreenExplainsWhichPurchaseRequirementsAreMissing(100,False,\"Vehicle key required.\",\"\")",
+      "Status": "Passed",
+      "Duration": 0.0088774,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.ScreenExplainsWhichPurchaseRequirementsAreMissing(99,False,\"Requirements not met.\",\"Not enough money and vehicle key missing.\")",
+      "Status": "Passed",
+      "Duration": 0.00085,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.ScreenExplainsWhichPurchaseRequirementsAreMissing(99,True,\"Not enough money\",\"$ 1\")",
+      "Status": "Passed",
+      "Duration": 0.0007073,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.ScreenExplainsWhichPurchaseRequirementsAreMissing(100,True,\"\",\"\")",
+      "Status": "Passed",
+      "Duration": 0.0006089,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.ScreenShowsCurrentAndNextVehicleSpeedAndSlotsAndBlocksMissingKey",
+      "Status": "Passed",
+      "Duration": 0.0017326,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.ScreenShowsTheNextVehiclesKeyAndClearsItWhenNoKeyIsRequiredOrMaxed",
+      "Status": "Passed",
+      "Duration": 0.0031757,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.TrailerVehicleReplacementKeepsTheAssemblyAndCanAdvanceToPickup",
+      "Status": "Passed",
+      "Duration": 0.0050365,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "VehicleUpgradeTests.VoucherPaysPriceButNeverBypassesRequiredKey",
+      "Status": "Passed",
+      "Duration": 0.0002785,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

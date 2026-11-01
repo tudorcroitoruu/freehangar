@@ -1,0 +1,7 @@
+{
+    "success":  true,
+    "result":  {
+                   "status":  "compiling",
+                   "message":  "Recompilation started. Poll script recompile_status until completed."
+               }
+}

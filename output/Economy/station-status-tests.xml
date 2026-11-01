@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Passed" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-31 22:54:07Z" end-time="2026-10-31 22:54:07Z" duration="0.0685273">
+  <test-suite type="TestSuite" id="1271" name="Project Name" fullname="Project Name" runstate="Runnable" testcasecount="209" result="Passed" start-time="2026-10-31 22:54:07Z" end-time="2026-10-31 22:54:07Z" duration="0.068527" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1260" name="Assembly-CSharp-Editor.dll" fullname="D:/Own projects/freehangar/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="209" result="Passed" start-time="2026-10-31 22:54:07Z" end-time="2026-10-31 22:54:07Z" duration="0.054364" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="5440" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestFixture" id="1086" name="GrainWeighStationStatusTests" fullname="GrainWeighStationStatusTests" classname="GrainWeighStationStatusTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 22:54:07Z" end-time="2026-10-31 22:54:07Z" duration="0.049132" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1088" name="GuidanceMatchesManualSellingFlowForPlayerVehicleAndEmptyCargo" fullname="GrainWeighStationStatusTests.GuidanceMatchesManualSellingFlowForPlayerVehicleAndEmptyCargo" methodname="GuidanceMatchesManualSellingFlowForPlayerVehicleAndEmptyCargo" classname="GrainWeighStationStatusTests" runstate="Runnable" seed="659932519" result="Passed" start-time="2026-10-31 22:54:07Z" end-time="2026-10-31 22:54:07Z" duration="0.016173" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1087" name="ParkedCargoOnlyShowsRedButtonInstructionsWithoutSellingOrChangingCargo" fullname="GrainWeighStationStatusTests.ParkedCargoOnlyShowsRedButtonInstructionsWithoutSellingOrChangingCargo" methodname="ParkedCargoOnlyShowsRedButtonInstructionsWithoutSellingOrChangingCargo" classname="GrainWeighStationStatusTests" runstate="Runnable" seed="823531737" result="Passed" start-time="2026-10-31 22:54:07Z" end-time="2026-10-31 22:54:07Z" duration="0.007009" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: C:/Users/Liviu Tataru/AppData/LocalLow/Account Name/Project Name\TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

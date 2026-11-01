@@ -1,0 +1,17 @@
+{
+    "success":  true,
+    "result":  {
+                   "output":  null,
+                   "diagnostics":  [
+
+                                   ],
+                   "success":  true,
+                   "result":  [
+                                  {
+                                      "enabled":  true,
+                                      "StatusMessage":  null,
+                                      "hasZone":  true
+                                  }
+                              ]
+               }
+}

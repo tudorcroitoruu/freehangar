@@ -10,6 +10,10 @@ public class SellingZone : MonoBehaviour
     [SerializeField] private GrainEconomySettings economySettings;
     private BoxCollider area;
     private readonly HashSet<BicycleController> parkedBicycles = new HashSet<BicycleController>();
+    public bool HasParkedVehicle
+    {
+        get { FindParkedBicycles(); return parkedBicycles.Count > 0; }
+    }
 
     private void Reset() => GetComponent<BoxCollider>().isTrigger = true;
     private void Awake() => area = GetComponent<BoxCollider>();

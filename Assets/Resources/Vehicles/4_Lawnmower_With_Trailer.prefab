@@ -1053,7 +1053,7 @@ MonoBehaviour:
   upgradeManager: {fileID: 0}
   targetVehicle: {fileID: 1809697905676644171}
   promptAnchor: {fileID: 6013012734015613169}
-  promptOffset: {x: 0, y: 0.3, z: 0}
+  promptOffset: {x: 0, y: 1.35, z: -0.5}
 --- !u!114 &6426863785060812347
 MonoBehaviour:
   m_ObjectHideFlags: 0

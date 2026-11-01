@@ -1,0 +1,23 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  2065,
+                   "executeMs":  1625,
+                   "assemblyName":  "PipelineRunScript_SetupStationStatus_5ec2248f2b0647e1af35e57189ed2a0f",
+                   "success":  true,
+                   "result":  [
+                                  {
+                                      "name":  "Selling scale",
+                                      "enabled":  true,
+                                      "StatusMessage":  "Park your vehicle on the scale and step off.\nPress on red weight button on left side of the weighting machine",
+                                      "text":  {
+                                                   "size":  1.85,
+                                                   "overflow":  false
+                                               }
+                                  }
+                              ]
+               }
+}

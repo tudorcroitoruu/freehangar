@@ -1,0 +1,55 @@
+{
+  "status": "completed",
+  "duration": 0.17,
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "ShovelUpgradeInteractionTests.ClosingDisablesChildPanelsAndReopeningRestoresTheCloseButton",
+      "Status": "Passed",
+      "Duration": 0.0183289,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeInteractionTests.DisplayLoadsSavedTypeAndSwitchesImmediatelyWhenPurchaseUnlocksNextShovel",
+      "Status": "Passed",
+      "Duration": 0.0045617,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeInteractionTests.EscapeClosesMenuBeforeProcessingAnyPurchaseAndConsumesTheGameplayFrame",
+      "Status": "Passed",
+      "Duration": 0.0072287,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeInteractionTests.StaminaStationOpensOnlyStaminaAndRoutesEToItsOwnSavedProgress",
+      "Status": "Passed",
+      "Duration": 0.0037161,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeInteractionTests.SubsequentEPressBuysOneUpgradeAndInsufficientMoneyDoesNothing",
+      "Status": "Passed",
+      "Duration": 0.0016397,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "ShovelUpgradeInteractionTests.WorkshopShovelOpensInactiveMenuWithoutPurchasingOnTheOpeningEPress",
+      "Status": "Passed",
+      "Duration": 0.0020771,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

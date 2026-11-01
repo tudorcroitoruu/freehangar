@@ -1274,6 +1274,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleCargoRack
   surface: {fileID: 2399664327943757645}
   baySpacing: 0.6
+  slotCount: 2
 --- !u!114 &4613546109000577557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1289,7 +1290,7 @@ MonoBehaviour:
   upgradeManager: {fileID: 0}
   targetVehicle: {fileID: 8103419784928300965}
   promptAnchor: {fileID: 6989609780038012702}
-  promptOffset: {x: 0, y: 0.3, z: 0}
+  promptOffset: {x: 0, y: 0.6, z: 0}
 --- !u!114 &427725007018918242
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1304,7 +1305,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgrade
   settings: {fileID: 11400000, guid: 0b15f2691eb74da684784edf778d5a6b, type: 2}
   vehicleId: bicycle
-  additionalCargoSlots: []
 --- !u!114 &4955551316705687805
 MonoBehaviour:
   m_ObjectHideFlags: 0

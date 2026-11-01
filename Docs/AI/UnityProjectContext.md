@@ -1,5 +1,34 @@
 # Unity project context
 
+2026-11-01 vehicle speed display: UpgradeVehicle converts all current/next/max
+movement-speed labels from the authored m/s values to km/h (multiply by 3.6).
+Driving/settings continue to use m/s internally. Displayed km/h are rounded to
+whole numbers with accounting grouping; e.g. 7 m/s displays 25 km/h.
+
+2026-11-01 vehicle requirement messages: UpgradeVehicle uses separate title and
+detail Text fields. Missing money+key shows "Requirements not met." and "Not
+enough money and vehicle key missing.". Missing only the key shows "Vehicle key
+required." and disables the detail GameObject. Missing only money shows "Not
+enough money" and the missing amount with accounting grouping. The detail is
+reactivated if funds later become insufficient; the popup hides when requirements
+are met. GameCanvas already binds notEnoughMoneyTitle.
+
+2026-11-01 vehicle key UI: VehicleUpgradeSettings.VehicleType includes keySprite
+alongside requiresKey/keyId. UpgradeVehicle activates keyParent for the NEXT
+vehicle's key requirement and assigns its keySprite to keyImage; it clears/hides
+the display otherwise, including at max level. The six existing VehicleKeys
+sprites are assigned to Motoroller, Trike, mower and the three pickups. Existing
+requiresKey flags are preserved. Purchases still require both price and collected
+key; vouchers do not bypass keys, and keys are retained after purchase.
+
+2026-11-01 weighing station: GrainWeighStation now ONLY displays instructions.
+Automatic sale/payment, cargo animation and container destruction are removed.
+It follows SellingZone's actual flow (park vehicle, step off, free hands, load
+grain) and includes "Press on red weight button on left side of the weighting
+machine". SellingScreen remains the sole sale/payment flow. The station is
+enabled and bound to its parent SellingZone; its TMP panel autosizes/wraps the
+longer message without overflow. See output/Economy/station-status-setup.json.
+
 2026-10-31 accounting display: economy calculated totals, captured stock, pile
 mass, grain HUD/bag prompts, wallet, shop/upgrade costs and sale totals use comma
 thousands grouping with no decimals, independently of OS locale. Configured unit

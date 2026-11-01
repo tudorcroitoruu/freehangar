@@ -1,0 +1,56 @@
+{
+    "success":  true,
+    "result":  {
+                   "diagnostics":  [
+
+                                   ],
+                   "compileMs":  2004,
+                   "executeMs":  303,
+                   "assemblyName":  "PipelineRunScript_AssignVehicleKeySprites_fa023da2425e44cf944b570b8a3b0473",
+                   "success":  true,
+                   "result":  [
+                                  {
+                                      "id":  "bicycle",
+                                      "requiresKey":  false,
+                                      "key":  "vehicle.key.bicycle",
+                                      "sprite":  null
+                                  },
+                                  {
+                                      "id":  "motoroller",
+                                      "requiresKey":  false,
+                                      "key":  "vehicle.key.motoroller",
+                                      "sprite":  "VehicleKeys_0000_Layer-2"
+                                  },
+                                  {
+                                      "id":  "trike",
+                                      "requiresKey":  false,
+                                      "key":  "vehicle.key.trike",
+                                      "sprite":  "VehicleKeys_0001_Layer-3"
+                                  },
+                                  {
+                                      "id":  "lawnmower",
+                                      "requiresKey":  false,
+                                      "key":  "vehicle.key.lawnmower",
+                                      "sprite":  "VehicleKeys_0002_Layer-4"
+                                  },
+                                  {
+                                      "id":  "pickup",
+                                      "requiresKey":  false,
+                                      "key":  "vehicle.key.pickup",
+                                      "sprite":  "VehicleKeys_0003_Layer-5"
+                                  },
+                                  {
+                                      "id":  "pickupBig",
+                                      "requiresKey":  false,
+                                      "key":  "vehicle.key.pickupBig",
+                                      "sprite":  "VehicleKeys_0004_Layer-6"
+                                  },
+                                  {
+                                      "id":  "pickupLast",
+                                      "requiresKey":  false,
+                                      "key":  "vehicle.key.pickupLast",
+                                      "sprite":  "VehicleKeys_0005_Layer-7"
+                                  }
+                              ]
+               }
+}
