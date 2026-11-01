@@ -155095,6 +155095,11 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1432797368949452403, guid: 92cd2246640b5a04ca292732de427687, type: 3}
   m_PrefabInstance: {fileID: 465358858}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &465358860 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1504256420291656262, guid: 92cd2246640b5a04ca292732de427687, type: 3}
+  m_PrefabInstance: {fileID: 465358858}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &465587943
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -186995,11 +187000,15 @@ MonoBehaviour:
   kind: 8
   findId: farm.tool.broom
   vehicleKeyName: 
+  chestKeyLabel: 
+  bottlePerk: 4
   requiredKeyId: 
   matchingHangarKeyId: 
   matchingKeyColor: 
   matchingKeyMaterial: {fileID: 0}
   cashReward: 500
+  variedChestRewards: 1
+  chestPerkSeconds: 300
   staminaDurationSeconds: 300
   coveringPile: {fileID: 0}
   settleOnReveal: 0
@@ -783268,7 +783277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuManager
   menuScreen: {fileID: 5925938949125262972}
-  settingsScreen: {fileID: 0}
+  settingsScreen: {fileID: 465358860}
   quitGamePopup: {fileID: 3985767016428473560}
   gameplayScene: Gameplay
   minimumLoadingSeconds: 1
