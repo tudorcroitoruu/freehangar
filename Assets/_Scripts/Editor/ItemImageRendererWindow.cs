@@ -30,11 +30,28 @@ public sealed class ItemImageRendererWindow : EditorWindow
     private Vector2 scroll;
     private string resultMessage;
 
+    private const string OpenedThisSession = "Freehangar.ItemImageRenderer.ManuallyOpened";
+
     [MenuItem("Tools/Freehangar/Render Item Images")]
-    public static void Open() => GetWindow<ItemImageRendererWindow>("Item PNG Renderer");
+    public static void Open()
+    {
+        // SessionState survives script reloads, but resets when Unity exits.
+        SessionState.SetBool(OpenedThisSession, true);
+        GetWindow<ItemImageRendererWindow>("Item PNG Renderer");
+    }
 
     private void OnEnable()
     {
+        if (!SessionState.GetBool(OpenedThisSession, false))
+        {
+            // A saved editor layout can recreate this window without using its menu command.
+            // Wait until layout restoration finishes before removing the restored tab.
+            EditorApplication.delayCall += () =>
+            {
+                if (this != null && !SessionState.GetBool(OpenedThisSession, false)) Close();
+            };
+            return;
+        }
         if (cameraPresetVersion != 0) return;
         if (Mathf.Approximately(viewAngles.x, 18f) && Mathf.Approximately(viewAngles.y, 145f))
             viewAngles = new Vector2(25f, 135f);
