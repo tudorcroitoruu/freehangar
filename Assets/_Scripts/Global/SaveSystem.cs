@@ -368,6 +368,7 @@ public class PlayerData
     }
 
     [Header("Grain progression")]
+    public AchievementProgress achievementProgress = new AchievementProgress();
     public double grainBaggedKilograms;
     public string[] foundSecrets = Array.Empty<string>();
     public int freeUpgradeVouchers;

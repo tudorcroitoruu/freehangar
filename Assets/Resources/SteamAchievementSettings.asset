@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be8d9afada124951ae78863d6d8156cf, type: 3}
+  m_Name: SteamAchievementSettings
+  m_EditorClassIdentifier: Assembly-CSharp::SteamAchievementSettings
+  appId: 0
+  syncInEditor: 0
+  apiNames:
+  - ACH_0
+  - ACH_1
+  - ACH_2
+  - ACH_3
+  - ACH_4
+  - ACH_5
+  - ACH_6
+  - ACH_7
+  - ACH_8
+  - ACH_9

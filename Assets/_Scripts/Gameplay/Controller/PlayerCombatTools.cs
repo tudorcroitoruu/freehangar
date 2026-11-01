@@ -122,7 +122,10 @@ public sealed class PlayerCombatTools : MonoBehaviour
         {
             var pest = hit.collider.GetComponentInParent<GrainPest>();
             if (pest != null && pest.ScaredAway(transform.position))
+            {
                 GameplayAudio.Instance?.PestHit(pest.IsCrow, hit.point);
+                GameAchievements.BroomPestScared(pest.IsCrow);
+            }
             GameplayAudio.Instance?.BroomHit();
             if (dustEffect != null) { var fx = Instantiate(dustEffect, hit.point, Quaternion.LookRotation(hit.normal)); Destroy(fx, 4f); }
             return;

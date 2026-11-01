@@ -123,6 +123,7 @@ public class SellingScreen : MonoBehaviour
         if (!IsOpen || !Zone.CanWeigh(player) || UIPopups.BasePopupUI.HasActivePopup) return;
         if (!QuoteMatches()) { Refresh(); return; }
         if (!CanPay() || !SaveSystem.AddMoney(quotedCash)) return;
+        GameAchievements.GrainSold(quotedCash);
         if (sellButton != null) sellButton.interactable = false;
         foreach (var container in containers)
         {

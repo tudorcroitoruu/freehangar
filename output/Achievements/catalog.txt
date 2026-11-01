@@ -1,0 +1,17 @@
+Live Gameplay catalog: 5 vehicle keys, 6 chests, 5 hangars.
+Vehicle key: vehicle.key.pickupBig
+Vehicle key: vehicle.key.trike
+Vehicle key: vehicle.key.pickup
+Vehicle key: vehicle.key.pickupLast
+Vehicle key: vehicle.key.lawnmower
+Chest: farm.chest.bonus.2
+Chest: farm.chest.bonus.1
+Chest: farm.chest.bonus.4
+Chest: farm.chest.h2
+Chest: farm.chest.bonus.3
+Chest: farm.chest.h4
+Hangar: 2
+Hangar: 5
+Hangar: 1
+Hangar: 4
+Hangar: 3

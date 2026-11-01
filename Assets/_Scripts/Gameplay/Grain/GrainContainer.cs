@@ -38,6 +38,8 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
             return origin + promptOffset;
         }
     }
+    [System.NonSerialized] private string achievementIdentity;
+    public string AchievementIdentity => achievementIdentity ?? (achievementIdentity=System.Guid.NewGuid().ToString("N"));
     public float Kilograms => kilograms;
     public float CapacityKg => capacityKg;
     public bool HasAssignedGrain => restrictGrain || kilograms > .000001f;
@@ -173,6 +175,7 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
         {
             IsClosing = false;
             GoalContext.Resolve(this, out int hangar, out _);
+            GameAchievements.BagClosed(this);
             GoalChecker.ReportProgress(GoalType.SackClosed, 1, hangar, acceptedGrain);
         }
     }

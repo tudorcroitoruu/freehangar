@@ -1,0 +1,11 @@
+index,api_name,name,requirement
+0,ACH_0,Grain Mountain,Collect 5000 kg of grain
+1,ACH_1,Packing Professional,Fill and close 50 different bags
+2,ACH_2,Clean Sweep,Fully clear 2 hangars
+3,ACH_3,Master Cleaner,Fully clear half the hangars (rounded up)
+4,ACH_4,Key Collector,Find half the vehicle keys (rounded up)
+5,ACH_5,Buried Treasure,Open half the hidden chests (rounded up)
+6,ACH_6,Crow Control,Scare away 25 crows with the broom
+7,ACH_7,Rat Patrol,Scare away 50 rats with the broom
+8,ACH_8,Heavy Lifter,Deliver 13 different full big bags by forklift to a weigh station
+9,ACH_9,Grain Tycoon,Earn 50000 dollars from grain sales

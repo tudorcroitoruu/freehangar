@@ -113,7 +113,7 @@ public sealed class ForkliftController : MonoBehaviour
         for(int i=0;i<cargoColliders.Length;i++)if(cargoColliders[i]!=null)cargoColliders[i].enabled=originalColliderStates[i];
         lastDropped=bag;bag.SetCarried(false);cargoBody.mass=Mathf.Max(1,bag.Kilograms+1);cargoBody.useGravity=true;cargoBody.isKinematic=false;
         cargoBody.constraints=RigidbodyConstraints.FreezeRotationX|RigidbodyConstraints.FreezeRotationZ;
-        cargo=null;cargoBody=null;cargoColliders=null;originalColliderStates=null;Physics.SyncTransforms();GameplayAudio.Instance?.Drop();return true;
+        cargo=null;cargoBody=null;cargoColliders=null;originalColliderStates=null;Physics.SyncTransforms();GameAchievements.ForkliftDelivered(bag);GameplayAudio.Instance?.Drop();return true;
     }
     private bool Ignore(Collider collider) => collider==null || collider.transform.IsChildOf(transform) || (cargo!=null && collider.transform.IsChildOf(cargo.transform));
     private void OnDestroy()
