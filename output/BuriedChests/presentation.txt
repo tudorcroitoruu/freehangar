@@ -1,6 +1,6 @@
-PASS Iron bonus chest - HANGAR 3: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
-PASS Copper bonus chest - HANGAR 2: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
-PASS Iron bonus chest - HANGAR 5: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
-PASS Copper chest - HANGAR 2 - key farm.key.copper: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
-PASS Copper bonus chest - HANGAR 4: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
-PASS Iron chest - HANGAR 4 - key farm.key.iron: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
+PASS H2 8 % - Copper chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
+PASS H3 67 % - Iron chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
+PASS H4 77 % - Copper chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
+PASS H2 67 % - Copper chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
+PASS H4 9 % - Iron chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
+PASS H5 80 % - Iron chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
