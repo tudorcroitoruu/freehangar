@@ -26,7 +26,7 @@ Prices, sale values, grain stock and the physical appearance of piles remain unc
 
 Cash discoveries supplement selling instead of replacing it. Small early caches help the first purchases; later caches support containers and an upgrade gap. The $100,000 grain-sales achievement remains achievable through ordinary grain sales and does not count chest money.
 
-The first vacuum now starts at 45 kg/s, adding 15 kg/s per upgrade dot. The second starts at 90 kg/s, adding 22.5 kg/s per dot (180 kg/s fully upgraded). This replaces the previous 540/1,080 kg/s starting rates, retaining the existing capacity and price progression while making suction take visible time. Fully upgrading is optional for completing the game.
+The first vacuum now starts at 45 kg/s, adding 15 kg/s per upgrade dot. The second starts at 90 kg/s, adding 22.5 kg/s per dot (180 kg/s fully upgraded). This replaces the previous 540/1,080 kg/s starting rates, retaining the existing capacity and price progression while making suction take visible time. Manual shovel loads are now 3x larger (Basic starts at 7.5 kg) with wider/deeper excavation; vacuum rates and capacities retain their existing values. This speeds up manual excavation, so the chapter time targets need a fresh playtest. Fully upgrading is optional for completing the game.
 
 ## Authoring and checks
 

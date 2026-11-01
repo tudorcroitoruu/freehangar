@@ -325,6 +325,9 @@ public class LoadingScene : MonoBehaviour
 
     private static void CompleteSceneLoad()
     {
+        // Recheck after all incoming Awake/OnEnable bindings, before uncovering its camera.
+        // The intro's own opaque cover takes over from the loading curtain.
+        GameManager.Instance?.PrepareIntroductionForReveal();
         LoadingScreen.Instance?.SetProgress(1f);
         gameplayRevealScheduled = false;
         activeLoading = false;

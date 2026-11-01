@@ -1,8 +1,83 @@
-Grain interaction tests: Passed; passed=6; failed=0
+Grain interaction tests: Passed; passed=31; failed=0
+CornSurfaceUpdateTests.BroadExcavationHasBoundedWorkAndEventuallyMatchesEveryKernelHeight: Passed
+
+
+CornSurfaceUpdateTests.ClearingAndRefillingQueuedCellsRestoresVisibilityAndCullingBounds: Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,False): Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,False): Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,False): Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,True): Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,True): Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,True): Passed
+
+
+GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(10.0f): Passed
+
+
+GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(200.0f): Passed
+
+
+GrainEconomyTests.DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource: Passed
+
+
+GrainEconomyTests.ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass: Passed
+
+
+GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(0.0f,1.0f): Passed
+
+
+GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(-10.0f,1.0f): Passed
+
+
+GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.NaN,1.0f): Passed
+
+
+GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.PositiveInfinity,1.0f): Passed
+
+
+GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(100000.0f,10000.0f): Passed
+
+
+GrainEconomyTests.LargerStartingShovelFillsFreeBagInTwoLoadsWithoutLosingTheRemainder: Passed
+
+
+GrainEconomyTests.ManualShovelUpgradeLoadsAreTripledWhileVacuumCapacityIsPreserved: Passed
+
+
+GrainInteractionPerformanceTests.ActiveLoadMeshKeepsGeometryAndUpdatesOnlyTheChangedKernel: Passed
+
+
+GrainInteractionPerformanceTests.LoadCountChangesReuseRetainedVerticesAndUploadNewSlots: Passed
+
+
 GrainInteractionPerformanceTests.LoadedShovelSleepsDuringUniformWalkingButWakesForAccelerationAndTurning: Passed
 
 
 GrainInteractionPerformanceTests.MovingAndRotatingBagReusesBakedSurfaceAndKeepsKernelsAttached: Passed
+
+
+GrainInteractionPerformanceTests.MovingLoadStaysBoundedAtFastAndSlowFrameRates(0.01f): Passed
+
+
+GrainInteractionPerformanceTests.MovingLoadStaysBoundedAtFastAndSlowFrameRates(0.033f): Passed
+
+
+GrainInteractionPerformanceTests.MovingLoadStaysBoundedAtFastAndSlowFrameRates(0.05f): Passed
+
+
+GrainInteractionPerformanceTests.PurePourStreamDoesNotQuerySceneCollidersAndDrainsAfterLanding: Passed
 
 
 GrainInteractionPerformanceTests.ScalingBagStillResamplesItsWorldSpaceKernelDensity: Passed

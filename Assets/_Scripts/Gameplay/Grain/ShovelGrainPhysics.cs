@@ -21,6 +21,11 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     private Quaternion[] rotations;
     private Matrix4x4[] matrices;
     private int count;
+    private int[] pairOrder;
+    private int pairOrderCount;
+    public int LastPairChecks { get; private set; }
+    public int LastWorldCollisionQueries { get; private set; }
+    public int LastUploadedLoadVertices { get; private set; }
     private readonly Vector3[] streamPosition = new Vector3[StreamCapacity];
     private readonly Vector3[] streamVelocity = new Vector3[StreamCapacity];
     private readonly float[] streamLife = new float[StreamCapacity];
@@ -44,7 +49,6 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     private float quietTime;
     private bool loadSleeping;
     private Vector3 pourDestination;
-    private Collider receiver;
     private System.Random random;
     private ShovelTool tool;
     private GrainType pourGrain;
@@ -66,7 +70,9 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
 
     private Mesh visibleLoad;
     private MeshRenderer loadRenderer;
-    private Vector3[] loadVertices, loadNormals, sourceVertices, sourceNormals;
+    private Vector3[] sourceVertices, sourceNormals;
+    private struct LoadVertex { public Vector3 position, normal; public Vector2 uv; }
+    private LoadVertex[] loadVertices;
     private int indicesPerKernel;
     private Matrix4x4[] uploadedLoadMatrices;
     private int uploadedLoadCount = -1;
@@ -79,51 +85,71 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         sourceVertices = kernelMesh.vertices; sourceNormals = kernelMesh.normals;
         var sourceUV = kernelMesh.uv; var sourceIndices = kernelMesh.triangles;
         indicesPerKernel = sourceIndices.Length;
-        loadVertices = new Vector3[capacity * sourceVertices.Length];
-        loadNormals = new Vector3[loadVertices.Length];
-        var uv = new Vector2[loadVertices.Length]; var indices = new int[capacity * indicesPerKernel];
+        loadVertices = new LoadVertex[capacity * sourceVertices.Length];
+        var indices = new int[capacity * indicesPerKernel];
         for (int k = 0; k < capacity; k++)
         {
-            for (int j = 0; j < sourceUV.Length; j++) uv[k * sourceVertices.Length + j] = sourceUV[j];
+            for (int j = 0; j < sourceUV.Length; j++) loadVertices[k * sourceVertices.Length + j].uv = sourceUV[j];
             for (int j = 0; j < indicesPerKernel; j++) indices[k * indicesPerKernel + j] = k * sourceVertices.Length + sourceIndices[j];
         }
         visibleLoad = new Mesh { name = "Held shovel visible grain", indexFormat = IndexFormat.UInt32 };
-        visibleLoad.MarkDynamic(); visibleLoad.vertices = loadVertices; visibleLoad.normals = loadNormals;
-        visibleLoad.uv = uv; visibleLoad.triangles = indices;
+        visibleLoad.MarkDynamic();
+        visibleLoad.SetVertexBufferParams(loadVertices.Length,
+            new VertexAttributeDescriptor(VertexAttribute.Position, VertexAttributeFormat.Float32, 3),
+            new VertexAttributeDescriptor(VertexAttribute.Normal, VertexAttributeFormat.Float32, 3),
+            new VertexAttributeDescriptor(VertexAttribute.TexCoord0, VertexAttributeFormat.Float32, 2));
+        visibleLoad.SetVertexBufferData(loadVertices, 0, 0, loadVertices.Length);
+        visibleLoad.SetIndexBufferParams(indices.Length, IndexFormat.UInt32);
+        visibleLoad.SetIndexBufferData(indices, 0, 0, indices.Length);
+        visibleLoad.subMeshCount = 1;
+        visibleLoad.SetSubMesh(0, new SubMeshDescriptor(0, 0), MeshUpdateFlags.DontRecalculateBounds);
+        // Every kernel is constrained to this local bowl envelope. Do not scan unused vertices.
+        visibleLoad.bounds = new Bounds(Vector3.zero, Vector3.one);
         var filter = GetComponent<MeshFilter>();
         if (filter == null) filter = gameObject.AddComponent<MeshFilter>();
         filter.sharedMesh = visibleLoad;
         loadRenderer = GetComponent<MeshRenderer>();
         if (loadRenderer == null) loadRenderer = gameObject.AddComponent<MeshRenderer>();
         loadRenderer.sharedMaterial = kernelMaterial; loadRenderer.enabled = false;
+        loadRenderer.shadowCastingMode = ShadowCastingMode.Off;
+        loadRenderer.lightProbeUsage = LightProbeUsage.Off;
     }
 
     private void DrawLoad(int amount)
     {
+        LastUploadedLoadVertices = 0;
         if (visibleLoad == null) BuildLoadRenderer();
         if (loadRenderer == null) return;
         loadRenderer.enabled = amount > 0;
         if (amount == 0) { uploadedLoadCount = 0; return; }
         loadRenderer.SetPropertyBlock(loadAppearance.Block);
-        bool changed = amount != uploadedLoadCount;
-        for (int k = 0; k < amount && !changed; k++) changed = uploadedLoadMatrices[k] != matrices[k];
-        if (!changed) return;
-        uploadedLoadCount = amount;
+        bool countChanged = amount != uploadedLoadCount;
+        int firstChanged = amount, lastChanged = -1;
         for (int k = 0; k < amount; k++)
         {
             Matrix4x4 matrix = matrices[k];
+            // A count change alters the index range, not every retained kernel.
+            // New slots must still be uploaded even if their cached matrix matches.
+            if (k < uploadedLoadCount && uploadedLoadMatrices[k] == matrix) continue;
+            firstChanged = Mathf.Min(firstChanged, k); lastChanged = k;
             uploadedLoadMatrices[k] = matrix;
             Matrix4x4 normal = matrix.inverse.transpose;
             for (int j = 0; j < sourceVertices.Length; j++)
             {
                 int index = k * sourceVertices.Length + j;
-                loadVertices[index] = matrix.MultiplyPoint3x4(sourceVertices[j]);
-                loadNormals[index] = normal.MultiplyVector(sourceNormals[j]).normalized;
+                loadVertices[index].position = matrix.MultiplyPoint3x4(sourceVertices[j]);
+                loadVertices[index].normal = normal.MultiplyVector(sourceNormals[j]).normalized;
             }
         }
-        visibleLoad.vertices = loadVertices; visibleLoad.normals = loadNormals;
-        visibleLoad.SetSubMesh(0, new SubMeshDescriptor(0, amount * indicesPerKernel), MeshUpdateFlags.DontRecalculateBounds);
-        visibleLoad.RecalculateBounds(); loadRenderer.SetPropertyBlock(loadAppearance.Block);
+        if (lastChanged >= firstChanged)
+        {
+            int start = firstChanged * sourceVertices.Length, length = (lastChanged - firstChanged + 1) * sourceVertices.Length;
+            LastUploadedLoadVertices = length;
+            visibleLoad.SetVertexBufferData(loadVertices, start, start, length, 0,
+                MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontValidateIndices);
+        }
+        if (countChanged) visibleLoad.SetSubMesh(0, new SubMeshDescriptor(0, amount * indicesPerKernel), MeshUpdateFlags.DontRecalculateBounds);
+        uploadedLoadCount = amount;
     }
 
     private void OnDestroy()
@@ -136,6 +162,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     {
         tool = GetComponentInParent<ShovelTool>();
         positions = new Vector3[maximumKernels]; velocities = new Vector3[maximumKernels];
+        pairOrder = new int[maximumKernels]; pairOrderCount = 0;
         rotations = new Quaternion[maximumKernels]; matrices = new Matrix4x4[maximumKernels + PackedCapacity];
         random = new System.Random(213);
         previousPosition = transform.position;
@@ -162,7 +189,6 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     public void SetPourTarget(Vector3 worldPoint, Collider target)
     {
         pourDestination = worldPoint;
-        receiver = target;
     }
 
     private float Random(float min, float max) => Mathf.Lerp(min, max, (float)random.NextDouble());
@@ -209,6 +235,24 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     {
         if (positions == null || kernelMesh == null || kernelMaterial == null) return;
         if (Time.deltaTime > 0) Simulate(Mathf.Min(Time.deltaTime, .05f));
+        UpdateLoad();
+        streamCount = 0;
+        for (int i = 0; i < StreamCapacity; i++)
+        {
+            if (streamLife[i] <= 0) continue;
+            drawnSpecies[streamCount] = streamSpecies[i];
+            float scale = Mathf.Clamp01(streamLife[i] * (scoopStream[i] ? 35f : cosmeticStream[i] ? 5f : 20f));
+            streamMatrices[streamCount++] = Matrix4x4.TRS(streamPosition[i],
+                Quaternion.Euler(streamLife[i] * 170f, i * 71f, streamLife[i] * 90f), new Vector3(.013f, .009f, .017f) * scale);
+        }
+        streamAppearance.Set(pourGrain);
+        streamAppearance.Block.SetFloatArray(SpeciesProperty, drawnSpecies);
+        if (streamCount > 0) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, streamMatrices, streamCount, streamAppearance.Block,
+            ShadowCastingMode.Off, true, airborneLayer, null, LightProbeUsage.Off);
+    }
+
+    private void UpdateLoad()
+    {
         HighestLoadPoint = 0;
         for (int i = 0; i < count; i++)
         {
@@ -229,23 +273,12 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         }
         if (tool != null) loadAppearance.Set(tool.Cargo); else loadAppearance.Set(GrainType.Corn);
         DrawLoad(count + PackedKernelCount);
-        streamCount = 0;
-        for (int i = 0; i < StreamCapacity; i++)
-        {
-            if (streamLife[i] <= 0) continue;
-            drawnSpecies[streamCount] = streamSpecies[i];
-            float scale = Mathf.Clamp01(streamLife[i] * (scoopStream[i] ? 35f : 5f));
-            streamMatrices[streamCount++] = Matrix4x4.TRS(streamPosition[i],
-                Quaternion.Euler(streamLife[i] * 170f, i * 71f, streamLife[i] * 90f), new Vector3(.013f, .009f, .017f) * scale);
-        }
-        streamAppearance.Set(pourGrain);
-        streamAppearance.Block.SetFloatArray(SpeciesProperty, drawnSpecies);
-        if (streamCount > 0) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, streamMatrices, streamCount, streamAppearance.Block,
-            ShadowCastingMode.Off, true, airborneLayer, null, LightProbeUsage.Off);
     }
 
     private void Simulate(float dt)
     {
+        LastPairChecks = 0;
+        LastWorldCollisionQueries = 0;
         displayedFill = Mathf.MoveTowards(displayedFill, requestedFill, dt * 2.5f);
         int desired = Mathf.RoundToInt(requestedFill * maximumKernels);
         spawnCredit = Mathf.Min(spawnCredit + dt * 750f, 32f);
@@ -313,8 +346,11 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
                 System.Array.Clear(velocities, 0, count);
             }
         }
-        float step = dt / 3f;
-        for (int sub = 0; !loadSleeping && sub < 3; sub++)
+        // At 100+ FPS, three passes were resolving the same millisecond-sized motion.
+        // Keep the small-step safety at low frame rates without paying it on every fast frame.
+        int substeps = Mathf.Clamp(Mathf.CeilToInt(dt / .016f), 1, 3);
+        float step = dt / substeps;
+        for (int sub = 0; !loadSleeping && sub < substeps; sub++)
         {
             for (int i = 0; i < count; i++)
             {
@@ -324,11 +360,29 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
                 rotations[i] = Quaternion.Normalize(Quaternion.Euler(velocities[i].z * step * 400f, 0, -velocities[i].x * step * 400f) * rotations[i]);
                 Constrain(i);
             }
-            // Small bounded pair set, no allocations, scene searches or PhysX bodies.
-            for (int i = 0; i < count; i++)
-            for (int j = i + 1; j < count; j++)
+            // Sweep the short X axis. Insertion sort is nearly linear once grains settle.
+            if (pairOrderCount != count)
             {
+                for (int i = 0; i < count; i++) pairOrder[i] = i;
+                pairOrderCount = count;
+            }
+            for (int order = 1; order < count; order++)
+            {
+                int item = pairOrder[order], previous = order - 1;
+                while (previous >= 0 && positions[pairOrder[previous]].x > positions[item].x)
+                {
+                    pairOrder[previous + 1] = pairOrder[previous]; previous--;
+                }
+                pairOrder[previous + 1] = item;
+            }
+            for (int left = 0; left < count; left++)
+            for (int right = left + 1; right < count; right++)
+            {
+                int i = pairOrder[left], j = pairOrder[right];
+                if (positions[j].x - positions[i].x >= Radius * 2) break;
+                LastPairChecks++;
                 Vector3 difference = positions[j] - positions[i];
+                if (difference.y >= Radius * 2 || difference.y <= -Radius * 2 || difference.z >= Radius * 2 || difference.z <= -Radius * 2) continue;
                 float squared = difference.sqrMagnitude;
                 if (squared >= 4f * Radius * Radius || squared < .00000001f) continue;
                 float distance = Mathf.Sqrt(squared);
@@ -360,9 +414,12 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
             Vector3 old = streamPosition[i];
             streamVelocity[i] += Physics.gravity * dt;
             Vector3 delta = streamVelocity[i] * dt;
+            // The pour destination is already known and gameplay owns grain transfer.
+            // Purely visual pour kernels must not raycast the whole pile every frame.
+            if (!cosmeticStream[i]) { streamPosition[i] += delta; continue; }
+            LastWorldCollisionQueries++;
             if (Physics.Raycast(old, delta.normalized, out RaycastHit hit, delta.magnitude + .006f, ~0, QueryTriggerInteraction.Ignore))
             {
-                if (!cosmeticStream[i] && receiver != null && hit.collider == receiver) { streamLife[i] = 0; continue; }
                 streamPosition[i] = hit.point + hit.normal * .01f;
                 streamVelocity[i] = Vector3.Reflect(streamVelocity[i], hit.normal) * .22f;
                 streamLife[i] = Mathf.Min(streamLife[i], .5f);
@@ -442,7 +499,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
         streamVelocity[i] = (pourDestination - position - Physics.gravity * (.5f * flightTime * flightTime)) / flightTime;
         streamVelocity[i].y = Mathf.Min(0, streamVelocity[i].y);
         streamVelocity[i] += new Vector3(Random(-.12f, .12f), Random(0, .12f), Random(-.12f, .12f));
-        streamLife[i] = 1.5f;
+        streamLife[i] = flightTime + .05f;
     }
 
     private void EmitCosmetic(Vector3 position, Vector3 velocity, bool fromScoop = false)

@@ -1,0 +1,9 @@
+Editor CPU microbenchmarks (not standalone frame times)
+Bag bake/sample Rebuild: mean=0.707 ms, p95=0.977 ms, max=0.977 ms, managed=0 B/call
+Bag visible kernels=455
+Bag rigid movement cached update: mean=0.032 ms, p95=0.053 ms, max=0.118 ms, managed=0 B/call
+Bag mesh bakes during rigid movement=0
+Loaded shovel constant walking Simulate: mean=0.014 ms, p95=0.015 ms, max=0.116 ms, managed=0 B/call
+Loaded shovel sleeping during uniform walking=True, kernels=192
+Active scoop/pour: solver mean=1.149 ms max=4.305; load mesh mean=0.876 ms max=7.740
+Three scoops settle steps=7, total=0.829 ms, still active=False

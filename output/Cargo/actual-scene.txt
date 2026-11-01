@@ -1,0 +1,17 @@
+Actual scene cargo placement audit
+BIKE Bicycle - red rideable worldScale=(1.46, 1.46, 1.46) rootEuler=(0.00, 0.00, 0.00) rack=(6.63, 1.11, 17.83) rackEuler=(0.00, 0.00, 0.00)
+BAG Sack id=FreeBag localScale=(1.00, 1.00, 1.00) worldScale=(1.00, 1.00, 1.00) euler=(270.02, 0.00, 0.00) parent= kg=0/50 prefab=Assets/Models/Bag/Sack.fbx
+BAG 50 kg sack - fill with loaded shovel id=FreeBag localScale=(1.00, 1.00, 1.00) worldScale=(1.00, 1.00, 1.00) euler=(270.02, 0.00, 0.00) parent=Grain Prototype kg=0/50 prefab=Assets/Models/Bag/Sack.fbx
+BAG Sorting sack 2 id=FreeBag localScale=(1.00, 1.00, 1.00) worldScale=(1.00, 1.00, 1.00) euler=(270.02, 0.00, 0.00) parent=Grain Prototype kg=0/50 prefab=
+BAG Sorting sack 3 id=FreeBag localScale=(1.00, 1.00, 1.00) worldScale=(1.00, 1.00, 1.00) euler=(270.02, 0.00, 0.00) parent=Grain Prototype kg=0/50 prefab=
+BAG FreeBag id=FreeBag localScale=(1.00, 1.00, 1.00) worldScale=(1.00, 1.00, 1.00) euler=(270.02, 0.00, 0.00) parent=Trash kg=0/10 prefab=Assets/Prefabs/Gameplay/Containers/FreeBag.prefab
+BAG SmallBag id=SmallBag localScale=(1.30, 1.30, 1.30) worldScale=(1.30, 1.30, 1.30) euler=(270.00, 0.00, 0.00) parent=Trash kg=0/25 prefab=Assets/Prefabs/Gameplay/Containers/SmallBag.prefab
+BAG LargeBag id=LargeBag localScale=(1.50, 1.50, 1.50) worldScale=(1.50, 1.50, 1.50) euler=(270.00, 0.00, 0.00) parent=Trash kg=0/50 prefab=Assets/Prefabs/Gameplay/Containers/LargeBag.prefab
+BAG Crate id=Crate localScale=(1.00, 1.00, 1.00) worldScale=(1.00, 1.00, 1.00) euler=(270.02, 0.00, 0.00) parent=Trash kg=0/80 prefab=Assets/Prefabs/Gameplay/Containers/Crate.prefab
+BAG BigBag id=BigBag localScale=(2.50, 2.50, 2.50) worldScale=(2.50, 2.50, 2.50) euler=(270.00, 0.00, 0.00) parent=Trash kg=0/500 prefab=Assets/Prefabs/Gameplay/Containers/BigBag.prefab
+BAG Barrel id=Barrel localScale=(1.00, 1.00, 1.00) worldScale=(1.00, 1.00, 1.00) euler=(270.02, 0.00, 0.00) parent=Trash kg=0/120 prefab=Assets/Prefabs/Gameplay/Containers/Barrel.prefab
+COMPARE Sack: taken=True stowed=True position delta=0.0000 angle delta=0.00 scale delta=0.0000 expected=(-0.77, 0.68, -0.90) actual=(-0.77, 0.68, -0.90)
+COMPARE 50 kg sack - fill with loaded shovel: taken=True stowed=True position delta=0.0000 angle delta=0.00 scale delta=0.0000 expected=(-0.77, 0.68, -0.90) actual=(-0.77, 0.68, -0.90)
+COMPARE Sorting sack 2: taken=True stowed=True position delta=0.0000 angle delta=0.00 scale delta=0.0000 expected=(-0.77, 0.68, -0.90) actual=(-0.77, 0.68, -0.90)
+COMPARE Sorting sack 3: taken=True stowed=True position delta=0.0000 angle delta=0.00 scale delta=0.0000 expected=(-0.77, 0.68, -0.90) actual=(-0.77, 0.68, -0.90)
+COMPARE FreeBag: taken=True stowed=True position delta=0.0000 angle delta=0.00 scale delta=0.0000 expected=(-0.77, 0.68, -0.90) actual=(-0.77, 0.68, -0.90)

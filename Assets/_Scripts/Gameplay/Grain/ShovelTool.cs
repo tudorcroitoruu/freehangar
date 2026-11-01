@@ -63,8 +63,9 @@ public sealed class ShovelTool : MonoBehaviour
             return Mathf.Clamp(Mathf.Pow(CapacityKg / Mathf.Max(.01f, startingCapacity), 1f / 3f), 1f, 2.4f);
         }
     }
-    private float EffectiveScoopRadius => scoopRadius * ScoopScale * 2.08008382f;
-    private float EffectiveScoopDepth => scoopDepth * Mathf.Sqrt(ScoopScale) * 2.08008382f;
+    // Cube-root scaling expands the excavation volume 3x alongside the larger load.
+    private float EffectiveScoopRadius => scoopRadius * ScoopScale * 3f;
+    private float EffectiveScoopDepth => scoopDepth * Mathf.Sqrt(ScoopScale) * 3f;
     public bool IsVacuum => ActiveVacuum != null;
     public Vector3 VacuumDropPoint => pendingContainer != null ? pendingContainer.PourPoint : targetPoint;
     private readonly GrainCargo cargo = new GrainCargo();

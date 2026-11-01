@@ -1,0 +1,7 @@
+Saved Gameplay pile CPU audit; Editor timings, not standalone FPS.
+Hangar 2 - Almost full grain bank: 387398 kernels
+Hangar 3 - Almost full grain bank: 387276 kernels
+Hangar 4 - Grain bank to entrance: 752612 kernels
+Hangar 5 - Grain bank to entrance: 753457 kernels
+Corn pile - scoop with left click: 104283 kernels
+Pile=Hangar 5 - Grain bank to entrance; mean=31.885 ms; p95=35.721 ms; max=35.724 ms; max kernels updated/frame=81600; allocations=0 B (including field simulation).

@@ -1,2 +1,30 @@
-Opening presentation: Passed; passed=6; failed=0
+Opening presentation: Passed; passed=9; failed=0
+
+
+OpeningPresentationTests.AnotherNewGameCanRestartIntroOnThePersistentAudioManager: Passed
+
+
+OpeningPresentationTests.FrontEndSceneRoutingStartsIntroInsteadOfRegularPlaylist("Bootstrap"): Passed
+
+
+OpeningPresentationTests.FrontEndSceneRoutingStartsIntroInsteadOfRegularPlaylist("Menu"): Passed
+
+
+OpeningPresentationTests.FrontEndSceneRoutingStartsIntroInsteadOfRegularPlaylist("LoadingScene"): Passed
+
+
+OpeningPresentationTests.GameplaySceneArrivalKeepsIntroMusicWhileWaitingForLoadingReveal: Passed
+
+
+OpeningPresentationTests.LateBindingsStillGetBlackCoverAndFailedPlaybackCanReleaseIt: Passed
+
+
+OpeningPresentationTests.PreparingBeforeLoadingCompletesCreatesOpaqueCoverWithoutStartingCutscene: Passed
+
+
+OpeningPresentationTests.PreparingTwiceReusesTheCoverAndCancelRemovesItBeforePlayback: Passed
+
+
+OpeningPresentationTests.SkippingIntroDoesNotCreateAnOpeningCover: Passed
+
 

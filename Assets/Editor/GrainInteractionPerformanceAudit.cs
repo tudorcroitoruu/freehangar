@@ -37,6 +37,16 @@ public static class GrainInteractionPerformanceAudit
             for(int i=0;i<100;i++){grain.transform.position+=Vector3.forward*.03f;simulate(.01f);}
             Measure(report,"Loaded shovel constant walking Simulate",200,()=>{grain.transform.position+=Vector3.forward*.03f;simulate(.01f);});
             report.AppendLine("Loaded shovel sleeping during uniform walking="+grain.IsLoadSleeping+", kernels="+grain.KernelCount);
+            var updateLoad=(Action)Delegate.CreateDelegate(typeof(Action),grain,typeof(ShovelGrainPhysics).GetMethod("UpdateLoad",Private));
+            var stopwatch=Stopwatch.StartNew();double solver=0,visual=0,maxSolver=0,maxVisual=0;
+            for(int i=0;i<300;i++)
+            {
+                grain.SetFill((i%100)/100f);grain.transform.rotation=Quaternion.Euler(0,i*.7f,0);
+                long start=Stopwatch.GetTimestamp();simulate(.01f);double a=(Stopwatch.GetTimestamp()-start)*1000.0/Stopwatch.Frequency;
+                start=Stopwatch.GetTimestamp();updateLoad();double b=(Stopwatch.GetTimestamp()-start)*1000.0/Stopwatch.Frequency;
+                solver+=a;visual+=b;maxSolver=Math.Max(maxSolver,a);maxVisual=Math.Max(maxVisual,b);
+            }
+            report.AppendLine($"Active scoop/pour: solver mean={solver/300:F3} ms max={maxSolver:F3}; load mesh mean={visual/300:F3} ms max={maxVisual:F3}");
             var field=new GrainHeightField(33,16,3);
             for(int i=0;i<3;i++)field.Scoop(i*.15f,0,1.5f,.2f,.1f);
             int steps=0;var watch=Stopwatch.StartNew();while(steps<1000&&field.Settle(33,.45f))steps++;watch.Stop();

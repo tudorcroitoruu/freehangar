@@ -77,4 +77,70 @@ public class GrainInteractionPerformanceTests
         Assert.IsTrue(grain.IsLoadSleeping);
         grain.transform.rotation=Quaternion.Euler(0,45,0)*grain.transform.rotation;step(.01f);Assert.IsFalse(grain.IsLoadSleeping);Assert.AreEqual(count,grain.KernelCount);
     }
+
+    private ShovelGrainPhysics LoadedShovel(out Action<float> step,out Action update)
+    {
+        var player=Object.Instantiate(Resources.Load<GameObject>("Player"),root.transform);
+        var grain=player.GetComponentInChildren<ShovelGrainPhysics>(true);
+        typeof(ShovelGrainPhysics).GetMethod("Awake",Private).Invoke(grain,null);
+        step=(Action<float>)Delegate.CreateDelegate(typeof(Action<float>),grain,typeof(ShovelGrainPhysics).GetMethod("Simulate",Private));
+        update=(Action)Delegate.CreateDelegate(typeof(Action),grain,typeof(ShovelGrainPhysics).GetMethod("UpdateLoad",Private));
+        grain.SetFill(1);for(int i=0;i<200;i++)step(.01f);update();return grain;
+    }
+    [Test]
+    public void ActiveLoadMeshKeepsGeometryAndUpdatesOnlyTheChangedKernel()
+    {
+        var grain=LoadedShovel(out var step,out var update);var mesh=Field<Mesh>(grain,"visibleLoad");
+        var kernel=Field<Mesh>(grain,"kernelMesh");int amount=grain.KernelCount+grain.PackedKernelCount;
+        Assert.AreEqual((uint)(amount*kernel.GetIndexCount(0)),mesh.GetIndexCount(0));
+        var positions=Field<Vector3[]>(grain,"positions");
+        update();Assert.AreEqual(0,grain.LastUploadedLoadVertices);
+        positions[0]+=Vector3.right*.001f;update();Assert.AreEqual(kernel.vertexCount,grain.LastUploadedLoadVertices);
+        var matrices=Field<Matrix4x4[]>(grain,"matrices");var source=kernel.vertices;var normals=kernel.normals;
+        var output=mesh.vertices;var outputNormals=mesh.normals;
+        foreach(int k in new[]{0,grain.KernelCount-1,amount-1})
+        for(int j=0;j<source.Length;j++)
+        {
+            Assert.Less(Vector3.Distance(matrices[k].MultiplyPoint3x4(source[j]),output[k*source.Length+j]),.00001f);
+            Assert.Less(Vector3.Distance(matrices[k].inverse.transpose.MultiplyVector(normals[j]).normalized,outputNormals[k*source.Length+j]),.00001f);
+            Assert.IsTrue(mesh.bounds.Contains(output[k*source.Length+j]));
+        }
+        Assert.AreEqual(UnityEngine.Rendering.ShadowCastingMode.Off,Field<MeshRenderer>(grain,"loadRenderer").shadowCastingMode);
+    }
+    [Test]
+    public void LoadCountChangesReuseRetainedVerticesAndUploadNewSlots()
+    {
+        var grain=LoadedShovel(out var step,out var update);
+        var draw=(Action<int>)Delegate.CreateDelegate(typeof(Action<int>),grain,typeof(ShovelGrainPhysics).GetMethod("DrawLoad",Private));
+        var kernel=Field<Mesh>(grain,"kernelMesh");
+        var mesh=Field<Mesh>(grain,"visibleLoad");
+        int amount=grain.KernelCount+grain.PackedKernelCount;
+        draw(amount-1);
+        Assert.AreEqual(0,grain.LastUploadedLoadVertices);
+        Assert.AreEqual((uint)((amount-1)*kernel.GetIndexCount(0)),mesh.GetIndexCount(0));
+        draw(amount);
+        Assert.AreEqual(kernel.vertexCount,grain.LastUploadedLoadVertices);
+        Assert.AreEqual((uint)(amount*kernel.GetIndexCount(0)),mesh.GetIndexCount(0));
+    }
+    [Test]
+    public void PurePourStreamDoesNotQuerySceneCollidersAndDrainsAfterLanding()
+    {
+        var grain=LoadedShovel(out var step,out var update);
+        grain.SetPourTarget(grain.transform.position+Vector3.down*.6f,null);grain.SetFill(0);
+        step(.01f);update();Assert.AreEqual(0,grain.LastWorldCollisionQueries);Assert.AreEqual(0,grain.KernelCount);
+        for(int i=0;i<100;i++){step(.01f);Assert.AreEqual(0,grain.LastWorldCollisionQueries);}
+        update();Assert.IsFalse(Field<MeshRenderer>(grain,"loadRenderer").enabled);
+        foreach(float life in Field<float[]>(grain,"streamLife"))Assert.LessOrEqual(life,0f);
+    }
+    [TestCase(.01f)][TestCase(.033f)][TestCase(.05f)]
+    public void MovingLoadStaysBoundedAtFastAndSlowFrameRates(float dt)
+    {
+        var grain=LoadedShovel(out var step,out var update);int count=grain.KernelCount;
+        for(int i=0;i<120;i++)
+        {
+            grain.transform.rotation=Quaternion.Euler(0,i*2f,0);step(dt);
+            Assert.AreEqual(count,grain.KernelCount);Assert.LessOrEqual(grain.MaximumBowlViolation,.0001f);
+            foreach(var point in Field<Vector3[]>(grain,"positions"))Assert.IsTrue(float.IsFinite(point.x)&&float.IsFinite(point.y)&&float.IsFinite(point.z));
+        }
+    }
 }

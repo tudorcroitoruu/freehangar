@@ -11,12 +11,17 @@ public class OpeningPresentationTests
     private AudioManager audio, previousAudio;
     private AudioSource source;
     private AudioClip music;
+    private GameManager manager, previousManager;
 
     [SetUp]
     public void SetUp()
     {
         root = new GameObject("Opening presentation tests");
         intro = root.AddComponent<GameIntroduction>();
+        previousManager = GameManager.Instance;
+        manager = root.AddComponent<GameManager>();
+        Set(manager, "introduction", intro);
+        GameManager.Instance = manager;
         var player = Child("Player").AddComponent<PlayerController>();
         player.characterCamera = Child("Camera").AddComponent<Camera>();
         player.characterCamera.enabled = false;
@@ -50,6 +55,7 @@ public class OpeningPresentationTests
         Object.DestroyImmediate(root);
         Object.DestroyImmediate(music);
         AudioManager.Instance = previousAudio;
+        GameManager.Instance = previousManager;
     }
 
     [Test]
@@ -72,10 +78,41 @@ public class OpeningPresentationTests
     }
 
     [Test]
-    public void MissingCutsceneReferencesDoNotLeaveAnOpaqueScreen()
+    public void LateBindingsStillGetBlackCoverAndFailedPlaybackCanReleaseIt()
     {
         Set(intro, "player", null);
-        Assert.IsFalse(intro.PrepareOpening()); Assert.IsNull(Cover);
+        Assert.IsTrue(manager.PrepareIntroductionForReveal());
+        Assert.AreEqual(Color.black, Cover.GetComponentInChildren<Image>().color);
+        Assert.IsFalse(intro.Play());
+        intro.Cancel(); Assert.IsNull(Cover);
+    }
+
+    [Test]
+    public void GameplaySceneArrivalKeepsIntroMusicWhileWaitingForLoadingReveal()
+    {
+        Assert.IsTrue(manager.IntroductionPending);
+        typeof(AudioManager).GetMethod("PlaySceneMusic", Private).Invoke(audio, new object[] { "Gameplay" });
+        Assert.AreSame(music, source.clip);
+        Assert.IsTrue(source.loop);
+        Assert.IsFalse((bool)typeof(AudioManager).GetField("introPlayed", Private).GetValue(audio));
+    }
+
+    [Test]
+    public void SkippingIntroDoesNotCreateAnOpeningCover()
+    {
+        manager.skipIntroCutscene = true;
+        Assert.IsFalse(manager.IntroductionPending);
+        Assert.IsFalse(manager.PrepareIntroductionForReveal());
+        Assert.IsNull(Cover);
+    }
+
+    [Test]
+    public void AnotherNewGameCanRestartIntroOnThePersistentAudioManager()
+    {
+        Set(audio, "introPlayed", true);
+        audio.PlayIntroOnce(restart: true);
+        Assert.AreSame(music, source.clip);
+        Assert.IsFalse(source.loop);
     }
 
     [TestCase("Bootstrap")]

@@ -14,6 +14,10 @@ public class GameManager : MonoBehaviour
     public bool bypassFinalRoomRestrictions = false;
     [SerializeField] private GameIntroduction introduction;
     public bool IsIntroPlaying => introduction != null && introduction.IsPlaying;
+    public bool IntroductionPending => !skipTutorial && !skipIntroCutscene && introduction != null &&
+        introduction.enabled && introduction.gameObject.activeInHierarchy && !introduction.Completed;
+
+    public bool PrepareIntroductionForReveal() => IntroductionPending && introduction.PrepareOpening();
 
     private void Awake()
     {
@@ -29,8 +33,7 @@ public class GameManager : MonoBehaviour
         if (settingsManager == null)
             settingsManager = FindFirstObjectByType<GameSettingsManager>(FindObjectsInactive.Include);
         if (settingsManager != null) settingsManager.Init();
-        if (!skipTutorial && !skipIntroCutscene && introduction != null)
-            introduction.PrepareOpening();
+        PrepareIntroductionForReveal();
     }
 
     private IEnumerator Start()

@@ -9,7 +9,7 @@ public static class GrainInteractionRegressionValidation
     {
         if(EditorApplication.isPlayingOrWillChangePlaymode)return;
         var api=ScriptableObject.CreateInstance<TestRunnerApi>();api.RegisterCallbacks(new Results());
-        api.Execute(new ExecutionSettings(new Filter{testMode=TestMode.EditMode,testNames=new[]{"GrainInteractionPerformanceTests"}}){runSynchronously=true});Object.DestroyImmediate(api);
+        api.Execute(new ExecutionSettings(new Filter{testMode=TestMode.EditMode,testNames=new[]{"GrainInteractionPerformanceTests","GrainEconomyTests","CornSurfaceUpdateTests"}}){runSynchronously=true});Object.DestroyImmediate(api);
     }
     private sealed class Results:ICallbacks
     {

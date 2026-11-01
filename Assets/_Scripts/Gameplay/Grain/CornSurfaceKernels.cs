@@ -35,8 +35,14 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private bool[] dirtyCells;
     private int[] sampleCells, sampleBatches, sampleSlots;
     private int[] cellSampleHeads, nextCellSample;
+    private int[] pendingCells, activeBatchCounts;
+    private bool[] visibleSamples;
+    private int pendingHead, pendingCount, pendingSample = -1;
+    private const int KernelUpdatesPerFrame = 4096;
+    private const double UpdateBudgetSeconds = .001;
+    public bool HasPendingSurfaceUpdates => pendingCount > 0 || pendingSample >= 0;
     private Bounds[] batchBounds, surfaceBounds;
-    private bool[] dirtyBatches, liveBatches;
+    private bool[] liveBatches;
     private int[] drawOrder;
     private readonly Plane[] cameraPlanes = new Plane[6];
     private Mesh nearMesh, mediumMesh, distantMesh;
@@ -153,13 +159,17 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         var field = pile.HeightField;
         previousHeights = (float[])field.Heights.Clone();
         dirtyCells = new bool[previousHeights.Length];
+        pendingCells = new int[previousHeights.Length];
+        pendingHead = pendingCount = 0; pendingSample = -1;
+        activeBatchCounts = (int[])counts.Clone();
+        visibleSamples = new bool[samples.Length];
         sampleCells = new int[samples.Length]; sampleBatches = new int[samples.Length]; sampleSlots = new int[samples.Length];
         cellSampleHeads = new int[previousHeights.Length];
         nextCellSample = new int[samples.Length];
         for (int cell = 0; cell < cellSampleHeads.Length; cell++) cellSampleHeads[cell] = -1;
         batchBounds = new Bounds[batches.Length];
         surfaceBounds = new Bounds[batches.Length];
-        dirtyBatches = new bool[batches.Length]; liveBatches = new bool[batches.Length];
+        liveBatches = new bool[batches.Length];
         Array.Clear(paletteCounts, 0, paletteCounts.Length);
         for (int order = 0; order < drawOrder.Length; order++)
         {
@@ -172,6 +182,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             if (!pile.IsInsideBoundary(pile.transform.TransformPoint(new Vector3(p.x, 0, p.y)), .04f) || field.Sample(p.x, p.y) < .001f) continue;
             int color = paletteIndices[i], batch = color * batchesPerColor + paletteCounts[color] / 1023, slot = paletteCounts[color]++ % 1023;
             sampleBatches[i] = batch; sampleSlots[i] = slot;
+            visibleSamples[i] = true;
             int cell = sampleCells[i];
             nextCellSample[i] = cellSampleHeads[cell];
             cellSampleHeads[cell] = i;
@@ -186,6 +197,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             liveBatches[b] = counts[b] > 0;
             Vector3 bottom = batchBounds[b].center; bottom.y = pile.transform.position.y;
             batchBounds[b].Encapsulate(bottom); batchBounds[b].Expand(.12f);
+            surfaceBounds[b] = batchBounds[b];
         }
         LastUpdatedKernels = KernelCount;
     }
@@ -194,7 +206,6 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     {
         var field = pile.HeightField;
         int n = field.Resolution;
-        Array.Clear(dirtyCells, 0, dirtyCells.Length);
         for (int i = 0; i < previousHeights.Length; i++)
         {
             if (previousHeights[i] == field.Heights[i]) continue;
@@ -203,18 +214,43 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             int x = i % n, z = i / n;
             int reach = Mathf.CeilToInt(.03f / field.Spacing) + 1;
             for (int dz = Mathf.Max(0, z - reach); dz <= Mathf.Min(n - 1, z + reach); dz++)
-            for (int dx = Mathf.Max(0, x - reach); dx <= Mathf.Min(n - 1, x + reach); dx++) dirtyCells[dz * n + dx] = true;
+            for (int dx = Mathf.Max(0, x - reach); dx <= Mathf.Min(n - 1, x + reach); dx++)
+            {
+                int cell = dz * n + dx;
+                if (dirtyCells[cell]) continue;
+                dirtyCells[cell] = true;
+                pendingCells[(pendingHead + pendingCount) % pendingCells.Length] = cell;
+                pendingCount++;
+            }
         }
+        revision = pile.SurfaceRevision;
+        ProcessPendingCells();
+    }
+
+    private void ProcessPendingCells()
+    {
+        var field = pile.HeightField;
         Matrix4x4 localToWorld = transform.localToWorldMatrix, normalMatrix = transform.worldToLocalMatrix.transpose;
         Quaternion yaw = Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up);
         LastUpdatedKernels = 0;
-        Array.Clear(dirtyBatches, 0, dirtyBatches.Length);
-        // Walk only samples in changed cells; large piles can contain hundreds of thousands.
-        for (int cell = 0; cell < dirtyCells.Length; cell++)
+        long started = System.Diagnostics.Stopwatch.GetTimestamp();
+        long budget = (long)(System.Diagnostics.Stopwatch.Frequency * UpdateBudgetSeconds);
+        // Resume even within a cell. A broad scoop or prolonged settling must not block a frame.
+        while (HasPendingSurfaceUpdates)
         {
-            if (!dirtyCells[cell]) continue;
-            for (int i = cellSampleHeads[cell]; i >= 0; i = nextCellSample[i])
+            if (pendingSample < 0)
             {
+                int cell = pendingCells[pendingHead];
+                pendingHead = (pendingHead + 1) % pendingCells.Length; pendingCount--;
+                // A later edit may enqueue this cell again, including samples already processed.
+                dirtyCells[cell] = false;
+                pendingSample = cellSampleHeads[cell];
+                if (pendingSample < 0) continue;
+            }
+            while (pendingSample >= 0)
+            {
+                int i = pendingSample;
+                pendingSample = nextCellSample[i];
                 int batch = sampleBatches[i];
                 Vector2 p = samples[i];
                 float h = field.Sample(p.x, p.y);
@@ -225,31 +261,33 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                     Quaternion.FromToRotation(Vector3.up, normal) * yaw * rotations[i],
                     new Vector3(.0255f, .014f, .029f) * (h < .001f ? 0 : sizes[i]));
                 LastUpdatedKernels++;
-                dirtyBatches[batch] = true;
+                bool visible = h >= .001f;
+                if (visibleSamples[i] != visible)
+                {
+                    activeBatchCounts[batch] += visible ? 1 : -1;
+                    visibleSamples[i] = visible;
+                    liveBatches[batch] = activeBatchCounts[batch] > 0;
+                }
+                // Initial bounds already span the surface down to ground. Only deposits
+                // growing beyond that envelope need expansion; no 1,023-kernel rescan.
+                Vector3 position = batches[batch][sampleSlots[i]].GetColumn(3);
+                if (visible && !batchBounds[batch].Contains(position))
+                {
+                    batchBounds[batch].Encapsulate(position + Vector3.up * .06f);
+                    surfaceBounds[batch] = batchBounds[batch];
+                }
+                if (LastUpdatedKernels >= KernelUpdatesPerFrame ||
+                    ((LastUpdatedKernels & 63) == 0 && System.Diagnostics.Stopwatch.GetTimestamp() - started >= budget)) return;
             }
         }
-        for (int b = 0; b < batches.Length; b++)
-        {
-            if (!dirtyBatches[b]) continue;
-            bool found = false; Bounds bounds = default;
-            for (int slot = 0; slot < counts[b]; slot++)
-            {
-                Matrix4x4 matrix = batches[b][slot];
-                if (((Vector3)matrix.GetColumn(0)).sqrMagnitude < .00000001f) continue;
-                Vector3 point = matrix.GetColumn(3);
-                if (!found) { bounds = new Bounds(point, Vector3.zero); found = true; }
-                else bounds.Encapsulate(point);
-            }
-            liveBatches[b] = found;
-            if (found) { bounds.Expand(.12f); surfaceBounds[b] = bounds; }
-        }
-        revision = pile.SurfaceRevision;
     }
 
     private void LateUpdate()
     {
         if (rebuildRequested) { rebuildRequested = false; Rebuild(); }
         if (pile != null && (revision != pile.SurfaceRevision || lastTransform != transform.localToWorldMatrix)) Build();
+        else if (HasPendingSurfaceUpdates) ProcessPendingCells();
+        else LastUpdatedKernels = 0;
     }
 
     private Vector2[] SampleSurface(float requestedSpacing)

@@ -19,13 +19,13 @@ MonoBehaviour:
     - containerId: FreeBag
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: -0.18, y: 0, z: -0.06}
+      position: {x: 0.1, y: 0, z: -0.06}
       rotation: {x: 0, y: 90, z: -90}
       scale: {x: 1, y: 1, z: 1}
     - containerId: SmallBag
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: -0.18, y: 0, z: -0.06}
+      position: {x: 0.1, y: 0, z: -0.06}
       rotation: {x: 0, y: 90, z: -90}
       scale: {x: 1, y: 1, z: 1}
     maximumCargoLevel: 2
@@ -44,37 +44,37 @@ MonoBehaviour:
     - containerId: SmallBag
       slotIndex: 0
       applyToAllSlots: 0
-      position: {x: -0.35, y: -0.2, z: 0.1}
+      position: {x: 0.15, y: -0.2, z: 0.1}
       rotation: {x: 0, y: 90, z: -90}
       scale: {x: 1, y: 1, z: 1}
     - containerId: FreeBag
       slotIndex: 0
       applyToAllSlots: 0
-      position: {x: -0.25, y: -0.2, z: 0.1}
+      position: {x: 0.15, y: -0.2, z: 0.1}
       rotation: {x: 0, y: 90, z: -90}
       scale: {x: 1, y: 1, z: 1}
     - containerId: LargeBag
       slotIndex: 0
       applyToAllSlots: 0
-      position: {x: 0.4, y: -0.2, z: 0}
+      position: {x: -0.15, y: -0.2, z: 0}
       rotation: {x: 0, y: -90, z: 0}
       scale: {x: 1, y: 1, z: 1}
     - containerId: FreeBag
       slotIndex: 1
       applyToAllSlots: 1
-      position: {x: 0.3, y: 0.28, z: -0.4}
+      position: {x: -0.15, y: 0.28, z: -0.4}
       rotation: {x: 0, y: -90, z: -90}
       scale: {x: 1, y: 1, z: 1}
     - containerId: SmallBag
       slotIndex: 1
       applyToAllSlots: 1
-      position: {x: 0.3, y: 0.28, z: -0.3}
+      position: {x: -0.15, y: 0.28, z: -0.3}
       rotation: {x: 0, y: -90, z: -90}
       scale: {x: 1, y: 1, z: 1}
     - containerId: LargeBag
       slotIndex: 1
       applyToAllSlots: 1
-      position: {x: -0.4, y: 0.5, z: -0.5}
+      position: {x: 0.15, y: 0.5, z: -0.5}
       rotation: {x: 0, y: 90, z: -90}
       scale: {x: 1, y: 1, z: 1}
     maximumCargoLevel: 3
@@ -93,25 +93,25 @@ MonoBehaviour:
     - containerId: FreeBag
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: -0.3, z: -0.1}
+      position: {x: 0, y: 0.1, z: -0.1}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 1, y: 1, z: 1}
     - containerId: SmallBag
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: -0.3, z: -0.1}
+      position: {x: 0, y: 0.1, z: -0.1}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 1, y: 1, z: 1}
     - containerId: LargeBag
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: -0.3, z: -0.1}
+      position: {x: 0, y: 0.2, z: -0.1}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 0.9, y: 0.9, z: 1}
     - containerId: Crate
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: -0.15, z: -0.1}
+      position: {x: 0, y: 0, z: -0.1}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 1, y: 0.9, z: 1}
     maximumCargoLevel: 4
@@ -142,7 +142,7 @@ MonoBehaviour:
     - containerId: Crate
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: 0, z: 0.2}
+      position: {x: 0, y: 0.1, z: 0.2}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 1, y: 1, z: 1}
     - containerId: Barrel
@@ -167,19 +167,19 @@ MonoBehaviour:
     - containerId: FreeBag
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: 0, z: 0.2}
+      position: {x: 0, y: 0.2, z: 0.2}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 1, y: 1, z: 1}
     - containerId: SmallBag
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: 0, z: 0.2}
+      position: {x: 0, y: 0.2, z: 0.2}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 1, y: 1, z: 1}
     - containerId: LargeBag
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: 0, z: 0.2}
+      position: {x: 0, y: 0.2, z: 0.2}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 0.8, y: 0.8, z: 0.8}
     - containerId: Crate
@@ -191,13 +191,13 @@ MonoBehaviour:
     - containerId: Barrel
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: 0, z: 0.2}
+      position: {x: 0, y: 0.2, z: 0.2}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 0.9, y: 0.9, z: 0.95}
     - containerId: BigBag
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: 0, z: 0.2}
+      position: {x: 0, y: 0.7, z: 0.2}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 0.65, y: 0.65, z: 0.65}
     maximumCargoLevel: 6
@@ -216,7 +216,31 @@ MonoBehaviour:
     - containerId: BigBag
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: 0, z: -0.1}
+      position: {x: 0, y: 0.7, z: -0.1}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: Barrel
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0.1, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: Crate
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0.1, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: LargeBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0.1, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    - containerId: SmallBag
+      slotIndex: 0
+      applyToAllSlots: 1
+      position: {x: 0, y: 0.1, z: 0}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 1, y: 1, z: 1}
     maximumCargoLevel: 6
@@ -235,7 +259,7 @@ MonoBehaviour:
     - containerId: BigBag
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: 0, z: -0.3}
+      position: {x: 0, y: 0.7, z: -0.3}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 1, y: 1, z: 1}
     - containerId: FreeBag
@@ -259,7 +283,7 @@ MonoBehaviour:
     - containerId: Crate
       slotIndex: 0
       applyToAllSlots: 1
-      position: {x: 0, y: 0, z: -0.2}
+      position: {x: 0, y: 0.1, z: -0.2}
       rotation: {x: 0, y: 0, z: 0}
       scale: {x: 1, y: 1, z: 1}
     - containerId: Barrel

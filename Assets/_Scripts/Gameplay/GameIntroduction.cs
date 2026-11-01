@@ -59,7 +59,9 @@ public sealed class GameIntroduction : MonoBehaviour
     /// <summary>Cover the player camera before waiting for scene loading to finish.</summary>
     public bool PrepareOpening()
     {
-        if (IsPlaying || !CanPlay) return false;
+        // Called from GameManager.Awake, before other components finish enabling/binding.
+        // The cover must not depend on the camera or the cutscene being ready to play.
+        if (IsPlaying || Completed || !enabled || !gameObject.activeInHierarchy) return false;
         CreateOpeningFade();
         return true;
     }
@@ -68,7 +70,7 @@ public sealed class GameIntroduction : MonoBehaviour
     {
         if (IsPlaying || !CanPlay) return false;
         IsPlaying = true; view = player.characterCamera;
-        AudioManager.Instance?.PlayIntroOnce();
+        AudioManager.Instance?.PlayIntroOnce(restart: true);
         cameraParent = view.transform.parent; cameraLocalPosition = view.transform.localPosition; cameraLocalRotation = view.transform.localRotation;
         originalFov = view.fieldOfView; playerPosition = player.transform.position; playerRotation = player.transform.rotation;
         bikePosition = bicycle.transform.position; bikeRotation = bicycle.transform.rotation;

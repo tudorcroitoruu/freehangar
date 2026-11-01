@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 71766751289759679}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.45, y: 1.38, z: -1.6666666666666665}
+  m_LocalPosition: {x: -0.45, y: 1.38, z: -1.6666666}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -157,6 +157,130 @@ LODGroup:
     - renderer: {fileID: 8408513894734896477}
     - renderer: {fileID: 6568990258148274037}
   m_Enabled: 1
+--- !u!1 &919000000000000808
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919000000000000809}
+  m_Layer: 0
+  m_Name: Cargo slot 5
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &919000000000000809
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919000000000000808}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.45, y: 1.38, z: -2.3333333}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7152650088946448521}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &919000000000000810
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919000000000000811}
+  m_Layer: 0
+  m_Name: Cargo slot 6
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &919000000000000811
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919000000000000810}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.45, y: 1.38, z: -2.3333333}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7152650088946448521}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &919000000000000812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919000000000000813}
+  m_Layer: 0
+  m_Name: Cargo slot 7
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &919000000000000813
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919000000000000812}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.45, y: 1.38, z: -3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7152650088946448521}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &919000000000000814
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919000000000000815}
+  m_Layer: 0
+  m_Name: Cargo slot 8
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &919000000000000815
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919000000000000814}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.45, y: 1.38, z: -3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7152650088946448521}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &921010049092442438
 GameObject:
   m_ObjectHideFlags: 0
@@ -765,6 +889,30 @@ MonoBehaviour:
   - {fileID: 4766670039937328115}
   - {fileID: 7865641245194889861}
   - {fileID: 2898571883804527754}
+--- !u!114 &918700000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850182445453681032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f36297bf3d2e8770701f4a22b2e8caf8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PickupCargoLayout
+  largeSlots:
+  - {fileID: 5096869187546813843}
+  - {fileID: 5974329585191613145}
+  - {fileID: 9193201203047440344}
+  - {fileID: 7618495435870191372}
+  - {fileID: 919000000000000809}
+  - {fileID: 919000000000000811}
+  - {fileID: 919000000000000813}
+  - {fileID: 919000000000000815}
+  smallContainerSeparation: 0.42
+  splitAlongLength: 1
+  anchors: []
 --- !u!1 &2196122858991572032
 GameObject:
   m_ObjectHideFlags: 0
@@ -1430,7 +1578,7 @@ Transform:
   m_GameObject: {fileID: 3451013571839344227}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.45, y: 1.38, z: -1.6666666666666665}
+  m_LocalPosition: {x: 0.45, y: 1.38, z: -1.6666666}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2890,7 +3038,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.000000021855694, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 0.96159, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6141495837877316103}
@@ -3060,92 +3208,3 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &919000000000000808
-GameObject:
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 919000000000000809}
-  m_Layer: 0
-  m_Name: Cargo slot 5
-  m_TagString: Untagged
-  m_IsActive: 1
---- !u!4 &919000000000000809
-Transform:
-  m_GameObject: {fileID: 919000000000000808}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.45, y: 1.38, z: -2.333333333333333}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 7152650088946448521}
---- !u!1 &919000000000000810
-GameObject:
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 919000000000000811}
-  m_Layer: 0
-  m_Name: Cargo slot 6
-  m_TagString: Untagged
-  m_IsActive: 1
---- !u!4 &919000000000000811
-Transform:
-  m_GameObject: {fileID: 919000000000000810}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.45, y: 1.38, z: -2.333333333333333}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 7152650088946448521}
---- !u!1 &919000000000000812
-GameObject:
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 919000000000000813}
-  m_Layer: 0
-  m_Name: Cargo slot 7
-  m_TagString: Untagged
-  m_IsActive: 1
---- !u!4 &919000000000000813
-Transform:
-  m_GameObject: {fileID: 919000000000000812}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.45, y: 1.38, z: -3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 7152650088946448521}
---- !u!1 &919000000000000814
-GameObject:
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 919000000000000815}
-  m_Layer: 0
-  m_Name: Cargo slot 8
-  m_TagString: Untagged
-  m_IsActive: 1
---- !u!4 &919000000000000815
-Transform:
-  m_GameObject: {fileID: 919000000000000814}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.45, y: 1.38, z: -3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 7152650088946448521}
---- !u!114 &918700000000000001
-MonoBehaviour:
-  m_GameObject: {fileID: 1850182445453681032}
-  m_Enabled: 1
-  m_Script: {fileID: 11500000, guid: f36297bf3d2e8770701f4a22b2e8caf8, type: 3}
-  m_EditorClassIdentifier: Assembly-CSharp::PickupCargoLayout
-  largeSlots:
-  - {fileID: 5096869187546813843}
-  - {fileID: 5974329585191613145}
-  - {fileID: 9193201203047440344}
-  - {fileID: 7618495435870191372}
-  - {fileID: 919000000000000809}
-  - {fileID: 919000000000000811}
-  - {fileID: 919000000000000813}
-  - {fileID: 919000000000000815}
-  smallContainerSeparation: 0.42
-  splitAlongLength: 1

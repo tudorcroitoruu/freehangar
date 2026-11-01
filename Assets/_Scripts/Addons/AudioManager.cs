@@ -89,6 +89,7 @@ public class AudioManager : MonoBehaviour
         if (sceneName == "Last Scene") PlayInterstellar();
         else if (sceneName == "Menu" || sceneName == "Bootstrap") PlayMenuMusic();
         else if (sceneName == "LoadingScene") PlayLoadingMusic();
+        else if (sceneName == "Gameplay" && GameManager.Instance != null && GameManager.Instance.IntroductionPending) PlayMenuMusic();
         else if (musicMode == MusicMode.Ending || musicMode == MusicMode.None || musicMode == MusicMode.Menu) PlayRegularMusic();
     }
 
@@ -113,8 +114,9 @@ public class AudioManager : MonoBehaviour
         // Menu playback does not consume the gameplay introduction's once-only cue.
     }
 
-    public void PlayIntroOnce()
+    public void PlayIntroOnce(bool restart = false)
     {
+        if (restart) introPlayed = false;
         if (introPlayed || introMusic == null || musicAudioSource == null) return;
         introPlayed = true;
         StopMusic();

@@ -1,4 +1,4 @@
-Cargo parity: Passed; passed=24; failed=0
+Cargo parity: Passed; passed=25; failed=0
 CargoPreviewParityTests.FullClosedPreviewUsesTheSameContactBoundsAsGameplay("FreeBag"): Passed
 
 
@@ -15,6 +15,9 @@ CargoPreviewParityTests.FullClosedPreviewUsesTheSameContactBoundsAsGameplay("Cra
 
 
 CargoPreviewParityTests.FullClosedPreviewUsesTheSameContactBoundsAsGameplay("Barrel"): Passed
+
+
+CargoPreviewParityTests.GameplaySceneContainersMatchThePreviewPrefabDimensions: Passed
 
 
 CargoPreviewParityTests.LegacyBagStowMatchesPreviewAndRemainsStableAfterPickupAndReload: Passed

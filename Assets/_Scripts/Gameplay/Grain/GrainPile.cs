@@ -372,7 +372,8 @@ public sealed class GrainPile : MonoBehaviour
         go.SetActive(false);
         go.transform.position = position;
         var pile = go.AddComponent<GrainPile>();
-        pile.initialHeight = 0; pile.size = Mathf.Max(1.5f, DropRadius(expectedKg) * 2f + .5f); pile.resolution = 65;
+        // Small spilled heaps need a fraction of the grid used by an entire hangar.
+        pile.initialHeight = 0; pile.size = Mathf.Max(1.5f, DropRadius(expectedKg) * 2f + .5f); pile.resolution = 33;
         pile.fitToWalls = true; pile.useSpatialLayout = true;
         if (appearanceSource != null)
         {

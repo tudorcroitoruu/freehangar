@@ -5,6 +5,26 @@ using UnityEngine;
 
 public class CargoPreviewParityTests
 {
+    [Test]
+    public void GameplaySceneContainersMatchThePreviewPrefabDimensions()
+    {
+        var scene=UnityEditor.SceneManagement.EditorSceneManager.OpenPreviewScene("Assets/Scenes/Gameplay.unity");
+        try
+        {
+            int checkedCount=0;
+            foreach(var root in scene.GetRootGameObjects())
+            foreach(var cargo in root.GetComponentsInChildren<GrainContainer>(true))
+            {
+                var prefab=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/"+cargo.CargoTypeId+".prefab");
+                if(prefab==null)continue;
+                Assert.Less(Vector3.Distance(prefab.transform.lossyScale,cargo.transform.lossyScale),.0001f,cargo.name+" has a scene scale override that the cargo preview does not use.");
+                Assert.IsFalse(string.IsNullOrWhiteSpace(new SerializedObject(cargo).FindProperty("cargoTypeId").stringValue),cargo.name+" must have an authored cargo identity.");
+                checkedCount++;
+            }
+            Assert.GreaterOrEqual(checkedCount,6);
+        }
+        finally{UnityEditor.SceneManagement.EditorSceneManager.ClosePreviewScene(scene);}
+    }
     private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
     private GameObject root;
     private PlayerData previousData;

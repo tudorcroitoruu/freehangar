@@ -335,8 +335,13 @@ public static class HangarVehicleAccess
     private static void Reset() { hangars.Clear(); nextScan = hintUntil = 0; }
     public static bool Blocks(Vector3 from, Vector3 to, float clearance, BicycleController vehicle = null)
     {
-        // Forklifts need access to retrieve heavy bags. Physical doors, walls and grain still collide.
-        if (vehicle != null && vehicle.TryGetComponent<ForkliftController>(out _)) return false;
+        // Small vehicles and forklifts may enter. Physical doors, walls and grain still collide.
+        // Larger vehicles also share the bicycle/motoroller rig, so exclude their specializations.
+        if (vehicle != null && (vehicle.TryGetComponent<ForkliftController>(out _) ||
+            (!vehicle.TryGetComponent<TrikeController>(out _) &&
+             !vehicle.TryGetComponent<PickupController>(out _) &&
+             !vehicle.TryGetComponent<LawnmowerController>(out _) &&
+             (!vehicle.motorDriven || vehicle.TryGetComponent<MotorollerController>(out _))))) return false;
         if ((to-from).sqrMagnitude < .0000001f) return false;
         if (Time.time >= nextScan)
         {
@@ -373,6 +378,6 @@ public static class HangarVehicleAccess
         if (Time.time >= hintUntil) return;
         var style = new GUIStyle(GUI.skin.box) { fontSize=16, alignment=TextAnchor.MiddleCenter, wordWrap=true };
         GUI.Box(new Rect(Screen.width*.2f,Screen.height*.72f,Screen.width*.6f,55),
-            "Use a forklift or wheelbarrow inside hangars to protect the grain.",style);
+            "Use a bicycle, motoroller, forklift or wheelbarrow inside hangars to protect the grain.",style);
     }
 }

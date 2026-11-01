@@ -40,18 +40,12 @@ lowering the prompt by 0.32 m. InteractionPromptGizmos now also previews selecte
 GrainContainer prompt positions. Adjust each container's anchor/offset in its
 Inspector for other tall/mismatched bounds.
 
-2026-11-01 tool capacity progression: all six shovel/vacuum initial capacities
-and capacity increments are reduced by factor 9 from the original progression.
-Basic 2.5/+1 kg; Medium 8.5/+1; Improved 14.5/+1; Expert 20/+1;
-Grain Vacuum 150/+37.5; High Capacity Vacuum 300/+75 (600 kg fully upgraded).
-ScoopScale derives its baseline from settings.Capacity(0), retaining the relative
-excavation geometry. All 24 purchases increase capacity. The central economy
-continues to reference the same ShovelUpgradeSettings asset.
-
-2026-11-01 starting shovel capacity: the central economy's referenced
-ShovelUpgradeSettings now starts Basic Shovel at 2.5 kg. Four full loads fill the
-10 kg FreeBag and consume 2,000 physical pile kg at multiplier 200. The full
-progression has since been rescaled as documented above.
+2026-11-01 manual shovel collection increased 3x: Basic 7.5/+3 kg;
+Medium 25.5/+3; Improved 43.5/+3; Expert 60/+3. Manual excavation
+radius/depth also grow by cube root of 3. Vacuum capacities remain 150/+37.5
+and 300/+75 (600 fully upgraded). Stock multiplier stays 200, preserving
+total collectible grain and campaign revenue. Two Basic loads fill a 10 kg
+FreeBag and leave 5 kg on the shovel. All 24 purchases increase capacity.
 
 2026-11-01 vehicle speed display: UpgradeVehicle converts all current/next/max
 movement-speed labels from the authored m/s values to km/h (multiply by 3.6).

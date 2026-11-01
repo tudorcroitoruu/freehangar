@@ -106,31 +106,46 @@ public class GrainEconomyTests
     }
 
     [Test]
-    public void FourFullStartingShovelLoadsFillTheTenKilogramFreeBag()
+    public void LargerStartingShovelFillsFreeBagInTwoLoadsWithoutLosingTheRemainder()
     {
         var settings=GrainEconomySettings.Default.shovelSettings;
         var prefab=UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/FreeBag.prefab");
         var bag=Object.Instantiate(prefab).GetComponent<GrainContainer>();
         try
         {
-            Assert.That(settings.Capacity(0),Is.EqualTo(2.5f));
+            Assert.That(settings.Capacity(0),Is.EqualTo(7.5f));
             Assert.That(bag.CapacityKg,Is.EqualTo(10f));
             economy.grainConsumeMultiplier=200;
             double before=pile.Kilograms;
             var cargo=new GrainCargo();
-            for(int i=0;i<4;i++)
+            for(int i=0;i<2;i++)
             {
                 Vector3 point=new Vector3(0,pile.SurfaceHeight(Vector3.zero),0);
                 float collected=pile.Scoop(point,100,10,settings.Capacity(0),cargo);
-                Assert.That(collected,Is.EqualTo(2.5f).Within(.002));
+                Assert.That(collected,Is.EqualTo(7.5f).Within(.002));
                 cargo.PourInto(bag,settings.Capacity(0));
-                if(i<3)Assert.IsFalse(bag.IsFull);
+                if(i==0)Assert.IsFalse(bag.IsFull);
             }
             Assert.That(bag.Kilograms,Is.EqualTo(10).Within(.002));
             Assert.IsTrue(bag.IsFull);
-            Assert.That(before-pile.Kilograms,Is.EqualTo(2000).Within(.2));
+            Assert.That(cargo.Total,Is.EqualTo(5).Within(.002));
+            Assert.That(before-pile.Kilograms,Is.EqualTo(3000).Within(.2));
         }
         finally { Object.DestroyImmediate(bag.gameObject); }
+    }
+
+    [Test]
+    public void ManualShovelUpgradeLoadsAreTripledWhileVacuumCapacityIsPreserved()
+    {
+        var settings = GrainEconomySettings.Default.shovelSettings;
+        float[] previousLoads = { 2.5f, 8.5f, 14.5f, 20f };
+        for (int type = 0; type < previousLoads.Length; type++)
+            for (int dot = 0; dot < ShovelUpgradeSettings.UpgradesPerShovel; dot++)
+                Assert.That(settings.Capacity(type * 4 + dot),
+                    Is.EqualTo((previousLoads[type] + dot) * 3).Within(.001));
+        Assert.That(settings.Capacity(16), Is.EqualTo(150));
+        Assert.That(settings.Capacity(24), Is.EqualTo(600));
+        Assert.That(GrainEconomySettings.Default.ConsumeMultiplier, Is.EqualTo(200));
     }
 
     [Test]
