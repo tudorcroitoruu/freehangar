@@ -88,7 +88,7 @@ MonoBehaviour:
   visual:
   - {fileID: 1348315383213445090}
   unlimitedCount: 1
-  maxActiveInScene: 10
+  maxActiveInScene: 16
   objectPrefab: {fileID: 1551148478017631140, guid: 6e20d490c6f359e498058c3c322daa95, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
@@ -1718,14 +1718,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: barrel
   productName: Barrel
-  productPrice: 2500
+  productPrice: 14
   toBuy: 1
   toRent: 0
   objectPrefab: {fileID: 6691740664109452445, guid: 0e1bd387d12bf994e93017e2686bb315, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
   inventoryManager: {fileID: 0}
-  maxActiveInScene: 10
+  maxActiveInScene: 16
 --- !u!114 &490652140599849361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2330,14 +2330,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: crate
   productName: Crate
-  productPrice: 1000
+  productPrice: 10
   toBuy: 1
   toRent: 0
   objectPrefab: {fileID: 7210842097477428087, guid: eb731e91ae410754ebc5f7596c6cbf2e, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
   inventoryManager: {fileID: 0}
-  maxActiveInScene: 10
+  maxActiveInScene: 16
 --- !u!114 &7951159114804894031
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2535,14 +2535,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: bigBag
   productName: Big Bag
-  productPrice: 5000
+  productPrice: 45
   toBuy: 1
   toRent: 0
   objectPrefab: {fileID: 1521085326205624577, guid: e081f75f0718b8f418e7a58f44bd497e, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 2099837709319181489}
   inventoryManager: {fileID: 0}
-  maxActiveInScene: 10
+  maxActiveInScene: 16
 --- !u!114 &9172195714476993290
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2921,14 +2921,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: largeBag
   productName: Large Bag
-  productPrice: 250
+  productPrice: 7
   toBuy: 1
   toRent: 0
   objectPrefab: {fileID: 6347959474882097887, guid: 74ea987079d2f16479c245f3ebeddb46, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
   inventoryManager: {fileID: 0}
-  maxActiveInScene: 10
+  maxActiveInScene: 16
 --- !u!114 &7171237466457534776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3468,14 +3468,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: smallBag
   productName: Small bag
-  productPrice: 100
+  productPrice: 4
   toBuy: 1
   toRent: 0
   objectPrefab: {fileID: 30410232912704535, guid: ab8b6d4aaac96504497dff8c04cb7891, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
   inventoryManager: {fileID: 0}
-  maxActiveInScene: 10
+  maxActiveInScene: 16
 --- !u!114 &3058034376239356345
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -49,6 +49,9 @@ public class GameplayCanvas : MonoBehaviour
         ChestReward.InfiniteStamina, ChestReward.NoAttacks, ChestReward.Mobility, ChestReward.DoubleSellCash
     };
 
+    [Space, Header("Warning")] 
+    [SerializeField] private WarningPopup warningPopup;
+
     private void Awake()
     {
         if (Instance == null)
