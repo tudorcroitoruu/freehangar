@@ -158,7 +158,7 @@ Material:
     - _DstBlendAlpha: 1
     - _EmissionEnabled: 1
     - _EmissiveExposureWeight: 0
-    - _EmissiveIntensity: 53.81737
+    - _EmissiveIntensity: 0.25
     - _EmissiveIntensityUnit: 1
     - _EnableFogOnTransparent: 0
     - _FlipbookBlending: 0
@@ -207,7 +207,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _ColorAddSubDiff: {r: -1, g: 1, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissiveColor: {r: 53.81737, g: 35.056942, b: 17.39072, a: 53.81737}
+    - _EmissiveColor: {r: 0.25, g: 0.16285142, b: 0.08078581, a: 0.25}
     - _EmissiveColorLDR: {r: 1, g: 0.827451, b: 0.6039216, a: 1}
     - _SoftParticleFadeParams: {r: 0, g: 0, b: 0, a: 0}
     - _UnlitColor: {r: 1, g: 1, b: 1, a: 1}

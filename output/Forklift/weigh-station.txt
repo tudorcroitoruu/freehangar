@@ -1,0 +1,1 @@
+PASS second forklift placed at (7.80, 12.12, 168.08), 8.6m from weigh zone center. Clear footprint verified; faces the scale. Original forklift retained.

@@ -205,7 +205,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         Vector3 motion = travelDirection * Speed * dt;
         float impactSpeed = Mathf.Abs(Speed);
         float clearance = Mathf.Max(motor.bounds.extents.x, motor.bounds.extents.z);
-        if (HangarVehicleAccess.Blocks(transform.position, transform.position + motion, clearance))
+        if (HangarVehicleAccess.Blocks(transform.position, transform.position + motion, clearance, this))
         {
             PlayVehicleImpact(impactSpeed);
             motion = Vector3.zero;
@@ -333,8 +333,10 @@ public static class HangarVehicleAccess
     private static float nextScan, hintUntil;
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Reset() { hangars.Clear(); nextScan = hintUntil = 0; }
-    public static bool Blocks(Vector3 from, Vector3 to, float clearance)
+    public static bool Blocks(Vector3 from, Vector3 to, float clearance, BicycleController vehicle = null)
     {
+        // Forklifts need access to retrieve heavy bags. Physical doors, walls and grain still collide.
+        if (vehicle != null && vehicle.TryGetComponent<ForkliftController>(out _)) return false;
         if ((to-from).sqrMagnitude < .0000001f) return false;
         if (Time.time >= nextScan)
         {
@@ -371,6 +373,6 @@ public static class HangarVehicleAccess
         if (Time.time >= hintUntil) return;
         var style = new GUIStyle(GUI.skin.box) { fontSize=16, alignment=TextAnchor.MiddleCenter, wordWrap=true };
         GUI.Box(new Rect(Screen.width*.2f,Screen.height*.72f,Screen.width*.6f,55),
-            "Vehicles aren't allowed in hangars — protect the grain. Use a wheelbarrow.",style);
+            "Use a forklift or wheelbarrow inside hangars to protect the grain.",style);
     }
 }
