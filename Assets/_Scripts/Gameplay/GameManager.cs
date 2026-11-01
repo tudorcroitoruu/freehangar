@@ -23,6 +23,12 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
         }
+        if (Instance != this) return;
+
+        var settingsManager = GameSettingsManager.Instance;
+        if (settingsManager == null)
+            settingsManager = FindFirstObjectByType<GameSettingsManager>(FindObjectsInactive.Include);
+        if (settingsManager != null) settingsManager.Init();
     }
 
     private IEnumerator Start()
