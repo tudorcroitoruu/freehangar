@@ -252,7 +252,9 @@ Shader "UI/Image Margin Fade"
                 OUT.vertex.xy += (_ScreenParams.zw - 1.0) * float2(-1, 1) * OUT.vertex.w;
                 #endif
 
-                OUT.color = IN.color * _Color;
+                // Image/CanvasGroup opacity applies to the entire composite.
+                // Material Tint belongs only to the base layer, not its overlay.
+                OUT.color = IN.color;
 
                 float2 pixelSize = OUT.vertex.w;
                 pixelSize /= abs(mul((float2x2)UNITY_MATRIX_P, _ScreenParams.xy));
@@ -539,7 +541,8 @@ Shader "UI/Image Margin Fade"
                     else
                         contourUV.y = (shapeUV.y - (_FillDirection < 2.5 ? 0.0 : 1.0 - amount)) / amount;
                 }
-                fixed4 color = (tex2D(_MainTex, useGlow ? saturate(shapeUV) : shapeUV) + _TextureSampleAdd) * IN.color;
+                fixed4 sprite = tex2D(_MainTex, useGlow ? saturate(shapeUV) : shapeUV) + _TextureSampleAdd;
+                fixed4 color = fixed4(sprite.rgb * _Color.rgb * IN.color.rgb, _Color.a);
                 if (_UseGradient > 0.5)
                 {
                     // Anchor the gradient to the full Image, so fill changes reveal
@@ -562,7 +565,7 @@ Shader "UI/Image Margin Fade"
                     color.rgb = lerp(color.rgb, _ShineColor.rgb, strength);
                 }
 
-                // A color overlay stains the Source Image without cutting its alpha.
+                // Compose an independent overlay over the tinted base layer.
                 // Full-image coordinates keep the pattern fixed while Fill reveals it.
                 // All three masks share the same aspect-preserving scale convention.
                 float2 maskLocalSize = 1.0 / max(float2(
@@ -612,9 +615,18 @@ Shader "UI/Image Margin Fade"
                     if (_MainOverlayBlackTransparent > 0.5)
                         overlay.a *= saturate(dot(overlay.rgb, half3(0.2126, 0.7152, 0.0722)));
                     overlay *= _MainOverlayColor;
-                    half3 stainedColor = _MainOverlayBlend < 0.5 ? color.rgb * overlay.rgb : overlay.rgb;
-                    color.rgb = lerp(color.rgb, stainedColor, saturate(_MainOverlayOpacity * overlay.a));
+                    half3 stainedColor = _MainOverlayBlend < 0.5 ? color.rgb * overlay.rgb : overlay.rgb * IN.color.rgb;
+                    half overlayAlpha = saturate(_MainOverlayOpacity * overlay.a);
+                    half baseContribution = color.a * (1.0 - overlayAlpha);
+                    half combinedAlpha = overlayAlpha + baseContribution;
+                    // Straight-alpha source-over: a transparent Tint reveals the
+                    // screen through the overlay's holes without hiding the stripes.
+                    color.rgb = (stainedColor * overlayAlpha + color.rgb * baseContribution)
+                        / max(combinedAlpha, 0.000001);
+                    color.a = combinedAlpha;
                 }
+                // Sprite silhouettes still clip both layers, independently of Tint.
+                color.a *= sprite.a;
 
                 float2 uv = contourUV;
                 half edgeNoise = SamplePaintedNoise(IN.noisePosition);
@@ -740,14 +752,15 @@ Shader "UI/Image Margin Fade"
                     result.a *= insideImage;
                     // Compose behind the original image/outline, then apply CanvasGroup
                     // opacity once. The sharp outline's original color stays on top.
-                    float baseAlpha = IN.color.a > 0.0 ? saturate(result.a / IN.color.a) : 0.0;
-                    float glowAlpha = saturate(glow * _GlowIntensity * _GlowColor.a);
+                    float baseAlpha = saturate(result.a);
+                    float glowAlpha = saturate(glow * _GlowIntensity * _GlowColor.a) * _Color.a;
                     float behindAlpha = glowAlpha * (1.0 - baseAlpha);
                     float combinedAlpha = baseAlpha + behindAlpha;
                     float3 glowColor = saturate(_GlowColor.rgb * _GlowIntensity);
                     result.rgb = (result.rgb * baseAlpha + glowColor * behindAlpha) / max(combinedAlpha, 0.000001);
-                    result.a = combinedAlpha * IN.color.a;
+                    result.a = combinedAlpha;
                 }
+                result.a *= IN.color.a;
 
                 // Multiply the complete composite so outline and glow cannot fill
                 // the mask's holes. The existing margins multiply this opacity further.

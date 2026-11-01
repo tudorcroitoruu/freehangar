@@ -313,7 +313,9 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
             DrawProperty(materialEditor, properties, textureName == "_MainOverlayTex" ? "_MainOverlayBlackTransparent" : "_OutlineOverlayBlackTransparent");
             DrawProperty(materialEditor, properties, textureName == "_MainOverlayTex" ? "_MainOverlayBlend" : "_OutlineOverlayBlend");
             materialEditor.TextureScaleOffsetProperty(texture);
-            EditorGUILayout.HelpBox("Multiply adds stains while preserving the base color. Normal blends the texture colors over it. Opacity 0 keeps the original appearance; 1 applies the full effect. Image transparency is preserved.", MessageType.Info);
+            EditorGUILayout.HelpBox(textureName == "_MainOverlayTex"
+                ? "Tint alpha controls the base only. Set Tint alpha to 0 to see only the overlay and its transparent holes. Normal uses the texture's own colors; Multiply combines them with the base RGB. Image Color and CanvasGroup alpha fade both layers."
+                : "Multiply adds stains while preserving the base color. Normal blends the texture colors over it. Opacity 0 keeps the original appearance; 1 applies the full effect. Image transparency is preserved.", MessageType.Info);
         }
     }
 
@@ -344,7 +346,7 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
             case "_MainTex":
                 return "Sprite texture sampled by the shader. For UI Image this is normally provided by the Image Source Image, not manually assigned on the material.";
             case "_Color":
-                return "Multiplies the UI Image sprite color. The alpha includes Image tint and CanvasGroup alpha.";
+                return "Tints the base sprite layer. Alpha 0 hides the base while Main Overlay remains visible using its own color/opacity. Image Color and CanvasGroup alpha still fade the entire element.";
             case "_TransparencyMaskTex":
                 return "Grayscale transparency across the whole Image, outline, and glow. Uses RGB brightness, not texture alpha. Black Is Transparent controls which areas become transparent. Empty means white.";
             case "_TransparencyMaskBlackTransparent":
@@ -354,7 +356,7 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
             case "_TransparencyMaskIntensity":
                 return "Transparency strength. 0 preserves the original Image; 1 fully applies the grayscale mask. Margins and existing sprite transparency still apply.";
             case "_MainOverlayTex":
-                return "Texture blended over the Source Image RGB to add stains/detail. Its alpha controls overlay strength without changing Image transparency. Preserves proportions and blends randomized samples to hide repetition, with independent scale, tiling, and offset.";
+                return "Independent texture layer over the tinted Source Image. Texture alpha defines its holes; Color alpha and Opacity control its visibility even when Tint alpha is 0. Use Normal for independent texture colors. Preserves proportions with independent scale, tiling, and offset.";
             case "_MainOverlayScale":
             case "_OutlineOverlayScale":
                 return "Pattern size relative to the Image's shorter side, preserving texture proportions. Higher values make details larger; lower values make details smaller. Uses blended randomized samples to hide seams and mirrored repetition.";
@@ -364,9 +366,11 @@ public class UIImageMarginFadeShaderGUI : ShaderGUI
             case "_OutlineOverlayTex":
                 return "Texture blended over the outline color with independent opacity and tiling/offset. Does not change the outline contour or Image transparency.";
             case "_MainOverlayOpacity":
+                return "Opacity of the independent main overlay. 0 leaves only the tinted base; 1 uses the full texture alpha. Unaffected by Tint alpha.";
             case "_OutlineOverlayOpacity":
                 return "Overlay opacity: 0 leaves the original color; 1 applies the full texture effect. Does not fade the Source Image itself.";
             case "_MainOverlayColor":
+                return "Tints the main overlay independently of base Tint alpha. White preserves texture colors in Normal blend mode. Alpha multiplies Main Overlay Opacity.";
             case "_OutlineOverlayColor":
                 return "Tints the overlay texture. White preserves its original colors. Color alpha multiplies Overlay Opacity without changing Source Image transparency.";
             case "_MainOverlayBlackTransparent":

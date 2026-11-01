@@ -30,6 +30,9 @@ public sealed class StaminaManager : MonoBehaviour
     private RectTransform backgroundRect;
     private float initialBackgroundSizeDeltaX;
     private PlayerData staminaProfile;
+    private Material originalFillMaterial, fillMaterial;
+    private static readonly int FillAmountId = Shader.PropertyToID("_FillAmount");
+    private static readonly int UseFillId = Shader.PropertyToID("_UseFill");
     public float CurrentStamina { get; private set; }
     private StaminaUpgradeSettings UpgradeSettings
     {
@@ -147,7 +150,7 @@ public sealed class StaminaManager : MonoBehaviour
 
     private void UpdateStaminaBar()
     {
-        if (staminaBarFill != null) staminaBarFill.fillAmount = NormalizedStamina;
+        UpdateFillMaterial();
         if (staminaBarBackground == null) return;
         if (backgroundRect != staminaBarBackground.rectTransform)
         {
@@ -161,6 +164,38 @@ public sealed class StaminaManager : MonoBehaviour
         float width = fullWidth * (1f - Mathf.Clamp01(hungryPercent / 100f));
         if (!Mathf.Approximately(backgroundRect.rect.width, width))
             backgroundRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+    }
+
+    private void UpdateFillMaterial()
+    {
+        if (staminaBarFill == null) return;
+        if (fillMaterial == null)
+        {
+            originalFillMaterial = staminaBarFill.material;
+            if (originalFillMaterial == null || !originalFillMaterial.HasProperty(FillAmountId)) return;
+            // Stamina must not change other UI elements sharing the material asset.
+            fillMaterial = new Material(originalFillMaterial) { hideFlags = HideFlags.DontSave };
+            staminaBarFill.material = fillMaterial;
+        }
+        fillMaterial.SetFloat(FillAmountId, NormalizedStamina);
+        if (fillMaterial.HasProperty(UseFillId)) fillMaterial.SetFloat(UseFillId, 1f);
+        // UI Mask can render a separate, cached stencil material.
+        var renderedMaterial = staminaBarFill.materialForRendering;
+        if (renderedMaterial != null && renderedMaterial != fillMaterial && renderedMaterial.HasProperty(FillAmountId))
+        {
+            renderedMaterial.SetFloat(FillAmountId, NormalizedStamina);
+            if (renderedMaterial.HasProperty(UseFillId)) renderedMaterial.SetFloat(UseFillId, 1f);
+        }
+        staminaBarFill.SetMaterialDirty();
+    }
+
+    private void OnDestroy()
+    {
+        if (fillMaterial == null) return;
+        if (staminaBarFill != null && staminaBarFill.material == fillMaterial)
+            staminaBarFill.material = originalFillMaterial;
+        if (Application.isPlaying) Destroy(fillMaterial);
+        else DestroyImmediate(fillMaterial);
     }
 
     private void OnGUI()

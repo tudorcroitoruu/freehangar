@@ -160,6 +160,32 @@ public class StaminaManagerTests
         Assert.AreEqual(30f, stamina.HungryPercent);
     }
 
+    [Test]
+    public void ShaderFillTracksStaminaWithoutChangingTheSharedMaterial()
+    {
+        barRoot = new GameObject("Shader stamina bar", typeof(RectTransform), typeof(Image));
+        var image = barRoot.GetComponent<Image>();
+        var shared = new Material(Shader.Find("UI/Image Margin Fade"));
+        shared.SetFloat("_FillAmount", .25f);
+        image.material = shared;
+        SetField("staminaBarFill", image);
+        try
+        {
+            stamina.Tick(true, 1f);
+            var runtime = image.material;
+            Assert.AreNotSame(shared, runtime);
+            Assert.That(runtime.GetFloat("_FillAmount"), Is.EqualTo(stamina.NormalizedStamina).Within(.001f));
+            Assert.That(runtime.GetFloat("_UseFill"), Is.EqualTo(1f));
+            Assert.That(shared.GetFloat("_FillAmount"), Is.EqualTo(.25f));
+            stamina.SetHungerPercent(100f);
+            Assert.That(runtime.GetFloat("_FillAmount"), Is.Zero);
+            Object.DestroyImmediate(root);
+            Assert.AreSame(shared, image.material);
+            Assert.IsTrue(runtime == null);
+        }
+        finally { Object.DestroyImmediate(shared); }
+    }
+
     private void SetField(string name, object value) =>
         typeof(StaminaManager).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(stamina, value);
 }

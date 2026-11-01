@@ -22,6 +22,9 @@ public class GameplayCanvas : MonoBehaviour
     [SerializeField] private GameObject[] drivingHints;
     [SerializeField] private GameObject bicycleBoostHint;
 
+    [Space, Header("Tools Equip Hints")] 
+    [SerializeField] private GameObject hintsParent;
+
     private void Awake()
     {
         if (Instance == null)
@@ -44,7 +47,7 @@ public class GameplayCanvas : MonoBehaviour
         SaveSystem.MoneyChanged += RefreshMoney;
         RefreshMoney(SaveSystem.Money);
         var rider = FindFirstObjectByType<PlayerBicycleInteraction>();
-        SetDrivingHints(rider != null && rider.IsRiding, rider != null && rider.bicycle != null && !rider.bicycle.motorDriven);
+        SetDrivingHints(rider != null && rider.IsRiding);
     }
 
     private void OnDisable()
@@ -82,7 +85,7 @@ public class GameplayCanvas : MonoBehaviour
         if (freeHandsFadeDuration <= 0f) freeHandsWarning.alpha = showFreeHandsWarning ? 1f : 0f;
     }
 
-    public void SetDrivingHints(bool driving, bool bicycle = false)
+    public void SetDrivingHints(bool driving)
     {
         if (walkingHints != null)
             foreach (var hint in walkingHints)
@@ -90,7 +93,6 @@ public class GameplayCanvas : MonoBehaviour
         if (drivingHints != null)
             foreach (var hint in drivingHints)
                 if (hint != null) hint.SetActive(driving);
-        if (bicycleBoostHint != null) bicycleBoostHint.SetActive(driving && bicycle);
     }
 
     private void Update() => FadeFreeHandsWarning(Time.unscaledDeltaTime);

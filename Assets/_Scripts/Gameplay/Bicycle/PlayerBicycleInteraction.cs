@@ -178,7 +178,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         view.transform.SetParent(bicycle.riderView,false);view.transform.localPosition=Vector3.zero;view.transform.localRotation=Quaternion.identity;
         yaw=pitch=lookIdleTime=yawReturnVelocity=pitchReturnVelocity=0;riding=true;bicycle.SetRidden(true);ApplyRidingView();
         hint="";
-        GameplayCanvas.Instance?.SetDrivingHints(true, bicycle != null && !bicycle.motorDriven);
+        GameplayCanvas.Instance?.SetDrivingHints(true);
         return true;
     }
     public bool TryDismount()
