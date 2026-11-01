@@ -72,7 +72,12 @@ public class Pause : MonoBehaviour
     {
         if (!screen || exitToMenu || restarting) return;
         if (!paused) PauseOn();
-        if (paused) SetActiveScreen(screen);
+        if (paused && !screen.activeSelf)
+        {
+            if (screen == mainScreen) AudioManager.Instance?.PlayCancel();
+            else AudioManager.Instance?.PlayConfirm();
+            SetActiveScreen(screen);
+        }
     }
 
     public void ShowMainScreen() => OpenScreen(mainScreen);
@@ -102,6 +107,7 @@ public class Pause : MonoBehaviour
         previousTimeScale = Time.timeScale;
         Time.timeScale = 0f;
         paused = true;
+        AudioManager.Instance?.PlayConfirm();
         // Select before enabling the root so stale subpanels do not reopen.
         SetActiveScreen(mainScreen);
         pauseScreen.SetActive(true);
@@ -118,6 +124,7 @@ public class Pause : MonoBehaviour
         SetActiveScreen(null);
         if (pauseScreen) pauseScreen.SetActive(false);
         if (!wasPaused) return;
+        AudioManager.Instance?.PlayCancel();
         Time.timeScale = previousTimeScale;
         Cursor.lockState = previousCursorLock;
         Cursor.visible = previousCursorVisible;

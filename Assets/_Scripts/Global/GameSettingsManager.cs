@@ -428,6 +428,9 @@ public class GameSettingsManager : MonoBehaviour
         if (sections == null || index < 0 || index >= sections.Length || !sections[index])
             return;
 
+        if (initialized && !sections[index].activeSelf)
+            AudioManager.Instance?.PlaySelectStandard(0);
+
         for (int i = 0; i < sections.Length; i++)
         {
             if (sections[i])
@@ -968,7 +971,12 @@ public class GameSettingsManager : MonoBehaviour
         pipelineSettings.msaaSampleCount = (MSAASamples)(int)preset.msaa;
         pipelineSettings.supportSSAO = preset.screenSpaceAmbientOcclusion;
         var dynamicResolution = pipelineSettings.dynamicResolutionSettings;
-        dynamicResolution.enabled = true;
+        // These presets use spatial resolution scaling, not temporal reconstruction.
+        // HDRP defaults to STP and can run it even at 100%, causing trails during walking.
+        // Replace the list instead of clearing it: the cloned asset can share nested lists.
+        dynamicResolution.advancedUpscalerNames = new List<string>();
+        dynamicResolution.upsampleFilter = DynamicResUpscaleFilter.CatmullRom;
+        dynamicResolution.enabled = preset.renderScale < 1f;
         dynamicResolution.dynResType = DynamicResolutionType.Software;
         dynamicResolution.forceResolution = true;
         dynamicResolution.forcedPercentage = Mathf.Clamp(preset.renderScale, 0.25f, 1f) * 100f;
@@ -1272,17 +1280,17 @@ public class GameSettingsManager : MonoBehaviour
 
     private void ApplyMasterVolume()
     {
-        SoundManager.instance?.VolumeMaster(settings.masterVolume);
+        SoundManager.instance?.VolumeMaster(SoundManager.ToDecibels(settings.masterVolume));
     }
     
     private void ApplyMusicVolume()
     {
-        SoundManager.instance?.VolumeMusic(settings.musicVolume);
+        SoundManager.instance?.VolumeMusic(SoundManager.ToDecibels(settings.musicVolume));
     }
 
     private void ApplySFXVolume()
     {
-        SoundManager.instance?.VolumeEffects(settings.effectsVolume);
+        SoundManager.instance?.VolumeEffects(SoundManager.ToDecibels(settings.effectsVolume));
     }
 
     #endregion

@@ -9,6 +9,9 @@ public class MenuManager : MonoBehaviour
 {
     public static MenuManager Instance { get; private set; }
     public static bool IsMenuOpen => Instance != null && Instance.isActiveAndEnabled;
+    [Header("Persistent services")]
+    [SerializeField, Tooltip("Creates the shared audio/loading services when the Menu scene is played directly.")]
+    private GlobalManager servicesPrefab;
     [Header("Screens")]
     [SerializeField] private GameObject menuScreen;
     [SerializeField] private GameObject settingsScreen;
@@ -43,6 +46,8 @@ public class MenuManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        if (GlobalManager.Instance == null && FindFirstObjectByType<GlobalManager>() == null && servicesPrefab != null)
+            Instantiate(servicesPrefab);
         var settingsManager = GameSettingsManager.Instance;
         if (settingsManager == null)
             settingsManager = FindFirstObjectByType<GameSettingsManager>(FindObjectsInactive.Include);
@@ -64,6 +69,8 @@ public class MenuManager : MonoBehaviour
     public void ShowMenuScreen()
     {
         if (transitionRequested || LoadingScreen.isLoadingOn) return;
+        if ((settingsScreen != null && settingsScreen.activeSelf) || (quitGamePopup != null && quitGamePopup.activeSelf))
+            AudioManager.Instance?.PlayCancel();
         SetScreenActive(menuScreen, true);
         SetScreenActive(settingsScreen, false);
         SetScreenActive(quitGamePopup, false);
@@ -72,6 +79,8 @@ public class MenuManager : MonoBehaviour
     public void ShowSettingsScreen()
     {
         if (transitionRequested || LoadingScreen.isLoadingOn) return;
+        if (settingsScreen == null || settingsScreen.activeSelf) return;
+        AudioManager.Instance?.PlayConfirm();
         SetScreenActive(menuScreen, false);
         SetScreenActive(quitGamePopup, false);
         SetScreenActive(settingsScreen, true);
@@ -80,6 +89,8 @@ public class MenuManager : MonoBehaviour
     public void ShowQuitGamePopup()
     {
         if (transitionRequested || LoadingScreen.isLoadingOn) return;
+        if (quitGamePopup == null || quitGamePopup.activeSelf) return;
+        AudioManager.Instance?.PlayConfirm();
         SetScreenActive(settingsScreen, false);
         SetScreenActive(menuScreen, true);
         SetScreenActive(quitGamePopup, true);
@@ -123,6 +134,7 @@ public class MenuManager : MonoBehaviour
             return;
         }
         transitionRequested = true;
+        AudioManager.Instance?.PlayConfirm();
         if (!loading.RunTransition(StartGame(newGame), minimumLoadingSeconds)) transitionRequested = false;
     }
 

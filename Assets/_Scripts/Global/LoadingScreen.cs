@@ -104,6 +104,7 @@ public class LoadingScreen : MonoBehaviour
 
     public void LoadingOn()
     {
+        AudioManager.Instance?.PlayLoadingMusic();
         if (fadeOut != null)
         {
             StopCoroutine(fadeOut);

@@ -172,8 +172,7 @@ public class Settings : MonoBehaviour
     private void ApplySettings()
     {
         if (SaveSystem.Data == null || SaveSystem.settingsData == null) return;
-        SoundManager.instance?.VolumeMusic((SaveSystem.settingsData.musicVolume > 0f) ? -9f : -30f);
-        SoundManager.instance?.VolumeEffects((SaveSystem.settingsData.effectsVolume > 0f) ? 0f : -30f);
+        SoundManager.instance?.ApplySavedVolumes(SaveSystem.settingsData);
         if (SaveSystem.Data.haptics)
         {
             // SDKManager.Haptic(HapticPreset.Toggle);

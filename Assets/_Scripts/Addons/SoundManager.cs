@@ -11,6 +11,17 @@ public class SoundManager : MonoBehaviour
 
     public static SoundManager instance;
 
+    public static float ToDecibels(float normalizedVolume) =>
+        normalizedVolume <= 0f ? -80f : Mathf.Log10(Mathf.Clamp01(normalizedVolume)) * 20f;
+
+    public void ApplySavedVolumes(SettingsData settings)
+    {
+        if (settings == null) return;
+        VolumeMaster(ToDecibels(settings.masterVolume));
+        VolumeMusic(ToDecibels(settings.musicVolume));
+        VolumeEffects(ToDecibels(settings.effectsVolume));
+    }
+
     private void Awake()
     {
         if (!instance)
@@ -28,7 +39,7 @@ public class SoundManager : MonoBehaviour
         //    audioMixerDialog.audioMixer.SetFloat("Dialog Volume", MathF.Log10(value)*20);
         audioMixerMusic.audioMixer.SetFloat("Music", value);
         
-        if (value <= -30f)
+        if (value <= -80f)
         {
             audioMixerMusic.audioMixer.SetFloat("Music", -80f);
         }
@@ -40,7 +51,7 @@ public class SoundManager : MonoBehaviour
         //   audioMixerDialog.audioMixer.SetFloat("Master Volume", MathF.Log10(value)*20);
         audioMixerEffects.audioMixer.SetFloat("Effects", value);
 
-        if (value <= -30f)
+        if (value <= -80f)
         {
             audioMixerEffects.audioMixer.SetFloat("Effects", -80f);
         }
@@ -52,7 +63,7 @@ public class SoundManager : MonoBehaviour
         //   audioMixerDialog.audioMixer.SetFloat("Master Volume", MathF.Log10(value)*20);
         audioMixerMaster.audioMixer.SetFloat("Master", value);
 
-        if (value <= -30f)
+        if (value <= -80f)
         {
             audioMixerMaster.audioMixer.SetFloat("Master", -80f);
         }
