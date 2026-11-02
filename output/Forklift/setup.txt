@@ -1,1 +1,1 @@
-PASS forklift shared driving rig, rider view, fork anchor. Engine uses lawnmower/motor clip at pitch multiplier 0,72. Fork contact automatically lifts full Big Bags; Q drops. Empty Big Bags can be carried by hand.
+PASS forklift shared driving rig, rider view, fork anchor. Engine uses lawnmower/motor clip at pitch multiplier 0.72. Fork contact automatically lifts full Big Bags; Q drops. Empty Big Bags can be carried by hand.
