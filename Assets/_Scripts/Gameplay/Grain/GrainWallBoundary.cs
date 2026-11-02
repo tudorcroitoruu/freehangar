@@ -67,7 +67,7 @@ public sealed class GrainWallBoundary
         return true;
     }
 
-    public void Build(GrainHeightField field, Transform transform, List<Plane> walls, float clearance)
+    public void Build(GrainHeightField field, Transform transform, List<Plane> walls, float clearance, Rect? excluded = null)
     {
         Walls.Clear(); Walls.AddRange(walls);
         Positions.Clear(); Triangles.Clear(); UV.Clear(); bindings.Clear();
@@ -102,9 +102,29 @@ public sealed class GrainWallBoundary
                 }
                 polygon.Clear(); polygon.AddRange(clipped);
             }
-            for (int i = 1; i + 1 < polygon.Count; i++)
+            // Partition the polygon around the room, retaining each outside piece
+            // once. The remaining inside polygon is discarded, including its mass.
+            var pieces = new List<List<Corner>>();
+            if (excluded.HasValue)
             {
-                Corner x = polygon[0], y = polygon[i], z = polygon[i + 1];
+                Rect r = excluded.Value;
+                var remaining = new List<Corner>(polygon);
+                var sides = new[] {
+                    new Plane(Vector3.right, new Vector3(r.xMin, 0, 0)),
+                    new Plane(Vector3.left, new Vector3(r.xMax, 0, 0)),
+                    new Plane(Vector3.forward, new Vector3(0, 0, r.yMin)),
+                    new Plane(Vector3.back, new Vector3(0, 0, r.yMax)) };
+                foreach (Plane side in sides)
+                {
+                    pieces.Add(Clip(remaining, side.flipped));
+                    remaining = Clip(remaining, side);
+                }
+            }
+            else pieces.Add(polygon);
+            foreach (var piece in pieces)
+            for (int i = 1; i + 1 < piece.Count; i++)
+            {
+                Corner x = piece[0], y = piece[i], z = piece[i + 1];
                 float area = Mathf.Abs(Vector3.Cross(y.point - x.point, z.point - x.point).y) * .5f;
                 if (area < .00000001f) continue;
                 Vector3 weights = (x.weights + y.weights + z.weights) * (area / 3f);
@@ -114,6 +134,21 @@ public sealed class GrainWallBoundary
         }
         field.SetAreaWeights(areas);
         UpdateHeights(field, 0);
+    }
+
+    private static List<Corner> Clip(List<Corner> input, Plane plane)
+    {
+        var output = new List<Corner>(input.Count + 1);
+        for (int i = 0; i < input.Count; i++)
+        {
+            Corner a = input[i], b = input[(i + 1) % input.Count];
+            float da = plane.GetDistanceToPoint(a.point), db = plane.GetDistanceToPoint(b.point);
+            if (da >= 0) output.Add(a);
+            if ((da >= 0) == (db >= 0)) continue;
+            float t = da / (da - db);
+            output.Add(new Corner(Vector3.Lerp(a.point, b.point, t), Vector3.Lerp(a.weights, b.weights, t)));
+        }
+        return output;
     }
 
     private static Vector3 Point(int i, GrainHeightField f) => new Vector3((i % f.Resolution) * f.Spacing - f.Size * .5f, 0, (i / f.Resolution) * f.Spacing - f.Size * .5f);

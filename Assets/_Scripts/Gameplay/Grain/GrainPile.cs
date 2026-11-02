@@ -133,12 +133,26 @@ public sealed class GrainPile : MonoBehaviour
     [SerializeField] private bool fitToWalls = true;
     [SerializeField] private LayerMask wallMask = ~0;
     [SerializeField, Range(.002f, .1f)] private float wallClearance = .01f;
+    [Tooltip("Grain-free rectangle in pile-local X/Z coordinates. Zero width or height disables it. Excludes surface, collision and collectible mass.")]
+    [SerializeField] private Rect excludedFootprint;
+    private bool HasExcludedFootprint => excludedFootprint.width > 0 && excludedFootprint.height > 0;
+    private bool HasClippedSurface => DetectedWallCount > 0 || HasExcludedFootprint;
     private GrainWallBoundary boundary;
     private readonly List<Plane> detectedWalls = new List<Plane>(12);
     private readonly RaycastHit[] wallHits = new RaycastHit[128];
     private Matrix4x4 lastPlacement;
     public int DetectedWallCount => boundary == null ? 0 : boundary.Walls.Count;
-    public bool IsInsideBoundary(Vector3 worldPoint, float radius = 0) => boundary == null || boundary.Contains(worldPoint, wallClearance + radius);
+    public bool IsInsideBoundary(Vector3 worldPoint, float radius = 0)
+    {
+        if (HasExcludedFootprint)
+        {
+            Vector3 p = transform.InverseTransformPoint(worldPoint);
+            float xMargin = radius / WorldScale.x, zMargin = radius / WorldScale.z;
+            if (p.x >= excludedFootprint.xMin - xMargin && p.x <= excludedFootprint.xMax + xMargin &&
+                p.z >= excludedFootprint.yMin - zMargin && p.z <= excludedFootprint.yMax + zMargin) return false;
+        }
+        return boundary == null || boundary.Contains(worldPoint, wallClearance + radius);
+    }
     private GrainHeightField field;
     internal GrainHeightField HeightField => field;
     private Mesh mesh;
@@ -241,7 +255,8 @@ public sealed class GrainPile : MonoBehaviour
         field = new GrainHeightField(grid, size, initialHeight, shape == PileShape.Cone ? null : Profile);
         DetectWalls();
         boundary = new GrainWallBoundary();
-        if (detectedWalls.Count > 0) boundary.Build(field, transform, detectedWalls, wallClearance);
+        if (detectedWalls.Count > 0 || HasExcludedFootprint)
+            boundary.Build(field, transform, detectedWalls, wallClearance, HasExcludedFootprint ? excludedFootprint : (Rect?)null);
         if (useSpatialLayout)
         {
             spatial = new GrainSpatialField(field, regions, arrangement, regionWaviness, grainLayoutSeed, sectionCenter, sectionRotation);
@@ -441,7 +456,7 @@ public sealed class GrainPile : MonoBehaviour
     {
         kilograms = Kilograms;
         SurfaceRevision++;
-        if (DetectedWallCount > 0)
+        if (HasClippedSurface)
         {
             boundary.UpdateHeights(field, .045f / WorldScale.y);
             mesh.Clear(); mesh.SetVertices(boundary.Positions); mesh.SetUVs(0, boundary.UV); mesh.SetTriangles(boundary.Triangles, 0);
@@ -488,7 +503,7 @@ public sealed class GrainPile : MonoBehaviour
         nextCollider = Time.time + 1f / colliderRate;
         colliderDirty = false;
         collisionIndices.Clear();
-        if (DetectedWallCount > 0)
+        if (HasClippedSurface)
         {
             boundary.UpdateHeights(field, 0);
             if (collisionVertexMap == null || collisionVertexMap.Length != boundary.Positions.Count || collisionVertices.Count == 0)
