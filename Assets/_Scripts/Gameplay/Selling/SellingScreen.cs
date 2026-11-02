@@ -131,7 +131,9 @@ public class SellingScreen : MonoBehaviour
         // Lock before AddMoney: its callbacks can invoke Sell again in the same frame.
         saleInProgress = true;
         if (sellButton != null) sellButton.interactable = false;
-        if (!SaveSystem.AddMoney(quotedCash))
+        var gameplayCanvas = GameplayCanvas.Instance;
+        bool paid = gameplayCanvas != null ? gameplayCanvas.AddMoney(quotedCash) : SaveSystem.AddMoney(quotedCash);
+        if (!paid)
         {
             saleInProgress = false;
             if (sellButton != null) sellButton.interactable = CanPay();
@@ -139,7 +141,6 @@ public class SellingScreen : MonoBehaviour
         }
         GameAchievements.GrainSold(quotedCash);
         SoldCargoAnimation.Begin(containers);
-        if (DataHolderUI.Instance != null) DataHolderUI.Instance.RefreshDataPlayer();
         Close();
     }
 

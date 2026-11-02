@@ -1,0 +1,157 @@
+Money restore: Passed; passed=52; failed=0; skipped=0
+CutscenePauseTests.CutsceneHidesOnlyHudAndUnpauseDoesNotRevealIt: Passed
+
+
+CutscenePauseTests.PauseFreezesAudioAndRestoresPreviousState: Passed
+
+
+MoneyChangePopupTests.AdditionFadesInThenTransfersTheSameAmountIntoBalance: Passed
+
+
+MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged("sale","+$50",150): Passed
+
+
+MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged("cashCache","+$50",150): Passed
+
+
+MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged("cashChest","+$50",150): Passed
+
+
+MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged("purchase","-$40",60): Passed
+
+
+MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged("failedDelivery","",100): Passed
+
+
+MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged("unaffordable","",100): Passed
+
+
+MoneyChangePopupTests.InitialBalanceDoesNotShowAChange: Passed
+
+
+MoneyChangePopupTests.NewTransactionsPreserveDisplayedBalanceAndUpdateRemainingDifference: Passed
+
+
+MoneyChangePopupTests.ResetClearsAnUnfinishedPopup: Passed
+
+
+MoneyChangePopupTests.SpendingDecreasesBalanceAndRemainingCostTogether: Passed
+
+
+MoneyChangePopupTests.TransferWaitsAfterFadeInAndNewUpdatesDoNotRestartTheDelay: Passed
+
+
+SellingZoneContainersOnlyTests.BagInASiblingTrailerSlotMustBeUnloadedBeforeItCanBeSold: Passed
+
+
+SellingZoneContainersOnlyTests.ContainersStillOnVehicleAreNeverIncludedInTheSale: Passed
+
+
+SellingZoneContainersOnlyTests.PlayersAndEmptyOrCarriedContainersCannotStartWeighing: Passed
+
+
+SellingZoneContainersOnlyTests.TrailerWithoutItsTowingVehicleStillBlocksTheScale: Passed
+
+
+SellingZoneContainersOnlyTests.UnloadedContainersEnableStartOnlyWhileTheVehicleIsCompletelyOutside: Passed
+
+
+SellingZoneContainersOnlyTests.VehicleColliderAtTheEdgeBlocksEvenWithOriginOutsideOrControllerDisabled(True): Passed
+
+
+SellingZoneContainersOnlyTests.VehicleColliderAtTheEdgeBlocksEvenWithOriginOutsideOrControllerDisabled(False): Passed
+
+
+SellingZoneContainersOnlyTests.WheelbarrowMustLeaveTheScale: Passed
+
+
+ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn("money"): Passed
+
+
+ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn("prefab"): Passed
+
+
+ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn("point"): Passed
+
+
+ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn("limit"): Passed
+
+
+ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn("hands"): Passed
+
+
+ShopPurchaseTests.CashAndOwnershipSurviveJsonRoundTrip: Passed
+
+
+ShopPurchaseTests.FailedDeliveryDoesNotCharge: Passed
+
+
+ShopPurchaseTests.InsufficientMoneyDoesNotChangeCashOrOwnership: Passed
+
+
+ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData(null,10): Passed
+
+
+ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData("",10): Passed
+
+
+ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData("   ",10): Passed
+
+
+ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData("crate",-10): Passed
+
+
+ShopPurchaseTests.InventoryPromptReflectsCurrentStock(0,"Crate\nOwn: 0",False): Passed
+
+
+ShopPurchaseTests.InventoryPromptReflectsCurrentStock(2,"Take 1 Crate\nLeft: 2",True): Passed
+
+
+ShopPurchaseTests.MissingCarrierOrSpawnPointDoesNotConsumeStock(Hands): Passed
+
+
+ShopPurchaseTests.MissingCarrierOrSpawnPointDoesNotConsumeStock(AtSpawnPoint): Passed
+
+
+ShopPurchaseTests.MissingInventoryAndUnknownProductsCannotBeTaken: Passed
+
+
+ShopPurchaseTests.OlderSaveWithoutProductListCanPurchase: Passed
+
+
+ShopPurchaseTests.ProductCountCannotOverflow: Passed
+
+
+ShopPurchaseTests.ProductsResolveManagerEvenWhenTheOldDepotIsDisabled(False): Passed
+
+
+ShopPurchaseTests.ProductsResolveManagerEvenWhenTheOldDepotIsDisabled(True): Passed
+
+
+ShopPurchaseTests.PurchaseWithExactMoneyAddsOneProduct: Passed
+
+
+ShopPurchaseTests.RepeatPurchaseIncrementsExistingEntryAndOtherProductsRemainSeparate: Passed
+
+
+ShopPurchaseTests.ShopDeliversImmediatelyWithoutAddingPickupStock(False): Passed
+
+
+ShopPurchaseTests.ShopDeliversImmediatelyWithoutAddingPickupStock(True): Passed
+
+
+ShopPurchaseTests.TakingLastProductKeepsZeroCountAndCannotTakeAgain: Passed
+
+
+ShopPurchaseTests.TakingOneProductLeavesOtherProductsUnchanged: Passed
+
+
+ShopPurchaseTests.UnlimitedProductIsVisibleAndCanBeTakenRepeatedlyWithoutSave: Passed
+
+
+SoldCargoAnimationTests.PaidCargoIsImmediatelyUncollectableAndCannotBeWeighedAgain: Passed
+
+
+SoldCargoAnimationTests.WholeBatchRisesShrinksAndDisappearsAfterPointEightSeconds: Passed
+
+

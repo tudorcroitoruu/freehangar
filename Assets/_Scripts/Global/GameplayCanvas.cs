@@ -26,6 +26,20 @@ public class GameplayCanvas : MonoBehaviour
     private int targetMoney;
     private float moneyAnimationElapsed;
     
+    [Header("Money Change")]
+    [SerializeField] private CanvasGroup moneyChangeCanvas;
+    [SerializeField] private Text moneyChangeValue;
+    [SerializeField] private RectTransform arrow;
+    [SerializeField] private Image arrowImage;
+    [SerializeField] private Color addMoneyColor;
+    [SerializeField] private Color removeMoneyColor;
+    [SerializeField, Min(0f)] private float moneyChangeFadeSeconds = .2f;
+    [SerializeField, Min(0f)] private float moneyChangeTransferDelay = .3f;
+    [SerializeField, Min(0f)] private float moneyChangeHoldSeconds = .35f;
+    private bool moneyChangeFadingIn, moneyChangeAdding;
+    private float moneyChangeHoldRemaining;
+    private float moneyChangeDelayRemaining;
+
     [Space, Header("Interactor")]
     public InteractionPrompt interactionPrompt;
 
@@ -82,6 +96,7 @@ public class GameplayCanvas : MonoBehaviour
         SaveSystem.MoneyChanged += RefreshMoney;
         // Opening the HUD shows the saved balance immediately; only later changes animate.
         moneyInitialized = false;
+        ResetMoneyChange();
         RefreshMoney(SaveSystem.Money);
         var rider = FindFirstObjectByType<PlayerBicycleInteraction>();
         SetDrivingHints(rider != null && rider.IsRiding);
@@ -97,6 +112,7 @@ public class GameplayCanvas : MonoBehaviour
         Pause.PauseOffAction -= RestoreHudAfterPause;
         RestoreHudAfterPause();
         SaveSystem.MoneyChanged -= RefreshMoney;
+        ResetMoneyChange();
         ResetFreeHandsWarning();
     }
 
@@ -134,7 +150,7 @@ public class GameplayCanvas : MonoBehaviour
     private void Update()
     {
         if (warningPopup != null) warningPopup.Tick(Time.deltaTime);
-        AnimateMoney(Time.unscaledDeltaTime);
+        if (!hudHiddenByPause) AnimateMoney(Time.unscaledDeltaTime);
         RefreshCollectibleUI();
         if (fadingToolHints && hintsParent != null)
         {
@@ -256,33 +272,107 @@ public class GameplayCanvas : MonoBehaviour
     private void RefreshMoney(int amount)
     {
         if (moneyInitialized && amount == targetMoney) return;
+        bool transferPending = moneyInitialized && displayedMoney != targetMoney;
         targetMoney = amount;
         moneyAnimationStart = displayedMoney;
         moneyAnimationElapsed = 0f;
-        if (!moneyInitialized || moneyAnimationSeconds <= 0f)
+        if (!moneyInitialized)
         {
             displayedMoney = amount;
             moneyInitialized = true;
             RenderMoney();
+            return;
         }
+        double change = targetMoney - displayedMoney;
+        if (change == 0d)
+        {
+            moneyChangeFadingIn = false;
+            moneyChangeHoldRemaining = 0f;
+            moneyChangeDelayRemaining = 0f;
+            RenderMoneyChange();
+            return;
+        }
+        moneyChangeAdding = change > 0d;
+        Color color = moneyChangeAdding ? addMoneyColor : removeMoneyColor;
+        if (moneyChangeValue != null) moneyChangeValue.color = color;
+        if (arrowImage != null) arrowImage.color = color;
+        if (arrow != null) arrow.localRotation = Quaternion.Euler(0f, 0f, moneyChangeAdding ? 0f : 180f);
+        moneyChangeHoldRemaining = moneyChangeHoldSeconds;
+        moneyChangeFadingIn = moneyChangeCanvas != null;
+        if (!transferPending)
+            moneyChangeDelayRemaining = moneyChangeCanvas != null ? moneyChangeTransferDelay : 0f;
+        if (moneyChangeCanvas != null)
+        {
+            moneyChangeCanvas.interactable = false;
+            moneyChangeCanvas.blocksRaycasts = false;
+            moneyChangeCanvas.gameObject.SetActive(true);
+        }
+        RenderMoneyChange();
     }
 
     private void AnimateMoney(float deltaTime)
     {
-        if (!moneyInitialized || displayedMoney == targetMoney) return;
-        moneyAnimationElapsed += Mathf.Max(0f, deltaTime);
+        if (!moneyInitialized) return;
+        deltaTime = Mathf.Max(0f, deltaTime);
+        if (moneyChangeFadingIn)
+        {
+            float fadeTime = moneyChangeFadeSeconds > 0f ? (1f - moneyChangeCanvas.alpha) * moneyChangeFadeSeconds : 0f;
+            moneyChangeCanvas.alpha = Mathf.MoveTowards(moneyChangeCanvas.alpha, 1f,
+                moneyChangeFadeSeconds > 0f ? deltaTime / moneyChangeFadeSeconds : 1f);
+            if (moneyChangeCanvas.alpha < 1f) return;
+            moneyChangeFadingIn = false;
+            deltaTime = Mathf.Max(0f, deltaTime - fadeTime);
+        }
+        if (displayedMoney == targetMoney)
+        {
+            float holdTime = Mathf.Min(deltaTime, moneyChangeHoldRemaining);
+            moneyChangeHoldRemaining -= holdTime;
+            deltaTime -= holdTime;
+            if (moneyChangeCanvas != null && moneyChangeHoldRemaining <= 0f)
+                moneyChangeCanvas.alpha = Mathf.MoveTowards(moneyChangeCanvas.alpha, 0f,
+                    moneyChangeFadeSeconds > 0f ? deltaTime / moneyChangeFadeSeconds : 1f);
+            return;
+        }
+        float delayTime = Mathf.Min(deltaTime, moneyChangeDelayRemaining);
+        moneyChangeDelayRemaining -= delayTime;
+        deltaTime -= delayTime;
+        if (moneyChangeDelayRemaining > 0f || deltaTime <= 0f) return;
+        moneyAnimationElapsed += deltaTime;
         float progress = moneyAnimationSeconds > 0f ? Mathf.Clamp01(moneyAnimationElapsed / moneyAnimationSeconds) : 1f;
         // Keep the interpolated value in double precision, including large balances.
         // New transactions restart from the current display rather than the old target.
         displayedMoney = progress >= 1f ? targetMoney
             : moneyAnimationStart + (targetMoney - moneyAnimationStart) * Mathf.SmoothStep(0f, 1f, progress);
         RenderMoney();
+        RenderMoneyChange();
+    }
+
+    private void RenderMoneyChange()
+    {
+        if (moneyChangeValue == null) return;
+        // Match the rounded balance so the visible remaining amount and balance add up exactly.
+        double remaining = System.Math.Abs(targetMoney - System.Math.Round(displayedMoney));
+        moneyChangeValue.text = (moneyChangeAdding ? "+$" : "-$") + EconomyNumberFormat.Accounting(remaining);
+    }
+
+    private void ResetMoneyChange()
+    {
+        moneyChangeDelayRemaining = 0f;
+        moneyChangeFadingIn = false;
+        moneyChangeHoldRemaining = 0f;
+        if (moneyChangeCanvas != null)
+        {
+            moneyChangeCanvas.alpha = 0f;
+            moneyChangeCanvas.interactable = false;
+            moneyChangeCanvas.blocksRaycasts = false;
+        }
+        if (moneyChangeValue != null) moneyChangeValue.text = "";
     }
 
     private void RenderMoney()
     {
         if (moneyText != null)
-            moneyText.text = "$ " + EconomyNumberFormat.Accounting((int)System.Math.Round(displayedMoney));
+            moneyText.text = "$" + EconomyNumberFormat.Accounting((int)System.Math.Round(displayedMoney));
     }
 
     public bool AddMoney(int amount) => SaveSystem.AddMoney(amount);

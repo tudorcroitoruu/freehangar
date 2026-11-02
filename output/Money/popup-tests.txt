@@ -1,0 +1,37 @@
+Money popup: Passed; passed=12; failed=0; skipped=0
+EconomyNumberFormatTests.AccountingUsesCommaThousandsAndNoDecimalsRegardlessOfLocale("ro-RO"): Passed
+
+
+EconomyNumberFormatTests.AccountingUsesCommaThousandsAndNoDecimalsRegardlessOfLocale("de-DE"): Passed
+
+
+EconomyNumberFormatTests.AccountingUsesCommaThousandsAndNoDecimalsRegardlessOfLocale("fr-FR"): Passed
+
+
+EconomyNumberFormatTests.DisplayNeverRoundsAnIncompleteBagOrFractionalCashUp: Passed
+
+
+EconomyNumberFormatTests.InvalidOrOverflowingQuotesCannotBePartiallyPaid: Passed
+
+
+EconomyNumberFormatTests.SaleTotalEqualsTheWholeDollarCropRowsWithoutHiddenFractionalCarry: Passed
+
+
+EconomyNumberFormatTests.SellingRowUsesAccountingAndTheActualWholeDollarPayout: Passed
+
+
+MoneyChangePopupTests.AdditionFadesInThenTransfersTheSameAmountIntoBalance: Passed
+
+
+MoneyChangePopupTests.InitialBalanceDoesNotShowAChange: Passed
+
+
+MoneyChangePopupTests.NewTransactionsPreserveDisplayedBalanceAndUpdateRemainingDifference: Passed
+
+
+MoneyChangePopupTests.ResetClearsAnUnfinishedPopup: Passed
+
+
+MoneyChangePopupTests.SpendingDecreasesBalanceAndRemainingCostTogether: Passed
+
+
