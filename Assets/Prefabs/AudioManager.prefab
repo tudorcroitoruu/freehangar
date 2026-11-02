@@ -344,6 +344,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameplayAudio
   effectsGroup: {fileID: 3455396778696250076, guid: 2363768d8fc9b624a9219fcc1bf533a6, type: 2}
+  airplane: {fileID: 8300000, guid: 702a47f545961b544b156b6aef8b57b4, type: 3}
+  airplaneIntervalSeconds: {x: 240, y: 420}
+  airplanePitchRange: {x: 0.95, y: 1.05}
+  airplaneVolumeRange: {x: 0.65, y: 0.8}
   crowHits:
   - {fileID: 8300000, guid: e6cf8774697ada342954f0d946171312, type: 3}
   - {fileID: 8300000, guid: 28bdf225c012b4b459784bb236e172df, type: 3}

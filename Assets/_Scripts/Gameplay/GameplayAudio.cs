@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -10,6 +11,13 @@ public sealed class GameplayAudio : MonoBehaviour
     public static GameplayAudio Instance { get; private set; }
 
     [SerializeField] private AudioMixerGroup effectsGroup;
+    [Header("Airplane ambience")]
+    [SerializeField] private AudioClip airplane;
+    [SerializeField] private Vector2 airplaneIntervalSeconds = new Vector2(240f, 420f);
+    [SerializeField] private Vector2 airplanePitchRange = new Vector2(.95f, 1.05f);
+    [SerializeField] private Vector2 airplaneVolumeRange = new Vector2(.65f, .8f);
+    private AudioSource airplaneSource;
+    private Coroutine airplanePlayback;
     [Header("Animals")]
     [SerializeField] private AudioClip[] crowHits;
     [SerializeField] private AudioClip crowFlyAway, crowsIdle, ratHit, ratIdle;
@@ -44,6 +52,50 @@ public sealed class GameplayAudio : MonoBehaviour
     }
 
     private void OnDestroy() { if (Instance == this) Instance = null; }
+
+    private void OnEnable()
+    {
+        if (airplane == null) return;
+        if (airplaneSource == null)
+        {
+            airplaneSource = gameObject.AddComponent<AudioSource>();
+            airplaneSource.playOnAwake = false;
+            airplaneSource.loop = false;
+            airplaneSource.spatialBlend = 0f;
+            airplaneSource.outputAudioMixerGroup = effectsGroup;
+        }
+        airplaneSource.clip = airplane;
+        airplanePlayback = StartCoroutine(PlayAirplaneAmbience());
+    }
+
+    private IEnumerator PlayAirplaneAmbience()
+    {
+        while (true)
+        {
+            float minimum = Mathf.Max(1f, airplaneIntervalSeconds.x);
+            float remaining = Random.Range(minimum, Mathf.Max(minimum, airplaneIntervalSeconds.y));
+            while (remaining > 0f)
+            {
+                if (SceneManager.GetActiveScene().name == "Gameplay" && !LoadingScreen.isLoadingOn &&
+                    !WorldSaveRuntime.IsSeeking && !WorldSaveRuntime.IsRestoring)
+                    remaining -= Time.deltaTime;
+                else if (airplaneSource.isPlaying) airplaneSource.Stop();
+                yield return null;
+            }
+            if (SceneManager.GetActiveScene().name != "Gameplay" || LoadingScreen.isLoadingOn ||
+                WorldSaveRuntime.IsSeeking || WorldSaveRuntime.IsRestoring || airplaneSource.isPlaying) continue;
+            airplaneSource.pitch = Mathf.Clamp(Random.Range(airplanePitchRange.x, airplanePitchRange.y), .1f, 3f);
+            airplaneSource.volume = Mathf.Clamp01(Random.Range(airplaneVolumeRange.x, airplaneVolumeRange.y));
+            airplaneSource.Play();
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (airplanePlayback != null) StopCoroutine(airplanePlayback);
+        airplanePlayback = null;
+        if (airplaneSource != null) airplaneSource.Stop();
+    }
 
     private void Play(AudioClip clip, float volume = 1f)
     {
