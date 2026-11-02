@@ -20,6 +20,8 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     public bool DoorOpen { get; private set; }
     public bool Running { get; private set; }
     private bool cleared;
+    private readonly HashSet<GameplayCanvas> hud = new HashSet<GameplayCanvas>();
+    private void LateUpdate() { if (overlay != null) overlay.GetComponent<Canvas>().enabled = Pause.Instance == null || !Pause.Instance.paused; }
     private Quaternion doorClosed, leverOff, hatchClosed;
     private Vector3 revealClosed;
     private Camera cinematic, original;
@@ -73,7 +75,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         cursorLock=Cursor.lockState;cursorVisible=Cursor.visible;Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;
         Suspend(player);Suspend(actor);Suspend(player.GetComponent<PlayerBicycleInteraction>());Suspend(player.GetComponent<PlayerCombatTools>());Suspend(player.Stamina);
         if(player.HeldInstrument!=null)Hide(player.HeldInstrument.gameObject);
-        foreach(var canvas in FindObjectsByType<Canvas>(FindObjectsSortMode.None))Hide(canvas.gameObject);
+        foreach(var canvas in FindObjectsByType<GameplayCanvas>(FindObjectsInactive.Include, FindObjectsSortMode.None)) { hud.Add(canvas); canvas.SetCutsceneHudHidden(this, true); }
         foreach(var sign in GetComponentsInChildren<TextMesh>())if(sign.text.StartsWith("ELECTRICAL"))Hide(sign.gameObject);
         var cameraObject=new GameObject("Electrical room cinematic camera");cinematic=cameraObject.AddComponent<Camera>();cinematic.CopyFrom(original);cinematic.transform.SetPositionAndRotation(original.transform.position,original.transform.rotation);
         cinematic.nearClipPlane=.03f;var hd=cameraObject.AddComponent<HDAdditionalCameraData>();var originalHD=original.GetComponent<HDAdditionalCameraData>();if(originalHD!=null)originalHD.CopyTo(hd);
@@ -85,7 +87,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         yield return Animate(.7f,t=>roomLight.intensity=Mathf.Lerp(0,180,t));
         GameAchievements.ElectricalRoomPowered();
         yield return TurnToward(revealView,.8f);
-        yield return new WaitForSecondsRealtime(.15f);
+        yield return new WaitForSeconds(.15f);
         GameplayAudio.Instance?.OpenRocketDoor();
         yield return Animate(1.4f,t=>revealDoor.localPosition=revealClosed+Vector3.up*revealLift*t);
         // Begin walking as the hatch opens, keeping the movement and door in sync.
@@ -102,9 +104,9 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         });
         // The latch catches their attention: turn sharply toward the door.
         if(lookBackView!=null)yield return MoveCamera(lookBackView,.48f);
-        yield return new WaitForSecondsRealtime(.3f);
+        yield return new WaitForSeconds(.3f);
         subtitle.text="GET READY FOR LAUNCH";Play(readyVoice);
-        yield return new WaitForSecondsRealtime(.5f);
+        yield return new WaitForSeconds(.5f);
         subtitle.text="GET READY FOR LAUNCH\n3...";Play(threeVoice);
         Vector3 windowStart=cinematic.transform.position;
         Quaternion windowRotation=cinematic.transform.rotation;
@@ -188,11 +190,11 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     {
         Quaternion center = cinematic.transform.rotation;
         yield return Animate(.6f, t => cinematic.transform.rotation = center * Quaternion.Euler(-3*t, -8*t, -t));
-        yield return new WaitForSecondsRealtime(.18f);
+        yield return new WaitForSeconds(.18f);
         Quaternion left = cinematic.transform.rotation;
         Quaternion right = center * Quaternion.Euler(2, 9, 1);
         yield return Animate(.85f, t => cinematic.transform.rotation = Quaternion.Slerp(left, right, t));
-        yield return new WaitForSecondsRealtime(.22f);
+        yield return new WaitForSeconds(.22f);
         Quaternion from = cinematic.transform.rotation;
         yield return Animate(.5f, t => cinematic.transform.rotation = Quaternion.Slerp(from, center, t));
     }
@@ -200,15 +202,15 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     {
         Quaternion center = cinematic.transform.rotation;
         yield return Animate(.45f, t => cinematic.transform.rotation = center * Quaternion.Euler(-2*t, -7*t, 0));
-        yield return new WaitForSecondsRealtime(.2f);
+        yield return new WaitForSeconds(.2f);
         yield return Animate(.7f, t => cinematic.transform.rotation = center * Quaternion.Euler(-2 + 3*t, -7 + 14*t, 0));
-        yield return new WaitForSecondsRealtime(.2f);
+        yield return new WaitForSeconds(.2f);
         Quaternion from = cinematic.transform.rotation;
         yield return Animate(.45f, t => cinematic.transform.rotation = Quaternion.Slerp(from, center, t));
     }
     private void Play(AudioClip clip){if(clip!=null)voice.PlayOneShot(clip);}
     private IEnumerator MoveCamera(Transform target,float duration){var p=cinematic.transform.position;var r=cinematic.transform.rotation;yield return Animate(duration,t=>cinematic.transform.SetPositionAndRotation(Vector3.Lerp(p,target.position,t),Quaternion.Slerp(r,target.rotation,t)));}
-    private IEnumerator Animate(float duration,System.Action<float> action){float t=0;while(t<duration){t+=Time.unscaledDeltaTime;action(Mathf.SmoothStep(0,1,Mathf.Clamp01(t/duration)));yield return null;}action(1);}
+    private IEnumerator Animate(float duration,System.Action<float> action){float t=0;while(t<duration){t+=Time.deltaTime;action(Mathf.SmoothStep(0,1,Mathf.Clamp01(t/duration)));yield return null;}action(1);}
     private void CreateOverlay()
     {
         overlay=new GameObject("Launch subtitles",typeof(Canvas),typeof(CanvasScaler));var canvas=overlay.GetComponent<Canvas>();canvas.renderMode=RenderMode.ScreenSpaceOverlay;canvas.sortingOrder=32000;
@@ -221,7 +223,8 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         StopAllCoroutines();if(!Running)return;Running=false;
         foreach(var pair in suspended)if(pair.Key!=null)pair.Key.enabled=pair.Value;
         foreach(var pair in hidden)if(pair.Key!=null)pair.Key.SetActive(pair.Value);
-        suspended.Clear();hidden.Clear();if(actor!=null)actor.EndDiscovery(this);
+        foreach(var canvas in hud) if(canvas != null) canvas.SetCutsceneHudHidden(this, false);
+        hud.Clear();suspended.Clear();hidden.Clear();if(actor!=null)actor.EndDiscovery(this);
         if(cinematic!=null)Destroy(cinematic.gameObject);if(overlay!=null)Destroy(overlay);
         Cursor.lockState=cursorLock;Cursor.visible=cursorVisible;
     }

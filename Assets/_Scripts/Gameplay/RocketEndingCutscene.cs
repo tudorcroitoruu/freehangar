@@ -60,7 +60,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
     }
     private readonly Dictionary<Behaviour,bool> behaviours = new Dictionary<Behaviour,bool>();
     private readonly Dictionary<GameObject,bool> hidden = new Dictionary<GameObject,bool>();
-    private readonly Dictionary<Canvas,bool> canvases = new Dictionary<Canvas,bool>();
+    private readonly HashSet<GameplayCanvas> canvases = new HashSet<GameplayCanvas>();
     private Vector3 direction, departure, finalCameraStart, finalCameraEnd;
     private Quaternion orientation, sunStartRotation;
     private float elapsed;
@@ -214,9 +214,14 @@ public sealed class RocketEndingCutscene : MonoBehaviour
     private void Suspend(Behaviour b) { behaviours[b] = b.enabled; b.enabled = false; }
     private void HideHud()
     {
-        foreach (var canvas in FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-        { if (canvas == overlay) continue; if (!canvases.ContainsKey(canvas)) canvases.Add(canvas,canvas.enabled); canvas.enabled = false; }
+        foreach (var canvas in FindObjectsByType<GameplayCanvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            canvases.Add(canvas);
+            canvas.SetCutsceneHudHidden(this, true);
+        }
+        if (overlay != null) overlay.enabled = Pause.Instance == null || !Pause.Instance.paused;
     }
+
     private void Update()
     {
         if (!IsPlaying || hero == null || view == null) return;
@@ -343,7 +348,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         if (transitionProfile != null) { foreach (var component in transitionProfile.components) Destroy(component); Destroy(transitionProfile); }
         foreach (var state in behaviours) if (state.Key != null) state.Key.enabled = state.Value;
         foreach (var state in hidden) if (state.Key != null) state.Key.SetActive(state.Value);
-        foreach (var state in canvases) if (state.Key != null) state.Key.enabled = state.Value;
+        foreach (var canvas in canvases) if (canvas != null) canvas.SetCutsceneHudHidden(this, false);
         behaviours.Clear(); hidden.Clear(); canvases.Clear(); ships.Clear(); shipStarts.Clear();
         shipDirections.Clear(); launchDelays.Clear(); shipSpeeds.Clear();
         Cursor.lockState = cursorMode; Cursor.visible = cursorVisible;

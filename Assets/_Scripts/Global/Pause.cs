@@ -23,6 +23,7 @@ public class Pause : MonoBehaviour
     private CursorLockMode previousCursorLock;
     private bool previousCursorVisible;
     private float previousTimeScale = 1f;
+    private bool previousAudioPaused;
 
     private void Awake()
     {
@@ -105,6 +106,8 @@ public class Pause : MonoBehaviour
         previousCursorLock = Cursor.lockState;
         previousCursorVisible = Cursor.visible;
         previousTimeScale = Time.timeScale;
+        previousAudioPaused = AudioListener.pause;
+        AudioListener.pause = true;
         Time.timeScale = 0f;
         paused = true;
         AudioManager.Instance?.PlayConfirm();
@@ -124,6 +127,7 @@ public class Pause : MonoBehaviour
         SetActiveScreen(null);
         if (pauseScreen) pauseScreen.SetActive(false);
         if (!wasPaused) return;
+        AudioListener.pause = previousAudioPaused;
         AudioManager.Instance?.PlayCancel();
         Time.timeScale = previousTimeScale;
         Cursor.lockState = previousCursorLock;

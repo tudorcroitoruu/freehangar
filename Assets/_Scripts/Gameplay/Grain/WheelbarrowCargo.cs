@@ -49,7 +49,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         previous.StopPushing();
         Vector3 position = previous.transform.position; Quaternion rotation = previous.transform.rotation;
         transform.SetParent(null,true);
-        transform.SetPositionAndRotation(position,rotation);x
+        transform.SetPositionAndRotation(position,rotation);
         GetComponent<VehicleReset>()?.SetHomePose();
         foreach (var bag in previous.bags.ToArray())
         {

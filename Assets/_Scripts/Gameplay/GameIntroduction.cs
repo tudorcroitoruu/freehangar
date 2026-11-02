@@ -46,7 +46,7 @@ public sealed class GameIntroduction : MonoBehaviour
     private bool instrumentActive, shovelEnabled, worldShovelActive, birdsWerePlaying;
     private readonly List<Behaviour> suspended = new List<Behaviour>();
     private readonly List<bool> enabledStates = new List<bool>();
-    private readonly Dictionary<Canvas, bool> hud = new Dictionary<Canvas, bool>();
+    private readonly HashSet<GameplayCanvas> hud = new HashSet<GameplayCanvas>();
     private readonly List<Collider> bikeColliders = new List<Collider>();
     private readonly List<bool> colliderStates = new List<bool>();
     private readonly Dictionary<Transform, Quaternion> wheelRotations = new Dictionary<Transform, Quaternion>();
@@ -118,13 +118,14 @@ public sealed class GameIntroduction : MonoBehaviour
     }
     private void HideHud()
     {
-        foreach (var canvas in FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (var canvas in FindObjectsByType<GameplayCanvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (canvas == openingFade || canvas.GetComponentInParent<LoadingScreen>(true) != null) continue;
-            if (!hud.ContainsKey(canvas)) hud.Add(canvas, canvas.enabled);
-            canvas.enabled = false;
+            hud.Add(canvas);
+            canvas.SetCutsceneHudHidden(this, true);
         }
+        if (openingFade != null) openingFade.enabled = Pause.Instance == null || !Pause.Instance.paused;
     }
+
     private void LateUpdate() { if (IsPlaying) HideHud(); }
     private void CreateOpeningFade()
     {
@@ -336,7 +337,7 @@ public sealed class GameIntroduction : MonoBehaviour
         }
         if (worldShovel != null) { worldShovel.transform.SetPositionAndRotation(worldShovelPosition, worldShovelRotation); worldShovel.transform.localScale = worldShovelScale; worldShovel.SetActive(finished ? false : worldShovelActive); }
         for (int i = 0; i < suspended.Count; i++) if (suspended[i] != null) suspended[i].enabled = enabledStates[i];
-        foreach (var pair in hud) if (pair.Key != null) pair.Key.enabled = pair.Value;
+        foreach (var canvas in hud) if (canvas != null) canvas.SetCutsceneHudHidden(this, false);
         if (birds != null && !birdsWerePlaying) birds.Stop();
         suspended.Clear(); enabledStates.Clear(); hud.Clear(); bikeColliders.Clear(); colliderStates.Clear(); wheelRotations.Clear();
     }

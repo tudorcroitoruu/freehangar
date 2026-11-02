@@ -9,6 +9,15 @@ public class GameplayCanvas : MonoBehaviour
     [SerializeField] private GameObject hudObject;
     private bool hudHiddenByPause;
     private bool hudActiveBeforePause;
+    private readonly HashSet<Object> cutsceneHudOwners = new HashSet<Object>();
+
+    public void SetCutsceneHudHidden(Object owner, bool hidden)
+    {
+        if (hidden) cutsceneHudOwners.Add(owner);
+        else cutsceneHudOwners.Remove(owner);
+        if (cutsceneHudOwners.Count > 0 || (Pause.Instance != null && Pause.Instance.paused)) HideHudForPause();
+        else RestoreHudAfterPause();
+    }
     [Header("Money")]
     [SerializeField] private Text moneyText;
     [SerializeField, Min(0f)] private float moneyAnimationSeconds = .4f;
@@ -101,6 +110,7 @@ public class GameplayCanvas : MonoBehaviour
 
     private void RestoreHudAfterPause()
     {
+        if (cutsceneHudOwners.Count > 0) return;
         if (!hudHiddenByPause) return;
         hudHiddenByPause = false;
         if (hudObject != null) hudObject.SetActive(hudActiveBeforePause);

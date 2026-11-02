@@ -49,6 +49,8 @@ public class AudioManager : MonoBehaviour
         }
 
         Instance = this;
+        if (soundEffectsAudioSource != null) soundEffectsAudioSource.ignoreListenerPause = true;
+        if (otherAudioSource != null) otherAudioSource.ignoreListenerPause = true;
         if (musicAudioSource != null) musicVolume = musicAudioSource.volume;
         PreloadResultAudio();
     }
@@ -210,7 +212,7 @@ public class AudioManager : MonoBehaviour
 
     private IEnumerator ResumeRegularMusicAfterSpecial(MusicMode special)
     {
-        while (musicMode == special && musicAudioSource != null && musicAudioSource.isPlaying)
+        while (musicMode == special && musicAudioSource != null && (AudioListener.pause || musicAudioSource.isPlaying))
             yield return null;
         if (musicMode != special) yield break;
         coroutine = null;
@@ -228,14 +230,14 @@ public class AudioManager : MonoBehaviour
             musicAudioSource.volume = 0f;
             musicAudioSource.Play();
             float fade = 0f;
-            while (musicMode == MusicMode.Regular && musicAudioSource.isPlaying && fade < 1f)
+            while (musicMode == MusicMode.Regular && (AudioListener.pause || musicAudioSource.isPlaying) && fade < 1f)
             {
-                fade += Time.unscaledDeltaTime;
+                if (!AudioListener.pause) fade += Time.unscaledDeltaTime;
                 musicAudioSource.volume = musicVolume * Mathf.Clamp01(fade);
                 yield return null;
             }
             musicAudioSource.volume = musicVolume;
-            while (musicMode == MusicMode.Regular && musicAudioSource.isPlaying)
+            while (musicMode == MusicMode.Regular && (AudioListener.pause || musicAudioSource.isPlaying))
                 yield return null;
             if (musicMode != MusicMode.Regular) yield break;
             if (Random.value < pauseChance && pauseSeconds > 0f)
