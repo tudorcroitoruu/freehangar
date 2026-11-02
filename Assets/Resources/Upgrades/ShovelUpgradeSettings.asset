@@ -21,7 +21,7 @@ MonoBehaviour:
     weightReductionPerUpgrade: 0.05
     suctionKgPerSecond: 8
     suctionPerUpgrade: 2
-    prices: 320000004b0000006400000096000000
+    prices: 0a0000000f0000001400000019000000
   - name: Medium Shovel
     image: {fileID: 21300000, guid: cfb9e0579b9c03c478557593242d6265, type: 3}
     capacityKg: 8.5

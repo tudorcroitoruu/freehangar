@@ -1,0 +1,3 @@
+PASS 10 kg corn sale=$20; first sale funds shovel; three sales fund Motoroller after buying shovel.
+PASS authored tutorial advances from one bag to shovel upgrade, then completes on purchase.
+PASS existing saves with a purchased shovel skip the new upgrade objective.

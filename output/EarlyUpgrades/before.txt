@@ -1,0 +1,64 @@
+Goals Assets/Scenes/Gameplay.unity
+0 tutorial_pick_up_sack | Pick up an empty sack | type=4 target=1 upgrade=0 reward=0
+1 tutorial_place_sack | Place the sack near the grain | type=5 target=1 upgrade=0 reward=0
+2 tutorial_equip_shovel | Equip your shovel | type=6 target=1 upgrade=0 reward=0
+3 tutorial_fill_corn_sack | Fill the free sack with 10 kg of grain | type=7 target=10 upgrade=0 reward=0
+4 tutorial_close_sack | Close the grain sack | type=8 target=1 upgrade=0 reward=0
+5 tutorial_load_sack | Load the grain sack onto the truck | type=9 target=1 upgrade=0 reward=0
+6 tutorial_load_200kg_corn | Load 20 kg of grain onto the vehicle | type=10 target=20 upgrade=0 reward=0
+7 tutorial_reach_buyer | Drive to the grain buyer | type=11 target=1 upgrade=0 reward=0
+8 tutorial_sell_corn | Sell your first load of grain | type=12 target=1 upgrade=0 reward=0
+9 h1_earn_500 | Earn $500 from grain sales | type=1 target=500 upgrade=0 reward=0
+10 upgrade_larger_sack | Buy a larger sack | type=13 target=1 upgrade=1 reward=0
+11 h1_deliver_500kg | Deliver 200 kg of grain | type=14 target=200 upgrade=0 reward=0
+12 upgrade_wheelbarrow | Buy a wheelbarrow | type=13 target=1 upgrade=2 reward=0
+13 h1_move_1000kg | Move 400 kg of grain | type=15 target=400 upgrade=0 reward=0
+14 h1_clear_25 | Clear 25% of Hangar 1 | type=16 target=25 upgrade=0 reward=0
+15 h1_clear_50 | Clear 50% of Hangar 1 | type=16 target=50 upgrade=0 reward=0
+16 h1_clear_75 | Clear 75% of Hangar 1 | type=16 target=75 upgrade=0 reward=0
+17 h1_clear_95 | Finish clearing Hangar 1 | type=16 target=95 upgrade=0 reward=0
+18 h2_collect_key | Collect the Hangar 2 key | type=17 target=1 upgrade=0 reward=0
+19 h2_unlock | Unlock Hangar 2 | type=18 target=1 upgrade=0 reward=0
+20 h2_fill_large_sack | Fill a large sack with 100 kg of grain | type=7 target=100 upgrade=0 reward=0
+21 h2_load_1000kg | Load 1,000 kg of grain onto the truck | type=10 target=1000 upgrade=0 reward=0
+22 h2_deliver_2500kg | Deliver 2,500 kg of grain | type=14 target=2500 upgrade=0 reward=0
+23 upgrade_hand_cart | Buy a hand cart | type=13 target=1 upgrade=3 reward=0
+24 upgrade_larger_truck | Buy a larger truck | type=13 target=1 upgrade=4 reward=0
+25 h2_clear_50 | Clear 50% of Hangar 2 | type=16 target=50 upgrade=0 reward=0
+26 h2_clear_75 | Clear 75% of Hangar 2 | type=16 target=75 upgrade=0 reward=0
+27 h2_clear_95 | Finish clearing Hangar 2 | type=16 target=95 upgrade=0 reward=0
+28 h3_collect_key | Collect the Hangar 3 key | type=17 target=1 upgrade=0 reward=0
+29 h3_unlock | Unlock Hangar 3 | type=18 target=1 upgrade=0 reward=0
+30 h3_move_5000kg | Move 5,000 kg of grain | type=15 target=5000 upgrade=0 reward=0
+31 upgrade_pallet_jack | Buy a pallet jack | type=13 target=1 upgrade=5 reward=0
+32 h3_load_2500kg | Load 2,500 kg of grain onto the truck | type=10 target=2500 upgrade=0 reward=0
+33 h3_deliver_5000kg | Deliver 5,000 kg of grain | type=14 target=5000 upgrade=0 reward=0
+34 h3_clear_50 | Clear 50% of Hangar 3 | type=16 target=50 upgrade=0 reward=0
+35 h3_clear_75 | Clear 75% of Hangar 3 | type=16 target=75 upgrade=0 reward=0
+36 h3_clear_95 | Finish clearing Hangar 3 | type=16 target=95 upgrade=0 reward=0
+37 h4_collect_key | Collect the Hangar 4 key | type=17 target=1 upgrade=0 reward=0
+38 h4_unlock | Unlock Hangar 4 | type=18 target=1 upgrade=0 reward=0
+39 h4_move_10000kg | Move 10,000 kg of grain | type=15 target=10000 upgrade=0 reward=0
+40 h4_load_5000kg | Load 5,000 kg of grain onto the truck | type=10 target=5000 upgrade=0 reward=0
+41 h4_deliver_10000kg | Deliver 10,000 kg of grain | type=14 target=10000 upgrade=0 reward=0
+42 h4_clear_50 | Clear 50% of Hangar 4 | type=16 target=50 upgrade=0 reward=0
+43 h4_clear_75 | Clear 75% of Hangar 4 | type=16 target=75 upgrade=0 reward=0
+44 h4_clear_95 | Finish clearing Hangar 4 | type=16 target=95 upgrade=0 reward=0
+45 h5_collect_key | Collect the final hangar key | type=17 target=1 upgrade=0 reward=0
+46 h5_unlock | Unlock Hangar 5 | type=18 target=1 upgrade=0 reward=0
+47 h5_move_20000kg | Move 20,000 kg of grain | type=15 target=20000 upgrade=0 reward=0
+48 h5_load_10000kg | Load 10,000 kg of grain onto the truck | type=10 target=10000 upgrade=0 reward=0
+49 h5_deliver_15000kg | Deliver 15,000 kg of grain | type=14 target=15000 upgrade=0 reward=0
+50 h5_clear_25 | Clear 25% of Hangar 5 | type=16 target=25 upgrade=0 reward=0
+51 h5_clear_50 | Clear 50% of Hangar 5 | type=16 target=50 upgrade=0 reward=0
+52 h5_clear_75 | Clear 75% of Hangar 5 | type=16 target=75 upgrade=0 reward=0
+53 h5_clear_95 | Finish clearing Hangar 5 | type=16 target=95 upgrade=0 reward=0
+54 final_load_shipment | Load the final 5,000 kg of grain | type=10 target=5000 upgrade=0 reward=0
+55 final_delivery | Deliver the final 5,000 kg of grain | type=14 target=5000 upgrade=0 reward=0
+56 final_return_warehouse | Return to the warehouse | type=19 target=1 upgrade=0 reward=0
+Motoroller 200 key=False
+Sorting sack 3 kg=50
+50 kg sack - fill with loaded shovel kg=50
+Sorting sack 2 kg=50
+FreeBag kg=10
+Sack kg=50

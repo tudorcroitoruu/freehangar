@@ -78,6 +78,8 @@ public class GoalsManager : MonoBehaviour
         {
             if (!progress.TryGetValue(goal.goalId, out var saved))
                 progress.Add(goal.goalId, saved = new GoalSettingsSave { goalId = goal.goalId });
+            if (goal.goalType == GoalType.UpgradePurchased && goal.upgradeType == GoalUpgradeType.Shovel &&
+                data.shovelUpgradeLevel > 0) saved.currentAmount = goal.goalAmount;
             if (!float.IsFinite(saved.currentAmount)) saved.currentAmount = 0;
             saved.currentAmount = saved.completed ? goal.goalAmount : Mathf.Clamp(saved.currentAmount, 0, goal.goalAmount);
             if (!saved.completed) saved.rewardClaimed = false;
@@ -254,7 +256,8 @@ public enum GoalUpgradeType
     Wheelbarrow = 2,
     HandCart = 3,
     LargerTruck = 4,
-    PalletJack = 5
+    PalletJack = 5,
+    Shovel = 6
 }
 
 public enum GoalProgressMode

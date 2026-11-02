@@ -44,6 +44,7 @@ public class SellingScreen : MonoBehaviour
         gameObject.SetActive(true);
         Refresh();
         AudioManager.Instance?.PlayConfirm();
+        GoalChecker.ReportValue(GoalType.BuyerReached, 1);
         return true;
     }
 
@@ -141,6 +142,9 @@ public class SellingScreen : MonoBehaviour
         }
         GameAchievements.GrainSold(quotedCash);
         SoldCargoAnimation.Begin(containers);
+        // Report only paid sales, after cargo is excluded from world saves.
+        GoalChecker.ReportProgress(GoalType.GrainSold, 1);
+        GoalChecker.ReportProgress(GoalType.MoneyEarned, quotedCash);
         Close();
     }
 

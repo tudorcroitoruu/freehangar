@@ -133,6 +133,7 @@ public sealed class BagInteraction : MonoBehaviour
         bag.transform.localPosition = -(uprightRotation * Vector3.Scale(localCenter, bag.transform.localScale));
         target = null;
         GameplayAudio.Instance?.PickUp();
+        if (!WorldSaveRuntime.IsRestoring) GoalChecker.ReportProgress(GoalType.SackPickedUp);
         return true;
     }
 
@@ -165,6 +166,11 @@ public sealed class BagInteraction : MonoBehaviour
         carried = null; target = null;
         RestoreShovelIfNeeded();
         Physics.SyncTransforms();
+        if (!WorldSaveRuntime.IsRestoring && bag.Kilograms > 0)
+        {
+            GoalChecker.ReportProgress(GoalType.SackLoaded);
+            GoalChecker.ReportProgress(GoalType.GrainLoaded, bag.Kilograms);
+        }
         GameplayAudio.Instance?.Drop();
         return true;
     }
@@ -173,6 +179,7 @@ public sealed class BagInteraction : MonoBehaviour
     {
         if (!FindDropPosition(out Vector3 center)) { blockedUntil = Time.time + 1f; return false; }
         Release(center);
+        if (!WorldSaveRuntime.IsRestoring) GoalChecker.ReportProgress(GoalType.SackPlaced);
         GameplayAudio.Instance?.Drop();
         return true;
     }
