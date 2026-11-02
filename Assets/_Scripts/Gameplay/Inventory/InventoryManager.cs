@@ -37,6 +37,24 @@ public class InventoryManager : MonoBehaviour
         item.ClearOwner();
     }
 
+    // Loading restores objects that already existed; the spawn limit only governs new deliveries.
+    internal InventoryItemInstance RegisterRestoredInstance(GameObject instance, string productID, int maxActiveInScene)
+    {
+        if (instance == null || string.IsNullOrWhiteSpace(productID)) return null;
+        var item = instance.GetComponent<InventoryItemInstance>();
+        if (item != null && item.Owner != null && item.Owner != this) return null;
+        if (item == null) item = instance.AddComponent<InventoryItemInstance>();
+        if (spawnedProducts.Contains(item))
+        {
+            if (item.ProductID != productID || item.MaxActiveInScene != maxActiveInScene)
+                item.Initialize(this, productID, maxActiveInScene);
+            return item;
+        }
+        item.Initialize(this, productID, maxActiveInScene);
+        spawnedProducts.Add(item);
+        return item;
+    }
+
     internal bool CanActivate(InventoryItemInstance item) => item.MaxActiveInScene <= 0 ||
         GetActiveCount(item.ProductID) <= item.MaxActiveInScene;
 

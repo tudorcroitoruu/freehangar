@@ -9,6 +9,7 @@ public sealed class InteractionPrompt : MonoBehaviour
     [SerializeField] private RectTransform panel;
     [SerializeField] private RectTransform canvasRect;
     [SerializeField] private TMP_Text description;
+    [SerializeField] private TMP_Text descriptionTwo;
     [SerializeField] private TMP_Text keycap;
     [SerializeField, Tooltip("Right mouse button indicator for pouring (legacy serialized field name).")]
     private GameObject mouseLeft;
@@ -55,6 +56,11 @@ public sealed class InteractionPrompt : MonoBehaviour
         if (!panel.gameObject.activeSelf) panel.gameObject.SetActive(true);
         CurrentText = data.Action;
         if (description != null && description.text != data.Action) description.text = data.Action;
+        if (descriptionTwo != null)
+        {
+            descriptionTwo.text = data.SecondaryDescription ?? "";
+            descriptionTwo.gameObject.SetActive(!string.IsNullOrEmpty(data.SecondaryDescription));
+        }
         bool showKey = data.ShowKey && !data.ShowPrimaryButton;
         string key = KeyLabel(data.InteractionKey);
         if (keycap != null && showKey && keycap.text != key) keycap.text = key;
@@ -106,6 +112,8 @@ public sealed class InteractionPrompt : MonoBehaviour
             // Clone the authored row to preserve its key background, font, and materials.
             var clone = Instantiate(panel, panel.parent);
             clone.name = "Interaction Action " + (actionRows.Count + 2);
+            var secondary = CopyOf(descriptionTwo != null ? descriptionTwo.transform : null, panel, clone);
+            if (secondary != null) secondary.gameObject.SetActive(false);
             foreach (var controller in clone.GetComponentsInChildren<InteractionPrompt>(true)) controller.enabled = false;
             var row = new ActionRow { panel = clone };
             var text = CopyOf(description != null ? description.transform : null, panel, clone);
@@ -146,6 +154,11 @@ public sealed class InteractionPrompt : MonoBehaviour
             if (row.panel != null) row.panel.gameObject.SetActive(false);
         }
         CurrentText = "";
+        if (descriptionTwo != null)
+        {
+            descriptionTwo.text = "";
+            descriptionTwo.gameObject.SetActive(false);
+        }
         if (description != null && description.text.Length > 0) description.text = "";
     }
 

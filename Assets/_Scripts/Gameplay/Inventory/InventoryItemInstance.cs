@@ -28,7 +28,7 @@ public sealed class InventoryItemInstance : MonoBehaviour
     private void OnEnable()
     {
         // Re-enabling an old instance must not exceed the limit after another one was delivered.
-        if (owner != null && !owner.CanActivate(this)) gameObject.SetActive(false);
+        if (!WorldSaveRuntime.IsRestoring && owner != null && !owner.CanActivate(this)) gameObject.SetActive(false);
     }
 
     private void OnDestroy()

@@ -7,6 +7,108 @@ using Object = UnityEngine.Object;
 
 public class WorldSaveTests
 {
+    [TestCase(false)]
+    [TestCase(true)]
+    public void SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects(bool recreate)
+    {
+        var originalScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        bool separateScene = !string.IsNullOrEmpty(originalScene.path);
+        var originalRoots = new System.Collections.Generic.HashSet<GameObject>(originalScene.GetRootGameObjects());
+        var scene = separateScene
+            ? UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Additive)
+            : originalScene;
+        var originalData = SaveSystem.Data;
+        bool wasLoaded = SaveSystem.savesLoaded;
+        var template = new GameObject("Saved bag template");
+        UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(template, originalScene);
+        template.SetActive(false);
+        template.AddComponent<GrainContainer>();
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        GameObject Create(string name)
+        {
+            var go = new GameObject(name);
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(go, scene);
+            return go;
+        }
+        try
+        {
+            SaveSystem.Data = new PlayerData();
+            SaveSystem.savesLoaded = false;
+            var manager = Create("Inventory").AddComponent<InventoryManager>();
+            var shop = Create("Free bag shop").AddComponent<ShopProduct>();
+            typeof(ShopProduct).GetField("productID", flags).SetValue(shop, "freeBags");
+            typeof(ShopProduct).GetField("objectPrefab", flags).SetValue(shop, template);
+            typeof(ShopProduct).GetField("maxActiveInScene", flags).SetValue(shop, 16);
+            var barrow = Create("Barrow").AddComponent<WheelbarrowCargo>();
+            var slot = Create("Bag slot").transform;
+            slot.SetParent(barrow.transform, false);
+            var loose = Create("Loose bag").AddComponent<GrainContainer>();
+            var loaded = Create("Loaded bag").AddComponent<GrainContainer>();
+            loaded.transform.SetParent(slot, false);
+            var inactive = Create("Inactive bag").AddComponent<GrainContainer>();
+            inactive.gameObject.SetActive(false);
+            var adapter = Create("Save adapter").AddComponent<WorldSaveRuntime>();
+            typeof(WorldSaveRuntime).GetMethod("Awake", flags).Invoke(adapter, null);
+            var saved = adapter.Capture();
+            string templateId = WorldSaveRuntime.Identity(template);
+            saved.bags.RemoveAll(bag => bag.id == templateId);
+            saved.authoredContainers.Remove(templateId);
+            Assert.AreEqual(2, saved.bags.Count);
+            Assert.AreEqual(1, saved.wheelbarrows[0].bags.Count);
+            if (recreate)
+            {
+                Object.DestroyImmediate(loose.gameObject);
+                Object.DestroyImmediate(loaded.gameObject);
+                Object.DestroyImmediate(inactive.gameObject);
+            }
+            var restore = typeof(WorldSaveRuntime).GetMethod("Restore", flags);
+            restore.Invoke(adapter, new object[] { saved });
+            Assert.AreEqual(3, manager.SpawnedProducts.Count);
+            Assert.AreEqual(2, manager.GetActiveCount("freeBags"));
+            Assert.AreEqual(0, manager.GetActiveCount("FreeBag"));
+            foreach (var item in manager.SpawnedProducts)
+            {
+                Assert.AreEqual("freeBags", item.ProductID);
+                Assert.AreEqual(16, typeof(InventoryItemInstance).GetProperty("MaxActiveInScene", flags).GetValue(item));
+            }
+            restore.Invoke(adapter, new object[] { saved });
+            Assert.AreEqual(3, manager.SpawnedProducts.Count, "Repeated restore must not duplicate inventory registrations.");
+            Object.DestroyImmediate(manager.SpawnedProducts[0].gameObject);
+            Assert.AreEqual(2, manager.SpawnedProducts.Count, "Destroyed restored bags must unregister normally.");
+        }
+        finally
+        {
+            if (separateScene) UnityEditor.SceneManagement.EditorSceneManager.CloseScene(scene, true);
+            else foreach (var go in scene.GetRootGameObjects())
+                if (!originalRoots.Contains(go)) Object.DestroyImmediate(go);
+            Object.DestroyImmediate(template);
+            UnityEngine.SceneManagement.SceneManager.SetActiveScene(originalScene);
+            SaveSystem.Data = originalData;
+            SaveSystem.savesLoaded = wasLoaded;
+        }
+    }
+
+    [Test]
+    public void RestoringSavedInventoryDoesNotApplyTheNewDeliveryLimit()
+    {
+        var root = new GameObject("Restored inventory limit");
+        try
+        {
+            var manager = root.AddComponent<InventoryManager>();
+            for (int i = 0; i < 2; i++)
+            {
+                var bag = new GameObject("Saved bag");
+                bag.transform.SetParent(root.transform);
+                Assert.IsNotNull(typeof(InventoryManager).GetMethod("RegisterRestoredInstance", BindingFlags.Instance | BindingFlags.NonPublic)
+                    .Invoke(manager, new object[] { bag, "freeBags", 1 }));
+            }
+            Assert.AreEqual(2, manager.GetActiveCount("freeBags"));
+            Assert.IsFalse(manager.CanSpawn("freeBags", 1));
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
+
     [Test]
     public void PartiallyBrokenBarrierRestoresHitProgress()
     {

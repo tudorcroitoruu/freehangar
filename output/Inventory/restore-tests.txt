@@ -1,0 +1,141 @@
+Saved inventory: Failed(Child); passed=42; failed=2; skipped=0
+ProductRemainingPromptTests.FullCapacityShowsZeroAndUnlimitedProductsHaveNoSecondaryDescription(True): Passed
+
+
+ProductRemainingPromptTests.FullCapacityShowsZeroAndUnlimitedProductsHaveNoSecondaryDescription(False): Passed
+
+
+ProductRemainingPromptTests.RemainingCapacityCountsOnlyActiveInstancesOfTheSameProduct(True): Passed
+
+
+ProductRemainingPromptTests.RemainingCapacityCountsOnlyActiveInstancesOfTheSameProduct(False): Passed
+
+
+ProductRemainingPromptTests.SecondaryDescriptionClearsWhenTargetChangesOrPromptHides: Passed
+
+
+ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn("money"): Passed
+
+
+ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn("prefab"): Passed
+
+
+ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn("point"): Passed
+
+
+ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn("limit"): Passed
+
+
+ShopPurchaseTests.BlockedShopPurchaseDoesNotChargeOrSpawn("hands"): Passed
+
+
+ShopPurchaseTests.CashAndOwnershipSurviveJsonRoundTrip: Passed
+
+
+ShopPurchaseTests.FailedDeliveryDoesNotCharge: Passed
+
+
+ShopPurchaseTests.InsufficientMoneyDoesNotChangeCashOrOwnership: Passed
+
+
+ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData(null,10): Passed
+
+
+ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData("",10): Passed
+
+
+ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData("   ",10): Passed
+
+
+ShopPurchaseTests.InvalidProductOrPriceDoesNotChangeData("crate",-10): Passed
+
+
+ShopPurchaseTests.InventoryPromptReflectsCurrentStock(0,"Crate\nOwn: 0",False): Passed
+
+
+ShopPurchaseTests.InventoryPromptReflectsCurrentStock(2,"Take 1 Crate\nLeft: 2",True): Passed
+
+
+ShopPurchaseTests.MissingCarrierOrSpawnPointDoesNotConsumeStock(Hands): Passed
+
+
+ShopPurchaseTests.MissingCarrierOrSpawnPointDoesNotConsumeStock(AtSpawnPoint): Passed
+
+
+ShopPurchaseTests.MissingInventoryAndUnknownProductsCannotBeTaken: Passed
+
+
+ShopPurchaseTests.OlderSaveWithoutProductListCanPurchase: Passed
+
+
+ShopPurchaseTests.ProductCountCannotOverflow: Passed
+
+
+ShopPurchaseTests.ProductsResolveManagerEvenWhenTheOldDepotIsDisabled(False): Passed
+
+
+ShopPurchaseTests.ProductsResolveManagerEvenWhenTheOldDepotIsDisabled(True): Passed
+
+
+ShopPurchaseTests.PurchaseWithExactMoneyAddsOneProduct: Passed
+
+
+ShopPurchaseTests.RepeatPurchaseIncrementsExistingEntryAndOtherProductsRemainSeparate: Passed
+
+
+ShopPurchaseTests.ShopDeliversImmediatelyWithoutAddingPickupStock(False): Passed
+
+
+ShopPurchaseTests.ShopDeliversImmediatelyWithoutAddingPickupStock(True): Passed
+
+
+ShopPurchaseTests.TakingLastProductKeepsZeroCountAndCannotTakeAgain: Passed
+
+
+ShopPurchaseTests.TakingOneProductLeavesOtherProductsUnchanged: Passed
+
+
+ShopPurchaseTests.UnlimitedProductIsVisibleAndCanBeTakenRepeatedlyWithoutSave: Passed
+
+
+WorldSaveTests.ContainerRestoresCropMassAndIdentityWithoutAwardingProgress: Passed
+
+
+WorldSaveTests.CutsceneSeekReconstructsCompletedShotsAndStopsAtSavedFraction: Passed
+
+
+WorldSaveTests.GrainGridAndCropStrataRoundTripWithoutRegrowingMaterial: Passed
+
+
+WorldSaveTests.LegacyCompressedWorldMigratesToNativeNestedLists: Passed
+
+
+WorldSaveTests.NativePlayerDataRoundTripsNestedVehicleCargo: Passed
+
+
+WorldSaveTests.PartiallyBrokenBarrierRestoresHitProgress: Passed
+
+
+WorldSaveTests.RestoringSavedInventoryDoesNotApplyTheNewDeliveryLimit: Passed
+
+
+WorldSaveTests.SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects(False): Failed:Error
+System.InvalidOperationException : Cannot create a new scene additively with an untitled scene unsaved.
+  at (wrapper managed-to-native) UnityEditor.SceneManagement.EditorSceneManager.NewScene_Injected(UnityEditor.SceneManagement.NewSceneSetup,UnityEditor.SceneManagement.NewSceneMode,UnityEngine.SceneManagement.Scene&)
+  at UnityEditor.SceneManagement.EditorSceneManager.NewScene (UnityEditor.SceneManagement.NewSceneSetup setup, UnityEditor.SceneManagement.NewSceneMode mode) [0x00000] in <a90f148a0c664ac8982a824605784e74>:0 
+  at WorldSaveTests.SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects (System.Boolean recreate) [0x00006] in D:\Own projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:15 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <41d29b352f6a475ab1bf7c6628b82790>:0 
+WorldSaveTests.SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects(True): Failed:Error
+System.InvalidOperationException : Cannot create a new scene additively with an untitled scene unsaved.
+  at (wrapper managed-to-native) UnityEditor.SceneManagement.EditorSceneManager.NewScene_Injected(UnityEditor.SceneManagement.NewSceneSetup,UnityEditor.SceneManagement.NewSceneMode,UnityEngine.SceneManagement.Scene&)
+  at UnityEditor.SceneManagement.EditorSceneManager.NewScene (UnityEditor.SceneManagement.NewSceneSetup setup, UnityEditor.SceneManagement.NewSceneMode mode) [0x00000] in <a90f148a0c664ac8982a824605784e74>:0 
+  at WorldSaveTests.SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects (System.Boolean recreate) [0x00006] in D:\Own projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:15 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <41d29b352f6a475ab1bf7c6628b82790>:0 
+WorldSaveTests.WorldIdentitySurvivesReparentAndVehicleReplacement: Passed
+
+
+WorldSaveTests.WorldRoundTripRestoresVehicleCargoAndDoesNotRespawnSoldBag: Passed
+
+

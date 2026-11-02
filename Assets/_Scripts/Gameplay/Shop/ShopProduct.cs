@@ -3,6 +3,7 @@ using UnityEngine;
 public class ShopProduct : MonoBehaviour, IInteractable
 {
     public string SaveProductId => productID;
+    public int MaxActiveInScene => maxActiveInScene;
     public enum DeliveryMode { Hands, AtSpawnPoint }
 
     [SerializeField] private string productID;
@@ -52,6 +53,13 @@ public class ShopProduct : MonoBehaviour, IInteractable
             transform.position + Vector3.up * .5f,
             $"{action} {productName}\n{price}",
             toBuy);
+        if (maxActiveInScene > 0)
+        {
+            if (inventoryManager == null) inventoryManager = GetComponentInParent<InventoryManager>(true);
+            if (inventoryManager == null) inventoryManager = FindFirstObjectByType<InventoryManager>(FindObjectsInactive.Include);
+            if (inventoryManager != null)
+                prompt.SecondaryDescription = $"Left: {Mathf.Max(0, maxActiveInScene - inventoryManager.GetActiveCount(productID))}/{maxActiveInScene}";
+        }
         return true;
     }
 
