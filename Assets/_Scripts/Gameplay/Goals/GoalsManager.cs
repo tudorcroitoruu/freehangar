@@ -8,6 +8,7 @@ public class GoalsManager : MonoBehaviour
 {
     [SerializeField] private CanvasGroup ownCanvasGroup;
     [SerializeField] private GoalListElement goalListElementPrefab;
+    [SerializeField] private Transform goalListElementParent;
 
     [Tooltip("Goals are played one at a time, in this array's order.")]
     [SerializeField] private GoalSettings[] allGoalSettings;
@@ -44,6 +45,7 @@ public class GoalsManager : MonoBehaviour
         }
         Instance = this;
         GoalChecker.ActionReported += ProcessAction;
+        RefreshNavigationIndicators();
     }
 
     private void Update()
@@ -163,6 +165,7 @@ public class GoalsManager : MonoBehaviour
 
     private void RefreshGoal()
     {
+        RefreshNavigationIndicators();
         if (Application.isPlaying && currentElement == null && goalListElementPrefab != null)
             currentElement = Instantiate(goalListElementPrefab, transform);
         if (currentElement != null)
@@ -171,6 +174,17 @@ public class GoalsManager : MonoBehaviour
             if (currentGoal != null) currentElement.SetGoal(currentGoal, CurrentProgress);
         }
         GoalChanged?.Invoke();
+    }
+
+    private void RefreshNavigationIndicators()
+    {
+        var activeIndicator = isActiveAndEnabled && initialized ? currentGoal?.navigationIndicator : null;
+        foreach (var goal in allGoalSettings ?? Array.Empty<GoalSettings>())
+        {
+            var indicator = goal?.navigationIndicator;
+            if (indicator != null && indicator.activeSelf != (indicator == activeIndicator))
+                indicator.SetActive(indicator == activeIndicator);
+        }
     }
 
     private void MarkDirty()
@@ -188,7 +202,11 @@ public class GoalsManager : MonoBehaviour
     private void OnDisable()
     {
         GoalChecker.ActionReported -= ProcessAction;
-        if (Instance == this) Instance = null;
+        if (Instance == this)
+        {
+            RefreshNavigationIndicators();
+            Instance = null;
+        }
     }
 }
 
@@ -199,6 +217,8 @@ public class GoalSettings
     public string goalId;
     [TextArea]
     public string goalDescription;
+    [Tooltip("Optional scene object with HUDNavigationElement. Active only while this goal is current.")]
+    public GameObject navigationIndicator;
     public GoalStage stage;
     [Tooltip("Target hangar, numbered 1 through 5. Zero means any hangar.")]
     [Range(0, 5)] public int hangarId;

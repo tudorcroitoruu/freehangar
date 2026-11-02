@@ -57,6 +57,37 @@ public sealed class GrainEconomySettingsEditor : Editor
         }
         if (economy.ExpectedBalance < 0) EditorGUILayout.HelpBox("Expected income does not cover all upgrades and containers.", MessageType.Warning);
         EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Grain and revenue per hangar (read only)", EditorStyles.boldLabel);
+        using (new EditorGUI.DisabledScope(true))
+        {
+            foreach (var hangar in (economy.hangars ?? Array.Empty<GrainEconomySettings.HangarStock>())
+                         .Where(h => h != null).OrderBy(h => h.hangarId))
+            {
+                double gross = 0, expected = 0;
+                for (int i = 0; i < GrainCargo.TypeCount; i++)
+                {
+                    var row = economy.ForecastCrop((GrainType)i, hangar);
+                    gross += row.grossRevenue;
+                    expected += row.expectedRevenue;
+                }
+                EditorGUILayout.LabelField("Hangar " + hangar.hangarId, EditorStyles.boldLabel);
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    EditorGUILayout.LabelField("Collectible kg: stock / consume multiplier", EditorStyles.miniLabel);
+                    double totalKg = 0;
+                    for (int i = 0; i < GrainCargo.TypeCount; i++)
+                    {
+                        var row = economy.ForecastCrop((GrainType)i, hangar);
+                        ReadOnlyNumber($"{(GrainType)i} kg", row.collectibleKg);
+                        totalKg += row.collectibleKg;
+                    }
+                    ReadOnlyNumber("Total collectible kg", totalKg);
+                    ReadOnlyNumber("Revenue before pests $", gross);
+                    ReadOnlyNumber("Revenue after pests $", expected);
+                }
+            }
+        }
+        EditorGUILayout.Space();
         EditorGUILayout.LabelField("Revenue per crop: expected / before pests", EditorStyles.boldLabel);
         for (int i = 0; i < GrainCargo.TypeCount; i++)
         {

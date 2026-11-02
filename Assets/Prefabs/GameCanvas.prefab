@@ -1968,6 +1968,7 @@ RectTransform:
   - {fileID: 6621555504700204998}
   - {fileID: 8513946829808345699}
   - {fileID: 3124916920602614667}
+  - {fileID: 957061658937698710}
   - {fileID: 1690666750351828640}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7362,6 +7363,479 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &2056800010655040191
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 957061658937698710}
+  - component: {fileID: 6101090569962030428}
+  m_Layer: 0
+  m_Name: GoalManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &957061658937698710
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056800010655040191}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7869879496375858122}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &6101090569962030428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056800010655040191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce5a1c30ca075944bb504e3e384e6312, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoalsManager
+  ownCanvasGroup: {fileID: 1565413576031007509}
+  goalListElementPrefab: {fileID: 9127069809935293017, guid: 3c4689e74f074194a8ec970ce4ef62c9, type: 3}
+  goalListElementParent: {fileID: 5681441617593288026}
+  allGoalSettings:
+  - goalId: tutorial_pick_up_bag
+    goalDescription: Pick up an empty bag
+    navigationIndicator: {fileID: 0}
+    stage: 0
+    hangarId: 0
+    goalType: 4
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 0
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: tutorial_place_bag
+    goalDescription: Place the bag near the grain
+    navigationIndicator: {fileID: 0}
+    stage: 0
+    hangarId: 0
+    goalType: 5
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 0
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: tutorial_fill_corn_bag
+    goalDescription: Fill the bag with grain.
+    navigationIndicator: {fileID: 0}
+    stage: 0
+    hangarId: 0
+    goalType: 7
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 15
+    rewardAmount: 0
+  - goalId: tutorial_close_bag
+    goalDescription: Close the grain bag.
+    navigationIndicator: {fileID: 0}
+    stage: 0
+    hangarId: 0
+    goalType: 8
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: tutorial_grab_and_load_bag
+    goalDescription: Grab the bag and load it onto the bicycle
+    navigationIndicator: {fileID: 0}
+    stage: 0
+    hangarId: 0
+    goalType: 9
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: tutorial_reach_buyer
+    goalDescription: Drive to the grain buyer
+    navigationIndicator: {fileID: 0}
+    stage: 0
+    hangarId: 0
+    goalType: 11
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: tutorial_sell_corn
+    goalDescription: Sell your first load of grain
+    navigationIndicator: {fileID: 0}
+    stage: 0
+    hangarId: 0
+    goalType: 12
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: tutorial_upgrade_shovel
+    goalDescription: Visit the base and upgrade your shovel.
+    navigationIndicator: {fileID: 0}
+    stage: 0
+    hangarId: 0
+    goalType: 13
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 6
+    progressMode: 1
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: upgrade_larger_sack
+    goalDescription: Buy a larger bag
+    navigationIndicator: {fileID: 0}
+    stage: 3
+    hangarId: 1
+    goalType: 13
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 1
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: h1_deliver_200kg
+    goalDescription: Deliver 200 kg of grain
+    navigationIndicator: {fileID: 0}
+    stage: 1
+    hangarId: 1
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 200
+    rewardAmount: 0
+  - goalId: h1_earn_500
+    goalDescription: Earn $500 from grain sales
+    navigationIndicator: {fileID: 0}
+    stage: 1
+    hangarId: 1
+    goalType: 1
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 500
+    rewardAmount: 0
+  - goalId: h2_collect_key
+    goalDescription: Collect the Hangar 2 key
+    navigationIndicator: {fileID: 0}
+    stage: 1
+    hangarId: 2
+    goalType: 17
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: h1_clear
+    goalDescription: Finish clearing Hangar 1
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 1
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 100
+    rewardAmount: 0
+  - goalId: h2_unlock
+    goalDescription: Unlock Hangar 2
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 2
+    goalType: 18
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: h2_load_2000kg
+    goalDescription: Load 2,000 kg of grain onto the truck
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 2
+    goalType: 10
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 2000
+    rewardAmount: 0
+  - goalId: h2_deliver_5000kg
+    goalDescription: Deliver 5000 kg of grain
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 2
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 5000
+    rewardAmount: 0
+  - goalId: upgrade_larger_truck
+    goalDescription: Upgrade the vehicle.
+    navigationIndicator: {fileID: 0}
+    stage: 3
+    hangarId: 2
+    goalType: 13
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 4
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: h3_collect_key
+    goalDescription: Collect the Hangar 3 key
+    navigationIndicator: {fileID: 0}
+    stage: 1
+    hangarId: 3
+    goalType: 17
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: h2_clear
+    goalDescription: Finish clearing Hangar 2
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 2
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 100
+    rewardAmount: 0
+  - goalId: h3_unlock
+    goalDescription: Unlock Hangar 3
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 3
+    goalType: 18
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: h3_deliver_7500kg
+    goalDescription: Deliver 7,500 kg of grain
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 3
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 7500
+    rewardAmount: 0
+  - goalId: h3_deliver_10000kg
+    goalDescription: Deliver 10,000 kg of grain
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 3
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 10000
+    rewardAmount: 0
+  - goalId: h3_clear
+    goalDescription: Finish clearing Hangar 3
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 3
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 2
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 100
+    rewardAmount: 0
+  - goalId: h4_collect_key
+    goalDescription: Collect the Hangar 4 key
+    navigationIndicator: {fileID: 0}
+    stage: 1
+    hangarId: 4
+    goalType: 17
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: h4_unlock
+    goalDescription: Unlock Hangar 4
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 4
+    goalType: 18
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: h4_deliver_10000kg
+    goalDescription: Deliver 10,000 kg of grain
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 4
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 10000
+    rewardAmount: 0
+  - goalId: h4_deliver_soybeans_5000kg
+    goalDescription: Deliver 5,000 kg of Soybeans
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 4
+    goalType: 14
+    filterByGrainType: 1
+    grainType: 7
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 5000
+    rewardAmount: 0
+  - goalId: h4_clear_98
+    goalDescription: Finish clearing Hangar 4
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 4
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 7
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 98
+    rewardAmount: 0
+  - goalId: h5_collect_key
+    goalDescription: Collect the final hangar key
+    navigationIndicator: {fileID: 0}
+    stage: 1
+    hangarId: 5
+    goalType: 17
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: h5_unlock
+    goalDescription: Unlock Hangar 5
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 5
+    goalType: 18
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: h5_deliver_rice_5000kg
+    goalDescription: Deliver 5,000 kg of rice
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 5
+    goalType: 14
+    filterByGrainType: 1
+    grainType: 5
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 5000
+    rewardAmount: 0
+  - goalId: h5_deliver_15000kg
+    goalDescription: Deliver 15,000 kg of grain.
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 5
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 15000
+    rewardAmount: 0
+  - goalId: h5_deliver_20000kg
+    goalDescription: Deliver 20,000 kg of grain
+    navigationIndicator: {fileID: 0}
+    stage: 2
+    hangarId: 5
+    goalType: 14
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 20000
+    rewardAmount: 0
+  - goalId: h5_find_out_what_is_behind_Door
+    goalDescription: Find out what is behind secret door.
+    navigationIndicator: {fileID: 0}
+    stage: 4
+    hangarId: 5
+    goalType: 16
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 2
+    goalAmount: 98
+    rewardAmount: 0
+  currentGoal:
+    goalId: tutorial_pick_up_sack
+    goalDescription: Pick up an empty bag
+    navigationIndicator: {fileID: 0}
+    stage: 0
+    hangarId: 1
+    goalType: 4
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 0
+    progressMode: 0
+    goalAmount: 1
+    rewardAmount: 0
 --- !u!1 &2069782557585117210
 GameObject:
   m_ObjectHideFlags: 0
@@ -16197,7 +16671,6 @@ GameObject:
   - component: {fileID: 5681441617593288026}
   - component: {fileID: 9177764113896427486}
   - component: {fileID: 8900705061378280487}
-  - component: {fileID: 6087155364332289459}
   - component: {fileID: 4495496357448387448}
   - component: {fileID: 7600003791489127831}
   - component: {fileID: 1565413576031007509}
@@ -16266,660 +16739,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6087155364332289459
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4657142445557162779}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce5a1c30ca075944bb504e3e384e6312, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GoalsManager
-  ownCanvasGroup: {fileID: 1565413576031007509}
-  goalListElementPrefab: {fileID: 9127069809935293017, guid: 3c4689e74f074194a8ec970ce4ef62c9, type: 3}
-  allGoalSettings:
-  - goalId: tutorial_pick_up_sack
-    goalDescription: Pick up an empty bag
-    stage: 0
-    hangarId: 1
-    goalType: 4
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 0
-    goalAmount: 1
-    rewardAmount: 0
-  - goalId: tutorial_place_sack
-    goalDescription: Place the bag near the grain
-    stage: 0
-    hangarId: 1
-    goalType: 5
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 0
-    goalAmount: 1
-    rewardAmount: 0
-  - goalId: tutorial_equip_shovel
-    goalDescription: Equip your shovel
-    stage: 0
-    hangarId: 1
-    goalType: 6
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 0
-  - goalId: tutorial_fill_corn_sack
-    goalDescription: Fill a bag with 50 kg of grain
-    stage: 0
-    hangarId: 1
-    goalType: 7
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 50
-    rewardAmount: 25
-  - goalId: tutorial_close_sack
-    goalDescription: Close the grain bag
-    stage: 0
-    hangarId: 1
-    goalType: 8
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 1
-    rewardAmount: 0
-  - goalId: tutorial_load_sack
-    goalDescription: Load the grain bag onto the truck
-    stage: 0
-    hangarId: 1
-    goalType: 9
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 1
-    rewardAmount: 25
-  - goalId: tutorial_load_200kg_corn
-    goalDescription: Load 200 kg of grain onto the truck
-    stage: 0
-    hangarId: 1
-    goalType: 10
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 200
-    rewardAmount: 50
-  - goalId: tutorial_reach_buyer
-    goalDescription: Drive to the grain buyer
-    stage: 0
-    hangarId: 1
-    goalType: 11
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 0
-  - goalId: tutorial_sell_corn
-    goalDescription: Sell your first load of grain
-    stage: 0
-    hangarId: 1
-    goalType: 12
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 1
-    rewardAmount: 50
-  - goalId: h1_earn_500
-    goalDescription: Earn $500 from grain sales
-    stage: 1
-    hangarId: 1
-    goalType: 1
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 500
-    rewardAmount: 100
-  - goalId: upgrade_larger_sack
-    goalDescription: Buy a larger bag
-    stage: 3
-    hangarId: 1
-    goalType: 13
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 1
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 100
-  - goalId: h1_deliver_500kg
-    goalDescription: Deliver 500 kg of grain
-    stage: 1
-    hangarId: 1
-    goalType: 14
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 500
-    rewardAmount: 100
-  - goalId: upgrade_wheelbarrow
-    goalDescription: Buy a wheelbarrow
-    stage: 3
-    hangarId: 1
-    goalType: 13
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 2
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 100
-  - goalId: h1_move_1000kg
-    goalDescription: Move 1,000 kg of grain
-    stage: 1
-    hangarId: 1
-    goalType: 15
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 1000
-    rewardAmount: 150
-  - goalId: h1_clear_25
-    goalDescription: Clear 25% of Hangar 1
-    stage: 2
-    hangarId: 1
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 25
-    rewardAmount: 50
-  - goalId: h1_clear_50
-    goalDescription: Clear 50% of Hangar 1
-    stage: 2
-    hangarId: 1
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 50
-    rewardAmount: 100
-  - goalId: h1_clear_75
-    goalDescription: Clear 75% of Hangar 1
-    stage: 2
-    hangarId: 1
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 75
-    rewardAmount: 150
-  - goalId: h1_clear_95
-    goalDescription: Finish clearing Hangar 1
-    stage: 2
-    hangarId: 1
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 95
-    rewardAmount: 300
-  - goalId: h2_collect_key
-    goalDescription: Collect the Hangar 2 key
-    stage: 1
-    hangarId: 2
-    goalType: 17
-    filterByGrainType: 0
-    grainType: 1
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 50
-  - goalId: h2_unlock
-    goalDescription: Unlock Hangar 2
-    stage: 2
-    hangarId: 2
-    goalType: 18
-    filterByGrainType: 0
-    grainType: 1
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 100
-  - goalId: h2_fill_large_sack
-    goalDescription: Fill a large bag with 100 kg of grain
-    stage: 2
-    hangarId: 2
-    goalType: 7
-    filterByGrainType: 0
-    grainType: 1
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 100
-    rewardAmount: 100
-  - goalId: h2_load_1000kg
-    goalDescription: Load 1,000 kg of grain onto the truck
-    stage: 2
-    hangarId: 2
-    goalType: 10
-    filterByGrainType: 0
-    grainType: 1
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 1000
-    rewardAmount: 150
-  - goalId: h2_deliver_2500kg
-    goalDescription: Deliver 2,500 kg of grain
-    stage: 2
-    hangarId: 2
-    goalType: 14
-    filterByGrainType: 0
-    grainType: 1
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 2500
-    rewardAmount: 250
-  - goalId: upgrade_hand_cart
-    goalDescription: Buy a hand cart
-    stage: 3
-    hangarId: 2
-    goalType: 13
-    filterByGrainType: 0
-    grainType: 1
-    upgradeType: 3
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 150
-  - goalId: upgrade_larger_truck
-    goalDescription: Buy a larger truck
-    stage: 3
-    hangarId: 2
-    goalType: 13
-    filterByGrainType: 0
-    grainType: 1
-    upgradeType: 4
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 200
-  - goalId: h2_clear_50
-    goalDescription: Clear 50% of Hangar 2
-    stage: 2
-    hangarId: 2
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 1
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 50
-    rewardAmount: 200
-  - goalId: h2_clear_75
-    goalDescription: Clear 75% of Hangar 2
-    stage: 2
-    hangarId: 2
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 1
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 75
-    rewardAmount: 250
-  - goalId: h2_clear_95
-    goalDescription: Finish clearing Hangar 2
-    stage: 2
-    hangarId: 2
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 1
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 95
-    rewardAmount: 500
-  - goalId: h3_collect_key
-    goalDescription: Collect the Hangar 3 key
-    stage: 1
-    hangarId: 3
-    goalType: 17
-    filterByGrainType: 0
-    grainType: 2
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 100
-  - goalId: h3_unlock
-    goalDescription: Unlock Hangar 3
-    stage: 2
-    hangarId: 3
-    goalType: 18
-    filterByGrainType: 0
-    grainType: 2
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 150
-  - goalId: h3_move_5000kg
-    goalDescription: Move 5,000 kg of grain
-    stage: 2
-    hangarId: 3
-    goalType: 15
-    filterByGrainType: 0
-    grainType: 2
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 5000
-    rewardAmount: 300
-  - goalId: upgrade_pallet_jack
-    goalDescription: Buy a pallet jack
-    stage: 3
-    hangarId: 3
-    goalType: 13
-    filterByGrainType: 0
-    grainType: 2
-    upgradeType: 5
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 250
-  - goalId: h3_load_2500kg
-    goalDescription: Load 2,500 kg of grain onto the truck
-    stage: 2
-    hangarId: 3
-    goalType: 10
-    filterByGrainType: 0
-    grainType: 2
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 2500
-    rewardAmount: 250
-  - goalId: h3_deliver_5000kg
-    goalDescription: Deliver 5,000 kg of grain
-    stage: 2
-    hangarId: 3
-    goalType: 14
-    filterByGrainType: 0
-    grainType: 2
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 5000
-    rewardAmount: 400
-  - goalId: h3_clear_50
-    goalDescription: Clear 50% of Hangar 3
-    stage: 2
-    hangarId: 3
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 2
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 50
-    rewardAmount: 300
-  - goalId: h3_clear_75
-    goalDescription: Clear 75% of Hangar 3
-    stage: 2
-    hangarId: 3
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 2
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 75
-    rewardAmount: 400
-  - goalId: h3_clear_95
-    goalDescription: Finish clearing Hangar 3
-    stage: 2
-    hangarId: 3
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 2
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 95
-    rewardAmount: 750
-  - goalId: h4_collect_key
-    goalDescription: Collect the Hangar 4 key
-    stage: 1
-    hangarId: 4
-    goalType: 17
-    filterByGrainType: 0
-    grainType: 7
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 150
-  - goalId: h4_unlock
-    goalDescription: Unlock Hangar 4
-    stage: 2
-    hangarId: 4
-    goalType: 18
-    filterByGrainType: 0
-    grainType: 7
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 200
-  - goalId: h4_move_10000kg
-    goalDescription: Move 10,000 kg of grain
-    stage: 2
-    hangarId: 4
-    goalType: 15
-    filterByGrainType: 0
-    grainType: 7
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 10000
-    rewardAmount: 400
-  - goalId: h4_load_5000kg
-    goalDescription: Load 5,000 kg of grain onto the truck
-    stage: 2
-    hangarId: 4
-    goalType: 10
-    filterByGrainType: 0
-    grainType: 7
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 5000
-    rewardAmount: 350
-  - goalId: h4_deliver_10000kg
-    goalDescription: Deliver 10,000 kg of grain
-    stage: 2
-    hangarId: 4
-    goalType: 14
-    filterByGrainType: 0
-    grainType: 7
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 10000
-    rewardAmount: 600
-  - goalId: h4_clear_50
-    goalDescription: Clear 50% of Hangar 4
-    stage: 2
-    hangarId: 4
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 7
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 50
-    rewardAmount: 400
-  - goalId: h4_clear_75
-    goalDescription: Clear 75% of Hangar 4
-    stage: 2
-    hangarId: 4
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 7
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 75
-    rewardAmount: 500
-  - goalId: h4_clear_95
-    goalDescription: Finish clearing Hangar 4
-    stage: 2
-    hangarId: 4
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 7
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 95
-    rewardAmount: 1000
-  - goalId: h5_collect_key
-    goalDescription: Collect the final hangar key
-    stage: 1
-    hangarId: 5
-    goalType: 17
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 200
-  - goalId: h5_unlock
-    goalDescription: Unlock Hangar 5
-    stage: 2
-    hangarId: 5
-    goalType: 18
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 250
-  - goalId: h5_move_20000kg
-    goalDescription: Move 20,000 kg of grain
-    stage: 2
-    hangarId: 5
-    goalType: 15
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 20000
-    rewardAmount: 600
-  - goalId: h5_load_10000kg
-    goalDescription: Load 10,000 kg of grain onto the truck
-    stage: 2
-    hangarId: 5
-    goalType: 10
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 10000
-    rewardAmount: 500
-  - goalId: h5_deliver_15000kg
-    goalDescription: Deliver 15,000 kg of grain
-    stage: 2
-    hangarId: 5
-    goalType: 14
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 1
-    goalAmount: 15000
-    rewardAmount: 750
-  - goalId: h5_clear_25
-    goalDescription: Clear 25% of Hangar 5
-    stage: 4
-    hangarId: 5
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 25
-    rewardAmount: 300
-  - goalId: h5_clear_50
-    goalDescription: Clear 50% of Hangar 5
-    stage: 4
-    hangarId: 5
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 50
-    rewardAmount: 500
-  - goalId: h5_clear_75
-    goalDescription: Clear 75% of Hangar 5
-    stage: 4
-    hangarId: 5
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 75
-    rewardAmount: 750
-  - goalId: h5_clear_95
-    goalDescription: Finish clearing Hangar 5
-    stage: 4
-    hangarId: 5
-    goalType: 16
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 2
-    goalAmount: 95
-    rewardAmount: 1500
-  - goalId: final_load_shipment
-    goalDescription: Load the final 5,000 kg of grain
-    stage: 4
-    hangarId: 5
-    goalType: 10
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 0
-    goalAmount: 5000
-    rewardAmount: 750
-  - goalId: final_delivery
-    goalDescription: Deliver the final 5,000 kg of grain
-    stage: 4
-    hangarId: 5
-    goalType: 14
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 0
-    goalAmount: 5000
-    rewardAmount: 1000
-  - goalId: final_return_warehouse
-    goalDescription: Return to the warehouse
-    stage: 4
-    hangarId: 5
-    goalType: 19
-    filterByGrainType: 0
-    grainType: 8
-    upgradeType: 0
-    progressMode: 0
-    goalAmount: 1
-    rewardAmount: 2000
-  currentGoal:
-    goalId: tutorial_pick_up_sack
-    goalDescription: Pick up an empty bag
-    stage: 0
-    hangarId: 1
-    goalType: 4
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 0
-    progressMode: 0
-    goalAmount: 1
-    rewardAmount: 0
 --- !u!114 &4495496357448387448
 MonoBehaviour:
   m_ObjectHideFlags: 0
