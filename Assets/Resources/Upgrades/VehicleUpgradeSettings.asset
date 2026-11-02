@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb2c4301ad1a89d4dabefa1f2beda8f2, type: 3}
   m_Name: VehicleUpgradeSettings
   m_EditorClassIdentifier: Assembly-CSharp::VehicleUpgradeSettings
+  upgradeEffect: {fileID: 9158635742410941698, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
   vehicles:
   - id: bicycle
     displayName: Bicycle

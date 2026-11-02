@@ -6,6 +6,9 @@ public sealed class VehicleUpgradeSettings : ScriptableObject
 {
     public const string ResourcePath = "Upgrades/VehicleUpgradeSettings";
 
+    [Tooltip("World-space effect played at the new vehicle's center after a successful upgrade purchase.")]
+    public GameObject upgradeEffect;
+
     [Serializable]
     public sealed class CargoPose
     {

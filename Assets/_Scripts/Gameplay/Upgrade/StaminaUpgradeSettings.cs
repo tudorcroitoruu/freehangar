@@ -4,6 +4,8 @@ using UnityEngine;
 public sealed class StaminaUpgradeSettings : ScriptableObject
 {
     public const string ResourcePath = "Upgrades/StaminaUpgradeSettings";
+    [Tooltip("World-space effect played around the player after a successful stamina upgrade.")]
+    public GameObject upgradeEffect;
     [Min(.01f)] public float baseStamina = 100f;
     [Min(.01f)] public float staminaPerUpgrade = 25f;
     [Tooltip("One price per upgrade. Zero means Free.")]

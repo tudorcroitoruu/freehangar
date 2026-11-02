@@ -57,8 +57,28 @@ public class UpgradeStamina : MonoBehaviour
         int level = SaveSystem.Data.staminaUpgradeLevel;
         if (level < 0 || level >= settings.MaxUpgrades) return false;
         bool purchased = SaveSystem.TryPurchaseStaminaUpgrade(settings.Price(level), level, settings.MaxUpgrades);
+        if (purchased && Application.isPlaying) PlayUpgradeEffect();
         Refresh();
         return purchased;
+    }
+
+    private void PlayUpgradeEffect()
+    {
+        if (settings.upgradeEffect == null) return;
+        var player = FindFirstObjectByType<PlayerController>();
+        if (player == null) return;
+        var controller = player.GetComponent<CharacterController>();
+        Vector3 center = controller != null ? controller.transform.TransformPoint(controller.center) : player.transform.position;
+        var effect = Instantiate(settings.upgradeEffect, center, settings.upgradeEffect.transform.rotation);
+        float lifetime = 0f;
+        foreach (var particles in effect.GetComponentsInChildren<ParticleSystem>(true))
+        {
+            var main = particles.main;
+            main.loop = false;
+            lifetime = Mathf.Max(lifetime, (main.startDelay.constantMax + main.duration + main.startLifetime.constantMax)
+                / Mathf.Max(.01f, main.simulationSpeed));
+        }
+        Destroy(effect, Mathf.Max(.1f, lifetime));
     }
 
     public void Refresh()

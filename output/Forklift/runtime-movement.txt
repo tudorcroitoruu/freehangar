@@ -1225,3 +1225,11 @@ time=296.58 throttle=0 speed=0 riderMounted=False ridden=False position=(10.27, 
 motor cache=Forklift (MotorollerController)
 time=296.58 throttle=0 speed=0 riderMounted=False ridden=False position=(10.27, 0.18, 28.77) focus=False cursor=None dt=0 scale=0 loading=False upgrade=False popup=False playerEnabled=True discovery=False
 motor cache=Forklift (MotorollerController)
+time=30,31 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0,0144133 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=30,56 throttle=1 speed=0,4927588 riderMounted=True ridden=True position=(9.98, 0.18, 18.90) focus=True cursor=Locked dt=0,0155997 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=30,82 throttle=0 speed=0,3111773 riderMounted=True ridden=True position=(9.98, 0.18, 19.03) focus=True cursor=Locked dt=0,0158611 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=31,08 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.18, 19.05) focus=True cursor=Locked dt=0,0326645 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)

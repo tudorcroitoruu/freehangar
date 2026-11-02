@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 865490475d7c449792fe4157fef401e2, type: 3}
   m_Name: StaminaUpgradeSettings
   m_EditorClassIdentifier: Assembly-CSharp::StaminaUpgradeSettings
+  upgradeEffect: {fileID: 9158635742410941698, guid: 0767fdb081295684aa29dc66fa58825d, type: 3}
   baseStamina: 100
   staminaPerUpgrade: 25
   prices: 4b000000900100000807000070170000

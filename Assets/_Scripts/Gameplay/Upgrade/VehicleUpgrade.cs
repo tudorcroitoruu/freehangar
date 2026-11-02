@@ -101,8 +101,39 @@ public sealed class VehicleUpgrade : MonoBehaviour
             if (next != null) ReleaseObject(next.AssemblyRoot);
             return false;
         }
-        if (next != null) ActivateReplacement(next);
+        if (next != null)
+        {
+            ActivateReplacement(next);
+            next.PlayUpgradeEffect();
+        }
         return true;
+    }
+
+    private void PlayUpgradeEffect()
+    {
+        if (settings == null || settings.upgradeEffect == null) return;
+        Bounds bounds = new Bounds(transform.position, Vector3.zero);
+        bool hasBounds = false;
+        foreach (var renderer in AssemblyRoot.GetComponentsInChildren<Renderer>())
+        {
+            if (!renderer.enabled || !(renderer is MeshRenderer || renderer is SkinnedMeshRenderer)) continue;
+            if (!hasBounds) { bounds = renderer.bounds; hasBounds = true; }
+            else bounds.Encapsulate(renderer.bounds);
+        }
+
+        var effect = Instantiate(settings.upgradeEffect, bounds.center, settings.upgradeEffect.transform.rotation);
+        // The authored cylinder has a radius of about 1.2 metres. Enclose larger vehicles too.
+        float scale = Mathf.Max(1f, Mathf.Max(bounds.extents.x, bounds.extents.z) / 1.2f);
+        effect.transform.localScale *= scale;
+        float lifetime = 0f;
+        foreach (var particles in effect.GetComponentsInChildren<ParticleSystem>(true))
+        {
+            var main = particles.main;
+            main.loop = false;
+            lifetime = Mathf.Max(lifetime, (main.startDelay.constantMax + main.duration + main.startLifetime.constantMax)
+                / Mathf.Max(.01f, main.simulationSpeed));
+        }
+        Destroy(effect, Mathf.Max(.1f, lifetime));
     }
 
     public bool TryAdvanceToUnlockedVehicle()

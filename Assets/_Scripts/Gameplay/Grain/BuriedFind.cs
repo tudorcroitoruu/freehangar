@@ -239,6 +239,8 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
 
     private IEnumerator OpenChest()
     {
+        // Capture the closed chest's center before the lid changes its visual bounds.
+        Vector3 effectOrigin = VisualBounds().center;
         if (keySocket != null && insertionKeyPrefab != null)
         {
             Quaternion facing = Quaternion.LookRotation(-keySocket.forward, keySocket.up);
@@ -272,8 +274,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
                 if (!CommitReward()) { CancelPresentation(); yield break; }
                 committed = true;
                 GameplayAudio.Instance?.PerkFound();
-                // Spawn above the body, where the open lid cannot hide the treasure burst.
-                DiscoveryBurst.Play(pickupEffect, originalPosition + Vector3.up * Mathf.Max(.45f, VisualBounds().size.y * .65f), Receipt(), view);
+                DiscoveryBurst.Play(pickupEffect, effectOrigin, Receipt(), view);
             }
             yield return null;
         }
