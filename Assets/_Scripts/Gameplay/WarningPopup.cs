@@ -10,7 +10,8 @@ public enum WarningType
     CrowsAttack,
     BlockHangarEntry,
     VehicleFull,
-    BlockVehicleExit
+    BlockVehicleExit,
+    OccupiedHands
 }
 public class WarningPopup : MonoBehaviour
 {

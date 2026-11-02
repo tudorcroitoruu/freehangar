@@ -7,6 +7,7 @@ public class FreeHandsWarningTests
     private GameObject root;
     private GameplayCanvas canvas;
     private CanvasGroup warning;
+    private WarningPopup popup;
 
     [SetUp]
     public void SetUp()
@@ -16,8 +17,10 @@ public class FreeHandsWarningTests
         var warningObject = new GameObject("Warning", typeof(CanvasGroup));
         warningObject.transform.SetParent(root.transform);
         warning = warningObject.GetComponent<CanvasGroup>();
-        typeof(GameplayCanvas).GetField("freeHandsWarning", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(canvas, warning);
-        typeof(GameplayCanvas).GetField("freeHandsFadeDuration", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(canvas, .2f);
+        popup = warningObject.AddComponent<WarningPopup>();
+        typeof(WarningPopup).GetField("warningCanvasGroup", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(popup, warning);
+        typeof(GameplayCanvas).GetField("warningPopup", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(canvas, popup);
+        popup.Initialize();
         Call("ResetFreeHandsWarning");
     }
 
@@ -29,17 +32,19 @@ public class FreeHandsWarningTests
     {
         Assert.AreEqual(0f, warning.alpha);
         canvas.SetFreeHandsWarning(true);
-        Call("FadeFreeHandsWarning", .1f);
+        popup.Tick(.1f);
+        Assert.AreEqual(WarningType.OccupiedHands, popup.CurrentType);
         Assert.That(warning.alpha, Is.EqualTo(.5f).Within(.001f));
         canvas.SetFreeHandsWarning(true);
-        Call("FadeFreeHandsWarning", .1f);
+        popup.Tick(.1f);
         Assert.AreEqual(1f, warning.alpha);
         Assert.IsFalse(warning.interactable);
         Assert.IsFalse(warning.blocksRaycasts);
         canvas.SetFreeHandsWarning(false);
-        Call("FadeFreeHandsWarning", .1f);
+        popup.Tick(.1f);
+        Assert.IsNull(popup.CurrentType);
         Assert.That(warning.alpha, Is.EqualTo(.5f).Within(.001f));
-        Call("FadeFreeHandsWarning", .1f);
+        popup.Tick(.1f);
         Assert.AreEqual(0f, warning.alpha);
     }
 
@@ -47,11 +52,12 @@ public class FreeHandsWarningTests
     public void ResetHidesWarningAndClearsItsRequestedState()
     {
         canvas.SetFreeHandsWarning(true);
-        Call("FadeFreeHandsWarning", 1f);
+        popup.Tick(1f);
         Assert.AreEqual(1f, warning.alpha);
         Call("ResetFreeHandsWarning");
-        Call("FadeFreeHandsWarning", 1f);
+        popup.Tick(1f);
         Assert.AreEqual(0f, warning.alpha);
+        Assert.IsNull(popup.CurrentType);
     }
 
     [TestCase(true, true)]

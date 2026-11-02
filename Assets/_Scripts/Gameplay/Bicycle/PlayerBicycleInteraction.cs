@@ -162,8 +162,11 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             for(int i=0;i<count;i++)if(!hits[i].transform.IsChildOf(transform))clear=false;
             if(clear){exit=ground.point+Vector3.up*.05f;break;}
         }
-        if(!clear){
-            return false;}
+        if (!clear)
+        {
+            GameplayCanvas.Instance?.ShowWarning(WarningType.BlockVehicleExit);
+            return false;
+        }
         Restore(exit);return true;
     }
     void Restore(Vector3 exit)
