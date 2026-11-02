@@ -86,16 +86,8 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         if (Application.isPlaying && samples != null && previousHeights != null &&
             sampledScale == pile.WorldScale && lastTransform == transform.localToWorldMatrix)
         {
-            // Settling after a deposit can expand the footprint. The incremental cache
-            // only contains samples that were visible when it was built, so moving those
-            // samples alone leaves holes wherever grain flows onto previously bare ground.
-            bool expanded = false;
-            var heights = pile.HeightField.Heights;
-            for (int i = 0; i < heights.Length; i++)
-                if (previousHeights[i] < .001f && heights[i] >= .001f)
-                { expanded = true; break; }
-            if (!expanded) { UpdateChangedCells(); return; }
-            samples = null;
+            // Bare cells have reserved samples, including when settling expands the pile.
+            UpdateChangedCells(); return;
         }
         float actualSpacing = Mathf.Max(.025f, spacing);
         Vector3 worldScale = pile.WorldScale;
@@ -146,7 +138,6 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             Vector2 p = samples[i];
             if (!pile.IsInsideBoundary(pile.transform.TransformPoint(new Vector3(p.x, 0, p.y)), .04f)) continue;
             float height = pile.SampleLocalHeight(p.x, p.y);
-            if (height < .001f) continue;
             float dx = pile.SampleLocalHeight(p.x + .03f, p.y, false) - pile.SampleLocalHeight(p.x - .03f, p.y, false);
             float dz = pile.SampleLocalHeight(p.x, p.y + .03f, false) - pile.SampleLocalHeight(p.x, p.y - .03f, false);
             Vector3 normal = pile.transform.worldToLocalMatrix.transpose.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
@@ -155,10 +146,10 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             int batch = color * batchesPerColor + paletteCounts[color] / 1023, slot = paletteCounts[color] % 1023;
             batches[batch][slot] = Matrix4x4.TRS(pile.transform.TransformPoint(new Vector3(p.x, height, p.y)) + Vector3.up * .003f,
                 slope * Quaternion.AngleAxis(pile.transform.eulerAngles.y, Vector3.up) * rotations[i],
-                new Vector3(.0255f, .014f, .029f) * sizes[i]);
+                new Vector3(.0255f, .014f, .029f) * (height < .001f ? 0 : sizes[i]));
             paletteCounts[color]++;
             counts[batch]++;
-            KernelCount++;
+            if (height >= .001f) KernelCount++;
         }
         revision = pile.SurfaceRevision;
         lastTransform = transform.localToWorldMatrix;
@@ -190,10 +181,11 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             int z = Mathf.Clamp((int)((p.y + field.Size * .5f) / field.Spacing), 0, field.Resolution - 2);
             sampleCells[i] = z * field.Resolution + x;
             sampleBatches[i] = -1;
-            if (!pile.IsInsideBoundary(pile.transform.TransformPoint(new Vector3(p.x, 0, p.y)), .04f) || field.Sample(p.x, p.y) < .001f) continue;
+            if (!pile.IsInsideBoundary(pile.transform.TransformPoint(new Vector3(p.x, 0, p.y)), .04f)) continue;
             int color = paletteIndices[i], batch = color * batchesPerColor + paletteCounts[color] / 1023, slot = paletteCounts[color]++ % 1023;
             sampleBatches[i] = batch; sampleSlots[i] = slot;
-            visibleSamples[i] = true;
+            visibleSamples[i] = field.Sample(p.x, p.y) >= .001f;
+            if (!visibleSamples[i]) activeBatchCounts[batch]--;
             int cell = sampleCells[i];
             nextCellSample[i] = cellSampleHeads[cell];
             cellSampleHeads[cell] = i;
@@ -205,7 +197,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         for (int b = 0; b < batchBounds.Length; b++)
         {
             surfaceBounds[b] = batchBounds[b]; surfaceBounds[b].Expand(.12f);
-            liveBatches[b] = counts[b] > 0;
+            liveBatches[b] = activeBatchCounts[b] > 0;
             Vector3 bottom = batchBounds[b].center; bottom.y = pile.transform.position.y;
             batchBounds[b].Encapsulate(bottom); batchBounds[b].Expand(.12f);
             surfaceBounds[b] = batchBounds[b];
@@ -276,6 +268,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                 if (visibleSamples[i] != visible)
                 {
                     activeBatchCounts[batch] += visible ? 1 : -1;
+                    KernelCount += visible ? 1 : -1;
                     visibleSamples[i] = visible;
                     liveBatches[batch] = activeBatchCounts[batch] > 0;
                 }
@@ -303,9 +296,14 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private Vector2[] SampleSurface(float requestedSpacing)
     {
-        Mesh surface = pile.GetComponent<MeshFilter>().sharedMesh;
-        if (surface == null) return Array.Empty<Vector2>();
-        Vector3[] vertices = surface.vertices; int[] triangles = surface.triangles;
+        // Reserve samples across bare cells too, so deposits can reveal them through
+        // the same bounded update queue instead of rebuilding the entire pile.
+        var field = pile.HeightField;
+        var vertices = new Vector3[field.Heights.Length];
+        for (int i = 0; i < vertices.Length; i++)
+            vertices[i] = new Vector3(i % field.Resolution * field.Spacing - field.Size * .5f,
+                field.Heights[i], i / field.Resolution * field.Spacing - field.Size * .5f);
+        int[] triangles = field.Triangles;
         float area = 0;
         for (int i = 0; i < vertices.Length; i++) vertices[i] = pile.transform.TransformPoint(vertices[i]);
         for (int i = 0; i < triangles.Length; i += 3)

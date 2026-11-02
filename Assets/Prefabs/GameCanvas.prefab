@@ -5610,6 +5610,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcb1f549a979d2c4d909f32e22ea0575, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SellingScreen
+  cashInClip: {fileID: 8300000, guid: 4f7f42c893daa0d44ab31e9fdc94216c, type: 3}
+  cashInMixerGroup: {fileID: 3455396778696250076, guid: 2363768d8fc9b624a9219fcc1bf533a6, type: 2}
   elementPrefab: {fileID: 516858187655956589, guid: a520130a7adc7854196035eb27b052e1, type: 3}
   elementsParent: {fileID: 8670400129886862964}
   totalWeight: {fileID: 4333979762398752702}

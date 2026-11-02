@@ -6,6 +6,8 @@ using UnityEngine.UI;
 [DefaultExecutionOrder(200)]
 public class SellingScreen : MonoBehaviour
 {
+    [SerializeField] private AudioClip cashInClip;
+    [SerializeField] private UnityEngine.Audio.AudioMixerGroup cashInMixerGroup;
     [SerializeField] private SellGrainElement elementPrefab;
     [SerializeField] private Transform elementsParent;
     [Space] [SerializeField] private Text totalWeight;
@@ -140,6 +142,9 @@ public class SellingScreen : MonoBehaviour
             if (sellButton != null) sellButton.interactable = CanPay();
             return;
         }
+        if (GameplayAudio.Instance != null) GameplayAudio.Instance.CashIn();
+        else if (cashInClip != null)
+            GlobalManager.PlaySound3D(cashInClip, Vector3.zero, .8f, 0f, cashInMixerGroup);
         GameAchievements.GrainSold(quotedCash);
         SoldCargoAnimation.Begin(containers);
         // Report only paid sales, after cargo is excluded from world saves.

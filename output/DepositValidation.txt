@@ -1,0 +1,7 @@
+Deposit validation, 2026-11-02
+Unity compilation: completed, no errors.
+VerifyDepositCache.cs: 12 portions onto initially bare dropped pile; same sample array throughout; <=4096 kernel updates per call; queue drained; 7558 visible kernels; 7.499999986 kg retained. Maximum deposit+refresh+kernel update 6.915 ms.
+Existing-pile centre benchmark: no significant improvement (before 39.60 ms deposit +13.63 ms visual total for 12 portions; after 44.78+13.50 ms). This change targets footprint-expansion rebuilds, not that case.
+Controlled identical 33x33 height fields with 0.2m deposit: previous settling 63 ticks, new 35 ticks. Volume 165.69763044 before, 165.69762889 after (float rounding).
+Original paused scene had 226 settling ticks remaining. Reload reset that state, so no equivalent after measurement claimed.
+Manual follow-up: repeatedly pour onto existing pile centre, excavated holes and outer edges, then watch CPU return to idle; inspect mixed crops and scoop the deposited grain.

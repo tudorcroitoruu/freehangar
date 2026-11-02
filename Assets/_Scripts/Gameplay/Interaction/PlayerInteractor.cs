@@ -232,6 +232,33 @@ public sealed class PlayerInteractor : MonoBehaviour
         }
         // Resolve only the first obstruction, including interactables on a collider's parent.
         if (closest == null) return null;
+        // Empty sacks sit below the vehicle's broad collision envelope. Allow a
+        // ray that actually hits attached cargo to pass only that owner's body.
+        var vehicle = VehicleCargoOwner.Resolve(closest);
+        if (vehicle != null && closest.GetComponentInParent<GrainContainer>() == null)
+        {
+            Collider cargoHit = null;
+            float cargoDistance = float.PositiveInfinity;
+            for (int i = 0; i < count; i++)
+            {
+                var bag = hits[i].collider.GetComponentInParent<GrainContainer>();
+                if (bag == null || !vehicle.HasCargo(bag.transform) || hits[i].distance >= cargoDistance) continue;
+                cargoHit = hits[i].collider;
+                cargoDistance = hits[i].distance;
+            }
+            if (cargoHit != null)
+            {
+                bool blocked = false;
+                for (int i = 0; i < count; i++)
+                {
+                    var hit = hits[i];
+                    if (hit.transform.IsChildOf(transform) || hit.distance >= cargoDistance) continue;
+                    if (VehicleCargoOwner.Resolve(hit.collider) != vehicle ||
+                        hit.collider.GetComponentInParent<GrainContainer>() != null) { blocked = true; break; }
+                }
+                if (!blocked) closest = cargoHit;
+            }
+        }
         var cargoOwner = closest.GetComponentInParent<VehicleCargoOwner>();
         if (cargoOwner != null && cargoOwner.vehicle != null && cargoOwner.vehicle.isActiveAndEnabled &&
             closest.GetComponentInParent<GrainContainer>() == null)

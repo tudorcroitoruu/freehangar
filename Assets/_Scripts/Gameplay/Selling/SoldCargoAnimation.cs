@@ -50,7 +50,6 @@ public sealed class SoldCargoAnimation : MonoBehaviour
         if (t < 1) return;
         completed = true;
         foreach (var item in items) if (item.transform != null) item.transform.gameObject.SetActive(false);
-        if (items.Count > 0) GameplayAudio.Instance?.CashIn();
         if (Application.isPlaying) Destroy(gameObject);
         else DestroyImmediate(gameObject);
     }

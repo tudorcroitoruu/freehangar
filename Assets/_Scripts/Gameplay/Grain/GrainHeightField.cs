@@ -130,18 +130,21 @@ public sealed class GrainHeightField
         if (metric == default) metric = Vector3.one;
         float threshold = Mathf.Tan(Mathf.Clamp(angleDegrees, 1f, 80f) * Mathf.Deg2Rad) * Spacing / metric.y;
         bool changed = false;
+        // Sub-millimetre relief is invisible but can keep meshes/colliders dirty
+        // for hundreds of simulation ticks after a deposit. Leave that mass in place.
+        float reliefTolerance = .001f / Mathf.Max(.0001f, metric.y);
         // An authored pile starts at rest. Only scoop-disturbed neighborhoods can move.
         for (int z = minZ; z <= maxZ; z++)
         for (int x = minX; x <= maxX; x++)
         {
             int i = z * Resolution + x;
-            if (x < Resolution - 1) changed |= Transfer(i, i + 1, threshold * metric.x, fraction);
-            if (z < Resolution - 1) changed |= Transfer(i, i + Resolution, threshold * metric.z, fraction);
+            if (x < Resolution - 1) changed |= Transfer(i, i + 1, threshold * metric.x, fraction, reliefTolerance);
+            if (z < Resolution - 1) changed |= Transfer(i, i + Resolution, threshold * metric.z, fraction, reliefTolerance);
             if (x < Resolution - 1 && z < Resolution - 1)
             {
                 float diagonal = threshold * new Vector2(metric.x, metric.z).magnitude;
-                changed |= Transfer(i, i + Resolution + 1, diagonal, fraction);
-                changed |= Transfer(i + 1, i + Resolution, diagonal, fraction);
+                changed |= Transfer(i, i + Resolution + 1, diagonal, fraction, reliefTolerance);
+                changed |= Transfer(i + 1, i + Resolution, diagonal, fraction, reliefTolerance);
             }
         }
         if (!changed)
@@ -153,7 +156,7 @@ public sealed class GrainHeightField
         return changed;
     }
 
-    private bool Transfer(int a, int b, float threshold, float fraction)
+    private bool Transfer(int a, int b, float threshold, float fraction, float reliefTolerance)
     {
         if (areas[a] <= .00000001f || areas[b] <= .00000001f) return false;
         if (!disturbed[a] || !disturbed[b]) return false;
@@ -166,7 +169,7 @@ public sealed class GrainHeightField
         // The reference is a ceiling/shape guide, never a source of replacement grain.
         float retainedDrop = Mathf.Min(.0025f, threshold * .02f);
         float relief = receiverDeficit - donorDeficit - retainedDrop;
-        if (relief <= .0001f) return false;
+        if (relief <= reliefTolerance) return false;
         // A lower neighbor cannot feed uphill, even when it has more material remaining.
         float excess = Mathf.Min(relief, Mathf.Abs(difference));
         float volume = excess / (1f / areas[high] + 1f / areas[low]) * Mathf.Clamp01(fraction);
