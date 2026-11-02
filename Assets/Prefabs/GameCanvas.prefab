@@ -7208,7 +7208,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Quit Game
+  m_Text: Return to menu
 --- !u!1 &2013264900775348702
 GameObject:
   m_ObjectHideFlags: 0
@@ -11063,7 +11063,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Quit Game
+  m_Text: Return to menu
 --- !u!1 &3119439258521488402
 GameObject:
   m_ObjectHideFlags: 0
@@ -17849,7 +17849,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 5862910987767254048}
         m_TargetAssemblyTypeName: Pause, Assembly-CSharp
-        m_MethodName: ShowLeaveGamePopup
+        m_MethodName: GoToMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
