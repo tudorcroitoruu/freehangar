@@ -171,6 +171,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         else action = interactor.Items != null && interactor.Items.IsCarrying ? "Put down item and push" : "Push wheelbarrow";
         prompt = new InteractionPromptData(transform.TransformPoint(trayCenter + Vector3.up * .35f),
             action + $"  ({occupiedVolume:0.00}/{CapacityVolume:0.00} m³)", available);
+        prompt.VehicleFull = !available && interactor.Bags != null && interactor.Bags.IsCarrying;
         return true;
     }
 

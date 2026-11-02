@@ -308,6 +308,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
             bool available = compatible && FreeBagCargoSlot(interactor.Bags.CarriedBag) != null && (upgrades == null || upgrades.CanLoadCargo(GetComponent<VehicleCargoRack>() is VehicleCargoRack cargoRack ? cargoRack.BagSlotCost : 1));
             Vector3 loadPosition = GetComponent<VehicleCargoRack>() is VehicleCargoRack loadingRack && loadingRack.surface != null ? loadingRack.surface.position + Vector3.up * .3f : transform.position + Vector3.up;
             prompt = new InteractionPromptData(loadPosition, available ? "Load bag" : !compatible ? "Container level too high" : "Vehicle full", available);
+            prompt.VehicleFull = compatible && !available;
             return true;
         }
         if (actor.IsCarrying) return false;
@@ -368,6 +369,7 @@ public static class HangarVehicleAccess
             if (bounds.Contains(b) || (bounds.IntersectRay(new Ray(a,delta.normalized),out float distance) && distance <= delta.magnitude))
             {
                 hintUntil = Time.time + 2f;
+                GameplayCanvas.Instance?.ShowWarning(WarningType.BlockHangarEntry);
                 return true;
             }
         }
@@ -375,6 +377,7 @@ public static class HangarVehicleAccess
     }
     public static void DrawHint()
     {
+        if (GameplayCanvas.Instance != null) return;
         if (Time.time >= hintUntil) return;
         var style = new GUIStyle(GUI.skin.box) { fontSize=16, alignment=TextAnchor.MiddleCenter, wordWrap=true };
         GUI.Box(new Rect(Screen.width*.2f,Screen.height*.72f,Screen.width*.6f,55),

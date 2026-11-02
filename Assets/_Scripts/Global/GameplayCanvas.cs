@@ -57,6 +57,7 @@ public class GameplayCanvas : MonoBehaviour
         if (Instance == null)
             Instance = this;
         ResetFreeHandsWarning();
+        if (warningPopup != null) warningPopup.Initialize();
     }
 
     private void OnDestroy()
@@ -131,6 +132,7 @@ public class GameplayCanvas : MonoBehaviour
 
     private void Update()
     {
+        if (warningPopup != null) warningPopup.Tick(Time.deltaTime);
         AnimateMoney(Time.unscaledDeltaTime);
         FadeFreeHandsWarning(Time.unscaledDeltaTime);
         RefreshCollectibleUI();
@@ -140,6 +142,16 @@ public class GameplayCanvas : MonoBehaviour
                 ? Mathf.MoveTowards(hintsParent.alpha, 1f, Time.unscaledDeltaTime / toolHintsFadeSeconds) : 1f;
             fadingToolHints = hintsParent.alpha < 1f;
         }
+    }
+
+    public void ShowWarning(WarningType type, float seconds = 2f)
+    {
+        if (warningPopup != null) warningPopup.ShowWarning(type, seconds);
+    }
+
+    public void SetWarning(WarningType type, Object source, bool visible)
+    {
+        if (warningPopup != null) warningPopup.SetWarning(type, source, visible);
     }
 
     private void RefreshCollectibleUI()

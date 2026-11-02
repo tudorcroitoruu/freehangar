@@ -52,10 +52,11 @@ public sealed class PlayerInteractor : MonoBehaviour
     {
         var prompt = Prompt;
         Target = null;
-        if (!CanInteract) { SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
+        if (!CanInteract) { SetVehicleFullWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
         var aimedTarget = FindTarget();
         InteractionPromptData aimedPrompt = default;
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
+        SetVehicleFullWarning(hasAimedPrompt && aimedPrompt.VehicleFull);
         UpdateResetTarget(hasAimedPrompt && aimedPrompt.ShowKey && !aimedPrompt.RequiresFreeHands ? aimedTarget : null);
         if (hasAimedPrompt)
         {
@@ -280,5 +281,8 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (GameplayCanvas.Instance != null) GameplayCanvas.Instance.SetFreeHandsWarning(visible);
     }
 
-    private void OnDisable() { SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
+    private void SetVehicleFullWarning(bool visible) =>
+        GameplayCanvas.Instance?.SetWarning(WarningType.VehicleFull, this, visible);
+
+    private void OnDisable() { SetVehicleFullWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
 }

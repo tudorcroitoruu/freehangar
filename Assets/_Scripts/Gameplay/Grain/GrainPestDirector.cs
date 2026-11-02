@@ -37,6 +37,9 @@ public sealed class GrainPest : MonoBehaviour
     }
     private void LateUpdate()
     {
+        GameplayCanvas.Instance?.SetWarning(IsCrow ? WarningType.CrowsAttack : WarningType.RatsAttack, this,
+            feedingNow && !fleeing && !climbing && Target != null && Target.isActiveAndEnabled &&
+            Target.Kilograms > .001f && !PlayerPerks.NoAttacksActive);
         // Follow the container after vehicle motion and cargo seating have been applied.
         if (IsCrow && crowPerched && !fleeing && Target != null && Target.isActiveAndEnabled)
         {
@@ -208,6 +211,7 @@ public sealed class GrainPest : MonoBehaviour
     public bool ScaredAway(Vector3? threatPosition = null)
     {
         if (fleeing) return false;
+        ClearWarning();
         if (IsCrow) StartCoroutine(PlayFlyAwaySound());
         if (IsCrow && animator != null && flying != null) animator.runtimeAnimatorController = flying;
         if (!IsCrow && animator != null)
@@ -226,6 +230,11 @@ public sealed class GrainPest : MonoBehaviour
         GetComponent<Collider>().enabled = false;
         return true;
     }
+
+    private void ClearWarning() => GameplayCanvas.Instance?.SetWarning(
+        IsCrow ? WarningType.CrowsAttack : WarningType.RatsAttack, this, false);
+
+    private void OnDisable() => ClearWarning();
 
     private IEnumerator PlayFlyAwaySound()
     {

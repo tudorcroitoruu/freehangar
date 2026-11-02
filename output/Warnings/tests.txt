@@ -1,0 +1,64 @@
+Warnings: Passed; passed=21; failed=0; skipped=0
+FreeHandsWarningTests.BlockedPromptHidesPanelAndClearsDescription(True,True): Passed
+
+
+FreeHandsWarningTests.BlockedPromptHidesPanelAndClearsDescription(False,True): Passed
+
+
+FreeHandsWarningTests.PromptShowsSeparateKeyRowsAndRemovesThemForTheNextObject: Passed
+
+
+FreeHandsWarningTests.ResetHidesWarningAndClearsItsRequestedState: Passed
+
+
+FreeHandsWarningTests.WarningFadesInAndOutWithoutRestartingOnRepeatedRequests: Passed
+
+
+VehicleCargoPlacementTests.FirstSlotValuesAreSharedByDefaultAndIndependentValuesSurviveToggle: Passed
+
+
+VehicleCargoPlacementTests.JointedTrailerResolvesItsDrivingVehicle: Passed
+
+
+VehicleCargoPlacementTests.RepeatedPlacementDoesNotAccumulateScaleAndDifferentSlotsStayIndependent: Passed
+
+
+VehicleCargoPlacementTests.SingleContainerSlotsHoldExactlyTheConfiguredNumberOfBags(2): Passed
+
+
+VehicleCargoPlacementTests.SingleContainerSlotsHoldExactlyTheConfiguredNumberOfBags(5): Passed
+
+
+VehiclePromptResetTests.AimedParkedVehicleOffersResetAndLosingTargetCancelsHold: Passed
+
+
+VehiclePromptResetTests.AnimatedResetKeepsPhysicsScaleAndRestoresVisualScaleOnRepeatedResets: Passed
+
+
+VehiclePromptResetTests.IdleWheelbarrowDoesNotOfferOrPerformReset: Passed
+
+
+VehiclePromptResetTests.PushedWheelbarrowKeepsResetButNeverUsesBagFillProgress: Passed
+
+
+VehiclePromptResetTests.RiddenVehicleCannotResetAndCancelsAnExistingHold: Passed
+
+
+VehiclePromptResetTests.VehiclePromptAndItsExtraActionsClearPreviouslyVisibleBagFill: Passed
+
+
+WarningPopupTests.ContextWarningPreemptsAttackThenReturnsToItWhenAimChanges: Passed
+
+
+WarningPopupTests.InactivePopupRendersPresetAndFadesWithoutBlockingInput: Passed
+
+
+WarningPopupTests.MultipleAttackersKeepOneWarningUntilLastSourceStops: Passed
+
+
+WarningPopupTests.RepeatedRequestsDoNotRestartRotationAndDestroyedSourcesAreRemoved: Passed
+
+
+WarningPopupTests.TimedHangarWarningRefreshesWithoutDuplicatingAndExpires: Passed
+
+

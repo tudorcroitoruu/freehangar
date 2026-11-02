@@ -9,6 +9,7 @@ public struct InteractionPromptData
     public KeyCode InteractionKey;
     public InteractionPromptAction[] AdditionalActions;
     public bool RequiresFreeHands;
+    public bool VehicleFull;
     public bool ShowPrimaryButton;
     public bool ShowProgress;
     public float Progress;
@@ -23,6 +24,7 @@ public struct InteractionPromptData
         InteractionKey = KeyCode.E;
         AdditionalActions = null;
         RequiresFreeHands = false;
+        VehicleFull = false;
         ShowPrimaryButton = false;
         ShowProgress = false;
         Progress = 0f;

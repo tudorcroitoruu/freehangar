@@ -2317,11 +2317,11 @@ MonoBehaviour:
   - warningType: 2
     icon: {fileID: 21300000, guid: 8f975711fbce5d440a2c0fe7f1d11fbf, type: 3}
     title: Cannot Enter
-    message: You cannot enter the barn while driving a vehicle.
+    message: This vehicle cannot enter the hangar. Use a bicycle, motoroller, forklift or wheelbarrow.
   - warningType: 3
     icon: {fileID: 21300000, guid: 8f434169ee7756b4a81881acf9073a17, type: 3}
     title: Vehicle Full
-    message: The vehicle is full and cannot carry any more grain.
+    message: There is not enough space on this vehicle for the container you are carrying.
   warningCanvasGroup: {fileID: 737507088087375577}
   warningImage: {fileID: 6193481453998981383}
   warningTitle: {fileID: 11493426258684311}
