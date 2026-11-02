@@ -131,6 +131,19 @@ public class VehiclePromptResetTests
         prompt.Hide();Assert.IsFalse(progress.activeSelf);Assert.That(fill.fillAmount,Is.Zero);Assert.That(status.text,Is.Empty);
     }
 
+    [TestCase(60)]
+    [TestCase(144)]
+    [TestCase(240)]
+    public void UnobstructedVehicleAcceleratesFromRestAtHighFrameRates(int fps)
+    {
+        var bike = CreateBike();
+        bike.SetRidden(true);
+        Assert.That(bike.GetComponent<CharacterController>().minMoveDistance, Is.Zero);
+        for (int frame = 0; frame < fps / 2; frame++)
+            bike.Drive(1f, 0f, false, 1f / fps);
+        Assert.That(bike.Speed, Is.EqualTo(bike.acceleration * .5f).Within(.01f));
+    }
+
     private BicycleController CreateBike()
     {
         var bike=Child("Vehicle").AddComponent<BicycleController>();

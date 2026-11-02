@@ -75,6 +75,8 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     {
         if (motor != null) return;
         motor = GetComponent<CharacterController>();
+        // Starting displacement can be sub-millimetre at high frame rates.
+        motor.minMoveDistance = 0f;
         motoroller = GetComponent<MotorollerController>();
         steerRest = steering.localRotation; frontRest = frontWheel.localRotation;
         rearRest = rearWheel.localRotation;
@@ -295,6 +297,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         Vector3 travelDirection = motor.isGrounded && groundAlignment.HasSupport
             ? Vector3.ProjectOnPlane(transform.forward, groundAlignment.GroundNormal).normalized : transform.forward;
         Vector3 motion = travelDirection * Speed * dt;
+        float requestedMotionSquared = motion.sqrMagnitude;
         float impactSpeed = Mathf.Abs(Speed);
         float clearance = Mathf.Max(motor.bounds.extents.x, motor.bounds.extents.z);
         if (HangarVehicleAccess.Blocks(transform.position, transform.position + motion, clearance, this))
@@ -326,7 +329,9 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
             GameplayAudio.Instance?.BicycleScratch(transform.position);
             nextScratchSound = Time.time + Random.Range(13f, 26f);
         }
-        if (motion.sqrMagnitude < .000001f && Mathf.Abs(Speed) > .1f) Speed = 0;
+        // Only a collision restriction stops acceleration. An absolute distance
+        // cutoff repeatedly reset unobstructed vehicles at high frame rates.
+        if (requestedMotionSquared > 0f && motion.sqrMagnitude < requestedMotionSquared * .0001f) Speed = 0;
         if ((hit & CollisionFlags.Sides) != 0 && Vector3.ProjectOnPlane(transform.position-before,Vector3.up).magnitude < Mathf.Abs(Speed)*dt*.3f) Speed = 0;
         if ((hit & CollisionFlags.Above) != 0) fallSpeed = 0;
         groundAlignment.Align(dt);
