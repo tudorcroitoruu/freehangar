@@ -6,6 +6,13 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public sealed class StaminaManager : MonoBehaviour
 {
+    public float SavedHunger => hungryPercent;
+    public void RestoreSave(float stamina, float hunger)
+    {
+        SetHungerPercent(hunger);
+        if (float.IsFinite(stamina) && stamina >= 0) CurrentStamina = Mathf.Clamp(stamina, 0, CurrentMaxStamina);
+        UpdateStaminaBar();
+    }
     [SerializeField, Min(.01f)] private float maxStamina = 100f;
     [SerializeField] private StaminaUpgradeSettings upgradeSettings;
     [SerializeField, Min(0f), Tooltip("Stamina per scoop for a 1 kg shovel; multiplied by the equipped shovel's weight.")]

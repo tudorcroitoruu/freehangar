@@ -64,12 +64,22 @@ public sealed class RocketEndingCutscene : MonoBehaviour
     private Vector3 direction, departure, finalCameraStart, finalCameraEnd;
     private Quaternion orientation, sunStartRotation;
     private float elapsed;
+    public float SavedTime => elapsed;
+    public void ResumeSaved(float time)
+    {
+        if (!IsPlaying && !Play()) return;
+        float target = Mathf.Clamp(time, 0, cabinSeconds + pullbackSeconds + fleetSeconds + sunSeconds + finalSunHoldSeconds + finalFadeSeconds + friendsTextDelaySeconds + endingTextFadeSeconds * 2);
+        // Reconstruct the preceding camera shots before the sun hold/ending card.
+        while (elapsed < target) Advance(Mathf.Min(1f / 60, target - elapsed));
+        AudioManager.Instance?.SeekMusic(target);
+        HDCamera.GetOrCreate(view).Reset();
+    }
     private float earthRadius;
     private bool sunStarted;
     private CursorLockMode cursorMode;
     private bool cursorVisible;
 
-    private void Start() { if (playOnStart) Play(); }
+    private void Start() { WorldSaveRuntime.EnsureScene(gameObject.scene); if (playOnStart) Play(); }
     public bool Play()
     {
         if (IsPlaying || Completed || rocketPrefab == null || fleetPrefab == null || earth == null || sourceCamera == null || sun == null) return false;
@@ -222,10 +232,12 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         if (overlay != null) overlay.enabled = Pause.Instance == null || !Pause.Instance.paused;
     }
 
-    private void Update()
+    private void Update() => Advance(Time.deltaTime);
+
+    private void Advance(float deltaTime)
     {
         if (!IsPlaying || hero == null || view == null) return;
-        elapsed += Time.deltaTime;
+        elapsed += deltaTime;
         for (int k = 0; k < ships.Count; k++) if (ships[k] != null)
         {
             float flightTime = elapsed - launchDelays[k];
@@ -244,7 +256,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
                 float growth = Smooth(altitude / companionFullSizeAltitude);
                 // Preserve monotonic growth despite the small flight sway.
                 float targetScale = Mathf.Max(ships[k].localScale.x, rocketScale * growth);
-                ships[k].localScale = Vector3.one * Mathf.MoveTowards(ships[k].localScale.x,targetScale,rocketScale * Time.deltaTime / 8f);
+                ships[k].localScale = Vector3.one * Mathf.MoveTowards(ships[k].localScale.x,targetScale,rocketScale * deltaTime / 8f);
             }
             ships[k].rotation = Quaternion.FromToRotation(direction,shipDirections[k]) * orientation * Quaternion.Euler(Mathf.Sin(elapsed*1.1f+k)*.7f,0,Mathf.Sin(elapsed*.9f+k)*1.2f);
         }

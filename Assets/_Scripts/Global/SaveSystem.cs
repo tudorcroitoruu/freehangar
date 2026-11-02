@@ -36,7 +36,7 @@ public static class SaveSystem
             if (!purchase(Data)) return false;
             upgradeCooldownProfile = Data;
             nextUpgradeAllowedAt = Time.realtimeSinceStartupAsDouble + .4d;
-            SaveData();
+            MoneyChanged?.Invoke(Money);
             nextUpgradeAllowedAt = Time.realtimeSinceStartupAsDouble + .4d;
             return true;
         }
@@ -46,7 +46,7 @@ public static class SaveSystem
     public static bool TryOpenHangar(int number)
     {
         if (!savesLoaded || Data == null || !Data.TryOpenHangar(number)) return false;
-        SaveData();
+        MoneyChanged?.Invoke(Money);
         HangarProgressChanged?.Invoke();
         return true;
     }
@@ -54,7 +54,7 @@ public static class SaveSystem
     public static bool TryUnlockFirstHangarShopProduct(float clearedPercent)
     {
         if (!savesLoaded || Data == null || !Data.TryRecordHangarClearance(1, clearedPercent)) return false;
-        SaveData();
+        MoneyChanged?.Invoke(Money);
         HangarProgressChanged?.Invoke();
         return true;
     }
@@ -89,7 +89,7 @@ public static class SaveSystem
         if (free) Data.freeUpgradeVouchers--;
         else Data.cash -= price;
         usedVoucher = free;
-        SaveData();
+        MoneyChanged?.Invoke(Money);
         return true;
     }
 
@@ -97,7 +97,7 @@ public static class SaveSystem
     {
         if (Data == null || amount <= 0 || Data.cash > int.MaxValue - amount) return false;
         Data.cash += amount;
-        SaveData();
+        MoneyChanged?.Invoke(Money);
         return true;
     }
 
@@ -105,14 +105,14 @@ public static class SaveSystem
     {
         if (Data == null || amount <= 0 || Data.cash < amount) return false;
         Data.cash -= amount;
-        SaveData();
+        MoneyChanged?.Invoke(Money);
         return true;
     }
 
     public static bool TryBuyProduct(string productID, int price)
     {
         if (Data == null || !Data.TryBuyProduct(productID, price)) return false;
-        SaveData();
+        MoneyChanged?.Invoke(Money);
         OwnedProductsChanged?.Invoke();
         return true;
     }
@@ -120,7 +120,7 @@ public static class SaveSystem
     public static bool TryTakeProduct(string productID)
     {
         if (Data == null || !Data.TryTakeProduct(productID)) return false;
-        SaveData();
+        MoneyChanged?.Invoke(Money);
         OwnedProductsChanged?.Invoke();
         return true;
     }
@@ -131,7 +131,7 @@ public static class SaveSystem
         if (Data == null || string.IsNullOrWhiteSpace(productID) || price < 0 || Data.cash < price ||
             tryDeliver == null || !tryDeliver()) return false;
         Data.cash -= price;
-        SaveData();
+        MoneyChanged?.Invoke(Money);
         return true;
     }
 
@@ -141,17 +141,24 @@ public static class SaveSystem
     
     public static void SaveData()
     {
+        WorldSaveRuntime.CaptureIntoPlayerData();
+        WriteData();
+    }
+
+    internal static void WriteData()
+    {
+        if (Data == null) return;
         string json = JsonUtility.ToJson(Data); //Global Data
         string jsonSettings = JsonUtility.ToJson(settingsData); //Settings Data (on new save it willhave same settings)
         string jsonActivity = JsonUtility.ToJson(activityData); //Activity Data (PS5)
         
+        if (PlayerPrefs.HasKey(savePath)) PlayerPrefs.SetString(savePath + "_Backup", PlayerPrefs.GetString(savePath));
         PlayerPrefs.SetString(savePath, EncryptDecrypt(json));
         PlayerPrefs.SetString(savePath +"_Settings", EncryptDecrypt(jsonSettings));
         PlayerPrefs.SetString("levelsCompleted", EncryptDecrypt(jsonActivity));
         
         PlayerPrefs.Save();
         MoneyChanged?.Invoke(Money);
-        Debug.Log("Saved Data");
     }
 
     /*public static bool LoadData()
@@ -212,14 +219,18 @@ public static class SaveSystem
                 string jsonSettings = PlayerPrefs.GetString(savePath +"_Settings");
                 string jsonActivity = PlayerPrefs.GetString("levelsCompleted");
                 
-                Data = JsonUtility.FromJson<PlayerData>(EncryptDecrypt(json));
+                Data = DeserializePlayerData(EncryptDecrypt(json));
                 settingsData = JsonUtility.FromJson<SettingsData>(EncryptDecrypt(jsonSettings));
                 activityData = JsonUtility.FromJson<ActivityData>(EncryptDecrypt(jsonActivity));
             }
             catch
             {
-                //NEW
-                newSave = true;
+                // Preserve the previous complete snapshot if the latest write was damaged.
+                string backup = PlayerPrefs.GetString(savePath + "_Backup", "");
+                if (string.IsNullOrEmpty(backup)) throw;
+                Data = DeserializePlayerData(EncryptDecrypt(backup));
+                if (Data == null) throw new InvalidDataException("Both save records are unreadable.");
+                Debug.LogWarning("Recovered the previous SaveSystem snapshot.");
             }
         }
         else
@@ -322,6 +333,37 @@ public static class SaveSystem
         }
     }
 
+    [Serializable] private sealed class LegacyPlayerData { public string worldSnapshot; }
+    [Serializable] private sealed class LegacyWorldData { public List<WorldObjectSave> objects; }
+
+    public static PlayerData DeserializePlayerData(string json)
+    {
+        var data = JsonUtility.FromJson<PlayerData>(json);
+        if (data == null) throw new InvalidDataException("Unreadable player save.");
+        var legacy = JsonUtility.FromJson<LegacyPlayerData>(json);
+        if (!string.IsNullOrEmpty(legacy.worldSnapshot))
+        {
+            string worldJson = DecompressString(Convert.FromBase64String(legacy.worldSnapshot));
+            data.world = JsonUtility.FromJson<WorldSaveData>(worldJson);
+            var records = JsonUtility.FromJson<LegacyWorldData>(worldJson).objects;
+            if (data.world == null || data.world.version != 1 || records == null)
+                throw new InvalidDataException("Unsupported legacy world save.");
+            data.world.bags = new List<BagSave>(); data.world.vehicles = new List<VehicleSave>();
+            data.world.wheelbarrows = new List<WheelbarrowSave>(); data.world.items = new List<WorldObjectSave>();
+            foreach (var record in records)
+            {
+                string recordJson = JsonUtility.ToJson(record);
+                if (record.kind == "container") data.world.bags.Add(JsonUtility.FromJson<BagSave>(recordJson));
+                else if (record.kind == "vehicle" && record.id.IndexOf("wheelbarrow", StringComparison.OrdinalIgnoreCase) >= 0)
+                    data.world.wheelbarrows.Add(JsonUtility.FromJson<WheelbarrowSave>(recordJson));
+                else if (record.kind == "vehicle") data.world.vehicles.Add(JsonUtility.FromJson<VehicleSave>(recordJson));
+                else data.world.items.Add(record);
+            }
+            data.world.version = 2; data.world.NestCargo();
+        }
+        return data;
+    }
+
     // Decompress byte array back to JSON string
     public static string DecompressString(byte[] compressedBytes)
     {
@@ -344,6 +386,7 @@ public static class SaveSystem
 [Serializable]
 public class PlayerData
 {
+    public WorldSaveData world;
     public bool introductionCompleted;
     [Header("Hangar progression")]
     public List<int> openedHangars = new List<int> { 1 };

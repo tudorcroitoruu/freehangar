@@ -1,0 +1,1 @@
+PASS automatic Continue checkpoint resume: time=21,52501, shot=Gameplay, playing=False

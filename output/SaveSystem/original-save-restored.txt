@@ -1,0 +1,1 @@
+PASS: all four original PlayerPrefs save records restored byte-for-byte after Play mode.

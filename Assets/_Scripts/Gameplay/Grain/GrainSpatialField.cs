@@ -42,6 +42,25 @@ public sealed class GrainSpatialField
     private bool dirty = true;
     public double InitialVolume { get; }
 
+    public List<GrainColumnSave> CaptureSave()
+    {
+        var result = new List<GrainColumnSave>();
+        for (int i = 0; i < columns.Length; i++) foreach (var segment in columns[i])
+            result.Add(new GrainColumnSave { index = i, volume = segment.volume, weights = (float[])segment.weights.Clone() });
+        return result;
+    }
+
+    public void RestoreSave(List<GrainColumnSave> saved)
+    {
+        if (saved == null) return;
+        foreach (var column in columns) column.Clear();
+        foreach (var segment in saved)
+            if (segment != null && segment.index >= 0 && segment.index < columns.Length && segment.volume >= 0 &&
+                double.IsFinite(segment.volume) && segment.weights?.Length == GrainCargo.TypeCount)
+                columns[segment.index].Add(new Segment(segment.volume, (float[])segment.weights.Clone()));
+        dirty = true;
+    }
+
     public GrainSpatialField(GrainHeightField field, GrainRegion[] regions, Arrangement arrangement, float waviness, int seed, Vector2? sectionCenter = null, float sectionRotation = 0)
     {
         this.field = field;

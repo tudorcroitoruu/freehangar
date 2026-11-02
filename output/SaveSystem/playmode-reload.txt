@@ -1,0 +1,27 @@
+PASS money survives native SaveSystem.LoadData and scene reload
+PASS player position restored
+PASS player rotation restored
+PASS camera look restored
+PASS shovel contents restored
+PASS object identity restored: container
+PASS position restored: container
+PASS rotation restored: container
+PASS container mass restored
+PASS container crop restored
+PASS cargo parent and slot restored: container
+PASS object identity restored: container
+PASS position restored: container
+PASS rotation restored: container
+PASS container mass restored
+PASS container crop restored
+PASS cargo parent and slot restored: container
+PASS object identity restored: vehicle
+PASS position restored: vehicle
+PASS rotation restored: vehicle
+PASS cargo parent and slot restored: vehicle
+PASS grain grid restored: scene:/New_Map#0/11_Five_Hangar_Farm#0/Interactive%20grain%20stockpiles#0/Hangar%203%20-%20Almost%20full%20grain%20bank#0
+PASS grain grid restored: scene:/New_Map#0/11_Five_Hangar_Farm#0/Interactive%20grain%20stockpiles#0/Hangar%205%20-%20Grain%20bank%20to%20entrance#0
+PASS grain grid restored: scene:/New_Map#0/11_Five_Hangar_Farm#0/Interactive%20grain%20stockpiles#0/Hangar%202%20-%20Almost%20full%20grain%20bank#0
+PASS grain grid restored: scene:/New_Map#0/11_Five_Hangar_Farm#0/Interactive%20grain%20stockpiles#0/Hangar%204%20-%20Grain%20bank%20to%20entrance#0
+PASS grain grid restored: scene:/Grain%20Prototype#0/Corn%20pile%20-%20scoop%20with%20left%20click#0
+PASS no duplicate saved identities

@@ -216,6 +216,30 @@ public sealed class GrainPile : MonoBehaviour
     }
 
     private void Awake() => Initialize();
+
+    public PileSave CaptureSave()
+    {
+        Initialize();
+        return new PileSave { size = field.Size, resolution = field.Resolution, initialKilograms = initialKilograms,
+            heights = (float[])field.Heights.Clone(), columns = spatial?.CaptureSave() };
+    }
+
+    public void RestoreSave(PileSave saved)
+    {
+        if (saved == null || saved.heights == null) return;
+        if (IsDroppedPile && (size != saved.size || field == null || field.Resolution != saved.resolution))
+        {
+            ReleaseMeshes(); field = null; spatial?.ReleaseTextures(); spatial = null;
+            size = saved.size; resolution = saved.resolution;
+        }
+        Initialize();
+        if (field.Heights.Length != saved.heights.Length) throw new System.InvalidOperationException("Saved grain grid does not match " + name);
+        for (int i = 0; i < saved.heights.Length; i++) field.Heights[i] = float.IsFinite(saved.heights[i]) ? Mathf.Max(0, saved.heights[i]) : 0;
+        spatial?.RestoreSave(saved.columns);
+        initialKilograms = saved.initialKilograms;
+        settling = true;
+        RefreshSurface(); RefreshCollider(); RefreshGrainAppearance();
+    }
     private void OnEnable() => Initialize();
     private void OnDisable() => spatial?.ReleaseTextures();
 

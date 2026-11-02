@@ -28,6 +28,15 @@ public sealed class GameIntroduction : MonoBehaviour
     [Tooltip("Actual seconds for stepping off the bike; independent of cutscene playback speed.")]
     [SerializeField, Min(.1f)] private float dismountSeconds = 1.8f;
     public bool IsPlaying { get; private set; }
+    private SavedCutsceneClock saveClock;
+    public float SavedTime => saveClock?.Elapsed ?? 0;
+    public bool IsSeeking => saveClock?.IsSeeking ?? false;
+    public Vector3 SavedPlayerPosition => playerPosition;
+    public Quaternion SavedPlayerRotation => playerRotation;
+    public Quaternion SavedLookRotation => cameraLocalRotation;
+    public Vector3 SavedBikePosition => bikePosition;
+    public Quaternion SavedBikeRotation => bikeRotation;
+    public BicycleController SavedBicycle => bicycle;
     private bool completed;
     public bool Completed
     {
@@ -71,9 +80,10 @@ public sealed class GameIntroduction : MonoBehaviour
         return true;
     }
 
-    public bool Play()
+    public bool Play(float resumeTime = 0)
     {
         if (IsPlaying || !CanPlay) return false;
+        saveClock = new SavedCutsceneClock(resumeTime);
         IsPlaying = true; view = player.characterCamera;
         AudioManager.Instance?.PlayIntroOnce(restart: true);
         cameraParent = view.transform.parent; cameraLocalPosition = view.transform.localPosition; cameraLocalRotation = view.transform.localRotation;
@@ -109,7 +119,9 @@ public sealed class GameIntroduction : MonoBehaviour
         view.transform.SetParent(null, true); view.fieldOfView = 60;
         routeLengths = new float[bicycleRoute.Length];
         for (int i = 1; i < routeLengths.Length; i++) routeLengths[i] = routeLengths[i - 1] + Vector3.Distance(bicycleRoute[i - 1], bicycleRoute[i]);
-        StartCoroutine(Sequence()); return true;
+        StartCoroutine(saveClock.Run(Sequence()));
+        if (resumeTime > 0) AudioManager.Instance?.SeekMusic(resumeTime);
+        return true;
     }
     private void Suspend(Behaviour component)
     {
@@ -149,16 +161,8 @@ public sealed class GameIntroduction : MonoBehaviour
         rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
         rect.offsetMin = rect.offsetMax = Vector2.zero;
     }
-    private IEnumerator Animate(float duration, Action<float> apply)
-    {
-        duration /= Mathf.Max(.1f, playbackSpeed);
-        float elapsed = 0;
-        while (elapsed < duration)
-        {
-            if (player == null || view == null) { Cancel(); yield break; }
-            elapsed += Time.deltaTime; apply(Mathf.Clamp01(elapsed / duration)); yield return null;
-        }
-    }
+    private IEnumerator Animate(float duration, Action<float> apply) =>
+        saveClock.Animate(duration / Mathf.Max(.1f, playbackSpeed), apply);
     private IEnumerator Sequence()
     {
         CurrentShot = "Farm panorama";

@@ -19,6 +19,21 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     public string endingScene = "Last Scene";
     public bool DoorOpen { get; private set; }
     public bool Running { get; private set; }
+    private SavedCutsceneClock saveClock;
+    public float SavedTime => saveClock?.Elapsed ?? 0;
+    public bool IsSeeking => saveClock?.IsSeeking ?? false;
+    public void RestoreDoor(bool open)
+    {
+        DoorOpen = open;
+        if (roomDoor != null) roomDoor.localRotation = doorClosed * Quaternion.Euler(0, open ? -100 : 0, 0);
+    }
+    public bool ResumeSaved(PlayerInteractor player, float time)
+    {
+        if (Running || player == null || !player.BeginDiscovery(this)) return false;
+        DoorOpen = true; roomDoor.localRotation = doorClosed * Quaternion.Euler(0,-100,0);
+        actor = player; Running = true; saveClock = new SavedCutsceneClock(time);
+        StartCoroutine(saveClock.Run(Launch())); return true;
+    }
     private bool cleared;
     private readonly HashSet<GameplayCanvas> hud = new HashSet<GameplayCanvas>();
     private void LateUpdate() { if (overlay != null) overlay.GetComponent<Canvas>().enabled = Pause.Instance == null || !Pause.Instance.paused; }
@@ -65,7 +80,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         if(Running||(!DoorOpen && !BypassRestrictions)||interactor==null||interactor.HandsOccupied||Time.timeScale<=0)return false;
         if(!Application.CanStreamedLevelBeLoaded(endingScene)){Debug.LogError("Launch destination is missing from Build Settings: "+endingScene,this);return false;}
         if(!interactor.BeginDiscovery(this))return false;
-        actor=interactor;Running=true;StartCoroutine(Launch());return true;
+        actor=interactor;Running=true;saveClock=new SavedCutsceneClock();StartCoroutine(saveClock.Run(Launch()));return true;
     }
     private void Suspend(Behaviour b){if(b==null||suspended.ContainsKey(b))return;suspended[b]=b.enabled;b.enabled=false;}
     private void Hide(GameObject go){if(go==null||hidden.ContainsKey(go))return;hidden[go]=go.activeSelf;go.SetActive(false);}
@@ -87,7 +102,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         yield return Animate(.7f,t=>roomLight.intensity=Mathf.Lerp(0,180,t));
         GameAchievements.ElectricalRoomPowered();
         yield return TurnToward(revealView,.8f);
-        yield return new WaitForSeconds(.15f);
+        yield return saveClock.Animate(.15f, _ => { });
         GameplayAudio.Instance?.OpenRocketDoor();
         yield return Animate(1.4f,t=>revealDoor.localPosition=revealClosed+Vector3.up*revealLift*t);
         // Begin walking as the hatch opens, keeping the movement and door in sync.
@@ -104,9 +119,9 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         });
         // The latch catches their attention: turn sharply toward the door.
         if(lookBackView!=null)yield return MoveCamera(lookBackView,.48f);
-        yield return new WaitForSeconds(.3f);
+        yield return saveClock.Animate(.3f, _ => { });
         subtitle.text="GET READY FOR LAUNCH";Play(readyVoice);
-        yield return new WaitForSeconds(.5f);
+        yield return saveClock.Animate(.5f, _ => { });
         subtitle.text="GET READY FOR LAUNCH\n3...";Play(threeVoice);
         Vector3 windowStart=cinematic.transform.position;
         Quaternion windowRotation=cinematic.transform.rotation;
@@ -127,7 +142,10 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         yield return Animate(1.1f,t=>cinematic.transform.rotation=Quaternion.Slerp(lastLook,windowRotation,t));
         var rest=cinematic.transform.localPosition;
         yield return Animate(.8f,t=>{cinematic.transform.localPosition=rest+new Vector3(Mathf.Sin(t*89),Mathf.Sin(t*117),0)*.025f*t;fade.color=new Color(0,0,0,t);});
-        subtitle.text="";var load=SceneManager.LoadSceneAsync(endingScene,LoadSceneMode.Single);if(load!=null)yield return load;
+        subtitle.text="";
+        if (WorldSaveRuntime.Instance != null) WorldSaveRuntime.Instance.DestinationScene = endingScene;
+        SaveSystem.SaveData();
+        var load=SceneManager.LoadSceneAsync(endingScene,LoadSceneMode.Single);if(load!=null)yield return load;
     }
     private IEnumerator TurnToward(Transform target, float duration)
     {
@@ -190,11 +208,11 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     {
         Quaternion center = cinematic.transform.rotation;
         yield return Animate(.6f, t => cinematic.transform.rotation = center * Quaternion.Euler(-3*t, -8*t, -t));
-        yield return new WaitForSeconds(.18f);
+        yield return saveClock.Animate(.18f, _ => { });
         Quaternion left = cinematic.transform.rotation;
         Quaternion right = center * Quaternion.Euler(2, 9, 1);
         yield return Animate(.85f, t => cinematic.transform.rotation = Quaternion.Slerp(left, right, t));
-        yield return new WaitForSeconds(.22f);
+        yield return saveClock.Animate(.22f, _ => { });
         Quaternion from = cinematic.transform.rotation;
         yield return Animate(.5f, t => cinematic.transform.rotation = Quaternion.Slerp(from, center, t));
     }
@@ -202,15 +220,15 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     {
         Quaternion center = cinematic.transform.rotation;
         yield return Animate(.45f, t => cinematic.transform.rotation = center * Quaternion.Euler(-2*t, -7*t, 0));
-        yield return new WaitForSeconds(.2f);
+        yield return saveClock.Animate(.2f, _ => { });
         yield return Animate(.7f, t => cinematic.transform.rotation = center * Quaternion.Euler(-2 + 3*t, -7 + 14*t, 0));
-        yield return new WaitForSeconds(.2f);
+        yield return saveClock.Animate(.2f, _ => { });
         Quaternion from = cinematic.transform.rotation;
         yield return Animate(.45f, t => cinematic.transform.rotation = Quaternion.Slerp(from, center, t));
     }
-    private void Play(AudioClip clip){if(clip!=null)voice.PlayOneShot(clip);}
+    private void Play(AudioClip clip){if(clip!=null && !IsSeeking)voice.PlayOneShot(clip);}
     private IEnumerator MoveCamera(Transform target,float duration){var p=cinematic.transform.position;var r=cinematic.transform.rotation;yield return Animate(duration,t=>cinematic.transform.SetPositionAndRotation(Vector3.Lerp(p,target.position,t),Quaternion.Slerp(r,target.rotation,t)));}
-    private IEnumerator Animate(float duration,System.Action<float> action){float t=0;while(t<duration){t+=Time.deltaTime;action(Mathf.SmoothStep(0,1,Mathf.Clamp01(t/duration)));yield return null;}action(1);}
+    private IEnumerator Animate(float duration,System.Action<float> action) => saveClock.Animate(duration, t => action(Mathf.SmoothStep(0,1,t)));
     private void CreateOverlay()
     {
         overlay=new GameObject("Launch subtitles",typeof(Canvas),typeof(CanvasScaler));var canvas=overlay.GetComponent<Canvas>();canvas.renderMode=RenderMode.ScreenSpaceOverlay;canvas.sortingOrder=32000;

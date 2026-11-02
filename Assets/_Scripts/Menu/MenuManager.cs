@@ -154,7 +154,8 @@ public class MenuManager : MonoBehaviour
                 while (!reset.IsCompleted) yield return null;
                 if (reset.IsFaulted) throw reset.Exception;
             }
-            yield return LoadingScreen.LoadSceneRoutine(gameplayScene);
+            string destination = !newGame && SaveSystem.Data?.world?.scene == "Last Scene" ? "Last Scene" : gameplayScene;
+            yield return LoadingScreen.LoadSceneRoutine(destination);
         }
         finally { transitionRequested = false; }
     }

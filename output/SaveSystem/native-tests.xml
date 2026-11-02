@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="8" result="Passed" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0,1409592">
+  <test-suite type="TestSuite" id="1000" name="Free Hangar" fullname="Free Hangar" runstate="Runnable" testcasecount="385" result="Passed" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0.140959" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1475" name="Assembly-CSharp-Editor.dll" fullname="F:/Projects/freehangar/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="385" result="Passed" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0.132277" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="27024" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestFixture" id="1466" name="WorldSaveTests" fullname="WorldSaveTests" classname="WorldSaveTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0.127385" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1472" name="ContainerRestoresCropMassAndIdentityWithoutAwardingProgress" fullname="WorldSaveTests.ContainerRestoresCropMassAndIdentityWithoutAwardingProgress" methodname="ContainerRestoresCropMassAndIdentityWithoutAwardingProgress" classname="WorldSaveTests" runstate="Runnable" seed="610680251" result="Passed" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0.018694" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1473" name="CutsceneSeekReconstructsCompletedShotsAndStopsAtSavedFraction" fullname="WorldSaveTests.CutsceneSeekReconstructsCompletedShotsAndStopsAtSavedFraction" methodname="CutsceneSeekReconstructsCompletedShotsAndStopsAtSavedFraction" classname="WorldSaveTests" runstate="Runnable" seed="1654494307" result="Passed" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0.002138" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1471" name="GrainGridAndCropStrataRoundTripWithoutRegrowingMaterial" fullname="WorldSaveTests.GrainGridAndCropStrataRoundTripWithoutRegrowingMaterial" methodname="GrainGridAndCropStrataRoundTripWithoutRegrowingMaterial" classname="WorldSaveTests" runstate="Runnable" seed="342339361" result="Passed" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0.033809" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1470" name="LegacyCompressedWorldMigratesToNativeNestedLists" fullname="WorldSaveTests.LegacyCompressedWorldMigratesToNativeNestedLists" methodname="LegacyCompressedWorldMigratesToNativeNestedLists" classname="WorldSaveTests" runstate="Runnable" seed="219791587" result="Passed" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0.018650" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1469" name="NativePlayerDataRoundTripsNestedVehicleCargo" fullname="WorldSaveTests.NativePlayerDataRoundTripsNestedVehicleCargo" methodname="NativePlayerDataRoundTripsNestedVehicleCargo" classname="WorldSaveTests" runstate="Runnable" seed="381284909" result="Passed" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0.003489" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1467" name="PartiallyBrokenBarrierRestoresHitProgress" fullname="WorldSaveTests.PartiallyBrokenBarrierRestoresHitProgress" methodname="PartiallyBrokenBarrierRestoresHitProgress" classname="WorldSaveTests" runstate="Runnable" seed="141102271" result="Passed" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0.001705" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1474" name="WorldIdentitySurvivesReparentAndVehicleReplacement" fullname="WorldSaveTests.WorldIdentitySurvivesReparentAndVehicleReplacement" methodname="WorldIdentitySurvivesReparentAndVehicleReplacement" classname="WorldSaveTests" runstate="Runnable" seed="935960239" result="Passed" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0.001101" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1468" name="WorldRoundTripRestoresVehicleCargoAndDoesNotRespawnSoldBag" fullname="WorldSaveTests.WorldRoundTripRestoresVehicleCargoAndDoesNotRespawnSoldBag" methodname="WorldRoundTripRestoresVehicleCargoAndDoesNotRespawnSoldBag" classname="WorldSaveTests" runstate="Runnable" seed="922750041" result="Passed" start-time="2026-11-02 11:42:07Z" end-time="2026-11-02 11:42:07Z" duration="0.030635" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: C:/Users/TudorCroitoru/AppData/LocalLow/Harbuz Games/Free Hangar\TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

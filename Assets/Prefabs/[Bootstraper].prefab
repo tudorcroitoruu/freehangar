@@ -1493,17 +1493,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlobalManager
   currentPlayerData:
+    worldSnapshot: 
+    introductionCompleted: 0
     openedHangars: 01000000
     firstHangarHalfCleared: 0
+    achievementProgress:
+      collectedKilograms: 0
+      grainSaleCash: 0
+      crowsScared: 0
+      ratsScared: 0
+      electricalRoomPowered: 0
+      closedBags: []
+      forkliftDeliveries: []
+      clearedHangars: 
+      requiredHangars: 
+      requiredVehicleKeys: []
+      requiredChests: []
+      unlocked: 
     grainBaggedKilograms: 0
     foundSecrets: []
     freeUpgradeVouchers: 0
     infiniteStaminaUntilUtc: 0
+    noAttacksUntilUtc: 0
+    mobilityUntilUtc: 0
+    doubleSellCashUntilUtc: 0
     wheelbarrowTier: 0
     wheelbarrowUpgradeLevels: 000000000000000000000000
     shovelUpgradeLevel: 0
     staminaUpgradeLevel: 0
     vehicleUpgrades: []
+    unlockedVehicles: []
     playerName: 
     tutorialPassed: 0
     newGameDone: 0
@@ -16998,6 +17017,7 @@ MonoBehaviour:
   popupUI: {fileID: 0}
   animating: 0
   loadingImage: {fileID: 0}
+  progressFillSeconds: 1
 --- !u!1 &7199597317043929800
 GameObject:
   m_ObjectHideFlags: 0

@@ -175,6 +175,22 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
 
     public void SetCarried(bool carried) => IsCarried = carried;
 
+    public ContainerSave CaptureSave() => new ContainerSave { kilograms = kilograms, grain = (int)acceptedGrain,
+        closure = sack != null ? sack.Close : 0, closing = IsClosing, achievementId = AchievementIdentity };
+
+    public void RestoreSave(ContainerSave saved)
+    {
+        if (saved == null) return;
+        kilograms = float.IsFinite(saved.kilograms) ? Mathf.Clamp(saved.kilograms, 0, capacityKg) : 0;
+        acceptedGrain = (GrainType)Mathf.Clamp(saved.grain, 0, GrainCargo.TypeCount - 1);
+        achievementIdentity = saved.achievementId;
+        RefreshFillPresentation();
+        if (sack != null) sack.Close = Mathf.Clamp01(saved.closure);
+        IsClosing = saved.closing && sack != null && !IsFinished;
+        IsCarried = false;
+        ApplyFill();
+    }
+
     private void Update()
     {
         if (!IsClosing || sack == null || Time.deltaTime <= 0) return;
@@ -183,6 +199,7 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
         if (IsFinished)
         {
             IsClosing = false;
+            GameplayAudio.Instance?.CloseContainer();
             GoalContext.Resolve(this, out int hangar, out _);
             GameAchievements.BagClosed(this);
             GoalChecker.ReportProgress(GoalType.SackClosed, 1, hangar, acceptedGrain);

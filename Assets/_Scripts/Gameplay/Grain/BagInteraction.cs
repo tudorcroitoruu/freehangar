@@ -23,6 +23,14 @@ public sealed class BagInteraction : MonoBehaviour
     private readonly Collider[] overlaps = new Collider[32];
     public bool IsCarrying => carried != null;
     public GrainContainer CarriedBag => carried;
+    public Vector3 SavedWorldScale => originalWorldScale;
+    public bool RestoreCarried(GrainContainer bag)
+    {
+        if (bag == null || carryAnchor == null) return false;
+        shovelWasActive = IsShovelEquipped;
+        if (shovelPresentation != null) shovelPresentation.gameObject.SetActive(false);
+        return Take(bag);
+    }
     public float CarriedVolume => carriedVolume;
     public InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;
     private bool IsShovelEquipped => GetComponent<PlayerController>() is PlayerController player ?

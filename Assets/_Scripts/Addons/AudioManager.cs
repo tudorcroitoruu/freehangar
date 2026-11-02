@@ -130,6 +130,12 @@ public class AudioManager : MonoBehaviour
 
     public void StopAttackMusic() { if(musicMode==MusicMode.Attack) PlayRegularMusic(); }
 
+    public void SeekMusic(float seconds)
+    {
+        if (musicAudioSource != null && musicAudioSource.clip != null)
+            musicAudioSource.time = Mathf.Clamp(seconds, 0, Mathf.Max(0, musicAudioSource.clip.length - .01f));
+    }
+
     public void PlayAttackMusic()
     {
         if (attackMusic == null || musicAudioSource == null || musicMode == MusicMode.Ending) return;

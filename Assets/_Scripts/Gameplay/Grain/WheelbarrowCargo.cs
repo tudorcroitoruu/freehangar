@@ -5,6 +5,13 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
 {
+    public void RestoreLoadedBag(GrainContainer bag, Transform slot)
+    {
+        if (bag == null || slot == null || bags.Contains(bag)) return;
+        var size = bag.WorldBounds.size;
+        float volume = size.x * size.y * size.z;
+        bags.Add(bag); bagVolumes.Add(volume); slots.Add(slot); occupiedVolume += volume;
+    }
     [SerializeField, Min(.01f)] private float cargoVolumeCubicMeters = .4f;
     [SerializeField] private Vector3 trayCenter = new Vector3(0f, .46f, -.72f);
     [SerializeField] private Vector3 traySize = new Vector3(.7f, .35f, .85f);

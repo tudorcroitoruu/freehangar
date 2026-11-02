@@ -12,6 +12,21 @@ public sealed class VehicleCargoPlacement : MonoBehaviour
     private string containerId;
     private int slotIndex;
 
+    public void CaptureSave(WorldObjectSave record)
+    {
+        record.placement = true; record.originalScale = baseWorldScale;
+        record.poseScale = baseScale; record.poseRotation = baseRotation; record.seatAtBottom = seatAtBottom;
+    }
+    public static void RestoreSave(Transform item, WorldObjectSave record)
+    {
+        if (!record.placement || item.parent == null) return;
+        Attach(item, item.parent, record.seatAtBottom);
+        var state = item.GetComponent<VehicleCargoPlacement>();
+        if (state == null) return;
+        state.baseWorldScale = record.originalScale; state.baseScale = record.poseScale;
+        state.baseRotation = record.poseRotation; state.Apply();
+    }
+
     public static void Attach(Transform item, Transform slot, bool bottom)
     {
         var upgrade=VehicleCargoOwner.Upgrade(slot);

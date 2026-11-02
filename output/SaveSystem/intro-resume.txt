@@ -1,0 +1,1 @@
+PASS Native saved intro checkpoint replays to Bicycle approach at 8.5 seconds after scene reload. Pause still suspends audio. Scene's developer skipIntroCutscene option was bypassed only for this probe.

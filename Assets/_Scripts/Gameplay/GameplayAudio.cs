@@ -18,6 +18,7 @@ public sealed class GameplayAudio : MonoBehaviour
     [SerializeField] private AudioClip[] axeWoodHits;
     [SerializeField] private AudioClip hammerMetal, hammerWood, pickUp, drop;
     [SerializeField] private AudioClip hitAir;
+    [SerializeField] private AudioClip closeBag;
     [Header("Last scene")]
     [SerializeField] private AudioClip openDoor, openRocketDoor, closeDoor, rocket, switchElectrical, lightsOn;
     [Header("Other")]
@@ -46,11 +47,13 @@ public sealed class GameplayAudio : MonoBehaviour
 
     private void Play(AudioClip clip, float volume = 1f)
     {
+        if (WorldSaveRuntime.IsSeeking || WorldSaveRuntime.IsRestoring) return;
         if (clip != null && effects != null) effects.PlayOneShot(clip, volume);
     }
 
     private void PlayAt(AudioClip clip, Vector3 position, float volume = 1f, float maxSeconds = float.PositiveInfinity)
     {
+        if (WorldSaveRuntime.IsSeeking || WorldSaveRuntime.IsRestoring) return;
         if (clip == null) return;
         var go = new GameObject("Gameplay sound: " + clip.name);
         go.transform.position = position;
@@ -71,6 +74,7 @@ public sealed class GameplayAudio : MonoBehaviour
     public void CrowFlyAway(Vector3 point) => PlayAt(crowFlyAway, point, .65f);
     public void BroomHit() => Play(Choose(broomHits), .75f);
     public void ToolSwing() => Play(hitAir, .75f);
+    public void CloseContainer() => Play(closeBag, .8f);
     public void PressWeighButton() => Play(pressButton, .8f);
     public void CashIn() => Play(cashIn, .8f);
     public void UpgradeResult(bool success) => Play(success ? upgradeSuccess : upgradeFailed, .8f);

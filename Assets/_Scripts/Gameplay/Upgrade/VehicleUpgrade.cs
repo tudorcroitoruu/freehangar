@@ -151,6 +151,7 @@ public sealed class VehicleUpgrade : MonoBehaviour
 
     private void ActivateReplacement(VehicleUpgrade next)
     {
+        WorldSaveIdentity.Transfer(gameObject, next.gameObject);
         Replacement = next;
         next.AssemblyRoot.SetActive(true);
         foreach (var rider in FindObjectsByType<PlayerBicycleInteraction>(FindObjectsInactive.Include, FindObjectsSortMode.None))

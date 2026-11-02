@@ -25,6 +25,7 @@ public sealed class PlayerItemCarry : MonoBehaviour
 
     public bool IsCarrying => carried != null;
     public GameObject CarriedObject => carried;
+    public Vector3 SavedWorldScale => worldScale;
     public bool CanTake => isActiveAndEnabled && player != null && player.isActiveAndEnabled &&
         view != null && !IsCarrying && (player.Shovel == null || !player.Shovel.IsBusy) && (bicycle == null || !bicycle.IsRiding) &&
         (interactor == null || (interactor.PushedWheelbarrow == null &&

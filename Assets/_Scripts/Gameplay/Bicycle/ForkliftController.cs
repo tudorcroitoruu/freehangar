@@ -10,6 +10,17 @@ public sealed class ForkliftController : MonoBehaviour
     [SerializeField, Min(.1f)] private float liftHeight=.55f;
     public float EnginePitchMultiplier => enginePitchMultiplier;
     public GrainContainer Cargo => cargo;
+    public void RestoreLoadedBag(GrainContainer bag)
+    {
+        if (bag == null || forkAnchor == null || bag.transform.parent != forkAnchor) return;
+        cargo = bag; cargoBody = bag.GetComponent<Rigidbody>();
+        cargoColliders = bag.GetComponentsInChildren<Collider>(true);
+        originalColliderStates = new bool[cargoColliders.Length];
+        for (int i = 0; i < cargoColliders.Length; i++) { originalColliderStates[i] = cargoColliders[i].enabled; cargoColliders[i].enabled = false; }
+        liftBlend = 1; seatedLocalPosition = bag.transform.localPosition - Vector3.up * liftHeight;
+        if (cargoBody != null) cargoBody.isKinematic = true;
+        bag.SetCarried(true);
+    }
     private BicycleController rig;
     private GrainContainer cargo;
     private Rigidbody cargoBody;

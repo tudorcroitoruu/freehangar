@@ -15,7 +15,8 @@ public class GameManager : MonoBehaviour
     public bool bypassFinalRoomRestrictions = false;
     [SerializeField] private GameIntroduction introduction;
     public bool IsIntroPlaying => introduction != null && introduction.IsPlaying;
-    public bool IntroductionPending => !skipTutorial && !skipIntroCutscene && introduction != null &&
+    private bool HasSavedIntroduction => SaveSystem.Data?.world?.introPlaying == true && SaveSystem.Data.world.scene == gameObject.scene.name;
+    public bool IntroductionPending => (HasSavedIntroduction || (!skipTutorial && !skipIntroCutscene)) && introduction != null &&
         introduction.enabled && introduction.gameObject.activeInHierarchy && !introduction.Completed;
 
     public bool PrepareIntroductionForReveal() => IntroductionPending && introduction.PrepareOpening();
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
             Instance = this;
         }
         if (Instance != this) return;
+        WorldSaveRuntime.EnsureScene(gameObject.scene);
 
         var settingsManager = GameSettingsManager.Instance;
         if (settingsManager == null)
@@ -41,8 +43,10 @@ public class GameManager : MonoBehaviour
     {
         // Cutscene timing and audio start only after the loading curtain is gone.
         while (LoadingScreen.IsLoading) yield return null;
+        while (!SaveSystem.savesLoaded || (WorldSaveRuntime.Instance != null && !WorldSaveRuntime.Instance.Ready)) yield return null;
         if (Instance != this || introduction == null) yield break;
-        if (skipTutorial || skipIntroCutscene || !introduction.Play()) introduction.Cancel();
+        float resume = HasSavedIntroduction ? SaveSystem.Data.world.introTime : 0;
+        if (((skipTutorial || skipIntroCutscene) && !HasSavedIntroduction) || !introduction.Play(resume)) introduction.Cancel();
     }
 
 #if UNITY_EDITOR

@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class ShopProduct : MonoBehaviour, IInteractable
 {
+    public string SaveProductId => productID;
     public enum DeliveryMode { Hands, AtSpawnPoint }
 
     [SerializeField] private string productID;

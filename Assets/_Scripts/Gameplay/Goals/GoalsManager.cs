@@ -21,7 +21,6 @@ public class GoalsManager : MonoBehaviour
     private GoalListElement currentElement;
     private int currentIndex;
     private bool initialized, processing, dirty;
-    private float saveAt;
 
     public static GoalsManager Instance { get; private set; }
     public GoalSettings CurrentGoal => currentGoal;
@@ -55,7 +54,6 @@ public class GoalsManager : MonoBehaviour
             try { Initialize(SaveSystem.Data); }
             catch (Exception error) { Debug.LogException(error, this); enabled = false; return; }
         }
-        if (dirty && Time.unscaledTime >= saveAt) FlushSave();
     }
 
     /// <summary>Bind saved player progress. Called automatically after SaveSystem finishes loading.</summary>
@@ -175,7 +173,6 @@ public class GoalsManager : MonoBehaviour
 
     private void MarkDirty()
     {
-        if (!dirty) saveAt = Time.unscaledTime + 1f;
         dirty = true;
     }
 
@@ -186,13 +183,10 @@ public class GoalsManager : MonoBehaviour
         dirty = false;
     }
 
-    private void OnApplicationPause(bool paused) { if (paused) FlushSave(); }
-    private void OnApplicationQuit() => FlushSave();
     private void OnDisable()
     {
         GoalChecker.ActionReported -= ProcessAction;
         if (Instance == this) Instance = null;
-        FlushSave();
     }
 }
 

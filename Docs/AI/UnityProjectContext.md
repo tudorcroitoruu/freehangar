@@ -221,3 +221,46 @@ Variable road-width pass: 5.2-10m dirt core with asymmetric feathered shoulders,
 2026-10-27: The three scene pickups now have driveable prefabs under Assets/Models/Pickups/Driveable, using the shared engine/interaction and PickupController for four-wheel visuals. Details and validation: Docs/AI/Pickups.md.
 
 Ground following update: all seven vehicle rigs now use runtime VehicleGroundAlignment for wheel-based pitch, roll and body height, with matching body sweeps/parked colliders. See Docs/AI/VehicleGroundAlignment.md for architecture and validation.
+
+2026-11-02 native world persistence: PlayerData.world is now native serializable
+version-2 data with lists of bags, vehicles and wheelbarrows. Loaded bags are nested
+in their owner's bags list; loose bags remain in the world list. Shared object
+records retain transform, physics, placement and content information. Existing
+version-1 gzip/base64 worldSnapshot saves are migrated on load; new writes contain
+no embedded compressed string.
+SaveSystem.SaveData() synchronously captures the current world and writes the
+existing PlayerPrefs store. Settings, completed goals, return to Menu and quit
+use this entry point. No periodic world/grain/achievement/provisional-goal saves.
+Economy helpers mutate PlayerData and notify UI without writing mid-transaction.
+WorldSaveRuntime restores after vehicle replacement. The previous save is retained
+as /save_Backup. Old saves without world state retain progression and use the
+authored scene.
+
+Snapshots include player/look/mounted or pushing state, equipped tool, shovel
+crop amounts, stamina/hunger, all container contents/closure/achievement IDs,
+vehicle and child Rigidbody poses/velocities, cargo slots and carry scale,
+wheelbarrow/forklift cargo, grain height grids and per-column crop strata,
+spilled grain, consumed food, and partial barrier damage. Sold/removed authored
+containers have tombstones. Runtime inventory is recreated through the existing
+shop/depot/supply prefab catalog and re-registered with its original limits.
+Scene identities use the original hierarchy names and same-name sibling ordinals;
+vehicle replacements transfer identity. Renaming/reparenting authored entities
+between game releases requires an ID migration. Missing templates/slots stop
+restoration and preserve the save rather than allowing a partial autosave.
+
+Intro and launch use SavedCutsceneClock to reconstruct completed shots and resume
+scaled-time playback without replaying one-shot effects. Ending playback rebuilds
+its preceding camera shots. Continue loads Last Scene for ending saves. A saved
+intro takes precedence over developer skip flags; new games still respect them.
+Previous implementation validation: output/SaveSystem has seven focused checks, 27 real Gameplay native
+save/load checks, and intro checkpoint/reload probes. The user's original four
+PlayerPrefs records were restored byte-for-byte; unsaved scene edits were kept.
+The focused checks ran directly in the Editor after the Test Runner requested an
+unwanted scene save. Last Scene/launch and each possible vehicle upgrade were not
+individually playtested; shared serialization/cutscene clock paths were checked.
+
+Native schema refactor validation (2026-11-02): both generated C# projects compiled
+with zero errors. Unity batch EditMode WorldSaveTests passed 8/8, covering native
+PlayerData serialization, nested vehicle cargo, old compressed-save migration,
+wheelbarrow restoration/deleted bags, crop state, barriers, cutscene seek and IDs.
+Results: output/SaveSystem/native-tests.xml. Interactive play mode was not rerun.

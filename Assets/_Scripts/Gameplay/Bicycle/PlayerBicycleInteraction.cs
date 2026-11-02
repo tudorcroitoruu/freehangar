@@ -124,6 +124,13 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         view.transform.localRotation = Quaternion.Euler(pitch + bicycle.RidingCameraPitch + bicycle.PedalingCameraPitch, yaw, 0) * Quaternion.Euler(roadAngles);
     }
 
+    public Vector2 SavedLook => new Vector2(yaw, pitch);
+    public void RestoreSavedLook(Vector2 look)
+    {
+        if (!riding) return;
+        yaw = Mathf.Clamp(look.x, -85, 85); pitch = Mathf.Clamp(look.y, -65, 65);
+        ApplyRidingView();
+    }
     public bool TryLoadBag() => !riding && bags != null && bicycle != null && bags.TryStow(bicycle.FreeBagCargoSlot(bags.CarriedBag));
     public bool TryMount()
     {

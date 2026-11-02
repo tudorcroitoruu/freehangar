@@ -29,8 +29,6 @@ public sealed class GrainProgression : MonoBehaviour
     };
     private PlayerData loadedData;
     private double pendingKg, sessionKg;
-    private bool dirty;
-    private float saveAt;
     public int CurrentStage { get; private set; } = -1;
     public double BaggedKilograms => sessionKg;
     public string StageTitle => CurrentStage >= 0 && CurrentStage < stages.Length ? stages[CurrentStage].title : "Corn";
@@ -39,15 +37,13 @@ public sealed class GrainProgression : MonoBehaviour
 
     private void OnEnable() { GrainContainer.GrainDeposited += RecordDeposit; }
     private void Start() { if (CurrentStage < 0) ApplyStage(0); }
-    private void OnDisable() { GrainContainer.GrainDeposited -= RecordDeposit; FlushSave(); }
-    private void OnApplicationPause(bool paused) { if (paused) FlushSave(); }
-    private void OnApplicationQuit() => FlushSave();
+    private void OnDisable() { GrainContainer.GrainDeposited -= RecordDeposit; }
     private void RecordDeposit(float kg)
     {
         if (!float.IsFinite(kg) || kg <= 0) return;
         sessionKg += kg;
         if (loadedData == null) pendingKg += kg;
-        else { loadedData.grainBaggedKilograms = sessionKg; saveAt = Time.unscaledTime + 3f; dirty = true; }
+        else loadedData.grainBaggedKilograms = sessionKg;
     }
     private void Update()
     {
@@ -57,12 +53,10 @@ public sealed class GrainProgression : MonoBehaviour
             double saved = loadedData.grainBaggedKilograms;
             sessionKg = (double.IsFinite(saved) ? Math.Max(0, saved) : 0) + pendingKg;
             loadedData.grainBaggedKilograms = sessionKg;
-            if (pendingKg > 0) { dirty = true; saveAt = Time.unscaledTime + 1; }
             pendingKg = 0;
         }
         int next = StageFor(sessionKg);
         if (next != CurrentStage) ApplyStage(next);
-        if (dirty && Time.unscaledTime >= saveAt) FlushSave();
     }
     public int StageFor(double baggedKg)
     {
@@ -86,10 +80,5 @@ public sealed class GrainProgression : MonoBehaviour
             pile.SetRecipe(recipe);
         }
         CurrentStage = index;
-    }
-    private void FlushSave()
-    {
-        if (!dirty || loadedData == null || loadedData != SaveSystem.Data || !SaveSystem.savesLoaded) return;
-        SaveSystem.SaveData(); dirty = false;
     }
 }

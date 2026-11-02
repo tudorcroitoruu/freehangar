@@ -21,6 +21,12 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
 
     public bool IsExposed => exposed;
     public int HitsRemaining => Mathf.Max(0, hitsRequired - hits);
+    public int SavedHits => hits;
+    public void RestoreSave(int savedHits, bool wasExposed)
+    {
+        hits = Mathf.Clamp(savedHits, 0, hitsRequired);
+        SetExposed(wasExposed);
+    }
 
     private void Awake()
     {

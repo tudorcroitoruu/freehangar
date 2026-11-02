@@ -19,6 +19,7 @@ public class InventoryProduct : MonoBehaviour, IInteractable
     private Transform spawnPoint;
 
     public string ProductID => productID;
+    public GameObject SavePrefab => objectPrefab;
     public bool UnlimitedCount => unlimitedCount;
     public int MaxActiveInScene => maxActiveInScene;
 
