@@ -30,9 +30,9 @@ MonoBehaviour:
   showIndicator: 1
   showOffscreenIndicator: 1
   ignoreIndicatorRadius: 0
-  ignoreIndicatorHideDistance: 1
+  ignoreIndicatorHideDistance: 0
   ignoreIndicatorScaling: 0
-  ignoreIndicatorFading: 1
+  ignoreIndicatorFading: 0
   useIndicatorDistanceText: 1
   showOffscreenIndicatorDistance: 0
   indicatorOnscreenDistanceTextFormat: '{0}m'
