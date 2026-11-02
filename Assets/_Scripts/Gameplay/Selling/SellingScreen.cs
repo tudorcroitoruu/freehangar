@@ -43,6 +43,7 @@ public class SellingScreen : MonoBehaviour
         current = this;
         gameObject.SetActive(true);
         Refresh();
+        AudioManager.Instance?.PlayConfirm();
         return true;
     }
 
@@ -144,6 +145,7 @@ public class SellingScreen : MonoBehaviour
 
     public void Close()
     {
+        if (IsOpen && !saleInProgress) AudioManager.Instance?.PlayCancel();
         gameObject.SetActive(false);
         ReleaseInput();
     }

@@ -1,0 +1,3 @@
+confirmClips: Assets/Audio/Sounds/Bee Jam/Ui Confirm.wav
+cancelClips: Assets/Audio/Sounds/Bee Jam/UI Cancel.wav
+UI audio source assigned.

@@ -47,6 +47,7 @@ public class UpgradeManager : MonoBehaviour
         gameObject.SetActive(true);
         upgradeShovelScreen.gameObject.SetActive(true);
         upgradeShovelScreen.Refresh();
+        AudioManager.Instance?.PlayConfirm();
         return true;
     }
 
@@ -65,6 +66,7 @@ public class UpgradeManager : MonoBehaviour
         gameObject.SetActive(true);
         upgradeStaminaScreen.gameObject.SetActive(true);
         upgradeStaminaScreen.Refresh();
+        AudioManager.Instance?.PlayConfirm();
         return true;
     }
 
@@ -83,6 +85,7 @@ public class UpgradeManager : MonoBehaviour
         if (closeButton != null) closeButton.gameObject.SetActive(true);
         gameObject.SetActive(true);
         upgradeVehicleScreen.gameObject.SetActive(true);
+        AudioManager.Instance?.PlayConfirm();
         return true;
     }
 
@@ -117,6 +120,7 @@ public class UpgradeManager : MonoBehaviour
 
     public void Close()
     {
+        if (IsOpen) AudioManager.Instance?.PlayCancel();
         foreach (Transform child in transform)
             if (child.gameObject.activeSelf) child.gameObject.SetActive(false);
         gameObject.SetActive(false);
