@@ -7,11 +7,15 @@ public sealed class GrainPest : MonoBehaviour
 {
     public GrainContainer Target { get; private set; }
     public bool IsCrow { get; private set; }
+    public bool IsFeeding => isActiveAndEnabled && feedingNow && !fleeing && !climbing &&
+        Target != null && Target.isActiveAndEnabled && Target.Kilograms > .001f && !PlayerPerks.NoAttacksActive;
     private float nextBite;
     private float speed;
     private Animator animator;
     private RuntimeAnimatorController flying, feeding;
     private bool fleeing, feedingNow;
+    private GameplayCanvas warningCanvas;
+    private bool warningVisible;
     private float fleeUntil;
     private Vector3 fleeDirection;
     private bool hasSlot, wantsToClimb, climbing, onBag;
@@ -37,9 +41,7 @@ public sealed class GrainPest : MonoBehaviour
     }
     private void LateUpdate()
     {
-        GameplayCanvas.Instance?.SetWarning(IsCrow ? WarningType.CrowsAttack : WarningType.RatsAttack, this,
-            feedingNow && !fleeing && !climbing && Target != null && Target.isActiveAndEnabled &&
-            Target.Kilograms > .001f && !PlayerPerks.NoAttacksActive);
+        RefreshWarning();
         // Follow the container after vehicle motion and cargo seating have been applied.
         if (IsCrow && crowPerched && !fleeing && Target != null && Target.isActiveAndEnabled)
         {
@@ -231,8 +233,27 @@ public sealed class GrainPest : MonoBehaviour
         return true;
     }
 
-    private void ClearWarning() => GameplayCanvas.Instance?.SetWarning(
-        IsCrow ? WarningType.CrowsAttack : WarningType.RatsAttack, this, false);
+    private void RefreshWarning()
+    {
+        var canvas = GameplayCanvas.Instance;
+        if (warningCanvas != canvas)
+        {
+            ClearWarning();
+            warningCanvas = canvas;
+        }
+        bool visible = IsFeeding;
+        if (warningCanvas == null || visible == warningVisible) return;
+        warningCanvas.SetWarning(IsCrow ? WarningType.CrowsAttack : WarningType.RatsAttack, this, visible);
+        warningVisible = visible;
+    }
+
+    private void ClearWarning()
+    {
+        if (warningVisible && warningCanvas != null)
+            warningCanvas.SetWarning(IsCrow ? WarningType.CrowsAttack : WarningType.RatsAttack, this, false);
+        warningVisible = false;
+        warningCanvas = null;
+    }
 
     private void OnDisable() => ClearWarning();
 
@@ -267,6 +288,131 @@ public sealed class GrainPestDirector : MonoBehaviour
     private bool introRunning, introDone, showBroomHint;
     private PlayerController introController;
     private bool introControllerWasEnabled;
+
+    [Space, Header("HUD Indicators")] 
+    [SerializeField] private GameObject ratsIndicator;
+    [SerializeField] private GameObject crowsIndicator;
+    private AttackIndicatorGroup ratsHud, crowsHud;
+
+    private sealed class AttackIndicator
+    {
+        private readonly GameObject indicator;
+        private readonly Transform originalParent;
+        private readonly Vector3 originalPosition, originalScale;
+        private readonly Quaternion originalRotation;
+        public GrainContainer Target { get; private set; }
+
+        public AttackIndicator(GameObject indicator)
+        {
+            this.indicator = indicator;
+            if (indicator == null) return;
+            originalParent = indicator.transform.parent;
+            originalPosition = indicator.transform.localPosition;
+            originalRotation = indicator.transform.localRotation;
+            originalScale = indicator.transform.localScale;
+            Hide();
+        }
+
+        public void Show(GrainContainer target)
+        {
+            if (indicator == null) return;
+            Target = target;
+            // Follow the cargo's moving hierarchy without making the reusable indicator
+            // a child of a container that can be sold or destroyed.
+            var parent = target.transform.parent != null ? target.transform.parent : originalParent;
+            if (indicator.transform.parent != parent) indicator.transform.SetParent(parent, true);
+            indicator.transform.position = target.WorldBounds.center;
+            if (!indicator.activeSelf) indicator.SetActive(true);
+        }
+
+        public void Hide()
+        {
+            if (indicator == null) return;
+            if (Target == null && !indicator.activeSelf && indicator.transform.parent == originalParent) return;
+            Target = null;
+            indicator.SetActive(false);
+            indicator.transform.SetParent(originalParent, false);
+            indicator.transform.localPosition = originalPosition;
+            indicator.transform.localRotation = originalRotation;
+            indicator.transform.localScale = originalScale;
+        }
+
+        public AttackIndicator CreateDuplicate()
+        {
+            if (indicator == null) return null;
+            var copy = Instantiate(indicator, originalParent, false);
+            copy.SetActive(false);
+            copy.transform.localPosition = originalPosition;
+            copy.transform.localRotation = originalRotation;
+            copy.transform.localScale = originalScale;
+            return new AttackIndicator(copy);
+        }
+
+        public void DestroyDuplicate()
+        {
+            if (indicator != null) Destroy(indicator);
+        }
+    }
+
+    private sealed class AttackIndicatorGroup
+    {
+        private readonly System.Collections.Generic.List<AttackIndicator> indicators = new();
+        private readonly System.Collections.Generic.HashSet<GrainContainer> targets = new();
+
+        public AttackIndicatorGroup(GameObject template)
+        {
+            if (template != null) indicators.Add(new AttackIndicator(template));
+        }
+
+        public void Refresh(System.Collections.Generic.List<GrainPest> pests, bool crow)
+        {
+            if (indicators.Count == 0) return;
+            targets.Clear();
+            foreach (var pest in pests)
+                if (pest != null && pest.IsCrow == crow && pest.IsFeeding) targets.Add(pest.Target);
+
+            // Keep existing assignments so markers do not switch between containers.
+            foreach (var indicator in indicators)
+            {
+                if (indicator.Target != null && targets.Remove(indicator.Target)) indicator.Show(indicator.Target);
+                else indicator.Hide();
+            }
+
+            foreach (var target in targets)
+            {
+                var available = indicators.Find(indicator => indicator.Target == null);
+                if (available == null)
+                {
+                    available = indicators[0].CreateDuplicate();
+                    if (available == null) continue;
+                    indicators.Add(available);
+                }
+                available.Show(target);
+            }
+        }
+
+        public void Hide()
+        {
+            foreach (var indicator in indicators) indicator.Hide();
+            targets.Clear();
+        }
+
+        public void DestroyDuplicates()
+        {
+            for (int i = 1; i < indicators.Count; i++) indicators[i].DestroyDuplicate();
+        }
+    }
+
+    private void Awake()
+    {
+        ratsHud = new AttackIndicatorGroup(ratsIndicator);
+        crowsHud = new AttackIndicatorGroup(crowsIndicator);
+    }
+
+    private void RefreshIndicator(AttackIndicatorGroup indicator, bool crow)
+    {
+        indicator?.Refresh(encounterPests, crow);
+    }
 #if UNITY_EDITOR
     private bool replayIntroForTesting, replayCrowForTesting;
     public void ReplayCrowIntroForTesting() { if (introRunning) return; replayCrowForTesting = true; crowIntroDone = false; }
@@ -285,12 +431,19 @@ public sealed class GrainPestDirector : MonoBehaviour
         }
         markerTexture.Apply(); markerTexture.hideFlags = HideFlags.HideAndDontSave;
     }
-    private void OnDestroy() { if (markerTexture != null) Destroy(markerTexture); }
+    private void OnDestroy()
+    {
+        ratsHud?.DestroyDuplicates();
+        crowsHud?.DestroyDuplicates();
+        if (markerTexture != null) Destroy(markerTexture);
+    }
     private void Schedule() => nextAttack = Time.time + Random.Range(Mathf.Max(1f,minInterval), Mathf.Max(minInterval,maxInterval));
     private void EndEncounter()
     {
         foreach (var pest in encounterPests) if (pest != null) pest.ScaredAway();
         encounterPests.Clear();
+        ratsHud?.Hide();
+        crowsHud?.Hide();
         encounterActive = false;
         LastAttackEnded = Time.time;
         Schedule();
@@ -508,6 +661,8 @@ public sealed class GrainPestDirector : MonoBehaviour
     {
         StopAllCoroutines();
         if (encounterActive) EndEncounter();
+        ratsHud?.Hide();
+        crowsHud?.Hide();
         RestoreIntroController();
         introRunning = false;
         GameplayCanvas.Instance?.SetWarning(WarningType.RatsAttack, this, false);
@@ -517,6 +672,8 @@ public sealed class GrainPestDirector : MonoBehaviour
 
     private void LateUpdate()
     {
+        RefreshIndicator(ratsHud, false);
+        RefreshIndicator(crowsHud, true);
         if (showBroomHint && player != null)
         {
             var tools = player.GetComponent<PlayerCombatTools>();
