@@ -23,6 +23,7 @@ public class SellingScreen : MonoBehaviour
     private CursorLockMode previousCursorLock;
     private bool previousCursorVisible;
     private bool cursorCaptured;
+    private bool saleInProgress;
     private int quotedCash;
     private int quotedSellMultiplier = 1;
     private static SellingScreen current;
@@ -33,10 +34,11 @@ public class SellingScreen : MonoBehaviour
 
     public bool Open(SellingZone zone, PlayerInteractor interactor)
     {
-        if (!enabled || zone == null || !zone.CanWeigh(interactor) || elementPrefab == null || elementsParent == null ||
+        if (IsOpen || !enabled || zone == null || !zone.CanWeigh(interactor) || elementPrefab == null || elementsParent == null ||
             UpgradeManager.BlocksGameplayInput || UIPopups.BasePopupUI.HasActivePopup ||
             (transform.parent != null && !transform.parent.gameObject.activeInHierarchy)) return false;
         Zone = zone;
+        saleInProgress = false;
         player = interactor;
         current = this;
         gameObject.SetActive(true);
@@ -60,6 +62,7 @@ public class SellingScreen : MonoBehaviour
         if (!IsOpen) return;
         if (!Zone.CanWeigh(player)) { Close(); return; }
         if (!Application.isFocused || UIPopups.BasePopupUI.HasActivePopup) return;
+        if (Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Return)) { Sell(); return; }
         if (Input.GetKeyDown(KeyCode.Escape)) Close();
         else if (!QuoteMatches()) Refresh();
         else if (sellButton != null) sellButton.interactable = CanPay();
@@ -103,7 +106,7 @@ public class SellingScreen : MonoBehaviour
         if (sellButton != null) sellButton.interactable = CanPay();
     }
 
-    private bool CanPay() => containers.Count > 0 && quotedCash > 0 && SaveSystem.Data != null && SaveSystem.Money <= int.MaxValue - quotedCash;
+    private bool CanPay() => !saleInProgress && containers.Count > 0 && quotedCash > 0 && SaveSystem.Data != null && SaveSystem.Money <= int.MaxValue - quotedCash;
 
     private bool QuoteMatches()
     {
@@ -120,11 +123,19 @@ public class SellingScreen : MonoBehaviour
 
     public void Sell()
     {
-        if (!IsOpen || !Zone.CanWeigh(player) || UIPopups.BasePopupUI.HasActivePopup) return;
+        if (saleInProgress || !IsOpen || !Zone.CanWeigh(player) || UIPopups.BasePopupUI.HasActivePopup) return;
         if (!QuoteMatches()) { Refresh(); return; }
-        if (!CanPay() || !SaveSystem.AddMoney(quotedCash)) return;
-        GameAchievements.GrainSold(quotedCash);
+        if (!CanPay()) return;
+        // Lock before AddMoney: its callbacks can invoke Sell again in the same frame.
+        saleInProgress = true;
         if (sellButton != null) sellButton.interactable = false;
+        if (!SaveSystem.AddMoney(quotedCash))
+        {
+            saleInProgress = false;
+            if (sellButton != null) sellButton.interactable = CanPay();
+            return;
+        }
+        GameAchievements.GrainSold(quotedCash);
         foreach (var container in containers)
         {
             var wheelbarrow = container.GetComponentInParent<WheelbarrowCargo>();
