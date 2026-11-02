@@ -7523,12 +7523,12 @@ MonoBehaviour:
     progressMode: 2
     goalAmount: 1
     rewardAmount: 0
-  - goalId: h1_deliver_200kg
-    goalDescription: Deliver 200 kg of grain
+  - goalId: h1_load_200kg
+    goalDescription: Load 200 kg of grain/
     navigationIndicator: {fileID: 0}
     stage: 1
     hangarId: 1
-    goalType: 14
+    goalType: 10
     filterByGrainType: 0
     grainType: 0
     upgradeType: 0
@@ -7584,7 +7584,7 @@ MonoBehaviour:
     goalAmount: 1
     rewardAmount: 0
   - goalId: h2_load_2000kg
-    goalDescription: Load 2,000 kg of grain onto the truck
+    goalDescription: Load 2,000 kg of grain.
     navigationIndicator: {fileID: 0}
     stage: 2
     hangarId: 2
@@ -7595,12 +7595,12 @@ MonoBehaviour:
     progressMode: 1
     goalAmount: 2000
     rewardAmount: 0
-  - goalId: h2_deliver_5000kg
-    goalDescription: Deliver 5000 kg of grain
+  - goalId: h2_load_5000kg
+    goalDescription: Load 5000 kg of grain
     navigationIndicator: {fileID: 0}
     stage: 2
     hangarId: 2
-    goalType: 14
+    goalType: 10
     filterByGrainType: 0
     grainType: 1
     upgradeType: 0
@@ -7655,24 +7655,24 @@ MonoBehaviour:
     progressMode: 2
     goalAmount: 1
     rewardAmount: 0
-  - goalId: h3_deliver_7500kg
-    goalDescription: Deliver 7,500 kg of grain
+  - goalId: h3_load_7500kg
+    goalDescription: Load 7,500 kg of grain
     navigationIndicator: {fileID: 0}
     stage: 2
     hangarId: 3
-    goalType: 14
+    goalType: 10
     filterByGrainType: 0
     grainType: 2
     upgradeType: 0
     progressMode: 1
     goalAmount: 7500
     rewardAmount: 0
-  - goalId: h3_deliver_10000kg
-    goalDescription: Deliver 10,000 kg of grain
+  - goalId: h3_load_10000kg
+    goalDescription: Load 10,000 kg of grain
     navigationIndicator: {fileID: 0}
     stage: 2
     hangarId: 3
-    goalType: 14
+    goalType: 10
     filterByGrainType: 0
     grainType: 2
     upgradeType: 0
@@ -7715,24 +7715,24 @@ MonoBehaviour:
     progressMode: 2
     goalAmount: 1
     rewardAmount: 0
-  - goalId: h4_deliver_10000kg
-    goalDescription: Deliver 10,000 kg of grain
+  - goalId: h4_load_10000kg
+    goalDescription: Load 10,000 kg of grain
     navigationIndicator: {fileID: 0}
     stage: 2
     hangarId: 4
-    goalType: 14
+    goalType: 10
     filterByGrainType: 0
     grainType: 7
     upgradeType: 0
     progressMode: 1
     goalAmount: 10000
     rewardAmount: 0
-  - goalId: h4_deliver_soybeans_5000kg
-    goalDescription: Deliver 5,000 kg of Soybeans
+  - goalId: h4_sell_soybeans_5000kg
+    goalDescription: Sell 5,000 kg of Soybeans
     navigationIndicator: {fileID: 0}
     stage: 2
     hangarId: 4
-    goalType: 14
+    goalType: 12
     filterByGrainType: 1
     grainType: 7
     upgradeType: 0
@@ -7775,36 +7775,36 @@ MonoBehaviour:
     progressMode: 2
     goalAmount: 1
     rewardAmount: 0
-  - goalId: h5_deliver_rice_5000kg
-    goalDescription: Deliver 5,000 kg of rice
+  - goalId: h5_sell_rice_5000kg
+    goalDescription: Sell 5,000 kg of rice
     navigationIndicator: {fileID: 0}
     stage: 2
     hangarId: 5
-    goalType: 14
+    goalType: 12
     filterByGrainType: 1
     grainType: 5
     upgradeType: 0
     progressMode: 1
     goalAmount: 5000
     rewardAmount: 0
-  - goalId: h5_deliver_15000kg
-    goalDescription: Deliver 15,000 kg of grain.
+  - goalId: h5_load_15000kg
+    goalDescription: Load 15,000 kg of grain.
     navigationIndicator: {fileID: 0}
     stage: 2
     hangarId: 5
-    goalType: 14
+    goalType: 10
     filterByGrainType: 0
     grainType: 8
     upgradeType: 0
     progressMode: 1
     goalAmount: 15000
     rewardAmount: 0
-  - goalId: h5_deliver_20000kg
-    goalDescription: Deliver 20,000 kg of grain
+  - goalId: h5_load_20000kg
+    goalDescription: Load 20,000 kg of grain
     navigationIndicator: {fileID: 0}
     stage: 2
     hangarId: 5
-    goalType: 14
+    goalType: 10
     filterByGrainType: 0
     grainType: 8
     upgradeType: 0
