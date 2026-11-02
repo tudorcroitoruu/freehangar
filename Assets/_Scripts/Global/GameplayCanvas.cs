@@ -7,6 +7,7 @@ public class GameplayCanvas : MonoBehaviour
     public static GameplayCanvas Instance;
 
     [SerializeField] private GameObject hudObject;
+    [SerializeField] private CanvasGroup hudNavigationObject;
     private bool hudHiddenByPause;
     private bool hudActiveBeforePause;
     private readonly HashSet<Object> cutsceneHudOwners = new HashSet<Object>();
@@ -124,6 +125,7 @@ public class GameplayCanvas : MonoBehaviour
         hudActiveBeforePause = hudObject.activeSelf;
         hudHiddenByPause = true;
         hudObject.SetActive(false);
+        if (hudNavigationObject != null) hudNavigationObject.alpha = 0f;
     }
 
     private void RestoreHudAfterPause()
@@ -132,6 +134,7 @@ public class GameplayCanvas : MonoBehaviour
         if (!hudHiddenByPause) return;
         hudHiddenByPause = false;
         if (hudObject != null) hudObject.SetActive(hudActiveBeforePause);
+        if (hudNavigationObject != null) hudNavigationObject.alpha = 1f;
     }
 
     public void SetFreeHandsWarning(bool visible)
