@@ -23,6 +23,7 @@ public sealed class WorldSaveRuntime : MonoBehaviour
     private RocketEndingCutscene ending;
     private readonly Dictionary<string, GameObject> objects = new Dictionary<string, GameObject>();
     private readonly Dictionary<string, GameObject> templates = new Dictionary<string, GameObject>();
+    private readonly Dictionary<string, (string productId, int limit)> inventoryCatalog = new Dictionary<string, (string, int)>();
     private readonly List<string> authoredContainers = new List<string>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -56,15 +57,25 @@ public sealed class WorldSaveRuntime : MonoBehaviour
             if (shop.ProductPrefab != null)
             {
                 templates[shop.SaveProductId] = shop.ProductPrefab;
+                inventoryCatalog[shop.SaveProductId] = (shop.SaveProductId, shop.MaxActiveInScene);
                 var container = shop.ProductPrefab.GetComponent<GrainContainer>();
-                if (container != null) templates[container.CargoTypeId] = shop.ProductPrefab;
+                if (container != null)
+                {
+                    templates[container.CargoTypeId] = shop.ProductPrefab;
+                    inventoryCatalog[container.CargoTypeId] = (shop.SaveProductId, shop.MaxActiveInScene);
+                }
             }
         foreach (var product in Find<InventoryProduct>())
             if (product.SavePrefab != null)
             {
                 templates[product.ProductID] = product.SavePrefab;
+                inventoryCatalog[product.ProductID] = (product.ProductID, product.MaxActiveInScene);
                 var container = product.SavePrefab.GetComponent<GrainContainer>();
-                if (container != null) templates[container.CargoTypeId] = product.SavePrefab;
+                if (container != null)
+                {
+                    templates[container.CargoTypeId] = product.SavePrefab;
+                    inventoryCatalog[container.CargoTypeId] = (product.ProductID, product.MaxActiveInScene);
+                }
             }
         foreach (var supply in Find<GrainBagSupply>()) if (supply.SavePrefab != null) templates[supply.SavePrefab.CargoTypeId] = supply.SavePrefab.gameObject;
         foreach (var pests in Find<GrainPestDirector>()) if (pests.tutorialBagTemplate != null && !templates.ContainsKey(pests.tutorialBagTemplate.CargoTypeId))
@@ -221,6 +232,7 @@ public sealed class WorldSaveRuntime : MonoBehaviour
         foreach (string id in saved.authoredContainers)
             if (!present.Contains(id) && objects.TryGetValue(id, out var removed) && removed != null)
             { removed.SetActive(false); if (Application.isPlaying) Destroy(removed); else DestroyImmediate(removed); objects.Remove(id); }
+        var inventory = Find<InventoryManager>().FirstOrDefault();
         foreach (var record in saved.Records())
         {
             if (!objects.TryGetValue(record.id, out var go) || go == null)
@@ -230,8 +242,6 @@ public sealed class WorldSaveRuntime : MonoBehaviour
                 else throw new InvalidOperationException("Cannot restore saved object " + record.id + " (" + record.prefab + "). The save has been preserved.");
                 Identity(go, record.id); objects[record.id] = go;
                 SceneManager.MoveGameObjectToScene(go, gameObject.scene);
-                var inventory = Find<InventoryManager>().FirstOrDefault();
-                if (record.kind == "container" || record.kind == "item") inventory?.RegisterInstance(go, record.prefab, record.inventoryLimit);
             }
             if (record.kind == "container" || record.kind == "item") go.transform.SetParent(null, true);
             SetPose(go.transform, record.position, record.rotation, record.scale);
@@ -239,6 +249,18 @@ public sealed class WorldSaveRuntime : MonoBehaviour
             go.GetComponent<GrainPile>()?.RestoreSave(record.pile);
             go.GetComponent<BreakableGrainBarrier>()?.RestoreSave(record.barrierHits, record.barrierExposed);
             go.SetActive(record.active);
+            if (inventory != null && (record is BagSave || record.kind == "container" || record.kind == "item"))
+            {
+                string productId = !string.IsNullOrWhiteSpace(record.prefab) ? record.prefab : go.GetComponent<GrainContainer>()?.CargoTypeId;
+                int limit = record.inventoryLimit;
+                if (productId != null && inventoryCatalog.TryGetValue(productId, out var product) && productId != product.productId)
+                {
+                    productId = product.productId;
+                    limit = product.limit;
+                }
+                if (inventory.RegisterRestoredInstance(go, productId, limit) == null)
+                    throw new InvalidOperationException("Cannot register restored inventory object " + record.id + " (" + productId + "). The save has been preserved.");
+            }
             if (record.hasBody && go.GetComponent<Rigidbody>() == null) go.AddComponent<Rigidbody>();
             if (go.TryGetComponent<Rigidbody>(out var body))
             {

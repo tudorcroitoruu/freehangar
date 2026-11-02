@@ -5,6 +5,7 @@ public struct InteractionPromptData
 {
     public Vector3 Position;
     public string Action;
+    public string SecondaryDescription;
     public bool ShowKey;
     public KeyCode InteractionKey;
     public InteractionPromptAction[] AdditionalActions;
@@ -20,6 +21,7 @@ public struct InteractionPromptData
     {
         Position = position;
         Action = action;
+        SecondaryDescription = "";
         ShowKey = showKey;
         InteractionKey = KeyCode.E;
         AdditionalActions = null;

@@ -53,6 +53,13 @@ public class InventoryProduct : MonoBehaviour, IInteractable
             action,
             available && string.IsNullOrEmpty(blockedReason));
         prompt.RequiresFreeHands = requiresFreeHands;
+        if (maxActiveInScene > 0)
+        {
+            if (inventoryManager == null) inventoryManager = GetComponentInParent<InventoryManager>(true);
+            if (inventoryManager == null) inventoryManager = FindFirstObjectByType<InventoryManager>(FindObjectsInactive.Include);
+            if (inventoryManager != null)
+                prompt.SecondaryDescription = $"Left: {Mathf.Max(0, maxActiveInScene - inventoryManager.GetActiveCount(productID))}/{maxActiveInScene}";
+        }
         return isActiveAndEnabled;
     }
 
