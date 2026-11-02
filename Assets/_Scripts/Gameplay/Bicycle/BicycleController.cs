@@ -63,6 +63,9 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     CharacterController motor;
     MotorollerController motoroller;
     VehicleGroundAlignment groundAlignment;
+    BoxCollider bicycleBody;
+    readonly RaycastHit[] bodyObstacles = new RaycastHit[32];
+    readonly Collider[] turnObstacles = new Collider[32];
     float fallSpeed, wheelAngle, crankAngle;
     float nextVehicleHitSound, nextScratchSound;
     Quaternion steerRest, frontRest, rearRest, crankRest;
@@ -84,6 +87,95 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         }
         groundAlignment = GetComponent<VehicleGroundAlignment>() ?? gameObject.AddComponent<VehicleGroundAlignment>();
         groundAlignment.Initialize(this);
+        if (motoroller == null) InitializeBicycleBody();
+    }
+
+    void InitializeBicycleBody()
+    {
+        // The upright movement capsule does not reach the wheels, fork or rear rack.
+        // Cache the model envelope before mounting disables the parked colliders.
+        Transform pose = groundAlignment.Pose;
+        Bounds bounds = default;
+        bool found = false;
+        foreach (var mesh in pose.GetComponentsInChildren<MeshFilter>(true))
+        {
+            if (mesh.sharedMesh == null || mesh.GetComponentInParent<GrainContainer>() != null ||
+                mesh.GetComponentInParent<BicycleCargoBox>() != null) continue;
+            Bounds local = mesh.sharedMesh.bounds;
+            for (int i = 0; i < 8; i++)
+            {
+                Vector3 corner = local.center + Vector3.Scale(local.extents,
+                    new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
+                Vector3 point = pose.InverseTransformPoint(mesh.transform.TransformPoint(corner));
+                if (!found) { bounds = new Bounds(point, Vector3.zero); found = true; }
+                else bounds.Encapsulate(point);
+            }
+        }
+        if (!found) return;
+        // Leave tire contact to the capsule/ground alignment, so level ground is not an obstacle.
+        Vector3 min = bounds.min;
+        min.y = Mathf.Min(bounds.max.y - .05f, min.y + .1f);
+        bounds.SetMinMax(min, bounds.max);
+        var body = new GameObject("Bicycle body collision");
+        body.layer = gameObject.layer;
+        body.transform.SetParent(pose, false);
+        bicycleBody = body.AddComponent<BoxCollider>();
+        bicycleBody.center = bounds.center;
+        bicycleBody.size = bounds.size;
+    }
+
+    internal Vector3 ConstrainBicycleMotion(Vector3 motion)
+    {
+        if (bicycleBody == null) return motion;
+        float distance = motion.magnitude;
+        if (distance < .00001f) return motion;
+        Transform pose = bicycleBody.transform;
+        Vector3 scale = pose.lossyScale;
+        scale = new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z));
+        int count = Physics.BoxCastNonAlloc(pose.TransformPoint(bicycleBody.center),
+            Vector3.Scale(bicycleBody.size * .5f, scale), motion / distance, bodyObstacles,
+            pose.rotation, distance + .025f, ~0, QueryTriggerInteraction.Ignore);
+        if (count == bodyObstacles.Length) return Vector3.zero;
+        float allowed = distance;
+        for (int i = 0; i < count; i++)
+        {
+            var hit = bodyObstacles[i];
+            if (hit.transform.IsChildOf(transform) || hit.normal.y > .65f ||
+                (hit.collider is TerrainCollider && hit.distance <= 0f)) continue;
+            allowed = Mathf.Min(allowed, Mathf.Max(0f, hit.distance - .025f));
+        }
+        return motion * (allowed / distance);
+    }
+
+    float ConstrainBicycleTurn(float angle)
+    {
+        if (bicycleBody == null) return angle;
+        Transform pose = bicycleBody.transform;
+        Vector3 scale = pose.lossyScale;
+        Vector3 extents = Vector3.Scale(bicycleBody.size * .5f,
+            new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z)));
+        int steps = Mathf.Max(1, Mathf.CeilToInt(Mathf.Abs(angle)));
+        float allowed = 0f;
+        for (int step = 1; step <= steps; step++)
+        {
+            float candidate = angle * step / steps;
+            Quaternion turn = Quaternion.AngleAxis(candidate, transform.up);
+            Vector3 position = transform.position + turn * (pose.position - transform.position);
+            Quaternion rotation = turn * pose.rotation;
+            Vector3 center = position + rotation * Vector3.Scale(bicycleBody.center, scale);
+            int count = Physics.OverlapBoxNonAlloc(center, extents, turnObstacles, rotation, ~0, QueryTriggerInteraction.Ignore);
+            if (count == turnObstacles.Length) return allowed;
+            for (int i = 0; i < count; i++)
+            {
+                var obstacle = turnObstacles[i];
+                if (obstacle.transform.IsChildOf(transform)) continue;
+                if (Physics.ComputePenetration(bicycleBody, position, rotation, obstacle,
+                    obstacle.transform.position, obstacle.transform.rotation, out Vector3 separation, out float depth) &&
+                    depth > .001f && separation.y < .65f) return allowed;
+            }
+            allowed = candidate;
+        }
+        return allowed;
     }
     void Awake()
     {
@@ -196,7 +288,8 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         currentSteering = Mathf.SmoothDampAngle(currentSteering, targetSteering, ref steeringVelocity,
             Mathf.Max(.02f, steeringSmoothTime), Mathf.Infinity, dt);
         float steer = currentSteering;
-        transform.Rotate(0, Mathf.Tan(steer * Mathf.Deg2Rad) * Speed / Mathf.Max(.2f,wheelbase * transform.lossyScale.z) * Mathf.Rad2Deg * dt, 0);
+        float turnAngle = Mathf.Tan(steer * Mathf.Deg2Rad) * Speed / Mathf.Max(.2f,wheelbase * transform.lossyScale.z) * Mathf.Rad2Deg * dt;
+        transform.Rotate(0, ConstrainBicycleTurn(turnAngle), 0);
         if (motor.isGrounded && fallSpeed < 0) fallSpeed = -2;
         fallSpeed -= 9.81f * dt;
         Vector3 before = transform.position;
@@ -217,6 +310,12 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
             motion = motoroller.ConstrainMotion(motion);
             if (motion.sqrMagnitude < desiredMotion.sqrMagnitude * .16f) PlayVehicleImpact(impactSpeed);
         }
+        else
+        {
+            Vector3 desiredMotion = motion;
+            motion = ConstrainBicycleMotion(motion);
+            if (motion.sqrMagnitude < desiredMotion.sqrMagnitude * .16f) PlayVehicleImpact(impactSpeed);
+        }
         CollisionFlags hit = motor.Move(motion + Vector3.up * fallSpeed * dt);
         float actualTravel = Vector3.ProjectOnPlane(transform.position - before, Vector3.up).magnitude;
         if ((hit & CollisionFlags.Sides) != 0 && actualTravel < impactSpeed * dt * .4f)
@@ -228,7 +327,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
             GameplayAudio.Instance?.BicycleScratch(transform.position);
             nextScratchSound = Time.time + Random.Range(13f, 26f);
         }
-        if (motoroller != null && motion.sqrMagnitude < .000001f && Mathf.Abs(Speed) > .1f) Speed = 0;
+        if (motion.sqrMagnitude < .000001f && Mathf.Abs(Speed) > .1f) Speed = 0;
         if ((hit & CollisionFlags.Sides) != 0 && Vector3.ProjectOnPlane(transform.position-before,Vector3.up).magnitude < Mathf.Abs(Speed)*dt*.3f) Speed = 0;
         if ((hit & CollisionFlags.Above) != 0) fallSpeed = 0;
         groundAlignment.Align(dt);
