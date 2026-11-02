@@ -62,6 +62,22 @@ public class PlayerToolInteractionTests
         tools.TryEquip(PlayerCombatTools.Tool.Broom);Set("strikeStart",Time.time-.3f);Call("AdvanceStrike");
         Assert.That(wall.HitsRemaining,Is.EqualTo(3));
     }
+    [TestCase(PlayerCombatTools.Tool.Axe)]
+    [TestCase(PlayerCombatTools.Tool.Broom)]
+    [TestCase(PlayerCombatTools.Tool.Hammer)]
+    public void EquippingToolIncludesInactiveMeshesInHeldCameraLayer(PlayerCombatTools.Tool tool)
+    {
+        var held = tool == PlayerCombatTools.Tool.Axe ? axe : tool == PlayerCombatTools.Tool.Broom ? broom : hammer;
+        var mesh = new GameObject("Inactive held mesh");
+        mesh.transform.SetParent(held, false);
+        mesh.SetActive(false);
+        int layer = LayerMask.NameToLayer("HeldTools");
+        Assert.That(layer, Is.GreaterThanOrEqualTo(0));
+        Assert.IsTrue(tools.TryEquip(tool));
+        Assert.That(held.gameObject.layer, Is.EqualTo(layer));
+        Assert.That(mesh.layer, Is.EqualTo(layer));
+        Assert.IsFalse(mesh.activeSelf);
+    }
     private BreakableGrainBarrier Wall(int material)
     {
         var go=new GameObject("External wall");wallObject=go;go.transform.position=root.transform.position+Vector3.forward*1.5f;

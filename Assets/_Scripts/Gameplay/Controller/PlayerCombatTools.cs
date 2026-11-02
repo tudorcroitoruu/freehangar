@@ -184,11 +184,28 @@ public sealed class PlayerCombatTools : MonoBehaviour
 
     private void ApplyVisuals()
     {
+        // All held models use the same independent depth pass as the shovel.
+        // Include inactive descendants so switching tools cannot reveal world-layer meshes.
+        int layer = LayerMask.NameToLayer("HeldTools");
+        if (layer >= 0)
+        {
+            SetHeldLayer(shovelHands, layer);
+            SetHeldLayer(heldBroom, layer);
+            SetHeldLayer(heldAxe, layer);
+            SetHeldLayer(heldSledgehammer, layer);
+        }
         if (shovelTool != null) shovelTool.enabled=equipped==Tool.Shovel;
         if (shovelHands != null) shovelHands.gameObject.SetActive(equipped == Tool.Shovel);
         if (heldBroom != null) heldBroom.gameObject.SetActive(equipped == Tool.Broom);
         if (heldAxe != null) heldAxe.gameObject.SetActive(equipped == Tool.Axe);
         if (heldSledgehammer != null) heldSledgehammer.gameObject.SetActive(equipped == Tool.Hammer);
+    }
+
+    private static void SetHeldLayer(Transform root, int layer)
+    {
+        if (root == null) return;
+        foreach (var child in root.GetComponentsInChildren<Transform>(true))
+            child.gameObject.layer = layer;
     }
 
     private void LateUpdate()

@@ -27,6 +27,18 @@ public static class HeldToolCameraSetup
         int mask = 1 << layer;
         foreach (var child in hands.GetComponentsInChildren<Transform>(true))
         { Undo.RecordObject(child.gameObject, "Held tool layer"); child.gameObject.layer = layer; }
+        var tools = player.GetComponent<PlayerCombatTools>();
+        if (tools != null)
+        {
+            var toolsData = new SerializedObject(tools);
+            foreach (string property in new[] { "shovelHands", "heldBroom", "heldAxe", "heldSledgehammer" })
+            {
+                var root = toolsData.FindProperty(property).objectReferenceValue as Transform;
+                if (root == null) continue;
+                foreach (var child in root.GetComponentsInChildren<Transform>(true))
+                { Undo.RecordObject(child.gameObject, "Held tool layer"); child.gameObject.layer = layer; }
+            }
+        }
         var world = player.characterCamera;
         Undo.RecordObject(world, "Exclude held tool from world camera"); world.cullingMask &= ~mask;
         var existing = world.transform.Find("Held Tool Camera");
