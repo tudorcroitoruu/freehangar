@@ -10147,6 +10147,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   wallClearance: 0.01
+  excludedFootprint:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
   kilograms: 58477.78580596023
 --- !u!64 &28963972
 MeshCollider:
@@ -86898,6 +86904,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   wallClearance: 0.01
+  excludedFootprint:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
   kilograms: 1083073.0595825578
 --- !u!64 &258152886
 MeshCollider:
@@ -273719,6 +273731,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   wallClearance: 0.01
+  excludedFootprint:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
   kilograms: 2759271.7315777005
 --- !u!64 &795295158
 MeshCollider:
@@ -459536,7 +459554,6 @@ GameObject:
   - component: {fileID: 1348423744}
   - component: {fileID: 1348423743}
   - component: {fileID: 1348423742}
-  - component: {fileID: 1348423741}
   m_Layer: 0
   m_Name: Bicycle cargo box
   m_TagString: Untagged
@@ -459544,18 +459561,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!114 &1348423741
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1348423740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53ce93520194f7243b5657e8cd4014f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BicycleCargoBox
 --- !u!54 &1348423742
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -493080,6 +493085,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   wallClearance: 0.01
+  excludedFootprint:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
   kilograms: 1082484.0168902844
 --- !u!64 &1445713582
 MeshCollider:
@@ -682035,6 +682046,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   wallClearance: 0.01
+  excludedFootprint:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
   kilograms: 2757642.0887678503
 --- !u!64 &1984240463
 MeshCollider:

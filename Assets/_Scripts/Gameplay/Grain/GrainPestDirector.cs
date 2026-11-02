@@ -510,20 +510,25 @@ public sealed class GrainPestDirector : MonoBehaviour
         if (encounterActive) EndEncounter();
         RestoreIntroController();
         introRunning = false;
+        GameplayCanvas.Instance?.SetWarning(WarningType.RatsAttack, this, false);
+        GameplayCanvas.Instance?.SetWarning(WarningType.CrowsAttack, this, false);
         if (player != null) player.EndDiscovery(this);
     }
-    private void OnGUI()
+
+    private void LateUpdate()
     {
         if (showBroomHint && player != null)
         {
             var tools = player.GetComponent<PlayerCombatTools>();
             if (tools != null && tools.Equipped == PlayerCombatTools.Tool.Broom) showBroomHint = false;
         }
-        if (introRunning || showBroomHint)
-        {
-            var hintStyle = new GUIStyle(GUI.skin.box) { fontSize = Mathf.Clamp(Screen.height / 35, 16, 28), wordWrap = true, alignment = TextAnchor.MiddleCenter };
-            GUI.Box(new Rect(Screen.width*.15f, Screen.height*.76f, Screen.width*.7f, 75), (crowLesson ? "Crows are stealing your grain! Press 4 for the broom, then left-click to scare them away." : "Rats are eating your grain! Press 4 to equip the broom, then left-click to scare them away."), hintStyle);
-        }
+        bool visible = introRunning || showBroomHint;
+        GameplayCanvas.Instance?.SetWarning(WarningType.RatsAttack, this, visible && !crowLesson);
+        GameplayCanvas.Instance?.SetWarning(WarningType.CrowsAttack, this, visible && crowLesson);
+    }
+
+    private void OnGUI()
+    {
         if (playerCamera == null) return;
         if (markerTexture == null) return;
         var marked = new System.Collections.Generic.HashSet<GrainContainer>();

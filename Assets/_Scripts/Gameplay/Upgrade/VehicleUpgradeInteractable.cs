@@ -19,7 +19,7 @@ public sealed class VehicleUpgradeInteractable : MonoBehaviour, IKeyedInteractab
     public static VehicleUpgradeInteractable FindForHit(Collider hit, PlayerInteractor interactor)
     {
         if (hit == null || (interactor != null && interactor.Bags != null && interactor.Bags.IsCarrying) ||
-            hit.GetComponentInParent<GrainContainer>() != null || hit.GetComponentInParent<BicycleCargoBox>() != null) return null;
+            hit.GetComponentInParent<GrainContainer>() != null) return null;
         var station = hit.GetComponentInParent<VehicleUpgradeInteractable>();
         return station != null && station.isActiveAndEnabled ? station : null;
     }

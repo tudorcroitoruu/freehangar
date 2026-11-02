@@ -234,7 +234,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (closest == null) return null;
         var cargoOwner = closest.GetComponentInParent<VehicleCargoOwner>();
         if (cargoOwner != null && cargoOwner.vehicle != null && cargoOwner.vehicle.isActiveAndEnabled &&
-            closest.GetComponentInParent<GrainContainer>() == null && closest.GetComponentInParent<BicycleCargoBox>() == null)
+            closest.GetComponentInParent<GrainContainer>() == null)
         {
             actionOrigin = cargoOwner.vehicle.transform;
             return cargoOwner.vehicle;

@@ -26,7 +26,6 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     Quaternion cameraRotation;
     float yaw, pitch;
     float lookIdleTime, yawReturnVelocity, pitchReturnVelocity;
-    string hint = "";
     readonly Collider[] hits = new Collider[32];
     void Awake() => CacheReferences();
     void CacheReferences()
@@ -50,7 +49,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             ApplyRidingView();
             return true;
         }
-        hint="";
+
         if (player != null && player.IsCarrying && (bags == null || !bags.IsCarrying)) return false;
         if (!input || Time.timeScale <= 0) return false;
         if(!Physics.Raycast(view.transform.position,view.transform.forward,out var hit,interactionDistance,~0,QueryTriggerInteraction.Ignore)) return false;
@@ -59,13 +58,6 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if (aimedVehicle != null) bicycle = aimedVehicle;
         if (bicycle == null || !bicycle.isActiveAndEnabled) return false;
         if ((bags == null || !bags.IsCarrying || aimedVehicle != bicycle) && Vector3.Distance(view.transform.position,bicycle.transform.position)>interactionDistance+1) return false;
-        var cargoBox = hit.collider.GetComponentInParent<BicycleCargoBox>();
-        if(cargoBox != null && cargoBox.IsLoaded)
-        {
-            hint = "E Unload box";
-            if(Input.GetKeyDown(KeyCode.E)) { TryUnloadBox(cargoBox); return true; }
-            return false;
-        }
         if(hit.transform.IsChildOf(bicycle.transform) || aimedVehicle == bicycle)
         {
             if (bags != null && bags.IsCarrying)
@@ -77,15 +69,6 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             if (hit.collider.GetComponentInParent<GrainContainer>() != null) return false;
             // Body actions and their key prompts are handled by PlayerInteractor.
             return false;
-        }
-        else
-        {
-            var box=hit.collider.GetComponentInParent<BicycleCargoBox>();
-            if(box!=null && Vector3.Distance(box.transform.position,bicycle.transform.position)<2.5f)
-            {
-                hint="E Secure box on " + bicycle.cargoLocationName;
-                if(Input.GetKeyDown(KeyCode.E))return box.Load(bicycle.FreeCargoSlot());
-            }
         }
         return false;
     }
@@ -140,20 +123,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         view.transform.localPosition = bicycle.RidingCameraOffset + roadOffset;
         view.transform.localRotation = Quaternion.Euler(pitch + bicycle.RidingCameraPitch + bicycle.PedalingCameraPitch, yaw, 0) * Quaternion.Euler(roadAngles);
     }
-    public bool TryUnloadBox(BicycleCargoBox box)
-    {
-        if(box == null || !box.IsLoaded || riding) return false;
-        for(int side=0;side<2;side++)
-        {
-            Vector3 point=bicycle.transform.position+bicycle.transform.right*(side==0?bicycle.dismountSideDistance:-bicycle.dismountSideDistance);
-            if(!Physics.Raycast(point+Vector3.up*2,Vector3.down,out var ground,5,~0,QueryTriggerInteraction.Ignore) || ground.normal.y<.65f)continue;
-            var bounds=box.GetComponentInChildren<Renderer>().bounds;
-            Vector3 center=ground.point+Vector3.up*(bounds.extents.y+.08f);
-            if(Physics.CheckBox(center,bounds.extents,Quaternion.identity,~0,QueryTriggerInteraction.Ignore))continue;
-            return box.Unload(center);
-        }
-        hint="Make room to unload";return false;
-    }
+
     public bool TryLoadBag() => !riding && bags != null && bicycle != null && bags.TryStow(bicycle.FreeBagCargoSlot(bags.CarriedBag));
     public bool TryMount()
     {
@@ -174,7 +144,6 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if(instrument!=null)instrument.gameObject.SetActive(false);
         view.transform.SetParent(bicycle.riderView,false);view.transform.localPosition=Vector3.zero;view.transform.localRotation=Quaternion.identity;
         yaw=pitch=lookIdleTime=yawReturnVelocity=pitchReturnVelocity=0;riding=true;bicycle.SetRidden(true);ApplyRidingView();
-        hint="";
         GameplayCanvas.Instance?.SetDrivingHints(true);
         return true;
     }
@@ -193,14 +162,14 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             for(int i=0;i<count;i++)if(!hits[i].transform.IsChildOf(transform))clear=false;
             if(clear){exit=ground.point+Vector3.up*.05f;break;}
         }
-        if(!clear){hint="Make room to get off";return false;}
+        if(!clear){
+            return false;}
         Restore(exit);return true;
     }
     void Restore(Vector3 exit)
     {
         if (vehicleReset != null) vehicleReset.CancelHold();
         riding=false;IsBoosting=false;boostExhausted=false;bicycle.SetRidden(false);
-        hint="";
         GameplayCanvas.Instance?.SetDrivingHints(false);
         if (pickup != null) pickup.ResetRoadCamera();
         view.transform.SetParent(cameraParent,false);view.transform.localPosition=cameraPosition;view.transform.localRotation=cameraRotation;
@@ -212,13 +181,4 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     bool applicationQuitting;
     void OnApplicationQuit() => applicationQuitting = true;
     void OnDisable() { if(!applicationQuitting && riding) { if(!TryDismount())Restore(bicycle.transform.position+Vector3.up*1.5f); } }
-    void OnGUI()
-    {
-        HangarVehicleAccess.DrawHint();
-        if(Cursor.lockState!=CursorLockMode.Locked)return;
-        bool promptVisible = !riding && hint.StartsWith("E ") && GameplayCanvas.Instance != null &&
-            GameplayCanvas.Instance.interactionPrompt != null && GameplayCanvas.Instance.interactionPrompt.IsVisible;
-        if (!string.IsNullOrEmpty(hint) && !promptVisible)
-            GUI.Box(new Rect(Mathf.Max(8, Screen.width/2-340),Screen.height-85,Mathf.Min(680, Screen.width-16),36),hint);
-    }
 }

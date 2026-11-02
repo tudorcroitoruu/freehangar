@@ -105,9 +105,6 @@ public class PlayerInteractorTests
         var collider = bag.AddComponent<BoxCollider>();
         Assert.IsNull(VehicleUpgradeInteractable.FindForHit(collider, interactor));
         Assert.AreSame(container, FindTarget());
-        Object.DestroyImmediate(container);
-        bag.AddComponent<BicycleCargoBox>();
-        Assert.IsNull(VehicleUpgradeInteractable.FindForHit(collider, interactor));
     }
 
     [Test]

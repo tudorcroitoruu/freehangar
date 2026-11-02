@@ -93,17 +93,6 @@ public class SellingZoneContainersOnlyTests
         zone.CollectContainers(collected);Assert.AreEqual(1,collected.Count);Assert.IsTrue(zone.CanWeigh(player));
     }
 
-    [Test]
-    public void BoxLoadedOntoASiblingTrailerSlotMustBeUnloadedBeforeItCanBeSold()
-    {
-        var box=container.gameObject.AddComponent<BicycleCargoBox>();
-        var slot=Child("Trailer cargo slot",Vector3.up).transform;
-        Assert.IsTrue(box.Load(slot));Physics.SyncTransforms();
-        zone.CollectContainers(collected);Assert.IsEmpty(collected);Assert.IsFalse(zone.CanWeigh(player));
-        Assert.IsTrue(box.Unload(root.transform.position+Vector3.up));Physics.SyncTransforms();
-        zone.CollectContainers(collected);Assert.AreEqual(1,collected.Count);Assert.IsTrue(zone.CanWeigh(player));
-    }
-
     private GameObject Child(string name,Vector3 local){var go=new GameObject(name);go.transform.SetParent(root.transform,false);go.transform.localPosition=local;return go;}
     private GameObject Cube(string name,Vector3 local){var go=GameObject.CreatePrimitive(PrimitiveType.Cube);go.name=name;go.transform.SetParent(root.transform,false);go.transform.localPosition=local;return go;}
     private static void Set(object target,string field,object value)=>target.GetType().GetField(field,BindingFlags.Instance|BindingFlags.NonPublic).SetValue(target,value);

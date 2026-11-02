@@ -110,8 +110,6 @@ public class SellingZone : MonoBehaviour
     {
         if (container.IsCarried || container.GetComponentInParent<BicycleController>() != null ||
             container.GetComponentInParent<WheelbarrowCargo>() != null) return false;
-        var box = container.GetComponentInParent<BicycleCargoBox>();
-        if (box != null && box.IsLoaded) return false;
         // Trailer slots can be siblings of the vehicle controller in the prefab.
         foreach (var vehicle in FindObjectsByType<BicycleController>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             if (vehicle.HasCargo(container.transform)) return false;

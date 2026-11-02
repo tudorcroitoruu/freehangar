@@ -99,8 +99,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         bool found = false;
         foreach (var mesh in pose.GetComponentsInChildren<MeshFilter>(true))
         {
-            if (mesh.sharedMesh == null || mesh.GetComponentInParent<GrainContainer>() != null ||
-                mesh.GetComponentInParent<BicycleCargoBox>() != null) continue;
+            if (mesh.sharedMesh == null || mesh.GetComponentInParent<GrainContainer>() != null) continue;
             Bounds local = mesh.sharedMesh.bounds;
             for (int i = 0; i < 8; i++)
             {
@@ -430,9 +429,9 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
 public static class HangarVehicleAccess
 {
     private static readonly System.Collections.Generic.List<Transform> hangars = new System.Collections.Generic.List<Transform>();
-    private static float nextScan, hintUntil;
+    private static float nextScan;
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void Reset() { hangars.Clear(); nextScan = hintUntil = 0; }
+    private static void Reset() { hangars.Clear(); nextScan = 0; }
     public static bool Blocks(Vector3 from, Vector3 to, float clearance, BicycleController vehicle = null)
     {
         // Small vehicles and forklifts may enter. Physical doors, walls and grain still collide.
@@ -467,19 +466,10 @@ public static class HangarVehicleAccess
             Vector3 delta = b-a;
             if (bounds.Contains(b) || (bounds.IntersectRay(new Ray(a,delta.normalized),out float distance) && distance <= delta.magnitude))
             {
-                hintUntil = Time.time + 2f;
                 GameplayCanvas.Instance?.ShowWarning(WarningType.BlockHangarEntry);
                 return true;
             }
         }
         return false;
-    }
-    public static void DrawHint()
-    {
-        if (GameplayCanvas.Instance != null) return;
-        if (Time.time >= hintUntil) return;
-        var style = new GUIStyle(GUI.skin.box) { fontSize=16, alignment=TextAnchor.MiddleCenter, wordWrap=true };
-        GUI.Box(new Rect(Screen.width*.2f,Screen.height*.72f,Screen.width*.6f,55),
-            "Use a bicycle, motoroller, forklift or wheelbarrow inside hangars to protect the grain.",style);
     }
 }

@@ -140,7 +140,7 @@ public sealed class ItemImageRendererWindow : EditorWindow
             var prop = so.FindProperty("objectPrefab");
             var prefab = prop != null ? prop.objectReferenceValue as GameObject : null;
             if (prefab == null) continue;
-            if (prefab.GetComponentInChildren<GrainContainer>(true) != null || prefab.GetComponentInChildren<BicycleCargoBox>(true) != null)
+            if (prefab.GetComponentInChildren<GrainContainer>(true) != null)
                 Add(prefab, "Containers");
             else if (prefab.name.IndexOf("box",StringComparison.OrdinalIgnoreCase) >= 0 ||
                 prefab.name.IndexOf("bag",StringComparison.OrdinalIgnoreCase) >= 0 ||
@@ -159,11 +159,6 @@ public sealed class ItemImageRendererWindow : EditorWindow
                 container.GetComponentInParent<BicycleController>() == null) Add(container.gameObject,"Containers");
         foreach (var vehicle in SceneObjects<BicycleController>()) Add(vehicle.gameObject, "Vehicles");
         foreach (var wheelbarrow in SceneObjects<WheelbarrowCargo>()) Add(wheelbarrow.gameObject, "Vehicles");
-        foreach (var box in SceneObjects<BicycleCargoBox>())
-        {
-            if (box.GetComponentInParent<BicycleController>() == null && box.GetComponentInParent<PlayerController>() == null)
-                Add(box.gameObject, "Containers");
-        }
         resultMessage = "Collected " + items.Count + " items. Use Add selected for any extra models.";
     }
 

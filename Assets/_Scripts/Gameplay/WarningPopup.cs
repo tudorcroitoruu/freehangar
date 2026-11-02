@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,8 @@ public enum WarningType
     RatsAttack,
     CrowsAttack,
     BlockHangarEntry,
-    VehicleFull
+    VehicleFull,
+    BlockVehicleExit
 }
 public class WarningPopup : MonoBehaviour
 {
@@ -17,7 +19,7 @@ public class WarningPopup : MonoBehaviour
     [SerializeField] private CanvasGroup warningCanvasGroup;
     [SerializeField] private Image warningImage;
     [SerializeField] private Text warningTitle;
-    [SerializeField] private Text warningMessage;
+    [SerializeField] private TMP_Text warningMessage;
     [SerializeField, Min(.1f)] private float rotationSeconds = 3f;
     [SerializeField, Min(0f)] private float fadeSeconds = .2f;
 
@@ -74,7 +76,7 @@ public class WarningPopup : MonoBehaviour
 
     private void PreferContextWarning(WarningType type)
     {
-        if (type == WarningType.BlockHangarEntry || type == WarningType.VehicleFull) Display(type);
+        if (type != WarningType.RatsAttack && type != WarningType.CrowsAttack) Display(type);
     }
 
     // Driven by GameplayCanvas, including when the authored popup starts inactive.
