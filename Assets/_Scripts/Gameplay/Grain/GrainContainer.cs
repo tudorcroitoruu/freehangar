@@ -32,6 +32,23 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     [SerializeField, Tooltip("World-space offset from the anchor or container top. Negative Y lowers the prompt.")]
     private Vector3 promptOffset = Vector3.up * .12f;
     private BoxCollider fillCollider;
+    [SerializeField, Tooltip("Optional pallet carried and seated with this container.")] private BoxCollider palletCollider;
+    public Bounds LocalBounds
+    {
+        get
+        {
+            var box = GetComponent<BoxCollider>();
+            var bounds = box != null ? new Bounds(box.center, box.size) : new Bounds(Vector3.zero, Vector3.one * .5f);
+            if (palletCollider != null)
+                for (int i = 0; i < 8; i++)
+                {
+                    Vector3 corner = palletCollider.center + Vector3.Scale(palletCollider.size * .5f,
+                        new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
+                    bounds.Encapsulate(transform.InverseTransformPoint(palletCollider.transform.TransformPoint(corner)));
+                }
+            return bounds;
+        }
+    }
     public Vector3 PromptPosition
     {
         get
@@ -87,9 +104,10 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
                 return bounds;
             }
             Bounds result = default;
+            Bounds localBounds = LocalBounds;
             for (int i = 0; i < 8; i++)
             {
-                Vector3 corner = box.center + Vector3.Scale(box.size * .5f,
+                Vector3 corner = localBounds.center + Vector3.Scale(localBounds.extents,
                     new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
                 Vector3 point = transform.TransformPoint(corner);
                 if (i == 0) result = new Bounds(point, Vector3.zero); else result.Encapsulate(point);

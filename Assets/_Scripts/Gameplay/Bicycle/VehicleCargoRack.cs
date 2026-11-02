@@ -95,6 +95,7 @@ public sealed class VehicleCargoRack : MonoBehaviour
     {
         var box=item.GetComponent<BoxCollider>(); Bounds result=default;
         Bounds bounds=box!=null?new Bounds(box.center,box.size):new Bounds(Vector3.zero,Vector3.one*.3f);
+        if (item.TryGetComponent<GrainContainer>(out var container)) bounds = container.LocalBounds;
         for(int n=0;n<8;n++)
         {
             var corner=bounds.center+Vector3.Scale(bounds.extents,new Vector3((n&1)==0?-1:1,(n&2)==0?-1:1,(n&4)==0?-1:1));

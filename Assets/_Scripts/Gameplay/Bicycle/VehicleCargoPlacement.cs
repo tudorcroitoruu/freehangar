@@ -14,6 +14,7 @@ public sealed class VehicleCargoPlacement : MonoBehaviour
 
     public void CaptureSave(WorldObjectSave record)
     {
+        if (!enabled || support == null || transform.parent != support) return;
         record.placement = true; record.originalScale = baseWorldScale;
         record.poseScale = baseScale; record.poseRotation = baseRotation; record.seatAtBottom = seatAtBottom;
     }

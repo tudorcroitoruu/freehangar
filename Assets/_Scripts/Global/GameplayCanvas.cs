@@ -46,6 +46,8 @@ public class GameplayCanvas : MonoBehaviour
     [Space, Header("Hints")]
     [SerializeField] private GameObject[] walkingHints;
     [SerializeField] private GameObject[] drivingHints;
+    [SerializeField] private GameObject drivingExitHint;
+    [SerializeField] private GameObject[] forkliftHints;
 
     [Space, Header("Tools Equip Hints")] 
     [SerializeField] private CanvasGroup hintsParent;
@@ -99,7 +101,7 @@ public class GameplayCanvas : MonoBehaviour
         ResetMoneyChange();
         RefreshMoney(SaveSystem.Money);
         var rider = FindFirstObjectByType<PlayerBicycleInteraction>();
-        SetDrivingHints(rider != null && rider.IsRiding);
+        SetDrivingHints(rider != null && rider.IsRiding, rider != null && rider.IsRiding && rider.bicycle != null && rider.bicycle.GetComponent<ForkliftController>() != null);
         playerTools = FindFirstObjectByType<PlayerCombatTools>(FindObjectsInactive.Include);
         // Rebuild hint visibility from saved discoveries whenever the HUD opens.
         displayedTools = -1;
@@ -137,7 +139,7 @@ public class GameplayCanvas : MonoBehaviour
         SetWarning(WarningType.OccupiedHands, this, visible && isActiveAndEnabled);
     }
 
-    public void SetDrivingHints(bool driving)
+    public void SetDrivingHints(bool driving, bool forklift = false)
     {
         if (walkingHints != null)
             foreach (var hint in walkingHints)
@@ -145,6 +147,10 @@ public class GameplayCanvas : MonoBehaviour
         if (drivingHints != null)
             foreach (var hint in drivingHints)
                 if (hint != null) hint.SetActive(driving);
+        if (drivingExitHint != null) drivingExitHint.SetActive(driving && !forklift);
+        if (forkliftHints != null)
+            foreach (var hint in forkliftHints)
+                if (hint != null) hint.SetActive(driving && forklift);
     }
 
     private void Update()

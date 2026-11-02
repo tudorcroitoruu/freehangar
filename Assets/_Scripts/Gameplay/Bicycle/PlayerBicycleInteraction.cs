@@ -39,7 +39,10 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if (!isActiveAndEnabled || view == null) return false;
         if (riding)
         {
-            if (input && Input.GetKeyDown(KeyCode.E)) { TryDismount(); return true; }
+            var forklift = bicycle != null ? bicycle.GetComponent<ForkliftController>() : null;
+            if (input && Input.GetKeyDown(forklift != null ? KeyCode.Q : KeyCode.E)) { TryDismount(); return true; }
+            if (input && forklift != null && Input.GetKeyDown(KeyCode.E)) forklift.DropCargo();
+            if (forklift != null && forklift.IsTransferring) input = false;
             if (vehicleReset != null) vehicleReset.CancelHold();
             DriveRiding(input ? Input.GetAxisRaw("Vertical") : 0,
                 input ? Input.GetAxisRaw("Horizontal") : 0,
@@ -151,7 +154,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if(instrument!=null)instrument.gameObject.SetActive(false);
         view.transform.SetParent(bicycle.riderView,false);view.transform.localPosition=Vector3.zero;view.transform.localRotation=Quaternion.identity;
         yaw=pitch=lookIdleTime=yawReturnVelocity=pitchReturnVelocity=0;riding=true;bicycle.SetRidden(true);ApplyRidingView();
-        GameplayCanvas.Instance?.SetDrivingHints(true);
+        GameplayCanvas.Instance?.SetDrivingHints(true, bicycle.GetComponent<ForkliftController>() != null);
         return true;
     }
     public bool TryDismount()

@@ -266,3 +266,13 @@ wheelbarrow restoration/deleted bags, crop state, barriers, cutscene seek and ID
 Results: output/SaveSystem/native-tests.xml. Interactive play mode was not rerun.
 
 2026-11-02 independent barriers: Gameplay has 24 additional individually breakable panels in hangars 2–5 (12 wood, 12 metal). Six per hangar: four upright in both yaw orientations and two lying horizontally. Existing barriers/IDs retained; new IDs farm.barrier.hN.independent.0–5. Each has its own collider/damage and covering pile. Validated burial, placement, unique IDs, non-overlap and independent correct-tool damage. See output/Barriers/validation.txt.
+
+2026-11-02 BigBag pallets and forklift unloading:
+BigBag.prefab includes a wooden pallet and collider. GrainContainer.LocalBounds and
+WorldBounds include the pallet; vehicle rack seating uses the combined bounds.
+The forklift automatically transfers a full, closed BigBag from a nearby parked
+vehicle within 3 m of its forks. Ground cargo still needs fork contact. The 1.25 s
+transfer lifts, pulls across and lowers cargo, blocking driving/drop during it.
+E drops forklift cargo; Q exits the forklift. Other vehicles retain E to exit.
+GameCanvas has dedicated forklift hints. Released VehicleCargoPlacement components
+no longer write stale truck poses into cargo saves.
