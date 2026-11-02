@@ -102,7 +102,8 @@ public class Pause : MonoBehaviour
 
     public void PauseOn()
     {
-        if (paused || !pauseScreen || !mainScreen || exitToMenu || restarting) return;
+        // Sale/upgrade screens own Escape, including the frame in which they close.
+        if (paused || UpgradeManager.BlocksGameplayInput || !pauseScreen || !mainScreen || exitToMenu || restarting) return;
         previousCursorLock = Cursor.lockState;
         previousCursorVisible = Cursor.visible;
         previousTimeScale = Time.timeScale;
