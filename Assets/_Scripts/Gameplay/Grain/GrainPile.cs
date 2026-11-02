@@ -404,10 +404,12 @@ public sealed class GrainPile : MonoBehaviour
         cargo.Clear();
         field.WakeNeighborhood(local.x, local.z, radius + settlingMargin, WorldScale);
         settling = true;
-        RefreshGrainAppearance(); RefreshSurface(); RefreshCollider();
-        // The incremental kernel cache tracks excavation of existing samples only.
-        // Deposits can introduce surface where no samples existed (especially a new spill).
-        GetComponent<CornSurfaceKernels>()?.Rebuild();
+        // Coalesce streamed portions with settling, just as excavation does. The
+        // kernel renderer observes SurfaceRevision and budgets changed-cell updates;
+        // it already rebuilds its samples when the footprint expands onto bare ground.
+        // Forcing Rebuild here resampled the entire hangar for every poured portion.
+        if (Application.isPlaying) surfaceRefreshPending = true;
+        else { RefreshGrainAppearance(); RefreshSurface(); RefreshCollider(); }
         return true;
     }
 
