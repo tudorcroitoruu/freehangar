@@ -264,3 +264,5 @@ with zero errors. Unity batch EditMode WorldSaveTests passed 8/8, covering nativ
 PlayerData serialization, nested vehicle cargo, old compressed-save migration,
 wheelbarrow restoration/deleted bags, crop state, barriers, cutscene seek and IDs.
 Results: output/SaveSystem/native-tests.xml. Interactive play mode was not rerun.
+
+2026-11-02 independent barriers: Gameplay has 24 additional individually breakable panels in hangars 2–5 (12 wood, 12 metal). Six per hangar: four upright in both yaw orientations and two lying horizontally. Existing barriers/IDs retained; new IDs farm.barrier.hN.independent.0–5. Each has its own collider/damage and covering pile. Validated burial, placement, unique IDs, non-overlap and independent correct-tool damage. See output/Barriers/validation.txt.

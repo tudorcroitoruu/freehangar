@@ -1,0 +1,124 @@
+Playing=False
+Hangar 3 Metal panel 2 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-63.42, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p1 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 2 bounds=Center: (-63.42, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 4 Wood panel 5 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-95.00, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p4 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 5 bounds=Center: (-95.00, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 3 Metal panel 4 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-57.82, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p3 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 4 bounds=Center: (-57.82, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 5 Metal panel 8 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(81.00, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p7 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 8 bounds=Center: (81.00, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 2 Wood panel 10 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(57.82, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p9 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 10 bounds=Center: (57.82, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 3 Metal panel 1 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-66.22, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p0 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 1 bounds=Center: (-66.22, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 5 Metal panel 1 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(61.40, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p0 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 1 bounds=Center: (61.40, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 5 Metal panel 3 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(67.00, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p2 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 3 bounds=Center: (67.00, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 2 Wood panel 13 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(66.22, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p12 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 13 bounds=Center: (66.22, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 5 Metal panel 15 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(100.60, 0.08, 37.23) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p14 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 15 bounds=Center: (100.60, 1.48, 37.23), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 3 Metal panel 7 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-49.42, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 7 bounds=Center: (-49.42, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 4 Wood panel 6 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-92.20, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 6 bounds=Center: (-92.20, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 5 Metal panel 14 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(97.80, 0.08, 37.23) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p13 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 14 bounds=Center: (97.80, 1.48, 37.23), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 4 Wood panel 9 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-83.80, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p8 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 9 bounds=Center: (-83.80, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 5 Metal panel 9 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(83.80, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p8 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 9 bounds=Center: (83.80, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 2 Wood panel 1 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(32.62, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p0 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 1 bounds=Center: (32.62, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 2 Wood panel 3 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(38.22, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p2 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 3 bounds=Center: (38.22, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 2 Wood panel 5 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(43.82, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p4 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 5 bounds=Center: (43.82, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 4 Wood panel 8 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-86.60, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p7 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 8 bounds=Center: (-86.60, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 4 Wood panel 13 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-72.60, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p12 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 13 bounds=Center: (-72.60, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 4 Wood panel 15 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-67.00, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p14 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 15 bounds=Center: (-67.00, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 4 Wood panel 17 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-61.40, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p16 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 17 bounds=Center: (-61.40, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 4 Wood panel 1 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-106.20, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p0 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 1 bounds=Center: (-106.20, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 4 Wood panel 11 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-78.20, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p10 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 11 bounds=Center: (-78.20, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 2 Wood panel 9 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(55.02, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 9 bounds=Center: (55.02, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 5 Metal panel 16 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(103.40, 0.08, 37.23) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p15 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 16 bounds=Center: (103.40, 1.48, 37.23), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 2 Wood panel 8 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(52.22, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p7 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 8 bounds=Center: (52.22, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 3 Metal panel 12 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-35.42, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p11 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 12 bounds=Center: (-35.42, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 5 Metal panel 7 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(78.20, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p6 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 7 bounds=Center: (78.20, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 4 Wood panel 4 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-97.80, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p3 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 4 bounds=Center: (-97.80, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 4 Wood panel 16 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-64.20, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p15 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 16 bounds=Center: (-64.20, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 3 Metal panel 6 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-52.22, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p5 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 6 bounds=Center: (-52.22, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 5 Metal panel 6 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(75.40, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 6 bounds=Center: (75.40, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 4 Wood panel 14 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-69.80, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p13 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 14 bounds=Center: (-69.80, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 3 Metal panel 3 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-60.62, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p2 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 3 bounds=Center: (-60.62, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 4 Wood panel 3 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-100.60, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p2 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 3 bounds=Center: (-100.60, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 5 Metal panel 10 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(86.60, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p9 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 10 bounds=Center: (86.60, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 2 Wood panel 11 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(60.62, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p10 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 11 bounds=Center: (60.62, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 5 Metal panel 2 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(64.20, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p1 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 2 bounds=Center: (64.20, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 3 Metal panel 5 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-55.02, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p4 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 5 bounds=Center: (-55.02, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 3 Metal panel 11 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-38.22, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p10 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 11 bounds=Center: (-38.22, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 5 Metal panel 11 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(89.40, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p10 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 11 bounds=Center: (89.40, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 5 Metal panel 17 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(106.20, 0.08, 37.23) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p16 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 17 bounds=Center: (106.20, 1.48, 37.23), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 5 Metal panel 4 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(69.80, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p3 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 4 bounds=Center: (69.80, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 3 Metal panel 9 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-43.82, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p8 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 9 bounds=Center: (-43.82, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 3 Metal panel 13 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-32.62, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p12 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 13 bounds=Center: (-32.62, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 5 Metal panel 5 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(72.60, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p4 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 5 bounds=Center: (72.60, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 5 Metal panel 12 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(92.20, 0.08, 43.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h5.metal.p11 material=1 pile=Hangar 5 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 5 Metal panel 12 bounds=Center: (92.20, 1.48, 43.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 4 Wood panel 10 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-81.00, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p9 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 10 bounds=Center: (-81.00, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 2 Wood panel 4 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(41.02, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p3 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 4 bounds=Center: (41.02, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 2 Wood panel 6 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(46.62, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p5 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 6 bounds=Center: (46.62, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 2 Wood panel 2 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(35.42, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p1 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 2 bounds=Center: (35.42, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 3 Metal panel 10 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-41.02, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p9 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 10 bounds=Center: (-41.02, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 4 Wood panel 7 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-89.40, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p6 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 7 bounds=Center: (-89.40, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 4 Wood panel 12 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-75.40, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p11 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 12 bounds=Center: (-75.40, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 4 Wood panel 2 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-103.40, 0.08, 35.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h4.wood.p1 material=0 pile=Hangar 4 - Grain bank to entrance (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 4 Wood panel 2 bounds=Center: (-103.40, 1.48, 35.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 2 Wood panel 12 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(63.42, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p11 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 12 bounds=Center: (63.42, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+Hangar 3 Metal panel 8 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(-46.62, 0.08, -14.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h3.metal.p7 material=1 pile=Hangar 3 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 3 Metal panel 8 bounds=Center: (-46.62, 1.48, -14.00), Extents: (1.40, 1.40, 0.42) mesh=BuriedMetalPanel.mesh
+Hangar 2 Wood panel 7 scene=Assets/Scenes/Gameplay.unity parent=16_Buried_Barriers pos=(49.42, 0.08, -6.00) rot=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) id=farm.barrier.h2.wood.p6 material=0 pile=Hangar 2 - Almost full grain bank (GrainPile) collider=(2.78, 2.80, 0.75)
+  Hangar 2 Wood panel 7 bounds=Center: (49.42, 1.48, -6.00), Extents: (1.39, 1.55, 0.39) mesh=BuriedWoodPanel.mesh
+PILE Hangar 3 - Almost full grain bank position=(-49.93, 0.04, -10.69) bounds=Center: (-49.93, 3.08, -10.69), Extents: (21.41, 3.09, 19.58)
+PILE Hangar 2 - Almost full grain bank position=(49.42, 0.04, -10.40) bounds=Center: (49.42, 3.13, -10.40), Extents: (21.41, 3.14, 19.58)
+PILE Hangar 5 - Grain bank to entrance position=(84.04, 0.04, 43.00) bounds=Center: (84.04, 3.88, 43.00), Extents: (26.50, 3.89, 16.00)
+PILE Corn pile - scoop with left click position=(8.34, 0.01, 3.06) bounds=Center: (5.91, 2.04, 2.90), Extents: (4.53, 2.08, 6.79)
+PILE Hangar 4 - Grain bank to entrance position=(-84.09, 0.04, 43.00) bounds=Center: (-84.09, 3.96, 43.00), Extents: (26.50, 3.96, 16.00)

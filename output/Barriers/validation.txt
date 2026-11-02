@@ -1,0 +1,27 @@
+PASS farm.barrier.h4.independent.2 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h3.independent.1 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h2.independent.0 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h5.independent.2 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h4.independent.0 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h5.independent.0 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h4.independent.4 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h4.independent.3 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h4.independent.1 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h3.independent.2 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h4.independent.5 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h3.independent.3 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h3.independent.5 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h5.independent.3 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h5.independent.5 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h2.independent.4 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h3.independent.4 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h2.independent.1 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h3.independent.0 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h5.independent.4 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h2.independent.3 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h2.independent.5 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h2.independent.2 independent collider, unique save ID, buried, no barrier overlap
+PASS farm.barrier.h5.independent.1 independent collider, unique save ID, buried, no barrier overlap
+PASS Axe damages only the aimed piece; wrong tool rejected.
+PASS Hammer damages only the aimed piece; wrong tool rejected.
+PASS saved Assets/Scenes/Gameplay.unity; 24 additions: 12 wood, 12 metal; 16 upright, 8 horizontal.
