@@ -13,13 +13,16 @@ public class MenuManager : MonoBehaviour
     [SerializeField, Tooltip("Creates the shared audio/loading services when the Menu scene is played directly.")]
     private GlobalManager servicesPrefab;
     [Header("Screens")]
+    [SerializeField] private GameObject continueButton;
     [SerializeField] private GameObject menuScreen;
     [SerializeField] private GameObject settingsScreen;
+    [SerializeField] private GameObject newGamePopup;
     [SerializeField] private GameObject quitGamePopup;
     [Header("Transitions")]
     [SerializeField] private string gameplayScene = "Gameplay";
     [SerializeField, Min(0f)] private float minimumLoadingSeconds = 1f;
     private bool transitionRequested;
+    private int newGamePopupOpenedFrame;
 
     [Header("Background cameras (in playback order)")]
     [SerializeField] private Camera[] menuCameras = new Camera[3];
@@ -63,22 +66,54 @@ public class MenuManager : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
-    public void ContinueGame() => BeginGame(false);
-    public void NewGame() => BeginGame(true);
+    public void ContinueGame()
+    {
+        if (LoadingScreen.isLoadingOn || !SaveSystem.HasSavedGame ||
+            (newGamePopup != null && newGamePopup.activeSelf)) return;
+        BeginGame(false);
+    }
+
+    public void NewGame()
+    {
+        if (transitionRequested || LoadingScreen.isLoadingOn) return;
+        if (!SaveSystem.HasSavedGame) { BeginGame(true); return; }
+        if (newGamePopup == null)
+        {
+            Debug.LogError("Assign the New Game confirmation popup before replacing a save.", this);
+            return;
+        }
+        if (newGamePopup.activeSelf) return;
+        AudioManager.Instance?.PlayConfirm();
+        SetScreenActive(settingsScreen, false);
+        SetScreenActive(quitGamePopup, false);
+        SetScreenActive(menuScreen, false);
+        SetScreenActive(newGamePopup, true);
+        newGamePopupOpenedFrame = Time.frameCount;
+    }
+
+    public void ConfirmNewGame()
+    {
+        if (LoadingScreen.isLoadingOn || newGamePopup == null || !newGamePopup.activeSelf) return;
+        BeginGame(true);
+    }
 
     public void ShowMenuScreen()
     {
         if (transitionRequested || LoadingScreen.isLoadingOn) return;
-        if ((settingsScreen != null && settingsScreen.activeSelf) || (quitGamePopup != null && quitGamePopup.activeSelf))
+        if ((settingsScreen != null && settingsScreen.activeSelf) || (quitGamePopup != null && quitGamePopup.activeSelf) ||
+            (newGamePopup != null && newGamePopup.activeSelf))
             AudioManager.Instance?.PlayCancel();
         SetScreenActive(menuScreen, true);
         SetScreenActive(settingsScreen, false);
         SetScreenActive(quitGamePopup, false);
+        SetScreenActive(newGamePopup, false);
+        SetScreenActive(continueButton, SaveSystem.HasSavedGame);
     }
 
     public void ShowSettingsScreen()
     {
         if (transitionRequested || LoadingScreen.isLoadingOn) return;
+        if (newGamePopup != null && newGamePopup.activeSelf) return;
         if (settingsScreen == null || settingsScreen.activeSelf) return;
         AudioManager.Instance?.PlayConfirm();
         SetScreenActive(menuScreen, false);
@@ -89,6 +124,7 @@ public class MenuManager : MonoBehaviour
     public void ShowQuitGamePopup()
     {
         if (transitionRequested || LoadingScreen.isLoadingOn) return;
+        if (newGamePopup != null && newGamePopup.activeSelf) return;
         if (quitGamePopup == null || quitGamePopup.activeSelf) return;
         AudioManager.Instance?.PlayConfirm();
         SetScreenActive(settingsScreen, false);
@@ -110,8 +146,15 @@ public class MenuManager : MonoBehaviour
 
     private void Update()
     {
-        if (transitionRequested || LoadingScreen.isLoadingOn || GameSettingsManager.IsRebindingInputCaptured ||
-            !Input.GetKeyDown(KeyCode.Escape)) return;
+        if (transitionRequested || LoadingScreen.isLoadingOn || GameSettingsManager.IsRebindingInputCaptured) return;
+        if (newGamePopup != null && newGamePopup.activeSelf)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape)) ShowMenuScreen();
+            else if (Time.frameCount > newGamePopupOpenedFrame &&
+                (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))) ConfirmNewGame();
+            return;
+        }
+        if (!Input.GetKeyDown(KeyCode.Escape)) return;
         if ((settingsScreen != null && settingsScreen.activeSelf) || (quitGamePopup != null && quitGamePopup.activeSelf))
             ShowMenuScreen();
         else ShowQuitGamePopup();
@@ -167,6 +210,8 @@ public class MenuManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         // Reset the page selection when this menu scene opens again.
+        SetScreenActive(newGamePopup, false);
+        SetScreenActive(continueButton, SaveSystem.HasSavedGame);
         SetScreenActive(menuScreen, true);
         SetScreenActive(settingsScreen, false);
         SetScreenActive(quitGamePopup, false);

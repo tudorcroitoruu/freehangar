@@ -7,7 +7,9 @@ using UnityEngine.TestTools;
 public class MenuSessionTests
 {
     private const BindingFlags Private=BindingFlags.Instance|BindingFlags.NonPublic;
-    private GameObject root,menuObject,otherObject,main,settings,quit;
+    private GameObject root,menuObject,otherObject,main,settings,quit,newGame,continueButton;
+    private string previousSave;
+    private bool hadSave;
     private MenuManager menu,previousInstance;
     private PlayerData previousData;
     private bool previousLoaded,previousVisible,previousLoading;
@@ -17,6 +19,8 @@ public class MenuSessionTests
     [SetUp]
     public void SetUp()
     {
+        hadSave=PlayerPrefs.HasKey("/save");previousSave=PlayerPrefs.GetString("/save");
+        PlayerPrefs.SetString("/save","menu-test-placeholder");
         previousInstance=MenuManager.Instance;previousData=SaveSystem.Data;previousLoaded=SaveSystem.savesLoaded;
         previousTimeScale=Time.timeScale;previousLock=Cursor.lockState;previousVisible=Cursor.visible;
         previousLoading=LoadingScreen.isLoadingOn;LoadingScreen.isLoadingOn=false;
@@ -27,11 +31,14 @@ public class MenuSessionTests
         settings=Child("SettingsScreen");settings.transform.SetParent(menuObject.transform);
         quit=Child("QuitGamePopup");quit.transform.SetParent(menuObject.transform);
         Set("menuScreen",main);Set("settingsScreen",settings);Set("quitGamePopup",quit);
+        newGame=Child("NewGamePopup");Set("newGamePopup",newGame);
+        continueButton=Child("Continue");Set("continueButton",continueButton);
         SaveSystem.Data=new PlayerData{cash=12345};SaveSystem.savesLoaded=true;
     }
     [TearDown]
     public void TearDown()
     {
+        if(hadSave)PlayerPrefs.SetString("/save",previousSave);else PlayerPrefs.DeleteKey("/save");
         Object.DestroyImmediate(root);
         typeof(MenuManager).GetProperty("Instance").SetValue(null,previousInstance);
         SaveSystem.Data=previousData;SaveSystem.savesLoaded=previousLoaded;
@@ -91,7 +98,7 @@ public class MenuSessionTests
     {
         Open();var data=SaveSystem.Data;Set("gameplayScene","MissingSceneForMenuTest");
         LogAssert.Expect(LogType.Error,"Cannot load scene because it is missing from Build Settings: MissingSceneForMenuTest");
-        if(newGame)menu.NewGame();else menu.ContinueGame();
+        if(newGame){menu.NewGame();menu.ConfirmNewGame();}else menu.ContinueGame();
         Assert.AreSame(data,SaveSystem.Data);Assert.That(SaveSystem.Money,Is.EqualTo(12345));
         Assert.IsFalse((bool)typeof(MenuManager).GetField("transitionRequested",Private).GetValue(menu));
     }
@@ -105,6 +112,29 @@ public class MenuSessionTests
         Set("menuCameras",new[]{camera});
         typeof(MenuManager).GetMethod("OnDisable",Private).Invoke(menu,null);
         Assert.IsFalse(camera.enabled);Assert.IsFalse(listener.enabled);Assert.IsFalse(cameraObject.activeSelf);
+    }
+
+    [Test]
+    public void NoSaveHidesContinueAndRejectsContinueRequests()
+    {
+        PlayerPrefs.DeleteKey("/save");Open();
+        Assert.IsFalse(continueButton.activeSelf);
+        var data=SaveSystem.Data;menu.ContinueGame();
+        Assert.AreSame(data,SaveSystem.Data);Assert.IsFalse(newGame.activeSelf);
+    }
+
+    [Test]
+    public void ExistingSaveRequiresConfirmationAndCancelPreservesData()
+    {
+        Open();var data=SaveSystem.Data;
+        Assert.IsTrue(continueButton.activeSelf);
+        menu.NewGame();
+        Assert.IsTrue(newGame.activeSelf);Assert.IsFalse(main.activeSelf);
+        menu.ContinueGame();menu.NewGame();
+        Assert.AreSame(data,SaveSystem.Data);
+        menu.ShowMenuScreen();
+        Assert.IsFalse(newGame.activeSelf);Assert.IsTrue(main.activeSelf);
+        menu.ConfirmNewGame();Assert.AreSame(data,SaveSystem.Data);
     }
 
     private void Open(){menuObject.SetActive(true);typeof(MenuManager).GetMethod("OnEnable",Private).Invoke(menu,null);}

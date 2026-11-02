@@ -138,6 +138,7 @@ public static class SaveSystem
     }
 
     static string savePath = "/save";
+    public static bool HasSavedGame => PlayerPrefs.HasKey(savePath);
 
     static int key = 5;
     
@@ -147,15 +148,19 @@ public static class SaveSystem
         WriteData();
     }
 
-    internal static void WriteData()
+    internal static void WriteData(bool createSave = false)
     {
         if (Data == null) return;
         string json = JsonUtility.ToJson(Data); //Global Data
         string jsonSettings = JsonUtility.ToJson(settingsData); //Settings Data (on new save it willhave same settings)
         string jsonActivity = JsonUtility.ToJson(activityData); //Activity Data (PS5)
         
-        if (PlayerPrefs.HasKey(savePath)) PlayerPrefs.SetString(savePath + "_Backup", PlayerPrefs.GetString(savePath));
-        PlayerPrefs.SetString(savePath, EncryptDecrypt(json));
+        // Opening the menu or changing settings must not create a resumable game.
+        if (createSave || HasSavedGame || WorldSaveRuntime.Instance != null)
+        {
+            if (PlayerPrefs.HasKey(savePath)) PlayerPrefs.SetString(savePath + "_Backup", PlayerPrefs.GetString(savePath));
+            PlayerPrefs.SetString(savePath, EncryptDecrypt(json));
+        }
         PlayerPrefs.SetString(savePath +"_Settings", EncryptDecrypt(jsonSettings));
         PlayerPrefs.SetString("levelsCompleted", EncryptDecrypt(jsonActivity));
         
@@ -242,8 +247,12 @@ public static class SaveSystem
 
         if (newSave)
         {
-            await MakeNewSave();
-            SaveData();
+            // Bootstrap also loads data before the menu: initialize defaults without
+            // creating a game until New Game is confirmed or gameplay saves progress.
+            Data.playerName = "PLAYER_" + Random.Range(1000, 10000);
+            string savedSettings = PlayerPrefs.GetString(savePath + "_Settings", "");
+            if (!string.IsNullOrEmpty(savedSettings))
+                settingsData = JsonUtility.FromJson<SettingsData>(EncryptDecrypt(savedSettings));
         }
 
         if (Data == null)
@@ -303,7 +312,7 @@ public static class SaveSystem
        
         //InitAchievementsList();
 
-        SaveData();
+        WriteData(createSave: true);
         if (GlobalManager.Instance != null) await GlobalManager.Instance.LoadData();
         Debug.Log("<color=red>New save</color>");
         return Data;
