@@ -198,14 +198,6 @@ public sealed class StaminaManager : MonoBehaviour
         else DestroyImmediate(fillMaterial);
     }
 
-    private void OnGUI()
-    {
-        if (!HasInfiniteStamina) return;
-        long remaining = InfiniteStaminaSecondsRemaining;
-        GUI.Box(new Rect(Mathf.Max(8f, Screen.width - 226f), 12f, 218f, 30f),
-            $"Infinite stamina  {remaining / 60:00}:{remaining % 60:00}");
-    }
-
     private void OnValidate()
     {
         maxStamina = Mathf.Max(.01f, maxStamina);
