@@ -33,7 +33,9 @@ public sealed class SellingWeighButton : MonoBehaviour, IInteractable
     public bool TryInteract(PlayerInteractor interactor)
     {
         if (!TryGetPrompt(interactor, out var prompt) || !prompt.ShowKey) return false;
-        return sellingZone.TryOpen(interactor);
+        bool opened = sellingZone.TryOpen(interactor);
+        if (opened) GameplayAudio.Instance?.PressWeighButton();
+        return opened;
     }
 
     private void OnDrawGizmosSelected()

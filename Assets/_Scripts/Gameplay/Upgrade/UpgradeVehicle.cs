@@ -46,6 +46,7 @@ public class UpgradeVehicle : MonoBehaviour
     private void OnEnable()
     {
         if (upgradeButton != null) upgradeButton.onClick.AddListener(Upgrade);
+        UpgradeButtonFeedback.Bind(upgradeButton, this);
         SaveSystem.MoneyChanged += OnMoneyChanged;
         VehicleUpgrade.VehicleReplaced += OnVehicleReplaced;
         Refresh();
@@ -65,7 +66,12 @@ public class UpgradeVehicle : MonoBehaviour
     {
         if (target == previous) SetTarget(next);
     }
-    public void Upgrade() => TryUpgrade();
+    public void Upgrade()
+    {
+        if (!isActiveAndEnabled || SaveSystem.UpgradePurchaseLocked) return;
+        bool purchased = TryUpgrade();
+        GameplayAudio.Instance?.UpgradeResult(purchased);
+    }
     public bool TryUpgrade()
     {
         if (!isActiveAndEnabled || SaveSystem.UpgradePurchaseLocked || target == null) return false;

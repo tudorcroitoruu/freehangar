@@ -55,10 +55,36 @@ public sealed class VehicleCargoPlacement : MonoBehaviour
     {
         var pose=profile?.FindCargoPose(containerId,index);
         item.localScale=Vector3.Scale(baseScale,pose?.EffectiveScale ?? Vector3.one);
-        item.rotation=slot.rotation*baseRotation*Quaternion.Euler(pose?.rotation ?? Vector3.zero);
+        bool empty = item.TryGetComponent<GrainContainer>(out var container) && container.IsEmpty;
+        item.rotation=slot.rotation*baseRotation*Quaternion.Euler(empty ? Vector3.zero : pose?.rotation ?? Vector3.zero);
         item.position=slot.position;
         if(bottom) VehicleCargoRack.SeatBase(item,slot);
         else if(item.TryGetComponent<GrainContainer>(out var cargo)) item.position+=slot.position-cargo.WorldBounds.center;
-        if(pose!=null) item.position+=slot.TransformVector(pose.position);
+        if(pose!=null && !empty) item.position+=slot.TransformVector(pose.position);
+        if (empty && bottom) StackEmptyBag(item, slot);
+    }
+
+    private static void StackEmptyBag(Transform item, Transform slot)
+    {
+        if (slot.parent == null) return;
+        bool earlierCargo = false;
+        // Earlier occupied slots form the stack; full containers retain their authored poses.
+        for (int i = slot.GetSiblingIndex() - 1; i >= 0; i--)
+        {
+            var previousSlot = slot.parent.GetChild(i);
+            if (previousSlot.childCount == 0) continue;
+            var previous = previousSlot.GetChild(0);
+            if (!previous.TryGetComponent<GrainContainer>(out var cargo)) continue;
+            earlierCargo = true;
+            if (!cargo.IsEmpty) continue;
+            Bounds below = VehicleCargoRack.ContactBounds(previous, slot);
+            Bounds current = VehicleCargoRack.ContactBounds(item, slot);
+            item.position += slot.TransformVector(new Vector3(below.center.x - current.center.x,
+                below.max.y - current.min.y, below.center.z - current.center.z));
+            return;
+        }
+        var rack = VehicleCargoOwner.Rack(slot);
+        if (!earlierCargo && rack != null && rack.surface == slot.parent)
+            item.position += rack.surface.TransformPoint(rack.SlotPosition(0)) - slot.position;
     }
 }

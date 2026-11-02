@@ -49,7 +49,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         previous.StopPushing();
         Vector3 position = previous.transform.position; Quaternion rotation = previous.transform.rotation;
         transform.SetParent(null,true);
-        transform.SetPositionAndRotation(position,rotation);
+        transform.SetPositionAndRotation(position,rotation);x
         GetComponent<VehicleReset>()?.SetHomePose();
         foreach (var bag in previous.bags.ToArray())
         {
@@ -142,6 +142,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     public bool CanLoad(BagInteraction carrier)
     {
         if (carrier == null || !carrier.IsCarrying || carrier.CarriedBag == null || pusher != null) return false;
+        if (!carrier.CarriedBag.CanLoadOnVehicle) return false;
         float volume = carrier.CarriedVolume;
         return occupiedVolume + volume <= CapacityVolume + .0001f && bags.Count < CargoSlotCount;
     }
@@ -166,12 +167,12 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         else if (interactor.Bags != null && interactor.Bags.IsCarrying)
         {
             available = CanLoad(interactor.Bags);
-            action = available ? "Load bag" : "Wheelbarrow full";
+            action = !interactor.Bags.CarriedBag.CanLoadOnVehicle ? "Finish filling and close bag" : available ? "Load bag" : "Wheelbarrow full";
         }
         else action = interactor.Items != null && interactor.Items.IsCarrying ? "Put down item and push" : "Push wheelbarrow";
         prompt = new InteractionPromptData(transform.TransformPoint(trayCenter + Vector3.up * .35f),
             action + $"  ({occupiedVolume:0.00}/{CapacityVolume:0.00} m³)", available);
-        prompt.VehicleFull = !available && interactor.Bags != null && interactor.Bags.IsCarrying;
+        prompt.VehicleFull = !available && interactor.Bags != null && interactor.Bags.IsCarrying && interactor.Bags.CarriedBag.CanLoadOnVehicle;
         return true;
     }
 

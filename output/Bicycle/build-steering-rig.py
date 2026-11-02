@@ -1,6 +1,7 @@
-import bpy,math,json,os
+import bpy,bmesh,math,json,os
+from pathlib import Path
 from mathutils import Vector
-P='D:/Projects/freehangar/'
+P=Path(__file__).resolve().parents[2].as_posix()+'/'
 bpy.ops.wm.open_mainfile(filepath=P+'output/Bicycle/Loose.blend')
 groups={k:[] for k in ['Frame','Steering','FrontWheel','RearWheel','Crank','LeftPedal','RightPedal','RearControlCable']}
 for o in list(bpy.context.scene.objects):
@@ -24,11 +25,15 @@ for key,objects in groups.items():
  for o in objects:o.select_set(True)
  bpy.context.view_layer.objects.active=objects[0];bpy.ops.object.join();o=bpy.context.object;o.name=key
  # decimate joined geometry retaining uv and material borders
- mod=o.modifiers.new('Gameplay reduction','DECIMATE');mod.ratio=.19 if 'Wheel' in key else .16
- bpy.ops.object.modifier_apply(modifier=mod.name)
+ # Small first-person parts collapse into floating triangles at the old 16% ratio.
+ if key not in {'Steering','Crank','LeftPedal','RightPedal'}:
+  mod=o.modifiers.new('Gameplay reduction','DECIMATE');mod.ratio=.19 if 'Wheel' in key else .16
+  bpy.ops.object.modifier_apply(modifier=mod.name)
  origin=Vector(origins[key])
  for v in o.data.vertices:
   q=v.co-origin;v.co=(q.x,-q.y,q.z)
+ if key in {'Steering','Crank','LeftPedal','RightPedal'}:
+  bm=bmesh.new();bm.from_mesh(o.data);bmesh.ops.reverse_faces(bm,faces=list(bm.faces));bm.normal_update();bm.to_mesh(o.data);bm.free()
  o.location=(origin.x,.414-origin.y,origin.z+.239)
  for p in o.data.polygons:p.use_smooth=True
  o.data.calc_loop_triangles();result.append({'name':key,'triangles':len(o.data.loop_triangles),'origin':list(o.location)})

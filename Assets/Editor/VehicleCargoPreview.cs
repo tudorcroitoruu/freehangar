@@ -337,6 +337,7 @@ public sealed class VehicleCargoPreview : EditorWindow
             if(!fillRack && supportIndex!=Mathf.Clamp(selectedSlot,0,supports.Count-1)) continue;
             var item=Copy(cargoPrefab,assembly.transform);
             PrepareContainer(item,cargoFill,cargoClosure);
+            item.transform.SetParent(support, true);
             item.transform.position=support.position; item.transform.rotation=Quaternion.AngleAxis(support.eulerAngles.y,Vector3.up)*cargoPrefab.transform.rotation;
             Quaternion baseRotation=Quaternion.Inverse(support.rotation)*item.transform.rotation;
             VehicleCargoPlacement.Place(item.transform,support,profile,container.CargoTypeId,usesRack?supportIndex*slotStride:supportIndex,baseRotation,usesRack,item.transform.localScale);

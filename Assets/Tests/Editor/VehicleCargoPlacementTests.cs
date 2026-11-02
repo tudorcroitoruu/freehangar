@@ -3,6 +3,101 @@ using UnityEngine;
 
 public class VehicleCargoPlacementTests
 {
+    [Test]
+    public void EmptyBagsStackWithoutPreviewPositionOffsetsOrSlotGaps()
+    {
+        var root = new GameObject("Empty bag stack");
+        try
+        {
+            root.transform.rotation = Quaternion.Euler(0, 35, 0);
+            root.transform.localScale = Vector3.one * 1.4f;
+            var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/FreeBag.prefab");
+            var profile = new VehicleUpgradeSettings.VehicleType { cargoPoses = new[] {
+                new VehicleUpgradeSettings.CargoPose { containerId="FreeBag", slotIndex=0,
+                    position=new Vector3(.4f, .7f, -.2f), rotation=new Vector3(0, 90, -90) } } };
+            Transform previous = null;
+            for (int i = 0; i < 3; i++)
+            {
+                var slot = new GameObject("Slot " + i).transform;
+                slot.SetParent(root.transform, false);
+                slot.localPosition = new Vector3(i * .3f, i * .6f, 0);
+                var item = Object.Instantiate(prefab, slot);
+                VehicleCargoPreview.PrepareContainer(item, 0, 0);
+                var scale = item.transform.localScale;
+                var rotation = item.transform.localRotation;
+                for (int pass = 0; pass < 3; pass++)
+                    VehicleCargoPlacement.Place(item.transform, slot, profile, "FreeBag", i, rotation, true, scale);
+                Bounds bounds = VehicleCargoRack.ContactBounds(item.transform, root.transform);
+                if (previous == null)
+                {
+                    Assert.Less(Mathf.Abs(bounds.min.y), .0001f);
+                    Assert.Less(Mathf.Abs(bounds.center.x), .0001f);
+                    Assert.Less(Mathf.Abs(bounds.center.z), .0001f);
+                }
+                else
+                {
+                    Bounds below = VehicleCargoRack.ContactBounds(previous, root.transform);
+                    Assert.Less(Mathf.Abs(bounds.min.y - below.max.y), .0001f);
+                    Assert.Less(Mathf.Abs(bounds.center.x - below.center.x), .0001f);
+                    Assert.Less(Mathf.Abs(bounds.center.z - below.center.z), .0001f);
+                }
+                previous = item.transform;
+            }
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
+
+    [TestCase(0f, 0f, true)]
+    [TestCase(.5f, 0f, false)]
+    [TestCase(.5f, 1f, false)]
+    [TestCase(1f, 0f, false)]
+    [TestCase(1f, 1f, true)]
+    public void VehicleLoadingRequiresEmptyOrFinishedBag(float fill, float close, bool allowed)
+    {
+        var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/FreeBag.prefab");
+        var item = Object.Instantiate(prefab);
+        var actor = new GameObject("Carrier");
+        var slot = new GameObject("Vehicle slot");
+        try
+        {
+            VehicleCargoPreview.PrepareContainer(item, fill, close);
+            var cargo = item.GetComponent<GrainContainer>();
+            Assert.That(cargo.CanLoadOnVehicle, Is.EqualTo(allowed));
+            if (!allowed)
+            {
+                var carry = actor.AddComponent<BagInteraction>();
+                typeof(BagInteraction).GetField("carried", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(carry, cargo);
+                Assert.IsFalse(carry.TryStow(slot.transform));
+                Assert.IsNull(item.transform.parent);
+            }
+        }
+        finally { Object.DestroyImmediate(actor); Object.DestroyImmediate(item); Object.DestroyImmediate(slot); }
+    }
+
+    [TestCase(0f)]
+    [TestCase(1f)]
+    public void OnlyEmptyBagsIgnorePreviewRotation(float fill)
+    {
+        var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/FreeBag.prefab");
+        var item = Object.Instantiate(prefab);
+        var slot = new GameObject("Vehicle slot");
+        try
+        {
+            VehicleCargoPreview.PrepareContainer(item, fill, fill);
+            slot.transform.rotation = Quaternion.Euler(0, 35, 0);
+            var pose = new VehicleUpgradeSettings.CargoPose { containerId="FreeBag", slotIndex=0, rotation=new Vector3(0, 90, -90), position=new Vector3(.1f, .2f, .3f), scale=new Vector3(.8f, .9f, 1.1f) };
+            var profile = new VehicleUpgradeSettings.VehicleType { cargoPoses=new[] { pose } };
+            var baseline = item.transform.rotation;
+            var scale = item.transform.localScale;
+            for (int i = 0; i < 3; i++)
+                VehicleCargoPlacement.Place(item.transform, slot.transform, profile, "FreeBag", 0, baseline, true, scale);
+            var expected = slot.transform.rotation * baseline * (fill == 0 ? Quaternion.identity : Quaternion.Euler(pose.rotation));
+            Assert.Less(Quaternion.Angle(expected, item.transform.rotation), .01f);
+            Assert.Less(Vector3.Distance(item.transform.localScale, Vector3.Scale(scale, pose.EffectiveScale)), .0001f);
+        }
+        finally { Object.DestroyImmediate(item); Object.DestroyImmediate(slot); }
+    }
+
     [TestCase(2)]
     [TestCase(5)]
     public void SingleContainerSlotsHoldExactlyTheConfiguredNumberOfBags(int capacity)

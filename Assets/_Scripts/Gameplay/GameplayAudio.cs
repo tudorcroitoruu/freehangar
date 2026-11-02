@@ -17,10 +17,12 @@ public sealed class GameplayAudio : MonoBehaviour
     [SerializeField] private AudioClip[] broomHits;
     [SerializeField] private AudioClip[] axeWoodHits;
     [SerializeField] private AudioClip hammerMetal, hammerWood, pickUp, drop;
+    [SerializeField] private AudioClip hitAir;
     [Header("Last scene")]
     [SerializeField] private AudioClip openDoor, openRocketDoor, closeDoor, rocket, switchElectrical, lightsOn;
     [Header("Other")]
     [SerializeField] private AudioClip paperGet, perkFound;
+    [SerializeField] private AudioClip pressButton, cashIn, upgradeFailed, upgradeSuccess;
     [Header("Grain tools")]
     [SerializeField] private AudioClip[] shovelGets, fillGrain;
     [SerializeField] private AudioClip vacuum;
@@ -68,6 +70,10 @@ public sealed class GameplayAudio : MonoBehaviour
     public void PestHit(bool crow, Vector3 point) => PlayAt(crow ? Choose(crowHits) : ratHit, point, .8f);
     public void CrowFlyAway(Vector3 point) => PlayAt(crowFlyAway, point, .65f);
     public void BroomHit() => Play(Choose(broomHits), .75f);
+    public void ToolSwing() => Play(hitAir, .75f);
+    public void PressWeighButton() => Play(pressButton, .8f);
+    public void CashIn() => Play(cashIn, .8f);
+    public void UpgradeResult(bool success) => Play(success ? upgradeSuccess : upgradeFailed, .8f);
     public void BarrierHit(bool metal) => Play(metal ? hammerMetal : (Choose(axeWoodHits) ?? hammerWood), .8f);
     public void PickUp() => Play(pickUp, .7f);
     public void Drop() => Play(drop, .7f);

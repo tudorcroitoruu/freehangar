@@ -91,7 +91,7 @@ public sealed class VehicleCargoRack : MonoBehaviour
         var bounds=ContactBounds(item,support);
         item.position += support.TransformVector(new Vector3(-bounds.center.x,-bounds.min.y,-bounds.center.z));
     }
-    private static Bounds ContactBounds(Transform item,Transform space)
+    public static Bounds ContactBounds(Transform item,Transform space)
     {
         var box=item.GetComponent<BoxCollider>(); Bounds result=default;
         Bounds bounds=box!=null?new Bounds(box.center,box.size):new Bounds(Vector3.zero,Vector3.one*.3f);

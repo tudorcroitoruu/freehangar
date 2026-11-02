@@ -56,8 +56,10 @@ public class ShopProduct : MonoBehaviour, IInteractable
 
     public bool TryInteract(PlayerInteractor interactor)
     {
-        if (!isActiveAndEnabled || !toBuy || !CanDeliver(interactor, out _)) return false;
-        return SaveSystem.TryBuyProduct(productID, Price, () => TryDeliver(interactor));
+        if (!isActiveAndEnabled || !toBuy) return false;
+        bool purchased = CanDeliver(interactor, out _) && SaveSystem.TryBuyProduct(productID, Price, () => TryDeliver(interactor));
+        GameplayAudio.Instance?.UpgradeResult(purchased);
+        return purchased;
     }
 
     private bool CanAfford() => SaveSystem.Data != null && Price >= 0 && SaveSystem.Money >= Price;

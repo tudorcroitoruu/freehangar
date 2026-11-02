@@ -98,7 +98,9 @@ public sealed class PlayerCombatTools : MonoBehaviour
         if (!isActiveAndEnabled || !IsUnlocked(equipped) || equipped == Tool.Shovel || viewCamera == null ||
             Time.timeScale<=0 || Time.time < strikeStart + StrikeDuration ||
             (bags!=null && bags.IsCarrying) || (interactor!=null && (interactor.HandsOccupied || interactor.DiscoveryBusy))) return false;
-        strikeStart=Time.time;impactPending=true;return true;
+        strikeStart=Time.time;impactPending=true;
+        GameplayAudio.Instance?.ToolSwing();
+        return true;
     }
     private void CancelStrike() { impactPending=false;strikeStart=-10f; }
     private void OnDisable() => CancelStrike();

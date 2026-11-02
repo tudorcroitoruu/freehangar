@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Steering",
+    "vertices": 5375,
+    "triangles": 9789
+  },
+  {
+    "name": "Crank",
+    "vertices": 1527,
+    "triangles": 3024
+  },
+  {
+    "name": "LeftPedal",
+    "vertices": 991,
+    "triangles": 1826
+  },
+  {
+    "name": "RightPedal",
+    "vertices": 971,
+    "triangles": 1798
+  }
+]

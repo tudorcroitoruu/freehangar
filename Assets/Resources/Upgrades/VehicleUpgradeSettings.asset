@@ -20,7 +20,7 @@ MonoBehaviour:
       slotIndex: 0
       applyToAllSlots: 1
       position: {x: 0.1, y: 0, z: -0.06}
-      rotation: {x: 0, y: 90, z: -90}
+      rotation: {x: 0, y: 90, z: 0}
       scale: {x: 1, y: 1, z: 1}
     - containerId: SmallBag
       slotIndex: 0

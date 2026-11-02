@@ -27,6 +27,7 @@ public class UpgradeStamina : MonoBehaviour
     {
         settings = GrainEconomySettings.ResolveStamina(settings);
         if (upgradeButton != null) upgradeButton.onClick.AddListener(Upgrade);
+        UpgradeButtonFeedback.Bind(upgradeButton, this);
         SaveSystem.MoneyChanged += OnMoneyChanged;
         Refresh();
     }
@@ -42,7 +43,12 @@ public class UpgradeStamina : MonoBehaviour
     {
         if (waitingForUpgrade && !SaveSystem.UpgradePurchaseLocked) Refresh();
     }
-    public void Upgrade() => TryUpgrade();
+    public void Upgrade()
+    {
+        if (!isActiveAndEnabled || SaveSystem.UpgradePurchaseLocked) return;
+        bool purchased = TryUpgrade();
+        GameplayAudio.Instance?.UpgradeResult(purchased);
+    }
 
     public bool TryUpgrade()
     {

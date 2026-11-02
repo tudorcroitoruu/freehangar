@@ -35,3 +35,15 @@ The long control cable is a two-bone skinned mesh: upper endpoint follows the le
 Bike pedaling camera amplitude also reduced by 1.5x: target 0.3 degrees instead of 0.45, with existing cadence/smoothing. Same simulation observed approximately -0.203 to +0.202 degrees; coast/brake fade and dismount-reset checks pass. Gameplay and rideable prefab saved.
 
 Rear rack update (2026-10-27): the bicycle prefab and scene instance now use two centerline box positions arranged front/back on the existing narrow rack. `exclusiveBagSlot` provides one centered bag position sharing the whole rack. `FreeBagCargoSlot` rejects bags when either box position is occupied; `FreeCargoSlot` rejects boxes when a bag is present. Other vehicles retain their existing per-slot cargo behavior. E bag loading uses the bag-specific query. Eighteen Play Mode checks passed for bag/box exclusivity, maximum capacity, retrieval/reloading, cargo recognition and centered placement; two-box render inspected. Validation: output/Lawnmower/ValidateRack.cs.
+
+2026-11-02 pedal/steering mesh repair: restored Steering, Crank, LeftPedal and
+RightPedal from the original loose-part geometry. The prior 16% decimation
+collapsed small first-person surfaces into fragments. Corrected winding after
+the source-to-game mirror as well; winding alone did not fix the visible gaps.
+UV/material assignments, object names and animation pivots are preserved.
+Updated Bicycle_Rigged.fbx, its editable Blender source, and the build script to
+retain detail for these four parts. The complete bike is now approximately 22k
+triangles instead of 8k; no target-device performance benchmark was run.
+Unity captures inspected at steering -30/0/+30 and pedal 0/90/180/270 degrees.
+All 13 existing rig checks passed (axle gap drift 0.000306 m, cable anchor error
+0.000978 m). See output/Bicycle/mesh-repair.json and pedals-repaired-*.png.

@@ -137,7 +137,7 @@ public sealed class BagInteraction : MonoBehaviour
 
     public bool TryStow(Transform slot)
     {
-        if (carried == null || slot == null) return false;
+        if (carried == null || slot == null || !carried.CanLoadOnVehicle) return false;
         var upgrades = VehicleCargoOwner.Upgrade(slot);
         var rack = VehicleCargoOwner.Rack(slot);
         var layout = VehicleCargoOwner.Resolve(slot)?.GetComponent<PickupCargoLayout>();

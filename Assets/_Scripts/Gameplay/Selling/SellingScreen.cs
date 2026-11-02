@@ -124,6 +124,7 @@ public class SellingScreen : MonoBehaviour
     public void Sell()
     {
         if (saleInProgress || !IsOpen || !Zone.CanWeigh(player) || UIPopups.BasePopupUI.HasActivePopup) return;
+        GameplayAudio.Instance?.PressWeighButton();
         if (!QuoteMatches()) { Refresh(); return; }
         if (!CanPay()) return;
         // Lock before AddMoney: its callbacks can invoke Sell again in the same frame.
@@ -136,14 +137,7 @@ public class SellingScreen : MonoBehaviour
             return;
         }
         GameAchievements.GrainSold(quotedCash);
-        foreach (var container in containers)
-        {
-            var wheelbarrow = container.GetComponentInParent<WheelbarrowCargo>();
-            container.transform.SetParent(null, true);
-            if (wheelbarrow != null) wheelbarrow.NotifyBagTaken(container);
-            container.gameObject.SetActive(false);
-            Destroy(container.gameObject);
-        }
+        SoldCargoAnimation.Begin(containers);
         if (DataHolderUI.Instance != null) DataHolderUI.Instance.RefreshDataPlayer();
         Close();
     }
