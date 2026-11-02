@@ -408,7 +408,7 @@ MonoBehaviour:
   transportLevel: 3
   cargoTypeId: LargeBag
   pickupSpaceUnits: 1
-  capacityKg: 50
+  capacityKg: 60
   kilograms: 0
   canBeCarried: 1
   restrictGrain: 0

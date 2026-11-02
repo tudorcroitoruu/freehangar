@@ -53,8 +53,14 @@ public static class SaveSystem
 
     public static bool TryUnlockFirstHangarShopProduct(float clearedPercent)
     {
-        if (!savesLoaded || Data == null || !Data.TryRecordHangarClearance(1, clearedPercent)) return false;
+        if (clearedPercent < 50f || !TryRecordHangarClearance(1, clearedPercent)) return false;
         MoneyChanged?.Invoke(Money);
+        return true;
+    }
+
+    public static bool TryRecordHangarClearance(int hangar, float clearedPercent)
+    {
+        if (!savesLoaded || Data == null || !Data.TryRecordHangarClearance(hangar, clearedPercent)) return false;
         HangarProgressChanged?.Invoke();
         return true;
     }
@@ -402,6 +408,7 @@ public class PlayerData
     [Header("Hangar progression")]
     public List<int> openedHangars = new List<int> { 1 };
     public bool firstHangarHalfCleared;
+    public List<float> hangarClearedPercent = new List<float>();
 
     public bool IsHangarOpen(int number) => number >= 1 && number <= 5 &&
         (number == 1 || (openedHangars != null && openedHangars.Contains(number)) ||
@@ -417,10 +424,24 @@ public class PlayerData
 
     public bool TryRecordHangarClearance(int number, float clearedPercent)
     {
-        if (number != 1 || !float.IsFinite(clearedPercent) || clearedPercent < 50f ||
-            clearedPercent > 100f || firstHangarHalfCleared) return false;
-        firstHangarHalfCleared = true;
+        if (number < 1 || number > 5 || !float.IsFinite(clearedPercent) || clearedPercent < 0f ||
+            clearedPercent > 100f || clearedPercent <= GetHangarClearedPercent(number)) return false;
+        hangarClearedPercent ??= new List<float>();
+        while (hangarClearedPercent.Count < number) hangarClearedPercent.Add(0f);
+        hangarClearedPercent[number - 1] = clearedPercent;
+        if (number == 1 && clearedPercent >= 50f) firstHangarHalfCleared = true;
         return true;
+    }
+
+    public float GetHangarClearedPercent(int number)
+    {
+        if (number < 1 || number > 5) return 0f;
+        float value = hangarClearedPercent != null && hangarClearedPercent.Count >= number
+            ? hangarClearedPercent[number - 1] : 0f;
+        if (!float.IsFinite(value)) value = 0f;
+        value = Mathf.Clamp(value, 0f, 100f);
+        // Old saves only stored this milestone; retain already unlocked products.
+        return number == 1 && firstHangarHalfCleared ? Mathf.Max(50f, value) : value;
     }
 
     /// <summary>Import hangars opened by older saves without treating a collected key as an open door.</summary>

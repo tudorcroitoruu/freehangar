@@ -69,7 +69,7 @@ MonoBehaviour:
   transportLevel: 2
   cargoTypeId: SmallBag
   pickupSpaceUnits: 1
-  capacityKg: 25
+  capacityKg: 30
   kilograms: 0
   canBeCarried: 1
   restrictGrain: 0

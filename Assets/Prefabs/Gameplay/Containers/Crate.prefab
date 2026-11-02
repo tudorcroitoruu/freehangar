@@ -255,7 +255,7 @@ MonoBehaviour:
   transportLevel: 4
   cargoTypeId: Crate
   pickupSpaceUnits: 1
-  capacityKg: 80
+  capacityKg: 100
   kilograms: 0
   canBeCarried: 1
   restrictGrain: 0

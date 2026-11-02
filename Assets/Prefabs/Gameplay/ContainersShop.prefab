@@ -2271,6 +2271,9 @@ MonoBehaviour:
   productPrice: 14
   toBuy: 1
   toRent: 0
+  unlockCondition: 2
+  requiredHangar: 4
+  requiredClearedPercent: 50
   objectPrefab: {fileID: 6691740664109452445, guid: 0e1bd387d12bf994e93017e2686bb315, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
@@ -3250,6 +3253,9 @@ MonoBehaviour:
   productPrice: 10
   toBuy: 1
   toRent: 0
+  unlockCondition: 2
+  requiredHangar: 3
+  requiredClearedPercent: 50
   objectPrefab: {fileID: 7210842097477428087, guid: eb731e91ae410754ebc5f7596c6cbf2e, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
@@ -3455,6 +3461,9 @@ MonoBehaviour:
   productPrice: 45
   toBuy: 1
   toRent: 0
+  unlockCondition: 2
+  requiredHangar: 5
+  requiredClearedPercent: 50
   objectPrefab: {fileID: 1521085326205624577, guid: e081f75f0718b8f418e7a58f44bd497e, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 2099837709319181489}
@@ -4024,6 +4033,9 @@ MonoBehaviour:
   productPrice: 7
   toBuy: 1
   toRent: 0
+  unlockCondition: 2
+  requiredHangar: 2
+  requiredClearedPercent: 50
   objectPrefab: {fileID: 6347959474882097887, guid: 74ea987079d2f16479c245f3ebeddb46, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
@@ -4477,12 +4489,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7952746250896148089}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0.032999996, y: 0.19100003, z: 0.0019988976}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.8390026, y: 0.012999999, z: -0.335999}
   m_LocalScale: {x: 1, y: 0.72, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5725461765521442003}
+  m_Father: {fileID: 1963732069032246040}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7963085346494650250
 GameObject:
@@ -4635,6 +4647,7 @@ Transform:
   - {fileID: 2814779740979516576}
   - {fileID: 8493732422424422874}
   - {fileID: 5779133139221689264}
+  - {fileID: 2099837709319181489}
   - {fileID: 5725461765521442003}
   - {fileID: 936609159133414298}
   - {fileID: 888915757085860988}
@@ -4755,6 +4768,9 @@ MonoBehaviour:
   productPrice: 4
   toBuy: 1
   toRent: 0
+  unlockCondition: 1
+  requiredHangar: 1
+  requiredClearedPercent: 50
   objectPrefab: {fileID: 30410232912704535, guid: ab8b6d4aaac96504497dff8c04cb7891, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
@@ -6561,12 +6577,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: TFP_Wooden_Pallet_02B
       objectReference: {fileID: 0}
+    - target: {fileID: 2485417223682031626, guid: e8e79e1e52c656c429c2c255b297a020, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 2485417223681940522, guid: e8e79e1e52c656c429c2c255b297a020, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2099837709319181489}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8e79e1e52c656c429c2c255b297a020, type: 3}
 --- !u!4 &5725461765521442003 stripped

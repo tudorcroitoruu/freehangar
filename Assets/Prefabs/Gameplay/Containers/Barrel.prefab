@@ -263,7 +263,7 @@ MonoBehaviour:
   transportLevel: 5
   cargoTypeId: Barrel
   pickupSpaceUnits: 1
-  capacityKg: 120
+  capacityKg: 150
   kilograms: 0
   canBeCarried: 1
   restrictGrain: 0

@@ -5,6 +5,7 @@ public class ShopProduct : MonoBehaviour, IInteractable
     public string SaveProductId => productID;
     public int MaxActiveInScene => maxActiveInScene;
     public enum DeliveryMode { Hands, AtSpawnPoint }
+    public enum UnlockCondition { Always, HangarCleared, HangarOpened }
 
     [SerializeField] private string productID;
     [SerializeField] private string productName;
@@ -12,6 +13,26 @@ public class ShopProduct : MonoBehaviour, IInteractable
     private int productPrice;
     [SerializeField] private bool toBuy = true;
     [SerializeField] private bool toRent;
+
+    [Header("Unlock")]
+    [SerializeField] private UnlockCondition unlockCondition = UnlockCondition.Always;
+    [SerializeField, Min(1), Tooltip("Hangar used by the opening or clearance unlock condition. Collecting its key alone is not enough.")]
+    private int requiredHangar = 2;
+    [SerializeField, Range(0f, 100f), Tooltip("Required percentage of the selected hangar cleared. The highest achieved percentage is saved.")]
+    private float requiredClearedPercent = 50f;
+
+    public bool IsUnlocked(PlayerData data)
+    {
+        if (data == null) return false;
+        switch (unlockCondition)
+        {
+            case UnlockCondition.Always: return true;
+            case UnlockCondition.HangarCleared:
+                return data.IsHangarOpen(requiredHangar) && data.GetHangarClearedPercent(requiredHangar) >= requiredClearedPercent;
+            case UnlockCondition.HangarOpened: return data.IsHangarOpen(requiredHangar);
+            default: return false;
+        }
+    }
 
     [Header("Delivery")]
     [SerializeField] private GameObject objectPrefab;

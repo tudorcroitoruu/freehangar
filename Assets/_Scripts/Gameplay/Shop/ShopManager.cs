@@ -35,12 +35,10 @@ public class ShopManager : MonoBehaviour
     {
         loadedData = SaveSystem.savesLoaded ? SaveSystem.Data : null;
         if (_shopProducts == null) return;
-        for (int i = 0; i < Mathf.Min(5, _shopProducts.Length); i++)
+        foreach (var product in _shopProducts)
         {
-            var product = _shopProducts[i];
             if (product == null) continue;
-            bool active = loadedData != null && (i == 0
-                ? loadedData.firstHangarHalfCleared : loadedData.IsHangarOpen(i + 1));
+            bool active = product.IsUnlocked(loadedData);
             if (product.gameObject.activeSelf != active) product.gameObject.SetActive(active);
         }
     }

@@ -163,7 +163,7 @@ MonoBehaviour:
   transportLevel: 1
   cargoTypeId: FreeBag
   pickupSpaceUnits: 1
-  capacityKg: 10
+  capacityKg: 15
   kilograms: 0
   canBeCarried: 1
   restrictGrain: 0

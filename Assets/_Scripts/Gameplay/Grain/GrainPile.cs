@@ -49,6 +49,8 @@ public sealed class GrainPile : MonoBehaviour
     private readonly GrainAppearance appearance = new GrainAppearance();
     public double HarvestedKg => harvestedKg;
     private double initialKilograms;
+    private PlayerData clearanceProfile;
+    private float reportedClearance = -1f;
     public double InitialKilograms => initialKilograms;
     public float ClearedPercent => initialKilograms > 0
         ? Mathf.Clamp01((float)(1 - Kilograms / initialKilograms)) * 100f : 0f;
@@ -463,11 +465,16 @@ public sealed class GrainPile : MonoBehaviour
             return;
         }
         if (field == null || Time.deltaTime <= 0) return;
-        if (SaveSystem.savesLoaded && SaveSystem.Data != null && !SaveSystem.Data.firstHangarHalfCleared &&
-            ClearedPercent >= 50f)
+        if (!IsDroppedPile && !WorldSaveRuntime.IsRestoring && SaveSystem.savesLoaded && SaveSystem.Data != null)
         {
-            GoalContext.Resolve(this, out int hangar, out _);
-            if (hangar == 1) SaveSystem.TryUnlockFirstHangarShopProduct(ClearedPercent);
+            float cleared = ClearedPercent;
+            if (clearanceProfile != SaveSystem.Data || cleared > reportedClearance)
+            {
+                clearanceProfile = SaveSystem.Data;
+                reportedClearance = cleared;
+                GoalContext.Resolve(this, out int hangar, out _);
+                SaveSystem.TryRecordHangarClearance(hangar, cleared);
+            }
         }
         if (settling && Time.time >= nextStep)
         {
