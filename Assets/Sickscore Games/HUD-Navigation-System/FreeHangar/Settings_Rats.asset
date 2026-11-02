@@ -34,7 +34,7 @@ MonoBehaviour:
   ignoreIndicatorScaling: 0
   ignoreIndicatorFading: 0
   useIndicatorDistanceText: 1
-  showOffscreenIndicatorDistance: 1
+  showOffscreenIndicatorDistance: 0
   indicatorOnscreenDistanceTextFormat: '{0}m'
   indicatorOffscreenDistanceTextFormat: '{0}'
   hideInMinimap: 0
