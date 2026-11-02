@@ -9983,6 +9983,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   wallClearance: 0.01
+  excludedFootprint:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
   kilograms: 58477.78580596023
 --- !u!64 &28963972
 MeshCollider:
@@ -154903,7 +154909,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 66986593005708501, guid: 92cd2246640b5a04ca292732de427687, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -360
       objectReference: {fileID: 0}
     - target: {fileID: 441147001786320752, guid: 92cd2246640b5a04ca292732de427687, type: 3}
       propertyPath: m_AnchorMax.y
@@ -154919,7 +154925,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 441147001786320752, guid: 92cd2246640b5a04ca292732de427687, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -200
       objectReference: {fileID: 0}
     - target: {fileID: 1382628437570982009, guid: 92cd2246640b5a04ca292732de427687, type: 3}
       propertyPath: m_AnchorMax.y
@@ -155021,6 +155027,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: SettingsScreen
       objectReference: {fileID: 0}
+    - target: {fileID: 1504256420291656262, guid: 92cd2246640b5a04ca292732de427687, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2291349000774751710, guid: 92cd2246640b5a04ca292732de427687, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2291349000774751710, guid: 92cd2246640b5a04ca292732de427687, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2291349000774751710, guid: 92cd2246640b5a04ca292732de427687, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2291349000774751710, guid: 92cd2246640b5a04ca292732de427687, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -120
+      objectReference: {fileID: 0}
     - target: {fileID: 2712382982618260199, guid: 92cd2246640b5a04ca292732de427687, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -155083,7 +155109,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4543737598644331905, guid: 92cd2246640b5a04ca292732de427687, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -280
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -783276,6 +783302,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e519fbe695a464c418046f95d97300cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuManager
+  servicesPrefab: {fileID: 0}
   menuScreen: {fileID: 5925938949125262972}
   settingsScreen: {fileID: 465358860}
   quitGamePopup: {fileID: 3985767016428473560}

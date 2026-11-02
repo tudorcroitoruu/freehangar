@@ -471,8 +471,8 @@ public class GameSettingsManager : MonoBehaviour
     {
         if (availableDisplays.Count == 0) return 0;
         DisplayInfo current = Screen.mainWindowDisplayInfo;
-        int index = availableDisplays.FindIndex(display => display.name == current.name &&
-            display.width == current.width && display.height == current.height);
+        // DisplayInfo equality includes the native monitor identity, unlike its name/resolution.
+        int index = availableDisplays.FindIndex(display => display.Equals(current));
         return index >= 0 ? index : 0;
     }
 
@@ -745,7 +745,7 @@ public class GameSettingsManager : MonoBehaviour
         if (!initialized || settings == null) return;
         SetupDisplays();
         if (availableDisplays.Count < 2) { UpdateVideoValues(); return; }
-        int index = (settings.displayIndex + direction + availableDisplays.Count) % availableDisplays.Count;
+        int index = (Mathf.Clamp(settings.displayIndex, 0, availableDisplays.Count - 1) + direction + availableDisplays.Count) % availableDisplays.Count;
         settings.displayIndex = index;
         settings.displayName = availableDisplays[index].name;
         ApplyResolution();
@@ -1400,7 +1400,10 @@ public class GameSettingsManager : MonoBehaviour
         settings.windowModeIndex = Mathf.Clamp(settings.windowModeIndex, 0, 1);
         if (availableDisplays.Count > 0)
         {
-            int displayIndex = settings.displayName == null ? FindCurrentDisplayIndex() :
+            // Keep the saved ordinal when two attached monitors have the same model name.
+            int displayIndex = settings.displayIndex >= 0 && settings.displayIndex < availableDisplays.Count &&
+                availableDisplays[settings.displayIndex].name == settings.displayName ? settings.displayIndex :
+                settings.displayName == null ? FindCurrentDisplayIndex() :
                 availableDisplays.FindIndex(display => display.name == settings.displayName);
             if (displayIndex < 0) displayIndex = FindCurrentDisplayIndex();
             if (settings.displayIndex != displayIndex || settings.displayName != availableDisplays[displayIndex].name)
