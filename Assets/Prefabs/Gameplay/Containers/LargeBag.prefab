@@ -353,6 +353,7 @@ GameObject:
   - component: {fileID: 2703916515079949562}
   - component: {fileID: 4599948850668223103}
   - component: {fileID: 4175973395640029877}
+  - component: {fileID: -6706110695466422771}
   m_Layer: 0
   m_Name: LargeBag
   m_TagString: Untagged
@@ -404,9 +405,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b490a70abf7e5db4e850392a1c7ec809, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrainContainer
-  pickupSpaceUnits: 1
-  cargoTypeId: LargeBag
   transportLevel: 3
+  cargoTypeId: LargeBag
+  pickupSpaceUnits: 1
   capacityKg: 50
   kilograms: 0
   canBeCarried: 1
@@ -424,6 +425,9 @@ MonoBehaviour:
     m_Center: {x: 0.0027515292, y: 0.002769649, z: 0.5049948}
     m_Extent: {x: 0.3501143, y: 0.3016718, z: 0.50499487}
   closeDuration: 0.65
+  promptAnchor: {fileID: 0}
+  promptOffset: {x: 0, y: 0.12, z: 0}
+  palletCollider: {fileID: 0}
 --- !u!65 &2703916515079949562
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -477,3 +481,74 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InteractionHighlight
   outlines:
   - {fileID: 8781846782174757783}
+--- !u!114 &-6706110695466422771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6347959474882097887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67a5fc50cb592fe4f95457eb6d66e520, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SickscoreGames.HUDNavigationSystem.HUDNavigationElement
+  Settings: {fileID: 11400000, guid: 3721b41e370d0e849b9df61c74a029ed, type: 2}
+  Prefabs:
+    RadarPrefab: {fileID: 0}
+    CompassBarPrefab: {fileID: 0}
+    IndicatorPrefab: {fileID: 0}
+    MinimapPrefab: {fileID: 0}
+  hideInRadar: 0
+  ignoreRadarRadius: 0
+  ignoreRadarScaling: 0
+  ignoreRadarFading: 0
+  rotateWithGameObject: 1
+  useRadarHeightSystem: 1
+  hideInCompassBar: 0
+  ignoreCompassBarRadius: 0
+  useCompassBarDistanceText: 1
+  compassBarDistanceTextFormat: '{0}m'
+  showIndicator: 1
+  showOffscreenIndicator: 1
+  ignoreIndicatorRadius: 1
+  ignoreIndicatorHideDistance: 0
+  ignoreIndicatorScaling: 0
+  ignoreIndicatorFading: 0
+  useIndicatorDistanceText: 1
+  showOffscreenIndicatorDistance: 0
+  indicatorOnscreenDistanceTextFormat: '{0}m'
+  indicatorOffscreenDistanceTextFormat: '{0}'
+  hideInMinimap: 0
+  ignoreMinimapRadius: 0
+  ignoreMinimapScaling: 0
+  ignoreMinimapFading: 0
+  rotateWithGameObjectMM: 1
+  useMinimapHeightSystem: 1
+  OnElementReady:
+    m_PersistentCalls:
+      m_Calls: []
+  OnElementUpdate:
+    m_PersistentCalls:
+      m_Calls: []
+  OnAppear:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDisappear:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEnterRadius:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLeaveRadius:
+    m_PersistentCalls:
+      m_Calls: []
+  IsActive: 1
+  Radar: {fileID: 0}
+  CompassBar: {fileID: 0}
+  Indicator: {fileID: 0}
+  Minimap: {fileID: 0}
+  IsInRadarRadius: 0
+  IsInCompassBarRadius: 0
+  IsInIndicatorRadius: 0
+  IsInMinimapRadius: 0
