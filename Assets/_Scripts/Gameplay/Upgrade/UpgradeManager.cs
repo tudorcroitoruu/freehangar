@@ -7,6 +7,8 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private UpgradeShovel upgradeShovelScreen;
     [SerializeField] private UpgradeStamina upgradeStaminaScreen;
     [SerializeField] private UpgradeVehicle upgradeVehicleScreen;
+    
+    [SerializeField] private ParticleSystem upgradeShovelParticles;
 
     [SerializeField] private Button closeButton;
     private static UpgradeManager current;
@@ -91,6 +93,7 @@ public class UpgradeManager : MonoBehaviour
 
     private void OnEnable()
     {
+        if (upgradeShovelScreen != null) upgradeShovelScreen.UpgradeSucceeded += PlayShovelUpgradeParticles;
         previousCursorLock = Cursor.lockState;
         previousCursorVisible = Cursor.visible;
         cursorCaptured = true;
@@ -129,6 +132,7 @@ public class UpgradeManager : MonoBehaviour
 
     private void OnDisable()
     {
+        if (upgradeShovelScreen != null) upgradeShovelScreen.UpgradeSucceeded -= PlayShovelUpgradeParticles;
         if (cursorCaptured)
         {
             cursorCaptured = false;
@@ -138,6 +142,14 @@ public class UpgradeManager : MonoBehaviour
         }
         if (closeButton != null) closeButton.onClick.RemoveListener(Close);
         ReleaseInput();
+    }
+
+    private void PlayShovelUpgradeParticles()
+    {
+        if (upgradeShovelParticles == null) return;
+        upgradeShovelParticles.gameObject.SetActive(true);
+        upgradeShovelParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        upgradeShovelParticles.Play(true);
     }
 
     private void ReleaseInput()

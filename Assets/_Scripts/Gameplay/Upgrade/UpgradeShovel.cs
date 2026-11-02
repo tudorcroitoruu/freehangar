@@ -4,6 +4,7 @@ using System.Globalization;
 
 public class UpgradeShovel : MonoBehaviour
 {
+    public event System.Action UpgradeSucceeded;
     [SerializeField] private ShovelUpgradeSettings settings;
     [SerializeField] private Image shovelImage;
     [SerializeField] private Text currentLevelText;
@@ -71,6 +72,7 @@ public class UpgradeShovel : MonoBehaviour
         int cost = settings.Price(level);
         bool purchased = cost >= 0 && SaveSystem.TryPurchaseShovelUpgrade(cost, level, settings.MaxUpgrades);
         Refresh();
+        if (purchased) UpgradeSucceeded?.Invoke();
         return purchased;
     }
 
