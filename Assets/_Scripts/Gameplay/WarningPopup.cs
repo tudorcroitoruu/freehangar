@@ -13,7 +13,8 @@ public enum WarningType
     BlockVehicleExit,
     OccupiedHands,
     OccupiedArea,
-    UseForkliftToMove
+    UseForkliftToMove,
+    NewContainerOpened
 }
 public class WarningPopup : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class WarningPopup : MonoBehaviour
     [SerializeField, Min(.1f)] private float rotationSeconds = 3f;
     [SerializeField, Min(0f)] private float fadeSeconds = .2f;
 
-    private sealed class Request
+    public sealed class Request
     {
         public WarningType type;
         public UnityEngine.Object source;

@@ -241,10 +241,13 @@ public class HangarShopProgressTests
             typeof(ShopManager).GetMethod("OnEnable", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(shop, null);
             AssertStates(products, false, true, false, false, true, true, false);
             Assert.IsTrue(SaveSystem.TryOpenHangar(5));
+            ProcessPendingAvailability(shop);
             AssertStates(products, true, true, false, false, true, true, false);
             Assert.IsTrue(SaveSystem.TryUnlockFirstHangarShopProduct(50));
+            ProcessPendingAvailability(shop);
             AssertStates(products, true, true, false, false, true, true, false);
             Assert.IsTrue(SaveSystem.TryRecordHangarClearance(1, 75));
+            ProcessPendingAvailability(shop);
             AssertStates(products, true, true, true, false, true, true, false);
             field.SetValue(shop, products);
             shop.RefreshProductAvailability();
@@ -258,5 +261,11 @@ public class HangarShopProgressTests
             SaveSystem.Data = previous;
             SaveSystem.savesLoaded = wasLoaded;
         }
+    }
+    private static void ProcessPendingAvailability(ShopManager shop)
+    {
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        typeof(ShopManager).GetField("nextAvailabilityCheck", flags).SetValue(shop, 0f);
+        typeof(ShopManager).GetMethod("Update", flags).Invoke(shop, null);
     }
 }

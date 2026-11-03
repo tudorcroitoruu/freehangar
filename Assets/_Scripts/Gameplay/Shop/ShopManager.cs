@@ -1,16 +1,21 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ShopManager : MonoBehaviour
 {
     [SerializeField] private ShopProduct[] _shopProducts;
     [SerializeField] private GrainEconomySettings economySettings;
+    [SerializeField, Min(.01f)] private float availabilityRefreshInterval = 3f;
     public GrainEconomySettings EconomySettings => economySettings;
     private PlayerData loadedData;
+    private float nextAvailabilityCheck;
+    private bool availabilityRefreshPending;
+    private readonly Dictionary<ShopProduct, bool> productUnlockStates = new Dictionary<ShopProduct, bool>();
 
     private void OnEnable()
     {
         ConfigureProductPricing();
-        SaveSystem.HangarProgressChanged += RefreshProductAvailability;
+        SaveSystem.HangarProgressChanged += RequestAvailabilityRefresh;
         SaveSystem.MoneyChanged += OnMoneyChanged;
         RefreshProductAvailability();
     }
@@ -26,28 +31,39 @@ public class ShopManager : MonoBehaviour
 
     private void OnDisable()
     {
-        SaveSystem.HangarProgressChanged -= RefreshProductAvailability;
+        SaveSystem.HangarProgressChanged -= RequestAvailabilityRefresh;
         SaveSystem.MoneyChanged -= OnMoneyChanged;
     }
 
     // Vehicle purchases (including vouchers) publish this after their unlock is saved in PlayerData.
-    private void OnMoneyChanged(int _) => RefreshProductAvailability();
+    private void OnMoneyChanged(int _) => RequestAvailabilityRefresh();
+
+    private void RequestAvailabilityRefresh() => availabilityRefreshPending = true;
 
     private void Update()
     {
+        if (Time.unscaledTime < nextAvailabilityCheck) return;
+        nextAvailabilityCheck = Time.unscaledTime + Mathf.Max(.01f, availabilityRefreshInterval);
         var data = SaveSystem.savesLoaded ? SaveSystem.Data : null;
-        if (loadedData != data) RefreshProductAvailability();
+        if (availabilityRefreshPending || loadedData != data) RefreshProductAvailability();
     }
 
     public void RefreshProductAvailability()
     {
-        loadedData = SaveSystem.savesLoaded ? SaveSystem.Data : null;
+        availabilityRefreshPending = false;
+        nextAvailabilityCheck = Time.unscaledTime + Mathf.Max(.01f, availabilityRefreshInterval);
+        var data = SaveSystem.savesLoaded ? SaveSystem.Data : null;
+        if (loadedData != data) productUnlockStates.Clear();
+        loadedData = data;
         if (_shopProducts == null) return;
         foreach (var product in _shopProducts)
         {
             if (product == null) continue;
             bool active = product.IsUnlocked(loadedData);
+            bool newlyUnlocked = active && productUnlockStates.TryGetValue(product, out bool wasUnlocked) && !wasUnlocked;
+            productUnlockStates[product] = active;
             if (product.gameObject.activeSelf != active) product.gameObject.SetActive(active);
+            if (newlyUnlocked) GameplayCanvas.Instance?.ShowAchievement(WarningType.NewContainerOpened);
         }
     }
 

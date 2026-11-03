@@ -77,6 +77,7 @@ public class GameplayCanvas : MonoBehaviour
 
     [Space, Header("Warning")] 
     [SerializeField] private WarningPopup warningPopup;
+    [SerializeField] private AchievementsPopup achievementsPopup;
 
     private void Awake()
     {
@@ -84,6 +85,8 @@ public class GameplayCanvas : MonoBehaviour
             Instance = this;
         ResetFreeHandsWarning();
         if (warningPopup != null) warningPopup.Initialize();
+        if (achievementsPopup == null) achievementsPopup = GetComponentInChildren<AchievementsPopup>(true);
+        if (achievementsPopup != null) achievementsPopup.Initialize();
     }
 
     private void OnDestroy()
@@ -169,6 +172,7 @@ public class GameplayCanvas : MonoBehaviour
     private void Update()
     {
         if (warningPopup != null) warningPopup.Tick(Time.deltaTime);
+        if (achievementsPopup != null) achievementsPopup.Tick(Time.deltaTime);
         if (!hudHiddenByPause) AnimateMoney(Time.unscaledDeltaTime);
         RefreshCollectibleUI();
         if (fadingToolHints && hintsParent != null)
@@ -191,6 +195,11 @@ public class GameplayCanvas : MonoBehaviour
     public void ShowWarning(WarningType type, float seconds = 2f)
     {
         if (warningPopup != null) warningPopup.ShowWarning(type, seconds);
+    }
+
+    public void ShowAchievement(WarningType type, float seconds = 2f)
+    {
+        if (achievementsPopup != null) achievementsPopup.ShowWarning(type, seconds);
     }
 
     public void SetWarning(WarningType type, Object source, bool visible)
