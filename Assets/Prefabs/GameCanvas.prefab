@@ -7511,18 +7511,6 @@ MonoBehaviour:
     progressMode: 1
     goalAmount: 1
     rewardAmount: 0
-  - goalId: upgrade_larger_sack
-    goalDescription: Buy a larger bag
-    navigationIndicator: {fileID: 0}
-    stage: 3
-    hangarId: 0
-    goalType: 13
-    filterByGrainType: 0
-    grainType: 0
-    upgradeType: 1
-    progressMode: 2
-    goalAmount: 1
-    rewardAmount: 0
   - goalId: h1_load_200kg
     goalDescription: Load 200 kg of grain/
     navigationIndicator: {fileID: 0}
@@ -7546,6 +7534,18 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 500
+    rewardAmount: 0
+  - goalId: upgrade_larger_sack
+    goalDescription: Buy a larger bag
+    navigationIndicator: {fileID: 0}
+    stage: 3
+    hangarId: 0
+    goalType: 13
+    filterByGrainType: 0
+    grainType: 0
+    upgradeType: 1
+    progressMode: 2
+    goalAmount: 1
     rewardAmount: 0
   - goalId: h2_collect_key
     goalDescription: Collect the Hangar 2 key
@@ -7664,6 +7664,18 @@ MonoBehaviour:
     filterByGrainType: 0
     grainType: 2
     upgradeType: 0
+    progressMode: 2
+    goalAmount: 1
+    rewardAmount: 0
+  - goalId: upgrade_stamina
+    goalDescription: Upgrade stamina.
+    navigationIndicator: {fileID: 0}
+    stage: 3
+    hangarId: 0
+    goalType: 13
+    filterByGrainType: 0
+    grainType: 1
+    upgradeType: 7
     progressMode: 2
     goalAmount: 1
     rewardAmount: 0

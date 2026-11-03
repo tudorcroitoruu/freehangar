@@ -76,7 +76,9 @@ public static class SaveSystem
 
     public static bool TryPurchaseStaminaUpgrade(int price, int expectedLevel, int maxLevel)
     {
-        return ApplyUpgradePurchase(data => data.TryUpgradeStamina(price, expectedLevel, maxLevel));
+        bool purchased = ApplyUpgradePurchase(data => data.TryUpgradeStamina(price, expectedLevel, maxLevel));
+        if (purchased) GoalChecker.ReportValue(GoalType.UpgradePurchased, 1, upgradeType: GoalUpgradeType.Stamina);
+        return purchased;
     }
 
     public static bool TryPurchaseVehicleUpgrade(string id, int price, int expectedLevel, int maxLevel)

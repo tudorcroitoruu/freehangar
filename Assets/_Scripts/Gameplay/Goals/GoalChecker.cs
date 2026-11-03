@@ -84,6 +84,7 @@ public static class GoalChecker
             case GoalType.UpgradePurchased:
                 bool owned = data.purchasedGoalUpgrades?.Contains(goal.upgradeType) ?? false;
                 if (goal.upgradeType == GoalUpgradeType.Shovel) owned |= data.shovelUpgradeLevel > 0;
+                if (goal.upgradeType == GoalUpgradeType.Stamina) owned |= data.staminaUpgradeLevel > 0;
                 if (goal.upgradeType == GoalUpgradeType.LargerSack) owned |= data.GetOwnedProductCount("largeBag") > 0;
                 if (goal.upgradeType == GoalUpgradeType.LargerTruck) owned |= (data.unlockedVehicles?.Count ?? 0) > 0;
                 value = owned ? 1 : 0;
