@@ -48,6 +48,7 @@ public class GameplayCanvas : MonoBehaviour
     [Space, Header("Hints")]
     [SerializeField] private GameObject[] walkingHints;
     [SerializeField] private GameObject[] drivingHints;
+    [SerializeField] private GameObject[] bicycleHints;
     [SerializeField] private GameObject[] forkliftHints;
     [SerializeField] private TMP_Text walkingInteraction;
     private BagInteraction playerBags;
@@ -148,12 +149,18 @@ public class GameplayCanvas : MonoBehaviour
 
     public void SetDrivingHints(bool driving, bool forklift = false)
     {
+        var rider = driving ? FindFirstObjectByType<PlayerBicycleInteraction>() : null;
+        bool ridingBicycle = driving && !forklift && rider != null && rider.IsRiding &&
+            rider.bicycle != null && !rider.bicycle.motorDriven;
         if (walkingHints != null)
             foreach (var hint in walkingHints)
                 if (hint != null) hint.SetActive(!driving);
         if (drivingHints != null)
             foreach (var hint in drivingHints)
                 if (hint != null) hint.SetActive(driving);
+        if (bicycleHints != null)
+            foreach (var hint in bicycleHints)
+                if (hint != null) hint.SetActive(ridingBicycle);
         if (forkliftHints != null)
             foreach (var hint in forkliftHints)
                 if (hint != null) hint.SetActive(driving && forklift);
