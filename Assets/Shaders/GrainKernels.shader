@@ -41,13 +41,14 @@ Shader "Freehangar/HDRP/Grain Kernels"
         float2 grid = saturate(local.xz / _PileSurfaceGrid.x + .5) * (_PileSurfaceGrid.y - 1);
         int2 cell = min((int2)floor(grid), (int)_PileSurfaceGrid.y - 2);
         float2 f = grid - cell;
-        float a = LOAD_TEXTURE2D(_PileSurfaceHeights, cell).r;
-        float b = LOAD_TEXTURE2D(_PileSurfaceHeights, cell + int2(1, 0)).r;
-        float c = LOAD_TEXTURE2D(_PileSurfaceHeights, cell + int2(0, 1)).r;
-        float d = LOAD_TEXTURE2D(_PileSurfaceHeights, cell + int2(1, 1)).r;
-        float height = f.x + f.y <= 1 ? a * (1-f.x-f.y) + b*f.x + c*f.y :
+        float2 a = LOAD_TEXTURE2D(_PileSurfaceHeights, cell).rg;
+        float2 b = LOAD_TEXTURE2D(_PileSurfaceHeights, cell + int2(1, 0)).rg;
+        float2 c = LOAD_TEXTURE2D(_PileSurfaceHeights, cell + int2(0, 1)).rg;
+        float2 d = LOAD_TEXTURE2D(_PileSurfaceHeights, cell + int2(1, 1)).rg;
+        float2 height = f.x + f.y <= 1 ? a * (1-f.x-f.y) + b*f.x + c*f.y :
             d*(f.x+f.y-1) + c*(1-f.x) + b*(1-f.y);
-        float2 slope = f.x + f.y <= 1 ? float2(b-a, c-a) : float2(d-c, d-b);
+        float ah = a.x + a.y, bh = b.x + b.y, ch = c.x + c.y, dh = d.x + d.y;
+        float2 slope = f.x + f.y <= 1 ? float2(bh-ah, ch-ah) : float2(dh-ch, dh-bh);
         float spacing = _PileSurfaceGrid.x / (_PileSurfaceGrid.y - 1);
         float3 localNormal = normalize(float3(-slope.x, spacing, -slope.y));
         float3 up = normalize(mul(localNormal, (float3x3)_PileSurfaceWorldToLocal));
@@ -56,9 +57,9 @@ Shader "Freehangar/HDRP/Grain Kernels"
         float3 axis = cross(float3(0,1,0), up);
         offset += cross(axis, offset) + cross(axis, cross(axis, offset)) / max(.001, 1+up.y);
         normal += cross(axis, normal) + cross(axis, cross(axis, normal)) / max(.001, 1+up.y);
-        float worldHeight = length(_PileSurfaceLocalToWorld._m01_m11_m21) * height;
+        float worldHeight = length(_PileSurfaceLocalToWorld._m01_m11_m21) * height.x;
         offset *= smoothstep(0, .012, worldHeight);
-        local.y = height;
+        local.y = height.x + height.y;
         return mul(_PileSurfaceLocalToWorld, float4(local, 1)).xyz + float3(0,.003,0);
     }
     UNITY_INSTANCING_BUFFER_START(GrainInstances)

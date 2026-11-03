@@ -33,6 +33,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private Matrix4x4 lastTransform;
     private float[] previousHeights;
     private Texture2D surfaceHeights;
+    private Vector2[] surfacePixels;
     private bool gpuSurface;
     private int uploadedRevision = -1;
     private bool[] dirtyCells;
@@ -156,14 +157,14 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             Vector2 p = samples[i];
             if (!pile.IsInsideBoundary(pile.transform.TransformPoint(new Vector3(p.x, 0, p.y)), .04f)) continue;
             float height = pile.VisualHeightField.Sample(p.x, p.y);
-            float dx = pile.VisualHeightField.Sample(p.x + .03f, p.y) - pile.VisualHeightField.Sample(p.x - .03f, p.y);
-            float dz = pile.VisualHeightField.Sample(p.x, p.y + .03f) - pile.VisualHeightField.Sample(p.x, p.y - .03f);
+            float dx = pile.VisualSurfaceHeight(p.x + .03f, p.y) - pile.VisualSurfaceHeight(p.x - .03f, p.y);
+            float dz = pile.VisualSurfaceHeight(p.x, p.y + .03f) - pile.VisualSurfaceHeight(p.x, p.y - .03f);
             Vector3 normal = pile.transform.worldToLocalMatrix.transpose.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
             Quaternion slope = Quaternion.FromToRotation(Vector3.up, normal);
             if (gpuSurface) slope = Quaternion.identity;
             int color = paletteIndices[i];
             int batch = color * batchesPerColor + paletteCounts[color] / 1023, slot = paletteCounts[color] % 1023;
-            batches[batch][slot] = Matrix4x4.TRS(pile.transform.TransformPoint(new Vector3(p.x, height, p.y)) + Vector3.up * .003f,
+            batches[batch][slot] = Matrix4x4.TRS(pile.transform.TransformPoint(new Vector3(p.x, height + pile.GroundOffset(p.x, p.y), p.y)) + Vector3.up * .003f,
                 slope * Quaternion.AngleAxis(pile.transform.eulerAngles.y, Vector3.up) * rotations[i],
                 new Vector3(.0255f, .014f, .029f) * (!gpuSurface && height < .001f ? 0 : sizes[i]));
             paletteCounts[color]++;
@@ -184,17 +185,25 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         if (surfaceHeights == null || surfaceHeights.width != field.Resolution)
         {
             ReleaseSurfaceTexture();
-            surfaceHeights = new Texture2D(field.Resolution, field.Resolution, TextureFormat.RFloat, false, true)
+            surfaceHeights = new Texture2D(field.Resolution, field.Resolution, TextureFormat.RGFloat, false, true)
             { name = "Animated grain surface", hideFlags = HideFlags.HideAndDontSave, filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
         }
-        surfaceHeights.SetPixelData(field.Heights, 0);
+        if (surfacePixels == null || surfacePixels.Length != field.Heights.Length)
+            surfacePixels = new Vector2[field.Heights.Length];
+        for (int i = 0; i < surfacePixels.Length; i++)
+            surfacePixels[i] = new Vector2(field.Heights[i], pile.GroundOffset(i));
+        surfaceHeights.SetPixelData(surfacePixels, 0);
         surfaceHeights.Apply(false, false);
         uploadedRevision = pile.SurfaceRevision;
         // GPU displacement can grow above or below the original instance matrices.
         // Give both our culling and Unity's instanced draw the current height envelope.
-        float maxHeight = 0;
-        foreach (float height in field.Heights) maxHeight = Mathf.Max(maxHeight, height);
-        float bottom = transform.position.y - .1f, top = transform.position.y + maxHeight * pile.WorldScale.y + .1f;
+        float maxHeight = 0, minHeight = 0;
+        foreach (var pixel in surfacePixels)
+        {
+            maxHeight = Mathf.Max(maxHeight, pixel.x + pixel.y);
+            minHeight = Mathf.Min(minHeight, pixel.y);
+        }
+        float bottom = transform.position.y + minHeight * pile.WorldScale.y - .1f, top = transform.position.y + maxHeight * pile.WorldScale.y + .1f;
         for (int b = 0; b < surfaceBounds.Length; b++)
         {
             var bounds = surfaceBounds[b];
@@ -330,10 +339,10 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                 float h = field.Sample(p.x, p.y);
                 if (!gpuSurface)
                 {
-                    float dx = field.Sample(p.x + .03f, p.y) - field.Sample(p.x - .03f, p.y);
-                    float dz = field.Sample(p.x, p.y + .03f) - field.Sample(p.x, p.y - .03f);
+                    float dx = pile.VisualSurfaceHeight(p.x + .03f, p.y) - pile.VisualSurfaceHeight(p.x - .03f, p.y);
+                    float dz = pile.VisualSurfaceHeight(p.x, p.y + .03f) - pile.VisualSurfaceHeight(p.x, p.y - .03f);
                     Vector3 normal = normalMatrix.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
-                    batches[batch][sampleSlots[i]] = Matrix4x4.TRS(localToWorld.MultiplyPoint3x4(new Vector3(p.x, h, p.y)) + Vector3.up * .003f,
+                    batches[batch][sampleSlots[i]] = Matrix4x4.TRS(localToWorld.MultiplyPoint3x4(new Vector3(p.x, h + pile.GroundOffset(p.x, p.y), p.y)) + Vector3.up * .003f,
                         Quaternion.FromToRotation(Vector3.up, normal) * yaw * rotations[i],
                         new Vector3(.0255f, .014f, .029f) * (h < .001f ? 0 : sizes[i]));
                 }
@@ -375,7 +384,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         var field = pile.VisualHeightField;
         int n = field.Resolution;
         Vector3 Vertex(int index) => transform.TransformPoint(new Vector3(
-            index % n * field.Spacing - field.Size * .5f, field.Heights[index],
+            index % n * field.Spacing - field.Size * .5f, field.Heights[index] + pile.GroundOffset(index),
             index / n * field.Spacing - field.Size * .5f));
         a = Vertex(triangle == 0 ? cell : cell + 1);
         b = Vertex(cell + n);
@@ -409,7 +418,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                 Quaternion rotation = Quaternion.Euler((float)random.NextDouble() * 28f - 14f,
                     (float)random.NextDouble() * 360f, (float)random.NextDouble() * 26f - 13f);
                 float size = .9f + (float)random.NextDouble() * .22f;
-                if (local.y < .001f || !pile.IsInsideBoundary(point, .04f)) continue;
+                if (field.Sample(local.x, local.z) < .001f || !pile.IsInsideBoundary(point, .04f)) continue;
                 yield return Matrix4x4.TRS(point + Vector3.up * .003f, slope * rotation,
                     new Vector3(.0255f, .014f, .029f) * (size * Mathf.Clamp01(desiredCount - i)));
             }
@@ -480,7 +489,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         var vertices = new Vector3[field.Heights.Length];
         for (int i = 0; i < vertices.Length; i++)
             vertices[i] = new Vector3(i % field.Resolution * field.Spacing - field.Size * .5f,
-                field.Heights[i], i / field.Resolution * field.Spacing - field.Size * .5f);
+                field.Heights[i] + pile.GroundOffset(i), i / field.Resolution * field.Spacing - field.Size * .5f);
         int[] triangles = field.Triangles;
         float area = 0;
         for (int i = 0; i < vertices.Length; i++) vertices[i] = pile.transform.TransformPoint(vertices[i]);

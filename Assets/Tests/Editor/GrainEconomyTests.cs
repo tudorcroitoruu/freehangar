@@ -31,6 +31,54 @@ public class GrainEconomyTests
     private void Set(string name, object value) => typeof(GrainPile)
         .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(pile, value);
 
+    [Test]
+    public void DroppedGrainFollowsSlopedGroundAndRestoresWithoutAddingMass()
+    {
+        var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        GrainPile dropped = null, restored = null;
+        try
+        {
+            ground.transform.position = new Vector3(10000, 0, 10000);
+            ground.transform.localScale = new Vector3(30, .2f, 30);
+            ground.transform.rotation = Quaternion.Euler(0, 0, 12);
+            Physics.SyncTransforms();
+            var collider = ground.GetComponent<Collider>();
+            Assert.IsTrue(collider.Raycast(new Ray(ground.transform.position + Vector3.up * 10, Vector3.down), out var center, 20));
+            dropped = GrainPile.CreateDroppedPile(center.point, pile, 6.5f);
+            var cargo = new GrainCargo(); cargo.Add(GrainType.Corn, 6.5f);
+            Assert.IsTrue(dropped.Deposit(center.point, cargo, GrainPile.DropRadius(6.5f)));
+            var saved = dropped.CaptureSave();
+            restored = GrainPile.CreateDroppedPile(center.point, pile);
+            restored.RestoreSave(saved);
+            foreach (var target in new[] { dropped, restored })
+            {
+                for (int side = -1; side <= 1; side += 2)
+                {
+                    Vector3 p = center.point + Vector3.right * (target.Size * .4f * side);
+                    Assert.IsTrue(collider.Raycast(new Ray(p + Vector3.up * 10, Vector3.down), out var hit, 20));
+                    float thickness = target.SampleLocalHeight(p.x - center.point.x, 0);
+                    Assert.That(target.SurfaceHeight(p) - thickness, Is.EqualTo(hit.point.y).Within(.002f));
+                }
+                Assert.That(target.CollectibleKilograms, Is.EqualTo(6.5).Within(.002));
+                var collision = target.GetComponent<MeshCollider>().sharedMesh;
+                var vertices = collision.vertices;
+                foreach (int index in collision.triangles)
+                {
+                    Vector3 p = target.transform.TransformPoint(vertices[index]);
+                    Assert.That(p.y, Is.EqualTo(target.SurfaceHeight(p)).Within(.002));
+                }
+                Vector3 contact = center.point; contact.y = target.SurfaceHeight(contact);
+                Assert.Greater(target.Scoop(contact, .5f, .2f, 1f, new GrainCargo()), 0);
+            }
+        }
+        finally
+        {
+            if (dropped != null) Object.DestroyImmediate(dropped.gameObject);
+            if (restored != null) Object.DestroyImmediate(restored.gameObject);
+            Object.DestroyImmediate(ground);
+        }
+    }
+
     [TestCase(200f)]
     [TestCase(900f)]
     [TestCase(3000f)]
@@ -111,6 +159,36 @@ public class GrainEconomyTests
             Assert.That(collected, Is.EqualTo(10).Within(.002));
             for (int i = 0; i < expected.Length; i++)
                 Assert.That(cargo[(GrainType)i], Is.EqualTo(expected[i]).Within(.002));
+        }
+        finally { Object.DestroyImmediate(dropped.gameObject); }
+    }
+
+    [TestCase(6.5f)]
+    [TestCase(25f)]
+    public void PouredGrainSettlesAsAMoundWithBareEdgesAndPreservesBothCrops(float kilograms)
+    {
+        economy.grainConsumeMultiplier = 220;
+        Set("kilogramsPerCubicMetre", 360f);
+        var dropped = GrainPile.CreateDroppedPile(new Vector3(10000, 0, 10000), pile, kilograms);
+        try
+        {
+            var cargo = new GrainCargo();
+            cargo.Add(GrainType.Corn, kilograms * .4f);
+            cargo.Add(GrainType.Wheat, kilograms * .6f);
+            Assert.IsTrue(dropped.Deposit(dropped.transform.position, cargo, GrainPile.DropRadius(kilograms)));
+            var field = (GrainHeightField)typeof(GrainPile).GetField("field", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(dropped);
+            for (int i = 0; i < 600; i++) field.Settle(32, .45f);
+            Assert.Greater(field.Sample(0, 0), field.Sample(field.Size * .3f, 0) * 1.5f, "Spilled grain should keep a mound, not flatten into a slab.");
+            for (int i = 0; i < field.Resolution; i++)
+            {
+                Assert.Less(field.Heights[i], .0001f);
+                Assert.Less(field.Heights[(field.Resolution - 1) * field.Resolution + i], .0001f);
+                Assert.Less(field.Heights[i * field.Resolution], .0001f);
+                Assert.Less(field.Heights[i * field.Resolution + field.Resolution - 1], .0001f);
+            }
+            Assert.AreEqual(kilograms, dropped.CollectibleKilograms, .002);
+            Assert.AreEqual(kilograms * .4f, dropped.GrainKilograms(GrainType.Corn) / 220, .002);
+            Assert.AreEqual(kilograms * .6f, dropped.GrainKilograms(GrainType.Wheat) / 220, .002);
         }
         finally { Object.DestroyImmediate(dropped.gameObject); }
     }

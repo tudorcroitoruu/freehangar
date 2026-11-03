@@ -168,11 +168,17 @@ public sealed class GrainHeightField
         // Spread the missing material locally instead of flattening the original slope.
         // The reference is a ceiling/shape guide, never a source of replacement grain.
         float retainedDrop = Mathf.Min(.0025f, threshold * .02f);
-        float relief = receiverDeficit - donorDeficit - retainedDrop;
+        // Deposits sit ABOVE the reference surface (a dropped heap starts with a
+        // zero-height reference). Equalizing their deficits flattened them into
+        // square slabs. Let added grain retain its natural angle of repose;
+        // excavated stock still refills locally toward the authored shape.
+        bool deposited = donorDeficit < -reliefTolerance;
+        float relief = deposited ? Mathf.Abs(difference) - threshold : receiverDeficit - donorDeficit - retainedDrop;
         if (relief <= reliefTolerance) return false;
         // A lower neighbor cannot feed uphill, even when it has more material remaining.
         float excess = Mathf.Min(relief, Mathf.Abs(difference));
         float volume = excess / (1f / areas[high] + 1f / areas[low]) * Mathf.Clamp01(fraction);
+        if (deposited) volume = Mathf.Min(volume, -donorDeficit * areas[high]);
         volume = Mathf.Min(volume, Heights[high] * areas[high]);
         if (volume <= .000000001f) return false;
         Transferred?.Invoke(high, low, volume);

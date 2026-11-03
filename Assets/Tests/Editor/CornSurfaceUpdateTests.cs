@@ -97,8 +97,12 @@ public class CornSurfaceUpdateTests
                 update();
                 Set(surface, "uploadedRevision", -1);
                 upload();
-                var heights = Get<Texture2D>(surface, "surfaceHeights").GetPixelData<float>(0);
-                for (int i = 0; i < field.Heights.Length; i++) Assert.AreEqual(field.Heights[i], heights[i]);
+                var heights = Get<Texture2D>(surface, "surfaceHeights").GetPixelData<Vector2>(0);
+                for (int i = 0; i < field.Heights.Length; i++)
+                {
+                    Assert.AreEqual(field.Heights[i], heights[i].x);
+                    Assert.AreEqual(0, heights[i].y, "Authored piles retain their original base.");
+                }
                 CollectionAssert.AreEqual(original, matrices[0], "GPU grains must not snap to queued CPU transforms.");
             }
             Array.Clear(field.Heights, 0, field.Heights.Length);

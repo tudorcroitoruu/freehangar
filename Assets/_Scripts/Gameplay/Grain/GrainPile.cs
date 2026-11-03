@@ -162,6 +162,39 @@ public sealed class GrainPile : MonoBehaviour
     private GrainHeightField field;
     internal GrainHeightField HeightField => field;
     private GrainHeightField visualField;
+    private GrainHeightField groundField;
+    internal float GroundOffset(int index) => groundField == null ? 0 : groundField.Heights[index];
+    internal float GroundOffset(float x, float z) => groundField == null ? 0 : groundField.Sample(x, z);
+    internal float VisualSurfaceHeight(float x, float z) => VisualHeightField.Sample(x, z) + GroundOffset(x, z);
+
+    private void SampleDropGround()
+    {
+        groundField = null;
+        if (!IsDroppedPile) return;
+        // Ground is geometry, never collectible grain. Re-sample on restoration too.
+        groundField = new GrainHeightField(field.Resolution, field.Size, 0);
+        Physics.SyncTransforms();
+        for (int i = 0; i < field.Heights.Length; i++)
+        {
+            Vector3 p = transform.TransformPoint(new Vector3(i % field.Resolution * field.Spacing - size * .5f,
+                0, i / field.Resolution * field.Spacing - size * .5f));
+            float reach = Mathf.Max(2f, size);
+            int count = Physics.RaycastNonAlloc(p + Vector3.up * reach, Vector3.down, wallHits,
+                reach * 2, wallMask, QueryTriggerInteraction.Ignore);
+            float nearest = float.PositiveInfinity;
+            for (int h = 0; h < count; h++)
+            {
+                var hit = wallHits[h];
+                if (hit.normal.y < .65f || hit.collider.attachedRigidbody != null ||
+                    hit.collider.GetComponentInParent<GrainPile>() != null ||
+                    hit.collider.GetComponentInParent<GrainContainer>() != null) continue;
+                float distance = Mathf.Abs(hit.point.y - p.y);
+                if (distance >= nearest) continue;
+                nearest = distance;
+                groundField.Heights[i] = transform.InverseTransformPoint(hit.point).y;
+            }
+        }
+    }
     internal GrainHeightField VisualHeightField => visualField ?? field;
     private bool visualSettling;
     private Mesh mesh;
@@ -195,7 +228,7 @@ public sealed class GrainPile : MonoBehaviour
         if (field == null) return worldPoint.y;
         if (!IsInsideBoundary(worldPoint)) return transform.position.y;
         Vector3 p = transform.InverseTransformPoint(worldPoint);
-        return transform.TransformPoint(new Vector3(p.x, field.Sample(p.x, p.z), p.z)).y;
+        return transform.TransformPoint(new Vector3(p.x, field.Sample(p.x, p.z) + GroundOffset(p.x, p.z), p.z)).y;
     }
 
     /// <summary>Find a real grain surface near the blade, rather than the distant aim point.</summary>
@@ -216,7 +249,7 @@ public sealed class GrainPile : MonoBehaviour
             if (Mathf.Abs(x) > field.Size * .5f || Mathf.Abs(z) > field.Size * .5f) continue;
             float height = i < 0 ? field.Sample(x, z) : field.Heights[i];
             if (height * heightScale < .000001f) continue;
-            Vector3 candidate = transform.TransformPoint(new Vector3(x, height, z));
+            Vector3 candidate = transform.TransformPoint(new Vector3(x, height + GroundOffset(x, z), z));
             float distance = (candidate - worldPoint).sqrMagnitude;
             if (distance >= best || !IsInsideBoundary(candidate, .025f)) continue;
             surface = candidate; best = distance; found = true;
@@ -288,6 +321,7 @@ public sealed class GrainPile : MonoBehaviour
         }
         int grid = Mathf.Clamp(Mathf.Max(resolution, Mathf.CeilToInt(size * Mathf.Max(scale.x, scale.z) / .2f) + 1), 9, 129);
         field = new GrainHeightField(grid, size, initialHeight, shape == PileShape.Cone ? null : Profile);
+        SampleDropGround();
         DetectWalls();
         boundary = new GrainWallBoundary();
         if (detectedWalls.Count > 0 || HasExcludedFootprint)
@@ -342,7 +376,7 @@ public sealed class GrainPile : MonoBehaviour
         Vector3 p = transform.InverseTransformPoint(worldPoint);
         // Reject a stale hit well above/below the actual surface.
         Vector3 scale = WorldScale;
-        if (Mathf.Abs(p.y - field.Sample(p.x, p.z)) * scale.y > depth + .15f) return 0;
+        if (Mathf.Abs(p.y - field.Sample(p.x, p.z) - GroundOffset(p.x, p.z)) * scale.y > depth + .15f) return 0;
         float multiplier = GrainConsumeMultiplier;
         float density = kilogramsPerCubicMetre * VolumeScale / multiplier;
         // Keep the tool's contact footprint local. Scaling the radius by the economy
@@ -444,9 +478,12 @@ public sealed class GrainPile : MonoBehaviour
             pile.surfaceSmoothTime = appearanceSource.surfaceSmoothTime;
             pile.settlingSpeed = appearanceSource.settlingSpeed;
         }
+        float expectedVolume = Mathf.Max(0, expectedKg) * pile.GrainConsumeMultiplier / pile.kilogramsPerCubicMetre;
+        float footprintRadius = Mathf.Pow(3f * expectedVolume / (Mathf.PI * Mathf.Tan(pile.reposeAngle * Mathf.Deg2Rad)), 1f / 3f);
         float visualScale = Mathf.Pow(pile.GrainConsumeMultiplier, 1f / 3f);
         // Small spilled heaps need a fraction of the grid used by an entire hangar.
-        pile.initialHeight = 0; pile.size = Mathf.Max(1.5f, DropRadius(expectedKg) * visualScale * 2f + .5f); pile.resolution = 33;
+        // Leave bare ground around the deposit brush as well as the settled cone.
+        pile.initialHeight = 0; pile.size = Mathf.Max(1.5f, Mathf.Max(footprintRadius, DropRadius(expectedKg) * visualScale) * 2f + 1f); pile.resolution = 33;
         pile.fitToWalls = true; pile.useSpatialLayout = true;
         if (appearanceSource != null)
         {
@@ -544,6 +581,7 @@ public sealed class GrainPile : MonoBehaviour
         if (HasClippedSurface)
         {
             boundary.UpdateHeights(surface, .045f / WorldScale.y);
+            OffsetBoundaryGround();
             mesh.Clear(); mesh.SetVertices(boundary.Positions); mesh.SetUVs(0, boundary.UV); mesh.SetTriangles(boundary.Triangles, 0);
             mesh.RecalculateNormals(); mesh.RecalculateTangents(); mesh.RecalculateBounds();
             if (!Application.isPlaying) colliderDirty = true;
@@ -551,7 +589,7 @@ public sealed class GrainPile : MonoBehaviour
         }
         // The volume skin sits beneath the visible kernels. Bury its zero-height apron
         // below the ground instead of exposing large orange triangles around the pile.
-        for (int i = 0; i < vertices.Length; i++) vertices[i].y = surface.Heights[i] - .045f / WorldScale.y;
+        for (int i = 0; i < vertices.Length; i++) vertices[i].y = surface.Heights[i] + GroundOffset(i) - .045f / WorldScale.y;
         mesh.vertices = vertices;
         activeTriangles.Clear();
         for (int t = 0; t < field.Triangles.Length; t += 3)
@@ -578,6 +616,16 @@ public sealed class GrainPile : MonoBehaviour
     }
 
     private int[] collisionVertexMap;
+    private void OffsetBoundaryGround()
+    {
+        if (groundField == null) return;
+        for (int i = 0; i < boundary.Positions.Count; i++)
+        {
+            Vector3 p = boundary.Positions[i];
+            p.y += GroundOffset(p.x, p.z);
+            boundary.Positions[i] = p;
+        }
+    }
     private readonly List<Vector3> collisionVertices = new List<Vector3>();
     private readonly List<int> collisionIndices = new List<int>();
     private readonly List<Vector3> cookedVertices = new List<Vector3>();
@@ -591,6 +639,7 @@ public sealed class GrainPile : MonoBehaviour
         if (HasClippedSurface)
         {
             boundary.UpdateHeights(field, 0);
+            OffsetBoundaryGround();
             if (collisionVertexMap == null || collisionVertexMap.Length != boundary.Positions.Count || collisionVertices.Count == 0)
             {
                 // The render skin splits every triangle for flat shading. Physics needs
@@ -617,7 +666,7 @@ public sealed class GrainPile : MonoBehaviour
             collisionVertices.Clear();
             for (int i = 0; i < vertices.Length; i++)
             {
-                Vector3 point = vertices[i]; point.y = field.Heights[i]; collisionVertices.Add(point);
+                Vector3 point = vertices[i]; point.y = field.Heights[i] + GroundOffset(i); collisionVertices.Add(point);
             }
             for (int t = 0; t < field.Triangles.Length; t += 3)
             {
