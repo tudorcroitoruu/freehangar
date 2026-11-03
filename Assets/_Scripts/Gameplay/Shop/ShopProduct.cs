@@ -5,7 +5,7 @@ public class ShopProduct : MonoBehaviour, IInteractable
     public string SaveProductId => productID;
     public int MaxActiveInScene => maxActiveInScene;
     public enum DeliveryMode { Hands, AtSpawnPoint }
-    public enum UnlockCondition { Always, HangarCleared, HangarOpened }
+    public enum UnlockCondition { Always, HangarCleared, HangarOpened, VehicleUnlocked }
 
     [SerializeField] private string productID;
     [SerializeField] private string productName;
@@ -20,6 +20,9 @@ public class ShopProduct : MonoBehaviour, IInteractable
     private int requiredHangar = 2;
     [SerializeField, Range(0f, 100f), Tooltip("Required percentage of the selected hangar cleared. The highest achieved percentage is saved.")]
     private float requiredClearedPercent = 50f;
+    [SerializeField, Tooltip("Vehicle ID required by the Vehicle Unlocked condition.")]
+    private string requiredVehicleId = "motoroller";
+    private VehicleUpgradeSettings vehicleUnlockSettings;
 
     public bool IsUnlocked(PlayerData data)
     {
@@ -30,6 +33,9 @@ public class ShopProduct : MonoBehaviour, IInteractable
             case UnlockCondition.HangarCleared:
                 return data.IsHangarOpen(requiredHangar) && data.GetHangarClearedPercent(requiredHangar) >= requiredClearedPercent;
             case UnlockCondition.HangarOpened: return data.IsHangarOpen(requiredHangar);
+            case UnlockCondition.VehicleUnlocked:
+                if (vehicleUnlockSettings == null) vehicleUnlockSettings = Resources.Load<VehicleUpgradeSettings>(VehicleUpgradeSettings.ResourcePath);
+                return vehicleUnlockSettings != null && vehicleUnlockSettings.IsUnlocked(requiredVehicleId, data);
             default: return false;
         }
     }

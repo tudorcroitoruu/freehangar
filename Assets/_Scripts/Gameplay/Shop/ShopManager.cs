@@ -11,6 +11,7 @@ public class ShopManager : MonoBehaviour
     {
         ConfigureProductPricing();
         SaveSystem.HangarProgressChanged += RefreshProductAvailability;
+        SaveSystem.MoneyChanged += OnMoneyChanged;
         RefreshProductAvailability();
     }
 
@@ -23,7 +24,14 @@ public class ShopManager : MonoBehaviour
     public int ProductPrice(string productId, int legacyPrice) => economySettings != null && economySettings.TryGetContainer(productId, out var entry) ? entry.price : legacyPrice;
     public GameObject ProductPrefab(string productId, GameObject legacyPrefab) => economySettings != null && economySettings.TryGetContainer(productId, out var entry) ? entry.prefab : legacyPrefab;
 
-    private void OnDisable() => SaveSystem.HangarProgressChanged -= RefreshProductAvailability;
+    private void OnDisable()
+    {
+        SaveSystem.HangarProgressChanged -= RefreshProductAvailability;
+        SaveSystem.MoneyChanged -= OnMoneyChanged;
+    }
+
+    // Vehicle purchases (including vouchers) publish this after their unlock is saved in PlayerData.
+    private void OnMoneyChanged(int _) => RefreshProductAvailability();
 
     private void Update()
     {

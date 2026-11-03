@@ -6,6 +6,26 @@ using UnityEngine;
 public class HangarShopProgressTests
 {
     [Test]
+    public void SecondBagUnlocksWithMotorollerAndStaysUnlockedAfterReload()
+    {
+        var root = new GameObject("Motoroller bag unlock");
+        try
+        {
+            var product = root.AddComponent<ShopProduct>();
+            SetUnlock(product, ShopProduct.UnlockCondition.VehicleUnlocked, 1);
+            var data = new PlayerData();
+            Assert.IsFalse(product.IsUnlocked(data));
+            data.TryRecordHangarClearance(1, 100);
+            Assert.IsFalse(product.IsUnlocked(data), "Hangar clearance alone must not unlock bag 2.");
+            data.unlockedVehicles.Add("motoroller");
+            Assert.IsTrue(product.IsUnlocked(data));
+            var restored = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(data));
+            Assert.IsTrue(product.IsUnlocked(restored));
+            Assert.IsFalse(product.IsUnlocked(new PlayerData()));
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
+    [Test]
     public void FirstProductUnlocksAtHalfOfFirstHangarAndStaysUnlocked()
     {
         var data = new PlayerData();

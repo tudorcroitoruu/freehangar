@@ -6562,3 +6562,288 @@ BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0
 time=24,08 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=False cursor=None dt=0,0179528 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
 motor cache=Forklift (MotorollerController)
 BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=1,11 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0132314 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=1,37 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0132432 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=1,62 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0161925 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=1,88 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0163454 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=2,13 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,015726 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=2,39 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0147386 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=2,64 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0181031 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=2,90 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0195243 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=3,15 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0209075 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=3,40 throttle=-1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0228055 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=3,65 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0211181 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=3,91 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0213038 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=4,17 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0180581 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=4,42 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0333274 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=4,70 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0181417 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=4,95 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0364765 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=5,22 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0242373 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=5,49 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0223688 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=5,76 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0241136 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=6,02 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0231526 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=6,29 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0236253 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=6,56 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0366157 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=6,84 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,02291001 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=7,10 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,01993999 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=7,36 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,02268311 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=7,61 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0215974 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=7,87 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0214723 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=8,14 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0225189 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=8,41 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0215138 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=8,66 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0186093 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=8,92 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0197784 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=9,19 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0206435 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=9,44 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0232434 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=9,70 throttle=-1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0270303 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=9,97 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0237909 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=10,21 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,03741091 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=10,50 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0268522 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=10,76 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0260049 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=11,01 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0221153 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=11,27 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0235816 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=11,54 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0263098 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=11,81 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0281037 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=12,07 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0224639 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=12,34 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0245371 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=12,61 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0273179 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=12,86 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0430559 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=13,13 throttle=-1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0295036 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=13,40 throttle=-1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0230306 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=13,63 throttle=-1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0245236 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=13,93 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0191755 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=14,18 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0256541 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=14,43 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0232243 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=14,71 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0243097 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=14,95 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,022651 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=15,22 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0219876 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=15,48 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0229883 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=15,73 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0225682 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=15,99 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0215705 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=16,25 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0194221 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=16,51 throttle=-1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0267758 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=16,75 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0395578 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=17,02 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0223429 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=17,29 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0207558 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=17,55 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0169921 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=17,82 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0163623 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=18,09 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0210732 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=18,34 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0215553 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=18,60 throttle=-1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0224346 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=18,85 throttle=-1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0439979 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=19,13 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0274373 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=19,39 throttle=-1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0233021 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=19,66 throttle=-1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0219063 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=19,92 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0238903 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=20,18 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0244321 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=20,45 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0204948 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=20,71 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0214575 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=20,97 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0265032 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=21,22 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,022392 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=21,49 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0235164 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=21,76 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,042833 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=22,02 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0217448 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=22,30 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0193339 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=22,56 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0220663 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=22,82 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0258511 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=23,09 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0197863 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=23,35 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0192407 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=23,60 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0191657 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=23,87 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0175759 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=24,12 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=False cursor=None dt=0,0301873 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=24,37 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=None dt=0,0296332 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=24,64 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=None dt=0,0173706 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=24,89 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=None dt=0,0188475 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=25,15 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=None dt=0,0192266 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=25,41 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=None dt=0,0172738 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=25,67 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=False cursor=None dt=0,0161345 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)

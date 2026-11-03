@@ -32,6 +32,9 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private int revision = -1;
     private Matrix4x4 lastTransform;
     private float[] previousHeights;
+    private Texture2D surfaceHeights;
+    private bool gpuSurface;
+    private int uploadedRevision = -1;
     private bool[] dirtyCells;
     private int[] sampleCells, sampleBatches, sampleSlots;
     private int[] cellSampleHeads, nextCellSample;
@@ -89,6 +92,10 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         // Component OnEnable order is not guaranteed when a scene is loaded.
         // The generated surface and cell cache both depend on the pile's field.
         pile.Initialize();
+        gpuSurface = kernelMaterial.HasProperty("_PileSurfaceHeights");
+        if (colorVariants != null)
+            foreach (var variant in colorVariants)
+                if (variant != null && !variant.HasProperty("_PileSurfaceHeights")) gpuSurface = false;
         if (pile.VisualHeightField == null)
         {
             samples = null; batches = null; KernelCount = 0;
@@ -153,11 +160,12 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             float dz = pile.VisualHeightField.Sample(p.x, p.y + .03f) - pile.VisualHeightField.Sample(p.x, p.y - .03f);
             Vector3 normal = pile.transform.worldToLocalMatrix.transpose.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
             Quaternion slope = Quaternion.FromToRotation(Vector3.up, normal);
+            if (gpuSurface) slope = Quaternion.identity;
             int color = paletteIndices[i];
             int batch = color * batchesPerColor + paletteCounts[color] / 1023, slot = paletteCounts[color] % 1023;
             batches[batch][slot] = Matrix4x4.TRS(pile.transform.TransformPoint(new Vector3(p.x, height, p.y)) + Vector3.up * .003f,
                 slope * Quaternion.AngleAxis(pile.transform.eulerAngles.y, Vector3.up) * rotations[i],
-                new Vector3(.0255f, .014f, .029f) * (height < .001f ? 0 : sizes[i]));
+                new Vector3(.0255f, .014f, .029f) * (!gpuSurface && height < .001f ? 0 : sizes[i]));
             paletteCounts[color]++;
             counts[batch]++;
             if (height >= .001f) KernelCount++;
@@ -165,6 +173,45 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         revision = pile.SurfaceRevision;
         lastTransform = transform.localToWorldMatrix;
         CacheCells();
+        uploadedRevision = -1;
+        UploadSurface();
+    }
+
+    private void UploadSurface()
+    {
+        if (!gpuSurface || pile == null || uploadedRevision == pile.SurfaceRevision) return;
+        var field = pile.VisualHeightField;
+        if (surfaceHeights == null || surfaceHeights.width != field.Resolution)
+        {
+            ReleaseSurfaceTexture();
+            surfaceHeights = new Texture2D(field.Resolution, field.Resolution, TextureFormat.RFloat, false, true)
+            { name = "Animated grain surface", hideFlags = HideFlags.HideAndDontSave, filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
+        }
+        surfaceHeights.SetPixelData(field.Heights, 0);
+        surfaceHeights.Apply(false, false);
+        uploadedRevision = pile.SurfaceRevision;
+        // GPU displacement can grow above or below the original instance matrices.
+        // Give both our culling and Unity's instanced draw the current height envelope.
+        float maxHeight = 0;
+        foreach (float height in field.Heights) maxHeight = Mathf.Max(maxHeight, height);
+        float bottom = transform.position.y - .1f, top = transform.position.y + maxHeight * pile.WorldScale.y + .1f;
+        for (int b = 0; b < surfaceBounds.Length; b++)
+        {
+            var bounds = surfaceBounds[b];
+            var min = bounds.min; var max = bounds.max;
+            min.y = bottom; max.y = top;
+            bounds.SetMinMax(min, max);
+            surfaceBounds[b] = bounds;
+        }
+    }
+
+    private void ReleaseSurfaceTexture()
+    {
+        if (surfaceHeights != null)
+        {
+            if (Application.isPlaying) Destroy(surfaceHeights); else DestroyImmediate(surfaceHeights);
+        }
+        surfaceHeights = null; uploadedRevision = -1;
     }
 
     private void CacheCells()
@@ -281,12 +328,15 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                 int batch = sampleBatches[i];
                 Vector2 p = samples[i];
                 float h = field.Sample(p.x, p.y);
-                float dx = field.Sample(p.x + .03f, p.y) - field.Sample(p.x - .03f, p.y);
-                float dz = field.Sample(p.x, p.y + .03f) - field.Sample(p.x, p.y - .03f);
-                Vector3 normal = normalMatrix.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
-                batches[batch][sampleSlots[i]] = Matrix4x4.TRS(localToWorld.MultiplyPoint3x4(new Vector3(p.x, h, p.y)) + Vector3.up * .003f,
-                    Quaternion.FromToRotation(Vector3.up, normal) * yaw * rotations[i],
-                    new Vector3(.0255f, .014f, .029f) * (h < .001f ? 0 : sizes[i]));
+                if (!gpuSurface)
+                {
+                    float dx = field.Sample(p.x + .03f, p.y) - field.Sample(p.x - .03f, p.y);
+                    float dz = field.Sample(p.x, p.y + .03f) - field.Sample(p.x, p.y - .03f);
+                    Vector3 normal = normalMatrix.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
+                    batches[batch][sampleSlots[i]] = Matrix4x4.TRS(localToWorld.MultiplyPoint3x4(new Vector3(p.x, h, p.y)) + Vector3.up * .003f,
+                        Quaternion.FromToRotation(Vector3.up, normal) * yaw * rotations[i],
+                        new Vector3(.0255f, .014f, .029f) * (h < .001f ? 0 : sizes[i]));
+                }
                 LastUpdatedKernels++;
                 bool visible = h >= .001f;
                 if (visibleSamples[i] != visible)
@@ -346,6 +396,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             if (area <= originalArea) continue;
             float desiredCount = (area - originalArea) / (EffectiveSpacing * EffectiveSpacing * .866f);
             Quaternion slope = Quaternion.FromToRotation(Vector3.up, cross.normalized);
+            if (gpuSurface) slope = Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up);
             // Stable barycentric samples: changing the slope must not reshuffle
             // every extra grain. Only the last grain grows/shrinks with density.
             var random = new System.Random(193 + cell * 2 + triangle);
@@ -418,6 +469,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         if (pile != null && (revision != pile.SurfaceRevision || lastTransform != transform.localToWorldMatrix)) Build();
         else if (HasPendingSurfaceUpdates) ProcessPendingCells();
         else LastUpdatedKernels = 0;
+        UploadSurface();
     }
 
     private Vector2[] SampleSurface(float requestedSpacing)
@@ -464,24 +516,38 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         GeometryUtility.CalculateFrustumPlanes(camera, cameraPlanes);
         grainAppearance.Set(pile.SurfaceGrain);
         pile.ApplySpatialAppearance(grainAppearance.Block);
+        grainAppearance.Block.SetFloat("_UsePileSurface", gpuSurface ? 1 : 0);
+        if (gpuSurface)
+        {
+            grainAppearance.Block.SetTexture("_PileSurfaceHeights", surfaceHeights);
+            grainAppearance.Block.SetVector("_PileSurfaceGrid", new Vector4(pile.Size, pile.VisualHeightField.Resolution, 0, 0));
+            grainAppearance.Block.SetMatrix("_PileSurfaceWorldToLocal", transform.worldToLocalMatrix);
+            grainAppearance.Block.SetMatrix("_PileSurfaceLocalToWorld", transform.localToWorldMatrix);
+        }
         LastDrawTriangles = 0;
         for (int i = 0; i < batches.Length; i++)
-            if (counts[i] > 0 && liveBatches[i] && GeometryUtility.TestPlanesAABB(cameraPlanes, surfaceBounds[i]))
+            if (counts[i] > 0 && (gpuSurface || liveBatches[i]) && GeometryUtility.TestPlanesAABB(cameraPlanes, surfaceBounds[i]))
             {
                 float distance = Vector3.Distance(camera.transform.position, surfaceBounds[i].ClosestPoint(camera.transform.position));
                 if (distance > drawDistance) continue;
                 Mesh lod = distance < fullDetailDistance ? nearMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
                 LastDrawTriangles += counts[i] * (int)(lod.GetIndexCount(0) / 3);
-                Graphics.DrawMeshInstanced(lod, 0,
-                    colorVariants != null && colorVariants.Length == colorCount && colorVariants[i / batchesPerColor] != null
-                        ? colorVariants[i / batchesPerColor] : kernelMaterial, batches[i], counts[i], grainAppearance.Block,
-                    ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
+                var material = colorVariants != null && colorVariants.Length == colorCount && colorVariants[i / batchesPerColor] != null
+                    ? colorVariants[i / batchesPerColor] : kernelMaterial;
+                DrawBatch(lod, material, batches[i], counts[i], surfaceBounds[i], camera);
             }
         foreach (var entry in coveragePatches)
         {
             var patch = entry.Value;
-            if (!GeometryUtility.TestPlanesAABB(cameraPlanes, patch.bounds)) continue;
-            float distance = Vector3.Distance(camera.transform.position, patch.bounds.ClosestPoint(camera.transform.position));
+            var bounds = patch.bounds;
+            if (gpuSurface && surfaceBounds.Length > 0)
+            {
+                var min = bounds.min; var max = bounds.max;
+                min.y = surfaceBounds[0].min.y; max.y = surfaceBounds[0].max.y;
+                bounds.SetMinMax(min, max);
+            }
+            if (!GeometryUtility.TestPlanesAABB(cameraPlanes, bounds)) continue;
+            float distance = Vector3.Distance(camera.transform.position, bounds.ClosestPoint(camera.transform.position));
             if (distance > drawDistance) continue;
             Mesh lod = distance < fullDetailDistance ? nearMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
             for (int i = 0; i < patch.batches.Length; i++)
@@ -491,10 +557,17 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                 var material = colorVariants != null && colorVariants.Length == colorCount && colorVariants[color] != null
                     ? colorVariants[color] : kernelMaterial;
                 LastDrawTriangles += matrices.Length * (int)(lod.GetIndexCount(0) / 3);
-                Graphics.DrawMeshInstanced(lod, 0, material, matrices, matrices.Length, grainAppearance.Block,
-                    ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
+                DrawBatch(lod, material, matrices, matrices.Length, bounds, camera);
             }
         }
+    }
+
+    private void DrawBatch(Mesh lod, Material material, Matrix4x4[] matrices, int count, Bounds bounds, Camera camera)
+    {
+        var parameters = new RenderParams(material) { worldBounds = bounds, matProps = grainAppearance.Block,
+            shadowCastingMode = ShadowCastingMode.Off, receiveShadows = true, layer = gameObject.layer,
+            camera = camera, lightProbeUsage = LightProbeUsage.Off };
+        Graphics.RenderMeshInstanced(parameters, lod, 0, matrices, count);
     }
 
     // Interleave X/Z bits to put neighboring surface samples into neighboring draw batches.
@@ -527,6 +600,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private void OnDestroy()
     {
+        ReleaseSurfaceTexture();
         if (nearMesh != null) { if (Application.isPlaying) Destroy(nearMesh); else DestroyImmediate(nearMesh); }
         if (mediumMesh != null) { if (Application.isPlaying) Destroy(mediumMesh); else DestroyImmediate(mediumMesh); }
         if (distantMesh != null) { if (Application.isPlaying) Destroy(distantMesh); else DestroyImmediate(distantMesh); }

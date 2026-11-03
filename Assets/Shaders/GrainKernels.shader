@@ -13,6 +13,8 @@ Shader "Freehangar/HDRP/Grain Kernels"
         [HideInInspector] _GrainMapA("Spatial grain A", 2D) = "black" {}
         [HideInInspector] _GrainMapB("Spatial grain B", 2D) = "black" {}
         [HideInInspector] _GrainMapC("Spatial grain C", 2D) = "black" {}
+        [HideInInspector] _PileSurfaceHeights("Animated pile heights", 2D) = "black" {}
+        [HideInInspector] _UsePileSurface("Follow animated pile", Float) = 0
     }
     HLSLINCLUDE
     #pragma target 4.5
@@ -24,10 +26,41 @@ Shader "Freehangar/HDRP/Grain Kernels"
     float _UseSpatialGrain;
     float4 _GrainGrid;
     float4x4 _GrainWorldToLocal;
+    float _UsePileSurface;
+    float4 _PileSurfaceGrid; // size, resolution
+    float4x4 _PileSurfaceWorldToLocal, _PileSurfaceLocalToWorld;
     CBUFFER_END
     TEXTURE2D(_GrainMapA); SAMPLER(sampler_GrainMapA);
     TEXTURE2D(_GrainMapB); SAMPLER(sampler_GrainMapB);
     TEXTURE2D(_GrainMapC); SAMPLER(sampler_GrainMapC);
+    TEXTURE2D(_PileSurfaceHeights);
+
+    float3 FollowPile(float3 origin, inout float3 offset, inout float3 normal)
+    {
+        float3 local = mul(_PileSurfaceWorldToLocal, float4(origin, 1)).xyz;
+        float2 grid = saturate(local.xz / _PileSurfaceGrid.x + .5) * (_PileSurfaceGrid.y - 1);
+        int2 cell = min((int2)floor(grid), (int)_PileSurfaceGrid.y - 2);
+        float2 f = grid - cell;
+        float a = LOAD_TEXTURE2D(_PileSurfaceHeights, cell).r;
+        float b = LOAD_TEXTURE2D(_PileSurfaceHeights, cell + int2(1, 0)).r;
+        float c = LOAD_TEXTURE2D(_PileSurfaceHeights, cell + int2(0, 1)).r;
+        float d = LOAD_TEXTURE2D(_PileSurfaceHeights, cell + int2(1, 1)).r;
+        float height = f.x + f.y <= 1 ? a * (1-f.x-f.y) + b*f.x + c*f.y :
+            d*(f.x+f.y-1) + c*(1-f.x) + b*(1-f.y);
+        float2 slope = f.x + f.y <= 1 ? float2(b-a, c-a) : float2(d-c, d-b);
+        float spacing = _PileSurfaceGrid.x / (_PileSurfaceGrid.y - 1);
+        float3 localNormal = normalize(float3(-slope.x, spacing, -slope.y));
+        float3 up = normalize(mul(localNormal, (float3x3)_PileSurfaceWorldToLocal));
+        // Shortest rotation from world up to the current slope. Instance matrices
+        // retain only the grain's stable random rotation, never a queued old slope.
+        float3 axis = cross(float3(0,1,0), up);
+        offset += cross(axis, offset) + cross(axis, cross(axis, offset)) / max(.001, 1+up.y);
+        normal += cross(axis, normal) + cross(axis, cross(axis, normal)) / max(.001, 1+up.y);
+        float worldHeight = length(_PileSurfaceLocalToWorld._m01_m11_m21) * height;
+        offset *= smoothstep(0, .012, worldHeight);
+        local.y = height;
+        return mul(_PileSurfaceLocalToWorld, float4(local, 1)).xyz + float3(0,.003,0);
+    }
     UNITY_INSTANCING_BUFFER_START(GrainInstances)
         UNITY_DEFINE_INSTANCED_PROP(float, _GrainType)
     UNITY_INSTANCING_BUFFER_END(GrainInstances)
@@ -96,6 +129,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
         #if defined(UNITY_INSTANCING_ENABLED)
         stableSeed = float3(unity_InstanceID, 13, 7);
         #endif
+        if (_UsePileSurface > .5) stableSeed = float3(origin.x, 0, origin.z);
         float seed = Hash(stableSeed * 31.7);
         int t = Species(seed, origin);
         float overrideType = UNITY_ACCESS_INSTANCED_PROP(GrainInstances, _GrainType);
@@ -118,8 +152,14 @@ Shader "Freehangar/HDRP/Grain Kernels"
             n = normalize(radial / shape);
         }
         o.world = GetAbsolutePositionWS(TransformObjectToWorld(p));
-        o.positionCS = TransformObjectToHClip(p);
         o.normalWS = TransformObjectToWorldNormal(n);
+        if (_UsePileSurface > .5 && _KernelMode > .5)
+        {
+            float3 offset = o.world - origin;
+            float3 surfaceOrigin = FollowPile(origin, offset, o.normalWS);
+            o.world = surfaceOrigin + offset;
+        }
+        o.positionCS = TransformWorldToHClip(GetCameraRelativePositionWS(o.world));
         o.lightmapUV = float4(input.uv1, input.uv2); o.species = t; o.variation = .86 + Hash(stableSeed * 73.3) * .28;
         return o;
     }

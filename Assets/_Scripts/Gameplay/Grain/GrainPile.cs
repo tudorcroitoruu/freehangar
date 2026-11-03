@@ -130,6 +130,8 @@ public sealed class GrainPile : MonoBehaviour
     [SerializeField, Range(5f, 60f)] private float reposeAngle = 32f;
     [SerializeField, Min(0f)] private float settlingMargin = .45f;
     [SerializeField, Range(1f, 30f)] private float simulationRate = 15f;
+    [SerializeField, Range(1f, 8f), Tooltip("How quickly disturbed grain flows into the excavated area.")]
+    private float settlingSpeed = 4f;
     [SerializeField, Range(0f, .5f), Tooltip("Visual settling response in seconds. Smooths scooping and pouring without delaying grain transfer.")]
     private float surfaceSmoothTime = .12f;
     [SerializeField, Range(1f, 15f)] private float colliderRate = 5f;
@@ -169,7 +171,7 @@ public sealed class GrainPile : MonoBehaviour
     private List<int> activeTriangles;
     private bool settling;
     private bool colliderDirty;
-    private float nextStep, nextCollider;
+    private float settlingSteps, nextCollider;
     private bool rebuildRequested;
     private Vector3 lastScale;
     public PileShape Shape => shape;
@@ -440,6 +442,7 @@ public sealed class GrainPile : MonoBehaviour
             pile.economySettings = appearanceSource.economySettings;
             pile.kilogramsPerCubicMetre = appearanceSource.kilogramsPerCubicMetre;
             pile.surfaceSmoothTime = appearanceSource.surfaceSmoothTime;
+            pile.settlingSpeed = appearanceSource.settlingSpeed;
         }
         float visualScale = Mathf.Pow(pile.GrainConsumeMultiplier, 1f / 3f);
         // Small spilled heaps need a fraction of the grid used by an entire hangar.
@@ -511,13 +514,25 @@ public sealed class GrainPile : MonoBehaviour
                 SaveSystem.TryRecordHangarClearance(hangar, cleared);
             }
         }
-        if (settling && Time.time >= nextStep)
-        {
-            nextStep = Time.time + 1f / simulationRate;
-            settling = field.Settle(reposeAngle, .45f, WorldScale);
-            if (settling) surfaceRefreshPending = true;
-        }
+        AdvanceSettling(Time.deltaTime);
         if (!surfaceRefreshPending && colliderDirty && Time.time >= nextCollider) RefreshCollider();
+    }
+
+    private void AdvanceSettling(float deltaTime)
+    {
+        if (settling)
+        {
+            // Accumulate time instead of scheduling from the current frame: the
+            // old timer lost fractional steps and visibly slowed at lower FPS.
+            settlingSteps = Mathf.Min(8f, settlingSteps + deltaTime * simulationRate * settlingSpeed);
+            while (settling && settlingSteps >= 1f)
+            {
+                settlingSteps -= 1f;
+                settling = field.Settle(reposeAngle, .45f, WorldScale);
+                if (settling) surfaceRefreshPending = true;
+            }
+        }
+        else settlingSteps = 0;
     }
 
     private void RefreshSurface()

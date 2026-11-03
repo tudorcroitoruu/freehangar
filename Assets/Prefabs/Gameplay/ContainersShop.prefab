@@ -2274,6 +2274,7 @@ MonoBehaviour:
   unlockCondition: 2
   requiredHangar: 4
   requiredClearedPercent: 50
+  requiredVehicleId: motoroller
   objectPrefab: {fileID: 6691740664109452445, guid: 0e1bd387d12bf994e93017e2686bb315, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
@@ -3262,6 +3263,7 @@ MonoBehaviour:
   unlockCondition: 2
   requiredHangar: 3
   requiredClearedPercent: 50
+  requiredVehicleId: motoroller
   objectPrefab: {fileID: 7210842097477428087, guid: eb731e91ae410754ebc5f7596c6cbf2e, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
@@ -3476,6 +3478,7 @@ MonoBehaviour:
   unlockCondition: 2
   requiredHangar: 5
   requiredClearedPercent: 50
+  requiredVehicleId: motoroller
   objectPrefab: {fileID: 1521085326205624577, guid: e081f75f0718b8f418e7a58f44bd497e, type: 3}
   deliveryMode: 1
   spawnPoint: {fileID: 2099837709319181489}
@@ -4054,6 +4057,7 @@ MonoBehaviour:
   unlockCondition: 2
   requiredHangar: 2
   requiredClearedPercent: 50
+  requiredVehicleId: motoroller
   objectPrefab: {fileID: 6347959474882097887, guid: 74ea987079d2f16479c245f3ebeddb46, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
@@ -4792,9 +4796,10 @@ MonoBehaviour:
   productPrice: 4
   toBuy: 1
   toRent: 0
-  unlockCondition: 1
+  unlockCondition: 3
   requiredHangar: 1
   requiredClearedPercent: 50
+  requiredVehicleId: motoroller
   objectPrefab: {fileID: 30410232912704535, guid: ab8b6d4aaac96504497dff8c04cb7891, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}

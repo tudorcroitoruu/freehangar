@@ -28,7 +28,7 @@ public class CornSurfaceUpdateTests
         kernel = new Mesh(); material = new Material(Shader.Find("HDRP/Lit"));
         Set(surface, "pile", pile); Set(surface, "kernelMesh", kernel); Set(surface, "kernelMaterial", material);
         root.SetActive(true);
-        field = Get<GrainHeightField>(pile, "field");
+        field = Get<GrainHeightField>(pile, "visualField");
         update = (Action)Delegate.CreateDelegate(typeof(Action), surface, typeof(CornSurfaceKernels).GetMethod("UpdateChangedCells", Private));
         nextFrame = (Action)Delegate.CreateDelegate(typeof(Action), surface, typeof(CornSurfaceKernels).GetMethod("LateUpdate", Private));
         Set(surface, "rebuildRequested", false);
@@ -58,7 +58,6 @@ public class CornSurfaceUpdateTests
     [Test] public void BroadExcavationHasBoundedWorkAndEventuallyMatchesEveryKernelHeight()
     {
         Assert.That(surface.KernelCount, Is.GreaterThan(4096));
-        int initialCount = surface.KernelCount;
         Lower(.7f); update();
         Assert.That(surface.LastUpdatedKernels, Is.InRange(1, 4096));
         Assert.IsTrue(surface.HasPendingSurfaceUpdates);
@@ -68,14 +67,45 @@ public class CornSurfaceUpdateTests
         var batches = Get<Matrix4x4[][]>(surface, "batches");
         var batchIds = Get<int[]>(surface, "sampleBatches");
         var slots = Get<int[]>(surface, "sampleSlots");
+        int expectedVisible = 0;
         for (int i = 0; i < samples.Length; i++)
         {
             if (batchIds[i] < 0) continue;
             var p = samples[i];
+            if (field.Sample(p.x, p.y) >= .001f) expectedVisible++;
             Assert.That(batches[batchIds[i]][slots[i]].m13, Is.EqualTo(field.Sample(p.x, p.y) + .003f).Within(.00001f));
         }
-        Assert.That(surface.KernelCount, Is.EqualTo(initialCount), "Scheduling preserves authored density.");
+        Assert.That(surface.KernelCount, Is.EqualTo(expectedVisible), "Thin grains below the visibility threshold are excluded.");
         update(); Assert.That(surface.LastUpdatedKernels, Is.Zero);
+    }
+
+    [Test] public void AnimatedSurfaceUploadsEveryHeightEvenWhileKernelWorkIsQueued()
+    {
+        var gpuMaterial = new Material(Shader.Find("Freehangar/HDRP/Grain Kernels"));
+        try
+        {
+            Set(surface, "kernelMaterial", gpuMaterial);
+            surface.Rebuild();
+            Assert.IsTrue(Get<bool>(surface, "gpuSurface"));
+            var matrices = Get<Matrix4x4[][]>(surface, "batches");
+            var original = (Matrix4x4[])matrices[0].Clone();
+            var upload = (Action)Delegate.CreateDelegate(typeof(Action), surface,
+                typeof(CornSurfaceKernels).GetMethod("UploadSurface", Private));
+            for (int frame = 0; frame < 10; frame++)
+            {
+                Lower(.97f);
+                update();
+                Set(surface, "uploadedRevision", -1);
+                upload();
+                var heights = Get<Texture2D>(surface, "surfaceHeights").GetPixelData<float>(0);
+                for (int i = 0; i < field.Heights.Length; i++) Assert.AreEqual(field.Heights[i], heights[i]);
+                CollectionAssert.AreEqual(original, matrices[0], "GPU grains must not snap to queued CPU transforms.");
+            }
+            Array.Clear(field.Heights, 0, field.Heights.Length);
+            update(); Drain();
+            Assert.AreEqual(0, surface.KernelCount);
+        }
+        finally { Object.DestroyImmediate(gpuMaterial); }
     }
 
     [Test] public void ClearingAndRefillingQueuedCellsRestoresVisibilityAndCullingBounds()
@@ -89,10 +119,11 @@ public class CornSurfaceUpdateTests
         var counts = Get<int[]>(surface, "counts");
         var bounds = Get<Bounds[]>(surface, "surfaceBounds");
         var live = Get<bool[]>(surface, "liveBatches");
+        var visibleCounts = Get<int[]>(surface, "activeBatchCounts");
         for (int b = 0; b < counts.Length; b++)
         {
             if (counts[b] == 0) continue;
-            Assert.IsTrue(live[b]);
+            Assert.AreEqual(visibleCounts[b] > 0, live[b], "Reserved bare-ground samples must not make an empty batch visible.");
             for (int s = 0; s < counts[b]; s++) Assert.IsTrue(bounds[b].Contains(matrices[b][s].GetColumn(3)));
         }
     }

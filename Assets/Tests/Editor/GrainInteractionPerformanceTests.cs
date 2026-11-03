@@ -22,6 +22,31 @@ public class GrainInteractionPerformanceTests
     private static void UpdateBag(BagCornSurface surface)=>typeof(BagCornSurface).GetMethod("LateUpdate",Private).Invoke(surface,null);
 
     [Test]
+    public void FasterPileRefillConservesMassAndMatchesAtThirtyAndOneTwentyFps()
+    {
+        GrainHeightField Run(float dt, int frames, float speed)
+        {
+            var go = new GameObject("Refill timing"); go.transform.SetParent(root.transform);
+            var pile = go.AddComponent<GrainPile>();
+            var field = Field<GrainHeightField>(pile, "field");
+            field.Scoop(0, 0, .5f, .5f, 1f, .45f);
+            double volume = field.Volume;
+            typeof(GrainPile).GetField("settling", Private).SetValue(pile, true);
+            typeof(GrainPile).GetField("settlingSpeed", Private).SetValue(pile, speed);
+            var step = (Action<float>)Delegate.CreateDelegate(typeof(Action<float>), pile,
+                typeof(GrainPile).GetMethod("AdvanceSettling", Private));
+            for (int i = 0; i < frames; i++) step(dt);
+            Assert.AreEqual(volume, field.Volume, .00001);
+            return field;
+        }
+        var at30 = Run(1f / 30, 6, 4);
+        var at120 = Run(1f / 120, 24, 4);
+        for (int i = 0; i < at30.Heights.Length; i++) Assert.AreEqual(at30.Heights[i], at120.Heights[i], .00001f);
+        var slow = Run(1f / 30, 6, 1);
+        Assert.Greater(at30.Sample(0, 0), slow.Sample(0, 0), "The excavated center should refill faster.");
+    }
+
+    [Test]
     public void StandingScoopAcceptsLowAuthoredPileButRejectsObstructionsAndDistance()
     {
         root.transform.position = Vector3.up * 1000;
