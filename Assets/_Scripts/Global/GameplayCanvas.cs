@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -48,6 +49,8 @@ public class GameplayCanvas : MonoBehaviour
     [SerializeField] private GameObject[] walkingHints;
     [SerializeField] private GameObject[] drivingHints;
     [SerializeField] private GameObject[] forkliftHints;
+    [SerializeField] private TMP_Text walkingInteraction;
+    private BagInteraction playerBags;
 
     [Space, Header("Tools Equip Hints")] 
     [SerializeField] private CanvasGroup hintsParent;
@@ -101,6 +104,8 @@ public class GameplayCanvas : MonoBehaviour
         ResetMoneyChange();
         RefreshMoney(SaveSystem.Money);
         var rider = FindFirstObjectByType<PlayerBicycleInteraction>();
+        playerBags = FindFirstObjectByType<BagInteraction>(FindObjectsInactive.Include);
+        RefreshWalkingInteraction();
         SetDrivingHints(rider != null && rider.IsRiding, rider != null && rider.IsRiding && rider.bicycle != null && rider.bicycle.GetComponent<ForkliftController>() != null);
         playerTools = FindFirstObjectByType<PlayerCombatTools>(FindObjectsInactive.Include);
         // Rebuild hint visibility from saved discoveries whenever the HUD opens.
@@ -165,6 +170,15 @@ public class GameplayCanvas : MonoBehaviour
                 ? Mathf.MoveTowards(hintsParent.alpha, 1f, Time.unscaledDeltaTime / toolHintsFadeSeconds) : 1f;
             fadingToolHints = hintsParent.alpha < 1f;
         }
+    }
+
+    private void LateUpdate() => RefreshWalkingInteraction();
+
+    private void RefreshWalkingInteraction()
+    {
+        if (walkingInteraction == null) return;
+        string action = playerBags != null && playerBags.IsCarrying ? "Drop" : "Interact";
+        if (walkingInteraction.text != action) walkingInteraction.text = action;
     }
 
     public void ShowWarning(WarningType type, float seconds = 2f)

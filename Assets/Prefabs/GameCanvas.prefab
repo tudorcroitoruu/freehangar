@@ -2082,10 +2082,10 @@ MonoBehaviour:
   - {fileID: 21898303859492186}
   - {fileID: 776254385692682722}
   - {fileID: 8236621728335235999}
-  drivingExitHint: {fileID: 2013264900775348702}
   forkliftHints:
   - {fileID: 429764560600554374}
   - {fileID: 0}
+  walkingInteraction: {fileID: 7031506191501916943}
   hintsParent: {fileID: 459435849332738037}
   shovelEquipped: {fileID: 8353208135329761499}
   broomEquipped: {fileID: 2955780447568988104}
