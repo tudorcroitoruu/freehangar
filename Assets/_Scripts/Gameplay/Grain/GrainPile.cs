@@ -202,6 +202,7 @@ public sealed class GrainPile : MonoBehaviour
     private Mesh collisionMesh;
     private MeshCollider meshCollider;
     private Vector3[] vertices;
+    private Vector2[] surfaceUV;
     private List<int> activeTriangles;
     private bool settling;
     private bool colliderDirty;
@@ -359,6 +360,7 @@ public sealed class GrainPile : MonoBehaviour
         mesh = new Mesh { name = "Grain surface (generated)", hideFlags = HideFlags.DontSave, indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
         mesh.MarkDynamic();
         mesh.vertices = vertices;
+        surfaceUV = uv;
         mesh.uv = uv;
         mesh.triangles = field.Triangles;
         mesh.RecalculateNormals();
@@ -599,7 +601,10 @@ public sealed class GrainPile : MonoBehaviour
         // The volume skin sits beneath the visible kernels. Bury its zero-height apron
         // below the ground instead of exposing large orange triangles around the pile.
         for (int i = 0; i < vertices.Length; i++) vertices[i].y = surface.Heights[i] + GroundOffset(i) - .045f / WorldScale.y;
+        // Remove the previous closure before assigning the top grid again.
+        mesh.Clear();
         mesh.vertices = vertices;
+        mesh.uv = surfaceUV;
         activeTriangles.Clear();
         for (int t = 0; t < field.Triangles.Length; t += 3)
         {
@@ -609,6 +614,7 @@ public sealed class GrainPile : MonoBehaviour
         }
         // Bare ground must not retain a golden rectangle or a phantom grain collider.
         mesh.SetTriangles(activeTriangles, 0);
+        if (IsDroppedPile) CloseDroppedEdges(surface);
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
@@ -625,6 +631,41 @@ public sealed class GrainPile : MonoBehaviour
     }
 
     private int[] collisionVertexMap;
+    private readonly List<Vector3> closedSurfaceVertices = new List<Vector3>();
+    private readonly List<Vector2> closedSurfaceUV = new List<Vector2>();
+    private readonly List<int> closedSurfaceTriangles = new List<int>();
+    private void CloseDroppedEdges(GrainHeightField surface)
+    {
+        closedSurfaceVertices.Clear(); closedSurfaceVertices.AddRange(vertices);
+        mesh.GetUVs(0, closedSurfaceUV);
+        closedSurfaceTriangles.Clear(); closedSurfaceTriangles.AddRange(activeTriangles);
+        int n = field.Resolution;
+        for (int i = 0; i < n - 1; i++)
+        {
+            AddGroundEdge(i + 1, i, surface);
+            AddGroundEdge(i * n, (i + 1) * n, surface);
+            AddGroundEdge((n - 1) * n + i, (n - 1) * n + i + 1, surface);
+            AddGroundEdge((i + 1) * n + n - 1, i * n + n - 1, surface);
+        }
+        mesh.SetVertices(closedSurfaceVertices); mesh.SetUVs(0, closedSurfaceUV);
+        mesh.SetTriangles(closedSurfaceTriangles, 0);
+    }
+    private void AddGroundEdge(int a, int b, GrainHeightField surface)
+    {
+        float inset = .045f / WorldScale.y;
+        if (Mathf.Max(surface.Heights[a], surface.Heights[b]) <= inset) return;
+        Vector3 topA = vertices[a], topB = vertices[b];
+        Vector3 bottomA = topA, bottomB = topB;
+        bottomA.y = GroundOffset(a) - inset;
+        bottomB.y = GroundOffset(b) - inset;
+        int start = closedSurfaceVertices.Count;
+        closedSurfaceVertices.Add(topA); closedSurfaceVertices.Add(topB);
+        closedSurfaceVertices.Add(bottomA); closedSurfaceVertices.Add(bottomB);
+        closedSurfaceUV.Add(closedSurfaceUV[a]); closedSurfaceUV.Add(closedSurfaceUV[b]);
+        closedSurfaceUV.Add(closedSurfaceUV[a]); closedSurfaceUV.Add(closedSurfaceUV[b]);
+        closedSurfaceTriangles.Add(start); closedSurfaceTriangles.Add(start + 2); closedSurfaceTriangles.Add(start + 1);
+        closedSurfaceTriangles.Add(start + 1); closedSurfaceTriangles.Add(start + 2); closedSurfaceTriangles.Add(start + 3);
+    }
     private void OffsetBoundaryGround()
     {
         if (groundField == null) return;

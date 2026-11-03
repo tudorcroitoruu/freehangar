@@ -69,6 +69,10 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     private bool wasKinematic;
     private Renderer[] heldVisuals;
     private bool[] heldVisible;
+    private bool drinkingCamera;
+    private Vector3 drinkCameraPosition;
+    private Quaternion drinkCameraRotation;
+    private AudioSource drinkingAudio;
     private static bool profileLoadRequested;
 
     public string FindId => findId;
@@ -285,19 +289,48 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
 
     private IEnumerator Drink()
     {
+        drinkingCamera = true;
+        drinkCameraPosition = view.transform.localPosition;
+        drinkCameraRotation = view.transform.localRotation;
+        // Bottle models are upright along local Y; place their neck at the mouth.
+        Bounds bottleBounds = new Bounds();
+        bool first = true;
+        foreach (var mesh in GetComponentsInChildren<MeshFilter>(true))
+        {
+            if (mesh.sharedMesh == null) continue;
+            var b = mesh.sharedMesh.bounds;
+            for (int i = 0; i < 8; i++)
+            {
+                var corner = b.center + Vector3.Scale(b.extents,new Vector3((i&1)==0?-1:1,(i&2)==0?-1:1,(i&4)==0?-1:1));
+                var point = transform.InverseTransformPoint(mesh.transform.TransformPoint(corner));
+                if(first) { bottleBounds = new Bounds(point,Vector3.zero); first=false; } else bottleBounds.Encapsulate(point);
+            }
+        }
+        Vector3 neck = new Vector3(bottleBounds.center.x,bottleBounds.max.y,bottleBounds.center.z);
+        float finish = .65f + (GameplayAudio.Instance != null ? GameplayAudio.Instance.BottleDrinkDuration : 1.9f);
+        bool soundStarted = false;
         float elapsed = 0;
-        while (elapsed < 1.8f)
+        while (elapsed < finish + .45f)
         {
             if (!PresentationValid) { CancelPresentation(); yield break; }
             elapsed += Time.deltaTime;
             float lift = Mathf.SmoothStep(0, 1, elapsed / .55f);
-            float tilt = Mathf.SmoothStep(0, 1, (elapsed - .55f) / .45f);
-            Vector3 hold = view.transform.TransformPoint(new Vector3(.13f, -.08f, .48f));
-            float lower = Mathf.SmoothStep(0, 1, (elapsed - 1.4f) / .4f);
-            transform.position = Vector3.Lerp(originalPosition, hold, lift) - view.transform.up * lower * .3f;
-            transform.rotation = Quaternion.Slerp(originalRotation, view.transform.rotation * Quaternion.Euler(-68 * tilt, 0, -12), lift);
+            float tilt = Mathf.SmoothStep(0, 1, (elapsed - .5f) / .45f);
+            float lower = Mathf.SmoothStep(0, 1, (elapsed - finish) / .45f);
+            float sip = tilt * (1-lower);
+            view.transform.localPosition = drinkCameraPosition + Vector3.up * (.025f*sip);
+            view.transform.localRotation = drinkCameraRotation * Quaternion.Euler(-8f*sip,0,0);
             transform.localScale = originalScale * (1 - lower);
-            if (!committed && elapsed >= 1.2f)
+            transform.rotation = Quaternion.Slerp(originalRotation, view.transform.rotation * Quaternion.Euler(-110f*tilt,0,0),lift);
+            Vector3 mouth = view.transform.TransformPoint(new Vector3(0,-.14f,.18f));
+            Vector3 hold = Vector3.Lerp(view.transform.TransformPoint(new Vector3(.04f,-.24f,.55f)), mouth-transform.TransformVector(neck),tilt);
+            transform.position = Vector3.Lerp(originalPosition,hold,lift)-view.transform.up*lower*.35f;
+            if (!soundStarted && elapsed >= .65f)
+            {
+                drinkingAudio = GameplayAudio.Instance?.StartBottleDrink();
+                soundStarted = true;
+            }
+            if (!committed && elapsed >= finish)
             {
                 if (!CommitReward()) { CancelPresentation(); yield break; }
                 committed = true;
@@ -311,6 +344,14 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
 
     private void ReleaseActor()
     {
+        if (drinkingCamera && view != null)
+        {
+            view.transform.localPosition = drinkCameraPosition;
+            view.transform.localRotation = drinkCameraRotation;
+        }
+        drinkingCamera = false;
+        if (drinkingAudio != null) { drinkingAudio.Stop(); Destroy(drinkingAudio); }
+        drinkingAudio = null;
         if (actor != null) actor.EndDiscovery(this);
         if (heldVisuals != null) for (int i = 0; i < heldVisuals.Length; i++) if (heldVisuals[i] != null) heldVisuals[i].enabled = heldVisible[i];
         heldVisuals = null; heldVisible = null; actor = null;

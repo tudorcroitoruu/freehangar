@@ -27,6 +27,20 @@ public sealed class GameplayAudio : MonoBehaviour
     [SerializeField] private AudioClip hammerMetal, hammerWood, pickUp, drop;
     [SerializeField] private AudioClip hitAir;
     [SerializeField] private AudioClip closeBag;
+    [SerializeField] private AudioClip drinkingBottle;
+    public float BottleDrinkDuration => drinkingBottle != null ? drinkingBottle.length : 1.9f;
+    public AudioSource StartBottleDrink()
+    {
+        if (drinkingBottle == null || WorldSaveRuntime.IsSeeking || WorldSaveRuntime.IsRestoring) return null;
+        var source = gameObject.AddComponent<AudioSource>();
+        source.playOnAwake = false;
+        source.spatialBlend = 0f;
+        source.outputAudioMixerGroup = effectsGroup;
+        source.clip = drinkingBottle;
+        source.volume = .9f;
+        source.Play();
+        return source;
+    }
     [Header("Last scene")]
     [SerializeField] private AudioClip openDoor, openRocketDoor, closeDoor, rocket, switchElectrical, lightsOn;
     [Header("Other")]
