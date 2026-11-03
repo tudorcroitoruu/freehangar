@@ -17,6 +17,8 @@ public sealed class StaminaManager : MonoBehaviour
     [SerializeField] private StaminaUpgradeSettings upgradeSettings;
     [SerializeField, Min(0f), Tooltip("Stamina per scoop for a 1 kg shovel; multiplied by the equipped shovel's weight.")]
     private float shovelActionCost = 10f;
+    [SerializeField, Min(0f), Tooltip("Stamina required and consumed by one successful jump.")]
+    private float jumpActionCost = 10f;
     [Tooltip("Stamina consumed per second while carrying a bag.")]
     [SerializeField, Min(0f)] private float workConsumptionPerSecond = 10f;
     [SerializeField, Min(0f), Tooltip("Additional stamina consumed per second while sprinting.")]
@@ -111,6 +113,17 @@ public sealed class StaminaManager : MonoBehaviour
     public void ConsumeShovelStamina()
     {
         ConsumeShovelStamina(1f);
+    }
+
+    public bool TryConsumeJumpStamina()
+    {
+        if (!isActiveAndEnabled || Time.timeScale <= 0f || CurrentMaxStamina <= 0f) return false;
+        if (HasInfiniteStamina) return true;
+        if (CurrentStamina < jumpActionCost) return false;
+        CurrentStamina = Mathf.Max(0f, CurrentStamina - jumpActionCost);
+        recoveryDelayRemaining = recoveryDelay;
+        UpdateStaminaBar();
+        return true;
     }
 
     public void ConsumeShovelStamina(float shovelWeightKg)

@@ -2267,7 +2267,7 @@ MonoBehaviour:
   sprintSpeed: 7
   bagCarrySpeedMultiplier: 0.6
   heavyBagWeightKg: 10
-  jumpForce: 5
+  jumpForce: 3.5
   gravity: 9.81
   movementAudioSource: {fileID: 3184703036978754463}
   jumpClip: {fileID: 8300000, guid: b0f827416eeaf21438278fd25d56e514, type: 3}

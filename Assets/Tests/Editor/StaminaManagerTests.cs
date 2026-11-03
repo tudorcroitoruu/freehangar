@@ -42,6 +42,29 @@ public class StaminaManagerTests
     }
 
     [Test]
+    public void JumpConsumesStaminaOnlyWhenAffordableAndDelaysRecovery()
+    {
+        stamina.RestoreSave(10f, 0f);
+        Assert.IsTrue(stamina.TryConsumeJumpStamina());
+        Assert.AreEqual(0f, stamina.CurrentStamina);
+        Assert.IsFalse(stamina.TryConsumeJumpStamina());
+        stamina.Tick(false, 1f);
+        Assert.AreEqual(0f, stamina.CurrentStamina);
+        stamina.RestoreSave(9f, 0f);
+        Assert.IsFalse(stamina.TryConsumeJumpStamina());
+        Assert.AreEqual(9f, stamina.CurrentStamina);
+    }
+
+    [Test]
+    public void InfiniteStaminaAllowsJumpWithoutSpendingStamina()
+    {
+        stamina.RestoreSave(0f, 0f);
+        SaveSystem.Data.infiniteStaminaUntilUtc = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 60;
+        Assert.IsTrue(stamina.TryConsumeJumpStamina());
+        Assert.AreEqual(0f, stamina.CurrentStamina);
+    }
+
+    [Test]
     public void HungerGrowsAtConfiguredRateAndRejectsInvalidTime()
     {
         SetField("hungerIncreasePerMinute", 1f);

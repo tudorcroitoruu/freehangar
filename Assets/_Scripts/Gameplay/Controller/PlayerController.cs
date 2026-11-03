@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float sprintSpeed = 10f;
     [SerializeField, Range(.1f, 1f), Tooltip("Movement speed multiplier while carrying a bag.")] private float bagCarrySpeedMultiplier = .6f;
     [SerializeField, Min(.1f), Tooltip("Grain weight at which the maximum bag movement penalty applies.")] private float heavyBagWeightKg = 10f;
-    [SerializeField, Min(0f)] private float jumpForce = 5f;
+    [SerializeField, Min(0f)] private float jumpForce = 2.5f;
     [SerializeField, Min(0f)] private float gravity = 9.81f;
 
     [Header("Movement audio")]
@@ -280,7 +280,8 @@ public class PlayerController : MonoBehaviour
         if (characterController.isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;
 
-        bool jumped = acceptInput && !pushingWheelbarrow && !isCrouching && wasGrounded && Input.GetKeyDown(KeyCode.Space);
+        bool jumped = acceptInput && !pushingWheelbarrow && !isCrouching && wasGrounded &&
+            Input.GetKeyDown(KeyCode.Space) && staminaManager != null && staminaManager.TryConsumeJumpStamina();
         if (jumped)
         {
             verticalVelocity = jumpForce;
