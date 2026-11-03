@@ -363,7 +363,7 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyLook(Vector2 input)
     {
-        lookInput = input;
+        lookInput = input * Mathf.Clamp(SaveSystem.settingsData?.aimSensitivity ?? 1f, .1f, 1.5f);
         if (IsPushing)
         {
             pushLookTarget = Mathf.Clamp(pushLookTarget + lookInput.x * cameraSensitivity, -65f, 65f);

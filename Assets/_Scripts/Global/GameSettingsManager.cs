@@ -118,6 +118,8 @@ public class GameSettingsManager : MonoBehaviour
     [SerializeField] private Slider sfxSlider;
 
     [Header("CONTROLS")]
+    [SerializeField] private Slider mouseSensitivitySlider;
+    [SerializeField] private Text mouseSensitivityValueText;
     [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private ActionBindingButton[] actionsButtons;
     private InputActionRebindingExtensions.RebindingOperation rebindOperation;
@@ -638,6 +640,7 @@ public class GameSettingsManager : MonoBehaviour
 
     private void RegisterListeners()
     {
+        if (mouseSensitivitySlider) mouseSensitivitySlider.onValueChanged.AddListener(OnAimSensitivityChangedInternal);
         if (decreaseMasterVolumeButton) decreaseMasterVolumeButton.onClick.AddListener(DecreaseMasterVolume);
         if (increaseMasterVolumeButton) increaseMasterVolumeButton.onClick.AddListener(IncreaseMasterVolume);
         if (decreaseMusicVolumeButton) decreaseMusicVolumeButton.onClick.AddListener(DecreaseMusicVolume);
@@ -686,6 +689,7 @@ public class GameSettingsManager : MonoBehaviour
 
     private void UnregisterListeners()
     {
+        if (mouseSensitivitySlider) mouseSensitivitySlider.onValueChanged.RemoveListener(OnAimSensitivityChangedInternal);
         if (decreaseMasterVolumeButton) decreaseMasterVolumeButton.onClick.RemoveListener(DecreaseMasterVolume);
         if (increaseMasterVolumeButton) increaseMasterVolumeButton.onClick.RemoveListener(IncreaseMasterVolume);
         if (decreaseMusicVolumeButton) decreaseMusicVolumeButton.onClick.RemoveListener(DecreaseMusicVolume);
@@ -1297,9 +1301,9 @@ public class GameSettingsManager : MonoBehaviour
 
     #region Aim Sensitivity
 
-    private const float SensitivityStep = 0.05f;
+    private const float SensitivityStep = 0.1f;
     private const float MinSensitivity = 0.1f;
-    private const float MaxSensitivity = 5f;
+    private const float MaxSensitivity = 1.5f;
 
     public void DecreaseSensitivity() => ChangeSensitivity(-SensitivityStep);
     public void IncreaseSensitivity() => ChangeSensitivity(SensitivityStep);
@@ -1320,9 +1324,12 @@ public class GameSettingsManager : MonoBehaviour
         if (!initialized || settings == null)
             return;
 
-        value = Mathf.Clamp(value, MinSensitivity, MaxSensitivity);
+        value = Mathf.Clamp(Mathf.Round(value * 10f) / 10f, MinSensitivity, MaxSensitivity);
         if (Mathf.Approximately(settings.aimSensitivity, value))
+        {
+            ApplyAimSensitivity();
             return;
+        }
 
         settings.aimSensitivity = value;
 
@@ -1333,6 +1340,14 @@ public class GameSettingsManager : MonoBehaviour
 
     private void ApplyAimSensitivity()
     {
+        if (mouseSensitivitySlider)
+        {
+            mouseSensitivitySlider.minValue = MinSensitivity;
+            mouseSensitivitySlider.maxValue = MaxSensitivity;
+            mouseSensitivitySlider.wholeNumbers = false;
+            mouseSensitivitySlider.SetValueWithoutNotify(settings.aimSensitivity);
+        }
+        if (mouseSensitivityValueText) mouseSensitivityValueText.text = settings.aimSensitivity.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
         AimSensitivity =
             settings.aimSensitivity;
 
