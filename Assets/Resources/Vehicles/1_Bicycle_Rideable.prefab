@@ -1358,7 +1358,7 @@ MonoBehaviour:
   exitCoastDuration: 0.8
   boostSpeedMultiplier: 1.5
   downhillSpeedMultiplier: 1.2
-  steeringSmoothTime: 0.14
+  steeringSmoothTime: 0.224
   maximumSteeringAngle: 30
   ridingCameraOffset: {x: 0, y: -0.5, z: 0}
   ridingCameraPitch: 8.2

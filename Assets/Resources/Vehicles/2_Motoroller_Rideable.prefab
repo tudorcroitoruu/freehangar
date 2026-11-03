@@ -1908,7 +1908,7 @@ MonoBehaviour:
   dismountSideDistance: 1.1
   dismountLongitudinalDistance: 1.5
   maximumSpeed: 12
-  acceleration: 6
+  acceleration: 3
   wheelRadius: 0.2471
   wheelbase: 1.29826
   brakingDeceleration: 10
@@ -1916,7 +1916,7 @@ MonoBehaviour:
   exitCoastDuration: 0.8
   boostSpeedMultiplier: 1
   downhillSpeedMultiplier: 1.2
-  steeringSmoothTime: 0.16
+  steeringSmoothTime: 0.256
   maximumSteeringAngle: 30
   ridingCameraOffset: {x: 0, y: 0, z: 0}
   ridingCameraPitch: 8
@@ -1935,7 +1935,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorollerController
   maximumSpeed: 12
-  acceleration: 6
+  acceleration: 3
   brakingDeceleration: 10
   wheelRadius: 0.2471
   wheelbase: 1.29826
