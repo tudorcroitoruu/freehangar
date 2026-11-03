@@ -11,7 +11,7 @@ public sealed class GrainWeighStation : MonoBehaviour
     private readonly List<GrainContainer> containers = new List<GrainContainer>();
     private float nextScan;
     public string StatusMessage { get; private set; }
-    public const string RedButtonInstruction = "Press on red weight button on left side of the weighting machine";
+    public const string RedButtonInstruction = "Press on red weight button on right side of the weighting machine";
 
     private void OnEnable() => RefreshStatus();
 
@@ -45,11 +45,6 @@ public sealed class GrainWeighStation : MonoBehaviour
         if (sellingZone.HasBlockingOccupants)
         {
             SetStatus("Remove people and other objects. Only containers may remain.\n" + RedButtonInstruction, new Color(1, .55f, .15f));
-            return;
-        }
-        if (player != null && player.HandsOccupied)
-        {
-            SetStatus("Free your hands before weighing.\n" + RedButtonInstruction, new Color(1, .55f, .15f));
             return;
         }
         sellingZone.CollectContainers(containers);
