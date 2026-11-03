@@ -7365,7 +7365,7 @@ MonoBehaviour:
     goalAmount: 1
     rewardAmount: 0
   - goalId: h1_load_200kg
-    goalDescription: Load 200 kg of grain/
+    goalDescription: Load 200 kg of grain
     navigationIndicator: {fileID: 0}
     stage: 1
     hangarId: 0
