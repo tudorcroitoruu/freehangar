@@ -36,6 +36,7 @@ public sealed class GameplayAudio : MonoBehaviour
     [SerializeField] private AudioClip[] shovelGets, fillGrain;
     [SerializeField] private AudioClip vacuum;
     [Header("Vehicles")]
+    [SerializeField] private AudioClip resetVehicle;
     [SerializeField] private AudioClip bicycleMove, bicycleScratch, motorollerAndTrike, pickupMotor, wheelbarrow;
     [SerializeField] private AudioClip[] vehicleHits;
 
@@ -128,7 +129,9 @@ public sealed class GameplayAudio : MonoBehaviour
     public void ToolSwing() => Play(hitAir, .75f);
     public void CloseContainer() => Play(closeBag, .8f);
     public void PressWeighButton() => Play(pressButton, .8f);
-    public void CashIn() => Play(cashIn, .8f);
+    // Cash_in is mastered very quietly (peak 0.066); compensate without clipping.
+    public const float CashInVolume = 8f;
+    public void CashIn() => Play(cashIn, CashInVolume);
     public void UpgradeResult(bool success) => Play(success ? upgradeSuccess : upgradeFailed, .8f);
     public void BarrierHit(bool metal) => Play(metal ? hammerMetal : (Choose(axeWoodHits) ?? hammerWood), .8f);
     public void PickUp() => Play(pickUp, .7f);
@@ -142,6 +145,7 @@ public sealed class GameplayAudio : MonoBehaviour
     public void ShovelGet() => Play(Choose(shovelGets), .75f);
     public void FillGrain() => Play(Choose(fillGrain), .65f);
     public void VehicleHit(Vector3 point) => PlayAt(Choose(vehicleHits), point, .85f);
+    public void VehicleResetComplete() => Play(resetVehicle, .8f);
     public void BicycleScratch(Vector3 point) => PlayAt(bicycleScratch, point, .25f, 1f);
 
     public void StartRocket() => RocketLaunchAudio.Begin(rocket, effectsGroup);

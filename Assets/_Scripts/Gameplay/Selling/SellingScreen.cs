@@ -128,7 +128,6 @@ public class SellingScreen : MonoBehaviour
     public void Sell()
     {
         if (saleInProgress || !IsOpen || !Zone.CanWeigh(player) || UIPopups.BasePopupUI.HasActivePopup) return;
-        GameplayAudio.Instance?.PressWeighButton();
         if (!QuoteMatches()) { Refresh(); return; }
         if (!CanPay()) return;
         // Lock before AddMoney: its callbacks can invoke Sell again in the same frame.
@@ -144,7 +143,7 @@ public class SellingScreen : MonoBehaviour
         }
         if (GameplayAudio.Instance != null) GameplayAudio.Instance.CashIn();
         else if (cashInClip != null)
-            GlobalManager.PlaySound3D(cashInClip, Vector3.zero, .8f, 0f, cashInMixerGroup);
+            GlobalManager.PlaySound3D(cashInClip, Vector3.zero, GameplayAudio.CashInVolume, 0f, cashInMixerGroup);
         GameAchievements.GrainSold(quotedCash);
         var soldQuantities = new Dictionary<GrainType, float>();
         foreach (var entry in quotedWeights)

@@ -124,7 +124,11 @@ public sealed class VehicleReset : MonoBehaviour
         transform.SetPositionAndRotation(transitionPosition, transitionRotation);
         // Keep physics transforms invertible while fully visually hidden.
         if (visualRoot != null) visualRoot.localScale = visualScale * Mathf.Max(.0001f, factor);
-        if (resetElapsed >= shrinkSeconds + growSeconds) FinishReset();
+        if (resetElapsed >= shrinkSeconds + growSeconds)
+        {
+            FinishReset();
+            GameplayAudio.Instance?.VehicleResetComplete();
+        }
     }
 
     private void FinishReset()
