@@ -7,6 +7,108 @@ using Object = UnityEngine.Object;
 
 public class WorldSaveTests
 {
+    [Test]
+    public void RemovedSceneWrapperDoesNotLoseWheelbarrowOrCargo()
+    {
+        InEmptyScene(() =>
+        {
+            var wrapper = new GameObject("New_Map");
+            var farm = new GameObject("Farm"); farm.transform.SetParent(wrapper.transform);
+            var vehicle = new GameObject("Wheelbarrow_Medium"); vehicle.transform.SetParent(farm.transform);
+            vehicle.AddComponent<WheelbarrowCargo>(); vehicle.transform.position = new Vector3(12, 2, 8);
+            var slot = new GameObject("Bag slot 0"); slot.transform.SetParent(vehicle.transform);
+            var bag = new GameObject("Bag"); bag.transform.SetParent(slot.transform);
+            bag.AddComponent<GrainContainer>().RestoreSave(new ContainerSave { kilograms = 7 });
+            var adapter = CreateAdapter();
+            var saved = adapter.Capture();
+            string id = saved.wheelbarrows[0].id;
+            Object.DestroyImmediate(adapter.gameObject);
+            foreach (var identity in wrapper.GetComponentsInChildren<WorldSaveIdentity>()) Object.DestroyImmediate(identity);
+            farm.transform.SetParent(null, true); Object.DestroyImmediate(wrapper);
+            vehicle.transform.position = Vector3.zero;
+            adapter = CreateAdapter();
+            Restore(adapter, saved);
+            Assert.AreEqual(new Vector3(12, 2, 8), vehicle.transform.position);
+            Assert.AreEqual(id, WorldSaveRuntime.Identity(vehicle));
+            Assert.AreEqual(1, vehicle.GetComponent<WheelbarrowCargo>().BagCount);
+            var captured = adapter.Capture();
+            Assert.AreEqual(1, captured.wheelbarrows.Count);
+            Assert.AreEqual(1, captured.wheelbarrows[0].bags.Count);
+            Assert.AreEqual(7, captured.wheelbarrows[0].bags[0].container.kilograms);
+        });
+    }
+
+    [Test]
+    public void MissingObjectsAndCargoSlotsDoNotAbortOrEraseSaveRecords()
+    {
+        InEmptyScene(() =>
+        {
+            var vehicle = new GameObject("Vehicle"); vehicle.AddComponent<WheelbarrowCargo>();
+            var bag = new GameObject("Bag"); bag.AddComponent<GrainContainer>(); bag.AddComponent<Rigidbody>();
+            var adapter = CreateAdapter();
+            var saved = adapter.Capture();
+            var bagRecord = saved.bags[0];
+            bagRecord.position = new Vector3(4, 3, 2);
+            bagRecord.parent = "scene:/Removed#0";
+            bagRecord.kinematic = true;
+            saved.items.Add(new WorldObjectSave { id = bagRecord.parent, kind = "item", prefab = "removed-product" });
+            Restore(adapter, saved);
+            Assert.AreEqual(bagRecord.position, bag.transform.position);
+            Assert.IsNull(bag.transform.parent);
+            Assert.IsFalse(bag.GetComponent<Rigidbody>().isKinematic);
+            Assert.AreEqual(1, adapter.Capture().items.FindAll(x => x.id == bagRecord.parent).Count);
+            // A malformed slot on an existing parent is also recoverable.
+            bagRecord.parent = saved.wheelbarrows[0].id;
+            bagRecord.slot = "/old-invalid-slot";
+            Restore(adapter, saved);
+            Assert.IsNull(bag.transform.parent);
+            Assert.AreEqual(bagRecord.position, bag.transform.position);
+            Assert.AreEqual(1, adapter.Capture().items.Count);
+        });
+    }
+
+    [Test]
+    public void AmbiguousSceneObjectsAreNotAssignedEachOthersSavedState()
+    {
+        InEmptyScene(() =>
+        {
+            foreach (string name in new[] { "First", "Second" })
+            {
+                var parent = new GameObject(name);
+                var barrow = new GameObject("Wheelbarrow"); barrow.transform.SetParent(parent.transform);
+                barrow.AddComponent<WheelbarrowCargo>();
+            }
+            var adapter = CreateAdapter();
+            var saved = new WorldSaveData();
+            saved.wheelbarrows.Add(new WheelbarrowSave { id = "scene:/Removed#0/Wheelbarrow#0", kind = "vehicle", position = Vector3.one * 123 });
+            Restore(adapter, saved);
+            Assert.AreEqual(3, adapter.Capture().wheelbarrows.Count, "Retain the unavailable record without guessing between two wheelbarrows.");
+        });
+    }
+
+    private static WorldSaveRuntime CreateAdapter()
+    {
+        var adapter = new GameObject("Save adapter").AddComponent<WorldSaveRuntime>();
+        typeof(WorldSaveRuntime).GetMethod("Awake", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(adapter, null);
+        return adapter;
+    }
+    private static void Restore(WorldSaveRuntime adapter, WorldSaveData saved) =>
+        typeof(WorldSaveRuntime).GetMethod("Restore", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(adapter, new object[] { saved });
+    private static void InEmptyScene(Action test)
+    {
+        var original = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        var data = SaveSystem.Data; bool loaded = SaveSystem.savesLoaded;
+        var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+            UnityEditor.SceneManagement.NewSceneMode.Additive);
+        try { SaveSystem.Data = new PlayerData(); SaveSystem.savesLoaded = false; test(); }
+        finally
+        {
+            UnityEditor.SceneManagement.EditorSceneManager.CloseScene(scene, true);
+            UnityEngine.SceneManagement.SceneManager.SetActiveScene(original);
+            SaveSystem.Data = data; SaveSystem.savesLoaded = loaded;
+        }
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public void SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects(bool recreate)

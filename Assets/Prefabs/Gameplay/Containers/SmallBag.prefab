@@ -68,6 +68,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GrainContainer
   transportLevel: 2
   cargoTypeId: SmallBag
+  uprightEulerAngles: {x: 270, y: 0, z: 0}
   pickupSpaceUnits: 1
   capacityKg: 30
   kilograms: 0

@@ -162,6 +162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GrainContainer
   transportLevel: 1
   cargoTypeId: FreeBag
+  uprightEulerAngles: {x: 270.01978, y: -0, z: 0}
   pickupSpaceUnits: 1
   capacityKg: 15
   kilograms: 0

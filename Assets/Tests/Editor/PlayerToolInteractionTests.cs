@@ -62,6 +62,86 @@ public class PlayerToolInteractionTests
         tools.TryEquip(PlayerCombatTools.Tool.Broom);Set("strikeStart",Time.time-.3f);Call("AdvanceStrike");
         Assert.That(wall.HitsRemaining,Is.EqualTo(3));
     }
+    [Test]
+    public void LoadedShovelReturnsAfterTakingAndStowingBag()
+    {
+        var player = CreateShovelPlayer(out var shovel);
+        shovel.Cargo.Add(GrainType.Corn, 2);
+        var bags = root.AddComponent<BagInteraction>();
+        Set("bags", bags);
+        typeof(PlayerController).GetField("bagInteraction", Private).SetValue(player, bags);
+        typeof(BagInteraction).GetField("carryAnchor", Private).SetValue(bags, Child("Carry anchor"));
+        typeof(BagInteraction).GetField("viewCamera", Private).SetValue(bags, player.characterCamera);
+        typeof(BagInteraction).GetField("shovelPresentation", Private).SetValue(bags, player.HeldInstrument);
+        var bag = Child("Bag").gameObject.AddComponent<GrainContainer>();
+        var slot = Child("Vehicle cargo slot");
+        for (int i = 0; i < 3; i++)
+        {
+            Assert.IsTrue(bags.TryInteract(bag));
+            Assert.IsFalse(player.IsShovelEquipped);
+            tools.Tick(false, false);
+            Assert.IsFalse(player.IsShovelEquipped, "Do not reveal the shovel while carrying.");
+            Assert.IsTrue(bags.TryStow(slot));
+            Assert.IsTrue(player.IsShovelEquipped, "Restore the selected shovel even when it contains grain.");
+            Assert.AreEqual(2, shovel.Kilograms);
+        }
+        Assert.IsFalse(tools.TryEquip(PlayerCombatTools.Tool.Axe), "A real switch must still require an empty shovel.");
+    }
+
+    [Test]
+    public void SelectedToolRecoversAfterMenuClosesButNotDuringDrivingOrCutscene()
+    {
+        var player = CreateShovelPlayer(out var shovel);
+        shovel.Cargo.Add(GrainType.Corn, 2);
+        var closedFrame = typeof(UpgradeManager).GetField("closedFrame", BindingFlags.Static | BindingFlags.NonPublic);
+        int previous = (int)closedFrame.GetValue(null);
+        try
+        {
+            Assert.IsTrue(PlayerCombatTools.SetShovelEquipped(player, false));
+            closedFrame.SetValue(null, Time.frameCount);
+            tools.Tick(false, false);
+            Assert.IsFalse(player.IsShovelEquipped);
+            closedFrame.SetValue(null, -1);
+            player.characterController.enabled = false;
+            tools.Tick(false, false);
+            Assert.IsFalse(player.IsShovelEquipped);
+            player.characterController.enabled = true;
+            tools.Tick(false, false);
+            Assert.IsTrue(player.IsShovelEquipped);
+            Assert.AreEqual(2, shovel.Kilograms);
+        }
+        finally { closedFrame.SetValue(null, previous); }
+    }
+
+    [TestCase(0)] [TestCase(4)] [TestCase(8)] [TestCase(12)] [TestCase(16)] [TestCase(20)]
+    public void UpgradeWhileHiddenShowsCurrentModelWhenHandsReturn(int level)
+    {
+        var player = CreateShovelPlayer(out var shovel);
+        var levels = shovel.gameObject.AddComponent<HeldGrainToolLevels>();
+        levels.levels = new GameObject[6];
+        for (int i = 0; i < levels.levels.Length; i++)
+        { levels.levels[i] = Child("Tool " + i).gameObject; levels.levels[i].transform.SetParent(shovel.transform, false); }
+        typeof(HeldGrainToolLevels).GetMethod("Awake", Private).Invoke(levels, null);
+        Assert.IsTrue(PlayerCombatTools.SetShovelEquipped(player, false));
+        SaveSystem.Data.shovelUpgradeLevel = level;
+        tools.Tick(false, false);
+        typeof(HeldGrainToolLevels).GetMethod("Update", Private).Invoke(levels, null);
+        Assert.IsTrue(player.IsShovelEquipped);
+        for (int i = 0; i < levels.levels.Length; i++) Assert.AreEqual(i == level / 4, levels.levels[i].activeInHierarchy);
+    }
+
+    private PlayerController CreateShovelPlayer(out ShovelTool shovel)
+    {
+        var player = root.AddComponent<PlayerController>();
+        player.characterCamera = root.GetComponentInChildren<Camera>();
+        player.characterController = root.GetComponent<CharacterController>();
+        var hands = Child("Shovel hands");
+        shovel = hands.gameObject.AddComponent<ShovelTool>();
+        typeof(PlayerController).GetField("heldInstrument", Private).SetValue(player, hands);
+        typeof(PlayerController).GetField("shovelTool", Private).SetValue(player, shovel);
+        Set("player", player); Set("shovelHands", hands); Set("shovelTool", shovel);
+        return player;
+    }
     [TestCase(PlayerCombatTools.Tool.Axe)]
     [TestCase(PlayerCombatTools.Tool.Broom)]
     [TestCase(PlayerCombatTools.Tool.Hammer)]

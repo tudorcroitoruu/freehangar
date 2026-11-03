@@ -60,8 +60,10 @@ public class CargoPreviewParityTests
         Assert.Less(Vector3.Distance(preview.GetComponent<GrainContainer>().WorldBounds.size,cargo.WorldBounds.size),.0001f);
         Assert.AreEqual(originalKg,prefab.GetComponent<GrainContainer>().Kilograms,"Preview must not modify source prefab.");
     }
-    [Test]
-    public void LegacyBagStowMatchesPreviewAndRemainsStableAfterPickupAndReload()
+    [TestCase(0f, 0f, 0f)]
+    [TestCase(55f, 123f, -35f)]
+    [TestCase(180f, 70f, 90f)]
+    public void LegacyBagStowMatchesPreviewAndRemainsStableAfterPickupAndReload(float pitch, float yaw, float roll)
     {
         var bike=Copy("Assets/Resources/Vehicles/1_Bicycle_Rideable.prefab");
         bike.transform.position=new Vector3(10000,1000,10000);bike.transform.rotation=Quaternion.Euler(0,35,0);
@@ -74,6 +76,8 @@ public class CargoPreviewParityTests
         var actor=new GameObject("Carrier");actor.transform.SetParent(root.transform);var carry=actor.AddComponent<BagInteraction>();
         var anchor=new GameObject("Hands");anchor.transform.SetParent(actor.transform);Set(carry,"carryAnchor",anchor.transform);
         Vector3 worldScale=item.transform.lossyScale;
+        // Physics may tip or overturn the bag before its first pickup.
+        item.transform.rotation = Quaternion.Euler(pitch, yaw, roll) * item.transform.rotation;
         for(int i=0;i<3;i++)
         {
             Assert.IsTrue((bool)typeof(BagInteraction).GetMethod("Take",Private).Invoke(carry,new object[]{cargo}));

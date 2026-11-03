@@ -254,6 +254,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GrainContainer
   transportLevel: 4
   cargoTypeId: Crate
+  uprightEulerAngles: {x: 270.01978, y: 0, z: 0}
   pickupSpaceUnits: 1
   capacityKg: 100
   kilograms: 0

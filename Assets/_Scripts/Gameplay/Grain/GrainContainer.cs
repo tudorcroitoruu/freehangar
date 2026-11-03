@@ -6,6 +6,9 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
 {
     [SerializeField, Min(1), Tooltip("Minimum vehicle cargo level required to transport this container.")] private int transportLevel = 1;
     [SerializeField] private string cargoTypeId;
+    [SerializeField, Tooltip("Model rotation when upright. Independent of physics rotation and vehicle cargo poses.")]
+    private Vector3 uprightEulerAngles = new Vector3(-90f, 0f, 0f);
+    public Quaternion UprightRotation => Quaternion.Euler(uprightEulerAngles);
     // Early scene sacks predate cargo IDs. Resolve them through the same levels as shop prefabs.
     public string CargoTypeId => !string.IsNullOrWhiteSpace(cargoTypeId) ? cargoTypeId : TransportLevel switch
     {

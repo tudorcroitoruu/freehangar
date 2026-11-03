@@ -24,6 +24,8 @@ public sealed class PlayerCombatTools : MonoBehaviour
     [SerializeField, Min(.1f)] private float strikeDuration = .55f;
 
     private PlayerInteractor interactor;
+    private PlayerController player;
+    private PlayerBicycleInteraction bicycle;
     private Tool equipped = Tool.Shovel;
     private float strikeStart = -10f;
     private bool impactPending;
@@ -50,6 +52,8 @@ public sealed class PlayerCombatTools : MonoBehaviour
     private void Awake()
     {
         interactor = GetComponent<PlayerInteractor>();
+        player = GetComponent<PlayerController>();
+        bicycle = GetComponent<PlayerBicycleInteraction>();
         if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
         if (bags == null) bags = GetComponent<BagInteraction>();
         if (viewCamera != null)
@@ -68,6 +72,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
     public void Tick(bool acceptInput, bool wasLocked)
     {
         if(!IsUnlocked(equipped)) { equipped=Tool.Shovel;CancelStrike();ApplyVisuals(); }
+        RestoreSelectedVisuals();
         if (!acceptInput || (interactor != null && interactor.DiscoveryBusy)) { CancelStrike(); return; }
         AdvanceStrike();
         if (Input.GetKeyDown(KeyCode.Alpha1)) TryEquip(Tool.Shovel);
@@ -165,9 +170,10 @@ public sealed class PlayerCombatTools : MonoBehaviour
         if (bags != null && bags.IsCarrying && !bags.TryInteract()) return false;
         if (interactor != null && interactor.Items != null && interactor.Items.IsCarrying && !interactor.Items.TryPlace()) return false;
         if (interactor != null && interactor.PushedWheelbarrow != null) return false;
+        // Showing the already-selected tool is not a tool switch and must preserve its load.
+        if(tool==equipped) { ApplyVisuals();return true; }
         if (shovelTool != null && (shovelTool.Kilograms > 0f || shovelTool.IsBusy)) return false;
         if (tool != Tool.Shovel && (tool == Tool.Broom ? heldBroom : tool == Tool.Axe ? heldAxe : heldSledgehammer) == null) return false;
-        if(tool==equipped) { ApplyVisuals();return true; }
         if (shovelTool != null) shovelTool.CancelAction();
         equipped = tool;
         strikeStart = -10f;
@@ -182,6 +188,21 @@ public sealed class PlayerCombatTools : MonoBehaviour
         impactPending = false;
         foreach (var tool in new[] { heldBroom, heldAxe, heldSledgehammer })
             if (tool != null && tool.gameObject.activeSelf) { hidden.Add(tool.gameObject); tool.gameObject.SetActive(false); }
+    }
+
+    private void RestoreSelectedVisuals()
+    {
+        // Temporary hide owners can overlap (cargo, menus, driving). Restore from the selected
+        // tool once gameplay is available, rather than relying on every owner remembering to show it.
+        if (player == null || !player.isActiveAndEnabled || Time.timeScale <= 0f || LoadingScreen.IsLoading ||
+            UpgradeManager.BlocksGameplayInput || UIPopups.BasePopupUI.HasActivePopup ||
+            (player.characterController != null && !player.characterController.enabled) || player.IsCarrying ||
+            (bicycle != null && bicycle.IsRiding) || (bags != null && bags.IsCarrying) ||
+            (interactor != null && (interactor.HandsOccupied || interactor.DiscoveryBusy))) return;
+        var selected = equipped == Tool.Shovel ? shovelHands : equipped == Tool.Broom ? heldBroom :
+            equipped == Tool.Axe ? heldAxe : heldSledgehammer;
+        if ((selected != null && !selected.gameObject.activeSelf) ||
+            (shovelTool != null && shovelTool.enabled != (equipped == Tool.Shovel))) ApplyVisuals();
     }
 
     private void ApplyVisuals()

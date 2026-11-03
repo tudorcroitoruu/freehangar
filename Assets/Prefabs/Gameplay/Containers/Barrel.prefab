@@ -262,6 +262,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GrainContainer
   transportLevel: 5
   cargoTypeId: Barrel
+  uprightEulerAngles: {x: 270.01978, y: 0, z: 0}
   pickupSpaceUnits: 1
   capacityKg: 150
   kilograms: 0

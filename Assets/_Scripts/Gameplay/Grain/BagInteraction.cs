@@ -113,7 +113,7 @@ public sealed class BagInteraction : MonoBehaviour
         carriedVolume = box != null ? Mathf.Abs(box.size.x * originalWorldScale.x *
             box.size.y * originalWorldScale.y * box.size.z * originalWorldScale.z) :
             bag.WorldBounds.size.x * bag.WorldBounds.size.y * bag.WorldBounds.size.z;
-        uprightRotation = Quaternion.FromToRotation(bag.transform.InverseTransformDirection(Vector3.up), Vector3.up);
+        uprightRotation = bag.UprightRotation;
         carriedBody = bag.GetComponent<Rigidbody>();
         if (carriedBody == null) carriedBody = bag.gameObject.AddComponent<Rigidbody>();
         if (!carriedBody.isKinematic) { carriedBody.linearVelocity = Vector3.zero; carriedBody.angularVelocity = Vector3.zero; }

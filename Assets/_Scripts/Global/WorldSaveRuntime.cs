@@ -25,6 +25,7 @@ public sealed class WorldSaveRuntime : MonoBehaviour
     private readonly Dictionary<string, GameObject> templates = new Dictionary<string, GameObject>();
     private readonly Dictionary<string, (string productId, int limit)> inventoryCatalog = new Dictionary<string, (string, int)>();
     private readonly List<string> authoredContainers = new List<string>();
+    private readonly List<WorldObjectSave> unavailableObjects = new List<WorldObjectSave>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Register()
@@ -84,7 +85,7 @@ public sealed class WorldSaveRuntime : MonoBehaviour
         {
             var go = component.gameObject;
             string id = "scene:" + Path(go.transform, null);
-            Identity(go, id); objects[id] = go;
+            id = Identity(go, id); objects[id] = go;
             if (component is GrainContainer || component is CarryableItem || component is ConsumableFood) authoredContainers.Add(id);
         }
     }
@@ -112,8 +113,9 @@ public sealed class WorldSaveRuntime : MonoBehaviour
         foreach (string part in (path ?? "").Split('/'))
         {
             if (part.Length == 0) continue;
-            int split = part.LastIndexOf('#'); string name = Uri.UnescapeDataString(part.Substring(0, split));
-            int ordinal = int.Parse(part.Substring(split + 1)); Transform next = null;
+            int split = part.LastIndexOf('#');
+            if (split <= 0 || !int.TryParse(part.Substring(split + 1), out int ordinal) || ordinal < 0) return null;
+            string name = Uri.UnescapeDataString(part.Substring(0, split)); Transform next = null;
             foreach (Transform child in root) if (child.name == name && ordinal-- == 0) { next = child; break; }
             if (next == null && create) { next = new GameObject(name).transform; next.SetParent(root, false); }
             if (next == null) return null; root = next;
@@ -217,6 +219,21 @@ public sealed class WorldSaveRuntime : MonoBehaviour
             else if (record is VehicleSave vehicleRecord) result.vehicles.Add(vehicleRecord);
             else result.items.Add(record);
         }
+        // Keep unavailable content in the save so a later scene/prefab repair can recover it.
+        foreach (var record in unavailableObjects)
+        {
+            string json = JsonUtility.ToJson(record);
+            if (record is WheelbarrowSave)
+            {
+                var copy = JsonUtility.FromJson<WheelbarrowSave>(json); copy.bags.Clear(); result.wheelbarrows.Add(copy);
+            }
+            else if (record is VehicleSave)
+            {
+                var copy = JsonUtility.FromJson<VehicleSave>(json); copy.bags.Clear(); result.vehicles.Add(copy);
+            }
+            else if (record is BagSave) result.bags.Add(JsonUtility.FromJson<BagSave>(json));
+            else result.items.Add(JsonUtility.FromJson<WorldObjectSave>(json));
+        }
         result.NestCargo();
         if (!string.IsNullOrEmpty(DestinationScene))
         { result.scene = DestinationScene; result.launchPlaying = false; result.endingPlaying = true; result.endingTime = 0; }
@@ -228,6 +245,8 @@ public sealed class WorldSaveRuntime : MonoBehaviour
         if (saved.version != 2) throw new InvalidOperationException("Unsupported world save version " + saved.version);
         if (ending != null && player == null) { ending.ResumeSaved(saved.endingTime); return; }
         foreach (var identity in Find<WorldSaveIdentity>()) if (!string.IsNullOrEmpty(identity.Id)) objects[identity.Id] = identity.gameObject;
+        ReconnectSceneObjects(saved);
+        unavailableObjects.Clear();
         var present = new HashSet<string>(saved.Records().Select(x => x.id));
         foreach (string id in saved.authoredContainers)
             if (!present.Contains(id) && objects.TryGetValue(id, out var removed) && removed != null)
@@ -239,7 +258,12 @@ public sealed class WorldSaveRuntime : MonoBehaviour
             {
                 if (record.kind == "spill") go = GrainPile.CreateDroppedPile(record.position, Find<GrainPile>().FirstOrDefault(p => !p.IsDroppedPile)).gameObject;
                 else if (!string.IsNullOrEmpty(record.prefab) && templates.TryGetValue(record.prefab, out var prefab)) go = Instantiate(prefab);
-                else throw new InvalidOperationException("Cannot restore saved object " + record.id + " (" + record.prefab + "). The save has been preserved.");
+                else
+                {
+                    unavailableObjects.Add(record);
+                    Debug.LogWarning("Saved object is unavailable: " + record.id + ". Continuing load; its record will be retained.");
+                    continue;
+                }
                 Identity(go, record.id); objects[record.id] = go;
                 SceneManager.MoveGameObjectToScene(go, gameObject.scene);
             }
@@ -259,7 +283,7 @@ public sealed class WorldSaveRuntime : MonoBehaviour
                     limit = product.limit;
                 }
                 if (inventory.RegisterRestoredInstance(go, productId, limit) == null)
-                    throw new InvalidOperationException("Cannot register restored inventory object " + record.id + " (" + productId + "). The save has been preserved.");
+                    Debug.LogWarning("Restored object has no inventory product: " + record.id + ". Its world state was restored.");
             }
             if (record.hasBody && go.GetComponent<Rigidbody>() == null) go.AddComponent<Rigidbody>();
             if (go.TryGetComponent<Rigidbody>(out var body))
@@ -278,10 +302,18 @@ public sealed class WorldSaveRuntime : MonoBehaviour
         }
         foreach (var record in saved.Records())
         {
-            if (string.IsNullOrEmpty(record.parent) || !objects.TryGetValue(record.id, out var go) || go == null ||
-                !objects.TryGetValue(record.parent, out var parent) || parent == null) continue;
-            var slot = Resolve(parent.transform, record.slot, parent.GetComponent<WheelbarrowCargo>() != null);
-            if (slot == null) throw new InvalidOperationException("Missing saved cargo slot " + record.slot + ". The save has been preserved.");
+            if (string.IsNullOrEmpty(record.parent) || !objects.TryGetValue(record.id, out var go) || go == null) continue;
+            objects.TryGetValue(record.parent, out var parent);
+            var slot = parent != null ? Resolve(parent.transform, record.slot, parent.GetComponent<WheelbarrowCargo>() != null) : null;
+            if (slot == null)
+            {
+                go.transform.SetParent(null, true);
+                SetPose(go.transform, record.position, record.rotation, record.scale);
+                if (go.TryGetComponent<GrainContainer>(out _) && go.TryGetComponent<Rigidbody>(out var looseBody))
+                { looseBody.isKinematic = false; looseBody.useGravity = true; }
+                Debug.LogWarning("Saved cargo support is unavailable for " + record.id + ". Restored at its saved world position.");
+                continue;
+            }
             if (parent.GetComponent<WheelbarrowCargo>() != null)
             { slot.localPosition = record.slotPosition; slot.localRotation = record.slotRotation; slot.localScale = record.slotScale; }
             go.transform.SetParent(slot, true); go.transform.localPosition = record.localPosition; go.transform.localRotation = record.localRotation;
@@ -311,6 +343,40 @@ public sealed class WorldSaveRuntime : MonoBehaviour
         if (saved.endingPlaying && ending != null) ending.ResumeSaved(saved.endingTime);
         launch?.RestoreDoor(saved.launchDoorOpen);
         if (saved.launchPlaying && launch != null && player != null) launch.ResumeSaved(player.GetComponent<PlayerInteractor>(), saved.launchTime);
+    }
+    private void ReconnectSceneObjects(WorldSaveData saved)
+    {
+        var ids = saved.Records().Select(x => x.id).Concat(saved.authoredContainers)
+            .Where(id => !string.IsNullOrEmpty(id) && id.StartsWith("scene:", StringComparison.Ordinal)).Distinct().ToArray();
+        var claimed = new HashSet<GameObject>(ids.Where(id => objects.TryGetValue(id, out var go) && go != null).Select(id => objects[id]));
+        foreach (string id in ids)
+        {
+            if (objects.TryGetValue(id, out var existing) && existing != null) continue;
+            // Compare from the object upward: adding/removing a scene wrapper must not invalidate saves.
+            var matches = objects.Where(pair => pair.Value != null && !claimed.Contains(pair.Value))
+                .Select(pair => new { pair.Value, Score = MatchingPathSuffix(id, pair.Key) })
+                .Where(match => match.Score > 0).OrderByDescending(match => match.Score).ToArray();
+            if (matches.Length == 0 || (matches.Length > 1 && matches[0].Score == matches[1].Score)) continue;
+            var match = matches[0];
+            string candidateId = match.Value.GetComponent<WorldSaveIdentity>().Id;
+            if (ids.Any(other => other != id && (!objects.TryGetValue(other, out var otherObject) || otherObject == null) &&
+                MatchingPathSuffix(other, candidateId) >= match.Score)) continue;
+            objects[id] = match.Value;
+            match.Value.GetComponent<WorldSaveIdentity>().Id = id;
+            claimed.Add(match.Value);
+        }
+        // Capture removals using the same identities as the migrated objects.
+        for (int i = 0; i < authoredContainers.Count; i++)
+            if (objects.TryGetValue(authoredContainers[i], out var go) && go != null)
+                authoredContainers[i] = go.GetComponent<WorldSaveIdentity>().Id;
+    }
+    private static int MatchingPathSuffix(string first, string second)
+    {
+        if (!second.StartsWith("scene:", StringComparison.Ordinal)) return 0;
+        var a = first.Substring(6).Split('/'); var b = second.Substring(6).Split('/');
+        int count = 0;
+        while (count < a.Length && count < b.Length && a[a.Length - 1 - count] == b[b.Length - 1 - count]) count++;
+        return count;
     }
     private static void SetPose(Transform target, Vector3 position, Quaternion rotation, Vector3 worldScale)
     {
