@@ -32,6 +32,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     private float decisionAt, fleeUntil, hitAt = -10f, nextHit, deathAt = -1f, nextSound;
     private NavMeshPath path;
     public bool IsDead => deathAt >= 0f;
+    public GameObject LastDrop { get; private set; }
     public static bool AxeDiscovered => BuriedFind.WasFound(SaveSystem.Data, PlayerCombatTools.AxeFindId) ||
         BuriedFind.WasFound(SaveSystem.Data, PlayerCombatTools.LegacyAxeFindId);
 
@@ -161,7 +162,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             foreach(var c in GetComponentsInChildren<Collider>())c.enabled=false;
             if(animator)animator.enabled=false;
             if(deathSound)audioSource.PlayOneShot(deathSound);
-            if(dropPrefab)Instantiate(dropPrefab,transform.position+Vector3.up*.15f,Quaternion.identity);
+            if(dropPrefab)LastDrop=Instantiate(dropPrefab,transform.position+Vector3.up*.15f,Quaternion.identity);
             Died?.Invoke();
         }
         return true;

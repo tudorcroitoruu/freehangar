@@ -81,6 +81,22 @@ public static class SaveSystem
         return purchased;
     }
 
+    public static bool TryPurchaseDogUpgrade(int price, int expectedLevel)
+    {
+        return ApplyUpgradePurchase(data =>
+        {
+            int level = Mathf.Clamp(data.dogLevel, 1, 5);
+            if (level != expectedLevel || level >= 5 || price <= 0) return false;
+            bool voucher = data.freeUpgradeVouchers > 0;
+            if (!voucher && data.cash < price) return false;
+            if (voucher) data.freeUpgradeVouchers--;
+            else data.cash -= price;
+            data.dogLevel = level + 1;
+            data.dogRestSeconds = Mathf.Min(data.dogRestSeconds, FarmDog.HuntInterval(data.dogLevel));
+            return true;
+        });
+    }
+
     public static bool TryPurchaseVehicleUpgrade(string id, int price, int expectedLevel, int maxLevel)
     {
         return ApplyUpgradePurchase(data => data.TryUpgradeVehicle(id, price, expectedLevel, maxLevel));
@@ -424,6 +440,10 @@ public class PlayerData
     public List<int> openedHangars = new List<int> { 1 };
     public bool firstHangarHalfCleared;
     public bool hangar2ChickenDefeated;
+    [Header("Dog")]
+    public int dogLevel = 1;
+    public float dogRestSeconds;
+    public bool dogHasDelivery;
     public List<float> hangarClearedPercent = new List<float>();
 
     public bool IsHangarOpen(int number) => number >= 1 && number <= 5 &&
