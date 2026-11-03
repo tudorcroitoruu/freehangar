@@ -46,6 +46,7 @@ public static class SaveSystem
     public static bool TryOpenHangar(int number)
     {
         if (!savesLoaded || Data == null || !Data.TryOpenHangar(number)) return false;
+        GoalChecker.ReportValue(GoalType.HangarUnlocked, 1, number);
         MoneyChanged?.Invoke(Money);
         HangarProgressChanged?.Invoke();
         return true;
@@ -61,6 +62,7 @@ public static class SaveSystem
     public static bool TryRecordHangarClearance(int hangar, float clearedPercent)
     {
         if (!savesLoaded || Data == null || !Data.TryRecordHangarClearance(hangar, clearedPercent)) return false;
+        GoalChecker.ReportValue(GoalType.HangarCleared, Data.GetHangarClearedPercent(hangar), hangar);
         HangarProgressChanged?.Invoke();
         return true;
     }
@@ -84,7 +86,16 @@ public static class SaveSystem
 
     public static bool TryPurchaseVehicle(VehicleUpgradeSettings settings, string currentId)
     {
-        return settings != null && ApplyUpgradePurchase(data => settings.TryPurchase(data, currentId));
+        bool purchased = settings != null && ApplyUpgradePurchase(data => settings.TryPurchase(data, currentId));
+        if (purchased) RecordGoalUpgrade(GoalUpgradeType.LargerTruck);
+        return purchased;
+    }
+
+    private static void RecordGoalUpgrade(GoalUpgradeType type)
+    {
+        Data.purchasedGoalUpgrades ??= new List<GoalUpgradeType>();
+        if (!Data.purchasedGoalUpgrades.Contains(type)) Data.purchasedGoalUpgrades.Add(type);
+        GoalChecker.ReportValue(GoalType.UpgradePurchased, 1, upgradeType: type);
     }
 
     public static bool TryPurchaseUpgrade(int price, Func<PlayerData, bool> apply, out bool usedVoucher)
@@ -120,6 +131,7 @@ public static class SaveSystem
     public static bool TryBuyProduct(string productID, int price)
     {
         if (Data == null || !Data.TryBuyProduct(productID, price)) return false;
+        if (productID == "largeBag") RecordGoalUpgrade(GoalUpgradeType.LargerSack);
         MoneyChanged?.Invoke(Money);
         OwnedProductsChanged?.Invoke();
         return true;
@@ -139,6 +151,7 @@ public static class SaveSystem
         if (Data == null || string.IsNullOrWhiteSpace(productID) || price < 0 || Data.cash < price ||
             tryDeliver == null || !tryDeliver()) return false;
         Data.cash -= price;
+        if (productID == "largeBag") RecordGoalUpgrade(GoalUpgradeType.LargerSack);
         MoneyChanged?.Invoke(Money);
         return true;
     }
@@ -473,6 +486,7 @@ public class PlayerData
     public int staminaUpgradeLevel;
     public List<VehicleUpgradeSave> vehicleUpgrades = new List<VehicleUpgradeSave>();
     public List<string> unlockedVehicles = new List<string>();
+    public List<GoalUpgradeType> purchasedGoalUpgrades = new List<GoalUpgradeType>();
 
     public int GetVehicleUpgradeLevel(string id)
     {

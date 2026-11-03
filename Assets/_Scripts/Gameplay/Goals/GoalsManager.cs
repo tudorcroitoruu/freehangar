@@ -44,6 +44,7 @@ public class GoalsManager : MonoBehaviour
             return;
         }
         Instance = this;
+        initialized = false;
         GoalChecker.ActionReported += ProcessAction;
         RefreshNavigationIndicators();
     }
@@ -80,8 +81,10 @@ public class GoalsManager : MonoBehaviour
         {
             if (!progress.TryGetValue(goal.goalId, out var saved))
                 progress.Add(goal.goalId, saved = new GoalSettingsSave { goalId = goal.goalId });
-            if (goal.goalType == GoalType.UpgradePurchased && goal.upgradeType == GoalUpgradeType.Shovel &&
-                data.shovelUpgradeLevel > 0) saved.currentAmount = goal.goalAmount;
+            if (goal.progressMode != GoalProgressMode.SinceActivation &&
+                GoalChecker.TryGetSavedValue(goal, data, out float savedValue))
+                saved.currentAmount = goal.progressMode == GoalProgressMode.CurrentValue
+                    ? savedValue : Mathf.Max(saved.currentAmount, savedValue);
             if (!float.IsFinite(saved.currentAmount)) saved.currentAmount = 0;
             saved.currentAmount = saved.completed ? goal.goalAmount : Mathf.Clamp(saved.currentAmount, 0, goal.goalAmount);
             if (!saved.completed) saved.rewardClaimed = false;
@@ -167,7 +170,8 @@ public class GoalsManager : MonoBehaviour
     {
         RefreshNavigationIndicators();
         if (Application.isPlaying && currentElement == null && goalListElementPrefab != null)
-            currentElement = Instantiate(goalListElementPrefab, transform);
+            currentElement = Instantiate(goalListElementPrefab,
+                goalListElementParent != null ? goalListElementParent : transform, false);
         if (currentElement != null)
         {
             currentElement.gameObject.SetActive(currentGoal != null);
@@ -220,7 +224,7 @@ public class GoalSettings
     [Tooltip("Optional scene object with HUDNavigationElement. Active only while this goal is current.")]
     public GameObject navigationIndicator;
     public GoalStage stage;
-    [Tooltip("Target hangar, numbered 1 through 5. Zero means any hangar.")]
+    [Tooltip("Target hangar, numbered 1 through 5. Zero means any hangar. Ignored for GrainCollected, GrainLoaded, GrainSold and GrainMoved, which count global kg.")]
     [Range(0, 5)] public int hangarId;
     public GoalType goalType;
     [Tooltip("Disabled: count all grain types together, including mixed-grain hangars. Enabled: count only grainType.")]
@@ -252,7 +256,7 @@ public enum GoalType
     BuyerReached = 11,
     GrainSold = 12,
     UpgradePurchased = 13,
-    GrainDelivered = 14,
+    // Value 14 is retired; keep subsequent IDs stable for serialized scenes and prefabs.
     GrainMoved = 15,
     HangarCleared = 16,
     HangarKeyCollected = 17,

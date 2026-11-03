@@ -37,7 +37,7 @@ public static class GoalChecker
     {
         if (goal == null || saved == null || saved.completed || !IsValid(action) ||
             goal.goalType != action.type ||
-            (goal.hangarId > 0 && goal.hangarId != action.hangarId) ||
+            (!IsGlobalGrainQuantity(goal.goalType) && goal.hangarId > 0 && goal.hangarId != action.hangarId) ||
             (goal.filterByGrainType && (!action.grainType.HasValue || goal.grainType != action.grainType.Value)) ||
             (goal.goalType == GoalType.UpgradePurchased && goal.upgradeType != action.upgradeType) ||
             (goal.goalType == GoalType.Custom && goal.goalId != action.goalId) ||
@@ -55,6 +55,41 @@ public static class GoalChecker
         if (saved.currentAmount == next) return false;
         saved.currentAmount = next;
         return true;
+    }
+
+    public static bool IsGlobalGrainQuantity(GoalType type) =>
+        type == GoalType.GrainCollected || type == GoalType.GrainLoaded ||
+        type == GoalType.GrainSold || type == GoalType.GrainMoved;
+
+    public static bool TryGetSavedValue(GoalSettings goal, PlayerData data, out float value)
+    {
+        value = 0;
+        if (goal == null || data == null) return false;
+        switch (goal.goalType)
+        {
+            case GoalType.HangarCleared:
+                if (goal.hangarId < 1 || goal.hangarId > 5) return false;
+                value = data.GetHangarClearedPercent(goal.hangarId);
+                return true;
+            case GoalType.HangarUnlocked:
+            case GoalType.HangarKeyCollected:
+                for (int hangar = 1; hangar <= 5; hangar++)
+                {
+                    if (goal.hangarId > 0 && goal.hangarId != hangar) continue;
+                    bool found = goal.goalType == GoalType.HangarUnlocked ? data.IsHangarOpen(hangar) :
+                        Array.IndexOf(data.foundSecrets ?? Array.Empty<string>(), HangarKeyDoor.KeyFor(hangar)) >= 0;
+                    if (found) value++;
+                }
+                return true;
+            case GoalType.UpgradePurchased:
+                bool owned = data.purchasedGoalUpgrades?.Contains(goal.upgradeType) ?? false;
+                if (goal.upgradeType == GoalUpgradeType.Shovel) owned |= data.shovelUpgradeLevel > 0;
+                if (goal.upgradeType == GoalUpgradeType.LargerSack) owned |= data.GetOwnedProductCount("largeBag") > 0;
+                if (goal.upgradeType == GoalUpgradeType.LargerTruck) owned |= (data.unlockedVehicles?.Count ?? 0) > 0;
+                value = owned ? 1 : 0;
+                return true;
+            default: return false;
+        }
     }
 
     private static bool IsStateType(GoalType type) =>

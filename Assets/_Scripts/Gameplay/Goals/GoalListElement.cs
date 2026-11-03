@@ -19,7 +19,7 @@ public class GoalListElement : MonoBehaviour
             case GoalType.GrainCollected:
             case GoalType.SackFilled:
             case GoalType.GrainLoaded:
-            case GoalType.GrainDelivered:
+            case GoalType.GrainSold:
             case GoalType.GrainMoved: suffix = " kg"; break;
             default:
                 suffix = "";

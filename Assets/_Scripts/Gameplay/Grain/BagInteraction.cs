@@ -169,7 +169,7 @@ public sealed class BagInteraction : MonoBehaviour
         if (!WorldSaveRuntime.IsRestoring && bag.Kilograms > 0)
         {
             GoalChecker.ReportProgress(GoalType.SackLoaded);
-            GoalChecker.ReportProgress(GoalType.GrainLoaded, bag.Kilograms);
+            GoalChecker.ReportProgress(GoalType.GrainLoaded, bag.Kilograms, grainType: bag.AcceptedGrain);
         }
         GameplayAudio.Instance?.Drop();
         return true;

@@ -20,10 +20,28 @@ public class GoalCheckerTests
     [Test]
     public void WrongActionOrHangarDoesNotCount()
     {
+        goal.goalType = GoalType.BagsFilled;
         Assert.IsFalse(GoalChecker.TryApply(goal, saved, new GoalAction(GoalType.GrainMoved, 10, 2), true));
-        Assert.IsFalse(GoalChecker.TryApply(goal, saved, new GoalAction(GoalType.GrainLoaded, 10, 1), true));
-        Assert.IsFalse(GoalChecker.TryApply(goal, saved, new GoalAction(GoalType.GrainLoaded, 10), true));
+        Assert.IsFalse(GoalChecker.TryApply(goal, saved, new GoalAction(goal.goalType, 10, 1), true));
+        Assert.IsFalse(GoalChecker.TryApply(goal, saved, new GoalAction(goal.goalType, 10), true));
         Assert.AreEqual(0, saved.currentAmount);
+    }
+
+    [TestCase(GoalType.GrainCollected)]
+    [TestCase(GoalType.GrainLoaded)]
+    [TestCase(GoalType.GrainSold)]
+    [TestCase(GoalType.GrainMoved)]
+    public void GlobalGrainQuantitiesIgnoreHangarAndKeepGrainFilter(GoalType type)
+    {
+        goal.goalType = type;
+        goal.filterByGrainType = true;
+        goal.grainType = GrainType.Wheat;
+        Assert.IsTrue(GoalChecker.TryApply(goal, saved, new GoalAction(type, 12.5f, 1, GrainType.Wheat), true));
+        Assert.IsTrue(GoalChecker.TryApply(goal, saved, new GoalAction(type, 20, 5, GrainType.Wheat), true));
+        Assert.IsTrue(GoalChecker.TryApply(goal, saved, new GoalAction(type, 7.5f, 0, GrainType.Wheat), true));
+        Assert.IsFalse(GoalChecker.TryApply(goal, saved, new GoalAction(type, 30, 2, GrainType.Corn), true));
+        Assert.IsFalse(GoalChecker.TryApply(goal, saved, new GoalAction(type, 30, 2), true));
+        Assert.AreEqual(40, saved.currentAmount);
     }
 
     [Test]
@@ -127,6 +145,71 @@ public class GoalCheckerTests
         goal.goalType = GoalType.Custom;
         Assert.IsFalse(GoalChecker.TryApply(goal, saved, new GoalAction(goal.goalType, 1, 2), true));
         Assert.IsTrue(GoalChecker.TryApply(goal, saved, new GoalAction(goal.goalType, 1, 2, goalId: goal.goalId), true));
+    }
+
+    [TestCase(GoalType.HangarKeyCollected)]
+    [TestCase(GoalType.HangarUnlocked)]
+    public void HangarMilestonesRequireStateReportsAndMatchingHangar(GoalType type)
+    {
+        goal.goalType = type;
+        goal.progressMode = GoalProgressMode.CurrentValue;
+        goal.goalAmount = 1;
+        Assert.IsFalse(GoalChecker.TryApply(goal, saved, new GoalAction(type, 1, 2), true));
+        Assert.IsFalse(GoalChecker.TryApply(goal, saved, new GoalAction(type, 1, 3, isValue: true), true));
+        Assert.IsTrue(GoalChecker.TryApply(goal, saved, new GoalAction(type, 1, 2, isValue: true), true));
+    }
+
+    [Test]
+    public void SavedHangarStateKeepsKeyCollectionSeparateFromOpening()
+    {
+        var data = new PlayerData { foundSecrets = new[] { "farm.hangar.key.2" } };
+        goal.goalType = GoalType.HangarKeyCollected;
+        Assert.IsTrue(GoalChecker.TryGetSavedValue(goal, data, out float key));
+        Assert.AreEqual(1, key);
+        goal.goalType = GoalType.HangarUnlocked;
+        Assert.IsTrue(GoalChecker.TryGetSavedValue(goal, data, out float closed));
+        Assert.AreEqual(0, closed);
+        data.TryOpenHangar(2);
+        Assert.IsTrue(GoalChecker.TryGetSavedValue(goal, data, out float opened));
+        Assert.AreEqual(1, opened);
+    }
+
+    [Test]
+    public void ClearanceStateRestoresTheSelectedHangarPercentage()
+    {
+        var data = new PlayerData();
+        data.TryRecordHangarClearance(1, 100);
+        data.TryRecordHangarClearance(2, 75);
+        goal.goalType = GoalType.HangarCleared;
+        Assert.IsTrue(GoalChecker.TryGetSavedValue(goal, data, out float value));
+        Assert.AreEqual(75, value);
+    }
+
+    [TestCase(GoalUpgradeType.LargerSack)]
+    [TestCase(GoalUpgradeType.LargerTruck)]
+    public void PurchasedUpgradesRemainCompleteWithoutPickupStock(GoalUpgradeType type)
+    {
+        var data = new PlayerData();
+        data.purchasedGoalUpgrades.Add(type);
+        goal.goalType = GoalType.UpgradePurchased;
+        goal.upgradeType = type;
+        Assert.IsTrue(GoalChecker.TryGetSavedValue(goal, data, out float value));
+        Assert.AreEqual(1, value);
+        Assert.AreEqual(0, data.GetOwnedProductCount("largeBag"));
+    }
+
+    [Test]
+    public void LegacyVehicleAndShovelPurchasesRestoreUpgradeState()
+    {
+        var data = new PlayerData { shovelUpgradeLevel = 1 };
+        data.unlockedVehicles.Add("motoroller");
+        goal.goalType = GoalType.UpgradePurchased;
+        goal.upgradeType = GoalUpgradeType.Shovel;
+        Assert.IsTrue(GoalChecker.TryGetSavedValue(goal, data, out float shovel));
+        Assert.AreEqual(1, shovel);
+        goal.upgradeType = GoalUpgradeType.LargerTruck;
+        Assert.IsTrue(GoalChecker.TryGetSavedValue(goal, data, out float vehicle));
+        Assert.AreEqual(1, vehicle);
     }
 }
 

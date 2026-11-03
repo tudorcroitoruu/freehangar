@@ -146,9 +146,17 @@ public class SellingScreen : MonoBehaviour
         else if (cashInClip != null)
             GlobalManager.PlaySound3D(cashInClip, Vector3.zero, .8f, 0f, cashInMixerGroup);
         GameAchievements.GrainSold(quotedCash);
+        var soldQuantities = new Dictionary<GrainType, float>();
+        foreach (var entry in quotedWeights)
+        {
+            var grain = quotedTypes[entry.Key];
+            soldQuantities.TryGetValue(grain, out float kilograms);
+            soldQuantities[grain] = kilograms + entry.Value;
+        }
         SoldCargoAnimation.Begin(containers);
         // Report only paid sales, after cargo is excluded from world saves.
-        GoalChecker.ReportProgress(GoalType.GrainSold, 1);
+        foreach (var entry in soldQuantities)
+            GoalChecker.ReportProgress(GoalType.GrainSold, entry.Value, grainType: entry.Key);
         GoalChecker.ReportProgress(GoalType.MoneyEarned, quotedCash);
         Close();
     }

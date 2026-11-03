@@ -59,7 +59,6 @@ public sealed class HangarKeyDoor : MonoBehaviour, IInteractable
         if (grainVisibility != null) grainVisibility.SetHangarOpen(true);
         RefreshLabel();
         DiscoveryBurst.Play(unlockEffect, transform.position, $"HANGAR {hangarNumber} UNLOCKED", interactor != null ? interactor.GetComponentInChildren<Camera>() : null);
-        GoalChecker.ReportProgress(GoalType.HangarUnlocked, 1, hangarNumber);
         return true;
     }
     private void RefreshLabel()

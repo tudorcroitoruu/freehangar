@@ -225,7 +225,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         Array.Resize(ref data.foundSecrets, index + 1);
         data.foundSecrets[index] = findId;
         SaveSystem.SaveData();
-        if (kind == Kind.HangarKey) GoalChecker.ReportProgress(GoalType.HangarKeyCollected, 1, targetHangar);
+        if (kind == Kind.HangarKey) GoalChecker.ReportValue(GoalType.HangarKeyCollected, 1, targetHangar);
         return true;
     }
 
