@@ -11,7 +11,8 @@ public enum WarningType
     BlockHangarEntry,
     VehicleFull,
     BlockVehicleExit,
-    OccupiedHands
+    OccupiedHands,
+    OccupiedArea
 }
 public class WarningPopup : MonoBehaviour
 {

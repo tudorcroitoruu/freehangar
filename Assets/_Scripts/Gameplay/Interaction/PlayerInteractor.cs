@@ -64,7 +64,7 @@ public sealed class PlayerInteractor : MonoBehaviour
             if (aimedTarget is BicycleController) AddResetAction(ref aimedPrompt);
         }
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
-        if (hasAimedPrompt && aimedPrompt.RequiresFreeHands)
+        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull))
         {
             Target = aimedTarget;
             SetHighlightedTarget(null);

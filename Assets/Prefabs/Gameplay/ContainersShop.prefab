@@ -2277,6 +2277,12 @@ MonoBehaviour:
   objectPrefab: {fileID: 6691740664109452445, guid: 0e1bd387d12bf994e93017e2686bb315, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
+  objectSpawnHolder: {fileID: 0}
+  spawnAreaSize: {x: 1, y: 1, z: 1}
+  spawnAreaOffset: {x: 0, y: 0.55, z: 0}
+  spawnBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   inventoryManager: {fileID: 0}
   maxActiveInScene: 16
 --- !u!114 &490652140599849361
@@ -3259,6 +3265,12 @@ MonoBehaviour:
   objectPrefab: {fileID: 7210842097477428087, guid: eb731e91ae410754ebc5f7596c6cbf2e, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
+  objectSpawnHolder: {fileID: 0}
+  spawnAreaSize: {x: 1, y: 1, z: 1}
+  spawnAreaOffset: {x: 0, y: 0.55, z: 0}
+  spawnBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   inventoryManager: {fileID: 0}
   maxActiveInScene: 16
 --- !u!114 &7951159114804894031
@@ -3465,8 +3477,14 @@ MonoBehaviour:
   requiredHangar: 5
   requiredClearedPercent: 50
   objectPrefab: {fileID: 1521085326205624577, guid: e081f75f0718b8f418e7a58f44bd497e, type: 3}
-  deliveryMode: 0
+  deliveryMode: 1
   spawnPoint: {fileID: 2099837709319181489}
+  objectSpawnHolder: {fileID: 5725461765521348851}
+  spawnAreaSize: {x: 1.5, y: 2, z: 1.5}
+  spawnAreaOffset: {x: 0, y: 1, z: 0}
+  spawnBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   inventoryManager: {fileID: 0}
   maxActiveInScene: 16
 --- !u!114 &9172195714476993290
@@ -4039,6 +4057,12 @@ MonoBehaviour:
   objectPrefab: {fileID: 6347959474882097887, guid: 74ea987079d2f16479c245f3ebeddb46, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
+  objectSpawnHolder: {fileID: 0}
+  spawnAreaSize: {x: 1, y: 1, z: 1}
+  spawnAreaOffset: {x: 0, y: 0.55, z: 0}
+  spawnBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   inventoryManager: {fileID: 0}
   maxActiveInScene: 16
 --- !u!114 &7171237466457534776
@@ -4774,6 +4798,12 @@ MonoBehaviour:
   objectPrefab: {fileID: 30410232912704535, guid: ab8b6d4aaac96504497dff8c04cb7891, type: 3}
   deliveryMode: 0
   spawnPoint: {fileID: 0}
+  objectSpawnHolder: {fileID: 0}
+  spawnAreaSize: {x: 1, y: 1, z: 1}
+  spawnAreaOffset: {x: 0, y: 0.55, z: 0}
+  spawnBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   inventoryManager: {fileID: 0}
   maxActiveInScene: 16
 --- !u!114 &3058034376239356345
@@ -6577,15 +6607,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: TFP_Wooden_Pallet_02B
       objectReference: {fileID: 0}
-    - target: {fileID: 2485417223682031626, guid: e8e79e1e52c656c429c2c255b297a020, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8e79e1e52c656c429c2c255b297a020, type: 3}
+--- !u!1 &5725461765521348851 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2485417223682031626, guid: e8e79e1e52c656c429c2c255b297a020, type: 3}
+  m_PrefabInstance: {fileID: 7856834045493090553}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5725461765521442003 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2485417223681940522, guid: e8e79e1e52c656c429c2c255b297a020, type: 3}

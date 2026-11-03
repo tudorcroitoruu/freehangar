@@ -39,6 +39,14 @@ public class ShopProduct : MonoBehaviour, IInteractable
     [SerializeField] private DeliveryMode deliveryMode = DeliveryMode.Hands;
     [SerializeField, Tooltip("Required when Delivery Mode is At Spawn Point.")]
     private Transform spawnPoint;
+
+    [SerializeField] private GameObject objectSpawnHolder;
+    [SerializeField, Tooltip("Delivery clearance box in spawn point local axes. Keep its bottom above the floor.")]
+    private Vector3 spawnAreaSize = Vector3.one;
+    [SerializeField] private Vector3 spawnAreaOffset = new Vector3(0f, .55f, 0f);
+    [SerializeField] private LayerMask spawnBlockingLayers = ~0;
+    private readonly Collider[] spawnOverlaps = new Collider[64];
+    private float nextSpawnAreaCheck;
     [SerializeField, Tooltip("Optional. Automatically finds a shared manager, including on a disabled inventory depot.")]
     private InventoryManager inventoryManager;
     [SerializeField, Min(0), Tooltip("Maximum active instances of this product ID in the scene. Zero disables the limit.")]
@@ -60,6 +68,67 @@ public class ShopProduct : MonoBehaviour, IInteractable
             if (pricingShop == null) pricingShop = GetComponentInParent<ShopManager>(true);
             return pricingShop != null ? pricingShop.ProductPrefab(productID, objectPrefab) : objectPrefab;
         }
+    }
+
+    private void OnEnable() => RefreshSpawnHolder();
+
+    private void Update()
+    {
+        if (deliveryMode != DeliveryMode.AtSpawnPoint || objectSpawnHolder == null ||
+            Time.unscaledTime < nextSpawnAreaCheck) return;
+        nextSpawnAreaCheck = Time.unscaledTime + .1f;
+        RefreshSpawnHolder();
+    }
+
+    private Vector3 SpawnAreaHalfSize => new Vector3(
+        Mathf.Max(.01f, spawnAreaSize.x), Mathf.Max(.01f, spawnAreaSize.y), Mathf.Max(.01f, spawnAreaSize.z)) * .5f;
+
+    private Vector3 SpawnAreaCenter => spawnPoint.position + spawnPoint.rotation * spawnAreaOffset;
+
+    private bool IsSpawnAreaClear()
+    {
+        if (spawnPoint == null) return false;
+        Physics.SyncTransforms();
+        int count = Physics.OverlapBoxNonAlloc(SpawnAreaCenter, SpawnAreaHalfSize, spawnOverlaps,
+            spawnPoint.rotation, spawnBlockingLayers, QueryTriggerInteraction.Ignore);
+        // A full buffer may omit a blocker, so treat it as occupied.
+        if (count == spawnOverlaps.Length) return false;
+        for (int i = 0; i < count; i++)
+        {
+            var hit = spawnOverlaps[i];
+            if (hit == null || (objectSpawnHolder != null && hit.transform.IsChildOf(objectSpawnHolder.transform))) continue;
+            return false;
+        }
+        return true;
+    }
+
+    private void RefreshSpawnHolder()
+    {
+        if (objectSpawnHolder == null) return;
+        bool visible = deliveryMode == DeliveryMode.AtSpawnPoint && IsSpawnAreaClear();
+        if (objectSpawnHolder.activeSelf != visible) objectSpawnHolder.SetActive(visible);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (deliveryMode != DeliveryMode.AtSpawnPoint || spawnPoint == null) return;
+        Matrix4x4 previousMatrix = Gizmos.matrix;
+        Color previousColor = Gizmos.color;
+        Gizmos.matrix = Matrix4x4.TRS(SpawnAreaCenter, spawnPoint.rotation, Vector3.one);
+        Gizmos.color = new Color(0f, 1f, 1f, .12f);
+        Gizmos.DrawCube(Vector3.zero, SpawnAreaHalfSize * 2f);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireCube(Vector3.zero, SpawnAreaHalfSize * 2f);
+        Gizmos.matrix = Matrix4x4.identity;
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(spawnPoint.position, .1f);
+        Gizmos.DrawLine(spawnPoint.position, SpawnAreaCenter);
+#if UNITY_EDITOR
+        UnityEditor.Handles.Label(SpawnAreaCenter + Vector3.up * (SpawnAreaHalfSize.y + .15f),
+            $"{productName} - Spawn area");
+#endif
+        Gizmos.matrix = previousMatrix;
+        Gizmos.color = previousColor;
     }
 
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
@@ -87,6 +156,12 @@ public class ShopProduct : MonoBehaviour, IInteractable
     public bool TryInteract(PlayerInteractor interactor)
     {
         if (!isActiveAndEnabled || !toBuy) return false;
+        if (deliveryMode == DeliveryMode.AtSpawnPoint && spawnPoint != null && !IsSpawnAreaClear())
+        {
+            GameplayCanvas.Instance?.ShowWarning(WarningType.OccupiedArea);
+            GameplayAudio.Instance?.UpgradeResult(false);
+            return false;
+        }
         bool purchased = CanDeliver(interactor, out _) && SaveSystem.TryBuyProduct(productID, Price, () => TryDeliver(interactor));
         GameplayAudio.Instance?.UpgradeResult(purchased);
         return purchased;
@@ -104,7 +179,7 @@ public class ShopProduct : MonoBehaviour, IInteractable
             inventoryManager = FindFirstObjectByType<InventoryManager>(FindObjectsInactive.Include);
         if (prefab == null || inventoryManager == null || string.IsNullOrWhiteSpace(productID) ||
             !inventoryManager.CanSpawn(productID, maxActiveInScene)) return false;
-        if (deliveryMode == DeliveryMode.AtSpawnPoint) return spawnPoint != null;
+        if (deliveryMode == DeliveryMode.AtSpawnPoint) return IsSpawnAreaClear();
 
         var container = prefab.GetComponent<GrainContainer>();
         if (container != null && !container.CanBeCarried) return false;
@@ -119,10 +194,13 @@ public class ShopProduct : MonoBehaviour, IInteractable
     {
         var prefab = ProductPrefab;
         if (prefab == null) return false;
+        if (deliveryMode == DeliveryMode.AtSpawnPoint && !IsSpawnAreaClear())
+        {
+            if (spawnPoint != null) GameplayCanvas.Instance?.ShowWarning(WarningType.OccupiedArea);
+            return false;
+        }
         var point = spawnPoint != null ? spawnPoint : transform;
-        // Preserve the authored axis correction of sacks when delivering to hands.
-        var rotation = deliveryMode == DeliveryMode.Hands ? prefab.transform.rotation : point.rotation;
-        var instance = Instantiate(prefab, point.position, rotation);
+        var instance = Instantiate(prefab, point.position, prefab.transform.rotation);
         if (instance == null) return false;
         // Track the purchased scene object; a failed handoff unregisters it below.
         var registration = inventoryManager.RegisterInstance(instance, productID, maxActiveInScene);
@@ -131,7 +209,11 @@ public class ShopProduct : MonoBehaviour, IInteractable
             Destroy(instance);
             return false;
         }
-        if (deliveryMode == DeliveryMode.AtSpawnPoint) return true;
+        if (deliveryMode == DeliveryMode.AtSpawnPoint)
+        {
+            if (objectSpawnHolder != null) objectSpawnHolder.SetActive(false);
+            return true;
+        }
 
         if (instance.GetComponent<IInteractable>() == null) instance.AddComponent<CarryableItem>();
         var container = instance.GetComponent<GrainContainer>();

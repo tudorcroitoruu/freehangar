@@ -5,6 +5,68 @@ using UnityEngine;
 public class ShopPurchaseTests
 {
     [Test]
+    public void OccupiedSpawnAreaBlocksPaymentAndHolderReturnsAfterCargoLeaves()
+    {
+        var previousData = SaveSystem.Data;
+        var root = new GameObject("Shop spawn clearance test");
+        root.transform.SetPositionAndRotation(new Vector3(20000, 300, 20000), Quaternion.Euler(0, 35, 0));
+        var manager = root.AddComponent<InventoryManager>();
+        var prefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        prefab.transform.position = root.transform.position + Vector3.right * 20;
+        var holder = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        holder.transform.SetParent(root.transform, false);
+        holder.transform.localPosition = Vector3.up * .55f;
+        var blocker = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        blocker.transform.SetParent(root.transform, false);
+        blocker.transform.localPosition = Vector3.right * 10;
+        try
+        {
+            SaveSystem.Data = new PlayerData { cash = 300 };
+            var shop = root.AddComponent<ShopProduct>();
+            ConfigureShop(shop, manager, prefab);
+            SetShopField(shop, "objectSpawnHolder", holder);
+            const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            var refresh = typeof(ShopProduct).GetMethod("RefreshSpawnHolder", flags);
+            refresh.Invoke(shop, null);
+            Assert.IsTrue(holder.activeSelf, "The marker's own collider must not block delivery.");
+
+            blocker.transform.localPosition = Vector3.up * .55f;
+            refresh.Invoke(shop, null);
+            Assert.IsFalse(holder.activeSelf);
+            Assert.IsTrue(shop.TryGetPrompt(null, out var blockedPrompt));
+            Assert.IsTrue(blockedPrompt.ShowKey, "The buy action must remain reachable to show the occupied-area warning.");
+            Assert.IsFalse(shop.TryInteract(null));
+            Assert.AreEqual(300, SaveSystem.Money);
+            Assert.AreEqual(0, manager.SpawnedProducts.Count);
+
+            blocker.transform.localPosition = Vector3.right * 10;
+            refresh.Invoke(shop, null);
+            Assert.IsTrue(holder.activeSelf);
+            Assert.IsTrue(shop.TryInteract(null));
+            Assert.AreEqual(200, SaveSystem.Money);
+            Assert.IsFalse(holder.activeSelf);
+            refresh.Invoke(shop, null);
+            Assert.IsFalse(holder.activeSelf, "Delivered cargo must keep the marker hidden.");
+            Assert.IsFalse(shop.TryInteract(null), "A second purchase cannot overlap the first delivery.");
+            Assert.AreEqual(200, SaveSystem.Money);
+            Assert.AreEqual(1, manager.SpawnedProducts.Count);
+
+            manager.SpawnedProducts[0].transform.position += Vector3.forward * 10;
+            refresh.Invoke(shop, null);
+            Assert.IsTrue(holder.activeSelf);
+            Assert.IsTrue(shop.TryGetPrompt(null, out var clearPrompt));
+            Assert.IsTrue(clearPrompt.ShowKey);
+        }
+        finally
+        {
+            DestroyDeliveredProducts(manager);
+            Object.DestroyImmediate(prefab);
+            Object.DestroyImmediate(root);
+            SaveSystem.Data = previousData;
+        }
+    }
+
+    [Test]
     public void PurchaseWithExactMoneyAddsOneProduct()
     {
         var data = new PlayerData { cash = 100 };
@@ -285,7 +347,7 @@ public class ShopPurchaseTests
             {
                 Assert.IsFalse(carrier.IsCarrying);
                 Assert.AreEqual(root.transform.position, instance.transform.position);
-                Assert.That(Quaternion.Angle(root.transform.rotation, instance.transform.rotation), Is.LessThan(.01f));
+                Assert.That(Quaternion.Angle(prefab.transform.rotation, instance.transform.rotation), Is.LessThan(.01f));
             }
         }
         finally
