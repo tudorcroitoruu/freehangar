@@ -11,6 +11,7 @@ public struct InteractionPromptData
     public InteractionPromptAction[] AdditionalActions;
     public bool RequiresFreeHands;
     public bool VehicleFull;
+    public bool UseForkliftToMove;
     public bool ShowPrimaryButton;
     public bool ShowProgress;
     public float Progress;
@@ -27,6 +28,7 @@ public struct InteractionPromptData
         AdditionalActions = null;
         RequiresFreeHands = false;
         VehicleFull = false;
+        UseForkliftToMove = false;
         ShowPrimaryButton = false;
         ShowProgress = false;
         Progress = 0f;

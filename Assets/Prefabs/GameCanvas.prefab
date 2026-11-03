@@ -2582,6 +2582,10 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 0946ae989cb7f0b4b8a844f31f312b91, type: 3}
     title: Clear the delivery area
     message: There's no room to place the bag in the delivery area.
+  - warningType: 7
+    icon: {fileID: 21300000, guid: 9737fc54409396d46ae2e1a810bfb078, type: 3}
+    title: Use Forklift
+    message: Use forklift to move
   warningCanvasGroup: {fileID: 737507088087375577}
   warningImage: {fileID: 6193481453998981383}
   warningTitle: {fileID: 11493426258684311}

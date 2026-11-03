@@ -78,7 +78,7 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     public bool IsCarried { get; private set; }
     public bool IsBigBag => string.Equals(CargoTypeId,"BigBag",System.StringComparison.OrdinalIgnoreCase);
     public bool RequiresForklift => IsBigBag && kilograms > .001f;
-    public bool CanBeCarried => (canBeCarried || IsBigBag) && !RequiresForklift;
+    public bool CanBeCarried => canBeCarried && !RequiresForklift;
     public bool CanCarry => CanBeCarried && isActiveAndEnabled && !IsCarried && !IsClosing;
     public bool CanHandle => isActiveAndEnabled && sack != null && IsFull && !IsCarried;
 

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class ForkliftCargoTests
 {
-    [TestCase("BigBag",0f,true,false)]
-    [TestCase("BigBag",250f,false,false)]
+    [TestCase("BigBag",0f,true,true)]
+    [TestCase("BigBag",250f,false,true)]
     [TestCase("BigBag",500f,false,true)]
     [TestCase("SmallBag",500f,true,false)]
     [TestCase("Crate",500f,true,false)]
@@ -18,6 +18,14 @@ public class ForkliftCargoTests
             data.FindProperty("cargoTypeId").stringValue=type;data.FindProperty("capacityKg").floatValue=500;
             data.FindProperty("kilograms").floatValue=kilograms;data.ApplyModifiedPropertiesWithoutUndo();
             Assert.That(bag.CanCarry,Is.EqualTo(handCarry));Assert.That(ForkliftController.CanLift(bag),Is.EqualTo(lift));
+            data.Update();data.FindProperty("canBeCarried").boolValue=false;data.ApplyModifiedPropertiesWithoutUndo();
+            Assert.IsFalse(bag.CanBeCarried);
+            Assert.IsFalse(bag.CanCarry,"The carry flag must also apply to empty Big Bags.");
+            Assert.That(ForkliftController.CanLift(bag),Is.EqualTo(lift),"Hand-carry restrictions must not change forklift eligibility.");
+            var interaction=host.AddComponent<BagInteraction>();
+            Assert.IsTrue(interaction.TryGetPrompt(bag,out var prompt));
+            Assert.AreNotEqual("Take",prompt.Action);
+            Assert.IsFalse(prompt.ShowKey);
             bag.SetCarried(true);Assert.IsFalse(bag.CanCarry);Assert.IsFalse(ForkliftController.CanLift(bag));
         }
         finally{Object.DestroyImmediate(host);}
@@ -39,7 +47,15 @@ public class ForkliftCargoTests
             Assert.IsTrue(forklift.TryAutoLift(bag));Assert.IsTrue(bag.IsCarried);
             Assert.IsFalse(forklift.TryDrop(),"A missing floor must preserve the load.");Assert.AreSame(bag,forklift.Cargo);
             floor=GameObject.CreatePrimitive(PrimitiveType.Cube);floor.transform.position=root.transform.position+new Vector3(0,-.1f,2);floor.transform.localScale=new Vector3(10,.2f,10);Physics.SyncTransforms();
+            Vector3 releasePosition=bag.transform.position;
+            Quaternion releaseRotation=bag.transform.rotation;
             Assert.IsTrue(forklift.TryDrop());Assert.IsFalse(bag.IsCarried);Assert.IsNull(forklift.Cargo);
+            Assert.That(Vector3.Distance(releasePosition,bag.transform.position),Is.LessThan(.001f),"Release must preserve the bag's world position.");
+            Assert.That(Quaternion.Angle(releaseRotation,bag.transform.rotation),Is.LessThan(.001f));
+            Assert.IsNull(bag.transform.parent);
+            Assert.IsTrue(bag.GetComponent<Rigidbody>().useGravity);
+            Assert.IsFalse(bag.GetComponent<Rigidbody>().isKinematic);
+            Assert.IsTrue(bag.GetComponent<BoxCollider>().enabled);
             Assert.IsFalse(forklift.TryAutoLift(bag),"Dropping must not immediately reattach the same bag.");
         }
         finally{Object.DestroyImmediate(bagObject);Object.DestroyImmediate(root);if(floor!=null)Object.DestroyImmediate(floor);}

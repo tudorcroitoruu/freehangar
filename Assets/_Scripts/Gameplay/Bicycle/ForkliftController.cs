@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-/// <summary>One full big bag on the forks; uses the shared driving rig and its engine loop.</summary>
+/// <summary>One big bag at any fill level on the forks; uses the shared driving rig and its engine loop.</summary>
 [DefaultExecutionOrder(400), DisallowMultipleComponent, RequireComponent(typeof(BicycleController))]
 public sealed class ForkliftController : MonoBehaviour
 {
@@ -46,7 +46,7 @@ public sealed class ForkliftController : MonoBehaviour
     private readonly RaycastHit[] groundHits=new RaycastHit[32];
     private string blocked="";
     private float blockedUntil;
-    public static bool CanLift(GrainContainer bag) => bag!=null && bag.isActiveAndEnabled && bag.IsBigBag && bag.IsFull && bag.CanLoadOnVehicle && !bag.IsCarried;
+    public static bool CanLift(GrainContainer bag) => bag!=null && bag.isActiveAndEnabled && bag.IsBigBag && !bag.IsCarried;
     private void Awake(){rig=GetComponent<BicycleController>();vehicleColliders=GetComponentsInChildren<Collider>(true);}
     private bool AcceptInput => rig!=null && rig.IsRidden && Time.timeScale>0 && Application.isFocused && Cursor.lockState==CursorLockMode.Locked && !UpgradeManager.BlocksGameplayInput && !UIPopups.BasePopupUI.HasActivePopup;
     private void Update()
@@ -95,7 +95,7 @@ public sealed class ForkliftController : MonoBehaviour
         }
         if(!AcceptInput || forkAnchor==null)return;
         bool available=cargo!=null && !transferring;
-        string action=Time.time<blockedUntil?blocked:transferring?"Unloading big bag":cargo!=null?"Lower and drop big bag":"Approach a vehicle or drive forks under a full big bag";
+        string action=Time.time<blockedUntil?blocked:transferring?"Unloading big bag":cargo!=null?"Lower and drop big bag":"Approach a vehicle or drive forks under a big bag";
         var data=new InteractionPromptData(forkAnchor.position+Vector3.up*.8f,action,available){InteractionKey=KeyCode.Q};
         GameplayCanvas.Instance?.interactionPrompt?.Show(Camera.main,data);
     }
@@ -187,21 +187,22 @@ public sealed class ForkliftController : MonoBehaviour
     {
         if(cargo==null || forkAnchor==null || transferring)return false;
         Bounds bounds=cargo.WorldBounds;Vector3 half=bounds.extents;
-        Vector3 center=default;bool found=false;
-        // The floor or a truck bed can support the bag; the volume above must be clear.
+        Vector3 center=bounds.center;bool found=false;
+        // Check for support below, but release from the current position without snapping to it.
         Vector3 origin=new Vector3(bounds.center.x,bounds.max.y+.3f,bounds.center.z);
         int count=Physics.RaycastNonAlloc(origin,Vector3.down,groundHits,4f,~0,QueryTriggerInteraction.Ignore);
         float nearest=float.PositiveInfinity;
         for(int i=0;i<count;i++)
         {
             var hit=groundHits[i];if(Ignore(hit.collider) || hit.normal.y<.7f || hit.distance>=nearest)continue;
-            center=hit.point+Vector3.up*(half.y+.08f);nearest=hit.distance;found=true;
+            if(hit.point.y>bounds.min.y+.02f)return false;
+            nearest=hit.distance;found=true;
         }
         if(!found || count==groundHits.Length)return false;
         count=Physics.OverlapBoxNonAlloc(center,half*.98f,overlaps,Quaternion.identity,~0,QueryTriggerInteraction.Ignore);
         if(count==overlaps.Length)return false;
         for(int i=0;i<count;i++)if(!Ignore(overlaps[i]))return false;
-        var bag=cargo;bag.transform.SetParent(null,true);bag.transform.position+=center-bag.WorldBounds.center;
+        var bag=cargo;bag.transform.SetParent(null,true);
         foreach(var own in vehicleColliders)foreach(var other in cargoColliders)if(own!=null && other!=null)Physics.IgnoreCollision(own,other,false);
         for(int i=0;i<cargoColliders.Length;i++)if(cargoColliders[i]!=null)cargoColliders[i].enabled=originalColliderStates[i];
         lastDropped=bag;bag.SetCarried(false);cargoBody.mass=Mathf.Max(1,bag.Kilograms+1);cargoBody.useGravity=true;cargoBody.isKinematic=false;

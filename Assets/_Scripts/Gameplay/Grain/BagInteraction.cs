@@ -53,12 +53,14 @@ public sealed class BagInteraction : MonoBehaviour
         bool canFinish = shovelEquipped && bag.CanHandle && !bag.IsFinished;
         bool canCarry = bag.CanCarry || bag == carried;
         bool canPour = shovelEquipped && shovel != null && bag != carried && shovel.CanPourInto(bag);
+        bool useForklift = bag.IsBigBag && !canCarry && !canPour && !canFinish;
         string action = canPour ? "Fill" : bag == carried ? "Drop" : canFinish ? "Finish" : canCarry ? "Take" :
-            bag.RequiresForklift ? (bag.IsFull ? "Use forklift to move" : "Fill before lifting with forklift") : bag.IsFull ? "Full" : "Fill";
+            useForklift ? "" : bag.IsFull ? "Full" : "Fill";
         data = new InteractionPromptData(position, blocked ? "Make room to drop" : action,
             !canPour && (canFinish || canCarry) && !blocked);
         data.ShowProgress = !bag.IsFull;
         data.ShowPrimaryButton = canPour;
+        data.UseForkliftToMove = useForklift;
         var interactor = GetComponent<PlayerInteractor>();
         data.RequiresFreeHands = bag != carried && bag.CanCarry && !canFinish && !data.ShowPrimaryButton &&
             interactor != null && interactor.HandsOccupied;
