@@ -17,7 +17,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     [SerializeField, Min(.2f)] private float mediumDetailDistance = 4f;
     [Tooltip("Advisory kernel budget. Exceeding this never spreads kernels farther apart; surface coverage is preserved.")]
     [SerializeField, Range(10000, 1000000)] private int maximumSurfaceKernels = 500000;
-    public bool ExceedsKernelBudget => KernelCount > maximumSurfaceKernels;
+    public bool ExceedsKernelBudget => KernelCount + SideKernelCount > maximumSurfaceKernels;
     private Vector3 sampledScale;
     public float EffectiveSpacing { get; private set; }
     private bool rebuildRequested;
@@ -47,6 +47,12 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private IEnumerator<Matrix4x4> pendingCoverage;
     private readonly List<Matrix4x4> coverageMatrices = new List<Matrix4x4>();
     private int coverageCell;
+    private CoveragePatch[] edgePatches;
+    private Vector4[] edgeHeights;
+    private Matrix4x4 edgeTransform;
+    private float edgeSize;
+    private int nextEdge;
+    public int SideKernelCount { get; private set; }
     private sealed class CoveragePatch
     {
         public Matrix4x4[][] batches;
@@ -78,6 +84,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     {
         // Unity hot reload can restore flat arrays but not jagged draw batches. Rebuild them together.
         samples = null;
+        edgePatches = null;
         if (pile == null) pile = GetComponent<GrainPile>();
         Build();
         RenderPipelineManager.beginCameraRendering += Draw;
@@ -85,7 +92,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private void OnDisable() => RenderPipelineManager.beginCameraRendering -= Draw;
 
-    public void Rebuild() { samples = null; Build(); }
+    public void Rebuild() { samples = null; edgePatches = null; Build(); }
 
     private void Build()
     {
@@ -176,6 +183,65 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         CacheCells();
         uploadedRevision = -1;
         UploadSurface();
+    }
+
+    private void UpdateEdgeCoverage()
+    {
+        if (pile == null || !pile.IsDroppedPile || pile.DetectedWallCount > 0 || pile.VisualHeightField == null)
+        { edgePatches=null;SideKernelCount=0;return; }
+        var field = pile.VisualHeightField;
+        int n = field.Resolution, edgeCount = (n - 1) * 4;
+        if (edgePatches == null || edgePatches.Length != edgeCount || edgeSize != field.Size || edgeTransform != transform.localToWorldMatrix)
+        {
+            edgePatches = new CoveragePatch[edgeCount]; edgeHeights = new Vector4[edgeCount];
+            for(int i=0;i<edgeCount;i++) edgeHeights[i]=Vector4.one*float.MinValue;
+            edgeTransform=transform.localToWorldMatrix;edgeSize=field.Size;nextEdge=0;SideKernelCount=0;
+        }
+        // Keep updates bounded while pouring; unchanged sides reuse their instance batches.
+        for (int work=0;work<Mathf.Min(8,edgeCount);work++)
+        {
+            int edge=nextEdge++%edgeCount, i=edge/4, a,b;
+            switch(edge%4)
+            {
+                case 0:a=i+1;b=i;break;
+                case 1:a=i*n;b=(i+1)*n;break;
+                case 2:a=(n-1)*n+i;b=a+1;break;
+                default:a=(i+1)*n+n-1;b=i*n+n-1;break;
+            }
+            var heights=new Vector4(field.Heights[a],field.Heights[b],pile.GroundOffset(a),pile.GroundOffset(b));
+            if((heights-edgeHeights[edge]).sqrMagnitude<.000001f)continue;
+            edgeHeights[edge]=heights;
+            if(edgePatches[edge]!=null)SideKernelCount-=edgePatches[edge].count;
+            edgePatches[edge]=null;
+            if(Mathf.Max(heights.x,heights.y)*pile.WorldScale.y<=.045f)continue;
+            Vector3 localA=new Vector3(a%n*field.Spacing-field.Size*.5f,heights.z,a/n*field.Spacing-field.Size*.5f);
+            Vector3 localB=new Vector3(b%n*field.Spacing-field.Size*.5f,heights.w,b/n*field.Spacing-field.Size*.5f);
+            Vector3 bottomA=transform.TransformPoint(localA),bottomB=transform.TransformPoint(localB);
+            Vector3 topA=transform.TransformPoint(localA+Vector3.up*heights.x),topB=transform.TransformPoint(localB+Vector3.up*heights.y);
+            Vector3 normal=Vector3.Cross(Vector3.down,topB-topA).normalized;
+            var matrices=new List<Matrix4x4>();var random=new System.Random(913+edge);
+            AddSideTriangle(topA,bottomA,topB,normal,random,matrices);
+            AddSideTriangle(topB,bottomA,bottomB,normal,random,matrices);
+            if(matrices.Count==0)continue;
+            var patch=new CoveragePatch{count=matrices.Count,bounds=new Bounds(topA,Vector3.zero),batches=new Matrix4x4[(matrices.Count+1022)/1023][]};
+            patch.bounds.Encapsulate(topB);patch.bounds.Encapsulate(bottomA);patch.bounds.Encapsulate(bottomB);patch.bounds.Expand(.12f);
+            for(int batch=0;batch<patch.batches.Length;batch++)
+            {
+                int count=Mathf.Min(1023,matrices.Count-batch*1023);patch.batches[batch]=new Matrix4x4[count];
+                matrices.CopyTo(batch*1023,patch.batches[batch],0,count);
+            }
+            edgePatches[edge]=patch;SideKernelCount+=patch.count;
+        }
+    }
+    private void AddSideTriangle(Vector3 a,Vector3 b,Vector3 c,Vector3 normal,System.Random random,List<Matrix4x4> output)
+    {
+        var slope=Quaternion.FromToRotation(Vector3.up,normal);
+        foreach(var point in SampleTriangle(a,b,c,Mathf.Max(.025f,spacing),random))
+        {
+            var rotation=Quaternion.Euler((float)random.NextDouble()*28-14,(float)random.NextDouble()*360,(float)random.NextDouble()*26-13);
+            float size=.9f+(float)random.NextDouble()*.22f;
+            output.Add(Matrix4x4.TRS(point+normal*.003f,slope*rotation,new Vector3(.0255f,.014f,.029f)*size));
+        }
     }
 
     private void UploadSurface()
@@ -479,6 +545,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         else if (HasPendingSurfaceUpdates) ProcessPendingCells();
         else LastUpdatedKernels = 0;
         UploadSurface();
+        UpdateEdgeCoverage();
     }
 
     private Vector2[] SampleSurface(float requestedSpacing)
@@ -567,6 +634,30 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                     ? colorVariants[color] : kernelMaterial;
                 LastDrawTriangles += matrices.Length * (int)(lod.GetIndexCount(0) / 3);
                 DrawBatch(lod, material, matrices, matrices.Length, bounds, camera);
+            }
+        }
+        DrawEdges(camera);
+    }
+
+    private void DrawEdges(Camera camera)
+    {
+        if(edgePatches==null)return;
+        // These instances already lie on vertical faces. Height-field displacement
+        // would otherwise move them back up onto the top of the pile.
+        grainAppearance.Block.SetFloat("_UsePileSurface",0);
+        for(int edge=0;edge<edgePatches.Length;edge++)
+        {
+            var patch=edgePatches[edge];
+            if(patch==null || !GeometryUtility.TestPlanesAABB(cameraPlanes,patch.bounds))continue;
+            float distance=Vector3.Distance(camera.transform.position,patch.bounds.ClosestPoint(camera.transform.position));
+            if(distance>drawDistance)continue;
+            var lod=distance<fullDetailDistance?nearMesh:distance<mediumDetailDistance?mediumMesh:distantMesh;
+            int color=edge%Mathf.Max(1,colorCount);
+            var material=colorVariants!=null && color<colorVariants.Length && colorVariants[color]!=null?colorVariants[color]:kernelMaterial;
+            foreach(var matrices in patch.batches)
+            {
+                LastDrawTriangles+=matrices.Length*(int)(lod.GetIndexCount(0)/3);
+                DrawBatch(lod,material,matrices,matrices.Length,patch.bounds,camera);
             }
         }
     }

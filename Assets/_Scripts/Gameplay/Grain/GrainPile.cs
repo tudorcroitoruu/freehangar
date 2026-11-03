@@ -604,6 +604,11 @@ public sealed class GrainPile : MonoBehaviour
         // Remove the previous closure before assigning the top grid again.
         mesh.Clear();
         mesh.vertices = vertices;
+        if (surfaceUV == null || surfaceUV.Length != vertices.Length)
+        {
+            surfaceUV = new Vector2[vertices.Length];
+            for (int i = 0; i < vertices.Length; i++) surfaceUV[i] = new Vector2(vertices[i].x, vertices[i].z);
+        }
         mesh.uv = surfaceUV;
         activeTriangles.Clear();
         for (int t = 0; t < field.Triangles.Length; t += 3)
