@@ -55,6 +55,12 @@ public sealed class MotorollerController : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             var hit = obstacles[i];
+            var chicken = hit.collider.GetComponentInParent<FarmChicken>();
+            if (chicken != null)
+            {
+                chicken.HitByVehicle(Movement);
+                continue;
+            }
             if (hit.transform.IsChildOf(transform) || hit.normal.y > .65f) continue;
             if (lawnmower != null && lawnmower.trailerJoint != null &&
                 hit.transform.IsChildOf(lawnmower.trailerJoint.transform)) continue;

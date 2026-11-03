@@ -141,6 +141,12 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         for (int i = 0; i < count; i++)
         {
             var hit = bodyObstacles[i];
+            var chicken = hit.collider.GetComponentInParent<FarmChicken>();
+            if (chicken != null && motorDriven)
+            {
+                chicken.HitByVehicle(this);
+                continue;
+            }
             if (hit.transform.IsChildOf(transform) || hit.normal.y > .65f ||
                 (hit.collider is TerrainCollider && hit.distance <= 0f)) continue;
             allowed = Mathf.Min(allowed, Mathf.Max(0f, hit.distance - .025f));

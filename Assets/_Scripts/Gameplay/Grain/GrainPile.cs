@@ -3,6 +3,7 @@ using UnityEngine;
 
 [ExecuteAlways, DisallowMultipleComponent, DefaultExecutionOrder(-50)]
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
+[RequireComponent(typeof(Unity.AI.Navigation.NavMeshModifier))]
 public sealed class GrainPile : MonoBehaviour
 {
     [Header("Spatial grain regions (percent of starting mass)")]
@@ -284,7 +285,15 @@ public sealed class GrainPile : MonoBehaviour
         settling = true;
         RefreshSurface(); RefreshCollider(); RefreshGrainAppearance();
     }
-    private void OnEnable() => Initialize();
+    private void OnEnable()
+    {
+        // Deformable grain must never become permanent navigation geometry.
+        var modifier = GetComponent<Unity.AI.Navigation.NavMeshModifier>();
+        if (modifier == null) modifier = gameObject.AddComponent<Unity.AI.Navigation.NavMeshModifier>();
+        modifier.ignoreFromBuild = true;
+        modifier.applyToChildren = true;
+        Initialize();
+    }
     private void OnDisable() => spatial?.ReleaseTextures();
 
     private float Profile(float x, float z)

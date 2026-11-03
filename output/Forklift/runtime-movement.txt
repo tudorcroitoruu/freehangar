@@ -6875,3 +6875,187 @@ time=38,81 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0
 motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
 time=39,07 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0120601 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
 motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+time=29.37 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0139839 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=29.62 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0245079 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=29.89 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.01624629 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=30.15 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0119002 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=30.41 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.01430381 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=30.67 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.013421 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=30.91 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0120749 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=31.17 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0129375 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=31.43 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0165557 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=31.69 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0180629 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=31.94 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0163682 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=32.20 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0172844 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=32.46 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0251367 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=32.72 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0185913 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=32.99 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0157273 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=33.25 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0180725 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=33.51 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0161445 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=33.77 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0200736 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=34.03 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0161134 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=34.28 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.01495111 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=34.54 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.013964 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=34.80 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0134357 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=35.06 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0155831 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=35.31 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0115284 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=35.57 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0126106 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=35.81 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0113933 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=36.07 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0107212 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=36.32 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0126025 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=36.58 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0130397 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=36.84 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007129896 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=37.10 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.006331803 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=37.35 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007910204 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=37.61 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.008950801 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=37.86 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.006815101 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=38.11 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.006981399 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=38.37 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007711302 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=38.62 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007328699 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=38.87 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.006217999 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=39.12 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007156002 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=39.37 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007096599 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=39.63 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007671202 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=39.88 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007168601 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=40.14 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0070437 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=40.39 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007006604 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=40.64 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007191504 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=40.90 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0104989 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=41.15 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.006614697 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=41.41 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.006061395 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=41.66 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007036005 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=41.92 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.006943601 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=42.17 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0066518 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=42.42 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.006147201 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=42.67 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.008111699 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=42.93 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007749299 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=43.18 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.006869203 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=43.44 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007493998 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=43.69 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007263194 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=43.94 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007775099 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=44.19 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007260601 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=44.44 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0120299 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=44.70 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0126673 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=44.96 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007468197 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=45.22 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0122084 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=45.47 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.008860204 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=45.72 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0068178 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=45.98 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0125828 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=46.24 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007499299 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=46.49 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007070195 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=46.74 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.007491 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=47.00 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0197762 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=47.26 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0161723 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=47.52 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.018382 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=47.77 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0162452 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=48.03 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0144878 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=48.30 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0188459 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=48.56 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0154025 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=48.82 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0149137 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=49.08 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.014529 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=49.34 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0139749 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=49.60 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0122291 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=49.86 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0132654 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=50.11 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0147272 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=50.37 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0140991 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=50.62 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0120994 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=50.88 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0126187 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=51.14 throttle=-1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0231038 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=51.40 throttle=-1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0190407 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=51.67 throttle=-1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0163302 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=51.93 throttle=-1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0176857 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=52.20 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0136486 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=52.45 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0140818 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=52.71 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0.0191163 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=

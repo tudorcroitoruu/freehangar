@@ -423,6 +423,7 @@ public class PlayerData
     [Header("Hangar progression")]
     public List<int> openedHangars = new List<int> { 1 };
     public bool firstHangarHalfCleared;
+    public bool hangar2ChickenDefeated;
     public List<float> hangarClearedPercent = new List<float>();
 
     public bool IsHangarOpen(int number) => number >= 1 && number <= 5 &&
