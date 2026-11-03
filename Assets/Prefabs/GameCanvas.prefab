@@ -7607,6 +7607,18 @@ MonoBehaviour:
     progressMode: 1
     goalAmount: 5000
     rewardAmount: 0
+  - goalId: p_sell_8500
+    goalDescription: Sell 8,500 kf of grains.
+    navigationIndicator: {fileID: 0}
+    stage: 1
+    hangarId: 0
+    goalType: 12
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 8500
+    rewardAmount: 0
   - goalId: upgrade_larger_truck
     goalDescription: Upgrade the vehicle.
     navigationIndicator: {fileID: 0}
@@ -7654,6 +7666,18 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 1
+    rewardAmount: 0
+  - goalId: p_sell_14000
+    goalDescription: Sell 14,000 kf of grains.
+    navigationIndicator: {fileID: 0}
+    stage: 1
+    hangarId: 0
+    goalType: 12
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 14000
     rewardAmount: 0
   - goalId: h3_load_7500kg
     goalDescription: Load 7,500 kg of grain
@@ -7714,6 +7738,18 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 1
+    rewardAmount: 0
+  - goalId: p_sell_26000
+    goalDescription: Sell 26,000 kf of grains.
+    navigationIndicator: {fileID: 0}
+    stage: 1
+    hangarId: 0
+    goalType: 12
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 26000
     rewardAmount: 0
   - goalId: h4_load_10000kg
     goalDescription: Load 10,000 kg of grain
