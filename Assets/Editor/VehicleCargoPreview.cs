@@ -6,6 +6,9 @@ using UnityEngine.Rendering.HighDefinition;
 
 public sealed class VehicleCargoPreview : EditorWindow
 {
+    [SerializeField] private WheelbarrowCargo wheelbarrow;
+    private VehicleUpgradeSettings.VehicleType Profile => wheelbarrow != null ? wheelbarrow.CargoProfile : settings.vehicles[vehicleIndex];
+    private Object PoseOwner => wheelbarrow != null ? (Object)wheelbarrow : settings;
     private VehicleUpgradeSettings settings;
     private readonly List<GameObject> containers = new List<GameObject>();
     private PreviewRenderUtility preview;
@@ -49,6 +52,9 @@ public sealed class VehicleCargoPreview : EditorWindow
     private void OnDisable() { EditorApplication.delayCall -= BuildDeferred; rebuildPending=false; Undo.undoRedoPerformed -= RefreshAfterUndo; preview?.Cleanup(); ReleaseColorMaterials(); preview = null; assembly = null; }
     private void OnGUI()
     {
+        EditorGUI.BeginChangeCheck();
+        wheelbarrow = (WheelbarrowCargo)EditorGUILayout.ObjectField("Wheelbarrow (scene or prefab)", wheelbarrow, typeof(WheelbarrowCargo), true);
+        if (EditorGUI.EndChangeCheck()) RequestBuild();
         settings = (VehicleUpgradeSettings)EditorGUILayout.ObjectField("Vehicle settings", settings, typeof(VehicleUpgradeSettings), false);
         if (settings == null || settings.vehicles.Length == 0 || containers.Count == 0) { EditorGUILayout.HelpBox("Vehicle settings and container prefabs are required.", MessageType.Warning); return; }
         var names = new string[settings.vehicles.Length];
@@ -56,7 +62,8 @@ public sealed class VehicleCargoPreview : EditorWindow
         vehicleIndex = Mathf.Clamp(vehicleIndex,0,names.Length-1);
         var cargoNames = containers.ConvertAll(p => p.name).ToArray();
         EditorGUI.BeginChangeCheck();
-        vehicleIndex = EditorGUILayout.Popup("Vehicle",vehicleIndex,names);
+        if(wheelbarrow==null) vehicleIndex = EditorGUILayout.Popup("Vehicle",vehicleIndex,names);
+        else EditorGUILayout.LabelField("Previewing",wheelbarrow.name+" — "+wheelbarrow.CargoSlotCount+" slots");
         containerIndex = EditorGUILayout.Popup("Container",Mathf.Clamp(containerIndex,0,containers.Count-1),cargoNames);
         mixedLoad = EditorGUILayout.Toggle("Mixed cargo preview",mixedLoad);
         if(!mixedLoad) fillRack = EditorGUILayout.Toggle("Fill all available slots",fillRack);
@@ -87,11 +94,11 @@ public sealed class VehicleCargoPreview : EditorWindow
         }
         EditorGUILayout.LabelField("Drag to orbit; mouse wheel to zoom. Preview copies never modify scene/prefabs.");
         scroll=EditorGUILayout.BeginScrollView(scroll,GUILayout.Height(130));
-        var profile=settings.vehicles[vehicleIndex];
+        var profile=Profile;
         foreach(var prefab in containers)
         {
             var cargo=prefab.GetComponentInChildren<GrainContainer>(true);
-            EditorGUILayout.LabelField(prefab.name+" (level "+cargo.TransportLevel+")",cargo.TransportLevel<=profile.maximumCargoLevel ? "Level allowed — inspect fit in preview" : "Blocked by vehicle level");
+            EditorGUILayout.LabelField(prefab.name+" (level "+cargo.TransportLevel+")",(wheelbarrow!=null?!cargo.IsBigBag:cargo.TransportLevel<=profile.maximumCargoLevel) ? "Level allowed — inspect fit in preview" : "Blocked by vehicle level");
         }
         EditorGUILayout.EndScrollView();
         if(GUILayout.Button("Select cargo / vehicle settings to edit levels")) Selection.objects=new Object[]{containers[containerIndex],settings};
@@ -146,46 +153,53 @@ public sealed class VehicleCargoPreview : EditorWindow
         int oldSlot=selectedSlot;
         selectedSlot=Mathf.Clamp(EditorGUILayout.IntField("Slot (0 = first)",selectedSlot),0,previewSlotCount-1);
         if(oldSlot!=selectedSlot) RequestBuild();
-        var profile=settings.vehicles[vehicleIndex];
+        var profile=Profile;
         string id=containers[containerIndex].GetComponentInChildren<GrainContainer>(true).CargoTypeId;
         bool share=profile.UsesFirstSlotForAll(id);
         bool nextShare=EditorGUILayout.Toggle("Apply first slot values to all slots",share);
         if(nextShare!=share)
         {
-            Undo.RecordObject(settings,"Share first cargo slot placement");
+            Undo.RecordObject(PoseOwner,"Share first cargo slot placement");
             var first=profile.FindCargoPoseExact(id,0);
             if(first==null)
             {
-                first=new VehicleUpgradeSettings.CargoPose{containerId=id,slotIndex=0};
+                first=new VehicleUpgradeSettings.CargoPose{containerId=id,slotIndex=0,rotation=wheelbarrow!=null?WheelbarrowCargo.DefaultCargoRotation(id):Vector3.zero};
                 ArrayUtility.Add(ref profile.cargoPoses,first);
             }
             first.applyToAllSlots=nextShare;
             share=nextShare;
-            EditorUtility.SetDirty(settings); RequestBuild();
+            EditorUtility.SetDirty(PoseOwner); RequestBuild();
         }
         int index=share?0:usesRack?selectedSlot*slotStride:selectedSlot;
         if(share) EditorGUILayout.LabelField("Editing first-slot offsets for every slot.",EditorStyles.miniLabel);
         var pose=profile.FindCargoPose(id,index);
         EditorGUI.BeginChangeCheck();
         Vector3 position=DelayedVector("Position offset (slot space)",pose?.position ?? Vector3.zero,"cargo-position");
-        Vector3 rotation=DelayedVector("Rotation offset (degrees)",pose?.rotation ?? Vector3.zero,"cargo-rotation");
+        Vector3 defaultRotation=wheelbarrow!=null?WheelbarrowCargo.DefaultCargoRotation(id):Vector3.zero;
+        Vector3 rotation=DelayedVector("Rotation offset (degrees)",pose?.rotation ?? defaultRotation,"cargo-rotation");
         Vector3 scale=DelayedVector("Scale multiplier",pose?.EffectiveScale ?? Vector3.one,"cargo-scale");
         bool edited=EditorGUI.EndChangeCheck();
-        if(GUILayout.Button("Reset this container / slot")) { position=rotation=Vector3.zero; scale=Vector3.one; edited=true; }
+        if(GUILayout.Button("Reset this container / slot")) { position=Vector3.zero; rotation=defaultRotation; scale=Vector3.one; edited=true; }
         if(edited)
         {
-            Undo.RecordObject(settings,"Adjust vehicle cargo placement");
+            Undo.RecordObject(PoseOwner,"Adjust vehicle cargo placement");
             if(pose==null)
             {
                 pose=new VehicleUpgradeSettings.CargoPose{containerId=id,slotIndex=index};
                 ArrayUtility.Add(ref profile.cargoPoses,pose);
             }
             pose.position=position; pose.rotation=rotation; pose.scale=new Vector3(Mathf.Max(.01f,scale.x),Mathf.Max(.01f,scale.y),Mathf.Max(.01f,scale.z));
-            EditorUtility.SetDirty(settings); RequestBuild();
+            EditorUtility.SetDirty(PoseOwner); RequestBuild();
         }
         if(GUILayout.Button("Save cargo placements"))
         {
-            AssetDatabase.SaveAssetIfDirty(settings);
+            if(wheelbarrow!=null && !EditorUtility.IsPersistent(wheelbarrow))
+            {
+                PrefabUtility.RecordPrefabInstancePropertyModifications(wheelbarrow);
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(wheelbarrow.gameObject.scene);
+                UnityEditor.SceneManagement.EditorSceneManager.SaveScene(wheelbarrow.gameObject.scene);
+            }
+            else AssetDatabase.SaveAssetIfDirty(PoseOwner);
             foreach(var cargo in editedSpaceAssets) if(cargo!=null) AssetDatabase.SaveAssetIfDirty(cargo);
             editedSpaceAssets.Clear();
         }
@@ -217,17 +231,27 @@ public sealed class VehicleCargoPreview : EditorWindow
     {
         rebuildPending=false;
         if(this==null || settings==null || containers.Count==0) return;
-        Build();
+        try { Build(); }
+        catch (System.Exception exception)
+        {
+            buildFailed=true;
+            result="Could not build preview: "+exception.Message;
+            Debug.LogException(exception);
+            Repaint();
+        }
     }
 
     private GameObject Copy(GameObject prefab, Transform parent)
     {
         // Instantiate directly in the isolated preview scene, never the user's scene.
-        var copy=(GameObject)PrefabUtility.InstantiatePrefab(prefab,preview.camera.scene);
+        var copy=PrefabUtility.IsPartOfPrefabAsset(prefab)
+            ? (GameObject)PrefabUtility.InstantiatePrefab(prefab,preview.camera.scene)
+            : Instantiate(prefab,parent,false);
         copy.transform.SetParent(parent,false);
         foreach(var behaviour in copy.GetComponentsInChildren<MonoBehaviour>(true)) behaviour.enabled=false;
         foreach(var collider in copy.GetComponentsInChildren<Collider>(true)) collider.enabled=false;
         foreach(var body in copy.GetComponentsInChildren<Rigidbody>(true)) body.isKinematic=true;
+        copy.SetActive(true);
         UseMaterialColors(copy);
         return copy;
     }
@@ -299,10 +323,16 @@ public sealed class VehicleCargoPreview : EditorWindow
         preview.lights[0].intensity=1.4f; preview.lights[0].transform.rotation=Quaternion.Euler(40,40,0);
         preview.lights[1].intensity=.7f;
         assembly=new GameObject("Cargo preview"); preview.AddSingleGO(assembly);
-        var profile=settings.vehicles[vehicleIndex];
-        var prefab=Resources.Load<GameObject>(profile.PrefabResourcePath);
+        var profile=Profile;
+        var prefab=wheelbarrow!=null?wheelbarrow.gameObject:Resources.Load<GameObject>(profile.PrefabResourcePath);
         if(prefab==null) { result="Missing vehicle prefab: "+profile.PrefabResourcePath; return; }
         var vehicle=Copy(prefab,assembly.transform);
+        if(wheelbarrow!=null)
+        {
+            vehicle.transform.localPosition=Vector3.zero;
+            vehicle.transform.localRotation=Quaternion.identity;
+            vehicle.transform.localScale=wheelbarrow.transform.lossyScale;
+        }
         var rig=vehicle.GetComponentInChildren<BicycleController>(true);
         var cargoPrefab=containers[containerIndex];
         var container=cargoPrefab.GetComponentInChildren<GrainContainer>(true);
@@ -328,8 +358,19 @@ public sealed class VehicleCargoPreview : EditorWindow
             else if(rig.exclusiveBagSlot!=null) supports.Add(rig.exclusiveBagSlot);
             else if(rig.cargoSlots!=null) foreach(var slot in rig.cargoSlots) if(slot!=null) supports.Add(slot);
         }
+        if(wheelbarrow!=null)
+        {
+            for(int i=0;i<wheelbarrow.CargoSlotCount;i++)
+            {
+                var support=new GameObject("Bag slot "+i).transform;
+                support.SetParent(vehicle.transform,false);
+                support.localPosition=wheelbarrow.SlotPosition(i);
+                support.localRotation=wheelbarrow.SlotRotation;
+                supports.Add(support);
+            }
+        }
         previewSlotCount=supports.Count;
-        bool allowed=container.TransportLevel<=profile.maximumCargoLevel;
+        bool allowed=wheelbarrow!=null?!container.IsBigBag:container.TransportLevel<=profile.maximumCargoLevel;
         int placed=0;
         if(!mixedLoad && allowed) foreach(var support in supports)
         {
@@ -340,7 +381,8 @@ public sealed class VehicleCargoPreview : EditorWindow
             item.transform.SetParent(support, true);
             item.transform.position=support.position; item.transform.rotation=Quaternion.AngleAxis(support.eulerAngles.y,Vector3.up)*cargoPrefab.transform.rotation;
             Quaternion baseRotation=Quaternion.Inverse(support.rotation)*item.transform.rotation;
-            VehicleCargoPlacement.Place(item.transform,support,profile,container.CargoTypeId,usesRack?supportIndex*slotStride:supportIndex,baseRotation,usesRack,item.transform.localScale);
+            if(wheelbarrow!=null) baseRotation=container.UprightRotation;
+            VehicleCargoPlacement.Place(item.transform,support,profile,container.CargoTypeId,usesRack?supportIndex*slotStride:supportIndex,baseRotation,usesRack || wheelbarrow!=null,item.transform.localScale);
             placedCargo.Add(item.GetComponentInChildren<GrainContainer>(true));
             placed++; if(!fillRack) break;
         }
@@ -354,7 +396,7 @@ public sealed class VehicleCargoPreview : EditorWindow
                 var source=containers.Find(p=>p.GetComponentInChildren<GrainContainer>(true).CargoTypeId==type);
                 var cargo=source!=null?source.GetComponentInChildren<GrainContainer>(true):null;
                 Transform slot=null;int poseIndex=0;
-                if(cargo!=null && cargo.TransportLevel<=profile.maximumCargoLevel)
+                if(cargo!=null && (wheelbarrow!=null?!cargo.IsBigBag:cargo.TransportLevel<=profile.maximumCargoLevel))
                 {
                     if(dynamicLayout!=null)
                     {
@@ -369,7 +411,7 @@ public sealed class VehicleCargoPreview : EditorWindow
                 }
                 if(slot==null)
                 {
-                    mixedStatus.Add(cargo!=null && cargo.TransportLevel>profile.maximumCargoLevel?"level blocked":"no free space");
+                    mixedStatus.Add(cargo!=null && (wheelbarrow!=null?cargo.IsBigBag:cargo.TransportLevel>profile.maximumCargoLevel)?"level blocked":"no free space");
                     mixedPoseIndices.Add(-1);rejected++;continue;
                 }
                 var item=Copy(source,assembly.transform);
@@ -377,7 +419,8 @@ public sealed class VehicleCargoPreview : EditorWindow
                 item.transform.SetParent(slot,true); // Reserve the actual bay for the next mixed item.
                 item.transform.rotation=Quaternion.AngleAxis(slot.eulerAngles.y,Vector3.up)*source.transform.rotation;
                 Quaternion relative=Quaternion.Inverse(slot.rotation)*item.transform.rotation;
-                VehicleCargoPlacement.Place(item.transform,slot,profile,cargo.CargoTypeId,poseIndex,relative,usesRack,item.transform.localScale);
+                if(wheelbarrow!=null) relative=cargo.UprightRotation;
+                VehicleCargoPlacement.Place(item.transform,slot,profile,cargo.CargoTypeId,poseIndex,relative,usesRack || wheelbarrow!=null,item.transform.localScale);
                 placedCargo.Add(item.GetComponentInChildren<GrainContainer>(true));
                 mixedStatus.Add("slot "+poseIndex);mixedPoseIndices.Add(poseIndex);placed++;
             }

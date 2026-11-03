@@ -31,16 +31,19 @@ public sealed class VehicleCargoPlacement : MonoBehaviour
     public static void Attach(Transform item, Transform slot, bool bottom)
     {
         var upgrade=VehicleCargoOwner.Upgrade(slot);
-        if(upgrade==null) return;
+        var barrow=slot.GetComponentInParent<WheelbarrowCargo>();
+        if(upgrade==null && barrow==null) return;
         var state=item.GetComponent<VehicleCargoPlacement>() ?? item.gameObject.AddComponent<VehicleCargoPlacement>();
         state.baseScale=item.localScale; state.baseWorldScale=item.lossyScale;
         state.support=slot; state.baseRotation=Quaternion.Inverse(slot.rotation)*item.rotation;
-        state.seatAtBottom=bottom; state.profile=upgrade.Profile;
+        state.seatAtBottom=bottom || barrow!=null; state.profile=barrow!=null?barrow.CargoProfile:upgrade.Profile;
         var cargo=item.GetComponent<GrainContainer>();
+        if(barrow!=null && cargo!=null) state.baseRotation=cargo.UprightRotation;
         state.containerId=cargo!=null?cargo.CargoTypeId:"box";
         var rig=VehicleCargoOwner.Resolve(slot);
         state.slotIndex=rig!=null && rig.cargoSlots!=null?System.Array.IndexOf(rig.cargoSlots,slot):0;
         if(rig!=null && rig.TryGetComponent<PickupCargoLayout>(out var layout)) state.slotIndex=layout.PoseIndex(slot);
+        if(barrow!=null) state.slotIndex=barrow.SlotIndex(slot);
         state.slotIndex=Mathf.Max(0,state.slotIndex);
         state.enabled=true; state.Apply();
     }
@@ -72,7 +75,9 @@ public sealed class VehicleCargoPlacement : MonoBehaviour
         var pose=profile?.FindCargoPose(containerId,index);
         item.localScale=Vector3.Scale(baseScale,pose?.EffectiveScale ?? Vector3.one);
         bool empty = item.TryGetComponent<GrainContainer>(out var container) && container.IsEmpty;
-        item.rotation=slot.rotation*baseRotation*Quaternion.Euler(empty ? Vector3.zero : pose?.rotation ?? Vector3.zero);
+        Vector3 defaultRotation = slot.GetComponentInParent<WheelbarrowCargo>() != null
+            ? WheelbarrowCargo.DefaultCargoRotation(containerId) : Vector3.zero;
+        item.rotation=slot.rotation*baseRotation*Quaternion.Euler(empty ? Vector3.zero : pose?.rotation ?? defaultRotation);
         item.position=slot.position;
         if(bottom) VehicleCargoRack.SeatBase(item,slot);
         else if(item.TryGetComponent<GrainContainer>(out var cargo)) item.position+=slot.position-cargo.WorldBounds.center;

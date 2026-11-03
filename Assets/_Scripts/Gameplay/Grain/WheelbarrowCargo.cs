@@ -14,6 +14,9 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     [SerializeField, Min(.01f)] private float cargoVolumeCubicMeters = .5f;
     [SerializeField] private Vector3 trayCenter = new Vector3(0f, .46f, -.72f);
     [SerializeField] private Vector3 traySize = new Vector3(.7f, .35f, .85f);
+    [SerializeField, Tooltip("Cargo tilt relative to the wheelbarrow; align this with the tray floor.")]
+    private Vector3 trayAngles = new Vector3(12f, 0f, 0f);
+    public Quaternion SlotRotation => Quaternion.Euler(trayAngles);
     [SerializeField, Min(.5f)] private float pushDistance = 1.4f;
     private readonly List<GrainContainer> bags = new List<GrainContainer>(6);
     private readonly List<float> bagVolumes = new List<float>(6);
@@ -62,9 +65,11 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
             if (bag == null) continue;
             var slot = new GameObject("Bag slot " + bags.Count).transform;
             slot.SetParent(transform,false);
-            slot.localPosition = trayCenter + Vector3.up * bags.Count * .32f;
+            slot.localPosition = SlotPosition(bags.Count);
+            slot.localRotation = SlotRotation;
+            bag.GetComponent<VehicleCargoPlacement>()?.ReleaseScale();
             bag.transform.SetParent(slot,true);
-            VehicleCargoRack.Seat(bag.transform,slot);
+            VehicleCargoPlacement.Attach(bag.transform,slot,true);
             bags.Add(bag);
         }
         RebuildCargo();
@@ -92,10 +97,33 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         if (Tier < tier) gameObject.SetActive(false);
     }
 
+    [SerializeField] private VehicleUpgradeSettings.VehicleType cargoProfile = new VehicleUpgradeSettings.VehicleType();
+    public VehicleUpgradeSettings.VehicleType CargoProfile => cargoProfile;
+    public Vector3 SlotPosition(int index)
+    {
+        index = Mathf.Clamp(index, 0, CargoSlotCount - 1);
+        // Small: two below one; medium: four below one; large: two by three.
+        int rows = Tier == 0 ? 1 : Tier == 1 ? 2 : 3;
+        if (Tier < 2 && index == CargoSlotCount - 1)
+            return trayCenter + SlotRotation * (Vector3.up * .22f);
+        float x = (index % 2 == 0 ? -.25f : .25f) * traySize.x;
+        float z = ((index / 2 + .5f) / rows - .5f) * traySize.z;
+        return trayCenter + SlotRotation * new Vector3(x, 0f, z);
+    }
+    public static Vector3 DefaultCargoRotation(string id) =>
+        id == "FreeBag" || id == "SmallBag" || id == "LargeBag" ? new Vector3(90f, 0f, 0f) : Vector3.zero;
+    public int SlotIndex(Transform slot) => int.TryParse(slot.name.Replace("Bag slot ", ""), out int index) ? index : 0;
+    private int FreeSlotIndex()
+    {
+        for (int i = 0; i < CargoSlotCount; i++)
+            if (!slots.Exists(slot => slot != null && SlotIndex(slot) == i)) return i;
+        return CargoSlotCount;
+    }
+
     public float CapacityVolume => cargoVolumeCubicMeters;
     public float OccupiedVolume => occupiedVolume;
     public int BagCount => bags.Count;
-    public int CargoSlotCount => Mathf.Max(1, Mathf.FloorToInt(traySize.z / .25f) * 2);
+    public int CargoSlotCount => Tier == 0 ? 3 : Tier == 1 ? 5 : 6;
 
     private void Awake()
     {
@@ -148,7 +176,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     public bool CanLoad(BagInteraction carrier)
     {
         if (carrier == null || !carrier.IsCarrying || carrier.CarriedBag == null || pusher != null) return false;
-        if (!carrier.CarriedBag.CanLoadOnVehicle) return false;
+        if (carrier.CarriedBag.IsBigBag || !carrier.CarriedBag.CanLoadOnVehicle) return false;
         float volume = carrier.CarriedVolume;
         return occupiedVolume + volume <= CapacityVolume + .0001f && bags.Count < CargoSlotCount;
     }
@@ -174,13 +202,13 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         {
             available = CanLoad(interactor.Bags);
             action = !interactor.Bags.CarriedBag.CanLoadOnVehicle ? "Finish filling and close bag" : available ? "Load bag" :
-                interactor.Bags.CarriedVolume > CapacityVolume + .0001f ? "Container too large for wheelbarrow" : "Wheelbarrow full";
+                (interactor.Bags.CarriedBag.IsBigBag || interactor.Bags.CarriedVolume > CapacityVolume + .0001f) ? "Container too large for wheelbarrow" : "Wheelbarrow full";
         }
         else action = interactor.Items != null && interactor.Items.IsCarrying ? "Put down item and push" : "Push wheelbarrow";
         prompt = new InteractionPromptData(transform.TransformPoint(trayCenter + Vector3.up * .35f),
             action + $"  ({occupiedVolume:0.00}/{CapacityVolume:0.00} m³)", available);
         prompt.VehicleFull = !available && interactor.Bags != null && interactor.Bags.IsCarrying &&
-            interactor.Bags.CarriedBag.CanLoadOnVehicle && interactor.Bags.CarriedVolume <= CapacityVolume + .0001f;
+            !interactor.Bags.CarriedBag.IsBigBag && interactor.Bags.CarriedBag.CanLoadOnVehicle && interactor.Bags.CarriedVolume <= CapacityVolume + .0001f;
         return true;
     }
 
@@ -195,11 +223,11 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
             if (!CanLoad(interactor.Bags)) return false;
             GrainContainer bag = interactor.Bags.CarriedBag;
             float volume = interactor.Bags.CarriedVolume;
-            GameObject anchor = new GameObject("Bag slot " + (bags.Count + 1));
+            int index = FreeSlotIndex();
+            GameObject anchor = new GameObject("Bag slot " + index);
             anchor.transform.SetParent(transform, false);
-            int index = bags.Count;
-            anchor.transform.localPosition = trayCenter + new Vector3(0f, index * .32f,
-                (index % 2 == 0 ? -.06f : .06f));
+            anchor.transform.localPosition = SlotPosition(index);
+            anchor.transform.localRotation = SlotRotation;
             if (!interactor.Bags.TryStow(anchor.transform)) { Destroy(anchor); return false; }
             bags.Add(bag); bagVolumes.Add(volume); slots.Add(anchor.transform); occupiedVolume += volume;
             return true;
