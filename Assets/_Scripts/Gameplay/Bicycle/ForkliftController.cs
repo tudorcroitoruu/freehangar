@@ -96,7 +96,7 @@ public sealed class ForkliftController : MonoBehaviour
         if(!AcceptInput || forkAnchor==null)return;
         bool available=cargo!=null && !transferring;
         string action=Time.time<blockedUntil?blocked:transferring?"Unloading big bag":cargo!=null?"Lower and drop big bag":"Approach a vehicle or drive forks under a full big bag";
-        var data=new InteractionPromptData(forkAnchor.position+Vector3.up*.8f,action,available){InteractionKey=KeyCode.E};
+        var data=new InteractionPromptData(forkAnchor.position+Vector3.up*.8f,action,available){InteractionKey=KeyCode.Q};
         GameplayCanvas.Instance?.interactionPrompt?.Show(Camera.main,data);
     }
     private GrainContainer FindBag()

@@ -47,7 +47,6 @@ public class GameplayCanvas : MonoBehaviour
     [Space, Header("Hints")]
     [SerializeField] private GameObject[] walkingHints;
     [SerializeField] private GameObject[] drivingHints;
-    [SerializeField] private GameObject drivingExitHint;
     [SerializeField] private GameObject[] forkliftHints;
 
     [Space, Header("Tools Equip Hints")] 
@@ -150,7 +149,6 @@ public class GameplayCanvas : MonoBehaviour
         if (drivingHints != null)
             foreach (var hint in drivingHints)
                 if (hint != null) hint.SetActive(driving);
-        if (drivingExitHint != null) drivingExitHint.SetActive(driving && !forklift);
         if (forkliftHints != null)
             foreach (var hint in forkliftHints)
                 if (hint != null) hint.SetActive(driving && forklift);
