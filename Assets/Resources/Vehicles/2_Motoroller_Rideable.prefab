@@ -1918,8 +1918,8 @@ MonoBehaviour:
   downhillSpeedMultiplier: 1.2
   steeringSmoothTime: 0.256
   maximumSteeringAngle: 30
-  ridingCameraOffset: {x: 0, y: 0, z: 0}
-  ridingCameraPitch: 8
+  ridingCameraOffset: {x: 0, y: 0, z: -0.3}
+  ridingCameraPitch: 10
   pedalingPitchAmplitude: 0.3
   pedalingPitchSmoothTime: 0.09
 --- !u!114 &2092507072865993016

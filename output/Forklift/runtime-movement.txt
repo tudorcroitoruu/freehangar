@@ -6847,3 +6847,31 @@ BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0
 time=25,67 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=False cursor=None dt=0,0161345 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
 motor cache=
 BLOCKER FreeBag(Clone) distance=0,02831083 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=21,04 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,019255 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,0283106 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=21,30 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0130185 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,0283106 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=65,81 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,016271 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+time=66,08 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,01296329 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+time=66,34 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0365848 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+time=66,59 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,01389751 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+time=66,86 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0124208 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+time=67,12 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0134131 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+time=67,37 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0134217 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+time=38,29 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0131511 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+time=38,55 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0139849 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+time=38,81 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0128252 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
+time=39,07 throttle=1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0120601 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=2_Motoroller_Rideable(Clone) (MotorollerController)
