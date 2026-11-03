@@ -6,16 +6,23 @@ public class ProductRemainingPromptTests
 {
     private GameObject root;
     private InventoryManager manager;
+    private PlayerData previousData;
 
     [SetUp]
     public void SetUp()
     {
+        previousData = SaveSystem.Data;
+        SaveSystem.Data = new PlayerData();
         root = new GameObject("Product capacity prompts");
         manager = root.AddComponent<InventoryManager>();
     }
 
     [TearDown]
-    public void TearDown() => Object.DestroyImmediate(root);
+    public void TearDown()
+    {
+        Object.DestroyImmediate(root);
+        SaveSystem.Data = previousData;
+    }
 
     [TestCase(true)]
     [TestCase(false)]
@@ -27,26 +34,27 @@ public class ProductRemainingPromptTests
         Register("FreeBag");
         Register("Other product");
         Assert.IsTrue(product.TryGetPrompt(null, out var prompt));
-        Assert.AreEqual("Left: 13/16", prompt.SecondaryDescription);
+        Assert.AreEqual(shop ? "Price: $0  |  Left: 13/16" : "Left: 13/16", prompt.SecondaryDescription);
+        if (shop) Assert.AreEqual("Buy Test product", prompt.Action);
         first.SetActive(false);
         product.TryGetPrompt(null, out prompt);
-        Assert.AreEqual("Left: 14/16", prompt.SecondaryDescription);
+        Assert.AreEqual(shop ? "Price: $0  |  Left: 14/16" : "Left: 14/16", prompt.SecondaryDescription);
         Object.DestroyImmediate(first);
         product.TryGetPrompt(null, out prompt);
-        Assert.AreEqual("Left: 14/16", prompt.SecondaryDescription);
+        Assert.AreEqual(shop ? "Price: $0  |  Left: 14/16" : "Left: 14/16", prompt.SecondaryDescription);
     }
 
     [TestCase(true)]
     [TestCase(false)]
-    public void FullCapacityShowsZeroAndUnlimitedProductsHaveNoSecondaryDescription(bool shop)
+    public void FullCapacityShowsZeroAndUnlimitedProductsOmitRemainingCapacity(bool shop)
     {
         var product = CreateProduct(shop, 1);
         Register("FreeBag");
         product.TryGetPrompt(null, out var prompt);
-        Assert.AreEqual("Left: 0/1", prompt.SecondaryDescription);
+        Assert.AreEqual(shop ? "Price: $0  |  Left: 0/1" : "Left: 0/1", prompt.SecondaryDescription);
         Set(product, "maxActiveInScene", 0);
         product.TryGetPrompt(null, out prompt);
-        Assert.IsTrue(string.IsNullOrEmpty(prompt.SecondaryDescription));
+        Assert.AreEqual(shop ? "Price: $0" : "", prompt.SecondaryDescription);
     }
 
     [Test]
@@ -80,6 +88,7 @@ public class ProductRemainingPromptTests
         var host = Child("Product");
         Component product = shop ? (Component)host.AddComponent<ShopProduct>() : host.AddComponent<InventoryProduct>();
         Set(product, "productID", "FreeBag");
+        if (shop) Set(product, "productName", "Test product");
         Set(product, "maxActiveInScene", limit);
         return (IInteractable)product;
     }

@@ -390,7 +390,7 @@ public class ShopPurchaseTests
             Assert.IsTrue(shop.TryGetPrompt(null, out var prompt));
             Assert.IsTrue(prompt.ShowKey);
             Assert.IsFalse(prompt.RequiresFreeHands);
-            if (reason == "money") StringAssert.Contains("<color=#D92D2D>$ 100</color>", prompt.Action);
+            if (reason == "money") StringAssert.Contains("Price: <color=#D92D2D>$100</color>", prompt.SecondaryDescription);
             Assert.IsFalse(shop.TryInteract(null));
             Assert.AreEqual(cash, SaveSystem.Money);
             Assert.AreEqual(0, SaveSystem.Data.GetOwnedProductCount("crate"));

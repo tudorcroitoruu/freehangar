@@ -143,18 +143,18 @@ public class ShopProduct : MonoBehaviour, IInteractable
         if (!isActiveAndEnabled || (!toBuy && !toRent)) return false;
 
         string action = toBuy ? "Buy" : "Rent";
-        string price = $"$ {EconomyNumberFormat.Accounting(Price)}";
+        string price = $"${EconomyNumberFormat.Accounting(Price)}";
         if (!CanAfford()) price = $"<color=#D92D2D>{price}</color>";
         prompt = new InteractionPromptData(
             transform.position + Vector3.up * .5f,
-            $"{action} {productName}\n{price}",
-            toBuy);
+            $"{action} {productName}",
+            toBuy) { SecondaryDescription = $"Price: {price}" };
         if (maxActiveInScene > 0)
         {
             if (inventoryManager == null) inventoryManager = GetComponentInParent<InventoryManager>(true);
             if (inventoryManager == null) inventoryManager = FindFirstObjectByType<InventoryManager>(FindObjectsInactive.Include);
             if (inventoryManager != null)
-                prompt.SecondaryDescription = $"Left: {Mathf.Max(0, maxActiveInScene - inventoryManager.GetActiveCount(productID))}/{maxActiveInScene}";
+                prompt.SecondaryDescription += $"  |  Left: {Mathf.Max(0, maxActiveInScene - inventoryManager.GetActiveCount(productID))}/{maxActiveInScene}";
         }
         return true;
     }
