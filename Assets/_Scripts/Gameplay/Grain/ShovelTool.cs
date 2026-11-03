@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// <summary>Every use plays a gesture. Only confirmed contact transfers grain.</summary>
+/// <summary>Every use plays a gesture. Scoops transfer grain from a reachable, unobstructed target.</summary>
 [DisallowMultipleComponent]
 public sealed class ShovelTool : MonoBehaviour
 {
@@ -374,10 +374,10 @@ public sealed class ShovelTool : MonoBehaviour
         float amount = (fraction - transferredFraction) * availableAtStart;
         if (pendingPile == null) transferredFraction = fraction;
         RaycastHit hit = default;
-        // Once contact has collected grain, the excavation itself lowers the surface
-        // below the animated blade. Finish this stroke at the same reachable point.
-        bool scrapeTarget = (smallPileScoop || scoopReported) && pendingPile != null && pendingPile.isActiveAndEnabled &&
-            CanReachPoint(actionCamera, actor, targetPoint, reach, pendingPile.GetComponent<Collider>());
+        // The aimed, reachable surface owns the scoop. The cosmetic handle-travel
+        // limit can leave the blade above low grain when standing, and excavation
+        // lowers it further. Neither should require the player to crouch.
+        bool scrapeTarget = CanScrapeTarget();
         if (amount > 0 && actionCamera != null && actor != null && (scrapeTarget || FindHit(actionCamera, actor, out hit)))
         {
             if (pendingPile != null && phase <= .67f && (scrapeTarget || (hit.collider.GetComponentInParent<GrainPile>() == pendingPile && HasScoopContact())))
@@ -525,6 +525,15 @@ public sealed class ShovelTool : MonoBehaviour
         float surface = pendingPile.SurfaceHeight(bladeTip.position);
         return new Vector2(difference.x, difference.z).sqrMagnitude <= EffectiveScoopRadius * EffectiveScoopRadius &&
             bladeTip.position.y <= surface + .06f && bladeTip.position.y >= surface - EffectiveScoopDepth - .12f;
+    }
+
+    private bool CanScrapeTarget()
+    {
+        if (actionCamera == null || actor == null || pendingPile == null || !pendingPile.isActiveAndEnabled ||
+            !pendingPile.IsInsideBoundary(targetPoint)) return false;
+        Vector3 point = targetPoint;
+        point.y = pendingPile.SurfaceHeight(point);
+        return CanReachPoint(actionCamera, actor, point, reach, pendingPile.GetComponent<Collider>());
     }
 
     private void UpdateScoopPose(float phase)

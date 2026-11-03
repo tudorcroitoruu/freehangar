@@ -130,6 +130,8 @@ public sealed class GrainPile : MonoBehaviour
     [SerializeField, Range(5f, 60f)] private float reposeAngle = 32f;
     [SerializeField, Min(0f)] private float settlingMargin = .45f;
     [SerializeField, Range(1f, 30f)] private float simulationRate = 15f;
+    [SerializeField, Range(0f, .5f), Tooltip("Visual settling response in seconds. Smooths scooping and pouring without delaying grain transfer.")]
+    private float surfaceSmoothTime = .12f;
     [SerializeField, Range(1f, 15f)] private float colliderRate = 5f;
     [Header("Wall fitting")]
     [SerializeField] private bool fitToWalls = true;
@@ -157,6 +159,9 @@ public sealed class GrainPile : MonoBehaviour
     }
     private GrainHeightField field;
     internal GrainHeightField HeightField => field;
+    private GrainHeightField visualField;
+    internal GrainHeightField VisualHeightField => visualField ?? field;
+    private bool visualSettling;
     private Mesh mesh;
     private Mesh collisionMesh;
     private MeshCollider meshCollider;
@@ -239,6 +244,8 @@ public sealed class GrainPile : MonoBehaviour
         for (int i = 0; i < saved.heights.Length; i++) field.Heights[i] = float.IsFinite(saved.heights[i]) ? Mathf.Max(0, saved.heights[i]) : 0;
         spatial?.RestoreSave(saved.columns);
         initialKilograms = saved.initialKilograms;
+        System.Array.Copy(field.Heights, visualField.Heights, field.Heights.Length);
+        visualSettling = false;
         settling = true;
         RefreshSurface(); RefreshCollider(); RefreshGrainAppearance();
     }
@@ -289,6 +296,9 @@ public sealed class GrainPile : MonoBehaviour
             if (!Application.isPlaying && previewClearedPercent > 0) spatial.PreviewClear(previewClearedPercent);
         }
         lastPlacement = transform.localToWorldMatrix;
+        visualField = new GrainHeightField(field.Resolution, field.Size, 0);
+        System.Array.Copy(field.Heights, visualField.Heights, field.Heights.Length);
+        visualSettling = false;
         initialKilograms = Kilograms;
         lastScale = scale;
         activeTriangles = new List<int>(field.Triangles.Length);
@@ -429,6 +439,7 @@ public sealed class GrainPile : MonoBehaviour
         {
             pile.economySettings = appearanceSource.economySettings;
             pile.kilogramsPerCubicMetre = appearanceSource.kilogramsPerCubicMetre;
+            pile.surfaceSmoothTime = appearanceSource.surfaceSmoothTime;
         }
         float visualScale = Mathf.Pow(pile.GrainConsumeMultiplier, 1f / 3f);
         // Small spilled heaps need a fraction of the grid used by an entire hangar.
@@ -448,11 +459,35 @@ public sealed class GrainPile : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (!surfaceRefreshPending || field == null) return;
-        surfaceRefreshPending = false;
-        RefreshSurface();
-        RefreshGrainAppearance();
+        if (field == null || !Application.isPlaying) return;
+        if (surfaceRefreshPending)
+        {
+            surfaceRefreshPending = false;
+            visualSettling = true;
+            colliderDirty = true;
+            RefreshGrainAppearance();
+        }
+        if (visualSettling && Time.deltaTime > 0)
+        {
+            visualSettling = SmoothVisualSurface(Time.deltaTime);
+            RefreshSurface();
+        }
         if (colliderDirty && Time.time >= nextCollider) RefreshCollider();
+    }
+
+    private bool SmoothVisualSurface(float deltaTime)
+    {
+        float blend = surfaceSmoothTime <= 0 ? 1f : 1f - Mathf.Exp(-deltaTime / surfaceSmoothTime);
+        float tolerance = .0001f / Mathf.Max(.0001f, WorldScale.y);
+        bool pending = false;
+        for (int i = 0; i < field.Heights.Length; i++)
+        {
+            float height = Mathf.Lerp(visualField.Heights[i], field.Heights[i], blend);
+            if (Mathf.Abs(height - field.Heights[i]) <= tolerance) height = field.Heights[i];
+            else pending = true;
+            visualField.Heights[i] = height;
+        }
+        return pending;
     }
 
     private void Update()
@@ -489,23 +524,25 @@ public sealed class GrainPile : MonoBehaviour
     {
         kilograms = Kilograms;
         SurfaceRevision++;
+        var surface = VisualHeightField;
+        if (!Application.isPlaying) System.Array.Copy(field.Heights, surface.Heights, field.Heights.Length);
         if (HasClippedSurface)
         {
-            boundary.UpdateHeights(field, .045f / WorldScale.y);
+            boundary.UpdateHeights(surface, .045f / WorldScale.y);
             mesh.Clear(); mesh.SetVertices(boundary.Positions); mesh.SetUVs(0, boundary.UV); mesh.SetTriangles(boundary.Triangles, 0);
             mesh.RecalculateNormals(); mesh.RecalculateTangents(); mesh.RecalculateBounds();
-            colliderDirty = true;
+            if (!Application.isPlaying) colliderDirty = true;
             return;
         }
         // The volume skin sits beneath the visible kernels. Bury its zero-height apron
         // below the ground instead of exposing large orange triangles around the pile.
-        for (int i = 0; i < vertices.Length; i++) vertices[i].y = field.Heights[i] - .045f / WorldScale.y;
+        for (int i = 0; i < vertices.Length; i++) vertices[i].y = surface.Heights[i] - .045f / WorldScale.y;
         mesh.vertices = vertices;
         activeTriangles.Clear();
         for (int t = 0; t < field.Triangles.Length; t += 3)
         {
             int a = field.Triangles[t], b = field.Triangles[t + 1], c = field.Triangles[t + 2];
-            if (field.Heights[a] <= .00001f && field.Heights[b] <= .00001f && field.Heights[c] <= .00001f) continue;
+            if (surface.Heights[a] <= .00001f && surface.Heights[b] <= .00001f && surface.Heights[c] <= .00001f) continue;
             activeTriangles.Add(a); activeTriangles.Add(b); activeTriangles.Add(c);
         }
         // Bare ground must not retain a golden rectangle or a phantom grain collider.
@@ -513,7 +550,7 @@ public sealed class GrainPile : MonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
-        colliderDirty = true;
+        if (!Application.isPlaying) colliderDirty = true;
     }
 
     private void OnValidate() { rebuildRequested = true; lastAppearanceKg = -1; SurfaceRevision++; }
@@ -567,7 +604,12 @@ public sealed class GrainPile : MonoBehaviour
             {
                 Vector3 point = vertices[i]; point.y = field.Heights[i]; collisionVertices.Add(point);
             }
-            collisionIndices.AddRange(activeTriangles);
+            for (int t = 0; t < field.Triangles.Length; t += 3)
+            {
+                int a = field.Triangles[t], b = field.Triangles[t + 1], c = field.Triangles[t + 2];
+                if (field.Heights[a] <= .00001f && field.Heights[b] <= .00001f && field.Heights[c] <= .00001f) continue;
+                collisionIndices.Add(a); collisionIndices.Add(b); collisionIndices.Add(c);
+            }
         }
         bool changed = cookedVertices.Count != collisionVertices.Count || cookedIndices.Count != collisionIndices.Count;
         float tolerance = .001f / Mathf.Max(.0001f, WorldScale.y);
@@ -600,6 +642,7 @@ public sealed class GrainPile : MonoBehaviour
         if (mesh != null) { if (Application.isPlaying) Destroy(mesh); else DestroyImmediate(mesh); }
         if (collisionMesh != null) { if (Application.isPlaying) Destroy(collisionMesh); else DestroyImmediate(collisionMesh); }
         mesh = collisionMesh = null;
+        visualField = null; visualSettling = false;
         collisionVertexMap = null; cookedVertices.Clear(); cookedIndices.Clear();
     }
 

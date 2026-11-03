@@ -36,7 +36,7 @@ public class SoldCargoAnimationTests
     }
 
     [Test]
-    public void WholeBatchRisesShrinksAndDisappearsAfterPointEightSeconds()
+    public void WholeBatchWaitsOneSecondThenRisesShrinksAndDisappears()
     {
         var first = new GameObject("First sold bag"); var second = new GameObject("Second sold bag");
         first.transform.position = new Vector3(30000, 1000, 30000);
@@ -47,14 +47,45 @@ public class SoldCargoAnimationTests
         try
         {
             var advance = typeof(SoldCargoAnimation).GetMethod("Advance", BindingFlags.Instance | BindingFlags.NonPublic);
+            advance.Invoke(animation, new object[] { .99f });
+            Assert.AreEqual(origin, first.transform.position);
+            Assert.AreEqual(scale, first.transform.localScale);
+            advance.Invoke(animation, new object[] { .01f });
+            Assert.AreEqual(origin, first.transform.position);
             advance.Invoke(animation, new object[] { .4f });
             Assert.Greater(first.transform.position.y, origin.y);
             Assert.Less(first.transform.localScale.magnitude, scale.magnitude);
             Assert.That(Vector3.Distance(first.transform.position, second.transform.position), Is.EqualTo(1).Within(.001f));
             Assert.IsTrue(first.activeSelf); Assert.IsTrue(second.activeSelf);
-            advance.Invoke(animation, new object[] { .4f });
+            advance.Invoke(animation, new object[] { .41f });
             Assert.IsTrue(first == null); Assert.IsTrue(second == null); Assert.IsTrue(animation == null);
         }
         finally { if (animation != null) Object.DestroyImmediate(animation.gameObject); }
+    }
+
+    [Test]
+    public void EveryBagGetsOneEffectAfterDelayAndEffectsOutliveCargo()
+    {
+        var effect = new GameObject("Green sale test effect");
+        var particles = effect.AddComponent<ParticleSystem>();
+        particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        var main = particles.main; main.duration = 2; main.startLifetime = .5f; main.loop = false;
+        effect.SetActive(false);
+        var first = new GameObject("First"); var second = new GameObject("Second");
+        var animation = SoldCargoAnimation.Begin(new[] { first.AddComponent<GrainContainer>(), second.AddComponent<GrainContainer>() }, effect);
+        try
+        {
+            var advance = typeof(SoldCargoAnimation).GetMethod("Advance", BindingFlags.Instance | BindingFlags.NonPublic);
+            advance.Invoke(animation, new object[] { .9f });
+            Assert.AreEqual(0, animation.GetComponentsInChildren<ParticleSystem>(true).Length);
+            advance.Invoke(animation, new object[] { .2f });
+            Assert.AreEqual(2, animation.GetComponentsInChildren<ParticleSystem>(true).Length);
+            advance.Invoke(animation, new object[] { .8f });
+            Assert.IsFalse(first.activeSelf); Assert.IsFalse(second.activeSelf);
+            Assert.AreEqual(2, animation.GetComponentsInChildren<ParticleSystem>(true).Length);
+            advance.Invoke(animation, new object[] { 2f });
+            Assert.IsTrue(animation == null);
+        }
+        finally { if (animation != null) Object.DestroyImmediate(animation.gameObject); Object.DestroyImmediate(effect); }
     }
 }

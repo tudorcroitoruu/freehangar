@@ -1011,8 +1011,8 @@ MonoBehaviour:
   cargoLocationName: trailer
   dismountSideDistance: 1.5
   dismountLongitudinalDistance: 2.5
-  maximumSpeed: 11
-  acceleration: 2
+  maximumSpeed: 13
+  acceleration: 5
   wheelRadius: 0.24
   wheelbase: 1.56
   brakingDeceleration: 6
@@ -1038,8 +1038,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8e06c634423c841a36065f6808df8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorollerController
-  maximumSpeed: 11
-  acceleration: 2
+  maximumSpeed: 13
+  acceleration: 5
   brakingDeceleration: 6
   wheelRadius: 0.24
   wheelbase: 1.56

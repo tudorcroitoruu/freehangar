@@ -1365,8 +1365,8 @@ MonoBehaviour:
   cargoLocationName: pickup bed
   dismountSideDistance: 2.4301329
   dismountLongitudinalDistance: 5.5569377
-  maximumSpeed: 15
-  acceleration: 4
+  maximumSpeed: 17
+  acceleration: 6
   wheelRadius: 0.45710695
   wheelbase: 3.9955206
   brakingDeceleration: 8
@@ -1392,8 +1392,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8e06c634423c841a36065f6808df8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorollerController
-  maximumSpeed: 15
-  acceleration: 4
+  maximumSpeed: 17
+  acceleration: 6
   brakingDeceleration: 8
   wheelRadius: 0.45710695
   wheelbase: 3.9955206

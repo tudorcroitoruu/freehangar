@@ -89,7 +89,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         // Component OnEnable order is not guaranteed when a scene is loaded.
         // The generated surface and cell cache both depend on the pile's field.
         pile.Initialize();
-        if (pile.HeightField == null)
+        if (pile.VisualHeightField == null)
         {
             samples = null; batches = null; KernelCount = 0;
             return;
@@ -130,7 +130,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             // Submission order changes only. Seeded positions, colors and rotations stay identical.
             drawOrder = new int[samples.Length];
             var keys = new uint[samples.Length];
-            float extent = Mathf.Max(.001f, pile.HeightField.Size);
+            float extent = Mathf.Max(.001f, pile.VisualHeightField.Size);
             for (int i = 0; i < samples.Length; i++)
             {
                 drawOrder[i] = i;
@@ -148,9 +148,9 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             int i = drawOrder[order];
             Vector2 p = samples[i];
             if (!pile.IsInsideBoundary(pile.transform.TransformPoint(new Vector3(p.x, 0, p.y)), .04f)) continue;
-            float height = pile.SampleLocalHeight(p.x, p.y);
-            float dx = pile.SampleLocalHeight(p.x + .03f, p.y, false) - pile.SampleLocalHeight(p.x - .03f, p.y, false);
-            float dz = pile.SampleLocalHeight(p.x, p.y + .03f, false) - pile.SampleLocalHeight(p.x, p.y - .03f, false);
+            float height = pile.VisualHeightField.Sample(p.x, p.y);
+            float dx = pile.VisualHeightField.Sample(p.x + .03f, p.y) - pile.VisualHeightField.Sample(p.x - .03f, p.y);
+            float dz = pile.VisualHeightField.Sample(p.x, p.y + .03f) - pile.VisualHeightField.Sample(p.x, p.y - .03f);
             Vector3 normal = pile.transform.worldToLocalMatrix.transpose.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
             Quaternion slope = Quaternion.FromToRotation(Vector3.up, normal);
             int color = paletteIndices[i];
@@ -169,7 +169,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private void CacheCells()
     {
-        var field = pile.HeightField;
+        var field = pile.VisualHeightField;
         pendingCoverage?.Dispose(); pendingCoverage = null;
         coveragePatches.Clear(); coverageMatrices.Clear();
         initialTriangleAreas = new float[field.Heights.Length * 2];
@@ -229,7 +229,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private void UpdateChangedCells()
     {
-        var field = pile.HeightField;
+        var field = pile.VisualHeightField;
         int n = field.Resolution;
         for (int i = 0; i < previousHeights.Length; i++)
         {
@@ -254,7 +254,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private void ProcessPendingCells()
     {
-        var field = pile.HeightField;
+        var field = pile.VisualHeightField;
         Matrix4x4 localToWorld = transform.localToWorldMatrix, normalMatrix = transform.worldToLocalMatrix.transpose;
         Quaternion yaw = Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up);
         LastUpdatedKernels = 0;
@@ -322,7 +322,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private void CellTriangle(int cell, int triangle, out Vector3 a, out Vector3 b, out Vector3 c)
     {
-        var field = pile.HeightField;
+        var field = pile.VisualHeightField;
         int n = field.Resolution;
         Vector3 Vertex(int index) => transform.TransformPoint(new Vector3(
             index % n * field.Spacing - field.Size * .5f, field.Heights[index],
@@ -334,9 +334,8 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private IEnumerable<Matrix4x4> SampleExtraCoverage(int cell)
     {
-        var field = pile.HeightField;
+        var field = pile.VisualHeightField;
         if (cell % field.Resolution >= field.Resolution - 1 || cell / field.Resolution >= field.Resolution - 1) yield break;
-        var random = new System.Random(193 + cell);
         for (int triangle = 0; triangle < 2; triangle++)
         {
             CellTriangle(cell, triangle, out var a, out var b, out var c);
@@ -344,18 +343,24 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             float area = cross.magnitude * .5f;
             float originalArea = initialTriangleAreas[cell * 2 + triangle];
             // Existing grains still cover the original area. Add only the density lost to stretching.
-            if (area <= originalArea * 1.05f) continue;
-            float step = EffectiveSpacing * Mathf.Sqrt(area / (area - originalArea));
+            if (area <= originalArea) continue;
+            float desiredCount = (area - originalArea) / (EffectiveSpacing * EffectiveSpacing * .866f);
             Quaternion slope = Quaternion.FromToRotation(Vector3.up, cross.normalized);
-            foreach (var point in SampleTriangle(a, b, c, step, random))
+            // Stable barycentric samples: changing the slope must not reshuffle
+            // every extra grain. Only the last grain grows/shrinks with density.
+            var random = new System.Random(193 + cell * 2 + triangle);
+            for (int i = 0; i < Mathf.CeilToInt(desiredCount); i++)
             {
+                float u = Mathf.Sqrt((float)random.NextDouble());
+                float v = (float)random.NextDouble();
+                Vector3 point = a * (1 - u) + b * (u * (1 - v)) + c * (u * v);
                 var local = transform.InverseTransformPoint(point);
-                if (local.y < .001f || !pile.IsInsideBoundary(point, .04f)) continue;
                 Quaternion rotation = Quaternion.Euler((float)random.NextDouble() * 28f - 14f,
                     (float)random.NextDouble() * 360f, (float)random.NextDouble() * 26f - 13f);
                 float size = .9f + (float)random.NextDouble() * .22f;
+                if (local.y < .001f || !pile.IsInsideBoundary(point, .04f)) continue;
                 yield return Matrix4x4.TRS(point + Vector3.up * .003f, slope * rotation,
-                    new Vector3(.0255f, .014f, .029f) * size);
+                    new Vector3(.0255f, .014f, .029f) * (size * Mathf.Clamp01(desiredCount - i)));
             }
         }
     }
@@ -419,7 +424,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     {
         // Reserve samples across bare cells too, so deposits can reveal them through
         // the same bounded update queue instead of rebuilding the entire pile.
-        var field = pile.HeightField;
+        var field = pile.VisualHeightField;
         var vertices = new Vector3[field.Heights.Length];
         for (int i = 0; i < vertices.Length; i++)
             vertices[i] = new Vector3(i % field.Resolution * field.Spacing - field.Size * .5f,

@@ -4,6 +4,61 @@ using UnityEngine;
 public class VehicleCargoPlacementTests
 {
     [Test]
+    public void EmptyStarterWheelbarrowAcceptsFinishedStarterBagAndReportsOversizeSeparately()
+    {
+        var root = new GameObject("Wheelbarrow regression");
+        var item = Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/FreeBag.prefab"));
+        var previousData = SaveSystem.Data;
+        try
+        {
+            SaveSystem.Data = new PlayerData();
+            var barrowObject = new GameObject("Wheelbarrow_Small");
+            barrowObject.transform.SetParent(root.transform);
+            var barrow = barrowObject.AddComponent<WheelbarrowCargo>();
+            var actor = new GameObject("Carrier"); actor.transform.SetParent(root.transform);
+            var carry = actor.AddComponent<BagInteraction>();
+            var interactor = actor.AddComponent<PlayerInteractor>();
+            const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            typeof(PlayerInteractor).GetMethod("Awake", flags).Invoke(interactor, null);
+            typeof(BagInteraction).GetField("carryAnchor", flags).SetValue(carry, actor.transform);
+            VehicleCargoPreview.PrepareContainer(item, 1, 1);
+            Assert.IsTrue(carry.RestoreCarried(item.GetComponent<GrainContainer>()));
+            Assert.IsTrue(barrow.CanLoad(carry));
+            Assert.IsTrue(barrow.TryGetPrompt(interactor, out var prompt));
+            Assert.IsTrue(prompt.ShowKey);
+            Assert.IsFalse(prompt.VehicleFull);
+            typeof(WheelbarrowCargo).GetField("occupiedVolume", flags).SetValue(barrow, barrow.CapacityVolume);
+            barrow.TryGetPrompt(interactor, out prompt);
+            Assert.IsFalse(prompt.ShowKey); Assert.IsTrue(prompt.VehicleFull);
+            typeof(WheelbarrowCargo).GetField("occupiedVolume", flags).SetValue(barrow, 0f);
+            typeof(BagInteraction).GetField("carriedVolume", flags).SetValue(carry, 2f);
+            barrow.TryGetPrompt(interactor, out prompt);
+            Assert.IsFalse(prompt.ShowKey); Assert.IsFalse(prompt.VehicleFull);
+        }
+        finally { Object.DestroyImmediate(item); Object.DestroyImmediate(root); SaveSystem.Data = previousData; }
+    }
+
+    [Test]
+    public void RestoredWheelbarrowVolumeDoesNotGrowWithCargoRotation()
+    {
+        var root = new GameObject("Restored barrow");
+        try
+        {
+            var barrow = root.AddComponent<WheelbarrowCargo>();
+            var slot = new GameObject("Bag slot 1"); slot.transform.SetParent(root.transform);
+            var item = new GameObject("Cargo"); item.transform.SetParent(slot.transform);
+            item.AddComponent<BoxCollider>().size = new Vector3(.5f, 1, .4f);
+            item.transform.rotation = Quaternion.Euler(20, 45, 30);
+            var bag = item.AddComponent<GrainContainer>();
+            barrow.RestoreLoadedBag(bag, slot.transform);
+            Assert.AreEqual(.2f, barrow.OccupiedVolume, .00001f);
+            barrow.NotifyBagTaken(bag);
+            Assert.AreEqual(0f, barrow.OccupiedVolume);
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
+
+    [Test]
     public void EmptyBagsStackWithoutPreviewPositionOffsetsOrSlotGaps()
     {
         var root = new GameObject("Empty bag stack");

@@ -693,8 +693,8 @@ MonoBehaviour:
   cargoLocationName: cargo bed
   dismountSideDistance: 1.65
   dismountLongitudinalDistance: 2.65
-  maximumSpeed: 10
-  acceleration: 2.5
+  maximumSpeed: 12
+  acceleration: 4
   wheelRadius: 0.28586
   wheelbase: 2.55731
   brakingDeceleration: 8
@@ -720,8 +720,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8e06c634423c841a36065f6808df8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorollerController
-  maximumSpeed: 10
-  acceleration: 2.5
+  maximumSpeed: 12
+  acceleration: 4
   brakingDeceleration: 8
   wheelRadius: 0.28586
   wheelbase: 2.55731

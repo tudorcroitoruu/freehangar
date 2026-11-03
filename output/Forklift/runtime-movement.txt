@@ -6447,3 +6447,118 @@ time=125.03 throttle=0 speed=0 riderMounted=False ridden=False position=(-31.41,
 motor cache=Forklift (MotorollerController)
 time=125.03 throttle=0 speed=0 riderMounted=False ridden=False position=(-31.41, 7.18, 108.11) focus=False cursor=None dt=0 scale=0 loading=False upgrade=False popup=False playerEnabled=True discovery=False
 motor cache=Forklift (MotorollerController)
+time=11,05 throttle=1 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0,0185197 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=11,32 throttle=0 speed=0 riderMounted=False ridden=False position=(9.98, 0.00, 18.85) focus=True cursor=Locked dt=0,0227864 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=
+time=11,59 throttle=0 speed=0 riderMounted=True ridden=True position=(9.98, 0.18, 18.85) focus=True cursor=Locked dt=0,0152396 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=11,85 throttle=0 speed=0 riderMounted=True ridden=True position=(9.98, 0.18, 18.85) focus=True cursor=Locked dt=0,0146474 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=12,10 throttle=0 speed=0 riderMounted=True ridden=True position=(9.98, 0.18, 18.85) focus=True cursor=Locked dt=0,0129734 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=12,37 throttle=0 speed=0 riderMounted=True ridden=True position=(9.98, 0.18, 18.85) focus=True cursor=Locked dt=0,0146172 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=12,62 throttle=1 speed=0,188941 riderMounted=True ridden=True position=(9.98, 0.18, 18.86) focus=True cursor=Locked dt=0,014431 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=12,88 throttle=1 speed=0,8339198 riderMounted=True ridden=True position=(9.98, 0.18, 18.99) focus=True cursor=Locked dt=0,0164074 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=13,13 throttle=1 speed=1,460374 riderMounted=True ridden=True position=(9.94, 0.18, 19.28) focus=True cursor=Locked dt=0,0161324 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=13,40 throttle=1 speed=2,120948 riderMounted=True ridden=True position=(9.81, 0.18, 19.75) focus=True cursor=Locked dt=0,0179856 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=13,65 throttle=0 speed=1,927994 riderMounted=True ridden=True position=(9.60, 0.18, 20.26) focus=True cursor=Locked dt=0,01480519 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=13,91 throttle=0 speed=1,464428 riderMounted=True ridden=True position=(9.38, 0.18, 20.64) focus=True cursor=Locked dt=0,0151121 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=14,16 throttle=0 speed=1,010566 riderMounted=True ridden=True position=(9.19, 0.18, 20.89) focus=True cursor=Locked dt=0,0167294 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=14,43 throttle=1 speed=1,074684 riderMounted=True ridden=True position=(9.04, 0.18, 21.07) focus=True cursor=Locked dt=0,0171675 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=14,68 throttle=1 speed=1,713351 riderMounted=True ridden=True position=(8.78, 0.18, 21.33) focus=True cursor=Locked dt=0,02085811 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=14,96 throttle=0 speed=2,092003 riderMounted=True ridden=True position=(8.33, 0.18, 21.68) focus=True cursor=Locked dt=0,0140597 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=15,22 throttle=0 speed=1,628805 riderMounted=True ridden=True position=(7.92, 0.18, 21.92) focus=True cursor=Locked dt=0,01293379 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=15,47 throttle=1 speed=1,59541 riderMounted=True ridden=True position=(7.57, 0.18, 22.08) focus=True cursor=Locked dt=0,0149289 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=15,73 throttle=1 speed=2,248214 riderMounted=True ridden=True position=(7.08, 0.18, 22.22) focus=True cursor=Locked dt=0,0137961 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=15,97 throttle=0 speed=2,632952 riderMounted=True ridden=True position=(6.48, 0.18, 22.31) focus=True cursor=Locked dt=0,0327545 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=16,24 throttle=0 speed=2,144863 riderMounted=True ridden=True position=(5.83, 0.18, 22.30) focus=True cursor=Locked dt=0,0158859 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=16,50 throttle=1 speed=2,176844 riderMounted=True ridden=True position=(5.32, 0.18, 22.21) focus=True cursor=Locked dt=0,0149819 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=16,75 throttle=1 speed=2,815581 riderMounted=True ridden=True position=(4.70, 0.18, 22.00) focus=True cursor=Locked dt=0,0131155 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=17,01 throttle=1 speed=3,463894 riderMounted=True ridden=True position=(3.96, 0.18, 21.64) focus=True cursor=Locked dt=0,0155565 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=17,27 throttle=1 speed=4,105713 riderMounted=True ridden=True position=(3.07, 0.18, 21.23) focus=True cursor=Locked dt=0,030558 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=17,53 throttle=1 speed=4,757692 riderMounted=True ridden=True position=(2.02, 0.18, 20.74) focus=True cursor=Locked dt=0,0159429 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=17,79 throttle=0 speed=4,698691 riderMounted=True ridden=True position=(0.92, 0.18, 20.11) focus=True cursor=Locked dt=0,0146251 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=18,04 throttle=1 speed=4,439443 riderMounted=True ridden=True position=(0.17, 0.18, 19.29) focus=True cursor=Locked dt=0,0422833 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=18,32 throttle=1 speed=5 riderMounted=True ridden=True position=(-0.37, 0.18, 18.02) focus=True cursor=Locked dt=0,0174156 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=18,58 throttle=0 speed=4,969197 riderMounted=True ridden=True position=(-0.65, 0.18, 16.77) focus=True cursor=Locked dt=0,0171128 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=18,83 throttle=0 speed=4,506345 riderMounted=True ridden=True position=(-0.92, 0.18, 15.59) focus=True cursor=Locked dt=0,017507 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=19,10 throttle=0 speed=4,019269 riderMounted=True ridden=True position=(-1.17, 0.19, 14.50) focus=True cursor=Locked dt=0,0165326 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=19,35 throttle=1 speed=4,285332 riderMounted=True ridden=True position=(-1.38, 0.19, 13.49) focus=True cursor=Locked dt=0,0179083 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=19,61 throttle=1 speed=4,920806 riderMounted=True ridden=True position=(-1.42, 0.19, 12.31) focus=True cursor=Locked dt=0,0417181 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=19,90 throttle=1 speed=5 riderMounted=True ridden=True position=(-1.46, 0.19, 10.86) focus=True cursor=Locked dt=0,016358 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=20,15 throttle=1 speed=5 riderMounted=True ridden=True position=(-1.49, 0.19, 9.59) focus=True cursor=Locked dt=0,0187947 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=20,43 throttle=1 speed=5 riderMounted=True ridden=True position=(-1.53, 0.19, 8.21) focus=True cursor=Locked dt=0,0385697 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=20,68 throttle=1 speed=5 riderMounted=True ridden=True position=(-1.57, 0.19, 6.93) focus=True cursor=Locked dt=0,0177379 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=20,94 throttle=1 speed=5 riderMounted=True ridden=True position=(-1.54, 0.19, 5.66) focus=True cursor=Locked dt=0,0157302 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=21,20 throttle=1 speed=5 riderMounted=True ridden=True position=(-1.29, 0.19, 4.36) focus=True cursor=Locked dt=0,0279051 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=21,46 throttle=0 speed=4,811567 riderMounted=True ridden=True position=(-0.89, 0.19, 3.16) focus=True cursor=Locked dt=0,0156769 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+time=21,72 throttle=-1 speed=-0,07118426 riderMounted=True ridden=True position=(-0.38, 0.19, 2.33) focus=True cursor=Locked dt=0,0143 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,02441341 normal=(-0.51, 0.00, 0.86) center=(-0.63, 0.86, 2.75) half=(1.10, 0.71, 1.38)
+time=21,95 throttle=-1 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0236099 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=22,24 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,0178727 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=22,50 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=True cursor=Locked dt=0,03355769 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=22,75 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=False cursor=None dt=0,0374847 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=23,01 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=False cursor=None dt=0,0195148 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=23,27 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=False cursor=None dt=0,0192046 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=23,53 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=False cursor=None dt=0,0167709 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=23,79 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=False cursor=None dt=0,019245 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=24,05 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=False cursor=None dt=0,0241967 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)
+time=24,08 throttle=0 speed=0 riderMounted=False ridden=False position=(-0.39, 0.19, 2.33) focus=False cursor=None dt=0,0179528 scale=1 loading=False upgrade=False popup=False playerEnabled=True discovery=False
+motor cache=Forklift (MotorollerController)
+BLOCKER FreeBag(Clone) distance=0,02831072 normal=(-0.51, 0.00, 0.86) center=(-0.64, 0.86, 2.76) half=(1.10, 0.71, 1.38)

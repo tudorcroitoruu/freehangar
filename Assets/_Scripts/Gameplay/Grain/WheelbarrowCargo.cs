@@ -8,11 +8,10 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     public void RestoreLoadedBag(GrainContainer bag, Transform slot)
     {
         if (bag == null || slot == null || bags.Contains(bag)) return;
-        var size = bag.WorldBounds.size;
-        float volume = size.x * size.y * size.z;
+        float volume = Volume(bag);
         bags.Add(bag); bagVolumes.Add(volume); slots.Add(slot); occupiedVolume += volume;
     }
-    [SerializeField, Min(.01f)] private float cargoVolumeCubicMeters = .4f;
+    [SerializeField, Min(.01f)] private float cargoVolumeCubicMeters = .5f;
     [SerializeField] private Vector3 trayCenter = new Vector3(0f, .46f, -.72f);
     [SerializeField] private Vector3 traySize = new Vector3(.7f, .35f, .85f);
     [SerializeField, Min(.5f)] private float pushDistance = 1.4f;
@@ -174,12 +173,14 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         else if (interactor.Bags != null && interactor.Bags.IsCarrying)
         {
             available = CanLoad(interactor.Bags);
-            action = !interactor.Bags.CarriedBag.CanLoadOnVehicle ? "Finish filling and close bag" : available ? "Load bag" : "Wheelbarrow full";
+            action = !interactor.Bags.CarriedBag.CanLoadOnVehicle ? "Finish filling and close bag" : available ? "Load bag" :
+                interactor.Bags.CarriedVolume > CapacityVolume + .0001f ? "Container too large for wheelbarrow" : "Wheelbarrow full";
         }
         else action = interactor.Items != null && interactor.Items.IsCarrying ? "Put down item and push" : "Push wheelbarrow";
         prompt = new InteractionPromptData(transform.TransformPoint(trayCenter + Vector3.up * .35f),
             action + $"  ({occupiedVolume:0.00}/{CapacityVolume:0.00} m³)", available);
-        prompt.VehicleFull = !available && interactor.Bags != null && interactor.Bags.IsCarrying && interactor.Bags.CarriedBag.CanLoadOnVehicle;
+        prompt.VehicleFull = !available && interactor.Bags != null && interactor.Bags.IsCarrying &&
+            interactor.Bags.CarriedBag.CanLoadOnVehicle && interactor.Bags.CarriedVolume <= CapacityVolume + .0001f;
         return true;
     }
 

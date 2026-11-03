@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
     private bool sprintMoving, sprintExhausted;
 
     [Header("Crouch (hold Ctrl or C)")]
-    [SerializeField, Min(0.1f)] private float crouchHeight = 1.2f;
+    [SerializeField, Min(0.1f)] private float crouchHeight = 1.55f;
     [SerializeField, Min(0f)] private float crouchSpeed = 1.5f;
     [SerializeField, Min(0.1f)] private float crouchTransitionSpeed = 5f;
     [SerializeField] private LayerMask crouchObstructionMask = ~0;
@@ -272,6 +272,7 @@ public class PlayerController : MonoBehaviour
         {
             currentSpeed *= Mathf.Lerp(1f, bagCarrySpeedMultiplier, bagWeight);
             if (carriedBag.Kilograms > .0001f) currentSpeed *= 1.3f;
+            if (carriedBag.IsFinished) currentSpeed *= 1.3f;
         }
         if(!pushingWheelbarrow) currentSpeed *= PlayerPerks.MobilityMultiplier;
         Vector3 velocity = (transform.right * input.x + transform.forward * input.y) * currentSpeed;

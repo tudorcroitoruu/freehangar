@@ -2287,7 +2287,7 @@ MonoBehaviour:
   sprintCameraHeight: 0.004166667
   sprintCameraPitch: 0.15625
   sprintStepFrequency: 2.6
-  crouchHeight: 1.2
+  crouchHeight: 1.55
   crouchSpeed: 1.5
   crouchTransitionSpeed: 5
   crouchObstructionMask:

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class SellingScreen : MonoBehaviour
 {
     [SerializeField] private AudioClip cashInClip;
+    [SerializeField] private GameObject soldBagEffect;
     [SerializeField] private UnityEngine.Audio.AudioMixerGroup cashInMixerGroup;
     [SerializeField] private SellGrainElement elementPrefab;
     [SerializeField] private Transform elementsParent;
@@ -152,7 +153,7 @@ public class SellingScreen : MonoBehaviour
             soldQuantities.TryGetValue(grain, out float kilograms);
             soldQuantities[grain] = kilograms + entry.Value;
         }
-        SoldCargoAnimation.Begin(containers);
+        SoldCargoAnimation.Begin(containers, soldBagEffect);
         // Report only paid sales, after cargo is excluded from world saves.
         foreach (var entry in soldQuantities)
             GoalChecker.ReportProgress(GoalType.GrainSold, entry.Value, grainType: entry.Key);

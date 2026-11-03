@@ -8,14 +8,22 @@ public sealed class SoldCargoAnimation : MonoBehaviour
     {
         public Transform transform;
         public Vector3 position, scale;
+        public Vector3 effectPosition;
+        public float effectScale;
     }
     private readonly List<Item> items = new List<Item>();
     private float elapsed;
     private bool completed;
+    private bool effectsStarted;
+    private GameObject effectPrefab;
+    private float effectDuration;
+    private const float StartDelay = 1f;
+    private const float AnimationDuration = .8f;
 
-    public static SoldCargoAnimation Begin(IEnumerable<GrainContainer> containers)
+    public static SoldCargoAnimation Begin(IEnumerable<GrainContainer> containers, GameObject effectPrefab = null)
     {
         var animation = new GameObject("Sold cargo animation").AddComponent<SoldCargoAnimation>();
+        animation.effectPrefab = effectPrefab;
         foreach (var container in containers)
         {
             if (container == null) continue;
@@ -26,8 +34,11 @@ public sealed class SoldCargoAnimation : MonoBehaviour
             container.enabled = false;
             foreach (var collider in container.GetComponentsInChildren<Collider>(true)) collider.enabled = false;
             foreach (var body in container.GetComponentsInChildren<Rigidbody>(true)) body.isKinematic = true;
+            var bounds = container.WorldBounds;
             animation.items.Add(new Item { transform = container.transform,
-                position = container.transform.position, scale = container.transform.localScale });
+                position = container.transform.position, scale = container.transform.localScale,
+                effectPosition = new Vector3(bounds.center.x, bounds.min.y, bounds.center.z),
+                effectScale = Mathf.Clamp(Mathf.Max(bounds.size.x, bounds.size.z), .35f, 1.5f) });
         }
         return animation;
     }
@@ -36,9 +47,15 @@ public sealed class SoldCargoAnimation : MonoBehaviour
 
     private void Advance(float deltaTime)
     {
-        if (completed) return;
         elapsed += Mathf.Max(0, deltaTime);
-        float t = Mathf.Clamp01(elapsed / .8f);
+        if (elapsed < StartDelay) return;
+        if (!effectsStarted) StartEffects();
+        if (completed)
+        {
+            if (elapsed >= StartDelay + Mathf.Max(AnimationDuration, effectDuration)) Release();
+            return;
+        }
+        float t = Mathf.Clamp01((elapsed - StartDelay) / AnimationDuration);
         float pop = t < .22f ? Mathf.Lerp(1, 1.15f, t / .22f)
             : Mathf.Lerp(1.15f, 0, Mathf.SmoothStep(0, 1, (t - .22f) / .78f));
         foreach (var item in items)
@@ -50,6 +67,33 @@ public sealed class SoldCargoAnimation : MonoBehaviour
         if (t < 1) return;
         completed = true;
         foreach (var item in items) if (item.transform != null) item.transform.gameObject.SetActive(false);
+        if (elapsed >= StartDelay + Mathf.Max(AnimationDuration, effectDuration)) Release();
+    }
+
+    private void StartEffects()
+    {
+        effectsStarted = true;
+        if (effectPrefab == null) return;
+        foreach (var item in items)
+        {
+            if (item.transform == null) continue;
+            var effect = Instantiate(effectPrefab, item.effectPosition, Quaternion.identity, transform);
+            effect.transform.localScale = effectPrefab.transform.localScale * item.effectScale;
+            effect.SetActive(true);
+            foreach (var particles in effect.GetComponentsInChildren<ParticleSystem>(true))
+            {
+                particles.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+                var main = particles.main;
+                main.loop = false;
+                effectDuration = Mathf.Max(effectDuration,
+                    (main.startDelay.constantMax + main.duration + main.startLifetime.constantMax) / Mathf.Max(.01f, main.simulationSpeed));
+                particles.Play(false);
+            }
+        }
+    }
+
+    private void Release()
+    {
         if (Application.isPlaying) Destroy(gameObject);
         else DestroyImmediate(gameObject);
     }

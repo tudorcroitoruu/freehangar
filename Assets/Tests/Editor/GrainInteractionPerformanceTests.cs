@@ -21,6 +21,102 @@ public class GrainInteractionPerformanceTests
     private static T Field<T>(object obj,string field)=>(T)obj.GetType().GetField(field,Private).GetValue(obj);
     private static void UpdateBag(BagCornSurface surface)=>typeof(BagCornSurface).GetMethod("LateUpdate",Private).Invoke(surface,null);
 
+    [Test]
+    public void StandingScoopAcceptsLowAuthoredPileButRejectsObstructionsAndDistance()
+    {
+        root.transform.position = Vector3.up * 1000;
+        var ground = new GameObject("Low authored pile");
+        ground.transform.SetParent(root.transform, false);
+        var pile = ground.AddComponent<GrainPile>();
+        var saved = pile.CaptureSave();
+        for (int i = 0; i < saved.heights.Length; i++) saved.heights[i] = .05f;
+        pile.RestoreSave(saved);
+        var actor = new GameObject("Standing actor");
+        actor.transform.SetParent(root.transform, false);
+        var camera = actor.AddComponent<Camera>();
+        camera.enabled = false;
+        actor.transform.localPosition = new Vector3(0, 1.8f, -1);
+        var toolObject = new GameObject("Shovel");
+        toolObject.transform.SetParent(actor.transform, false);
+        var tool = toolObject.AddComponent<ShovelTool>();
+        void Set(string name, object value) => typeof(ShovelTool).GetField(name, Private).SetValue(tool, value);
+        Set("actionCamera", camera); Set("actor", actor.transform); Set("pendingPile", pile);
+        Set("targetPoint", ground.transform.position + Vector3.up * .05f);
+        var canScrape = (Func<bool>)Delegate.CreateDelegate(typeof(Func<bool>), tool,
+            typeof(ShovelTool).GetMethod("CanScrapeTarget", Private));
+        Physics.SyncTransforms();
+        Assert.IsTrue(canScrape(), "Standing above low grain should not require animated blade contact.");
+        var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        wall.transform.SetParent(root.transform, false);
+        wall.transform.localPosition = new Vector3(0, 1, -.5f);
+        wall.transform.localScale = new Vector3(2, 2, .1f);
+        Physics.SyncTransforms();
+        Assert.IsFalse(canScrape(), "A wall must block the scoop.");
+        Object.DestroyImmediate(wall);
+        actor.transform.localPosition = new Vector3(0, 1.8f, -5);
+        Physics.SyncTransforms();
+        Assert.IsFalse(canScrape(), "Moving out of reach must cancel collection.");
+        actor.transform.localPosition = new Vector3(0, 1.8f, -1);
+        actor.transform.LookAt(ground.transform.position + Vector3.up * .05f);
+        Set("bladeTip", toolObject.transform); // Deliberately above the grain.
+        typeof(ShovelTool).GetMethod("Awake", Private).Invoke(tool, null);
+        Physics.SyncTransforms();
+        var previousData = SaveSystem.Data;
+        try
+        {
+            SaveSystem.Data = new PlayerData();
+            Assert.IsTrue(tool.TryUse(camera, actor.transform));
+            Assert.IsTrue(tool.IsScooping);
+            tool.Tick(.6f);
+            Assert.Greater(tool.Kilograms, 0, "Standing scoop must actually transfer grain despite the high blade.");
+            Assert.LessOrEqual(tool.Kilograms, tool.CapacityKg);
+        }
+        finally { tool.CancelAction(); SaveSystem.Data = previousData; }
+    }
+
+    [TestCase(0f, 1f)]
+    [TestCase(1f, 0f)]
+    public void PileVisualTransitionIsGradualAndDoesNotChangeStoredGrain(float start, float target)
+    {
+        var go = new GameObject("Smooth pile");
+        go.transform.SetParent(root.transform);
+        var pile = go.AddComponent<GrainPile>();
+        var actual = Field<GrainHeightField>(pile, "field");
+        var visual = Field<GrainHeightField>(pile, "visualField");
+        int center = actual.Heights.Length / 2;
+        visual.Heights[center] = start;
+        actual.Heights[center] = target;
+        double mass = pile.Kilograms;
+        var step = (Func<float, bool>)Delegate.CreateDelegate(typeof(Func<float, bool>), pile,
+            typeof(GrainPile).GetMethod("SmoothVisualSurface", Private));
+        Assert.IsTrue(step(1f / 60));
+        Assert.That(visual.Heights[center], Is.InRange(Mathf.Min(start, target) + .001f, Mathf.Max(start, target) - .001f));
+        for (int i = 0; i < 120; i++) step(1f / 60);
+        Assert.AreEqual(target, visual.Heights[center]);
+        Assert.AreEqual(mass, pile.Kilograms);
+        Assert.AreEqual(target, pile.CaptureSave().heights[center]);
+    }
+
+    [Test]
+    public void PileVisualTransitionIsIndependentOfFrameRate()
+    {
+        var go = new GameObject("Smooth pile frame rates");
+        go.transform.SetParent(root.transform);
+        var pile = go.AddComponent<GrainPile>();
+        var actual = Field<GrainHeightField>(pile, "field");
+        var visual = Field<GrainHeightField>(pile, "visualField");
+        int center = actual.Heights.Length / 2;
+        actual.Heights[center] = 1;
+        var step = (Func<float, bool>)Delegate.CreateDelegate(typeof(Func<float, bool>), pile,
+            typeof(GrainPile).GetMethod("SmoothVisualSurface", Private));
+        visual.Heights[center] = 0;
+        for (int i = 0; i < 6; i++) step(1f / 30);
+        float at30 = visual.Heights[center];
+        visual.Heights[center] = 0;
+        for (int i = 0; i < 24; i++) step(1f / 120);
+        Assert.AreEqual(at30, visual.Heights[center], .00001f);
+    }
+
     [TestCase(.2f)][TestCase(.75f)][TestCase(1f)]
     public void SpatialSamplingMatchesEveryTriangleReferenceAcrossTheBag(float fill)
     {

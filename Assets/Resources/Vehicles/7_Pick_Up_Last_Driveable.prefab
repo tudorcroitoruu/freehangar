@@ -872,7 +872,7 @@ MonoBehaviour:
   dismountSideDistance: 2.5621216
   dismountLongitudinalDistance: 5.7538147
   maximumSpeed: 20
-  acceleration: 4
+  acceleration: 6
   wheelRadius: 0.45710734
   wheelbase: 3.9955213
   brakingDeceleration: 8
@@ -899,7 +899,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorollerController
   maximumSpeed: 20
-  acceleration: 4
+  acceleration: 6
   brakingDeceleration: 8
   wheelRadius: 0.45710734
   wheelbase: 3.9955213
