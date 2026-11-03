@@ -38,9 +38,20 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private int[] pendingCells, activeBatchCounts;
     private bool[] visibleSamples;
     private int pendingHead, pendingCount, pendingSample = -1;
+    private float[] initialTriangleAreas;
+    private readonly Dictionary<int, CoveragePatch> coveragePatches = new Dictionary<int, CoveragePatch>();
+    private IEnumerator<Matrix4x4> pendingCoverage;
+    private readonly List<Matrix4x4> coverageMatrices = new List<Matrix4x4>();
+    private int coverageCell;
+    private sealed class CoveragePatch
+    {
+        public Matrix4x4[][] batches;
+        public Bounds bounds;
+        public int count;
+    }
     private const int KernelUpdatesPerFrame = 4096;
     private const double UpdateBudgetSeconds = .001;
-    public bool HasPendingSurfaceUpdates => pendingCount > 0 || pendingSample >= 0;
+    public bool HasPendingSurfaceUpdates => pendingCount > 0 || pendingSample >= 0 || pendingCoverage != null;
     private Bounds[] batchBounds, surfaceBounds;
     private bool[] liveBatches;
     private int[] drawOrder;
@@ -159,6 +170,17 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private void CacheCells()
     {
         var field = pile.HeightField;
+        pendingCoverage?.Dispose(); pendingCoverage = null;
+        coveragePatches.Clear(); coverageMatrices.Clear();
+        initialTriangleAreas = new float[field.Heights.Length * 2];
+        for (int z = 0; z < field.Resolution - 1; z++)
+        for (int x = 0; x < field.Resolution - 1; x++)
+        for (int triangle = 0; triangle < 2; triangle++)
+        {
+            int cell = z * field.Resolution + x;
+            CellTriangle(cell, triangle, out var a, out var b, out var c);
+            initialTriangleAreas[cell * 2 + triangle] = Vector3.Cross(b - a, c - a).magnitude * .5f;
+        }
         previousHeights = (float[])field.Heights.Clone();
         dirtyCells = new bool[previousHeights.Length];
         pendingCells = new int[previousHeights.Length];
@@ -241,14 +263,16 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         // Resume even within a cell. A broad scoop or prolonged settling must not block a frame.
         while (HasPendingSurfaceUpdates)
         {
-            if (pendingSample < 0)
+            if (pendingSample < 0 && pendingCoverage == null)
             {
                 int cell = pendingCells[pendingHead];
                 pendingHead = (pendingHead + 1) % pendingCells.Length; pendingCount--;
                 // A later edit may enqueue this cell again, including samples already processed.
                 dirtyCells[cell] = false;
                 pendingSample = cellSampleHeads[cell];
-                if (pendingSample < 0) continue;
+                coverageCell = cell;
+                coverageMatrices.Clear();
+                pendingCoverage = SampleExtraCoverage(cell).GetEnumerator();
             }
             while (pendingSample >= 0)
             {
@@ -283,7 +307,104 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                 if (LastUpdatedKernels >= KernelUpdatesPerFrame ||
                     ((LastUpdatedKernels & 63) == 0 && System.Diagnostics.Stopwatch.GetTimestamp() - started >= budget)) return;
             }
+            while (pendingCoverage.MoveNext())
+            {
+                coverageMatrices.Add(pendingCoverage.Current);
+                LastUpdatedKernels++;
+                if (LastUpdatedKernels >= KernelUpdatesPerFrame ||
+                    ((LastUpdatedKernels & 63) == 0 && System.Diagnostics.Stopwatch.GetTimestamp() - started >= budget)) return;
+            }
+            pendingCoverage.Dispose(); pendingCoverage = null;
+            ReplaceCoveragePatch();
+            if (System.Diagnostics.Stopwatch.GetTimestamp() - started >= budget) return;
         }
+    }
+
+    private void CellTriangle(int cell, int triangle, out Vector3 a, out Vector3 b, out Vector3 c)
+    {
+        var field = pile.HeightField;
+        int n = field.Resolution;
+        Vector3 Vertex(int index) => transform.TransformPoint(new Vector3(
+            index % n * field.Spacing - field.Size * .5f, field.Heights[index],
+            index / n * field.Spacing - field.Size * .5f));
+        a = Vertex(triangle == 0 ? cell : cell + 1);
+        b = Vertex(cell + n);
+        c = Vertex(triangle == 0 ? cell + 1 : cell + n + 1);
+    }
+
+    private IEnumerable<Matrix4x4> SampleExtraCoverage(int cell)
+    {
+        var field = pile.HeightField;
+        if (cell % field.Resolution >= field.Resolution - 1 || cell / field.Resolution >= field.Resolution - 1) yield break;
+        var random = new System.Random(193 + cell);
+        for (int triangle = 0; triangle < 2; triangle++)
+        {
+            CellTriangle(cell, triangle, out var a, out var b, out var c);
+            Vector3 cross = Vector3.Cross(b - a, c - a);
+            float area = cross.magnitude * .5f;
+            float originalArea = initialTriangleAreas[cell * 2 + triangle];
+            // Existing grains still cover the original area. Add only the density lost to stretching.
+            if (area <= originalArea * 1.05f) continue;
+            float step = EffectiveSpacing * Mathf.Sqrt(area / (area - originalArea));
+            Quaternion slope = Quaternion.FromToRotation(Vector3.up, cross.normalized);
+            foreach (var point in SampleTriangle(a, b, c, step, random))
+            {
+                var local = transform.InverseTransformPoint(point);
+                if (local.y < .001f || !pile.IsInsideBoundary(point, .04f)) continue;
+                Quaternion rotation = Quaternion.Euler((float)random.NextDouble() * 28f - 14f,
+                    (float)random.NextDouble() * 360f, (float)random.NextDouble() * 26f - 13f);
+                float size = .9f + (float)random.NextDouble() * .22f;
+                yield return Matrix4x4.TRS(point + Vector3.up * .003f, slope * rotation,
+                    new Vector3(.0255f, .014f, .029f) * size);
+            }
+        }
+    }
+
+    private void ReplaceCoveragePatch()
+    {
+        if (coveragePatches.TryGetValue(coverageCell, out var previous)) KernelCount -= previous.count;
+        if (coverageMatrices.Count == 0) { coveragePatches.Remove(coverageCell); return; }
+        var patch = new CoveragePatch { count = coverageMatrices.Count,
+            batches = new Matrix4x4[(coverageMatrices.Count + 1022) / 1023][],
+            bounds = new Bounds(coverageMatrices[0].GetColumn(3), Vector3.zero) };
+        for (int i = 0; i < patch.batches.Length; i++)
+        {
+            int count = Mathf.Min(1023, coverageMatrices.Count - i * 1023);
+            patch.batches[i] = new Matrix4x4[count];
+            coverageMatrices.CopyTo(i * 1023, patch.batches[i], 0, count);
+        }
+        foreach (var matrix in coverageMatrices) patch.bounds.Encapsulate((Vector3)matrix.GetColumn(3));
+        patch.bounds.Expand(.12f);
+        coveragePatches[coverageCell] = patch;
+        KernelCount += patch.count;
+    }
+
+    private static IEnumerable<Vector3> SampleTriangle(Vector3 a, Vector3 b, Vector3 c, float step, System.Random random)
+    {
+        if ((c - b).sqrMagnitude > (b - a).sqrMagnitude && (c - b).sqrMagnitude > (c - a).sqrMagnitude)
+        { Vector3 old = a; a = b; b = c; c = old; }
+        else if ((c - a).sqrMagnitude > (b - a).sqrMagnitude) { Vector3 old = b; b = c; c = old; }
+        float length = (b - a).magnitude;
+        if (length < .00001f) yield break;
+        Vector3 right = (b - a) / length, up = Vector3.ProjectOnPlane(c - a, right).normalized;
+        float cx = Vector3.Dot(c - a, right), cy = Vector3.Dot(c - a, up);
+        if (cy < .00001f) yield break;
+        float rowStep = step * .866f;
+        bool sampled = false;
+        for (int row = 0; row < Mathf.CeilToInt(cy / rowStep); row++)
+        {
+            float y = (row + .5f) * rowStep;
+            if (y > cy) continue;
+            float x0 = cx * y / cy, x1 = length + (cx - length) * y / cy;
+            int columns = Mathf.Max(1, Mathf.CeilToInt((x1 - x0) / step));
+            for (int col = 0; col < columns; col++)
+            {
+                float x = x0 + (col + .35f + (float)random.NextDouble() * .3f) * (x1 - x0) / columns;
+                sampled = true;
+                yield return a + right * x + up * y;
+            }
+        }
+        if (!sampled) yield return (a + b + c) / 3f;
     }
 
     private void LateUpdate()
@@ -317,33 +438,9 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         for (int i = 0; i < triangles.Length; i += 3)
         {
             Vector3 a = vertices[triangles[i]], b = vertices[triangles[i + 1]], c = vertices[triangles[i + 2]];
-            // Put the longest edge along X so skinny clipped triangles have small sample bounds.
-            if ((c - b).sqrMagnitude > (b - a).sqrMagnitude && (c - b).sqrMagnitude > (c - a).sqrMagnitude) { Vector3 old = a; a = b; b = c; c = old; }
-            else if ((c - a).sqrMagnitude > (b - a).sqrMagnitude) { Vector3 old = b; b = c; c = old; }
-            float length = (b - a).magnitude;
-            if (length < .00001f) continue;
-            Vector3 right = (b - a) / length, up = Vector3.ProjectOnPlane(c - a, right).normalized;
-            float cx = Vector3.Dot(c - a, right), cy = Vector3.Dot(c - a, up);
-            if (cy < .00001f) continue;
-            int before = points.Count;
-            float rowStep = step * .866f;
-            int rows = Mathf.CeilToInt(cy / rowStep);
-            for (int row = 0; row < rows; row++)
+            foreach (var point in SampleTriangle(a, b, c, step, random))
             {
-                float y = (row + .5f) * rowStep;
-                if (y > cy) continue;
-                float x0 = cx * y / cy, x1 = length + (cx - length) * y / cy;
-                int columns = Mathf.Max(1, Mathf.CeilToInt((x1 - x0) / step));
-                for (int col = 0; col < columns; col++)
-                {
-                    float x = x0 + (col + .35f + (float)random.NextDouble() * .3f) * (x1 - x0) / columns;
-                    Vector3 local = pile.transform.InverseTransformPoint(a + right * x + up * y);
-                    points.Add(new Vector2(local.x, local.z));
-                }
-            }
-            if (points.Count == before)
-            {
-                Vector3 local = pile.transform.InverseTransformPoint((a + b + c) / 3f);
+                Vector3 local = pile.transform.InverseTransformPoint(point);
                 points.Add(new Vector2(local.x, local.z));
             }
         }
@@ -375,6 +472,24 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                         ? colorVariants[i / batchesPerColor] : kernelMaterial, batches[i], counts[i], grainAppearance.Block,
                     ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
             }
+        foreach (var entry in coveragePatches)
+        {
+            var patch = entry.Value;
+            if (!GeometryUtility.TestPlanesAABB(cameraPlanes, patch.bounds)) continue;
+            float distance = Vector3.Distance(camera.transform.position, patch.bounds.ClosestPoint(camera.transform.position));
+            if (distance > drawDistance) continue;
+            Mesh lod = distance < fullDetailDistance ? nearMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
+            for (int i = 0; i < patch.batches.Length; i++)
+            {
+                var matrices = patch.batches[i];
+                int color = (entry.Key + i) % colorCount;
+                var material = colorVariants != null && colorVariants.Length == colorCount && colorVariants[color] != null
+                    ? colorVariants[color] : kernelMaterial;
+                LastDrawTriangles += matrices.Length * (int)(lod.GetIndexCount(0) / 3);
+                Graphics.DrawMeshInstanced(lod, 0, material, matrices, matrices.Length, grainAppearance.Block,
+                    ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
+            }
+        }
     }
 
     // Interleave X/Z bits to put neighboring surface samples into neighboring draw batches.

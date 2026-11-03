@@ -96,4 +96,32 @@ public class CornSurfaceUpdateTests
             for (int s = 0; s < counts[b]; s++) Assert.IsTrue(bounds[b].Contains(matrices[b][s].GetColumn(3)));
         }
     }
+
+    [Test] public void SteepExcavationAddsCoverageAndLaterEditsRemoveStaleGrains()
+    {
+        int originalCount = surface.KernelCount;
+        int center = field.Resolution / 2 * field.Resolution + field.Resolution / 2;
+        field.Heights[center] = .001f;
+        var expectedShape = (float[])field.Heights.Clone();
+        update(); Drain();
+        var patches = Get<System.Collections.IDictionary>(surface, "coveragePatches");
+        Assert.That(patches.Count, Is.GreaterThan(0), "Steep cuts need additional surface samples.");
+        Assert.That(surface.KernelCount, Is.GreaterThan(originalCount));
+        CollectionAssert.AreEqual(expectedShape, field.Heights, "Coverage must not change the excavation shape.");
+        foreach (System.Collections.DictionaryEntry entry in patches)
+        {
+            var matrices = (Matrix4x4[][])entry.Value.GetType().GetField("batches").GetValue(entry.Value);
+            foreach (var batch in matrices)
+            foreach (var matrix in batch)
+            {
+                var local = root.transform.InverseTransformPoint(matrix.GetColumn(3));
+                Assert.That(local.y, Is.EqualTo(field.Sample(local.x, local.z) + .003f).Within(.0001f));
+            }
+        }
+        // Edit again while coverage work is queued, then remove the entire pile.
+        field.Heights[center] = 2f; update();
+        Array.Clear(field.Heights, 0, field.Heights.Length); update(); Drain();
+        Assert.That(surface.KernelCount, Is.Zero);
+        Assert.That(patches.Count, Is.Zero);
+    }
 }
