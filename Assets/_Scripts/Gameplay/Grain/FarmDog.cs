@@ -14,7 +14,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     [Range(1, 5)] public int startingLevel = 1;
     [Min(.1f)] public float petDuration = 2f;
     [Min(0)] public float petCooldown = 3f;
-    [Min(0)] public float strokeSleepBlendSeconds = 2f;
+    [Min(0)] public float strokeSleepBlendSeconds = 1.2f;
     [Min(0)] public float nearbyWakeDistance = 4f;
     [Min(1)] public float runSpeed = 5.5f;
     [Min(1)] public float attackDamage = 28f;
