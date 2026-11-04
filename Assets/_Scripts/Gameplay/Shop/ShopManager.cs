@@ -59,9 +59,10 @@ public class ShopManager : MonoBehaviour
         foreach (var product in _shopProducts)
         {
             if (product == null) continue;
-            bool active = product.IsUnlocked(loadedData);
-            bool newlyUnlocked = active && productUnlockStates.TryGetValue(product, out bool wasUnlocked) && !wasUnlocked;
-            productUnlockStates[product] = active;
+            bool unlocked = product.IsUnlocked(loadedData);
+            bool active = unlocked || product.ShowWhileLocked;
+            bool newlyUnlocked = unlocked && productUnlockStates.TryGetValue(product, out bool wasUnlocked) && !wasUnlocked;
+            productUnlockStates[product] = unlocked;
             if (product.gameObject.activeSelf != active) product.gameObject.SetActive(active);
             if (newlyUnlocked) GameplayCanvas.Instance?.ShowAchievement(WarningType.NewContainerOpened);
         }

@@ -3476,6 +3476,7 @@ MonoBehaviour:
   toBuy: 1
   toRent: 0
   unlockCondition: 2
+  showWhileLocked: 1
   requiredHangar: 5
   requiredClearedPercent: 50
   requiredVehicleId: motoroller
@@ -4055,6 +4056,7 @@ MonoBehaviour:
   toBuy: 1
   toRent: 0
   unlockCondition: 2
+  showWhileLocked: 1
   requiredHangar: 2
   requiredClearedPercent: 50
   requiredVehicleId: motoroller
@@ -4797,6 +4799,7 @@ MonoBehaviour:
   toBuy: 1
   toRent: 0
   unlockCondition: 3
+  showWhileLocked: 1
   requiredHangar: 1
   requiredClearedPercent: 50
   requiredVehicleId: motoroller

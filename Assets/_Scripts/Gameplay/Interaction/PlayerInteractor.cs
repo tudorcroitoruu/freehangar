@@ -13,6 +13,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     private PlayerBicycleInteraction bicycle;
     private InteractionHighlight highlight;
     private CombatToolUpgradeInteractable focusedToolDesk;
+    private ShopProduct focusedLockedBag;
     private Transform actionOrigin;
     public BagInteraction Bags { get; private set; }
     public PlayerItemCarry Items { get; private set; }
@@ -305,6 +306,14 @@ public sealed class PlayerInteractor : MonoBehaviour
             if (focusedToolDesk != null) hud.SetWarning(focusedToolDesk.FindWarning, this, false);
             focusedToolDesk = desk != null && !desk.Found ? desk : null;
             if (focusedToolDesk != null) hud.SetWarning(focusedToolDesk.FindWarning, this, true);
+        }
+        var bag = target as ShopProduct;
+        if (bag != null && (!bag.ShowWhileLocked || !bag.Locked)) bag = null;
+        if (hud != null && focusedLockedBag != bag)
+        {
+            if (focusedLockedBag) hud.SetWarning(WarningType.LockedBag, focusedLockedBag, false);
+            focusedLockedBag = bag;
+            if (bag) hud.SetWarning(WarningType.LockedBag, bag, true);
         }
         if (highlight != next)
         {

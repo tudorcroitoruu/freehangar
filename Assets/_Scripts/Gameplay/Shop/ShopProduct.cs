@@ -24,6 +24,26 @@ public class ShopProduct : MonoBehaviour, IInteractable
     private string requiredVehicleId = "motoroller";
     private VehicleUpgradeSettings vehicleUnlockSettings;
 
+    [SerializeField] private bool showWhileLocked;
+    public bool ShowWhileLocked => showWhileLocked;
+    public bool Locked => unlockCondition != UnlockCondition.Always &&
+        (!SaveSystem.savesLoaded || !IsUnlocked(SaveSystem.Data));
+
+    public string UnlockHint()
+    {
+        if (!SaveSystem.savesLoaded || SaveSystem.Data == null) return "Loading shop availability…";
+        return unlockCondition switch
+        {
+            UnlockCondition.HangarOpened => $"Open Hangar {requiredHangar} to buy the {productName}.",
+            UnlockCondition.HangarCleared when requiredClearedPercent > 0 =>
+                $"Clear {requiredClearedPercent:0.##}% of Hangar {requiredHangar} to buy the {productName}.",
+            UnlockCondition.HangarCleared => $"Open Hangar {requiredHangar} to buy the {productName}.",
+            UnlockCondition.VehicleUnlocked =>
+                $"Unlock the {vehicleUnlockSettings?.Find(requiredVehicleId)?.displayName ?? requiredVehicleId} to buy the {productName}.",
+            _ => ""
+        };
+    }
+
     public bool IsUnlocked(PlayerData data)
     {
         if (data == null) return false;
@@ -111,7 +131,7 @@ public class ShopProduct : MonoBehaviour, IInteractable
     private void RefreshSpawnHolder()
     {
         if (objectSpawnHolder == null) return;
-        bool visible = deliveryMode == DeliveryMode.AtSpawnPoint && IsSpawnAreaClear();
+        bool visible = !Locked && deliveryMode == DeliveryMode.AtSpawnPoint && IsSpawnAreaClear();
         if (objectSpawnHolder.activeSelf != visible) objectSpawnHolder.SetActive(visible);
     }
 
@@ -142,6 +162,12 @@ public class ShopProduct : MonoBehaviour, IInteractable
         prompt = default;
         if (!isActiveAndEnabled || (!toBuy && !toRent)) return false;
 
+        if (Locked)
+        {
+            prompt = new InteractionPromptData(transform.position + Vector3.up * .5f, $"{productName} — Locked", false);
+            return showWhileLocked;
+        }
+
         string action = toBuy ? "Buy" : "Rent";
         string price = $"${EconomyNumberFormat.Accounting(Price)}";
         if (!CanAfford()) price = $"<color=#D92D2D>{price}</color>";
@@ -161,7 +187,7 @@ public class ShopProduct : MonoBehaviour, IInteractable
 
     public bool TryInteract(PlayerInteractor interactor)
     {
-        if (!isActiveAndEnabled || !toBuy) return false;
+        if (!isActiveAndEnabled || !toBuy || Locked) return false;
         if (deliveryMode == DeliveryMode.AtSpawnPoint && spawnPoint != null && !IsSpawnAreaClear())
         {
             GameplayCanvas.Instance?.ShowWarning(WarningType.OccupiedArea);

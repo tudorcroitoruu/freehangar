@@ -118,6 +118,47 @@ public class HangarShopProgressTests
         }
     }
 
+    [TestCase("smallBag", "Motoroller", 0)]
+    [TestCase("largeBag", "Hangar 2", 2)]
+    [TestCase("bigBag", "Hangar 5", 5)]
+    public void ShelfBagStaysVisibleAndExplainsItsUnlock(string id, string requirement, int hangar)
+    {
+        var previous = SaveSystem.Data;
+        bool wasLoaded = SaveSystem.savesLoaded;
+        var shelf = Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/Prefabs/Gameplay/ContainersShop.prefab"));
+        try
+        {
+            SaveSystem.savesLoaded = true;
+            SaveSystem.Data = new PlayerData { cash = 2000 };
+            var bag = System.Array.Find(shelf.GetComponentsInChildren<ShopProduct>(true), p => p.SaveProductId == id);
+            var manager = shelf.AddComponent<ShopManager>();
+            typeof(ShopManager).GetField("_shopProducts", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(manager, new[] { bag });
+            bag.gameObject.SetActive(false);
+            manager.RefreshProductAvailability();
+            Assert.IsTrue(bag.gameObject.activeSelf);
+            Assert.IsTrue(bag.TryGetPrompt(null, out var locked));
+            Assert.IsFalse(locked.ShowKey);
+            StringAssert.Contains("Locked", locked.Action);
+            StringAssert.Contains(requirement, bag.UnlockHint());
+            Assert.IsFalse(bag.TryInteract(null));
+            Assert.AreEqual(2000, SaveSystem.Data.cash);
+
+            if (hangar == 0) SaveSystem.Data.unlockedVehicles.Add("motoroller");
+            else SaveSystem.Data.TryOpenHangar(hangar);
+            Assert.IsTrue(bag.TryGetPrompt(null, out var unlocked));
+            Assert.IsTrue(unlocked.ShowKey);
+            StringAssert.StartsWith("Buy ", unlocked.Action);
+        }
+        finally
+        {
+            Object.DestroyImmediate(shelf);
+            SaveSystem.Data = previous;
+            SaveSystem.savesLoaded = wasLoaded;
+        }
+    }
+
     [Test]
     public void ClearingMeasuresRemainingMassRatherThanRepeatedlyMovedGrain()
     {
