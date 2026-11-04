@@ -594,6 +594,7 @@ public sealed class GrainPile : MonoBehaviour
             boundary.UpdateHeights(surface, .045f / WorldScale.y);
             OffsetBoundaryGround();
             mesh.Clear(); mesh.SetVertices(boundary.Positions); mesh.SetUVs(0, boundary.UV); mesh.SetTriangles(boundary.Triangles, 0);
+            CloseClippedEdges();
             mesh.RecalculateNormals(); mesh.RecalculateTangents(); mesh.RecalculateBounds();
             if (!Application.isPlaying) colliderDirty = true;
             return;
@@ -619,7 +620,8 @@ public sealed class GrainPile : MonoBehaviour
         }
         // Bare ground must not retain a golden rectangle or a phantom grain collider.
         mesh.SetTriangles(activeTriangles, 0);
-        if (IsDroppedPile) CloseDroppedEdges(surface);
+        // Authored stock can also rise at its footprint edge after a deposit.
+        CloseDroppedEdges(surface);
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
@@ -639,11 +641,65 @@ public sealed class GrainPile : MonoBehaviour
     private readonly List<Vector3> closedSurfaceVertices = new List<Vector3>();
     private readonly List<Vector2> closedSurfaceUV = new List<Vector2>();
     private readonly List<int> closedSurfaceTriangles = new List<int>();
+    private int sideTriangleStart;
+    internal int SideFaceCount => (closedSurfaceTriangles.Count - sideTriangleStart) / 6;
+    internal void SideFace(int index, out Vector3 a, out Vector3 b, out Vector3 c, out Vector3 d)
+    {
+        int t = sideTriangleStart + index * 6;
+        a = transform.TransformPoint(closedSurfaceVertices[closedSurfaceTriangles[t]]);
+        b = transform.TransformPoint(closedSurfaceVertices[closedSurfaceTriangles[t + 2]]);
+        c = transform.TransformPoint(closedSurfaceVertices[closedSurfaceTriangles[t + 1]]);
+        d = transform.TransformPoint(closedSurfaceVertices[closedSurfaceTriangles[t + 5]]);
+    }
+    private GrainWallBoundary closedBoundary;
+    private readonly List<Vector2Int> clippedEdges = new List<Vector2Int>();
+
+    private void CloseClippedEdges()
+    {
+        if (closedBoundary != boundary)
+        {
+            closedBoundary = boundary;
+            clippedEdges.Clear();
+            // Clipping splits vertices per triangle. Weld X/Z keys only for finding
+            // perimeter edges; do not alter the top surface or its volume weights.
+            var pointIds = new Dictionary<Vector2Int, int>();
+            var edges = new Dictionary<Vector2Int, Vector2Int>();
+            var counts = new Dictionary<Vector2Int, int>();
+            int PointId(int index)
+            {
+                Vector3 p = boundary.Positions[index];
+                var key = new Vector2Int(Mathf.RoundToInt(p.x * 100000), Mathf.RoundToInt(p.z * 100000));
+                if (!pointIds.TryGetValue(key, out int id)) { id = pointIds.Count; pointIds.Add(key, id); }
+                return id;
+            }
+            for (int i = 0; i < boundary.Positions.Count; i += 3)
+            for (int side = 0; side < 3; side++)
+            {
+                int a = i + side, b = i + (side + 1) % 3;
+                int x = PointId(a), y = PointId(b);
+                if (x == y) continue;
+                var key = new Vector2Int(Mathf.Min(x, y), Mathf.Max(x, y));
+                counts.TryGetValue(key, out int count);
+                counts[key] = count + 1;
+                edges[key] = new Vector2Int(a, b);
+            }
+            foreach (var entry in counts)
+                if (entry.Value == 1) clippedEdges.Add(edges[entry.Key]);
+        }
+        closedSurfaceVertices.Clear(); closedSurfaceVertices.AddRange(boundary.Positions);
+        closedSurfaceUV.Clear(); closedSurfaceUV.AddRange(boundary.UV);
+        closedSurfaceTriangles.Clear(); closedSurfaceTriangles.AddRange(boundary.Triangles);
+        sideTriangleStart = closedSurfaceTriangles.Count;
+        foreach (var edge in clippedEdges) AddGroundEdge(edge.x, edge.y, null);
+        mesh.SetVertices(closedSurfaceVertices); mesh.SetUVs(0, closedSurfaceUV);
+        mesh.SetTriangles(closedSurfaceTriangles, 0);
+    }
     private void CloseDroppedEdges(GrainHeightField surface)
     {
         closedSurfaceVertices.Clear(); closedSurfaceVertices.AddRange(vertices);
         mesh.GetUVs(0, closedSurfaceUV);
         closedSurfaceTriangles.Clear(); closedSurfaceTriangles.AddRange(activeTriangles);
+        sideTriangleStart = closedSurfaceTriangles.Count;
         int n = field.Resolution;
         for (int i = 0; i < n - 1; i++)
         {
@@ -658,11 +714,16 @@ public sealed class GrainPile : MonoBehaviour
     private void AddGroundEdge(int a, int b, GrainHeightField surface)
     {
         float inset = .045f / WorldScale.y;
-        if (Mathf.Max(surface.Heights[a], surface.Heights[b]) <= inset) return;
-        Vector3 topA = vertices[a], topB = vertices[b];
+        Vector3 topA = closedSurfaceVertices[a], topB = closedSurfaceVertices[b];
         Vector3 bottomA = topA, bottomB = topB;
-        bottomA.y = GroundOffset(a) - inset;
-        bottomB.y = GroundOffset(b) - inset;
+        bottomA.y = GroundOffset(topA.x, topA.z) - inset;
+        bottomB.y = GroundOffset(topB.x, topB.z) - inset;
+        if (Mathf.Max(topA.y - bottomA.y, topB.y - bottomB.y) <= inset) return;
+        // A small rounded apron softens exposed edges; keep it inside authored
+        // wall/exclusion constraints. Side kernels use these exact same vertices.
+        Vector3 outward = Vector3.Cross(Vector3.down, topB - topA).normalized;
+        bottomA = SpreadEdge(topA, bottomA, outward);
+        bottomB = SpreadEdge(topB, bottomB, outward);
         int start = closedSurfaceVertices.Count;
         closedSurfaceVertices.Add(topA); closedSurfaceVertices.Add(topB);
         closedSurfaceVertices.Add(bottomA); closedSurfaceVertices.Add(bottomB);
@@ -670,6 +731,21 @@ public sealed class GrainPile : MonoBehaviour
         closedSurfaceUV.Add(closedSurfaceUV[a]); closedSurfaceUV.Add(closedSurfaceUV[b]);
         closedSurfaceTriangles.Add(start); closedSurfaceTriangles.Add(start + 2); closedSurfaceTriangles.Add(start + 1);
         closedSurfaceTriangles.Add(start + 1); closedSurfaceTriangles.Add(start + 2); closedSurfaceTriangles.Add(start + 3);
+    }
+    private Vector3 SpreadEdge(Vector3 top, Vector3 bottom, Vector3 outward)
+    {
+        float worldHeight = Mathf.Max(0, top.y - bottom.y) * WorldScale.y;
+        float width = Mathf.Min(.65f, worldHeight / Mathf.Tan(reposeAngle * Mathf.Deg2Rad));
+        float variation = .9f + .1f * Mathf.PerlinNoise(top.x * 2.3f, top.z * 2.3f);
+        Vector3 offset = outward * (width * variation / Mathf.Max(.001f, Vector3.Scale(outward, WorldScale).magnitude));
+        // Never spread through a physical wall or into a grain-free opening.
+        for (int step = 0; step < 6; step++)
+        {
+            Vector3 candidate = bottom + offset;
+            if (IsInsideBoundary(transform.TransformPoint(candidate))) return candidate;
+            offset *= .5f;
+        }
+        return bottom;
     }
     private void OffsetBoundaryGround()
     {

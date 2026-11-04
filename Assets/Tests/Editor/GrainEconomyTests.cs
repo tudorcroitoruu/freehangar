@@ -31,6 +31,38 @@ public class GrainEconomyTests
     private void Set(string name, object value) => typeof(GrainPile)
         .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(pile, value);
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public void DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass(bool clipped)
+    {
+        Set("initialHeight", 0f);
+        if (clipped) Set("excludedFootprint", new Rect(1f, -1f, 2f, 2f));
+        pile.RebuildPreview();
+        double before = pile.Kilograms;
+        var cargo = new GrainCargo();
+        cargo.Add(GrainType.Corn, 10f);
+        float edgeX = clipped ? 1f : 3f;
+        Assert.IsTrue(pile.Deposit(new Vector3(edgeX - .1f, 0, 0), cargo, 1f));
+        Assert.That(pile.Kilograms - before, Is.EqualTo(10 * pile.GrainConsumeMultiplier).Within(.1));
+        var mesh = root.GetComponent<MeshFilter>().sharedMesh;
+        var points = mesh.vertices;
+        var triangles = mesh.triangles;
+        bool closed = false;
+        bool sloped = false;
+        for (int i = 0; i < triangles.Length; i += 3)
+        {
+            Vector3 a = points[triangles[i]], b = points[triangles[i + 1]], c = points[triangles[i + 2]];
+            if (a.x < edgeX - .001f || b.x < edgeX - .001f || c.x < edgeX - .001f) continue;
+            if (Mathf.Min(a.y, Mathf.Min(b.y, c.y)) < 0 && Mathf.Max(a.y, Mathf.Max(b.y, c.y)) > 0)
+            {
+                closed = true;
+                sloped |= Mathf.Max(a.x, Mathf.Max(b.x, c.x)) > edgeX + .01f;
+            }
+        }
+        Assert.IsTrue(closed, "Raised stock edge must have a side face reaching the ground.");
+        if (!clipped) Assert.IsTrue(sloped, "An exposed edge should slope outward instead of forming a vertical wall.");
+    }
+
     [Test]
     public void DroppedGrainFollowsSlopedGroundAndRestoresWithoutAddingMass()
     {

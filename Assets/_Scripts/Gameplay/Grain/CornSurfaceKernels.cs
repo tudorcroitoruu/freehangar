@@ -49,6 +49,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private int coverageCell;
     private CoveragePatch[] edgePatches;
     private Vector4[] edgeHeights;
+    private Vector3[] edgeCorners;
     private Matrix4x4 edgeTransform;
     private float edgeSize;
     private int nextEdge;
@@ -200,38 +201,33 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private void UpdateEdgeCoverage()
     {
-        if (pile == null || !pile.IsDroppedPile || pile.DetectedWallCount > 0 || pile.VisualHeightField == null)
+        if (pile == null || pile.VisualHeightField == null || pile.SideFaceCount == 0)
         { edgePatches=null;SideKernelCount=0;return; }
         var field = pile.VisualHeightField;
-        int n = field.Resolution, edgeCount = (n - 1) * 4;
+        int edgeCount = pile.SideFaceCount;
         if (edgePatches == null || edgePatches.Length != edgeCount || edgeSize != field.Size || edgeTransform != transform.localToWorldMatrix)
         {
-            edgePatches = new CoveragePatch[edgeCount]; edgeHeights = new Vector4[edgeCount];
+            edgePatches = new CoveragePatch[edgeCount]; edgeHeights = new Vector4[edgeCount]; edgeCorners = new Vector3[edgeCount * 4];
             for(int i=0;i<edgeCount;i++) edgeHeights[i]=Vector4.one*float.MinValue;
             edgeTransform=transform.localToWorldMatrix;edgeSize=field.Size;nextEdge=0;SideKernelCount=0;
         }
         // Keep updates bounded while pouring; unchanged sides reuse their instance batches.
         for (int work=0;work<Mathf.Min(8,edgeCount);work++)
         {
-            int edge=nextEdge++%edgeCount, i=edge/4, a,b;
-            switch(edge%4)
-            {
-                case 0:a=i+1;b=i;break;
-                case 1:a=i*n;b=(i+1)*n;break;
-                case 2:a=(n-1)*n+i;b=a+1;break;
-                default:a=(i+1)*n+n-1;b=i*n+n-1;break;
-            }
-            var heights=new Vector4(field.Heights[a],field.Heights[b],pile.GroundOffset(a),pile.GroundOffset(b));
-            if((heights-edgeHeights[edge]).sqrMagnitude<.000001f)continue;
-            edgeHeights[edge]=heights;
+            int edge=nextEdge++%edgeCount;
+            pile.SideFace(edge, out Vector3 topA, out Vector3 topB, out Vector3 bottomA, out Vector3 bottomB);
+            int offset = edge * 4;
+            if (edgeHeights[edge].x != float.MinValue &&
+                (edgeCorners[offset] - topA).sqrMagnitude < .000001f &&
+                (edgeCorners[offset+1] - topB).sqrMagnitude < .000001f &&
+                (edgeCorners[offset+2] - bottomA).sqrMagnitude < .000001f &&
+                (edgeCorners[offset+3] - bottomB).sqrMagnitude < .000001f) continue;
+            edgeHeights[edge] = Vector4.zero;
+            edgeCorners[offset] = topA; edgeCorners[offset+1] = topB;
+            edgeCorners[offset+2] = bottomA; edgeCorners[offset+3] = bottomB;
             if(edgePatches[edge]!=null)SideKernelCount-=edgePatches[edge].count;
             edgePatches[edge]=null;
-            if(Mathf.Max(heights.x,heights.y)*pile.WorldScale.y<=.045f)continue;
-            Vector3 localA=new Vector3(a%n*field.Spacing-field.Size*.5f,heights.z,a/n*field.Spacing-field.Size*.5f);
-            Vector3 localB=new Vector3(b%n*field.Spacing-field.Size*.5f,heights.w,b/n*field.Spacing-field.Size*.5f);
-            Vector3 bottomA=transform.TransformPoint(localA),bottomB=transform.TransformPoint(localB);
-            Vector3 topA=transform.TransformPoint(localA+Vector3.up*heights.x),topB=transform.TransformPoint(localB+Vector3.up*heights.y);
-            Vector3 normal=Vector3.Cross(Vector3.down,topB-topA).normalized;
+            Vector3 normal=Vector3.Cross(bottomA-topA,topB-topA).normalized;
             var matrices=new List<Matrix4x4>();var random=new System.Random(913+edge);
             AddSideTriangle(topA,bottomA,topB,normal,random,matrices);
             AddSideTriangle(topB,bottomA,bottomB,normal,random,matrices);
