@@ -108,7 +108,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (hasAimedPrompt)
         {
             SetHighlightedTarget(Target);
-            if (focusedToolDesk != null) HidePrompt();
+            if (focusedToolDesk != null || Target is ShopProduct product && product.Locked) HidePrompt();
             else if (prompt != null) prompt.Show(viewCamera, aimedPrompt);
         }
         else { SetHighlightedTarget(null); HidePrompt(); }

@@ -128,14 +128,13 @@ public class WarningPopup : MonoBehaviour
             warningImage.sprite = preset?.icon;
             warningImage.enabled = preset?.icon != null;
         }
+        if (warningTitle != null) warningTitle.text = preset != null ? preset.title : type.ToString();
         if (type == WarningType.LockedBag &&
             requests.Find(request => request.type == type)?.source is ShopProduct bag)
         {
-            if (warningTitle != null) warningTitle.text = "Bag locked";
             if (warningMessage != null) warningMessage.text = bag.UnlockHint();
             return;
         }
-        if (warningTitle != null) warningTitle.text = preset != null ? preset.title : type.ToString();
         if (warningMessage != null) warningMessage.text = preset != null ? preset.message : "";
     }
 }
