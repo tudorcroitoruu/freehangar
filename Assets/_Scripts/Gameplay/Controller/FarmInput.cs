@@ -8,17 +8,20 @@ public static class FarmInput
     private static InputActionAsset actions;
     private static InputActionMap player;
     private static bool padLast;
-    public static bool UsingPad => padLast && Gamepad.current != null;
+    private static Gamepad activePad;
+    public static Gamepad ActivePad => activePad != null && activePad.added ? activePad : null;
+    public static bool UsingPad => padLast && ActivePad != null;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Reset()
     {
-        InputSystem.onActionChange -= TrackDevice;
+        InputSystem.onActionChange -= TrackDevice; InputSystem.onAfterUpdate -= TrackDesktop;
         GameSettingsManager.InputBindingsChanged -= RefreshBindings;
         if (actions) { actions.Disable(); Object.Destroy(actions); }
         actions = null;
         player = null;
         padLast = false;
+        activePad = null;
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -29,8 +32,9 @@ public static class FarmInput
         player = actions.FindActionMap("Player", true);
         RefreshBindings();
         player.Enable();
-        padLast = Gamepad.current != null;
-        InputSystem.onActionChange += TrackDevice;
+        activePad = Gamepad.current;
+        padLast = activePad != null;
+        InputSystem.onActionChange += TrackDevice; InputSystem.onAfterUpdate += TrackDesktop;
         GameSettingsManager.InputBindingsChanged += RefreshBindings;
     }
 
@@ -43,13 +47,24 @@ public static class FarmInput
     {
         if (change != InputActionChange.ActionPerformed || !(changed is InputAction action)) return;
         var device = action.activeControl?.device;
-        if (device is Gamepad) padLast = true;
-        else if (device is Keyboard) padLast = false;
-        else if (device is Mouse mouse && mouse.layout != "VirtualMouse" &&
-            (mouse.delta.ReadValue().sqrMagnitude > .01f || mouse.leftButton.isPressed || mouse.rightButton.isPressed))
-            padLast = false;
+        if (device is Gamepad pad && action.activeControl.EvaluateMagnitude() > .2f)
+        {
+            // Keep ownership while a controller is in use; emulated duplicates can also emit events.
+            if (ActivePad == null || pad == activePad || !padLast ||
+                (activePad.leftStick.ReadValue().sqrMagnitude < .01f && activePad.rightStick.ReadValue().sqrMagnitude < .01f))
+                activePad = pad;
+            padLast = true;
+        }
     }
-
+    private static void TrackDesktop()
+    {
+        if (Keyboard.current?.anyKey.wasPressedThisFrame == true) padLast = false;
+        foreach (var device in InputSystem.devices)
+            if (device is Mouse mouse && mouse.layout != "VirtualMouse" && mouse.name != "VirtualMouse" &&
+                (mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame ||
+                 mouse.middleButton.wasPressedThisFrame || mouse.forwardButton.wasPressedThisFrame ||
+                 mouse.backButton.wasPressedThisFrame)) padLast = false;
+    }
     private static InputAction Action(string name)
     {
         if (player == null) Initialize();
@@ -83,7 +98,14 @@ public static class FarmInput
         var a = Action(action);
         if (a == null) return keyboard;
         foreach (var control in a.controls)
-            if (control.device == Gamepad.current) return control.shortDisplayName ?? control.displayName;
+            if (control.device == ActivePad) return GamepadPromptSprites.Label(control.name) ?? (control.name switch
+            {
+                "leftTrigger" => "L2", "rightTrigger" => "R2",
+                "leftShoulder" => "L1", "rightShoulder" => "R1",
+                "leftStickPress" => "L3", "rightStickPress" => "R3",
+                "leftStick" => "LS", "rightStick" => "RS",
+                _ => control.shortDisplayName ?? control.displayName
+            });
         return keyboard;
     }
     public static string KeyLabel(KeyCode key) => key switch

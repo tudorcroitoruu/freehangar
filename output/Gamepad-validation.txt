@@ -1,0 +1,9 @@
+Gamepad input manual regression checks
+1. Move with the left stick, press L3, release L3: running continues.
+2. Press L3 again: walking resumes. Release movement: running resets.
+3. Keyboard Shift remains hold-to-run. Pause and resume, disable/re-enable player: no retained running toggle.
+4. Use controller then leave it idle: controller prompts remain. Mouse movement alone does not switch prompts. Click any physical mouse button or press any keyboard key: PC prompts appear. Use controller again: controller prompts appear.
+5. Navigate menus with the controller virtual cursor: no PC/controller flicker.
+6. Inspect interaction prompts and additional action rows: triangle/cross/square/circle render as PNG icons. Options/share assets are available for their bound controls.
+Validation: Assembly-CSharp dotnet build passed with 0 errors (21 existing project warnings). Hardware/Play Mode and visual checks above have not been executed.
+Source: Kenney Input Prompts, CC0, https://kenney.nl/assets/input-prompts

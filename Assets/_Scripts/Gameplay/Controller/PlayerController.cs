@@ -141,6 +141,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnDisable()
     {
+        padSprint = false;
         if (shovelTool != null) shovelTool.GrainScooped -= HandleGrainScooped;
         if (shovelTool != null) shovelTool.CancelAction();
         SetCursorLocked(false);
@@ -252,6 +253,7 @@ public class PlayerController : MonoBehaviour
         if (staminaManager != null) staminaManager.ConsumeShovelStamina(shovelTool != null ? shovelTool.WeightKg : 1f);
     }
 
+    private bool padSprint;
     private void HandleMovement(bool acceptInput)
     {
         bool wasGrounded = characterController.isGrounded;
@@ -261,7 +263,9 @@ public class PlayerController : MonoBehaviour
             : Vector2.zero;
         input = Vector2.ClampMagnitude(input, 1f);
         bool pushingWheelbarrow = interactor != null && interactor.PushedWheelbarrow != null;
-        bool wantsSprint = acceptInput && FarmInput.Held("Sprint");
+        if (!acceptInput || !FarmInput.UsingPad || input.sqrMagnitude < .0001f) padSprint = false;
+        else if (FarmInput.Down("Sprint")) padSprint = !padSprint;
+        bool wantsSprint = acceptInput && (FarmInput.UsingPad ? padSprint : FarmInput.Held("Sprint"));
         if (!wantsSprint || staminaManager == null || staminaManager.NormalizedStamina >= .2f) sprintExhausted = false;
         if (staminaManager != null && staminaManager.IsExhausted) sprintExhausted = true;
         var carriedBag = bagInteraction != null ? bagInteraction.CarriedBag : null;

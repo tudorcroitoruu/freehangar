@@ -6,6 +6,30 @@ using UnityEngine.InputSystem.LowLevel;
 
 public class FarmGamepadInputTests
 {
+    [TestCase("buttonNorth")]
+    [TestCase("buttonSouth")]
+    [TestCase("buttonWest")]
+    [TestCase("buttonEast")]
+    [TestCase("start")]
+    [TestCase("select")]
+    public void ButtonPromptRendersAsOneSprite(string control)
+    {
+        var root = new GameObject("Prompt rendering test", typeof(RectTransform), typeof(Canvas));
+        var child = new GameObject("Label", typeof(RectTransform), typeof(TMPro.TextMeshProUGUI));
+        child.transform.SetParent(root.transform, false);
+        try
+        {
+            var label = child.GetComponent<TMPro.TextMeshProUGUI>();
+            label.font = TMPro.TMP_Settings.defaultFontAsset;
+            label.richText = true;
+            label.rectTransform.sizeDelta = new Vector2(32, 32);
+            label.text = GamepadPromptSprites.Label(control);
+            label.ForceMeshUpdate(true, true);
+            Assert.AreEqual(1, label.textInfo.characterCount, "Sprite tag was displayed as literal text.");
+            Assert.AreEqual(TMPro.TMP_TextElementType.Sprite, label.textInfo.characterInfo[0].elementType);
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
     [Test]
     public void ControllerSticksAndButtonsReachTheGameplayActions()
     {

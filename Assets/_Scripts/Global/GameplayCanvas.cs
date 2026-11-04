@@ -233,7 +233,7 @@ public class GameplayCanvas : MonoBehaviour
 
     private void Update()
     {
-        int device = FarmInput.UsingPad ? UnityEngine.InputSystem.Gamepad.current.deviceId : -1;
+        int device = FarmInput.UsingPad ? FarmInput.ActivePad.deviceId : -1;
         if (device != hintDevice)
         {
             hintDevice = device;
