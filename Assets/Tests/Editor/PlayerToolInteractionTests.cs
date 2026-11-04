@@ -59,6 +59,42 @@ public class PlayerToolInteractionTests
         }
         finally { Object.DestroyImmediate(bird); }
     }
+    [TestCase(PlayerCombatTools.Tool.Axe, PlayerCombatTools.LegacyAxeFindId)]
+    [TestCase(PlayerCombatTools.Tool.Hammer, PlayerCombatTools.HammerFindId)]
+    public void CombatUpgradesRequireDiscoveryAndStopAtThree(PlayerCombatTools.Tool tool, string findId)
+    {
+        var data = new PlayerData { cash = 2000, freeUpgradeVouchers = 1 };
+        Assert.IsFalse(CombatToolUpgrades.Purchase(data, tool, 0));
+        Assert.AreEqual(1, data.freeUpgradeVouchers);
+        data.foundSecrets = new[] { findId };
+        Assert.IsTrue(CombatToolUpgrades.Purchase(data, tool, 0));
+        Assert.AreEqual(2000, data.cash);
+        Assert.AreEqual(0, data.freeUpgradeVouchers);
+        Assert.IsFalse(CombatToolUpgrades.Purchase(data, tool, 0));
+        Assert.IsTrue(CombatToolUpgrades.Purchase(data, tool, 1));
+        Assert.IsTrue(CombatToolUpgrades.Purchase(data, tool, 2));
+        Assert.IsFalse(CombatToolUpgrades.Purchase(data, tool, 3));
+        Assert.AreEqual(600, data.cash);
+        var restored = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(data));
+        Assert.AreEqual(3, CombatToolUpgrades.Level(restored, tool));
+        Assert.AreEqual(0, CombatToolUpgrades.Level(restored, tool == PlayerCombatTools.Tool.Axe ?
+            PlayerCombatTools.Tool.Hammer : PlayerCombatTools.Tool.Axe));
+    }
+
+    [Test] public void MaxCombatUpgradeBreaksMatchingWallsAndNeedsTwoChickenHits()
+    {
+        SaveSystem.Data.axeUpgradeLevel = SaveSystem.Data.hammerUpgradeLevel = 3;
+        Assert.AreEqual(50, CombatToolUpgrades.AxeDamage(3));
+        for (int strength = 2; strength <= 8; strength++)
+        {
+            Assert.Less(CombatToolUpgrades.WallDamage(2, strength), strength);
+            Assert.AreEqual(strength, CombatToolUpgrades.WallDamage(3, strength));
+        }
+        var metal = Wall(1);
+        Assert.IsFalse(metal.AcceptsTool(PlayerCombatTools.Tool.Axe));
+        Assert.IsTrue(metal.AcceptsTool(PlayerCombatTools.Tool.Hammer));
+    }
+
     [Test] public void ExistingAxeDiscoverySaveUnlocksOnlyItsMatchingHeldModel()
     {
         SaveSystem.Data.foundSecrets=new[]{PlayerCombatTools.LegacyAxeFindId};

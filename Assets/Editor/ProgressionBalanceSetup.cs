@@ -34,7 +34,7 @@ public static class ProgressionBalanceSetup
         new FindPlan("farm.perk.free-upgrade",2,.59f,-.2f),
         new FindPlan("farm.chest.bonus.1",2,.67f,.6f,750),
         new FindPlan("farm.perk.bottle.infinitestamina",2,.74f,-.45f),
-        new FindPlan("farm.tool.sledgehammer",2,.78f,.1f),
+        new FindPlan("farm.tool.sledgehammer",3,.08f,.1f),
         new FindPlan("farm.hangar.key.3",2,.88f,-.15f),
         new FindPlan("farm.perk.bottle.mobility",3,.14f,.25f),
         new FindPlan("farm.key.iron.bonus.2",3,.26f,-.55f),

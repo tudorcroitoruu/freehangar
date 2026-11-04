@@ -74,6 +74,9 @@ public static class SaveSystem
         return purchased;
     }
 
+    public static bool TryPurchaseCombatToolUpgrade(PlayerCombatTools.Tool tool, int expectedLevel) =>
+        ApplyUpgradePurchase(data => CombatToolUpgrades.Purchase(data, tool, expectedLevel));
+
     public static bool TryPurchaseStaminaUpgrade(int price, int expectedLevel, int maxLevel)
     {
         bool purchased = ApplyUpgradePurchase(data => data.TryUpgradeStamina(price, expectedLevel, maxLevel));
@@ -506,6 +509,7 @@ public class PlayerData
     public int wheelbarrowTier;
     public int[] wheelbarrowUpgradeLevels = new int[3];
     public int shovelUpgradeLevel;
+    public int axeUpgradeLevel, hammerUpgradeLevel;
     public int staminaUpgradeLevel;
     public List<VehicleUpgradeSave> vehicleUpgrades = new List<VehicleUpgradeSave>();
     public List<string> unlockedVehicles = new List<string>();

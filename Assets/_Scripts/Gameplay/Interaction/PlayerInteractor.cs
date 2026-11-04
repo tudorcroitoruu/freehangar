@@ -12,6 +12,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     private PlayerController player;
     private PlayerBicycleInteraction bicycle;
     private InteractionHighlight highlight;
+    private CombatToolUpgradeInteractable focusedToolDesk;
     private Transform actionOrigin;
     public BagInteraction Bags { get; private set; }
     public PlayerItemCarry Items { get; private set; }
@@ -106,7 +107,8 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (hasAimedPrompt)
         {
             SetHighlightedTarget(Target);
-            if (prompt != null) prompt.Show(viewCamera, aimedPrompt);
+            if (focusedToolDesk != null) HidePrompt();
+            else if (prompt != null) prompt.Show(viewCamera, aimedPrompt);
         }
         else { SetHighlightedTarget(null); HidePrompt(); }
     }
@@ -296,6 +298,14 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void SetHighlightedTarget(IInteractable target)
     {
         var next = target is Component component && component != null ? component.GetComponent<InteractionHighlight>() : null;
+        var desk = target as CombatToolUpgradeInteractable;
+        var hud = GameplayCanvas.Instance;
+        if (hud != null && (desk != focusedToolDesk || focusedToolDesk != null && focusedToolDesk.Found))
+        {
+            if (focusedToolDesk != null) hud.SetWarning(focusedToolDesk.FindWarning, this, false);
+            focusedToolDesk = desk != null && !desk.Found ? desk : null;
+            if (focusedToolDesk != null) hud.SetWarning(focusedToolDesk.FindWarning, this, true);
+        }
         if (highlight != next)
         {
             if (highlight != null) highlight.SetFocused(false);

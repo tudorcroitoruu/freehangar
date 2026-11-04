@@ -190,7 +190,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
         var chicken = hit.collider.GetComponentInParent<FarmChicken>();
         if (chicken != null && (equipped == Tool.Axe || equipped == Tool.Broom))
         {
-            chicken.Hit(equipped == Tool.Axe ? 28f : 3f, transform.position, transform);
+            chicken.Hit(equipped == Tool.Axe ? CombatToolUpgrades.AxeDamage(CombatToolUpgrades.Level(SaveSystem.Data, equipped)) : 3f, transform.position, transform);
             return;
         }
         if (equipped == Tool.Broom)

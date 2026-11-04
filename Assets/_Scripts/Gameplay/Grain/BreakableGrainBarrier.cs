@@ -87,7 +87,9 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
         prompt = default;
         if (!isActiveAndEnabled || !exposed || BuriedFind.WasFound(SaveSystem.Data, barrierId)) return false;
         string tool = material == Material.Wood ? "axe (2)" : "hammer (3)";
-        string label = $"{material} wall: {tool}, left click ({HitsRemaining} hits)";
+        int level = CombatToolUpgrades.Level(SaveSystem.Data, material == Material.Wood ? PlayerCombatTools.Tool.Axe : PlayerCombatTools.Tool.Hammer);
+        int strikes = Mathf.CeilToInt((float)HitsRemaining / CombatToolUpgrades.WallDamage(level, hitsRequired));
+        string label = $"{material} wall: {tool}, left click ({strikes} hits)";
         Bounds bounds = VisualBounds();
         prompt = new InteractionPromptData(new Vector3(bounds.center.x, bounds.max.y + .15f, bounds.center.z), label, false);
         return true;
@@ -103,7 +105,8 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
         if (!AcceptsTool(tool))
             return false;
         GameplayAudio.Instance?.BarrierHit(material == Material.Metal);
-        if (++hits < hitsRequired) return true;
+        hits = Mathf.Min(hitsRequired, hits + CombatToolUpgrades.WallDamage(CombatToolUpgrades.Level(SaveSystem.Data, tool), hitsRequired));
+        if (hits < hitsRequired) return true;
 
         PlayerData data = SaveSystem.Data;
         if (data.foundSecrets == null) data.foundSecrets = Array.Empty<string>();

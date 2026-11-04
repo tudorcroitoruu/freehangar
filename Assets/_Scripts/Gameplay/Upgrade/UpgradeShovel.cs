@@ -5,6 +5,8 @@ using System.Globalization;
 public class UpgradeShovel : MonoBehaviour
 {
     public event System.Action UpgradeSucceeded;
+    [SerializeField] private PlayerCombatTools.Tool tool = PlayerCombatTools.Tool.Shovel;
+    private bool IsCombatTool => tool == PlayerCombatTools.Tool.Axe || tool == PlayerCombatTools.Tool.Hammer;
     [SerializeField] private ShovelUpgradeSettings settings;
     [SerializeField] private Image shovelImage;
     [SerializeField] private Text currentLevelText;
@@ -65,6 +67,11 @@ public class UpgradeShovel : MonoBehaviour
 
     public bool TryUpgrade()
     {
+        if (IsCombatTool)
+        {
+            if (!isActiveAndEnabled) return false;
+            return SaveSystem.TryPurchaseCombatToolUpgrade(tool, CombatToolUpgrades.Level(SaveSystem.Data, tool));
+        }
         if (Application.isPlaying) settings = GrainEconomySettings.ResolveShovel(settings);
         if (!isActiveAndEnabled || SaveSystem.UpgradePurchaseLocked || SaveSystem.Data == null || settings == null || !settings.IsConfigured) return false;
         int level = SaveSystem.Data.shovelUpgradeLevel;
@@ -79,17 +86,17 @@ public class UpgradeShovel : MonoBehaviour
     public void Refresh()
     {
         if (Application.isPlaying) settings = GrainEconomySettings.ResolveShovel(settings);
-        bool configured = settings != null && settings.IsConfigured;
-        int level = configured ? settings.ClampLevel(SaveSystem.Data?.shovelUpgradeLevel ?? 0) : 0;
-        bool maxed = configured && level >= settings.MaxUpgrades;
-        int cost = configured ? settings.Price(level) : 0;
+        bool configured = IsCombatTool || settings != null && settings.IsConfigured;
+        int level = IsCombatTool ? CombatToolUpgrades.Level(SaveSystem.Data, tool) : configured ? settings.ClampLevel(SaveSystem.Data?.shovelUpgradeLevel ?? 0) : 0;
+        bool maxed = configured && level >= (IsCombatTool ? CombatToolUpgrades.MaximumLevel : settings.MaxUpgrades);
+        int cost = IsCombatTool ? CombatToolUpgrades.Price(level) : configured ? settings.Price(level) : 0;
         bool usesVoucher = cost > 0 && (SaveSystem.Data?.freeUpgradeVouchers ?? 0) > 0;
-        bool available = configured && SaveSystem.Data != null && !maxed && cost >= 0;
+        bool available = (!IsCombatTool || CombatToolUpgrades.Found(SaveSystem.Data, tool)) && configured && SaveSystem.Data != null && !maxed && cost >= 0;
         int missing = available && !usesVoucher ? Mathf.Max(0, cost - SaveSystem.Money) : 0;
         bool affordable = available && missing == 0;
         waitingForUpgrade = SaveSystem.UpgradePurchaseLocked;
         bool canUpgrade = affordable && !waitingForUpgrade;
-        bool vacuum = configured && settings.IsVacuum(level);
+        bool vacuum = !IsCombatTool && configured && settings.IsVacuum(level);
         if (shovelModifications != null)
             foreach (var item in shovelModifications)
                 if (item != null) item.SetActive(!vacuum);
@@ -97,7 +104,21 @@ public class UpgradeShovel : MonoBehaviour
             foreach (var item in vacuumModifications)
                 if (item != null) item.SetActive(vacuum);
 
-        if (configured)
+        if (IsCombatTool)
+        {
+            if (currentLevelText) currentLevelText.text = $"{level} / {CombatToolUpgrades.MaximumLevel}";
+            for (int i = 0; i < upgradeDots.Length; i++)
+                if (upgradeDots[i]) upgradeDots[i].SetActive(i < level);
+            int next = Mathf.Min(level + 1, CombatToolUpgrades.MaximumLevel);
+            if (weightModification) weightModification.text = maxed ? "One hit (MAX)" :
+                next == CombatToolUpgrades.MaximumLevel ? "Next: one hit" : $"Power {level + 1} → {next + 1}";
+            if (tool == PlayerCombatTools.Tool.Axe)
+                SetModification(scopeModification, CombatToolUpgrades.AxeDamage(level), CombatToolUpgrades.AxeDamage(next), maxed, "damage");
+            else
+                SetModification(scopeModification, Mathf.CeilToInt(5f / CombatToolUpgrades.WallDamage(level, 5)),
+                    Mathf.CeilToInt(5f / CombatToolUpgrades.WallDamage(next, 5)), maxed, "hits");
+        }
+        else if (configured)
         {
             var shovel = settings.shovels[settings.TypeIndex(level)];
             if (shovelImage != null) shovelImage.sprite = shovel.image;

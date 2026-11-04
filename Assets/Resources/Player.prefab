@@ -5067,8 +5067,33 @@ PrefabInstance:
     - {fileID: 5313634144718844689, guid: 62b6c43e752d8344ba410b42f2af7afa, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5313634144718943678, guid: 62b6c43e752d8344ba410b42f2af7afa, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1371806168887203065}
   m_SourcePrefab: {fileID: 100100000, guid: 62b6c43e752d8344ba410b42f2af7afa, type: 3}
+--- !u!1 &8047712762066936401 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5313634144718943678, guid: 62b6c43e752d8344ba410b42f2af7afa, type: 3}
+  m_PrefabInstance: {fileID: 2743512427453437935}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1371806168887203065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8047712762066936401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11107784455daad43b0ca781a0c06f0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatToolFinish
+  tool: 2
+  finishes:
+  - {fileID: 2800000, guid: a7f907ac1d3d68b458963865f3e4e033, type: 3}
+  - {fileID: 2800000, guid: 5eb5d005bec208f49a477391a275f0b3, type: 3}
+  - {fileID: 2800000, guid: 05ed33cd5fc43354fbe889f11434629f, type: 3}
 --- !u!4 &8047712762067369585 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5313634144718973342, guid: 62b6c43e752d8344ba410b42f2af7afa, type: 3}
@@ -6148,13 +6173,38 @@ PrefabInstance:
     - {fileID: 7257383528210283399, guid: c04d85704b2046b4f8110de72884d87f, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3394552151553313453, guid: c04d85704b2046b4f8110de72884d87f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8056622849061451846}
   m_SourcePrefab: {fileID: 100100000, guid: c04d85704b2046b4f8110de72884d87f, type: 3}
 --- !u!4 &6123201028038926348 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3394552151552824973, guid: c04d85704b2046b4f8110de72884d87f, type: 3}
   m_PrefabInstance: {fileID: 8926739015815214721}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6123201028039293996 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3394552151553313453, guid: c04d85704b2046b4f8110de72884d87f, type: 3}
+  m_PrefabInstance: {fileID: 8926739015815214721}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8056622849061451846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6123201028039293996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11107784455daad43b0ca781a0c06f0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatToolFinish
+  tool: 3
+  finishes:
+  - {fileID: 2800000, guid: 19007ff601ea9144d99d8bb93a3f81de, type: 3}
+  - {fileID: 2800000, guid: 1fe898326b835f745972972c0dbb5418, type: 3}
+  - {fileID: 2800000, guid: fee449f202e70f54c8c9f3cc430acb5d, type: 3}
 --- !u!1001 &9069517389694598191
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class UpgradeManager : MonoBehaviour
 {
     [SerializeField] private UpgradeShovel upgradeShovelScreen;
+    [SerializeField] private UpgradeShovel axeScreen, hammerScreen;
     [SerializeField] private UpgradeStamina upgradeStaminaScreen;
     [SerializeField] private UpgradeVehicle upgradeVehicleScreen;
     
@@ -28,6 +29,8 @@ public class UpgradeManager : MonoBehaviour
     {
         if (initialized) return;
         initialized = true;
+        if (axeScreen) axeScreen.gameObject.SetActive(false);
+        if (hammerScreen) hammerScreen.gameObject.SetActive(false);
         if (upgradeShovelScreen != null) upgradeShovelScreen.gameObject.SetActive(false);
         if (upgradeStaminaScreen != null) upgradeStaminaScreen.gameObject.SetActive(false);
         if (upgradeVehicleScreen != null) upgradeVehicleScreen.gameObject.SetActive(false);
@@ -49,6 +52,23 @@ public class UpgradeManager : MonoBehaviour
         gameObject.SetActive(true);
         upgradeShovelScreen.gameObject.SetActive(true);
         upgradeShovelScreen.Refresh();
+        AudioManager.Instance?.PlayConfirm();
+        return true;
+    }
+
+    public bool OpenCombatTool(PlayerCombatTools.Tool tool)
+    {
+        var screen = tool == PlayerCombatTools.Tool.Axe ? axeScreen : hammerScreen;
+        if (!screen || !CombatToolUpgrades.Found(SaveSystem.Data, tool) || !enabled ||
+            (current != null && current.IsOpen) || UIPopups.BasePopupUI.HasActivePopup ||
+            (transform.parent && !transform.parent.gameObject.activeInHierarchy)) return false;
+        Initialize();
+        openedFrame = Time.frameCount;
+        IsOpen = true;
+        current = this;
+        if (closeButton) closeButton.gameObject.SetActive(true);
+        gameObject.SetActive(true);
+        screen.gameObject.SetActive(true);
         AudioManager.Instance?.PlayConfirm();
         return true;
     }
@@ -115,6 +135,8 @@ public class UpgradeManager : MonoBehaviour
         if (closePressed) Close();
         else if (upgradePressed && upgradeShovelScreen != null && upgradeShovelScreen.isActiveAndEnabled)
             upgradeShovelScreen.TryUpgrade();
+        else if (upgradePressed && axeScreen && axeScreen.isActiveAndEnabled) axeScreen.Upgrade();
+        else if (upgradePressed && hammerScreen && hammerScreen.isActiveAndEnabled) hammerScreen.Upgrade();
         else if (upgradePressed && upgradeStaminaScreen != null && upgradeStaminaScreen.isActiveAndEnabled)
             upgradeStaminaScreen.TryUpgrade();
         else if (upgradePressed && upgradeVehicleScreen != null && upgradeVehicleScreen.isActiveAndEnabled)

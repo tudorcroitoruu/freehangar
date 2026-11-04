@@ -14,7 +14,9 @@ public enum WarningType
     OccupiedHands,
     OccupiedArea,
     UseForkliftToMove,
-    NewContainerOpened
+    NewContainerOpened,
+    FindAxe,
+    FindHammer
 }
 public class WarningPopup : MonoBehaviour
 {
