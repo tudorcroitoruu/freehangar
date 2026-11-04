@@ -34,6 +34,7 @@ namespace SickscoreGames.HUDNavigationSystem
 
 		// INDICATOR SETTINGS
 		public bool showIndicator = true;
+		public System.Predicate<float> IndicatorVisibilityFilter { get; set; }
 		public bool showOffscreenIndicator = true;
 		public bool ignoreIndicatorRadius = true;
 		public bool ignoreIndicatorHideDistance = false;

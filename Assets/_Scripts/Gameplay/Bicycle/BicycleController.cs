@@ -4,6 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController)), DisallowMultipleComponent]
 public sealed class BicycleController : MonoBehaviour, IInteractable
 {
+    [SerializeField, Min(0f)] private float hudIndicatorHideDistance = 5f;
     public Transform steering, frontWheel, rearWheel, crank, leftPedal, rightPedal, riderView;
     public Transform[] cargoSlots;
     [Tooltip("Optional single bag position sharing the entire box rack.")]
@@ -187,9 +188,18 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     void Awake()
     {
         Initialize(); LoadRidingCamera();
+        foreach (var marker in GetComponentsInChildren<SickscoreGames.HUDNavigationSystem.HUDNavigationElement>(true))
+        {
+            // Bags and crates have their own markers even when loaded onto a vehicle.
+            if (marker.GetComponentInParent<GrainContainer>(true) == null &&
+                marker.GetComponentInParent<BicycleController>(true) == this)
+                marker.IndicatorVisibilityFilter = ShowVehicleIndicator;
+        }
         if (GetComponent<VehicleReset>() == null) gameObject.AddComponent<VehicleReset>();
         if (GetComponent<VehicleUpgrade>() == null) gameObject.AddComponent<VehicleUpgrade>();
     }
+    private bool ShowVehicleIndicator(float distance) => !IsRidden && distance > hudIndicatorHideDistance;
+
     Collider[] cargoColliders;
     bool[] cargoColliderStates;
     bool coasting;

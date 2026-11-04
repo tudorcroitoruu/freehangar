@@ -645,7 +645,7 @@ namespace SickscoreGames.HUDNavigationSystem
 		#region Indicator Methods
 		protected virtual void UpdateIndicatorElement (HUDNavigationElement element, Vector3 screenPos, float distance)
 		{
-			if (useIndicators && element.showIndicator) {
+			if (useIndicators && element.showIndicator && (element.IndicatorVisibilityFilter?.Invoke(distance) ?? true)) {
 				// check indicator distance
 				if ((distance > indicatorRadius && !element.ignoreIndicatorRadius)) {
 					element.SetIndicatorActive (false);
