@@ -29,6 +29,36 @@ public class PlayerToolInteractionTests
         Assert.IsFalse(tools.TryEquip(PlayerCombatTools.Tool.Broom));Assert.IsFalse(tools.TryEquip(PlayerCombatTools.Tool.Axe));Assert.IsFalse(tools.TryEquip(PlayerCombatTools.Tool.Hammer));
         Assert.IsTrue(tools.TryEquip(PlayerCombatTools.Tool.Shovel));
     }
+    [Test] public void PistolRequiresDiscoveryAndCannotShootThroughWallsOrDuringReload()
+    {
+        var pistol = Child("Pistol");
+        Set("heldPistol", pistol);
+        Assert.IsFalse(tools.TryEquip(PlayerCombatTools.Tool.Pistol));
+        SaveSystem.Data.foundSecrets = new[] { PlayerCombatTools.PistolFindId };
+        Assert.IsTrue(tools.TryEquip(PlayerCombatTools.Tool.Pistol));
+        Assert.AreEqual(LayerMask.NameToLayer("HeldTools"), pistol.gameObject.layer);
+        var bird = new GameObject("Target behind wall");
+        try
+        {
+            bird.transform.position = root.transform.position + Vector3.forward * 8f;
+            new GameObject("Visual").transform.SetParent(bird.transform, false);
+            bird.AddComponent<SphereCollider>();
+            var chicken = bird.AddComponent<FarmChicken>();
+            typeof(FarmChicken).GetMethod("Awake", Private).Invoke(chicken, null);
+            var wall = Wall(1);
+            wall.GetComponent<BoxCollider>().enabled = true;
+            Physics.SyncTransforms();
+            Assert.IsTrue(tools.TryStartStrike());
+            Assert.IsFalse(chicken.IsDead);
+            Assert.IsFalse(tools.TryStartStrike());
+            wall.gameObject.SetActive(false);
+            Set("lastShot", Time.time - 2f);
+            Physics.SyncTransforms();
+            Assert.IsTrue(tools.TryStartStrike());
+            Assert.IsTrue(chicken.IsDead);
+        }
+        finally { Object.DestroyImmediate(bird); }
+    }
     [Test] public void ExistingAxeDiscoverySaveUnlocksOnlyItsMatchingHeldModel()
     {
         SaveSystem.Data.foundSecrets=new[]{PlayerCombatTools.LegacyAxeFindId};

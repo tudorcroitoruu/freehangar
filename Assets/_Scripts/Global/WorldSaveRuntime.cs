@@ -271,8 +271,8 @@ public sealed class WorldSaveRuntime : MonoBehaviour
             SetPose(go.transform, record.position, record.rotation, record.scale);
             go.GetComponent<GrainContainer>()?.RestoreSave(record.container);
             go.GetComponent<GrainPile>()?.RestoreSave(record.pile);
-            go.GetComponent<BreakableGrainBarrier>()?.RestoreSave(record.barrierHits, record.barrierExposed);
-            go.SetActive(record.active);
+            var barrier = go.GetComponent<BreakableGrainBarrier>();
+            go.SetActive(barrier != null ? barrier.RestoreSave(record.barrierHits, record.barrierExposed, record.active) : record.active);
             if (inventory != null && (record is BagSave || record.kind == "container" || record.kind == "item"))
             {
                 string productId = !string.IsNullOrWhiteSpace(record.prefab) ? record.prefab : go.GetComponent<GrainContainer>()?.CargoTypeId;

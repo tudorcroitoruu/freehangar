@@ -7,7 +7,7 @@ using UnityEngine;
 public sealed class BuriedFind : MonoBehaviour, IInteractable
 {
     // Explicit values preserve existing scene, prefab and save assignments when renaming tools.
-    public enum Kind { Key = 0, CashChest = 1, UpgradeVoucher = 2, InfiniteStamina = 3, CashCache = 4, Axe = 5, Hammer = 6, HangarKey = 7, Broom = 8, VehicleKey = 9, PerkBottle = 10 }
+    public enum Kind { Key = 0, CashChest = 1, UpgradeVoucher = 2, InfiniteStamina = 3, CashCache = 4, Axe = 5, Hammer = 6, HangarKey = 7, Broom = 8, VehicleKey = 9, PerkBottle = 10, Pistol = 11 }
 
     [SerializeField] private Kind kind;
     [SerializeField] private string findId;
@@ -53,6 +53,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     [SerializeField] private GameObject insertionKeyPrefab;
     [SerializeField] private DiscoveryBurst pickupEffect;
     [SerializeField, Range(2, 5)] private int targetHangar = 2;
+    [SerializeField] private BreakableGrainBarrier[] enclosingPanels;
     private BoxCollider interactionCollider;
     private Renderer[] visuals;
     private float nextRevealCheck;
@@ -106,6 +107,8 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         if (WasFound(SaveSystem.Data, findId)) { gameObject.SetActive(false); return; }
         if (revealed || Time.time < nextRevealCheck) return;
         nextRevealCheck = Time.time + .3f;
+        if (kind == Kind.Pistol && (!WasFound(SaveSystem.Data, PlayerCombatTools.HammerFindId) ||
+            enclosingPanels == null || !Array.Exists(enclosingPanels, panel => panel && panel.IsBroken))) return;
         if (coveringPile == null) { SetRevealed(true); return; }
         // Closed hangars keep their grain disabled until opened. That is not an excavation.
         if (!coveringPile.isActiveAndEnabled) return;
@@ -156,6 +159,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
             kind == Kind.VehicleKey ? $"Take {vehicleKeyName} key" :
             kind == Kind.Key ? $"Take {(string.IsNullOrEmpty(chestKeyLabel) ? "chest" : chestKeyLabel)} key" :
             kind == Kind.HangarKey ? $"Take HANGAR {targetHangar} key" :
+            kind == Kind.Pistol ? "Press E to pick up the pistol" :
             kind == Kind.Broom ? "Take broom (equip with 4)" :
             kind == Kind.Axe ? "Take axe (equip with 2)" :
             kind == Kind.Hammer ? "Take hammer (equip with 3)" :
@@ -234,6 +238,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     }
 
     private string Receipt() => kind == Kind.CashChest && variedChestRewards && chestRewardRolled ? PlayerPerks.Receipt(rolledChestReward,cashReward,chestPerkSeconds) : kind == Kind.VehicleKey ? $"{vehicleKeyName.ToUpperInvariant()} KEY FOUND" : kind == Kind.HangarKey ? $"HANGAR {targetHangar} KEY\nUse at Hangar {targetHangar}" :
+        kind == Kind.Pistol ? "PISTOL FOUND\nPress 4 to switch" :
         kind == Kind.Broom ? "BROOM FOUND\nPress 4 to equip" : kind == Kind.Key ? $"{(string.IsNullOrEmpty(chestKeyLabel) ? "CHEST" : chestKeyLabel.ToUpperInvariant())} KEY FOUND" : IsBottle ? PlayerPerks.Receipt(BottleReward,0,staminaDurationSeconds) :
         kind == Kind.CashChest || kind == Kind.CashCache ? $"+${cashReward}" :
         kind == Kind.UpgradeVoucher ? "FREE UPGRADE!" : kind == Kind.Axe ? "AXE FOUND\nPress 2 to equip" : "HAMMER FOUND\nPress 3 to equip";

@@ -12,6 +12,8 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
     [SerializeField, Min(1)] private int hitsRequired = 3;
     [SerializeField] private GrainPile coveringPile;
 
+    [SerializeField] private bool alwaysExposed;
+    public bool IsBroken => BuriedFind.WasFound(SaveSystem.Data, barrierId);
     private BoxCollider blockingCollider;
     private Renderer[] visuals;
     private int hits;
@@ -22,10 +24,12 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
     public bool IsExposed => exposed;
     public int HitsRemaining => Mathf.Max(0, hitsRequired - hits);
     public int SavedHits => hits;
-    public void RestoreSave(int savedHits, bool wasExposed)
+    public bool RestoreSave(int savedHits, bool wasExposed, bool wasActive = true)
     {
         hits = Mathf.Clamp(savedHits, 0, hitsRequired);
-        SetExposed(wasExposed);
+        SetExposed(alwaysExposed || wasExposed);
+        // Older saves used a different wall's discovery ID for all six box panels.
+        return alwaysExposed ? !IsBroken : wasActive;
     }
 
     private void Awake()
@@ -34,7 +38,7 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
         visuals = GetComponentsInChildren<Renderer>(true);
         topHeight = VisualBounds().max.y;
         nextRevealCheck = Time.time + UnityEngine.Random.Range(0f, .3f);
-        SetExposed(false);
+        SetExposed(alwaysExposed);
     }
 
     private void Update()

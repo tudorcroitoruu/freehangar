@@ -16,6 +16,13 @@ public sealed class GameManagerTestEditor : Editor
             if (GUILayout.Button("Test Hangar 3 — Rats")) ((GameManager)target).TestTeleportToHangar(3);
             if (GUILayout.Button("Test Hangar 4 — Crows")) ((GameManager)target).TestTeleportToHangar(4);
         }
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Tool testing", EditorStyles.boldLabel);
+        using (new EditorGUI.DisabledScope(!Application.isPlaying))
+        {
+            if (GUILayout.Button("Give test pistol (Play Mode)")) ((GameManager)target).GrantTestPistol();
+        }
     }
 }
 #endif

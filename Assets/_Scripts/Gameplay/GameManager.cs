@@ -56,6 +56,13 @@ public class GameManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ClearEditorTestItems() => editorTestItems.Clear();
 
+    public void GrantTestPistol()
+    {
+        if (!Application.isPlaying) return;
+        editorTestItems.Add(PlayerCombatTools.PistolFindId);
+        Debug.Log("Pistol available for this Play session. Press 4 to select it.", this);
+    }
+
     public void TestTeleportToHangar(int number)
     {
         if (!Application.isPlaying) { Debug.LogWarning("Enter Play mode before using the hangar test buttons.", this); return; }

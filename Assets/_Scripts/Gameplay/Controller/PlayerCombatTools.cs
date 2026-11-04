@@ -5,8 +5,9 @@ using UnityEngine.Serialization;
 [DisallowMultipleComponent]
 public sealed class PlayerCombatTools : MonoBehaviour
 {
-    public enum Tool { Shovel = 1, Axe = 2, Hammer = 3, Broom = 4 }
+    public enum Tool { Shovel = 1, Axe = 2, Hammer = 3, Broom = 4, Pistol = 5 }
 
+    public const string PistolFindId = "farm.tool.pistol";
     public const string BroomFindId = "farm.tool.broom";
     public const string LegacyAxeFindId = "farm.tool.hammer"; // Keep the old axe discovery ID for existing saves.
     public const string AxeFindId = "farm.tool.axe";
@@ -23,6 +24,15 @@ public sealed class PlayerCombatTools : MonoBehaviour
     [SerializeField, Min(.5f)] private float strikeReach = 3f;
     [SerializeField, Min(.1f)] private float strikeDuration = .55f;
 
+    [SerializeField] private Transform heldPistol;
+    [SerializeField] private GameObject pistolSmoke;
+    [SerializeField] private AudioClip pistolShot, pistolReload;
+    private const float ReloadDuration = 1.2f;
+    private float lastShot = float.NegativeInfinity;
+    private bool reloadSoundPending;
+    private AudioSource pistolAudio;
+    private Vector3 pistolRestPosition;
+    private Quaternion pistolRestRotation;
     private PlayerInteractor interactor;
     private PlayerController player;
     private PlayerBicycleInteraction bicycle;
@@ -66,6 +76,13 @@ public sealed class PlayerCombatTools : MonoBehaviour
         if (heldBroom != null) { broomRestPosition = heldBroom.localPosition; broomRestRotation = heldBroom.localRotation; }
         if (heldAxe != null) { hammerRestPosition = heldAxe.localPosition; hammerRestRotation = heldAxe.localRotation; }
         if (heldSledgehammer != null) { sledgeRestPosition = heldSledgehammer.localPosition; sledgeRestRotation = heldSledgehammer.localRotation; }
+        if (heldPistol != null)
+        {
+            pistolRestPosition = heldPistol.localPosition;
+            pistolRestRotation = heldPistol.localRotation;
+            pistolAudio = gameObject.AddComponent<AudioSource>();
+            pistolAudio.playOnAwake = false;
+        }
         ApplyVisuals();
     }
 
@@ -74,11 +91,16 @@ public sealed class PlayerCombatTools : MonoBehaviour
         if(!IsUnlocked(equipped)) { equipped=Tool.Shovel;CancelStrike();ApplyVisuals(); }
         RestoreSelectedVisuals();
         if (!acceptInput || (interactor != null && interactor.DiscoveryBusy)) { CancelStrike(); return; }
+        if (equipped == Tool.Pistol && reloadSoundPending && Time.time >= lastShot + .18f)
+        {
+            reloadSoundPending = false;
+            if (pistolReload) pistolAudio.PlayOneShot(pistolReload);
+        }
         AdvanceStrike();
         if (Input.GetKeyDown(KeyCode.Alpha1)) TryEquip(Tool.Shovel);
         else if (Input.GetKeyDown(KeyCode.Alpha2)) TryEquip(Tool.Axe);
         else if (Input.GetKeyDown(KeyCode.Alpha3)) TryEquip(Tool.Hammer);
-        else if (Input.GetKeyDown(KeyCode.Alpha4)) TryEquip(Tool.Broom);
+        else if (Input.GetKeyDown(KeyCode.Alpha4)) TryEquip(IsUnlocked(Tool.Pistol) && (equipped == Tool.Broom || !IsUnlocked(Tool.Broom)) ? Tool.Pistol : Tool.Broom);
 
         if (wasLocked && Input.GetMouseButtonDown(0)) TryStartStrike();
     }
@@ -94,6 +116,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
     }
 
     public bool IsUnlocked(Tool tool) => tool == Tool.Shovel ||
+        (tool == Tool.Pistol && BuriedFind.WasFound(SaveSystem.Data,PistolFindId)) ||
         (tool == Tool.Broom && BuriedFind.WasFound(SaveSystem.Data,BroomFindId)) ||
         (tool == Tool.Axe && (BuriedFind.WasFound(SaveSystem.Data,AxeFindId) || BuriedFind.WasFound(SaveSystem.Data,LegacyAxeFindId))) ||
         (tool == Tool.Hammer && BuriedFind.WasFound(SaveSystem.Data,HammerFindId));
@@ -103,11 +126,50 @@ public sealed class PlayerCombatTools : MonoBehaviour
         if (!isActiveAndEnabled || !IsUnlocked(equipped) || equipped == Tool.Shovel || viewCamera == null ||
             Time.timeScale<=0 || Time.time < strikeStart + StrikeDuration ||
             (bags!=null && bags.IsCarrying) || (interactor!=null && (interactor.HandsOccupied || interactor.DiscoveryBusy))) return false;
+        if (equipped == Tool.Pistol)
+        {
+            if (!heldPistol || Time.time < lastShot + ReloadDuration) return false;
+            lastShot = Time.time;
+            reloadSoundPending = true;
+            if (pistolShot) pistolAudio.PlayOneShot(pistolShot);
+            FirePistol();
+            return true;
+        }
         strikeStart=Time.time;impactPending=true;
         GameplayAudio.Instance?.ToolSwing();
         return true;
     }
-    private void CancelStrike() { impactPending=false;strikeStart=-10f; }
+    private void FirePistol()
+    {
+        var ray = PlayerAim.CenterRay(viewCamera);
+        var muzzle = heldPistol.TransformPoint(new Vector3(0f, -.25f, .145f));
+        SpawnPistolSmoke(muzzle, ray.direction);
+        RaycastHit nearest = default;
+        foreach (var hit in Physics.RaycastAll(ray, 150f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+        {
+            if (hit.transform.IsChildOf(transform) || (nearest.collider && hit.distance >= nearest.distance)) continue;
+            nearest = hit;
+        }
+        if (!nearest.collider) return;
+        SpawnPistolSmoke(nearest.point + nearest.normal * .02f, nearest.normal);
+        var chicken = nearest.collider.GetComponentInParent<FarmChicken>();
+        if (chicken) chicken.Hit(chicken.health, transform.position, transform);
+        var pest = nearest.collider.GetComponentInParent<GrainPest>();
+        if (pest)
+        {
+            GameplayAudio.Instance?.PestHit(pest.IsCrow, nearest.point);
+            Destroy(pest.gameObject);
+        }
+    }
+
+    private void SpawnPistolSmoke(Vector3 position, Vector3 direction)
+    {
+        if (!pistolSmoke) return;
+        var effect = Instantiate(pistolSmoke, position, Quaternion.LookRotation(direction));
+        Destroy(effect, 3f);
+    }
+
+    private void CancelStrike() { impactPending=false;strikeStart=-10f;reloadSoundPending=false; }
     private void OnDisable() => CancelStrike();
 
     private void PerformStrike()
@@ -179,8 +241,9 @@ public sealed class PlayerCombatTools : MonoBehaviour
         // Showing the already-selected tool is not a tool switch and must preserve its load.
         if(tool==equipped) { ApplyVisuals();return true; }
         if (shovelTool != null && (shovelTool.Kilograms > 0f || shovelTool.IsBusy)) return false;
-        if (tool != Tool.Shovel && (tool == Tool.Broom ? heldBroom : tool == Tool.Axe ? heldAxe : heldSledgehammer) == null) return false;
+        if (tool != Tool.Shovel && GetHeldModel(tool) == null) return false;
         if (shovelTool != null) shovelTool.CancelAction();
+        reloadSoundPending = false;
         equipped = tool;
         strikeStart = -10f;
         impactPending = false;
@@ -192,9 +255,19 @@ public sealed class PlayerCombatTools : MonoBehaviour
     {
         strikeStart = -10f;
         impactPending = false;
-        foreach (var tool in new[] { heldBroom, heldAxe, heldSledgehammer })
+        foreach (var tool in new[] { heldBroom, heldAxe, heldSledgehammer, heldPistol })
             if (tool != null && tool.gameObject.activeSelf) { hidden.Add(tool.gameObject); tool.gameObject.SetActive(false); }
     }
+
+    private Transform GetHeldModel(Tool tool) => tool switch
+    {
+        Tool.Shovel => shovelHands,
+        Tool.Axe => heldAxe,
+        Tool.Hammer => heldSledgehammer,
+        Tool.Broom => heldBroom,
+        Tool.Pistol => heldPistol,
+        _ => null
+    };
 
     private void RestoreSelectedVisuals()
     {
@@ -205,8 +278,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
             (player.characterController != null && !player.characterController.enabled) || player.IsCarrying ||
             (bicycle != null && bicycle.IsRiding) || (bags != null && bags.IsCarrying) ||
             (interactor != null && (interactor.HandsOccupied || interactor.DiscoveryBusy))) return;
-        var selected = equipped == Tool.Shovel ? shovelHands : equipped == Tool.Broom ? heldBroom :
-            equipped == Tool.Axe ? heldAxe : heldSledgehammer;
+        var selected = GetHeldModel(equipped);
         if ((selected != null && !selected.gameObject.activeSelf) ||
             (shovelTool != null && shovelTool.enabled != (equipped == Tool.Shovel))) ApplyVisuals();
     }
@@ -220,11 +292,13 @@ public sealed class PlayerCombatTools : MonoBehaviour
         {
             SetHeldLayer(shovelHands, layer);
             SetHeldLayer(heldBroom, layer);
+            SetHeldLayer(heldPistol, layer);
             SetHeldLayer(heldAxe, layer);
             SetHeldLayer(heldSledgehammer, layer);
         }
         if (shovelTool != null) shovelTool.enabled=equipped==Tool.Shovel;
         if (shovelHands != null) shovelHands.gameObject.SetActive(equipped == Tool.Shovel);
+        if (heldPistol != null) heldPistol.gameObject.SetActive(equipped == Tool.Pistol);
         if (heldBroom != null) heldBroom.gameObject.SetActive(equipped == Tool.Broom);
         if (heldAxe != null) heldAxe.gameObject.SetActive(equipped == Tool.Axe);
         if (heldSledgehammer != null) heldSledgehammer.gameObject.SetActive(equipped == Tool.Hammer);
@@ -239,6 +313,16 @@ public sealed class PlayerCombatTools : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (equipped == Tool.Pistol && heldPistol)
+        {
+            float t = Time.time - lastShot;
+            float recoil = Mathf.Clamp01(1f - t / .18f);
+            float lower = Mathf.SmoothStep(0f, 1f, (t - .12f) / .30f)
+                * (1f - Mathf.SmoothStep(0f, 1f, (t - .80f) / (ReloadDuration - .80f)));
+            heldPistol.localPosition = pistolRestPosition + new Vector3(0f, .04f * recoil - .34f * lower, -.09f * recoil);
+            heldPistol.localRotation = Quaternion.Euler(-14f * recoil + 20f * lower, 0f, -8f * lower) * pistolRestRotation;
+            return;
+        }
         Transform held = equipped == Tool.Broom ? heldBroom : equipped == Tool.Axe ? heldAxe : equipped == Tool.Hammer ? heldSledgehammer : null;
         if (held == null) return;
         float phase = Mathf.Clamp01((Time.time - strikeStart) / StrikeDuration);

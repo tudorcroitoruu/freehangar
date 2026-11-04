@@ -31,7 +31,7 @@ public static class HeldToolCameraSetup
         if (tools != null)
         {
             var toolsData = new SerializedObject(tools);
-            foreach (string property in new[] { "shovelHands", "heldBroom", "heldAxe", "heldSledgehammer" })
+            foreach (string property in new[] { "shovelHands", "heldBroom", "heldAxe", "heldSledgehammer", "heldPistol" })
             {
                 var root = toolsData.FindProperty(property).objectReferenceValue as Transform;
                 if (root == null) continue;

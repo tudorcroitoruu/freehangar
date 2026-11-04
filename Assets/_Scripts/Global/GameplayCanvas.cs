@@ -213,12 +213,13 @@ public class GameplayCanvas : MonoBehaviour
         if (IsToolUnlocked(PlayerCombatTools.Tool.Broom)) tools |= 2;
         if (IsToolUnlocked(PlayerCombatTools.Tool.Axe)) tools |= 4;
         if (IsToolUnlocked(PlayerCombatTools.Tool.Hammer)) tools |= 8;
+        if (IsToolUnlocked(PlayerCombatTools.Tool.Pistol)) tools |= 16;
         var equipped = playerTools != null ? playerTools.Equipped : PlayerCombatTools.Tool.Shovel;
         if (tools != displayedTools || equipped != displayedEquipped)
         {
             bool showNewTool = displayedTools < 0 || (tools & ~displayedTools) != 0;
             SetToolHint(shovelEquipped, true, equipped == PlayerCombatTools.Tool.Shovel);
-            SetToolHint(broomEquipped, (tools & 2) != 0, equipped == PlayerCombatTools.Tool.Broom);
+            SetToolHint(broomEquipped, (tools & 18) != 0, equipped == PlayerCombatTools.Tool.Broom || equipped == PlayerCombatTools.Tool.Pistol);
             SetToolHint(axeEquipped, (tools & 4) != 0, equipped == PlayerCombatTools.Tool.Axe);
             SetToolHint(hammerEquipped, (tools & 8) != 0, equipped == PlayerCombatTools.Tool.Hammer);
             displayedTools = tools;
@@ -276,6 +277,7 @@ public class GameplayCanvas : MonoBehaviour
         if (playerTools != null) return playerTools.IsUnlocked(tool);
         var data = SaveSystem.Data;
         return tool == PlayerCombatTools.Tool.Broom ? BuriedFind.WasFound(data, PlayerCombatTools.BroomFindId)
+            : tool == PlayerCombatTools.Tool.Pistol ? BuriedFind.WasFound(data, PlayerCombatTools.PistolFindId)
             : tool == PlayerCombatTools.Tool.Axe ? BuriedFind.WasFound(data, PlayerCombatTools.AxeFindId) || BuriedFind.WasFound(data, PlayerCombatTools.LegacyAxeFindId)
             : BuriedFind.WasFound(data, PlayerCombatTools.HammerFindId);
     }

@@ -55,6 +55,31 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         nextSound = Time.time + Random.Range(4f, 10f);
     }
 
+    private void Start()
+    {
+        // The grain-feeding chicken's home is its authored spot beside the pile.
+        if (feedingPile || !agent.isOnNavMesh) return;
+
+        var terrain = Terrain.activeTerrain;
+        for (int attempt = 0; attempt < 24; attempt++)
+        {
+            var candidate = new Vector3(Random.Range(yard.min.x, yard.max.x), homePosition.y,
+                Random.Range(yard.min.z, yard.max.z));
+            if (terrain)
+                candidate.y = terrain.SampleHeight(candidate) + terrain.transform.position.y;
+
+            if (!NavMesh.SamplePosition(candidate, out var hit, 2f, agent.areaMask) || !InsideYard(hit.position))
+                continue;
+            if (!agent.CalculatePath(hit.position, path) || path.status != NavMeshPathStatus.PathComplete)
+                continue;
+            if (agent.Warp(hit.position))
+            {
+                homePosition = hit.position;
+                return;
+            }
+        }
+    }
+
     private void Update()
     {
         if (IsDead)
