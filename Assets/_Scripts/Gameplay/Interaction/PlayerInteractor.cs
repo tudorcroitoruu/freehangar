@@ -135,13 +135,13 @@ public sealed class PlayerInteractor : MonoBehaviour
 
     public bool TryAdditionalInput()
     {
-        if (!Input.anyKeyDown || !CanInteract) return false;
+        if (!CanInteract || (!FarmInput.Down("Secondary") && !FarmInput.Down("Cargo"))) return false;
         if (PushedWheelbarrow != null) return false;
         var primary = FindTarget();
         if (!(primary is Component component)) return false;
         foreach (var behaviour in ActionBehaviours(component))
             if (behaviour != null && behaviour.isActiveAndEnabled && behaviour is IKeyedInteractable action &&
-                action.InteractionKey != KeyCode.E && action.InteractionKey != KeyCode.None && Input.GetKeyDown(action.InteractionKey))
+                action.InteractionKey != KeyCode.E && action.InteractionKey != KeyCode.None && FarmInput.ContextDown(action.InteractionKey))
                 return TryInteract(action.InteractionKey);
         return false;
     }
@@ -192,7 +192,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         else if (!HandsOccupied && aimedTarget is BicycleController vehicle && !vehicle.IsRidden)
             next = vehicle.GetComponent<VehicleReset>();
         SetResetTarget(next);
-        if (resetTarget != null) resetTarget.TickHold(Input.GetKey(KeyCode.R), Time.deltaTime);
+        if (resetTarget != null) resetTarget.TickHold(FarmInput.Held("ResetVehicle"), Time.deltaTime);
     }
 
     private void AddResetAction(ref InteractionPromptData data)

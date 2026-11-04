@@ -315,6 +315,7 @@ public static class SaveSystem
      //  InitAchievementsList();
         
         savesLoaded = true;
+        FarmInput.RefreshBindings();
 
         if (Data.MigrateHangarProgress()) SaveData();
         HangarProgressChanged?.Invoke();

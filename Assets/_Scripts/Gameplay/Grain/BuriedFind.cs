@@ -159,10 +159,10 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
             kind == Kind.VehicleKey ? $"Take {vehicleKeyName} key" :
             kind == Kind.Key ? $"Take {(string.IsNullOrEmpty(chestKeyLabel) ? "chest" : chestKeyLabel)} key" :
             kind == Kind.HangarKey ? $"Take HANGAR {targetHangar} key" :
-            kind == Kind.Pistol ? "Press E to pick up the pistol" :
-            kind == Kind.Broom ? "Take broom (equip with 4)" :
-            kind == Kind.Axe ? "Take axe (equip with 2)" :
-            kind == Kind.Hammer ? "Take hammer (equip with 3)" :
+            kind == Kind.Pistol ? $"Press {FarmInput.KeyLabel(KeyCode.E)} to pick up the pistol" :
+            kind == Kind.Broom ? $"Take broom (equip with {FarmInput.KeyLabel(KeyCode.Alpha4)})" :
+            kind == Kind.Axe ? $"Take axe (equip with {FarmInput.KeyLabel(KeyCode.Alpha2)})" :
+            kind == Kind.Hammer ? $"Take hammer (equip with {FarmInput.KeyLabel(KeyCode.Alpha3)})" :
             kind == Kind.UpgradeVoucher ? "Pick up free upgrade" :
             IsBottle ? $"Drink {BottleName} tonic ({staminaDurationSeconds / 60} min)" :
             kind == Kind.CashCache ? $"Take cash cache (+${cashReward})" :
@@ -238,10 +238,10 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     }
 
     private string Receipt() => kind == Kind.CashChest && variedChestRewards && chestRewardRolled ? PlayerPerks.Receipt(rolledChestReward,cashReward,chestPerkSeconds) : kind == Kind.VehicleKey ? $"{vehicleKeyName.ToUpperInvariant()} KEY FOUND" : kind == Kind.HangarKey ? $"HANGAR {targetHangar} KEY\nUse at Hangar {targetHangar}" :
-        kind == Kind.Pistol ? "PISTOL FOUND\nPress 4 to switch" :
-        kind == Kind.Broom ? "BROOM FOUND\nPress 4 to equip" : kind == Kind.Key ? $"{(string.IsNullOrEmpty(chestKeyLabel) ? "CHEST" : chestKeyLabel.ToUpperInvariant())} KEY FOUND" : IsBottle ? PlayerPerks.Receipt(BottleReward,0,staminaDurationSeconds) :
+        kind == Kind.Pistol ? $"PISTOL FOUND\nPress {FarmInput.KeyLabel(KeyCode.Alpha4)} to switch" :
+        kind == Kind.Broom ? $"BROOM FOUND\nPress {FarmInput.KeyLabel(KeyCode.Alpha4)} to equip" : kind == Kind.Key ? $"{(string.IsNullOrEmpty(chestKeyLabel) ? "CHEST" : chestKeyLabel.ToUpperInvariant())} KEY FOUND" : IsBottle ? PlayerPerks.Receipt(BottleReward,0,staminaDurationSeconds) :
         kind == Kind.CashChest || kind == Kind.CashCache ? $"+${cashReward}" :
-        kind == Kind.UpgradeVoucher ? "FREE UPGRADE!" : kind == Kind.Axe ? "AXE FOUND\nPress 2 to equip" : "HAMMER FOUND\nPress 3 to equip";
+        kind == Kind.UpgradeVoucher ? "FREE UPGRADE!" : kind == Kind.Axe ? $"AXE FOUND\nPress {FarmInput.KeyLabel(KeyCode.Alpha2)} to equip" : $"HAMMER FOUND\nPress {FarmInput.KeyLabel(KeyCode.Alpha3)} to equip";
 
     private bool PresentationValid => actor != null && actor.isActiveAndEnabled && view != null &&
         view.isActiveAndEnabled && SaveSystem.Data == animationProfile;

@@ -174,6 +174,8 @@ public class PlayerController : MonoBehaviour
             if (staminaManager != null) staminaManager.Tick(false, Time.deltaTime);
             return;
         }
+        if (FarmInput.UsingPad && Application.isFocused && !UIPopups.BasePopupUI.HasActivePopup &&
+            Cursor.lockState != CursorLockMode.Locked) SetCursorLocked(true);
         bool wasLocked = Cursor.lockState == CursorLockMode.Locked;
         if (Input.GetKeyDown(KeyCode.Escape))
             SetCursorLocked(false);
@@ -195,16 +197,16 @@ public class PlayerController : MonoBehaviour
         HandleCrouch(acceptInput);
         HandleMovement(acceptInput);
         if (combatTools != null) combatTools.Tick(acceptInput && !IsPushing, wasLocked);
-        bool interactionAction = acceptInput && interactor != null && Input.GetKeyDown(KeyCode.E) && interactor.TryInteract();
+        bool interactionAction = acceptInput && interactor != null && FarmInput.Down("Interact") && interactor.TryInteract();
         if (IsShovelEquipped && !interactionAction && !IsCarrying)
         {
             if (!acceptInput) shovelTool.CancelAction();
             else
             {
                 // The first click after Escape only captures the mouse.
-                if (wasLocked && Input.GetMouseButtonDown(1))
+                if (wasLocked && FarmInput.Down("Unload"))
                     shovelTool.TryDrop(characterCamera, transform);
-                else if (wasLocked && (shovelTool.IsVacuum ? Input.GetMouseButton(0) : Input.GetMouseButtonDown(0)))
+                else if (wasLocked && (shovelTool.IsVacuum ? FarmInput.Held("Attack") : FarmInput.Down("Attack")))
                     shovelTool.TryUse(characterCamera, transform);
                 shovelTool.Tick(Time.deltaTime);
             }
@@ -255,11 +257,11 @@ public class PlayerController : MonoBehaviour
         bool wasGrounded = characterController.isGrounded;
         Vector3 previousPosition = transform.position;
         Vector2 input = acceptInput
-            ? new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
+            ? FarmInput.Move
             : Vector2.zero;
         input = Vector2.ClampMagnitude(input, 1f);
         bool pushingWheelbarrow = interactor != null && interactor.PushedWheelbarrow != null;
-        bool wantsSprint = acceptInput && Input.GetKey(KeyCode.LeftShift);
+        bool wantsSprint = acceptInput && FarmInput.Held("Sprint");
         if (!wantsSprint || staminaManager == null || staminaManager.NormalizedStamina >= .2f) sprintExhausted = false;
         if (staminaManager != null && staminaManager.IsExhausted) sprintExhausted = true;
         var carriedBag = bagInteraction != null ? bagInteraction.CarriedBag : null;
@@ -281,7 +283,7 @@ public class PlayerController : MonoBehaviour
             verticalVelocity = -2f;
 
         bool jumped = acceptInput && !pushingWheelbarrow && !isCrouching && wasGrounded &&
-            Input.GetKeyDown(KeyCode.Space) && staminaManager != null && staminaManager.TryConsumeJumpStamina();
+            FarmInput.Down("Jump") && staminaManager != null && staminaManager.TryConsumeJumpStamina();
         if (jumped)
         {
             verticalVelocity = jumpForce;
@@ -358,7 +360,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleCamera()
     {
-        ApplyLook(new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")));
+        ApplyLook(FarmInput.Look);
     }
 
     private void ApplyLook(Vector2 input)
@@ -384,7 +386,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleCrouch(bool acceptInput)
     {
-        bool requested = acceptInput && !IsPushing && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C));
+        bool requested = acceptInput && !IsPushing && FarmInput.Held("Crouch");
         float minimumHeight = Mathf.Min(standingHeight, Mathf.Max(crouchHeight, characterController.radius * 2f));
         float nextHeight = Mathf.MoveTowards(characterController.height,
             requested ? minimumHeight : standingHeight, crouchTransitionSpeed * Time.deltaTime);

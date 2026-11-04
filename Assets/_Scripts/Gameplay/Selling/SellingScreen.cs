@@ -67,8 +67,8 @@ public class SellingScreen : MonoBehaviour
         if (!IsOpen) return;
         if (!Zone.CanWeigh(player)) { Close(); return; }
         if (!Application.isFocused || UIPopups.BasePopupUI.HasActivePopup) return;
-        if (Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Return)) { Sell(); return; }
-        if (Input.GetKeyDown(KeyCode.Escape)) Close();
+        if (FarmInput.Down("Secondary") || Input.GetKeyDown(KeyCode.Return)) { Sell(); return; }
+        if (FarmInput.Back) Close();
         else if (!QuoteMatches()) Refresh();
         else if (sellButton != null) sellButton.interactable = CanPay();
     }

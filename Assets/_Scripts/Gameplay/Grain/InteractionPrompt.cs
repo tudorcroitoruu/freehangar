@@ -61,11 +61,12 @@ public sealed class InteractionPrompt : MonoBehaviour
             descriptionTwo.text = data.SecondaryDescription ?? "";
             descriptionTwo.gameObject.SetActive(!string.IsNullOrEmpty(data.SecondaryDescription));
         }
-        bool showKey = data.ShowKey && !data.ShowPrimaryButton;
-        string key = KeyLabel(data.InteractionKey);
+        bool padPrimary = FarmInput.UsingPad && data.ShowPrimaryButton;
+        bool showKey = padPrimary || (data.ShowKey && !data.ShowPrimaryButton);
+        string key = padPrimary ? FarmInput.Label(data.PrimaryIsAttack ? "Attack" : "Unload", "") : KeyLabel(data.InteractionKey);
         if (keycap != null && showKey && keycap.text != key) keycap.text = key;
         if (keycap != null && keycap.gameObject.activeSelf != showKey) keycap.gameObject.SetActive(showKey);
-        if (mouseLeft != null && mouseLeft.activeSelf != data.ShowPrimaryButton) mouseLeft.SetActive(data.ShowPrimaryButton);
+        if (mouseLeft != null && mouseLeft.activeSelf != (data.ShowPrimaryButton && !padPrimary)) mouseLeft.SetActive(data.ShowPrimaryButton && !padPrimary);
         if (bagSliderFill != null && bagSliderFill.activeSelf != data.ShowProgress) bagSliderFill.SetActive(data.ShowProgress);
         if (bagFill != null) bagFill.fillAmount = Mathf.Clamp01(data.Progress);
         if (bagFillStatus != null && bagFillStatus.text != data.ProgressText) bagFillStatus.text = data.ProgressText;
@@ -102,8 +103,7 @@ public sealed class InteractionPrompt : MonoBehaviour
             actionRows[i].panel.anchoredPosition = panel.anchoredPosition - Vector2.up * ((i + 1) * rowStep);
     }
 
-    private static string KeyLabel(KeyCode key) => key == KeyCode.None ? "E" :
-        key >= KeyCode.Alpha0 && key <= KeyCode.Alpha9 ? ((int)key - (int)KeyCode.Alpha0).ToString() : key.ToString();
+    private static string KeyLabel(KeyCode key) => FarmInput.KeyLabel(key);
 
     private void EnsureActionRows(int count)
     {

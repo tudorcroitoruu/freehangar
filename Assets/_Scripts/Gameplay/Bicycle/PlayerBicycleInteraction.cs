@@ -40,15 +40,15 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if (riding)
         {
             var forklift = bicycle != null ? bicycle.GetComponent<ForkliftController>() : null;
-            if (input && Input.GetKeyDown(KeyCode.E)) { TryDismount(); return true; }
-            if (input && forklift != null && Input.GetKeyDown(KeyCode.Q)) forklift.DropCargo();
+            if (input && FarmInput.Down("Interact")) { TryDismount(); return true; }
+            if (input && forklift != null && FarmInput.Down("Cargo")) forklift.DropCargo();
             if (forklift != null && forklift.IsTransferring) input = false;
             if (vehicleReset != null) vehicleReset.CancelHold();
-            DriveRiding(input ? Input.GetAxisRaw("Vertical") : 0,
-                input ? Input.GetAxisRaw("Horizontal") : 0,
-                !input || Input.GetKey(KeyCode.Space),
-                input && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)), Time.deltaTime);
-            if(input) UpdateRidingLook(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"), Time.deltaTime);
+            DriveRiding(input ? FarmInput.Move.y : 0,
+                input ? FarmInput.Move.x : 0,
+                !input || FarmInput.Held("Jump"),
+                input && (FarmInput.Held("Sprint") || Input.GetKey(KeyCode.RightShift)), Time.deltaTime);
+            if (input) { var look = FarmInput.Look; UpdateRidingLook(look.x, look.y, Time.deltaTime); }
             ApplyRidingView();
             return true;
         }
@@ -65,7 +65,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         {
             if (bags != null && bags.IsCarrying)
             {
-                if (Input.GetKeyDown(KeyCode.E)) { TryLoadBag(); return true; }
+                if (FarmInput.Down("Interact")) { TryLoadBag(); return true; }
                 return false;
             }
             // Aiming at an attached bag uses the existing bag interaction to take it back.

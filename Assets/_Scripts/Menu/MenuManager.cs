@@ -149,12 +149,12 @@ public class MenuManager : MonoBehaviour
         if (transitionRequested || LoadingScreen.isLoadingOn || GameSettingsManager.IsRebindingInputCaptured) return;
         if (newGamePopup != null && newGamePopup.activeSelf)
         {
-            if (Input.GetKeyDown(KeyCode.Escape)) ShowMenuScreen();
+            if (FarmInput.Back) ShowMenuScreen();
             else if (Time.frameCount > newGamePopupOpenedFrame &&
                 (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))) ConfirmNewGame();
             return;
         }
-        if (!Input.GetKeyDown(KeyCode.Escape)) return;
+        if (!FarmInput.Back) return;
         if ((settingsScreen != null && settingsScreen.activeSelf) || (quitGamePopup != null && quitGamePopup.activeSelf))
             ShowMenuScreen();
         else ShowQuitGamePopup();

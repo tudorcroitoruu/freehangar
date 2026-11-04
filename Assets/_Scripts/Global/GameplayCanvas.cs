@@ -52,6 +52,64 @@ public class GameplayCanvas : MonoBehaviour
     [SerializeField] private GameObject[] forkliftHints;
     [SerializeField] private TMP_Text walkingInteraction;
     private BagInteraction playerBags;
+    private readonly List<System.Action<bool>> controlHintUpdates = new List<System.Action<bool>>();
+    private int hintDevice = -2;
+
+    private void CacheControlHints()
+    {
+        if (controlHintUpdates.Count != 0) return;
+        void AddRows(GameObject[] rows)
+        {
+            if (rows == null) return;
+            foreach (var row in rows)
+            {
+                if (!row) continue;
+                string action = row.name switch
+                {
+                    "Interact" or "GetOff" => "Interact",
+                    "TakeInShovel" => "Attack", "ReleaseFromShovel" => "Unload",
+                    "Brake" => "Jump", "MoveFaster" => "Sprint", "ForkliftDrop" => "Cargo",
+                    "Steer" or "Pedal" => "Move", _ => null
+                };
+                if (action == null) continue;
+                foreach (var label in row.GetComponentsInChildren<TMP_Text>(true))
+                {
+                    if (label.name != "Button") continue;
+                    string keyboard = label.text;
+                    bool wasActive = label.gameObject.activeSelf;
+                    controlHintUpdates.Add(pad =>
+                    {
+                        label.gameObject.SetActive(pad || wasActive);
+                        label.text = pad ? (action == "Move" ? "LS" : FarmInput.Label(action, keyboard)) : keyboard;
+                    });
+                }
+                foreach (var icon in row.GetComponentsInChildren<Image>(true))
+                {
+                    if (icon.name != "Image") continue;
+                    bool wasActive = icon.gameObject.activeSelf;
+                    controlHintUpdates.Add(pad => icon.gameObject.SetActive(!pad && wasActive));
+                }
+            }
+        }
+        AddRows(walkingHints); AddRows(drivingHints); AddRows(bicycleHints); AddRows(forkliftHints);
+        void AddTool(SelectedUI tool, string action)
+        {
+            if (!tool) return;
+            var label = tool.GetComponentInChildren<Text>(true);
+            if (!label) return;
+            string keyboard = label.text;
+            bool fit = label.resizeTextForBestFit;
+            controlHintUpdates.Add(pad =>
+            {
+                label.resizeTextForBestFit = pad || fit;
+                label.text = pad ? FarmInput.Label(action, keyboard) : keyboard;
+            });
+        }
+        AddTool(shovelEquipped, "Previous"); AddTool(axeEquipped, "Next");
+        AddTool(hammerEquipped, "HammerSlot"); AddTool(broomEquipped, "UtilitySlot");
+    }
+    private void InvalidateControlHints() => hintDevice = -2;
+
 
     [Space, Header("Tools Equip Hints")] 
     [SerializeField] private CanvasGroup hintsParent;
@@ -98,6 +156,9 @@ public class GameplayCanvas : MonoBehaviour
 
     private void OnEnable()
     {
+        CacheControlHints();
+        InvalidateControlHints();
+        GameSettingsManager.InputBindingsChanged += InvalidateControlHints;
         Pause.PauseOnAction += HideHudForPause;
         Pause.PauseOffAction += RestoreHudAfterPause;
         if (Pause.Instance != null && Pause.Instance.paused) HideHudForPause();
@@ -119,6 +180,7 @@ public class GameplayCanvas : MonoBehaviour
 
     private void OnDisable()
     {
+        GameSettingsManager.InputBindingsChanged -= InvalidateControlHints;
         Pause.PauseOnAction -= HideHudForPause;
         Pause.PauseOffAction -= RestoreHudAfterPause;
         RestoreHudAfterPause();
@@ -171,6 +233,12 @@ public class GameplayCanvas : MonoBehaviour
 
     private void Update()
     {
+        int device = FarmInput.UsingPad ? UnityEngine.InputSystem.Gamepad.current.deviceId : -1;
+        if (device != hintDevice)
+        {
+            hintDevice = device;
+            foreach (var update in controlHintUpdates) update(device != -1);
+        }
         if (warningPopup != null) warningPopup.Tick(Time.deltaTime);
         if (achievementsPopup != null) achievementsPopup.Tick(Time.deltaTime);
         if (!hudHiddenByPause) AnimateMoney(Time.unscaledDeltaTime);

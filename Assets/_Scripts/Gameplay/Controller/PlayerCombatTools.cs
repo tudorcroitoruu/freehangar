@@ -97,12 +97,12 @@ public sealed class PlayerCombatTools : MonoBehaviour
             if (pistolReload) pistolAudio.PlayOneShot(pistolReload);
         }
         AdvanceStrike();
-        if (Input.GetKeyDown(KeyCode.Alpha1)) TryEquip(Tool.Shovel);
-        else if (Input.GetKeyDown(KeyCode.Alpha2)) TryEquip(Tool.Axe);
-        else if (Input.GetKeyDown(KeyCode.Alpha3)) TryEquip(Tool.Hammer);
-        else if (Input.GetKeyDown(KeyCode.Alpha4)) TryEquip(IsUnlocked(Tool.Pistol) && (equipped == Tool.Broom || !IsUnlocked(Tool.Broom)) ? Tool.Pistol : Tool.Broom);
+        if (FarmInput.Down("Previous")) TryEquip(Tool.Shovel);
+        else if (FarmInput.Down("Next")) TryEquip(Tool.Axe);
+        else if (FarmInput.Down("HammerSlot")) TryEquip(Tool.Hammer);
+        else if (FarmInput.Down("UtilitySlot")) TryEquip(IsUnlocked(Tool.Pistol) && (equipped == Tool.Broom || !IsUnlocked(Tool.Broom)) ? Tool.Pistol : Tool.Broom);
 
-        if (wasLocked && Input.GetMouseButtonDown(0)) TryStartStrike();
+        if (wasLocked && FarmInput.Down("Attack")) TryStartStrike();
     }
 
     private void AdvanceStrike()

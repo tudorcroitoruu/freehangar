@@ -202,10 +202,12 @@ public class GameSettingsManager : MonoBehaviour
 
     private void Update()
     {
+        if (rebindOperation != null && Gamepad.current?.startButton.wasPressedThisFrame == true) CancelRebinding();
         if (!initialized || IsRebindingInputCaptured)
             return;
 
-        if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
+        if ((Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame) ||
+            Gamepad.current?.selectButton.wasPressedThisFrame == true)
             ResetToDefaults();
     }
 
@@ -222,8 +224,8 @@ public class GameSettingsManager : MonoBehaviour
 
         // GlobalManager can initialize the inactive settings page before Awake.
         // Create the runtime asset before binding buttons keep references to its actions.
-        if (inputActions)
-            inputActions = Instantiate(inputActions);
+        var source = inputActions ? inputActions : InputSystem.actions;
+        if (source) inputActions = Instantiate(source);
 
 //         dlssProvider = dlssProviderBehaviour as IDLSSProvider;
 
@@ -258,6 +260,7 @@ public class GameSettingsManager : MonoBehaviour
     private void SetupInputBindings()
     {
         ApplySavedInputBindings(inputActions);
+        FarmInput.RefreshBindings();
         if (actionsButtons == null)
             return;
 
@@ -305,6 +308,7 @@ public class GameSettingsManager : MonoBehaviour
         {
             rebindOperation = action.PerformInteractiveRebinding(bindingIndex)
                 .WithCancelingThrough("<Keyboard>/escape")
+                .WithControlsExcluding("<Gamepad>/start")
                 .WithControlsExcluding("<Pointer>/position")
                 .WithControlsExcluding("<Pointer>/delta")
                 .WithControlsExcluding("<Keyboard>/anyKey")

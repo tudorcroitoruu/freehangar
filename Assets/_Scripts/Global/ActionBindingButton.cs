@@ -89,7 +89,7 @@ public class ActionBindingButton : MonoBehaviour
 
         if (InputButtonText)
         {
-            InputButtonText.text = "Press a key... (Esc to cancel)";
+            InputButtonText.text = FarmInput.UsingPad ? "Press a control... (Start to cancel)" : "Press a key... (Esc to cancel)";
             if (!inputButtonCanvasGroup && !InputButtonText.TryGetComponent(out inputButtonCanvasGroup))
                 inputButtonCanvasGroup = InputButtonText.gameObject.AddComponent<CanvasGroup>();
 

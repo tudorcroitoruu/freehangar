@@ -125,7 +125,7 @@ public class UpgradeManager : MonoBehaviour
     private void Update()
     {
         if (!Application.isFocused || UIPopups.BasePopupUI.HasActivePopup) return;
-        HandleInput(Input.GetKeyDown(KeyCode.Escape), Input.GetKeyDown(KeyCode.E));
+        HandleInput(FarmInput.Back, FarmInput.Down("Interact"));
     }
 
     private void HandleInput(bool closePressed, bool upgradePressed)

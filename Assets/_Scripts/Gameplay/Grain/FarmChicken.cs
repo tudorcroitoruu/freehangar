@@ -205,6 +205,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         prompt=new InteractionPromptData(transform.position+Vector3.up*.8f,
             AxeDiscovered ? "Use your axe to stop the chicken eating grain" : "Find the axe to stop this chicken",false);
         prompt.ShowPrimaryButton=AxeDiscovered;
+        prompt.PrimaryIsAttack = true;
         return feedingPile!=null && !IsDead && interactor!=null;
     }
     public bool TryInteract(PlayerInteractor interactor) => false;

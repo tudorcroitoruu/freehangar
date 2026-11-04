@@ -13,6 +13,7 @@ public struct InteractionPromptData
     public bool VehicleFull;
     public bool UseForkliftToMove;
     public bool ShowPrimaryButton;
+    public bool PrimaryIsAttack;
     public bool ShowProgress;
     public float Progress;
     public string ProgressText;
@@ -30,6 +31,7 @@ public struct InteractionPromptData
         VehicleFull = false;
         UseForkliftToMove = false;
         ShowPrimaryButton = false;
+        PrimaryIsAttack = false;
         ShowProgress = false;
         Progress = 0f;
         ProgressText = "";

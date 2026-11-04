@@ -52,7 +52,7 @@ public class Pause : MonoBehaviour
     private void Update()
     {
         if (MenuManager.IsMenuOpen || exitToMenu || restarting || GameSettingsManager.IsRebindingInputCaptured || LoadingScreen.IsLoading ||
-            !Input.GetKeyDown(KeyCode.Escape)) return;
+            !(FarmInput.Down("Pause") || (paused && FarmInput.Back))) return;
         if (!paused) PauseOn();
         else if (IsSubScreenOpen()) ShowMainScreen();
         else Unpause();
