@@ -32,6 +32,8 @@ public static class FarmChickenSetup
         foreach(var r in fence.GetComponentsInChildren<Renderer>()) { if(first){bounds=r.bounds;first=false;}else bounds.Encapsulate(r.bounds); }
         bounds.Expand(new Vector3(-3f,40f,-3f));
         if(!AssetDatabase.IsValidFolder(Folder))AssetDatabase.CreateFolder("Assets/Prefabs/Gameplay","Chickens");
+        var drop = AssetDatabase.LoadAssetAtPath<GameObject>(Folder + "/ChickenLeg.prefab");
+        if (drop == null) throw new System.InvalidOperationException("Chicken leg pickup prefab is missing.");
         var root=new GameObject("Farm chickens");
         var surface=root.AddComponent<NavMeshSurface>();
         surface.collectObjects=CollectObjects.Volume;
@@ -42,7 +44,6 @@ public static class FarmChickenSetup
         surface.BuildNavMesh();
         if(surface.navMeshData==null)throw new System.InvalidOperationException("Navigation bake produced no data.");
         AssetDatabase.CreateAsset(surface.navMeshData,Folder+"/ChickenYardNavMesh.asset");
-        var drop=CreateDrop();
         var habitats=new[]{new Vector3(0,0,-10),new Vector3(-55,0,125),new Vector3(-25,0,65),new Vector3(30,0,105)};
         for(int i=0;i<4;i++)
         {
@@ -74,16 +75,5 @@ public static class FarmChickenSetup
         EditorSceneManager.SaveScene(root.scene);
         AssetDatabase.SaveAssets();
         Debug.Log("Baked fenced chicken yard and placed four adult variants.");
-    }
-    private static GameObject CreateDrop()
-    {
-        var root=new GameObject("Chicken leg");
-        var meat=new Material(Shader.Find("HDRP/Lit"));meat.SetColor("_BaseColor",new Color(.5f,.22f,.06f));
-        var bone=new Material(Shader.Find("HDRP/Lit"));bone.SetColor("_BaseColor",new Color(.95f,.85f,.65f));
-        AssetDatabase.CreateAsset(meat,Folder+"/ChickenMeat.mat");AssetDatabase.CreateAsset(bone,Folder+"/ChickenBone.mat");
-        var body=GameObject.CreatePrimitive(PrimitiveType.Sphere);body.transform.SetParent(root.transform,false);body.transform.localScale=new Vector3(.24f,.17f,.3f);body.GetComponent<Renderer>().sharedMaterial=meat;
-        var tip=GameObject.CreatePrimitive(PrimitiveType.Capsule);tip.transform.SetParent(root.transform,false);tip.transform.localPosition=new Vector3(0,0,.21f);tip.transform.localRotation=Quaternion.Euler(90,0,0);tip.transform.localScale=new Vector3(.07f,.11f,.07f);tip.GetComponent<Renderer>().sharedMaterial=bone;
-        root.AddComponent<ChickenLegPickup>();
-        var result=PrefabUtility.SaveAsPrefabAsset(root,Folder+"/ChickenLeg.prefab");Object.DestroyImmediate(root);return result;
     }
 }

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1590791516764295512}
   - component: {fileID: 7275957336848027674}
   m_Layer: 0
-  m_Name: P_PROP_food_meat_07
+  m_Name: Chicken Leg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

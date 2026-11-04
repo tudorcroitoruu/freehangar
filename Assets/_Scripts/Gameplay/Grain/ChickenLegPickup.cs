@@ -2,11 +2,23 @@ using UnityEngine;
 
 public sealed class ChickenLegPickup : MonoBehaviour, IInteractable
 {
+    private const float SpinDegreesPerSecond = 90f;
     private bool collected;
     private bool carried;
     private float expiresAt;
     private void Start() => expiresAt = Time.time + 60f;
-    private void Update() { if (!carried && Time.time >= expiresAt) Destroy(gameObject); }
+    private void Update()
+    {
+        if (carried || collected) return;
+        if (Time.time >= expiresAt)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        transform.Rotate(Vector3.up, SpinDegreesPerSecond * Time.deltaTime, Space.World);
+    }
+
     public bool Carry(Transform mouth)
     {
         if (collected || carried || mouth == null) return false;
