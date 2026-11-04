@@ -5,6 +5,25 @@ using UnityEngine.TextCore;
 public static class GamepadPromptSprites
 {
     private static TMP_SpriteAsset asset;
+    public static void SetKeycap(TMP_Text label, string value)
+    {
+        if (!label) return;
+        const string prefix = "<sprite=\"GamepadPrompts\" name=\"";
+        if (value != null && value.StartsWith(prefix, System.StringComparison.Ordinal) && asset)
+        {
+            string name = value.Substring(prefix.Length).TrimEnd('>', '"');
+            int index = asset.GetSpriteIndexFromName(name);
+            if (index >= 0)
+            {
+                label.richText = true;
+                label.spriteAsset = asset;
+                label.text = "<sprite=" + index + ">";
+                return;
+            }
+        }
+        label.text = value ?? "";
+    }
+
     public static string Label(string control)
     {
         string name = control switch

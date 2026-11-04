@@ -7,6 +7,7 @@ using UnityEngine.UI;
 [DefaultExecutionOrder(-1000)]
 public class MenuManager : MonoBehaviour
 {
+    public Transform NavigationRoot => (quitGamePopup && quitGamePopup.activeInHierarchy ? quitGamePopup : newGamePopup && newGamePopup.activeInHierarchy ? newGamePopup : settingsScreen && settingsScreen.activeInHierarchy ? settingsScreen : menuScreen)?.transform;
     public static MenuManager Instance { get; private set; }
     public static bool IsMenuOpen => Instance != null && Instance.isActiveAndEnabled;
     [Header("Persistent services")]

@@ -64,7 +64,7 @@ public sealed class InteractionPrompt : MonoBehaviour
         bool padPrimary = FarmInput.UsingPad && data.ShowPrimaryButton;
         bool showKey = padPrimary || (data.ShowKey && !data.ShowPrimaryButton);
         string key = padPrimary ? FarmInput.Label(data.PrimaryIsAttack ? "Attack" : "Unload", "") : KeyLabel(data.InteractionKey);
-        if (keycap != null && showKey && keycap.text != key) keycap.text = key;
+        if (keycap != null && showKey) GamepadPromptSprites.SetKeycap(keycap, key);
         if (keycap != null && keycap.gameObject.activeSelf != showKey) keycap.gameObject.SetActive(showKey);
         if (mouseLeft != null && mouseLeft.activeSelf != (data.ShowPrimaryButton && !padPrimary)) mouseLeft.SetActive(data.ShowPrimaryButton && !padPrimary);
         if (bagSliderFill != null && bagSliderFill.activeSelf != data.ShowProgress) bagSliderFill.SetActive(data.ShowProgress);
@@ -84,7 +84,7 @@ public sealed class InteractionPrompt : MonoBehaviour
             }
             var action = data.AdditionalActions[i];
             if (row.description != null) row.description.text = action.Action;
-            if (row.key != null) { row.key.text = KeyLabel(action.Key); row.key.gameObject.SetActive(true); }
+            if (row.key != null) { GamepadPromptSprites.SetKeycap(row.key, KeyLabel(action.Key)); row.key.gameObject.SetActive(true); }
             if (row.mouse != null) row.mouse.SetActive(false);
             if (row.progress != null) row.progress.SetActive(action.ShowProgress);
             if (row.progressFill != null) row.progressFill.fillAmount = Mathf.Clamp01(action.Progress);

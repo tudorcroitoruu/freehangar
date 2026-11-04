@@ -3,7 +3,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SelectedUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class SelectedUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler
 {
     [SerializeField] private bool selectOnHover;
     [Tooltip("Use hoverImage when hovering an unselected item. Selected items keep selectedImage.")]
@@ -19,6 +19,7 @@ public class SelectedUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     [Range(0f, 1f)]
     [SerializeField] private float unselectedAlpha = 0.5f;
     private bool isSelected;
+    private bool hasNavigationFocus;
 
     [Header("Hover Events")]
     [SerializeField] private UnityEvent onHoverOn;
@@ -37,9 +38,20 @@ public class SelectedUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     private void UpdateCanvasGroup()
     {
         if (canvasGroup)
-            canvasGroup.alpha = isSelected || (selectOnHover && isHovered) ? selectedAlpha : unselectedAlpha;
+            canvasGroup.alpha = isSelected || hasNavigationFocus || (selectOnHover && isHovered) ? selectedAlpha : unselectedAlpha;
     }
 
+    public void OnSelect(BaseEventData eventData)
+    {
+        hasNavigationFocus = true;
+        UpdateSelectionVisuals();
+    }
+
+    public void OnDeselect(BaseEventData eventData)
+    {
+        hasNavigationFocus = false;
+        UpdateSelectionVisuals();
+    }
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!isActiveAndEnabled || isHovered)
@@ -62,6 +74,8 @@ public class SelectedUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     private void OnDisable()
     {
+        hasNavigationFocus = false;
+        UpdateSelectionVisuals();
         EndHover();
     }
 
@@ -98,6 +112,7 @@ public class SelectedUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     [SerializeField] private Vector2 originalSize;
     [SerializeField] private Vector2 newSize;
     
+    public Image SelectionBackground => selectedImage ? selectedImage.GetComponent<Image>() : null;
     public void Select()
     {
         isSelected = true;
@@ -112,7 +127,7 @@ public class SelectedUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     private void UpdateSelectionVisuals()
     {
-        bool highlighted = isSelected || (selectOnHover && isHovered);
+        bool highlighted = isSelected || hasNavigationFocus || (selectOnHover && isHovered);
         bool showHoverImage = (!isSelected || showHoverWhenSelected) && selectOnHover && isHovered && useDifferentHover &&
             hoverImage && hoverImage != selectedImage;
         UpdateCanvasGroup();

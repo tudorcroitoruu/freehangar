@@ -257,6 +257,11 @@ Material:
     - _ObjectSpaceUVMappingEmissive: 0
     - _OpaqueCullMode: 2
     - _Outline: 0
+    - _OutlineFillAmount: 1
+    - _OutlineFillClockwise: 1
+    - _OutlineFillDirection: 0
+    - _OutlineFillFollowPerimeter: 0
+    - _OutlineFillOrigin: 0
     - _OutlineMaskChannel: 0
     - _OutlineOverlayBlackTransparent: 0
     - _OutlineOverlayBlend: 0
@@ -330,6 +335,7 @@ Material:
     - _UseGlow: 1
     - _UseGradient: 1
     - _UseNoise: 1
+    - _UseOutlineFill: 0
     - _UseSecondaryNoise: 1
     - _UseShadowThreshold: 0
     - _UseUIAlphaClip: 0

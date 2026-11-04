@@ -429,6 +429,30 @@ public class GameSettingsManager : MonoBehaviour
         SaveInputBindings();
     }
 
+    public Transform FirstSectionTab => buttons != null && buttons.Length > 0 && buttons[0] ? buttons[0].transform : null;
+    public Transform LastSectionTab => buttons != null && buttons.Length > 0 && buttons[buttons.Length - 1] ? buttons[buttons.Length - 1].transform : null;
+
+    public void CycleSection(int direction)
+    {
+        if (sections == null || sections.Length < 2 || IsRebindingInputCaptured) return;
+        int current = 0;
+        for (int i = 0; i < sections.Length; i++)
+            if (sections[i] && sections[i].activeSelf) { current = i; break; }
+        for (int step = 1; step <= sections.Length; step++)
+        {
+            int next = (current + (direction < 0 ? -step : step) + sections.Length) % sections.Length;
+            if (!sections[next]) continue;
+            ShowSection(next);
+            var first = sections[next].GetComponentsInChildren<UnityEngine.UI.Selectable>();
+            foreach (var control in first)
+                if (control.IsActive() && control.IsInteractable())
+                {
+                    UnityEngine.EventSystems.EventSystem.current?.SetSelectedGameObject(control.gameObject);
+                    break;
+                }
+            return;
+        }
+    }
     public void ShowSection(int index)
     {
         if (sections == null || index < 0 || index >= sections.Length || !sections[index])

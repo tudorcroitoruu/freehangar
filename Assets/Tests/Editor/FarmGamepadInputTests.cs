@@ -23,7 +23,8 @@ public class FarmGamepadInputTests
             label.font = TMPro.TMP_Settings.defaultFontAsset;
             label.richText = true;
             label.rectTransform.sizeDelta = new Vector2(32, 32);
-            label.text = GamepadPromptSprites.Label(control);
+            label.richText = false;
+            GamepadPromptSprites.SetKeycap(label, GamepadPromptSprites.Label(control));
             label.ForceMeshUpdate(true, true);
             Assert.AreEqual(1, label.textInfo.characterCount, "Sprite tag was displayed as literal text.");
             Assert.AreEqual(TMPro.TMP_TextElementType.Sprite, label.textInfo.characterInfo[0].elementType);

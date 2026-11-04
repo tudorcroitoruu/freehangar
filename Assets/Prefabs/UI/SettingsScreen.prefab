@@ -14489,7 +14489,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Mouse sensitivity
+  m_Text: Camera Look sensitivity
 --- !u!1 &8348151031548763964
 GameObject:
   m_ObjectHideFlags: 0

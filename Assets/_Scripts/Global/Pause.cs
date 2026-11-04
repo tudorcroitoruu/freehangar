@@ -16,6 +16,7 @@ public class Pause : MonoBehaviour
     [Space]
     public bool paused;
 
+    public Transform NavigationRoot => (leaveGamePopup && leaveGamePopup.activeInHierarchy ? leaveGamePopup : settingsScreen && settingsScreen.activeInHierarchy ? settingsScreen : mainScreen)?.transform;
     public static Pause Instance;
     public static Action PauseOnAction;
     public static Action PauseOffAction;
