@@ -27,6 +27,8 @@ public sealed class StaminaManager : MonoBehaviour
     [SerializeField, Min(0f)] private float recoveryDelay = 2f;
 
     [Header("Hunger")]
+    [SerializeField, Range(0f, 100f), Tooltip("Maximum hunger percentage. At 70%, the player retains 30% of their maximum stamina capacity.")]
+    private float maxHungryPercent = 70f;
     [SerializeField, Range(0f, 100f)] private float hungryPercent;
     [SerializeField, Min(0f), Tooltip("Percentage points of hunger gained per minute of game time. Zero pauses hunger growth.")]
     private float hungerIncreasePerMinute = 1f;
@@ -66,6 +68,7 @@ public sealed class StaminaManager : MonoBehaviour
     private void Awake()
     {
         staminaProfile = SaveSystem.Data;
+        SetHungerPercent(hungryPercent);
         CurrentStamina = CurrentMaxStamina;
         UpdateStaminaBar();
     }
@@ -97,7 +100,7 @@ public sealed class StaminaManager : MonoBehaviour
     public void SetHungerPercent(float percent)
     {
         if (!float.IsFinite(percent)) return;
-        hungryPercent = Mathf.Clamp(percent, 0f, 100f);
+        hungryPercent = Mathf.Clamp(percent, 0f, Mathf.Clamp(maxHungryPercent, 0f, 100f));
         CurrentStamina = HasInfiniteStamina ? CurrentMaxStamina : Mathf.Clamp(CurrentStamina, 0f, CurrentMaxStamina);
         UpdateStaminaBar();
     }
@@ -226,7 +229,8 @@ public sealed class StaminaManager : MonoBehaviour
         sprintConsumptionPerSecond = Mathf.Max(0f, sprintConsumptionPerSecond);
         recoveryPerSecond = Mathf.Max(0f, recoveryPerSecond);
         recoveryDelay = Mathf.Max(0f, recoveryDelay);
-        hungryPercent = Mathf.Clamp(hungryPercent, 0f, 100f);
+        maxHungryPercent = Mathf.Clamp(maxHungryPercent, 0f, 100f);
+        hungryPercent = Mathf.Clamp(hungryPercent, 0f, maxHungryPercent);
         hungerIncreasePerMinute = Mathf.Max(0f, hungerIncreasePerMinute);
         // OnValidate may run during asset import: do not load Resources here.
         float validatedMax = upgradeSettings != null && upgradeSettings.IsConfigured

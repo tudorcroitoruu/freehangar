@@ -23074,8 +23074,9 @@ MonoBehaviour:
   sprintConsumptionPerSecond: 10
   recoveryPerSecond: 5
   recoveryDelay: 2
+  maxHungryPercent: 70
   hungryPercent: 0
-  hungerIncreasePerMinute: 0
+  hungerIncreasePerMinute: 1
   staminaBarFill: {fileID: 9223117642901653718}
   staminaBarBackground: {fileID: 8847032452986105463}
 --- !u!1 &5233323181870602202

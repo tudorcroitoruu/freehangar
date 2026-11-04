@@ -89,8 +89,29 @@ public class StaminaManagerTests
     }
 
     [Test]
+    public void HungerStopsAtDefaultMaximumAndRetainsThirtyPercentCapacity()
+    {
+        stamina.TickHunger(60000f);
+        Assert.AreEqual(70f, stamina.HungryPercent);
+        Assert.That(stamina.CurrentMaxStamina, Is.EqualTo(stamina.MaxStamina * .3f).Within(.001f));
+        stamina.TickHunger(60f);
+        Assert.AreEqual(70f, stamina.HungryPercent);
+    }
+
+    [Test]
+    public void RestoredHungerAndStaminaRespectConfiguredMaximum()
+    {
+        SetField("maxHungryPercent", 60f);
+        stamina.RestoreSave(100f, 95f);
+        Assert.AreEqual(60f, stamina.SavedHunger);
+        Assert.That(stamina.CurrentMaxStamina, Is.EqualTo(40f).Within(.001f));
+        Assert.That(stamina.CurrentStamina, Is.EqualTo(40f).Within(.001f));
+    }
+
+    [Test]
     public void CompleteHungerHasZeroCapacityWithoutInvalidFillValues()
     {
+        SetField("maxHungryPercent", 100f);
         stamina.SetHungerPercent(200f);
         Assert.AreEqual(100f, stamina.HungryPercent);
         Assert.AreEqual(0f, stamina.CurrentMaxStamina);
@@ -200,6 +221,7 @@ public class StaminaManagerTests
             Assert.That(runtime.GetFloat("_FillAmount"), Is.EqualTo(stamina.NormalizedStamina).Within(.001f));
             Assert.That(runtime.GetFloat("_UseFill"), Is.EqualTo(1f));
             Assert.That(shared.GetFloat("_FillAmount"), Is.EqualTo(.25f));
+            SetField("maxHungryPercent", 100f);
             stamina.SetHungerPercent(100f);
             Assert.That(runtime.GetFloat("_FillAmount"), Is.Zero);
             Object.DestroyImmediate(root);
