@@ -157,6 +157,8 @@ public class GoalCampaignTests
         owner = new GameObject("Isolated goal campaign") { hideFlags = HideFlags.HideAndDontSave };
         owner.SetActive(false);
         manager = owner.AddComponent<GoalsManager>();
+        typeof(GoalsManager).GetField("goalAchievedDelay", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(manager, 0f);
         typeof(GoalsManager).GetField("allGoalSettings", BindingFlags.Instance | BindingFlags.NonPublic)
             .SetValue(manager, goals);
         data = new PlayerData();

@@ -13,6 +13,8 @@ public class GoalsManager : MonoBehaviour
     [Tooltip("Goals are played one at a time, in this array's order.")]
     [SerializeField] private GoalSettings[] allGoalSettings;
     [SerializeField] private GoalSettings currentGoal;
+    [SerializeField] private AudioSource goalAchievedSource;
+    [SerializeField, Min(0f)] private float goalAchievedDelay = 1.5f;
 
     private readonly System.Collections.Generic.Dictionary<string, GoalSettingsSave> progress =
         new System.Collections.Generic.Dictionary<string, GoalSettingsSave>();
@@ -22,6 +24,8 @@ public class GoalsManager : MonoBehaviour
     private GoalListElement currentElement;
     private int currentIndex;
     private bool initialized, processing, dirty;
+    private bool awaitingNextGoal;
+    private float goalDelayRemaining;
 
     public static GoalsManager Instance { get; private set; }
     public GoalSettings CurrentGoal => currentGoal;
@@ -56,7 +60,9 @@ public class GoalsManager : MonoBehaviour
         {
             try { Initialize(SaveSystem.Data); }
             catch (Exception error) { Debug.LogException(error, this); enabled = false; return; }
+            return;
         }
+        AdvanceGoalTransition(Time.deltaTime);
     }
 
     /// <summary>Bind saved player progress. Called automatically after SaveSystem finishes loading.</summary>
@@ -73,6 +79,8 @@ public class GoalsManager : MonoBehaviour
         }
 
         loadedData = data;
+        awaitingNextGoal = false;
+        goalDelayRemaining = 0f;
         progress.Clear();
         foreach (var saved in data.goals ?? Array.Empty<GoalSettingsSave>())
             if (saved != null && !string.IsNullOrEmpty(saved.goalId) && !progress.ContainsKey(saved.goalId))
@@ -139,6 +147,7 @@ public class GoalsManager : MonoBehaviour
 
     private void CompleteReadyGoals()
     {
+        if (awaitingNextGoal) return;
         var completed = new System.Collections.Generic.List<GoalSettings>();
         while (currentGoal != null)
         {
@@ -154,13 +163,33 @@ public class GoalsManager : MonoBehaviour
             state.completed = true;
             state.currentAmount = currentGoal.goalAmount;
             completed.Add(currentGoal);
+            if (goalAchievedSource != null) goalAchievedSource.Play();
+            if (goalAchievedDelay > 0f)
+            {
+                awaitingNextGoal = true;
+                goalDelayRemaining = goalAchievedDelay;
+                break;
+            }
             currentIndex++;
             SelectCurrentGoal();
         }
         if (completed.Count == 0) return;
         MarkDirty();
         FlushSave();
+        if (awaitingNextGoal) RefreshGoal();
         foreach (var goal in completed) GoalCompleted?.Invoke(goal);
+    }
+
+    private void AdvanceGoalTransition(float deltaTime)
+    {
+        if (!initialized || !awaitingNextGoal) return;
+        goalDelayRemaining -= Mathf.Max(0f, deltaTime);
+        if (goalDelayRemaining > 0f) return;
+        awaitingNextGoal = false;
+        currentIndex++;
+        SelectCurrentGoal();
+        CompleteReadyGoals();
+        RefreshGoal();
     }
 
     private void SelectCurrentGoal() =>

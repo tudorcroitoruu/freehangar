@@ -223,6 +223,8 @@ public class GoalsManagerTests
         owner = new GameObject("Goal checks") { hideFlags = HideFlags.HideAndDontSave };
         owner.SetActive(false);
         manager = owner.AddComponent<GoalsManager>();
+        typeof(GoalsManager).GetField("goalAchievedDelay", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(manager, 0f);
         typeof(GoalsManager).GetField("allGoalSettings", BindingFlags.Instance | BindingFlags.NonPublic)
             .SetValue(manager, goals);
     }
@@ -236,6 +238,78 @@ public class GoalsManagerTests
     {
         if (owner != null) UnityEngine.Object.DestroyImmediate(owner);
     }
+
+    [Test]
+    public void CompletedGoalShowsCheckmarkUntilDelayEndsAndRewardsOnlyOnce()
+    {
+        Create(Goal("first", 10, GoalProgressMode.SinceActivation, 5),
+            Goal("second", 10, GoalProgressMode.SinceActivation, 7));
+        typeof(GoalsManager).GetField("goalAchievedDelay", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(manager, 2f);
+        var elementObject = new GameObject("Goal element");
+        elementObject.transform.SetParent(owner.transform);
+        var element = elementObject.AddComponent<GoalListElement>();
+        var checker = new GameObject("Checker");
+        checker.transform.SetParent(owner.transform);
+        typeof(GoalListElement).GetField("checkerObj", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(element, checker);
+        typeof(GoalsManager).GetField("currentElement", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(manager, element);
+        int completions = 0;
+        manager.GoalCompleted += _ => completions++;
+        var data = new PlayerData { cash = 0 };
+        manager.Initialize(data);
+        Assert.IsFalse(checker.activeSelf);
+
+        manager.ProcessAction(new GoalAction(GoalType.GrainLoaded, 10, 1));
+        Assert.AreEqual("first", manager.CurrentGoal.goalId);
+        Assert.IsTrue(checker.activeSelf);
+        Assert.IsTrue(data.goals[0].completed);
+        Assert.AreEqual(5, data.cash);
+        AdvanceTransition(1f);
+        manager.ProcessAction(new GoalAction(GoalType.GrainLoaded, 10, 1));
+        Assert.AreEqual(1, completions);
+        Assert.AreEqual(5, data.cash);
+        AdvanceTransition(.9f);
+        Assert.AreEqual("first", manager.CurrentGoal.goalId);
+        AdvanceTransition(.2f);
+        Assert.AreEqual("second", manager.CurrentGoal.goalId);
+        Assert.AreEqual(0, manager.CurrentProgress);
+        Assert.IsFalse(checker.activeSelf);
+
+        manager.ProcessAction(new GoalAction(GoalType.GrainLoaded, 10, 1));
+        Assert.IsFalse(manager.AllGoalsCompleted);
+        AdvanceTransition(2f);
+        Assert.IsTrue(manager.AllGoalsCompleted);
+        Assert.AreEqual(12, data.cash);
+        Assert.AreEqual(2, completions);
+    }
+
+    [Test]
+    public void ReadyLifetimeGoalsEachWaitBeforeAdvancingAndReloadDoesNotRewardTwice()
+    {
+        Create(Goal("first", 10, GoalProgressMode.LifetimeTotal, 5),
+            Goal("second", 20, GoalProgressMode.LifetimeTotal, 7));
+        typeof(GoalsManager).GetField("goalAchievedDelay", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(manager, 2f);
+        var data = new PlayerData { cash = 0 };
+        manager.Initialize(data);
+        manager.ProcessAction(new GoalAction(GoalType.GrainLoaded, 100, 1));
+        Assert.AreEqual("first", manager.CurrentGoal.goalId);
+        Assert.AreEqual(5, data.cash);
+        AdvanceTransition(2f);
+        Assert.AreEqual("second", manager.CurrentGoal.goalId);
+        Assert.AreEqual(12, data.cash);
+        Assert.IsFalse(manager.AllGoalsCompleted);
+        manager.Initialize(JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(data)));
+        Assert.IsTrue(manager.AllGoalsCompleted);
+        AdvanceTransition(2f);
+        Assert.IsTrue(manager.AllGoalsCompleted);
+    }
+
+    private void AdvanceTransition(float seconds) => typeof(GoalsManager)
+        .GetMethod("AdvanceGoalTransition", BindingFlags.Instance | BindingFlags.NonPublic)
+        .Invoke(manager, new object[] { seconds });
 
     [Test]
     public void OneActionDoesNotSpillIntoNextSinceActivationGoal()
