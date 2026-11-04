@@ -315,8 +315,10 @@ public class LoadingScene : MonoBehaviour
 
     private static IEnumerator RevealGameplayAfterDelay()
     {
-        // Let the incoming scene finish Start before revealing it, even on a slow load.
+        // Keep the curtain up while Gameplay restores the world and prepares closed piles.
         yield return null;
+        while (WorldSaveRuntime.Instance != null && !WorldSaveRuntime.Instance.Ready)
+            yield return null;
         float remaining = MinimumLoadingDuration - (Time.realtimeSinceStartup - loadingStartedAt);
         if (remaining > 0f)
             yield return new WaitForSecondsRealtime(remaining);

@@ -64,7 +64,10 @@ public sealed class HangarKeyDoor : MonoBehaviour, IInteractable
     private void RefreshLabel()
     {
         if (TryGetComponent<Collider>(out var lockCollider)) lockCollider.enabled = !IsUnlocked;
-        if (label != null) label.text = $"HANGAR {hangarNumber}\n" + (IsUnlocked ? "OPEN" : $"{KeyColor(hangarNumber).ToUpperInvariant()} KEY REQUIRED");
+        // The plaque, key model and label are children of the lock. Its controller
+        // stays active so the door keeps sliding and can restore another profile.
+        foreach (Transform part in transform) part.gameObject.SetActive(!IsUnlocked);
+        if (label != null && !IsUnlocked) label.text = $"HANGAR {hangarNumber}\n{KeyColor(hangarNumber).ToUpperInvariant()} KEY REQUIRED";
         if (overheadLabel != null) overheadLabel.text = IsUnlocked ? "OPEN" : "LOCKED";
     }
 }

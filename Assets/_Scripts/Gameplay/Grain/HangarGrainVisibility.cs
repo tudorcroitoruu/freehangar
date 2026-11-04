@@ -16,6 +16,17 @@ public sealed class HangarGrainVisibility : MonoBehaviour
     public GameObject GrainRoot => grainRoot;
 
     private void OnEnable() => ApplyState();
+    internal void PrepareClosedPile()
+    {
+        if (!Application.isPlaying || hangarOpen || grainRoot == null || grainRoot.activeSelf ||
+            transform.IsChildOf(grainRoot.transform)) return;
+
+        // Build the closed pile during scene startup. No simulation or rendering
+        // runs between these calls, and opening the door can reuse the kernel batches.
+        grainRoot.SetActive(true);
+        grainRoot.SetActive(false);
+    }
+
     private void OnValidate() => applyRequested = true;
     private void Update()
     {

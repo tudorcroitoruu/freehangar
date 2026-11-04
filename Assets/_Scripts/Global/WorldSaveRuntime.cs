@@ -134,6 +134,12 @@ public sealed class WorldSaveRuntime : MonoBehaviour
         {
             var saved = profile.world;
             if (saved != null && saved.scene == gameObject.scene.name) Restore(saved);
+            foreach (var hangar in Find<HangarGrainVisibility>())
+            {
+                if (!hangar.isActiveAndEnabled || hangar.HangarOpen) continue;
+                hangar.PrepareClosedPile();
+                yield return null;
+            }
             ready = true;
         }
         finally { restoring = false; }

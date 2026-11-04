@@ -82,12 +82,20 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private void OnEnable()
     {
-        // Unity hot reload can restore flat arrays but not jagged draw batches. Rebuild them together.
-        samples = null;
-        edgePatches = null;
         if (pile == null) pile = GetComponent<GrainPile>();
-        Build();
+        if (!Application.isPlaying || !TryReuseBatches()) Rebuild();
+        rebuildRequested = false;
         RenderPipelineManager.beginCameraRendering += Draw;
+    }
+
+    private bool TryReuseBatches()
+    {
+        // Hot reload can restore flat arrays without their jagged draw batches.
+        if (rebuildRequested || batches == null || samples == null || previousHeights == null ||
+            pile == null || pile.VisualHeightField == null || previousHeights.Length != pile.VisualHeightField.Heights.Length ||
+            sampledScale != pile.WorldScale || lastTransform != transform.localToWorldMatrix) return false;
+        if (revision != pile.SurfaceRevision) UpdateChangedCells();
+        return true;
     }
 
     private void OnDisable() => RenderPipelineManager.beginCameraRendering -= Draw;
@@ -158,21 +166,26 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         Array.Clear(counts, 0, counts.Length);
         Array.Clear(paletteCounts, 0, paletteCounts.Length);
         KernelCount = 0;
+        var normalMatrix = pile.transform.worldToLocalMatrix.transpose;
+        var yaw = Quaternion.AngleAxis(pile.transform.eulerAngles.y, Vector3.up);
         for (int order = 0; order < drawOrder.Length; order++)
         {
             int i = drawOrder[order];
             Vector2 p = samples[i];
             if (!pile.IsInsideBoundary(pile.transform.TransformPoint(new Vector3(p.x, 0, p.y)), .04f)) continue;
             float height = pile.VisualHeightField.Sample(p.x, p.y);
-            float dx = pile.VisualSurfaceHeight(p.x + .03f, p.y) - pile.VisualSurfaceHeight(p.x - .03f, p.y);
-            float dz = pile.VisualSurfaceHeight(p.x, p.y + .03f) - pile.VisualSurfaceHeight(p.x, p.y - .03f);
-            Vector3 normal = pile.transform.worldToLocalMatrix.transpose.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
-            Quaternion slope = Quaternion.FromToRotation(Vector3.up, normal);
-            if (gpuSurface) slope = Quaternion.identity;
+            Quaternion slope = Quaternion.identity;
+            if (!gpuSurface)
+            {
+                float dx = pile.VisualSurfaceHeight(p.x + .03f, p.y) - pile.VisualSurfaceHeight(p.x - .03f, p.y);
+                float dz = pile.VisualSurfaceHeight(p.x, p.y + .03f) - pile.VisualSurfaceHeight(p.x, p.y - .03f);
+                Vector3 normal = normalMatrix.MultiplyVector(new Vector3(-dx, .06f, -dz)).normalized;
+                slope = Quaternion.FromToRotation(Vector3.up, normal);
+            }
             int color = paletteIndices[i];
             int batch = color * batchesPerColor + paletteCounts[color] / 1023, slot = paletteCounts[color] % 1023;
             batches[batch][slot] = Matrix4x4.TRS(pile.transform.TransformPoint(new Vector3(p.x, height + pile.GroundOffset(p.x, p.y), p.y)) + Vector3.up * .003f,
-                slope * Quaternion.AngleAxis(pile.transform.eulerAngles.y, Vector3.up) * rotations[i],
+                slope * yaw * rotations[i],
                 new Vector3(.0255f, .014f, .029f) * (!gpuSurface && height < .001f ? 0 : sizes[i]));
             paletteCounts[color]++;
             counts[batch]++;
