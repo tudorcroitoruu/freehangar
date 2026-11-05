@@ -115,6 +115,8 @@ Shader "Toon/CustomToonGrass"
             float2 jitterUV = windUV * 2.0 + _WindJitter * 0.5 * _TimeParameters.x;
             float3 wind = pow(abs(SAMPLE_TEXTURE2D_LOD(_WindNoiseTexture, sampler_WindNoiseTexture, scrollUV, 0).rgb), 2.5)
                 * SAMPLE_TEXTURE2D_LOD(_WindNoiseTexture, sampler_WindNoiseTexture, jitterUV, 0).rgb * input.color.rgb;
+            // Wind bends vegetation sideways; vertical noise lifts the entire patch.
+            wind.y = 0;
             output.positionRWS = TransformObjectToWorld(input.positionOS + wind);
 			output.positionCS = TransformWorldToHClip(output.positionRWS);
 			output.normalWS = TransformObjectToWorldNormal(input.normalOS);

@@ -95,6 +95,13 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
 
     private void Awake()
     {
+        // A moved map pickup must not wait for an unrelated, closed hangar.
+        if (coveringPile != null)
+        {
+            Vector3 local = coveringPile.transform.InverseTransformPoint(transform.position);
+            if (Mathf.Abs(local.x) > coveringPile.Size * .5f || Mathf.Abs(local.z) > coveringPile.Size * .5f)
+                coveringPile = null;
+        }
         interactionCollider = GetComponent<BoxCollider>();
         visuals = GetComponentsInChildren<Renderer>(true);
         interactionCollider.isTrigger = false;
