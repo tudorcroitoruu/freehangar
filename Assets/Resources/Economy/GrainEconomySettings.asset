@@ -84,7 +84,7 @@ MonoBehaviour:
     birdLossPercent: 0
     containerProductId: smallBag
     targetShovelLevel: 4
-    targetStaminaLevel: 1
+    targetStaminaLevel: 2
     targetVehicleId: motoroller
   - hangarId: 2
     pileName: Hangar 2 - Almost full grain bank
@@ -103,7 +103,7 @@ MonoBehaviour:
     birdLossPercent: 0
     containerProductId: largeBag
     targetShovelLevel: 16
-    targetStaminaLevel: 2
+    targetStaminaLevel: 4
     targetVehicleId: lawnmower
   - hangarId: 3
     pileName: Hangar 3 - Almost full grain bank
@@ -122,7 +122,7 @@ MonoBehaviour:
     birdLossPercent: 0
     containerProductId: crate
     targetShovelLevel: 20
-    targetStaminaLevel: 3
+    targetStaminaLevel: 6
     targetVehicleId: pickup
   - hangarId: 4
     pileName: Hangar 4 - Grain bank to entrance
@@ -141,7 +141,7 @@ MonoBehaviour:
     birdLossPercent: 5
     containerProductId: barrel
     targetShovelLevel: 22
-    targetStaminaLevel: 4
+    targetStaminaLevel: 8
     targetVehicleId: pickupBig
   - hangarId: 5
     pileName: Hangar 5 - Grain bank to entrance
@@ -160,6 +160,6 @@ MonoBehaviour:
     birdLossPercent: 5
     containerProductId: bigBag
     targetShovelLevel: 24
-    targetStaminaLevel: 4
+    targetStaminaLevel: 10
     targetVehicleId: pickupLast
   stressLossPercent: 20
