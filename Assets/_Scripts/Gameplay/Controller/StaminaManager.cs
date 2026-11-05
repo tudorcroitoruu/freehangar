@@ -33,6 +33,9 @@ public sealed class StaminaManager : MonoBehaviour
     [SerializeField, Min(0f), Tooltip("Percentage points of hunger gained per minute of game time. Zero pauses hunger growth.")]
     private float hungerIncreasePerMinute = 1f;
 
+    [SerializeField] private GameObject hungryIcon;
+    [SerializeField] private float hungryPercentToShowIcon = 15f;
+
     [Header("UI")]
     [SerializeField] private Image staminaBarFill;
     [SerializeField] private Image staminaBarBackground;
@@ -77,9 +80,21 @@ public sealed class StaminaManager : MonoBehaviour
     {
         SaveSystem.MoneyChanged += RefreshUpgrade;
         RefreshUpgrade(SaveSystem.Money);
+        InvokeRepeating(nameof(UpdateHungryIcon), 0f, 5f);
     }
 
-    private void OnDisable() => SaveSystem.MoneyChanged -= RefreshUpgrade;
+    private void OnDisable()
+    {
+        SaveSystem.MoneyChanged -= RefreshUpgrade;
+        CancelInvoke(nameof(UpdateHungryIcon));
+    }
+
+    private void UpdateHungryIcon()
+    {
+        if (hungryIcon == null) return;
+        bool showIcon = hungryPercent >= hungryPercentToShowIcon;
+        if (hungryIcon.activeSelf != showIcon) hungryIcon.SetActive(showIcon);
+    }
 
     private void RefreshUpgrade(int _)
     {

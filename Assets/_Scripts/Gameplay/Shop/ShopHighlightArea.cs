@@ -23,4 +23,18 @@ public sealed class ShopHighlightArea : MonoBehaviour
     }
 
     private void OnDisable() => SetInside(false);
+
+    private void OnDrawGizmosSelected()
+    {
+        Matrix4x4 previousMatrix = Gizmos.matrix;
+        Color previousColor = Gizmos.color;
+        Gizmos.matrix = transform.localToWorldMatrix;
+        Color color = inside ? Color.green : Color.cyan;
+        Gizmos.color = new Color(color.r, color.g, color.b, .12f);
+        Gizmos.DrawCube(localBounds.center, localBounds.size);
+        Gizmos.color = color;
+        Gizmos.DrawWireCube(localBounds.center, localBounds.size);
+        Gizmos.matrix = previousMatrix;
+        Gizmos.color = previousColor;
+    }
 }

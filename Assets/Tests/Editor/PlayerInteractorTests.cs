@@ -214,6 +214,34 @@ public class PlayerInteractorTests
         Assert.IsFalse(second.enabled);
     }
 
+    [Test]
+    public void ShopHighlightPreservesStylesWhenOutlinesAreAddedAndReorderedBeforeReenable()
+    {
+        var target = CreateTarget(1);
+        var first = AddHighlight(target);
+        first.OutlineColor = Color.red;
+        first.OutlineWidth = 3f;
+        var highlight = target.GetComponent<InteractionHighlight>();
+        highlight.SetShopVisible(true);
+        highlight.enabled = false;
+
+        var second = Create("New model", target.transform.position).AddComponent<Outline>();
+        second.OutlineColor = Color.blue;
+        second.OutlineWidth = 4f;
+        SetField(highlight, "outlines", new[] { second, null, first });
+        highlight.enabled = true;
+        typeof(InteractionHighlight).GetMethod("OnEnable", BindingFlags.Instance | BindingFlags.NonPublic)
+            .Invoke(highlight, null);
+
+        Assert.AreEqual(Color.white, first.OutlineColor);
+        Assert.AreEqual(Color.white, second.OutlineColor);
+        highlight.SetShopVisible(false);
+        Assert.AreEqual(Color.red, first.OutlineColor);
+        Assert.AreEqual(3f, first.OutlineWidth);
+        Assert.AreEqual(Color.blue, second.OutlineColor);
+        Assert.AreEqual(4f, second.OutlineWidth);
+    }
+
     private Outline AddHighlight(EventInteractable target)
     {
         // Allow the model/Outline to live on a child of the interactive root.
