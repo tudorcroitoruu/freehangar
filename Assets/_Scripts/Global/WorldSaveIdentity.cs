@@ -4,7 +4,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class WorldSaveIdentity : MonoBehaviour
 {
-    public string Id { get; internal set; }
+    [field: SerializeField] public string Id { get; internal set; }
     public static void Transfer(GameObject from, GameObject to)
     {
         var identity = from.GetComponent<WorldSaveIdentity>();

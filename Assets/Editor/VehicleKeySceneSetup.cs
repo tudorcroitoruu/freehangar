@@ -17,6 +17,7 @@ public static class VehicleKeySceneSetup
             if(EditorApplication.isPlayingOrWillChangePlaymode)return;
             Scene scene=SceneManager.GetActiveScene();
             if(scene.name!="Gameplay")return;
+            if (GameObject.Find("New_Map/Collectables/Keys") != null) return;
             foreach(var root in scene.GetRootGameObjects()) if(root.name==RootName)return;
             Apply();
         };

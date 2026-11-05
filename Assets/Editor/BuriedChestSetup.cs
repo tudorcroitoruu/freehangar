@@ -13,6 +13,7 @@ public static class BuriedChestSetup
     {
         if(EditorApplication.isPlayingOrWillChangePlaymode || SceneManager.GetActiveScene().name!="Gameplay")return;
         foreach(var root in SceneManager.GetActiveScene().GetRootGameObjects())if(root.name==GroupName){EnableRewardPool();ApplyPresentation();return;}
+        if (GameObject.Find("New_Map/Collectables/Chests") != null) { EnableRewardPool(); ApplyPresentation(); return; }
         Apply();
     };
     [MenuItem("Tools/Grain/Place matching buried key chests")]

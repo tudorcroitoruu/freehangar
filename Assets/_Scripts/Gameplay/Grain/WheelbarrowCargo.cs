@@ -36,11 +36,12 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     private readonly List<GameObject> hiddenTools = new List<GameObject>();
 
     private bool progressionApplied;
+    [SerializeField] private HangarGrainVisibility discoveryHangar;
     private int Tier => name.Contains("Max") ? 2 : name.Contains("Medium") ? 1 : 0;
     private bool IsUpgrade => SaveSystem.Data != null && Tier > SaveSystem.Data.wheelbarrowTier;
     private bool UpgradeExposed()
     {
-        var hangar = GetComponentInParent<HangarGrainVisibility>();
+        var hangar = discoveryHangar != null ? discoveryHangar : GetComponentInParent<HangarGrainVisibility>();
         if (hangar == null) return true;
         if (!hangar.HangarOpen || hangar.GrainRoot == null) return false;
         var grain = hangar.GrainRoot.GetComponent<GrainPile>();

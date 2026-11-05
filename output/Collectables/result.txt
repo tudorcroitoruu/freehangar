@@ -1,0 +1,55 @@
+Organized 54 objects; world transforms preserved.
+Wheelbarrows/Wheelbarrow_Medium
+Wheelbarrows/Wheelbarrow_Max
+Brooms/H2 32 % - Broom
+Keys/H1 44 % - Copper chest key
+Keys/H3 76 % - Iron chest key
+Perks/H2 59 % - Free upgrade voucher
+Perks/H2 59 % - Free upgrade voucher (2)
+Perks/H2 59 % - Free upgrade voucher (1)
+Perks/H1 28 % - Stamina bottle (5 min)
+Cash/H1 10 % - Cash cache
+Cash/H1 10 % - Cash cache (2)
+Cash/H1 10 % - Cash cache (1)
+Perks/H1 58 % - Stamina bottle (5 min)
+Cash/H2 24 % - Cash cache
+Perks/H4 45 % - Free upgrade voucher
+Cash/H3 45 % - Cash cache
+Cash/H4 60 % - Cash cache
+Perks/H4 53 % - Stamina bottle (5 min)
+Cash/H5 70 % - Cash cache
+Axes/H1 68 % - Axe
+Hammers/H3 08 % - Hammer
+Keys/H1 84 % - Hangar 2 key
+Keys/H2 88 % - Hangar 3 key
+Keys/H3 88 % - Hangar 4 key
+Keys/H4 89 % - Hangar 5 key
+Cash/H1 96 % - Cash cache
+Cash/H5 12 % - Cash cache
+Cash/H5 91 % - Cash cache
+Pistols/Pistol Find
+Wheelbarrows/Wheelbarrow_Small
+Keys/H2 15 % - trike vehicle key
+Keys/H2 52 % - lawnmower vehicle key
+Keys/H3 36 % - pickup vehicle key
+Keys/H4 27 % - pickupBig vehicle key
+Keys/H4 69 % - pickupLast vehicle key
+Chests/H2 8 % - Copper chest
+Chests/H4 9 % - Iron chest
+Keys/H2 43 % - Copper chest key
+Chests/H2 67 % - Copper chest
+Perks/H2 74 % - Infinite Stamina bottle (5 min)
+Keys/H3 26 % - Iron chest key
+Chests/H3 67 % - Iron chest
+Perks/H3 14 % - Mobility bottle (5 min)
+Keys/H4 37 % - Copper chest key
+Chests/H4 77 % - Copper chest
+Perks/H4 19 % - No Attacks bottle (5 min)
+Perks/H4 19 % - No Attacks bottle (5 min) (1)
+Keys/H5 24 % - Iron chest key
+Chests/H5 80 % - Iron chest
+Perks/H5 48 % - Double Sell Cash bottle (5 min)
+Perks/H3 57 % - Double Sell Cash bottle (5 min)
+Perks/H5 36 % - Mobility bottle (5 min)
+Perks/H5 36 % - Mobility bottle (5 min) (1)
+Perks/H5 60 % - Infinite Stamina bottle (5 min)

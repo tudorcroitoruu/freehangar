@@ -29,7 +29,7 @@ public static class PerkTreasureSetup
         var copperKey=finds.Find(f=>f.FindKind==BuriedFind.Kind.Key && f.FindId.Contains("copper"));
         var ironKey=finds.Find(f=>f.FindKind==BuriedFind.Kind.Key && f.FindId.Contains("iron"));
         if(bottle==null || copper==null || iron==null || copperKey==null || ironKey==null){Debug.LogWarning("Treasure setup needs the existing bottle and copper/iron discoveries.");return;}
-        Transform group=null;foreach(var root in scene.GetRootGameObjects())if(root.name==GroupName)group=root.transform;
+        Transform group=GameObject.Find("New_Map/Collectables/Perks")?.transform;foreach(var root in scene.GetRootGameObjects())if(root.name==GroupName)group=root.transform;
         if(group==null){var host=new GameObject(GroupName);SceneManager.MoveGameObjectToScene(host,scene);Undo.RegisterCreatedObjectUndo(host,"Add scattered discoveries");group=host.transform;}
         var random=new System.Random(731129);var report=new System.Text.StringBuilder();bool changed=false;
         var rewards=new[]{ChestReward.InfiniteStamina,ChestReward.Mobility,ChestReward.NoAttacks,ChestReward.DoubleSellCash};
