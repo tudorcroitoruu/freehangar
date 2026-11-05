@@ -11,6 +11,11 @@ public sealed class InteractionPrompt : MonoBehaviour
     [SerializeField] private TMP_Text description;
     [SerializeField] private TMP_Text descriptionTwo;
     [SerializeField] private TMP_Text keycap;
+    [SerializeField] private Sprite axeIcon;
+    [SerializeField] private Sprite hammerIcon;
+    private Image keyBackground;
+    private Sprite originalKeySprite;
+    private bool originalKeyAspect;
     [SerializeField, Tooltip("Right mouse button indicator for pouring (legacy serialized field name).")]
     private GameObject mouseLeft;
 
@@ -55,6 +60,22 @@ public sealed class InteractionPrompt : MonoBehaviour
         if (screen.z <= 0 || screen.x < 0 || screen.x > Screen.width || screen.y < 0 || screen.y > Screen.height) { Hide(); return; }
         if (!panel.gameObject.activeSelf) panel.gameObject.SetActive(true);
         CurrentText = data.Action;
+        if (keyBackground == null && keycap != null)
+        {
+            keyBackground = keycap.transform.parent.GetComponent<Image>();
+            if (keyBackground != null)
+            {
+                originalKeySprite = keyBackground.sprite;
+                originalKeyAspect = keyBackground.preserveAspect;
+            }
+        }
+        if (keyBackground != null)
+        {
+            Sprite icon = data.RequiredTool == PlayerCombatTools.Tool.Axe ? axeIcon :
+                data.RequiredTool == PlayerCombatTools.Tool.Hammer ? hammerIcon : null;
+            keyBackground.sprite = icon != null ? icon : originalKeySprite;
+            keyBackground.preserveAspect = icon != null || originalKeyAspect;
+        }
         if (description != null && description.text != data.Action) description.text = data.Action;
         if (descriptionTwo != null)
         {
@@ -122,6 +143,15 @@ public sealed class InteractionPrompt : MonoBehaviour
             var progress = CopyOf(bagSliderFill != null ? bagSliderFill.transform : null, panel, clone);
             row.description = text != null ? text.GetComponent<TMP_Text>() : null;
             row.key = key != null ? key.GetComponent<TMP_Text>() : null;
+            if (key != null && keyBackground != null)
+            {
+                var background = key.parent.GetComponent<Image>();
+                if (background != null)
+                {
+                    background.sprite = originalKeySprite;
+                    background.preserveAspect = originalKeyAspect;
+                }
+            }
             row.mouse = mouse != null ? mouse.gameObject : null;
             row.progress = progress != null ? progress.gameObject : null;
             var fill = CopyOf(bagFill != null ? bagFill.transform : null, panel, clone);

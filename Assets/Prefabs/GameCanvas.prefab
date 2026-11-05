@@ -2502,6 +2502,8 @@ MonoBehaviour:
   description: {fileID: 6260917780900176759}
   descriptionTwo: {fileID: 9139496950940980543}
   keycap: {fileID: 6902854521414314670}
+  axeIcon: {fileID: 21300000, guid: add56af62cb972d48a834de40a428c42, type: 3}
+  hammerIcon: {fileID: 21300000, guid: ed14aaec73c521d4b9f61d64a3ca8ac0, type: 3}
   mouseLeft: {fileID: 1401144034268598406}
   bagSliderFill: {fileID: 2274562060591844815}
   bagFill: {fileID: 7925694482381865645}

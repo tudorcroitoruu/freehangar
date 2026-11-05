@@ -719,11 +719,7 @@ public sealed class GrainPile : MonoBehaviour
         bottomA.y = GroundOffset(topA.x, topA.z) - inset;
         bottomB.y = GroundOffset(topB.x, topB.z) - inset;
         if (Mathf.Max(topA.y - bottomA.y, topB.y - bottomB.y) <= inset) return;
-        // A small rounded apron softens exposed edges; keep it inside authored
-        // wall/exclusion constraints. Side kernels use these exact same vertices.
-        Vector3 outward = Vector3.Cross(Vector3.down, topB - topA).normalized;
-        bottomA = SpreadEdge(topA, bottomA, outward);
-        bottomB = SpreadEdge(topB, bottomB, outward);
+        // Shared corners must coincide to keep the perimeter closed.
         int start = closedSurfaceVertices.Count;
         closedSurfaceVertices.Add(topA); closedSurfaceVertices.Add(topB);
         closedSurfaceVertices.Add(bottomA); closedSurfaceVertices.Add(bottomB);
@@ -731,21 +727,6 @@ public sealed class GrainPile : MonoBehaviour
         closedSurfaceUV.Add(closedSurfaceUV[a]); closedSurfaceUV.Add(closedSurfaceUV[b]);
         closedSurfaceTriangles.Add(start); closedSurfaceTriangles.Add(start + 2); closedSurfaceTriangles.Add(start + 1);
         closedSurfaceTriangles.Add(start + 1); closedSurfaceTriangles.Add(start + 2); closedSurfaceTriangles.Add(start + 3);
-    }
-    private Vector3 SpreadEdge(Vector3 top, Vector3 bottom, Vector3 outward)
-    {
-        float worldHeight = Mathf.Max(0, top.y - bottom.y) * WorldScale.y;
-        float width = Mathf.Min(.65f, worldHeight / Mathf.Tan(reposeAngle * Mathf.Deg2Rad));
-        float variation = .9f + .1f * Mathf.PerlinNoise(top.x * 2.3f, top.z * 2.3f);
-        Vector3 offset = outward * (width * variation / Mathf.Max(.001f, Vector3.Scale(outward, WorldScale).magnitude));
-        // Never spread through a physical wall or into a grain-free opening.
-        for (int step = 0; step < 6; step++)
-        {
-            Vector3 candidate = bottom + offset;
-            if (IsInsideBoundary(transform.TransformPoint(candidate))) return candidate;
-            offset *= .5f;
-        }
-        return bottom;
     }
     private void OffsetBoundaryGround()
     {
@@ -789,6 +770,9 @@ public sealed class GrainPile : MonoBehaviour
                     collisionVertexMap[i] = index;
                 }
             }
+            int topCount = 0;
+            foreach (int index in collisionVertexMap) topCount = Mathf.Max(topCount, index + 1);
+            if (collisionVertices.Count > topCount) collisionVertices.RemoveRange(topCount, collisionVertices.Count - topCount);
             for (int i = 0; i < boundary.Positions.Count; i++) collisionVertices[collisionVertexMap[i]] = boundary.Positions[i];
             foreach (int index in boundary.Triangles) collisionIndices.Add(collisionVertexMap[index]);
         }
@@ -805,6 +789,20 @@ public sealed class GrainPile : MonoBehaviour
                 if (field.Heights[a] <= .00001f && field.Heights[b] <= .00001f && field.Heights[c] <= .00001f) continue;
                 collisionIndices.Add(a); collisionIndices.Add(b); collisionIndices.Add(c);
             }
+        }
+        // Include the exposed sides, using physical rather than smoothed heights.
+        for (int t = sideTriangleStart; t < closedSurfaceTriangles.Count; t += 6)
+        {
+            int start = collisionVertices.Count;
+            for (int corner = 0; corner < 4; corner++)
+            {
+                Vector3 point = closedSurfaceVertices[closedSurfaceTriangles[t] + corner];
+                point.y = GroundOffset(point.x, point.z);
+                if (corner < 2) point.y += field.Sample(point.x, point.z);
+                collisionVertices.Add(point);
+            }
+            collisionIndices.Add(start); collisionIndices.Add(start + 2); collisionIndices.Add(start + 1);
+            collisionIndices.Add(start + 1); collisionIndices.Add(start + 2); collisionIndices.Add(start + 3);
         }
         bool changed = cookedVertices.Count != collisionVertices.Count || cookedIndices.Count != collisionIndices.Count;
         float tolerance = .001f / Mathf.Max(.0001f, WorldScale.y);

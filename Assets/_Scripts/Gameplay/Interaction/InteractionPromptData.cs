@@ -5,6 +5,7 @@ public struct InteractionPromptData
 {
     public Vector3 Position;
     public string Action;
+    public PlayerCombatTools.Tool RequiredTool;
     public string SecondaryDescription;
     public bool ShowKey;
     public KeyCode InteractionKey;
@@ -23,6 +24,7 @@ public struct InteractionPromptData
     {
         Position = position;
         Action = action;
+        RequiredTool = default;
         SecondaryDescription = "";
         ShowKey = showKey;
         InteractionKey = KeyCode.E;
