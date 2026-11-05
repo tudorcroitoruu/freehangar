@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>Mounting, first-person view and rear rack interaction for the existing player.</summary>
 [DisallowMultipleComponent]
@@ -27,6 +28,8 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     float yaw, pitch;
     float lookIdleTime, yawReturnVelocity, pitchReturnVelocity;
     readonly Collider[] hits = new Collider[32];
+    readonly List<GrainContainer> cameraCargo = new List<GrainContainer>();
+    readonly List<Bounds> cameraCargoBounds = new List<Bounds>();
     void Awake() => CacheReferences();
     void CacheReferences()
     {
@@ -123,8 +126,50 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     {
         Vector3 roadOffset = pickup != null ? pickup.RoadCameraOffset : Vector3.zero;
         Vector3 roadAngles = pickup != null ? pickup.RoadCameraAngles : Vector3.zero;
-        view.transform.localPosition = bicycle.RidingCameraOffset + roadOffset;
+        view.transform.localPosition = ClearCargoFromCamera(bicycle.RidingCameraOffset + roadOffset);
         view.transform.localRotation = Quaternion.Euler(pitch + bicycle.RidingCameraPitch + bicycle.PedalingCameraPitch, yaw, 0) * Quaternion.Euler(roadAngles);
+    }
+
+    Vector3 ClearCargoFromCamera(Vector3 desired)
+    {
+        bicycle.GetComponentsInChildren(false, cameraCargo);
+        cameraCargoBounds.Clear();
+        // Enclose the near-plane corners for every look direction, not just the eye.
+        float halfHeight = view.nearClipPlane * Mathf.Tan(view.fieldOfView * .5f * Mathf.Deg2Rad);
+        float clearance = Mathf.Sqrt(view.nearClipPlane * view.nearClipPlane +
+            halfHeight * halfHeight * (1f + view.aspect * view.aspect)) + .08f;
+        Vector3 scale = bicycle.riderView.lossyScale;
+        Vector3 margin = new Vector3(clearance / Mathf.Max(.001f, Mathf.Abs(scale.x)),
+            clearance / Mathf.Max(.001f, Mathf.Abs(scale.y)), clearance / Mathf.Max(.001f, Mathf.Abs(scale.z)));
+        foreach (var cargo in cameraCargo)
+        {
+            if (!bicycle.HasCargo(cargo.transform)) continue;
+            Bounds local = cargo.LocalBounds;
+            Bounds bounds = default;
+            for (int i = 0; i < 8; i++)
+            {
+                Vector3 corner = local.center + Vector3.Scale(local.extents,
+                    new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
+                Vector3 point = bicycle.riderView.InverseTransformPoint(cargo.transform.TransformPoint(corner));
+                if (i == 0) bounds = new Bounds(point, Vector3.zero); else bounds.Encapsulate(point);
+            }
+            bounds.Expand(margin * 2f);
+            cameraCargoBounds.Add(bounds);
+        }
+        // A shift out of one bag may enter another; forward progress converges
+        // after at most one pass per container, regardless of hierarchy order.
+        for (int pass = 0; pass < cameraCargoBounds.Count; pass++)
+        {
+            bool moved = false;
+            foreach (Bounds bounds in cameraCargoBounds)
+                if (bounds.Contains(desired))
+                {
+                    desired.z = bounds.max.z + .001f;
+                    moved = true;
+                }
+            if (!moved) break;
+        }
+        return desired;
     }
 
     public Vector2 SavedLook => new Vector2(yaw, pitch);
