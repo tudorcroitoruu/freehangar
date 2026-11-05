@@ -1894,6 +1894,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd2db587a0c5ed5438cfe500addebb84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BicycleController
+  hudIndicatorHideDistance: 5
   steering: {fileID: 6361744984673084161}
   frontWheel: {fileID: 7912735030352183773}
   rearWheel: {fileID: 6649282262576641970}
@@ -1907,7 +1908,7 @@ MonoBehaviour:
   cargoLocationName: rear rack
   dismountSideDistance: 1.1
   dismountLongitudinalDistance: 1.5
-  maximumSpeed: 12
+  maximumSpeed: 10
   acceleration: 3
   wheelRadius: 0.2471
   wheelbase: 1.29826
@@ -1934,7 +1935,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8e06c634423c841a36065f6808df8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MotorollerController
-  maximumSpeed: 12
+  maximumSpeed: 10
   acceleration: 3
   brakingDeceleration: 10
   wheelRadius: 0.2471

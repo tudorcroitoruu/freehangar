@@ -86,8 +86,7 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
     {
         prompt = default;
         if (!isActiveAndEnabled || !exposed || BuriedFind.WasFound(SaveSystem.Data, barrierId)) return false;
-        string tool = material == Material.Wood ? $"axe ({FarmInput.KeyLabel(KeyCode.Alpha2)})" : $"hammer ({FarmInput.KeyLabel(KeyCode.Alpha3)})";
-        string label = $"{material} wall: {tool}, {FarmInput.Label("Attack", "left click")}";
+        string label = material == Material.Wood ? "Wooden Wall" : "Metal Wall";
         Bounds bounds = VisualBounds();
         prompt = new InteractionPromptData(new Vector3(bounds.center.x, bounds.max.y + .15f, bounds.center.z), label, false);
         prompt.RequiredTool = material == Material.Wood ? PlayerCombatTools.Tool.Axe : PlayerCombatTools.Tool.Hammer;

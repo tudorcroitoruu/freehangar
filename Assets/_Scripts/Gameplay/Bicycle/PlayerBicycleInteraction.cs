@@ -154,6 +154,8 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if(instrument!=null)instrument.gameObject.SetActive(false);
         view.transform.SetParent(bicycle.riderView,false);view.transform.localPosition=Vector3.zero;view.transform.localRotation=Quaternion.identity;
         yaw=pitch=lookIdleTime=yawReturnVelocity=pitchReturnVelocity=0;riding=true;bicycle.SetRidden(true);ApplyRidingView();
+        // The walking body stays at the mounting point while the vehicle moves.
+        SickscoreGames.HUDNavigationSystem.HUDNavigationSystem.Instance?.ChangePlayerController(bicycle.transform);
         GameplayCanvas.Instance?.SetDrivingHints(true, bicycle.GetComponent<ForkliftController>() != null);
         return true;
     }
@@ -187,6 +189,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         if (pickup != null) pickup.ResetRoadCamera();
         view.transform.SetParent(cameraParent,false);view.transform.localPosition=cameraPosition;view.transform.localRotation=cameraRotation;
         transform.SetPositionAndRotation(exit,Quaternion.Euler(0,bicycle.transform.eulerAngles.y+yaw,0));
+        SickscoreGames.HUDNavigationSystem.HUDNavigationSystem.Instance?.ChangePlayerController(transform);
         player.ResetLook();player.characterController.enabled=true;
         if(bags!=null)bags.enabled=true;
         if(instrument!=null)instrument.gameObject.SetActive(instrumentActive);
