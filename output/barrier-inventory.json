@@ -1,0 +1,850 @@
+[
+    {
+        "go":  "51213656",
+        "name":  "Wooden Wall",
+        "id":  "farm.pistol.box.panel.1",
+        "pos":  "{x: 0, y: 0.005, z: 0.935527}",
+        "parent":  "1483251648",
+        "exposed":  "1"
+    },
+    {
+        "go":  "70871310",
+        "name":  "Hangar 4 Wood panel 12",
+        "id":  "farm.barrier.h4.wood.p11",
+        "pos":  "{x: -75.4, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "79773462",
+        "name":  "Hangar 5 Wood independent 5 horizontal",
+        "id":  "farm.barrier.h5.independent.4",
+        "pos":  "{x: 92.04, y: 1.58, z: 28.1}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "131501451",
+        "name":  "Hangar 5 Metal panel 6 (4)",
+        "id":  "farm.barrier.h5.metal",
+        "pos":  "{x: 17.15, y: 11.338508, z: 168.833}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "134654233",
+        "name":  "Hangar 2 Wood independent 5 horizontal",
+        "id":  "farm.barrier.h2.independent.4",
+        "pos":  "{x: 36.062, y: 0.784, z: -13.285}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "136723302",
+        "name":  "Hangar 4 Metal independent 2 upright",
+        "id":  "farm.barrier.h4.independent.1",
+        "pos":  "{x: -73.59, y: 0.120000005, z: 57}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "175993512",
+        "name":  "Metal Wall (3)",
+        "id":  "farm.pistol.box.panel.3",
+        "pos":  "{x: 0, y: 0.058225334, z: -0.66281813}",
+        "parent":  "432470954",
+        "exposed":  "1"
+    },
+    {
+        "go":  "251359254",
+        "name":  "Wooden Wall",
+        "id":  "farm.pistol.box.panel.5",
+        "pos":  "{x: 0.768, y: -0.01999998, z: 0.14566803}",
+        "parent":  "1483251648",
+        "exposed":  "1"
+    },
+    {
+        "go":  "273151248",
+        "name":  "Hangar 5 Metal panel 2",
+        "id":  "farm.barrier.h5.metal.p1",
+        "pos":  "{x: 64.200005, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "273909196",
+        "name":  "Hangar 2 Wood independent 3 upright",
+        "id":  "farm.barrier.h2.independent.2",
+        "pos":  "{x: 47.42487, y: 0.26984584, z: 1.1000004}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "278987260",
+        "name":  "Hangar 5 Metal panel 6 (7)",
+        "id":  "farm.barrier.h5.metal",
+        "pos":  "{x: 20.23, y: 11.338508, z: 170.24}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "293140635",
+        "name":  "Hangar 4 Metal independent 6 horizontal",
+        "id":  "farm.barrier.h4.independent.5",
+        "pos":  "{x: -73.546814, y: 2.4516592, z: 43.08105}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "293622480",
+        "name":  "Hangar 3 Metal independent 6 horizontal",
+        "id":  "farm.barrier.h3.independent.5",
+        "pos":  "{x: -43.33, y: 0.53500015, z: 3.3099997}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "294199904",
+        "name":  "Hangar 2 Wood panel 6",
+        "id":  "farm.barrier.h2.wood.p5",
+        "pos":  "{x: 46.62487, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "324207447",
+        "name":  "Hangar 3 Metal independent 4 upright",
+        "id":  "farm.barrier.h3.independent.3",
+        "pos":  "{x: -61.93, y: 0.120000005, z: -21.689999}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "339032458",
+        "name":  "Hangar 4 Wood panel 4",
+        "id":  "farm.barrier.h4.wood.p3",
+        "pos":  "{x: -97.8, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "351133414",
+        "name":  "Hangar 4 Metal independent 4 upright",
+        "id":  "farm.barrier.h4.independent.3",
+        "pos":  "{x: -81.09, y: 0.120000005, z: 44.5}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "395222716",
+        "name":  "Hangar 5 Metal panel 6 (2)",
+        "id":  "farm.barrier.h5.metal",
+        "pos":  "{x: 11.64, y: -0.97999996, z: 18.987}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "419013663",
+        "name":  "Hangar 5 Metal panel 9",
+        "id":  "farm.barrier.h5.metal.p8",
+        "pos":  "{x: 83.8, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "459238456",
+        "name":  "Hangar 5 Metal panel 6 (5)",
+        "id":  "farm.barrier.h5.metal",
+        "pos":  "{x: 17.149994, y: 11.338508, z: 172.103}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "478808707",
+        "name":  "Hangar 2 Wood panel 2",
+        "id":  "farm.barrier.h2.wood.p1",
+        "pos":  "{x: 38.596, y: 7.786, z: 126.972}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "485797131",
+        "name":  "Metal Wall (2)",
+        "id":  "farm.pistol.box.panel.2",
+        "pos":  "{x: -0.027902603, y: 1.4764396, z: -0.66352004}",
+        "parent":  "432470954",
+        "exposed":  "1"
+    },
+    {
+        "go":  "505945463",
+        "name":  "Hangar 4 Wood panel 11",
+        "id":  "farm.barrier.h4.wood.p10",
+        "pos":  "{x: -78.200005, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "515019543",
+        "name":  "Hangar 2 Wood panel 10",
+        "id":  "farm.barrier.h2.wood.p9",
+        "pos":  "{x: 57.82487, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "526439020",
+        "name":  "Hangar 5 Metal panel 6 (3)",
+        "id":  "farm.barrier.h5.metal",
+        "pos":  "{x: 10.1, y: -0.98, z: 21.7}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "548596193",
+        "name":  "Hangar 2 Wood panel 5",
+        "id":  "farm.barrier.h2.wood.p4",
+        "pos":  "{x: 43.82487, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "564259953",
+        "name":  "Hangar 4 Wood panel 5",
+        "id":  "farm.barrier.h4.wood.p4",
+        "pos":  "{x: -95, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "591360000",
+        "name":  "Hangar 4 Wood panel 2",
+        "id":  "farm.barrier.h4.wood.p1",
+        "pos":  "{x: -103.4, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "603823704",
+        "name":  "Hangar 4 Wood panel 14",
+        "id":  "farm.barrier.h4.wood.p13",
+        "pos":  "{x: -69.8, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "624544149",
+        "name":  "Hangar 5 Metal panel 16",
+        "id":  "farm.barrier.h5.metal.p15",
+        "pos":  "{x: 103.4, y: 0.08, z: 37.226}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "629212401",
+        "name":  "Hangar 5 Metal panel 1",
+        "id":  "farm.barrier.h5.metal.p0",
+        "pos":  "{x: 61.4, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "701764407",
+        "name":  "Hangar 5 Metal panel 6",
+        "id":  "farm.barrier.h5.metal",
+        "pos":  "{x: 75.4, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "706211960",
+        "name":  "Hangar 3 Metal independent 5 horizontal",
+        "id":  "farm.barrier.h3.independent.4",
+        "pos":  "{x: -34.43, y: 0.53500056, z: -8.09}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "708621808",
+        "name":  "Hangar 3 Metal panel 9",
+        "id":  "farm.barrier.h3.metal.p8",
+        "pos":  "{x: -43.82487, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "766812706",
+        "name":  "Hangar 3 Metal panel 10",
+        "id":  "farm.barrier.h3.metal.p9",
+        "pos":  "{x: -41.024868, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "803059691",
+        "name":  "Hangar 5 Metal panel 12",
+        "id":  "farm.barrier.h5.metal.p11",
+        "pos":  "{x: 92.200005, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "823803319",
+        "name":  "Hangar 3 Metal panel 8",
+        "id":  "farm.barrier.h3.metal.p7",
+        "pos":  "{x: -46.62487, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "845182825",
+        "name":  "Hangar 4 Wood panel 9",
+        "id":  "farm.barrier.h4.wood.p8",
+        "pos":  "{x: -83.8, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "854088547",
+        "name":  "Hangar 3 Metal panel 6",
+        "id":  "farm.barrier.h3.metal.p5",
+        "pos":  "{x: -52.22487, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "936924380",
+        "name":  "Hangar 2 Wood panel 7",
+        "id":  "farm.barrier.h2.wood.p6",
+        "pos":  "{x: 49.42487, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "990379376",
+        "name":  "Hangar 4 Wood panel 10",
+        "id":  "farm.barrier.h4.wood.p9",
+        "pos":  "{x: -81, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1000972800",
+        "name":  "Metal Wall (1)",
+        "id":  "farm.pistol.box.panel.1",
+        "pos":  "{x: 0, y: 0.005, z: 0.935527}",
+        "parent":  "432470954",
+        "exposed":  "1"
+    },
+    {
+        "go":  "1011145958",
+        "name":  "Hangar 5 Metal panel 7",
+        "id":  "farm.barrier.h5.metal.p6",
+        "pos":  "{x: 78.200005, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1011201562",
+        "name":  "Hangar 5 Metal panel 10",
+        "id":  "farm.barrier.h5.metal.p9",
+        "pos":  "{x: 86.600006, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1012736591",
+        "name":  "Hangar 4 Wood panel 17",
+        "id":  "farm.barrier.h4.wood.p16",
+        "pos":  "{x: -61.4, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1021333578",
+        "name":  "Hangar 2 Wood panel 1",
+        "id":  "farm.barrier.h2.wood.p0",
+        "pos":  "{x: 32.62487, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1043019852",
+        "name":  "Hangar 2 Wood panel 2 (3)",
+        "id":  "farm.barrier.h2.wood.p1",
+        "pos":  "{x: 41.02, y: 7.77, z: 127.76}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1079939553",
+        "name":  "Hangar 5 Metal panel 3",
+        "id":  "farm.barrier.h5.metal.p2",
+        "pos":  "{x: 67, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1112386010",
+        "name":  "Hangar 3 Metal panel 7",
+        "id":  "farm.barrier.h3.metal",
+        "pos":  "{x: -49.42487, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1137799874",
+        "name":  "Hangar 3 Metal panel 12",
+        "id":  "farm.barrier.h3.metal.p11",
+        "pos":  "{x: -35.42487, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1140387151",
+        "name":  "Hangar 3 Metal panel 13",
+        "id":  "farm.barrier.h3.metal.p12",
+        "pos":  "{x: -32.62487, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1146711933",
+        "name":  "Hangar 2 Wood panel 2 (1)",
+        "id":  "farm.barrier.h2.wood.p1",
+        "pos":  "{x: 35.42487, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1148015361",
+        "name":  "Hangar 5 Metal panel 8",
+        "id":  "farm.barrier.h5.metal.p7",
+        "pos":  "{x: 81, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1186876185",
+        "name":  "Hangar 5 Metal panel 4",
+        "id":  "farm.barrier.h5.metal.p3",
+        "pos":  "{x: 69.8, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1220934421",
+        "name":  "Hangar 5 Wood independent 3 upright",
+        "id":  "farm.barrier.h5.independent.2",
+        "pos":  "{x: 64.54, y: 0.26984584, z: 32}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1230034824",
+        "name":  "Hangar 2 Wood panel 8",
+        "id":  "farm.barrier.h2.wood.p7",
+        "pos":  "{x: 52.22487, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1232752534",
+        "name":  "Hangar 2 Wood panel 2 (2)",
+        "id":  "farm.barrier.h2.wood.p1",
+        "pos":  "{x: 36.24, y: 7.81, z: 126.08}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1255239239",
+        "name":  "Hangar 5 Metal panel 17",
+        "id":  "farm.barrier.h5.metal.p16",
+        "pos":  "{x: 106.200005, y: 0.08, z: 37.226}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1294185557",
+        "name":  "Hangar 2 Wood independent 4 upright",
+        "id":  "farm.barrier.h2.independent.3",
+        "pos":  "{x: 62.42487, y: 0.26984584, z: -21.4}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1358066152",
+        "name":  "Hangar 3 Metal panel 4",
+        "id":  "farm.barrier.h3.metal.p3",
+        "pos":  "{x: -57.82487, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1368493290",
+        "name":  "Hangar 2 Wood independent 2 upright",
+        "id":  "farm.barrier.h2.independent.1",
+        "pos":  "{x: 44.92487, y: 0.26984584, z: -18.9}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1374551052",
+        "name":  "Hangar 4 Wood panel 13",
+        "id":  "farm.barrier.h4.wood.p12",
+        "pos":  "{x: -72.600006, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1381380240",
+        "name":  "Wooden Wall",
+        "id":  "farm.pistol.box.panel.0",
+        "pos":  "{x: 0, y: 0, z: -0.7}",
+        "parent":  "1483251648",
+        "exposed":  "1"
+    },
+    {
+        "go":  "1397826331",
+        "name":  "Hangar 3 Metal panel 1",
+        "id":  "farm.barrier.h3.metal.p0",
+        "pos":  "{x: -66.22487, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1422026726",
+        "name":  "Hangar 2 Wood panel 9",
+        "id":  "farm.barrier.h2.wood",
+        "pos":  "{x: 55.024868, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1453573210",
+        "name":  "Wooden Wall",
+        "id":  "farm.pistol.box.panel.2",
+        "pos":  "{x: -0.027902603, y: 1.4764396, z: -0.66352004}",
+        "parent":  "1483251648",
+        "exposed":  "1"
+    },
+    {
+        "go":  "1518528141",
+        "name":  "Hangar 5 Metal panel 11",
+        "id":  "farm.barrier.h5.metal.p10",
+        "pos":  "{x: 89.4, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1546369635",
+        "name":  "Hangar 4 Wood panel 7",
+        "id":  "farm.barrier.h4.wood.p6",
+        "pos":  "{x: -89.4, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1546688329",
+        "name":  "Hangar 3 Metal panel 3",
+        "id":  "farm.barrier.h3.metal.p2",
+        "pos":  "{x: -60.62487, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1560006122",
+        "name":  "Hangar 2 Wood panel 4",
+        "id":  "farm.barrier.h2.wood.p3",
+        "pos":  "{x: 41.024868, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1563633192",
+        "name":  "Hangar 2 Wood panel 2 (4)",
+        "id":  "farm.barrier.h2.wood.p1",
+        "pos":  "{x: 43.04, y: 7.71, z: 129.78}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1590475780",
+        "name":  "Hangar 4 Wood independent 3 upright",
+        "id":  "farm.barrier.h4.independent.2",
+        "pos":  "{x: -63.589996, y: 0.26984584, z: 52}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1647135721",
+        "name":  "Hangar 4 Wood panel 3",
+        "id":  "farm.barrier.h4.wood.p2",
+        "pos":  "{x: -100.600006, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1680716880",
+        "name":  "Hangar 3 Metal panel 5",
+        "id":  "farm.barrier.h3.metal.p4",
+        "pos":  "{x: -55.024868, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1683735989",
+        "name":  "Hangar 2 Wood panel 11",
+        "id":  "farm.barrier.h2.wood.p10",
+        "pos":  "{x: 60.62487, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1715700662",
+        "name":  "Hangar 4 Wood panel 6",
+        "id":  "farm.barrier.h4.wood",
+        "pos":  "{x: -92.200005, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1719701949",
+        "name":  "Hangar 5 Metal independent 2 upright",
+        "id":  "farm.barrier.h5.independent.1",
+        "pos":  "{x: 72.04, y: 0.120000005, z: 57}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1753869923",
+        "name":  "Metal Wall (5)",
+        "id":  "farm.pistol.box.panel.5",
+        "pos":  "{x: 0.768, y: -0.01999998, z: 0.14566803}",
+        "parent":  "432470954",
+        "exposed":  "1"
+    },
+    {
+        "go":  "1757081226",
+        "name":  "Hangar 4 Wood panel 1",
+        "id":  "farm.barrier.h4.wood.p0",
+        "pos":  "{x: -106.200005, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1779033748",
+        "name":  "Hangar 4 Wood panel 16",
+        "id":  "farm.barrier.h4.wood.p15",
+        "pos":  "{x: -64.200005, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1788326075",
+        "name":  "Hangar 4 Wood panel 8",
+        "id":  "farm.barrier.h4.wood.p7",
+        "pos":  "{x: -86.600006, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1806969844",
+        "name":  "Hangar 5 Wood independent 1 upright",
+        "id":  "farm.barrier.h5.independent.0",
+        "pos":  "{x: 84.54, y: 0.26984584, z: 29.5}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1809890212",
+        "name":  "Hangar 4 Wood independent 1 upright",
+        "id":  "farm.barrier.h4.independent.0",
+        "pos":  "{x: -91.09, y: 0.26984584, z: 57}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1820079409",
+        "name":  "Hangar 2 Wood panel 3",
+        "id":  "farm.barrier.h2.wood.p2",
+        "pos":  "{x: 38.22487, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1826797984",
+        "name":  "Hangar 2 Wood independent 1 upright",
+        "id":  "farm.barrier.h2.independent.0",
+        "pos":  "{x: 59.92487, y: 0.26984584, z: -26.4}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1845853360",
+        "name":  "Hangar 3 Metal independent 2 upright",
+        "id":  "farm.barrier.h3.independent.1",
+        "pos":  "{x: -59.43, y: 0.120000005, z: -26.689999}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1853547189",
+        "name":  "Hangar 3 Metal panel 2",
+        "id":  "farm.barrier.h3.metal.p1",
+        "pos":  "{x: -63.42487, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1883650228",
+        "name":  "Hangar 2 Wood independent 6 horizontal",
+        "id":  "farm.barrier.h2.independent.5",
+        "pos":  "{x: 66.024864, y: 1.821, z: -11.4}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1899061489",
+        "name":  "Hangar 5 Metal independent 4 upright",
+        "id":  "farm.barrier.h5.independent.3",
+        "pos":  "{x: 62.04, y: 0.120000005, z: 54.5}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1914058337",
+        "name":  "Metal Wall (4)",
+        "id":  "farm.pistol.box.panel.4",
+        "pos":  "{x: -0.768, y: -0.01999998, z: 0.14566803}",
+        "parent":  "432470954",
+        "exposed":  "1"
+    },
+    {
+        "go":  "1925810795",
+        "name":  "Hangar 2 Wood panel 12",
+        "id":  "farm.barrier.h2.wood.p11",
+        "pos":  "{x: 63.42487, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1932350341",
+        "name":  "Hangar 4 Wood panel 15",
+        "id":  "farm.barrier.h4.wood.p14",
+        "pos":  "{x: -67, y: 0.08, z: 35}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1935501835",
+        "name":  "Hangar 5 Metal panel 15",
+        "id":  "farm.barrier.h5.metal.p14",
+        "pos":  "{x: 100.600006, y: 0.08, z: 37.226}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1941905764",
+        "name":  "Wooden Wall",
+        "id":  "farm.pistol.box.panel.3",
+        "pos":  "{x: 0, y: 0.058225334, z: -0.66281813}",
+        "parent":  "1483251648",
+        "exposed":  "1"
+    },
+    {
+        "go":  "1976960787",
+        "name":  "Hangar 3 Metal panel 11",
+        "id":  "farm.barrier.h3.metal.p10",
+        "pos":  "{x: -38.22487, y: 0.08, z: -14}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "1988273394",
+        "name":  "Hangar 4 Wood independent 5 horizontal",
+        "id":  "farm.barrier.h4.independent.4",
+        "pos":  "{x: -95.52358, y: 0.5465226, z: 42.749134}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "2010123993",
+        "name":  "Hangar 5 Metal panel 6 (1)",
+        "id":  "farm.barrier.h5.metal",
+        "pos":  "{x: 8.37, y: -0.97999996, z: 18.987}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "2016073768",
+        "name":  "Hangar 5 Metal independent 6 horizontal",
+        "id":  "farm.barrier.h5.independent.5",
+        "pos":  "{x: 103.14, y: 3.06, z: 29.5}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "2025196797",
+        "name":  "Hangar 5 Metal panel 14",
+        "id":  "farm.barrier.h5.metal.p13",
+        "pos":  "{x: 97.8, y: 0.08, z: 37.226}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "2026843690",
+        "name":  "Metal Wall",
+        "id":  "farm.pistol.box.panel.0",
+        "pos":  "{x: 0, y: 0, z: -0.7}",
+        "parent":  "432470954",
+        "exposed":  "1"
+    },
+    {
+        "go":  "2028867845",
+        "name":  "Hangar 5 Metal panel 6 (6)",
+        "id":  "farm.barrier.h5.metal",
+        "pos":  "{x: 14.4369955, y: 11.338508, z: 170.56299}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "2063910200",
+        "name":  "Hangar 3 Metal independent 1 upright",
+        "id":  "farm.barrier.h3.independent.0",
+        "pos":  "{x: -49.43, y: 0.120000005, z: 0.8099997}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "2094404435",
+        "name":  "Hangar 5 Metal panel 5",
+        "id":  "farm.barrier.h5.metal.p4",
+        "pos":  "{x: 72.600006, y: 0.08, z: 43}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "2105587458",
+        "name":  "Hangar 3 Metal independent 3 upright",
+        "id":  "farm.barrier.h3.independent.2",
+        "pos":  "{x: -49.43, y: 0.120000005, z: -21.689999}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    },
+    {
+        "go":  "2121658358",
+        "name":  "Wooden Wall",
+        "id":  "farm.pistol.box.panel.4",
+        "pos":  "{x: -0.768, y: -0.01999998, z: 0.14566803}",
+        "parent":  "1483251648",
+        "exposed":  "1"
+    },
+    {
+        "go":  "2130019279",
+        "name":  "Hangar 2 Wood panel 13",
+        "id":  "farm.barrier.h2.wood.p12",
+        "pos":  "{x: 66.22487, y: 0.08, z: -6}",
+        "parent":  "593345611",
+        "exposed":  "0"
+    }
+]

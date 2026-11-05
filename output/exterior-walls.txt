@@ -1,0 +1,12 @@
+Configured 11 exterior walls.
+Hangar 2 Wood panel 2 (2) -> farm.barrier.exterior.1232752538
+Hangar 5 Metal panel 6 (1) -> farm.barrier.exterior.2010123997
+Hangar 5 Metal panel 6 (2) -> farm.barrier.exterior.395222720
+Hangar 5 Metal panel 6 (4) -> farm.barrier.exterior.131501455
+Hangar 2 Wood panel 2 -> farm.barrier.exterior.478808709
+Hangar 5 Metal panel 6 (7) -> farm.barrier.exterior.278987264
+Hangar 2 Wood panel 2 (3) -> farm.barrier.exterior.1043019856
+Hangar 2 Wood panel 2 (4) -> farm.barrier.exterior.1563633196
+Hangar 5 Metal panel 6 (3) -> farm.barrier.exterior.526439024
+Hangar 5 Metal panel 6 (5) -> farm.barrier.exterior.459238460
+Hangar 5 Metal panel 6 (6) -> farm.barrier.exterior.2028867849
