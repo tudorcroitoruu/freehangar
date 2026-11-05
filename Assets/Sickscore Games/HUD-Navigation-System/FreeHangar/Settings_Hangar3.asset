@@ -24,7 +24,7 @@ MonoBehaviour:
   rotateWithGameObject: 1
   useRadarHeightSystem: 1
   hideInCompassBar: 0
-  ignoreCompassBarRadius: 1
+  ignoreCompassBarRadius: 0
   useCompassBarDistanceText: 1
   compassBarDistanceTextFormat: '{0}m'
   showIndicator: 1

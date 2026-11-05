@@ -31,9 +31,9 @@ MonoBehaviour:
   radarDistanceAbove: 5
   radarDistanceBelow: 5
   useCompassBar: 1
-  compassBarRadius: 150
+  compassBarRadius: 100
   useIndicators: 1
-  indicatorRadius: 40
+  indicatorRadius: 25
   indicatorHideDistance: 1.75
   useOffscreenIndicators: 1
   indicatorOffscreenBorder: 0.1
@@ -41,7 +41,7 @@ MonoBehaviour:
   indicatorScaleRadius: 1
   indicatorMinScale: 0.8
   useIndicatorFading: 1
-  indicatorFadeRadius: 3
+  indicatorFadeRadius: 2
   indicatorMinFade: 0
   useMinimap: 1
   minimapProfile: {fileID: 11400000, guid: 263ac76fd96a0d3469ca0f61fe774580, type: 2}

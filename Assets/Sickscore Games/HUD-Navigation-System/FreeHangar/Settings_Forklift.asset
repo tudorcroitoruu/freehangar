@@ -29,7 +29,7 @@ MonoBehaviour:
   compassBarDistanceTextFormat: '{0}m'
   showIndicator: 1
   showOffscreenIndicator: 1
-  ignoreIndicatorRadius: 1
+  ignoreIndicatorRadius: 0
   ignoreIndicatorHideDistance: 0
   ignoreIndicatorScaling: 0
   ignoreIndicatorFading: 0
