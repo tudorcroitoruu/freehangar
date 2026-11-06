@@ -11,10 +11,8 @@ public static class PerkTreasureSetup
 {
     private const string GroupName="Scattered treasure and perk bottles";
     private const string Folder="Assets/NewMap/Discoveries";
-    [InitializeOnLoadMethod] private static void AfterImport() => EditorApplication.delayCall+=()=>
-    {
-        if(!EditorApplication.isPlayingOrWillChangePlaymode && SceneManager.GetActiveScene().name=="Gameplay")Apply();
-    };
+    // Only the menu command authors discoveries; importing scripts must not
+    // recreate or reconfigure objects that the level designer has edited.
     [MenuItem("Tools/Grain/Add scattered chests and perk bottles")]
     public static void Apply()
     {
@@ -90,7 +88,10 @@ public static class PerkTreasureSetup
         }
         if(!placed){Debug.LogError("No safely buried, separated position for "+name);return null;}
         var clone=UnityEngine.Object.Instantiate(template.gameObject,group);clone.name=name;
-        Undo.RegisterCreatedObjectUndo(clone,"Scatter buried discovery");clone.transform.SetPositionAndRotation(point,Quaternion.Euler(0,(float)random.NextDouble()*360f,0));
+        // Rotate around world up while retaining the model's authored tilt.
+        // The imported chest needs its -90 degree X correction to keep its lid up.
+        Undo.RegisterCreatedObjectUndo(clone,"Scatter buried discovery");
+        clone.transform.SetPositionAndRotation(point,Quaternion.AngleAxis((float)random.NextDouble()*360f,Vector3.up)*template.transform.rotation);
         clone.SetActive(true);var result=clone.GetComponent<BuriedFind>();
         var data=new SerializedObject(result);data.FindProperty("findId").stringValue=id;data.FindProperty("coveringPile").objectReferenceValue=pile;data.ApplyModifiedPropertiesWithoutUndo();
         finds.Add(result);changed=true;return result;

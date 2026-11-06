@@ -9,13 +9,8 @@ using UnityEngine.SceneManagement;
 public static class BuriedChestSetup
 {
     private const string GroupName="Matching buried copper and iron chests";
-    [InitializeOnLoadMethod] private static void AutoSetup() => EditorApplication.delayCall+=()=>
-    {
-        if(EditorApplication.isPlayingOrWillChangePlaymode || SceneManager.GetActiveScene().name!="Gameplay")return;
-        foreach(var root in SceneManager.GetActiveScene().GetRootGameObjects())if(root.name==GroupName){EnableRewardPool();ApplyPresentation();return;}
-        if (GameObject.Find("New_Map/Collectables/Chests") != null) { EnableRewardPool(); ApplyPresentation(); return; }
-        Apply();
-    };
+    // Authoring is explicit: a renamed/reparented group must never trigger a
+    // placement pass on script reload and overwrite hand-edited chest transforms.
     [MenuItem("Tools/Grain/Place matching buried key chests")]
     public static void Apply()
     {
@@ -60,10 +55,13 @@ public static class BuriedChestSetup
             if(!VehicleKeyBurial.TryPlacement(pile,VehicleKeyBurial.FindEntrance(scene,hangar,pile),progress,out var point))throw new InvalidOperationException("Cannot bury matching chest in Hangar "+hangar);
             Material tint=ChestMaterial(label);
             Undo.RecordObject(chest,"Configure matching chest");Undo.RecordObject(chest.transform,"Bury matching chest");
-            Undo.SetTransformParent(chest.transform,group.transform,"Organize buried chests");
-            chest.transform.SetPositionAndRotation(point,Quaternion.LookRotation((VehicleKeyBurial.FindEntrance(scene,hangar,pile)-point).normalized,Vector3.up));
-            // Keep chest upright even when the door lock is higher than the floor.
-            chest.transform.rotation=Quaternion.Euler(0,chest.transform.eulerAngles.y,0);
+            if (created)
+            {
+                Undo.SetTransformParent(chest.transform,group.transform,"Organize buried chests");
+                Vector3 facing = VehicleKeyBurial.FindEntrance(scene,hangar,pile) - point;
+                facing.y = 0;
+                chest.transform.SetPositionAndRotation(point,Quaternion.LookRotation(facing.normalized,Vector3.up));
+            }
             EnsureGeometry(chest,tint);
             string chestId=string.IsNullOrEmpty(chest.FindId)?"farm.chest.for."+id:chest.FindId;
             chest.ConfigureMatchingChest(chestId,id,label,pile,tint);
