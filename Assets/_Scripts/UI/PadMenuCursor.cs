@@ -14,6 +14,7 @@ public sealed class PadMenuCursor : MonoBehaviour
     private Image focusBackground;
     private EventSystem owner;
     private bool previousNavigation;
+    private bool pointerOwnsFocus;
     private Transform scope;
     private Vector2 lastDirection;
     private float repeatAt;
@@ -31,6 +32,21 @@ public sealed class PadMenuCursor : MonoBehaviour
 
     private void Update()
     {
+        var mouse = Mouse.current;
+        bool pointerInput = mouse != null && mouse.layout != "VirtualMouse" && mouse.name != "VirtualMouse" &&
+            (mouse.delta.ReadValue().sqrMagnitude > .01f ||
+            mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame ||
+            mouse.scroll.ReadValue().sqrMagnitude > .01f);
+        var events = EventSystem.current;
+        if (pointerInput) pointerOwnsFocus = true;
+        if (pointerInput && events && events.currentSelectedGameObject)
+        {
+            var current = events.currentSelectedGameObject;
+            // Moving the mouse must not leave a second navigation highlight behind.
+            // Text fields retain focus so moving the pointer does not interrupt typing.
+            if (!current.GetComponent<InputField>() && !current.GetComponent<TMPro.TMP_InputField>())
+                events.SetSelectedGameObject(null);
+        }
         var root = Pause.Instance && Pause.Instance.paused ? Pause.Instance.NavigationRoot :
             MenuManager.IsMenuOpen ? MenuManager.Instance.NavigationRoot :
             UIPopups.BasePopupUI.CurrentPopup ? UIPopups.BasePopupUI.CurrentPopup.transform : null;
@@ -54,7 +70,6 @@ public sealed class PadMenuCursor : MonoBehaviour
         }
         if (!root || !Application.isFocused || LoadingScreen.IsLoading || GameSettingsManager.IsRebindingInputCaptured)
         { Restore(); scope = null; return; }
-        var events = EventSystem.current;
         if (!events) return;
         if (owner != events)
         {
@@ -65,11 +80,19 @@ public sealed class PadMenuCursor : MonoBehaviour
         foreach (var connected in Gamepad.all)
             if (HasNavigationInput(connected)) { pad = connected; break; }
         bool padInput = pad != null && HasNavigationInput(pad);
+        if (padInput && !pointerInput) pointerOwnsFocus = false;
         owner.sendNavigationEvents = !padInput && !FarmInput.UsingPad && previousNavigation;
         var selected = owner.currentSelectedGameObject ? owner.currentSelectedGameObject.GetComponent<Selectable>() : null;
         if (scope != root || !selected || !controls.Contains(selected))
         {
             scope = root;
+            // Mouse hover owns its own visuals. Only controller navigation needs
+            // an automatically selected first control.
+            if (pointerOwnsFocus || (!padInput && !FarmInput.UsingPad))
+            {
+                lastDirection = Vector2.zero;
+                return;
+            }
             // Hierarchy order is stable; Unity's global selectable array is not.
             foreach (var first in navigationRoot.GetComponentsInChildren<Selectable>())
                 if (controls.Contains(first))
