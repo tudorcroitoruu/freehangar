@@ -17,7 +17,8 @@ public enum WarningType
     NewContainerOpened,
     FindAxe,
     FindHammer,
-    LockedBag
+    LockedBag,
+    DogResting
 }
 public class WarningPopup : MonoBehaviour
 {

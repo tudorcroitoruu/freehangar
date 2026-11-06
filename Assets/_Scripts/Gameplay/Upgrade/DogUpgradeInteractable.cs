@@ -12,10 +12,13 @@ public sealed class DogUpgradeInteractable : MonoBehaviour, IKeyedInteractable
         if (!dog) dog = GetComponent<FarmDog>();
         int level = dog.Level;
         bool voucher = (SaveSystem.Data?.freeUpgradeVouchers ?? 0) > 0;
-        string cost = voucher ? "Free voucher" : "$" + EconomyNumberFormat.Accounting(settings ? settings.Price(level) : 0);
+        int price = settings ? settings.Price(level) : 0;
+        string cost = voucher ? "Free voucher" : "$" + EconomyNumberFormat.Accounting(price);
+        if (!voucher && (SaveSystem.Data == null || price < 0 || SaveSystem.Money < price))
+            cost = $"<color=#D92D2D>{cost}</color>";
         prompt = new InteractionPromptData(transform.position + Vector3.up,
-            "Upgrade dog to level " + (level + 1) + " — " + cost);
-        prompt.SecondaryDescription = DogUpgradeSettings.Description(level + 1);
+            "Upgrade dog to level " + (level + 1));
+        prompt.SecondaryDescription = "Price: " + cost;
         prompt.InteractionKey = KeyCode.F;
         return isActiveAndEnabled && interactor != null && settings && level < 5 && dog.CanPet &&
             !SaveSystem.UpgradePurchaseLocked && SaveSystem.savesLoaded;

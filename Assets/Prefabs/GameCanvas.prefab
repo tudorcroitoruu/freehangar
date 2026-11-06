@@ -3139,6 +3139,10 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 47e852e0065a6f04f83f217d7904557c, type: 3}
     title: Bag locked
     message: Bag is locked
+  - warningType: 12
+    icon: {fileID: 21300000, guid: 0c28da6489224b24cb7c275970fef04c, type: 3}
+    title: Dog resting
+    message: Let the dog rest
   warningCanvasGroup: {fileID: 737507088087375577}
   warningImage: {fileID: 6193481453998981383}
   warningTitle: {fileID: 11493426258684311}

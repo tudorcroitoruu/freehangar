@@ -54,10 +54,11 @@ public sealed class PlayerInteractor : MonoBehaviour
     {
         var prompt = Prompt;
         Target = null;
-        if (!CanInteract) { SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
+        if (!CanInteract) { SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
         var aimedTarget = FindTarget();
         InteractionPromptData aimedPrompt = default;
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
+        SetDogRestingWarning(hasAimedPrompt && aimedPrompt.DogResting);
         SetVehicleFullWarning(hasAimedPrompt && aimedPrompt.VehicleFull);
         SetUseForkliftWarning(hasAimedPrompt && aimedPrompt.UseForkliftToMove);
         UpdateResetTarget(hasAimedPrompt && aimedPrompt.ShowKey && !aimedPrompt.RequiresFreeHands ? aimedTarget : null);
@@ -67,7 +68,7 @@ public sealed class PlayerInteractor : MonoBehaviour
             if (aimedTarget is BicycleController) AddResetAction(ref aimedPrompt);
         }
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
-        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.UseForkliftToMove))
+        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
         {
             Target = aimedTarget;
             SetHighlightedTarget(null);
@@ -173,7 +174,10 @@ public sealed class PlayerInteractor : MonoBehaviour
                 ReferenceEquals(primary, action) || action.InteractionKey == data.InteractionKey ||
                 !action.TryGetPrompt(this, out var extra) || !extra.ShowKey || extra.RequiresFreeHands) continue;
             if (actions.Exists(item => item.Key == action.InteractionKey)) continue;
-            actions.Add(new InteractionPromptAction(extra.Action, action.InteractionKey));
+            actions.Add(new InteractionPromptAction(extra.Action, action.InteractionKey)
+            {
+                SecondaryDescription = extra.SecondaryDescription
+            });
         }
         data.AdditionalActions = actions.Count > 0 ? actions.ToArray() : null;
     }
@@ -334,5 +338,8 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void SetUseForkliftWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.UseForkliftToMove, this, visible);
 
-    private void OnDisable() { SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
+    private void SetDogRestingWarning(bool visible) =>
+        GameplayCanvas.Instance?.SetWarning(WarningType.DogResting, this, visible);
+
+    private void OnDisable() { SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
 }

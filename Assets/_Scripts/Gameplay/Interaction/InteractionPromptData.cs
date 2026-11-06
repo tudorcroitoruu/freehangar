@@ -13,6 +13,7 @@ public struct InteractionPromptData
     public bool RequiresFreeHands;
     public bool VehicleFull;
     public bool UseForkliftToMove;
+    public bool DogResting;
     public bool ShowPrimaryButton;
     public bool PrimaryIsAttack;
     public bool ShowProgress;
@@ -32,6 +33,7 @@ public struct InteractionPromptData
         RequiresFreeHands = false;
         VehicleFull = false;
         UseForkliftToMove = false;
+        DogResting = false;
         ShowPrimaryButton = false;
         PrimaryIsAttack = false;
         ShowProgress = false;
@@ -43,6 +45,7 @@ public struct InteractionPromptData
 public struct InteractionPromptAction
 {
     public string Action;
+    public string SecondaryDescription;
     public KeyCode Key;
     public bool ShowProgress;
     public float Progress;
@@ -51,6 +54,7 @@ public struct InteractionPromptAction
     {
         Action = action;
         Key = key;
+        SecondaryDescription = "";
         ShowProgress = false;
         Progress = 0f;
         ProgressText = "";

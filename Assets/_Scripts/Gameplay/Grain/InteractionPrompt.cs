@@ -26,7 +26,7 @@ public sealed class InteractionPrompt : MonoBehaviour
     private sealed class ActionRow
     {
         public RectTransform panel;
-        public TMP_Text description, key;
+        public TMP_Text description, secondaryDescription, key;
         public GameObject mouse, progress;
         public Image progressFill;
         public Text progressText;
@@ -105,6 +105,11 @@ public sealed class InteractionPrompt : MonoBehaviour
             }
             var action = data.AdditionalActions[i];
             if (row.description != null) row.description.text = action.Action;
+            if (row.secondaryDescription != null)
+            {
+                row.secondaryDescription.text = action.SecondaryDescription ?? "";
+                row.secondaryDescription.gameObject.SetActive(!string.IsNullOrEmpty(action.SecondaryDescription));
+            }
             if (row.key != null) { GamepadPromptSprites.SetKeycap(row.key, KeyLabel(action.Key)); row.key.gameObject.SetActive(true); }
             if (row.mouse != null) row.mouse.SetActive(false);
             if (row.progress != null) row.progress.SetActive(action.ShowProgress);
@@ -137,6 +142,7 @@ public sealed class InteractionPrompt : MonoBehaviour
             if (secondary != null) secondary.gameObject.SetActive(false);
             foreach (var controller in clone.GetComponentsInChildren<InteractionPrompt>(true)) controller.enabled = false;
             var row = new ActionRow { panel = clone };
+            row.secondaryDescription = secondary != null ? secondary.GetComponent<TMP_Text>() : null;
             var text = CopyOf(description != null ? description.transform : null, panel, clone);
             var key = CopyOf(keycap != null ? keycap.transform : null, panel, clone);
             var mouse = CopyOf(mouseLeft != null ? mouseLeft.transform : null, panel, clone);

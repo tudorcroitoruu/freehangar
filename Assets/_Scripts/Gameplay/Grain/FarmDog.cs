@@ -256,7 +256,8 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         if (State == DogState.Petting) return false;
         prompt = new InteractionPromptData(transform.position + Vector3.up,
             CanPet ? "Stroke dog" :
-            State == DogState.Chasing || State == DogState.Attacking || State == DogState.Returning ? "Dog is hunting" : "Let the dog rest", CanPet);
+            State == DogState.Chasing || State == DogState.Attacking || State == DogState.Returning ? "Dog is hunting" : "", CanPet);
+        prompt.DogResting = !CanPet && (State == DogState.Idle || State == DogState.Sleeping);
         if (interactor != null) prompt.RequiresFreeHands = interactor.HandsOccupied;
         return isActiveAndEnabled && interactor != null;
     }
