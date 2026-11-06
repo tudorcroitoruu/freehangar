@@ -6,6 +6,7 @@ using UnityEngine;
 [DisallowMultipleComponent, RequireComponent(typeof(BoxCollider))]
 public sealed class BuriedFind : MonoBehaviour, IInteractable
 {
+    public static event Action<BuriedFind, PlayerData> Collected;
     // Explicit values preserve existing scene, prefab and save assignments when renaming tools.
     public enum Kind { Key = 0, CashChest = 1, UpgradeVoucher = 2, InfiniteStamina = 3, CashCache = 4, Axe = 5, Hammer = 6, HangarKey = 7, Broom = 8, VehicleKey = 9, PerkBottle = 10, Pistol = 11 }
 
@@ -83,7 +84,11 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     public bool IsAnimating => opening;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetProfileRequest() => profileLoadRequested = false;
+    private static void ResetProfileRequest()
+    {
+        profileLoadRequested = false;
+        Collected = null;
+    }
 
     private async void Start()
     {
@@ -240,6 +245,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         Array.Resize(ref data.foundSecrets, index + 1);
         data.foundSecrets[index] = findId;
         SaveSystem.SaveData();
+        Collected?.Invoke(this, data);
         if (kind == Kind.HangarKey) GoalChecker.ReportValue(GoalType.HangarKeyCollected, 1, targetHangar);
         return true;
     }

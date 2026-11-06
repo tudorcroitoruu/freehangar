@@ -1,36 +1,22 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class DogScreenStatus : MonoBehaviour
 {
     [SerializeField] private FarmDog dog;
     [SerializeField] private DogStatusPreset[] presets;
-    [SerializeField] private RectTransform rectTransform;
     [Space, Header("Main")] 
+    [SerializeField] private Image outlineFillImage;
     [SerializeField] private Image dogStatusImage;
     [SerializeField] private Image dogStatusSecondImage;
     [SerializeField] private Text statusNameText;
-    [FormerlySerializedAs("heightOnIdle")]
-    [SerializeField] private float heightOnReady = 120;
-
-    [Space, Header("Rest timer")]
-    [SerializeField] private GameObject restingStatus;
-    [SerializeField] private Text timerText;
-    [SerializeField] private Image timerImageFill;
-    [SerializeField] private float heightOnResting = 200;
-
-    [SerializeField] private Color readyColorText = Color.darkGreen;
-    [SerializeField] private Color timerColorText = Color.sandyBrown;
-    [SerializeField, Min(0f)] private float readyDelay = 3f;
-    [SerializeField, Min(0f)] private float heightTransitionDuration = .3f;
 
     private FarmDog.DogState? displayedState;
-    private bool timerRunning, closing;
-    private float readyUntil = -1f, nextDogSearch;
-    private float heightFrom, heightTarget, heightElapsed;
-    private int displayedSeconds = -1;
+    private float nextDogSearch;
+    private Material originalMaterial, runtimeMaterial;
+    private static readonly int OutlineFillAmountId = Shader.PropertyToID("_OutlineFillAmount");
+    private static readonly int UseOutlineFillId = Shader.PropertyToID("_UseOutlineFill");
 
     private void OnEnable()
     {
@@ -52,20 +38,14 @@ public class DogScreenStatus : MonoBehaviour
         }
 
         if (displayedState != dog.State) ApplyPreset(dog.State);
-        UpdateTimer();
-        UpdateHeight();
+        float interval = FarmDog.HuntInterval(dog.Level);
+        SetOutlineFill(interval > 0f ? Mathf.Clamp01(dog.RestRemaining / interval) : 0f);
     }
 
     private void ResetView()
     {
         displayedState = null;
-        timerRunning = closing = false;
-        readyUntil = -1f;
-        displayedSeconds = -1;
-        heightFrom = heightTarget = heightOnReady;
-        heightElapsed = 0f;
-        if (restingStatus) restingStatus.SetActive(false);
-        if (rectTransform) rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, heightOnReady);
+        SetOutlineFill(0f);
     }
 
     private void ApplyPreset(FarmDog.DogState state)
@@ -82,73 +62,35 @@ public class DogScreenStatus : MonoBehaviour
         }
     }
 
-    private void UpdateTimer()
+    private void SetOutlineFill(float fill)
     {
-        float remaining = dog.RestRemaining;
-        if (remaining > 0f)
+        if (!outlineFillImage) return;
+        if (runtimeMaterial == null)
         {
-            if (!timerRunning)
-            {
-                timerRunning = true;
-                closing = false;
-                readyUntil = -1f;
-                displayedSeconds = -1;
-                if (restingStatus) restingStatus.SetActive(true);
-                if (timerText) timerText.color = timerColorText;
-                TransitionHeight(heightOnResting);
-            }
-
-            int seconds = Mathf.CeilToInt(remaining);
-            if (seconds != displayedSeconds)
-            {
-                displayedSeconds = seconds;
-                if (timerText) timerText.text = $"{seconds / 60:00}:{seconds % 60:00}";
-            }
-            float interval = FarmDog.HuntInterval(dog.Level);
-            if (timerImageFill) timerImageFill.fillAmount = interval > 0f ? Mathf.Clamp01(remaining / interval) : 0f;
-            return;
+            originalMaterial = outlineFillImage.material;
+            if (originalMaterial == null || !originalMaterial.HasProperty(OutlineFillAmountId)) return;
+            // Each status owns its countdown; never modify the shared material asset.
+            runtimeMaterial = new Material(originalMaterial) { hideFlags = HideFlags.DontSave };
+            outlineFillImage.material = runtimeMaterial;
         }
-
-        if (timerRunning)
-        {
-            timerRunning = false;
-            if (timerText)
-            {
-                timerText.text = "Ready";
-                timerText.color = readyColorText;
-            }
-            if (timerImageFill) timerImageFill.fillAmount = 0f;
-            readyUntil = Time.unscaledTime + readyDelay;
-        }
-
-        if (readyUntil >= 0f && Time.unscaledTime >= readyUntil)
-        {
-            readyUntil = -1f;
-            closing = true;
-            TransitionHeight(heightOnReady);
-        }
+        ApplyFill(runtimeMaterial, fill);
+        var renderedMaterial = outlineFillImage.materialForRendering;
+        if (renderedMaterial != null && renderedMaterial != runtimeMaterial) ApplyFill(renderedMaterial, fill);
+        outlineFillImage.SetMaterialDirty();
     }
 
-    private void TransitionHeight(float target)
+    private static void ApplyFill(Material material, float fill)
     {
-        heightFrom = rectTransform ? rectTransform.rect.height : target;
-        heightTarget = target;
-        heightElapsed = 0f;
+        if (material.HasProperty(UseOutlineFillId)) material.SetFloat(UseOutlineFillId, 1f);
+        if (material.HasProperty(OutlineFillAmountId)) material.SetFloat(OutlineFillAmountId, fill);
     }
 
-    private void UpdateHeight()
+    private void OnDestroy()
     {
-        heightElapsed += Time.unscaledDeltaTime;
-        float progress = heightTransitionDuration > 0f ? Mathf.Clamp01(heightElapsed / heightTransitionDuration) : 1f;
-        if (rectTransform)
-            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,
-                Mathf.Lerp(heightFrom, heightTarget, Mathf.SmoothStep(0f, 1f, progress)));
-        // Keep the Ready panel active until the collapse finishes.
-        if (closing && progress >= 1f)
-        {
-            closing = false;
-            if (restingStatus) restingStatus.SetActive(false);
-        }
+        if (runtimeMaterial == null) return;
+        if (outlineFillImage != null && outlineFillImage.material == runtimeMaterial) outlineFillImage.material = originalMaterial;
+        if (Application.isPlaying) Destroy(runtimeMaterial);
+        else DestroyImmediate(runtimeMaterial);
     }
 }
 

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="41" result="Passed" total="41" passed="41" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-06 18:35:39Z" end-time="2026-11-06 18:35:41Z" duration="1.2967497">
+  <test-suite type="TestSuite" id="1000" name="Grain Cleanup Co." fullname="Grain Cleanup Co." runstate="Runnable" testcasecount="504" result="Passed" start-time="2026-11-06 18:35:39Z" end-time="2026-11-06 18:35:41Z" duration="1.296750" total="41" passed="41" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1620" name="Assembly-CSharp-Editor.dll" fullname="D:/Own projects/freehangar/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="504" result="Passed" start-time="2026-11-06 18:35:39Z" end-time="2026-11-06 18:35:41Z" duration="1.199333" total="41" passed="41" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="2604" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestFixture" id="1033" name="CollectablesManagerTests" fullname="CollectablesManagerTests" classname="CollectablesManagerTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-06 18:35:39Z" end-time="2026-11-06 18:35:40Z" duration="0.066836" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1036" name="PopupQueuesImagesAndTitlesThenRestoresExistingWarning" fullname="CollectablesManagerTests.PopupQueuesImagesAndTitlesThenRestoresExistingWarning" methodname="PopupQueuesImagesAndTitlesThenRestoresExistingWarning" classname="CollectablesManagerTests" runstate="Runnable" seed="1109159187" result="Passed" start-time="2026-11-06 18:35:39Z" end-time="2026-11-06 18:35:40Z" duration="0.034672" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1034" name="ProgressCountsUniqueListIdsAndExcludesOtherSavedEvents" fullname="CollectablesManagerTests.ProgressCountsUniqueListIdsAndExcludesOtherSavedEvents" methodname="ProgressCountsUniqueListIdsAndExcludesOtherSavedEvents" classname="CollectablesManagerTests" runstate="Runnable" seed="703829763" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.002402" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1035" name="ScenePopulationIncludesInactiveAndLaterSpawnedFindsWithoutDuplicates" fullname="CollectablesManagerTests.ScenePopulationIncludesInactiveAndLaterSpawnedFindsWithoutDuplicates" methodname="ScenePopulationIncludesInactiveAndLaterSpawnedFindsWithoutDuplicates" classname="CollectablesManagerTests" runstate="Runnable" seed="417317522" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.002529" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1290" name="MoneyChangePopupTests" fullname="MoneyChangePopupTests" classname="MoneyChangePopupTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.858950" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1292" name="AdditionFadesInThenTransfersTheSameAmountIntoBalance" fullname="MoneyChangePopupTests.AdditionFadesInThenTransfersTheSameAmountIntoBalance" methodname="AdditionFadesInThenTransfersTheSameAmountIntoBalance" classname="MoneyChangePopupTests" runstate="Runnable" seed="45377774" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.008029" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1303" name="GameplayTransactionsReachThePopupThroughMoneyChanged" fullname="MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged" classname="MoneyChangePopupTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.844405" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1297" name="GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;sale&quot;,&quot;+$50&quot;,150)" fullname="MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;sale&quot;,&quot;+$50&quot;,150)" methodname="GameplayTransactionsReachThePopupThroughMoneyChanged" classname="MoneyChangePopupTests" runstate="Runnable" seed="895794772" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.125469" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1298" name="GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;cashCache&quot;,&quot;+$50&quot;,150)" fullname="MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;cashCache&quot;,&quot;+$50&quot;,150)" methodname="GameplayTransactionsReachThePopupThroughMoneyChanged" classname="MoneyChangePopupTests" runstate="Runnable" seed="1843024037" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.299506" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1299" name="GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;cashChest&quot;,&quot;+$50&quot;,150)" fullname="MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;cashChest&quot;,&quot;+$50&quot;,150)" methodname="GameplayTransactionsReachThePopupThroughMoneyChanged" classname="MoneyChangePopupTests" runstate="Runnable" seed="473661879" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.169453" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1300" name="GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;purchase&quot;,&quot;-$40&quot;,60)" fullname="MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;purchase&quot;,&quot;-$40&quot;,60)" methodname="GameplayTransactionsReachThePopupThroughMoneyChanged" classname="MoneyChangePopupTests" runstate="Runnable" seed="201590035" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.083360" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1301" name="GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;failedDelivery&quot;,&quot;&quot;,100)" fullname="MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;failedDelivery&quot;,&quot;&quot;,100)" methodname="GameplayTransactionsReachThePopupThroughMoneyChanged" classname="MoneyChangePopupTests" runstate="Runnable" seed="1112489260" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.079643" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1302" name="GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;unaffordable&quot;,&quot;&quot;,100)" fullname="MoneyChangePopupTests.GameplayTransactionsReachThePopupThroughMoneyChanged(&quot;unaffordable&quot;,&quot;&quot;,100)" methodname="GameplayTransactionsReachThePopupThroughMoneyChanged" classname="MoneyChangePopupTests" runstate="Runnable" seed="1159187503" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.081588" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1291" name="InitialBalanceDoesNotShowAChange" fullname="MoneyChangePopupTests.InitialBalanceDoesNotShowAChange" methodname="InitialBalanceDoesNotShowAChange" classname="MoneyChangePopupTests" runstate="Runnable" seed="717343050" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.001060" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1294" name="NewTransactionsPreserveDisplayedBalanceAndUpdateRemainingDifference" fullname="MoneyChangePopupTests.NewTransactionsPreserveDisplayedBalanceAndUpdateRemainingDifference" methodname="NewTransactionsPreserveDisplayedBalanceAndUpdateRemainingDifference" classname="MoneyChangePopupTests" runstate="Runnable" seed="1368280736" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000817" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1295" name="ResetClearsAnUnfinishedPopup" fullname="MoneyChangePopupTests.ResetClearsAnUnfinishedPopup" methodname="ResetClearsAnUnfinishedPopup" classname="MoneyChangePopupTests" runstate="Runnable" seed="1059096001" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000744" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1293" name="SpendingDecreasesBalanceAndRemainingCostTogether" fullname="MoneyChangePopupTests.SpendingDecreasesBalanceAndRemainingCostTogether" methodname="SpendingDecreasesBalanceAndRemainingCostTogether" classname="MoneyChangePopupTests" runstate="Runnable" seed="300531578" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.001050" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1296" name="TransferWaitsAfterFadeInAndNewUpdatesDoNotRestartTheDelay" fullname="MoneyChangePopupTests.TransferWaitsAfterFadeInAndNewUpdatesDoNotRestartTheDelay" methodname="TransferWaitsAfterFadeInAndNewUpdatesDoNotRestartTheDelay" classname="MoneyChangePopupTests" runstate="Runnable" seed="1826001194" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000850" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1380" name="PlayerPerksTests" fullname="PlayerPerksTests" classname="PlayerPerksTests" runstate="Runnable" testcasecount="21" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:41Z" duration="0.135929" total="21" passed="21" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1403" name="BoosterIndicatorUsesConfiguredIconAndPrivateOutlineCountdown" fullname="PlayerPerksTests.BoosterIndicatorUsesConfiguredIconAndPrivateOutlineCountdown" methodname="BoosterIndicatorUsesConfiguredIconAndPrivateOutlineCountdown" classname="PlayerPerksTests" runstate="Runnable" seed="2037245205" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.004880" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1395" name="CashAndVoucherRewardsChangeOnlyTheirOwnBalance" fullname="PlayerPerksTests.CashAndVoucherRewardsChangeOnlyTheirOwnBalance" methodname="CashAndVoucherRewardsChangeOnlyTheirOwnBalance" classname="PlayerPerksTests" runstate="Runnable" seed="735153058" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000415" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1401" name="DoubleSalesPayExactlyTwiceTheDisplayedRoundedBaseValue" fullname="PlayerPerksTests.DoubleSalesPayExactlyTwiceTheDisplayedRoundedBaseValue" methodname="DoubleSalesPayExactlyTwiceTheDisplayedRoundedBaseValue" classname="PlayerPerksTests" runstate="Runnable" seed="943421302" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000249" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1402" name="LegacySavesStartWithoutPerks" fullname="PlayerPerksTests.LegacySavesStartWithoutPerks" methodname="LegacySavesStartWithoutPerks" classname="PlayerPerksTests" runstate="Runnable" seed="269421922" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000744" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1394" name="PoolIncludesEveryReward" fullname="PlayerPerksTests.PoolIncludesEveryReward" classname="PlayerPerksTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.006962" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1388" name="PoolIncludesEveryReward(0.1f,Cash)" fullname="PlayerPerksTests.PoolIncludesEveryReward(0.1f,Cash)" methodname="PoolIncludesEveryReward" classname="PlayerPerksTests" runstate="Runnable" seed="79092837" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000728" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1389" name="PoolIncludesEveryReward(0.5f,FreeUpgrade)" fullname="PlayerPerksTests.PoolIncludesEveryReward(0.5f,FreeUpgrade)" methodname="PoolIncludesEveryReward" classname="PlayerPerksTests" runstate="Runnable" seed="942776563" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000082" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1390" name="PoolIncludesEveryReward(0.65f,NoAttacks)" fullname="PlayerPerksTests.PoolIncludesEveryReward(0.65f,NoAttacks)" methodname="PoolIncludesEveryReward" classname="PlayerPerksTests" runstate="Runnable" seed="1770548597" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000059" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1391" name="PoolIncludesEveryReward(0.75f,Mobility)" fullname="PlayerPerksTests.PoolIncludesEveryReward(0.75f,Mobility)" methodname="PoolIncludesEveryReward" classname="PlayerPerksTests" runstate="Runnable" seed="1806143587" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000064" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1392" name="PoolIncludesEveryReward(0.85f,InfiniteStamina)" fullname="PlayerPerksTests.PoolIncludesEveryReward(0.85f,InfiniteStamina)" methodname="PoolIncludesEveryReward" classname="PlayerPerksTests" runstate="Runnable" seed="1729094748" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000057" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1393" name="PoolIncludesEveryReward(0.95f,DoubleSellCash)" fullname="PlayerPerksTests.PoolIncludesEveryReward(0.95f,DoubleSellCash)" methodname="PoolIncludesEveryReward" classname="PlayerPerksTests" runstate="Runnable" seed="970422900" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000056" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1405" name="SavedBoostersRestoreOnceExtendWithoutDuplicatesAndDisappearOnExpiry" fullname="PlayerPerksTests.SavedBoostersRestoreOnceExtendWithoutDuplicatesAndDisappearOnExpiry" methodname="SavedBoostersRestoreOnceExtendWithoutDuplicatesAndDisappearOnExpiry" classname="PlayerPerksTests" runstate="Runnable" seed="636133447" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.003239" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1400" name="TimedRewardsPersistAndExtendWithoutChangingStrength" fullname="PlayerPerksTests.TimedRewardsPersistAndExtendWithoutChangingStrength" classname="PlayerPerksTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.006387" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1396" name="TimedRewardsPersistAndExtendWithoutChangingStrength(NoAttacks)" fullname="PlayerPerksTests.TimedRewardsPersistAndExtendWithoutChangingStrength(NoAttacks)" methodname="TimedRewardsPersistAndExtendWithoutChangingStrength" classname="PlayerPerksTests" runstate="Runnable" seed="1301046672" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000782" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1397" name="TimedRewardsPersistAndExtendWithoutChangingStrength(Mobility)" fullname="PlayerPerksTests.TimedRewardsPersistAndExtendWithoutChangingStrength(Mobility)" methodname="TimedRewardsPersistAndExtendWithoutChangingStrength" classname="PlayerPerksTests" runstate="Runnable" seed="2109666367" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000170" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1398" name="TimedRewardsPersistAndExtendWithoutChangingStrength(InfiniteStamina)" fullname="PlayerPerksTests.TimedRewardsPersistAndExtendWithoutChangingStrength(InfiniteStamina)" methodname="TimedRewardsPersistAndExtendWithoutChangingStrength" classname="PlayerPerksTests" runstate="Runnable" seed="59523213" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000140" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1399" name="TimedRewardsPersistAndExtendWithoutChangingStrength(DoubleSellCash)" fullname="PlayerPerksTests.TimedRewardsPersistAndExtendWithoutChangingStrength(DoubleSellCash)" methodname="TimedRewardsPersistAndExtendWithoutChangingStrength" classname="PlayerPerksTests" runstate="Runnable" seed="1537414568" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.000128" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1404" name="ToolHintsRestoreDiscoveriesAndSelectTheEquippedTool" fullname="PlayerPerksTests.ToolHintsRestoreDiscoveriesAndSelectTheEquippedTool" methodname="ToolHintsRestoreDiscoveriesAndSelectTheEquippedTool" classname="PlayerPerksTests" runstate="Runnable" seed="698958429" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:40Z" duration="0.001899" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1387" name="UpgradePurchaseBlocksReentryAndRapidPurchasesAcrossScreens" fullname="PlayerPerksTests.UpgradePurchaseBlocksReentryAndRapidPurchasesAcrossScreens" methodname="UpgradePurchaseBlocksReentryAndRapidPurchasesAcrossScreens" classname="PlayerPerksTests" runstate="Runnable" seed="1313432223" result="Passed" start-time="2026-11-06 18:35:40Z" end-time="2026-11-06 18:35:41Z" duration="0.084330" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1386" name="VoucherMakesUpgradeScreenFreeWithoutRequiringCash" fullname="PlayerPerksTests.VoucherMakesUpgradeScreenFreeWithoutRequiringCash" classname="PlayerPerksTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.012147" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1384" name="VoucherMakesUpgradeScreenFreeWithoutRequiringCash(True)" fullname="PlayerPerksTests.VoucherMakesUpgradeScreenFreeWithoutRequiringCash(True)" methodname="VoucherMakesUpgradeScreenFreeWithoutRequiringCash" classname="PlayerPerksTests" runstate="Runnable" seed="2047963703" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.005128" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1385" name="VoucherMakesUpgradeScreenFreeWithoutRequiringCash(False)" fullname="PlayerPerksTests.VoucherMakesUpgradeScreenFreeWithoutRequiringCash(False)" methodname="VoucherMakesUpgradeScreenFreeWithoutRequiringCash" classname="PlayerPerksTests" runstate="Runnable" seed="1092882080" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.001241" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1383" name="VoucherPaysForOnlyOneSuccessfulToolUpgrade" fullname="PlayerPerksTests.VoucherPaysForOnlyOneSuccessfulToolUpgrade" classname="PlayerPerksTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.007215" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1381" name="VoucherPaysForOnlyOneSuccessfulToolUpgrade(True)" fullname="PlayerPerksTests.VoucherPaysForOnlyOneSuccessfulToolUpgrade(True)" methodname="VoucherPaysForOnlyOneSuccessfulToolUpgrade" classname="PlayerPerksTests" runstate="Runnable" seed="1645112555" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.000828" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1382" name="VoucherPaysForOnlyOneSuccessfulToolUpgrade(False)" fullname="PlayerPerksTests.VoucherPaysForOnlyOneSuccessfulToolUpgrade(False)" methodname="VoucherPaysForOnlyOneSuccessfulToolUpgrade" classname="PlayerPerksTests" runstate="Runnable" seed="1111107356" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.000241" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+      </test-suite>
+      <test-suite type="TestFixture" id="1598" name="WarningPopupTests" fullname="WarningPopupTests" classname="WarningPopupTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.106123" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1601" name="ContextWarningPreemptsAttackThenReturnsToItWhenAimChanges" fullname="WarningPopupTests.ContextWarningPreemptsAttackThenReturnsToItWhenAimChanges" methodname="ContextWarningPreemptsAttackThenReturnsToItWhenAimChanges" classname="WarningPopupTests" runstate="Runnable" seed="1945986362" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.003199" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1603" name="InactivePopupRendersPresetAndFadesWithoutBlockingInput" fullname="WarningPopupTests.InactivePopupRendersPresetAndFadesWithoutBlockingInput" methodname="InactivePopupRendersPresetAndFadesWithoutBlockingInput" classname="WarningPopupTests" runstate="Runnable" seed="574058216" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.001453" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1599" name="MultipleAttackersKeepOneWarningUntilLastSourceStops" fullname="WarningPopupTests.MultipleAttackersKeepOneWarningUntilLastSourceStops" methodname="MultipleAttackersKeepOneWarningUntilLastSourceStops" classname="WarningPopupTests" runstate="Runnable" seed="1983870495" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.000462" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1600" name="RepeatedRequestsDoNotRestartRotationAndDestroyedSourcesAreRemoved" fullname="WarningPopupTests.RepeatedRequestsDoNotRestartRotationAndDestroyedSourcesAreRemoved" methodname="RepeatedRequestsDoNotRestartRotationAndDestroyedSourcesAreRemoved" classname="WarningPopupTests" runstate="Runnable" seed="2099093551" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.000468" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1602" name="TimedHangarWarningRefreshesWithoutDuplicatingAndExpires" fullname="WarningPopupTests.TimedHangarWarningRefreshesWithoutDuplicatingAndExpires" methodname="TimedHangarWarningRefreshesWithoutDuplicatingAndExpires" classname="WarningPopupTests" runstate="Runnable" seed="1399757883" result="Passed" start-time="2026-11-06 18:35:41Z" end-time="2026-11-06 18:35:41Z" duration="0.000548" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: C:/Users/Liviu Tataru/AppData/LocalLow/Harbuz Games/Grain Cleanup Co_\TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

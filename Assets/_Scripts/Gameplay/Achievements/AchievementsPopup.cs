@@ -18,6 +18,36 @@ public class AchievementsPopup : MonoBehaviour
     private readonly List<WarningType> activeTypes = new List<WarningType>();
     public WarningType? CurrentType { get; private set; }
     private float shownSeconds;
+    private struct Notification
+    {
+        public Sprite image;
+        public string title;
+        public float seconds;
+    }
+    private readonly Queue<Notification> notifications = new Queue<Notification>();
+    private bool showingNotification;
+    private float notificationRemaining;
+
+    public void Show(Sprite image, string title, float seconds = 3f)
+    {
+        notifications.Enqueue(new Notification { image = image, title = title, seconds = Mathf.Max(.1f, seconds) });
+        if (!showingNotification) DisplayNextNotification();
+    }
+
+    private void DisplayNextNotification()
+    {
+        var notification = notifications.Dequeue();
+        showingNotification = true;
+        notificationRemaining = notification.seconds;
+        CurrentType = null;
+        if (!gameObject.activeSelf) gameObject.SetActive(true);
+        if (achievementsImage != null)
+        {
+            achievementsImage.sprite = notification.image;
+            achievementsImage.enabled = notification.image != null;
+        }
+        if (achievementsTitle != null) achievementsTitle.text = notification.title;
+    }
 
     public void Initialize()
     {
@@ -76,7 +106,18 @@ public class AchievementsPopup : MonoBehaviour
         foreach (var request in requests)
             if (!activeTypes.Contains(request.type)) activeTypes.Add(request.type);
 
-        if (activeTypes.Count == 0) CurrentType = null;
+        if (showingNotification)
+        {
+            notificationRemaining -= deltaTime;
+            if (notificationRemaining <= 0f)
+            {
+                showingNotification = false;
+                if (notifications.Count > 0) DisplayNextNotification();
+            }
+        }
+
+        if (showingNotification) CurrentType = null;
+        else if (activeTypes.Count == 0) CurrentType = null;
         else if (!CurrentType.HasValue || !activeTypes.Contains(CurrentType.Value)) Display(activeTypes[0]);
         else
         {
@@ -89,13 +130,14 @@ public class AchievementsPopup : MonoBehaviour
         {
             achievementsCanvasGroup.interactable = false;
             achievementsCanvasGroup.blocksRaycasts = false;
-            achievementsCanvasGroup.alpha = Mathf.MoveTowards(achievementsCanvasGroup.alpha, CurrentType.HasValue ? 1f : 0f,
+            achievementsCanvasGroup.alpha = Mathf.MoveTowards(achievementsCanvasGroup.alpha, showingNotification || CurrentType.HasValue ? 1f : 0f,
                 fadeSeconds > 0f ? deltaTime / fadeSeconds : 1f);
         }
     }
 
     private void Display(WarningType type)
     {
+        if (showingNotification) return;
         CurrentType = type;
         shownSeconds = 0f;
         var preset = achievementsPresets == null ? null : Array.Find(achievementsPresets, item => item != null && item.warningType == type);
