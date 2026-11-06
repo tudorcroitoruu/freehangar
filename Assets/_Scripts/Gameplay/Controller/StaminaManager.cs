@@ -108,7 +108,7 @@ public sealed class StaminaManager : MonoBehaviour
 
     public void TickHunger(float deltaTime)
     {
-        if (!isActiveAndEnabled || !(deltaTime > 0f) || !float.IsFinite(deltaTime)) return;
+        if (!isActiveAndEnabled || HasInfiniteStamina || !(deltaTime > 0f) || !float.IsFinite(deltaTime)) return;
         SetHungerPercent(hungryPercent + hungerIncreasePerMinute * (deltaTime / 60f));
     }
 
