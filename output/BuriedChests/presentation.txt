@@ -1,6 +1,6 @@
 PASS H4 9 % - Iron chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
-PASS H4 77 % - Copper chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
 PASS H3 67 % - Iron chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
-PASS H2 8 % - Copper chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
 PASS H5 80 % - Iron chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
 PASS H2 67 % - Copper chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
+PASS H2 8 % - Copper chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
+PASS H4 77 % - Copper chest: texture=True, animated lid=True, treasure VFX=True, shared E interaction.
