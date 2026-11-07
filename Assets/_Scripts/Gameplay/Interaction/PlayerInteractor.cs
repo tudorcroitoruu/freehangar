@@ -5,6 +5,8 @@ using System.Collections.Generic;
 [DefaultExecutionOrder(300), DisallowMultipleComponent]
 public sealed class PlayerInteractor : MonoBehaviour
 {
+    private readonly List<MonoBehaviour> targetBehaviours = new List<MonoBehaviour>(16);
+    private readonly List<MonoBehaviour> actionBehaviours = new List<MonoBehaviour>(16);
     [SerializeField] private Camera viewCamera;
     [SerializeField, Min(.1f)] private float interactionDistance = 4f;
     [SerializeField] private LayerMask interactionMask = ~0;
@@ -232,7 +234,8 @@ public sealed class PlayerInteractor : MonoBehaviour
         var origin = actionOrigin != null && actionOrigin.IsChildOf(primary.transform) ? actionOrigin : primary.transform;
         for (var host = origin; host != null; host = host.parent)
         {
-            foreach (var behaviour in host.GetComponents<MonoBehaviour>()) yield return behaviour;
+            host.GetComponents(actionBehaviours);
+            for (int i = 0; i < actionBehaviours.Count; i++) yield return actionBehaviours[i];
             if (host == primary.transform) yield break;
         }
     }
@@ -294,7 +297,8 @@ public sealed class PlayerInteractor : MonoBehaviour
         for (Transform host = closest.transform; host != null; host = host.parent)
         {
             bool foundDefault = false;
-            foreach (var behaviour in host.GetComponents<MonoBehaviour>())
+            host.GetComponents(targetBehaviours);
+            foreach (var behaviour in targetBehaviours)
             {
                 if (!(behaviour is IInteractable candidate)) continue;
                 if (KeyFor(candidate) == KeyCode.E) foundDefault = true;
