@@ -26,6 +26,7 @@ public sealed class GameplayAudio : MonoBehaviour
     [SerializeField] private AudioClip[] axeWoodHits;
     [SerializeField] private AudioClip hammerMetal, hammerWood, pickUp, drop;
     [SerializeField] private AudioClip hitAir;
+    [SerializeField] private AudioClip switchInstruments;
     [SerializeField] private AudioClip closeBag;
     [SerializeField] private AudioClip drinkingBottle;
     public float BottleDrinkDuration => drinkingBottle != null ? drinkingBottle.length : 1.9f;
@@ -140,6 +141,7 @@ public sealed class GameplayAudio : MonoBehaviour
     public void PestHit(bool crow, Vector3 point) => PlayAt(crow ? Choose(crowHits) : ratHit, point, .8f);
     public void CrowFlyAway(Vector3 point) => PlayAt(crowFlyAway, point, .65f);
     public void BroomHit() => Play(Choose(broomHits), .75f);
+    public void SwitchInstruments() => Play(switchInstruments, .8f);
     public void ToolSwing() => Play(hitAir, .75f);
     public void CloseContainer() => Play(closeBag, .8f);
     public void PressWeighButton() => Play(pressButton, .8f);

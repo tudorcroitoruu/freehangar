@@ -57,7 +57,45 @@ public sealed class PlayerCombatTools : MonoBehaviour
     private Vector3 broomRestPosition, hammerRestPosition, sledgeRestPosition;
     private Quaternion broomRestRotation, hammerRestRotation, sledgeRestRotation;
 
+    private float switchStarted = -10f;
+    private Tool outgoingTool;
+    private bool switching;
+    private readonly System.Collections.Generic.Dictionary<Tool, Transform> switchPivots = new();
+    public bool IsSwitching => switching;
     public Tool Equipped => equipped;
+
+    private Transform SwitchPivot(Tool tool)
+    {
+        if (switchPivots.TryGetValue(tool, out var pivot)) return pivot;
+        var model = GetHeldModel(tool);
+        if (model == null) return null;
+        pivot = new GameObject("Tool switch pivot").transform;
+        pivot.SetParent(model.parent, false);
+        model.SetParent(pivot, false);
+        switchPivots.Add(tool, pivot);
+        return pivot;
+    }
+
+    private void FinishSwitch()
+    {
+        switching = false;
+        foreach (var pivot in switchPivots.Values)
+            if (pivot != null) pivot.localPosition = Vector3.zero;
+        ApplyVisuals();
+    }
+
+    private void AdvanceSwitch()
+    {
+        const float halfDuration = .16f;
+        float elapsed = Time.time - switchStarted;
+        if (elapsed >= halfDuration * 2f) { FinishSwitch(); return; }
+        Tool shown = elapsed < halfDuration ? outgoingTool : equipped;
+        ApplyVisuals();
+        var pivot = SwitchPivot(shown);
+        float lower = elapsed < halfDuration ? Mathf.SmoothStep(0f, 1f, elapsed / halfDuration)
+            : 1f - Mathf.SmoothStep(0f, 1f, (elapsed - halfDuration) / halfDuration);
+        if (pivot != null) pivot.localPosition = Vector3.down * (.65f * lower);
+    }
 
     private void Awake()
     {
@@ -89,6 +127,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
     public void Tick(bool acceptInput, bool wasLocked)
     {
         if(!IsUnlocked(equipped)) { equipped=Tool.Shovel;CancelStrike();ApplyVisuals(); }
+        if (switching) AdvanceSwitch();
         RestoreSelectedVisuals();
         if (!acceptInput || (interactor != null && interactor.DiscoveryBusy)) { CancelStrike(); return; }
         if (equipped == Tool.Pistol && reloadSoundPending && Time.time >= lastShot + .18f)
@@ -123,7 +162,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
 
     public bool TryStartStrike()
     {
-        if (!isActiveAndEnabled || !IsUnlocked(equipped) || equipped == Tool.Shovel || viewCamera == null ||
+        if (switching || !isActiveAndEnabled || !IsUnlocked(equipped) || equipped == Tool.Shovel || viewCamera == null ||
             Time.timeScale<=0 || Time.time < strikeStart + StrikeDuration ||
             (bags!=null && bags.IsCarrying) || (interactor!=null && (interactor.HandsOccupied || interactor.DiscoveryBusy))) return false;
         if (equipped == Tool.Pistol)
@@ -170,7 +209,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
     }
 
     private void CancelStrike() { impactPending=false;strikeStart=-10f;reloadSoundPending=false; }
-    private void OnDisable() => CancelStrike();
+    private void OnDisable() { CancelStrike(); if (switching) FinishSwitch(); }
 
     private void PerformStrike()
     {
@@ -234,6 +273,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
 
     public bool TryEquip(Tool tool)
     {
+        if (switching) return false;
         if(!IsUnlocked(tool) || (interactor!=null && interactor.DiscoveryBusy))return false;
         if (bags != null && bags.IsCarrying && !bags.TryInteract()) return false;
         if (interactor != null && interactor.Items != null && interactor.Items.IsCarrying && !interactor.Items.TryPlace()) return false;
@@ -245,7 +285,16 @@ public sealed class PlayerCombatTools : MonoBehaviour
         if (tool != Tool.Shovel && GetHeldModel(tool) == null) return false;
         if (shovelTool != null) shovelTool.CancelAction();
         reloadSoundPending = false;
+        outgoingTool = equipped;
         equipped = tool;
+        if (Application.isPlaying && !WorldSaveRuntime.IsRestoring && !WorldSaveRuntime.IsSeeking)
+        {
+            switchStarted = Time.time;
+            switching = true;
+            SwitchPivot(outgoingTool);
+            SwitchPivot(equipped);
+            GameplayAudio.Instance?.SwitchInstruments();
+        }
         strikeStart = -10f;
         impactPending = false;
         ApplyVisuals();
@@ -254,6 +303,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
 
     public void HideForPushing(System.Collections.Generic.List<GameObject> hidden)
     {
+        if (switching) FinishSwitch();
         strikeStart = -10f;
         impactPending = false;
         foreach (var tool in new[] { heldBroom, heldAxe, heldSledgehammer, heldPistol })
@@ -297,12 +347,13 @@ public sealed class PlayerCombatTools : MonoBehaviour
             SetHeldLayer(heldAxe, layer);
             SetHeldLayer(heldSledgehammer, layer);
         }
-        if (shovelTool != null) shovelTool.enabled=equipped==Tool.Shovel;
-        if (shovelHands != null) shovelHands.gameObject.SetActive(equipped == Tool.Shovel);
-        if (heldPistol != null) heldPistol.gameObject.SetActive(equipped == Tool.Pistol);
-        if (heldBroom != null) heldBroom.gameObject.SetActive(equipped == Tool.Broom);
-        if (heldAxe != null) heldAxe.gameObject.SetActive(equipped == Tool.Axe);
-        if (heldSledgehammer != null) heldSledgehammer.gameObject.SetActive(equipped == Tool.Hammer);
+        Tool shown = switching && Time.time - switchStarted < .16f ? outgoingTool : equipped;
+        if (shovelTool != null) shovelTool.enabled=!switching && equipped==Tool.Shovel;
+        if (shovelHands != null) shovelHands.gameObject.SetActive(shown == Tool.Shovel);
+        if (heldPistol != null) heldPistol.gameObject.SetActive(shown == Tool.Pistol);
+        if (heldBroom != null) heldBroom.gameObject.SetActive(shown == Tool.Broom);
+        if (heldAxe != null) heldAxe.gameObject.SetActive(shown == Tool.Axe);
+        if (heldSledgehammer != null) heldSledgehammer.gameObject.SetActive(shown == Tool.Hammer);
     }
 
     private static void SetHeldLayer(Transform root, int layer)

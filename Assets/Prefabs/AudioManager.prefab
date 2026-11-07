@@ -391,6 +391,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: b87bdcb29e132734592d487eabee2143, type: 3}
   - {fileID: 8300000, guid: b0e3db8e8f6196a478f3df81c29febe7, type: 3}
   vacuum: {fileID: 8300000, guid: 22d62c6b4244af94e8ed02060c747a58, type: 3}
+  switchInstruments: {fileID: 8300000, guid: dc26554963a47ea48aa34b6c56ae8151, type: 3}
   resetVehicle: {fileID: 8300000, guid: 475cd1d870a626d46ab143bcf88f22ed, type: 3}
   bicycleMove: {fileID: 8300000, guid: 82cf4d9dce0d75b4f8d730605297fff0, type: 3}
   bicycleScratch: {fileID: 8300000, guid: 26e039b91e196e24c93fd92db5eb3c19, type: 3}
