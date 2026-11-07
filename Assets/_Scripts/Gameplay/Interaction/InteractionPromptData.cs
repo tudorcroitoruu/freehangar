@@ -14,6 +14,8 @@ public struct InteractionPromptData
     public bool VehicleFull;
     public bool NotFitInWheelBarrow;
     public bool NotHungry;
+    public bool WeighingEmpty;
+    public bool WeighingWrong;
     public bool UseForkliftToMove;
     public bool DogResting;
     public bool ShowPrimaryButton;
@@ -36,6 +38,8 @@ public struct InteractionPromptData
         VehicleFull = false;
         NotFitInWheelBarrow = false;
         NotHungry = false;
+        WeighingEmpty = false;
+        WeighingWrong = false;
         UseForkliftToMove = false;
         DogResting = false;
         ShowPrimaryButton = false;

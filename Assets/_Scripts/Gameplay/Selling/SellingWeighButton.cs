@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>Place on the physical weighs button, with a non-trigger collider.</summary>
 [DisallowMultipleComponent]
@@ -7,27 +8,27 @@ public sealed class SellingWeighButton : MonoBehaviour, IInteractable
     [SerializeField] private SellingZone sellingZone;
     [SerializeField] private Transform promptAnchor;
     [SerializeField] private Vector3 promptOffset = Vector3.up * .2f;
+    private readonly List<GrainContainer> containers = new List<GrainContainer>();
     private Vector3 PromptPosition => (promptAnchor != null ? promptAnchor.position : transform.position) + promptOffset;
 
     private void Reset() => sellingZone = GetComponentInParent<SellingZone>();
 
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
     {
-        bool ready = sellingZone != null && sellingZone.CanWeigh(interactor);
-        string action = ready ? "Start weighing" : "Place filled containers on the scale and step off";
-        if (!ready && sellingZone != null)
+        prompt = default;
+        if (!isActiveAndEnabled || sellingZone == null || !sellingZone.isActiveAndEnabled || interactor == null ||
+            UpgradeManager.BlocksGameplayInput || UIPopups.BasePopupUI.HasActivePopup) return false;
+        bool wrong = sellingZone.HasBlockingOccupants || sellingZone.Contains(interactor);
+        sellingZone.CollectContainers(containers);
+        bool empty = !wrong && containers.Count == 0;
+        bool ready = !wrong && !empty && sellingZone.CanWeigh(interactor);
+        prompt = new InteractionPromptData(PromptPosition, "Start weighing", ready)
         {
-            if (sellingZone.HasVehicleOnScale) action = "Unload containers and move the vehicle off the scale";
-            else if (interactor != null && sellingZone.Contains(interactor)) action = "Step off the scale";
-            else if (sellingZone.HasBlockingOccupants) action = "Clear the scale: containers only";
-            else if (interactor != null && interactor.HandsOccupied) action = "Free your hands before weighing";
-        }
-        prompt = new InteractionPromptData(
-            PromptPosition,
-            action, ready);
-        prompt.RequiresFreeHands = interactor != null && interactor.HandsOccupied;
-        return isActiveAndEnabled && sellingZone != null && interactor != null &&
-            !UpgradeManager.BlocksGameplayInput && !UIPopups.BasePopupUI.HasActivePopup;
+            WeighingWrong = wrong,
+            WeighingEmpty = empty,
+            RequiresFreeHands = !wrong && !empty && interactor.HandsOccupied
+        };
+        return true;
     }
 
     public bool TryInteract(PlayerInteractor interactor)

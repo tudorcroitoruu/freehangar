@@ -14,6 +14,7 @@ public sealed class GrainWeighStation : MonoBehaviour
     public const string RedButtonInstruction = "Press on red weight button on right side of the weighting machine";
 
     private void OnEnable() => RefreshStatus();
+    private void OnDisable() => SetWrongWarning(false);
 
     private void Update()
     {
@@ -29,28 +30,22 @@ public sealed class GrainWeighStation : MonoBehaviour
         if (player == null) player = FindFirstObjectByType<PlayerInteractor>();
         if (sellingZone == null || !sellingZone.isActiveAndEnabled)
         {
+            SetWrongWarning(false);
             SetStatus("WEIGHING UNAVAILABLE", Color.yellow);
             return;
         }
-        if (sellingZone.HasVehicleOnScale)
+        bool wrong = sellingZone.HasVehicleOnScale || (player != null && sellingZone.Contains(player)) ||
+            sellingZone.HasBlockingOccupants;
+        SetWrongWarning(wrong);
+        if (wrong)
         {
-            SetStatus("Unload the containers, then move the vehicle off the scale.\n" + RedButtonInstruction, new Color(1, .55f, .15f));
-            return;
-        }
-        if (player != null && sellingZone.Contains(player))
-        {
-            SetStatus("Step off the scale. Only containers may remain.\n" + RedButtonInstruction, new Color(1, .55f, .15f));
-            return;
-        }
-        if (sellingZone.HasBlockingOccupants)
-        {
-            SetStatus("Remove people and other objects. Only containers may remain.\n" + RedButtonInstruction, new Color(1, .55f, .15f));
+            SetStatus("", Color.white);
             return;
         }
         sellingZone.CollectContainers(containers);
         if (containers.Count == 0)
         {
-            SetStatus("Place filled grain containers on the scale.\n" + RedButtonInstruction, Color.white);
+            SetStatus("Place containers with grain on the scale.\n" + RedButtonInstruction, Color.white);
             return;
         }
         SetStatus("READY TO WEIGH\n" + RedButtonInstruction, new Color(.5f, 1, .65f));
@@ -63,4 +58,7 @@ public sealed class GrainWeighStation : MonoBehaviour
         if (statusText.text != message) statusText.text = message;
         statusText.color = color;
     }
+
+    private void SetWrongWarning(bool visible) =>
+        GameplayCanvas.Instance?.SetWarning(WarningType.weighingWrong, this, visible);
 }

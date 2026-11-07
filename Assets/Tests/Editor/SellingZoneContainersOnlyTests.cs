@@ -34,7 +34,7 @@ public class SellingZoneContainersOnlyTests
         button.TryGetPrompt(player,out var prompt);Assert.IsTrue(prompt.ShowKey);Assert.That(prompt.Action,Is.EqualTo("Start weighing"));
         vehicle.transform.localPosition=Vector3.up;Physics.SyncTransforms();
         Assert.IsTrue(zone.HasVehicleOnScale);Assert.IsFalse(zone.CanWeigh(player));
-        button.TryGetPrompt(player,out prompt);Assert.IsFalse(prompt.ShowKey);StringAssert.Contains("move the vehicle off",prompt.Action);
+        button.TryGetPrompt(player,out prompt);Assert.IsFalse(prompt.ShowKey);Assert.IsTrue(prompt.WeighingWrong);
         Assert.IsFalse(button.TryInteract(player));
         vehicle.transform.localPosition=Vector3.forward*20;Physics.SyncTransforms();Assert.IsTrue(zone.CanWeigh(player));
     }
@@ -48,6 +48,23 @@ public class SellingZoneContainersOnlyTests
         container.transform.SetParent(root.transform,true);Physics.SyncTransforms();
         zone.CollectContainers(collected);Assert.AreEqual(1,collected.Count);Assert.IsFalse(zone.CanWeigh(player));
         vehicle.transform.localPosition=Vector3.forward*20;Physics.SyncTransforms();Assert.IsTrue(zone.CanWeigh(player));
+    }
+
+    [TestCase(1f)]
+    [TestCase(10f)]
+    [TestCase(25f)]
+    public void PartiallyFilledContainersCanBeWeighedForSale(float kilograms)
+    {
+        container.SetDemonstrationFill(kilograms);
+        Assert.IsFalse(container.IsFull);
+        Assert.IsTrue(zone.CanWeigh(player));
+        zone.CollectContainers(collected);
+        Assert.That(collected, Is.EquivalentTo(new[] { container }));
+        Assert.IsTrue(button.TryGetPrompt(player, out var prompt));
+        Assert.IsTrue(prompt.ShowKey);
+        Assert.IsFalse(prompt.WeighingEmpty);
+        Assert.IsFalse(prompt.WeighingWrong);
+        Assert.AreEqual(kilograms, container.Kilograms);
     }
 
     [TestCase(true)]
