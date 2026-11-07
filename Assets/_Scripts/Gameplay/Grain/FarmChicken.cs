@@ -31,6 +31,9 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     private Vector3 homePosition;
     private float decisionAt, fleeUntil, hitAt = -10f, nextHit, deathAt = -1f, nextSound;
     private NavMeshPath path;
+    private GrainPile[] grainPiles;
+    private Vector3 safePosition;
+    private Material[] hitMaterials;
     public bool IsDead => deathAt >= 0f;
     public GameObject LastDrop { get; private set; }
     public static bool AxeDiscovered => BuriedFind.WasFound(SaveSystem.Data, PlayerCombatTools.AxeFindId) ||
@@ -41,9 +44,19 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         agent = GetComponent<NavMeshAgent>();
         homePosition = transform.position;
         path = new NavMeshPath();
+        grainPiles = FindObjectsByType<GrainPile>(FindObjectsSortMode.None);
+        safePosition = transform.position;
         if (!visual) visual = transform.GetChild(0);
         visualRest = visual.localPosition; originalScale = visual.localScale;
         renderers = visual.GetComponentsInChildren<Renderer>(true);
+        var materials = new System.Collections.Generic.List<Material>();
+        foreach (var renderer in renderers)
+            foreach (var material in renderer.materials)
+            {
+                material.EnableKeyword("_EMISSION");
+                materials.Add(material);
+            }
+        hitMaterials = materials.ToArray();
         flash = new MaterialPropertyBlock();
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.spatialBlend = 1f; audioSource.maxDistance = 22f;
@@ -68,13 +81,13 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             if (terrain)
                 candidate.y = terrain.SampleHeight(candidate) + terrain.transform.position.y;
 
-            if (!NavMesh.SamplePosition(candidate, out var hit, 2f, agent.areaMask) || !InsideYard(hit.position))
+            if (!NavMesh.SamplePosition(candidate, out var hit, 2f, agent.areaMask) || !InsideYard(hit.position) || !GrainClear(hit.position))
                 continue;
             if (!agent.CalculatePath(hit.position, path) || path.status != NavMeshPathStatus.PathComplete)
                 continue;
             if (agent.Warp(hit.position))
             {
-                homePosition = hit.position;
+                homePosition = safePosition = hit.position;
                 return;
             }
         }
@@ -88,17 +101,30 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             visual.localPosition = visualRest + transform.InverseTransformDirection(knockDirection) * Mathf.Min(t, .5f)
                 + Vector3.up * (Mathf.Max(0, 2.4f*t - 4.9f*t*t) + .22f*Mathf.Clamp01(t*2f));
             visual.localRotation = Quaternion.Euler(0, 0, Mathf.Min(90, t*180));
-            visual.localScale = originalScale * (1-Mathf.Clamp01((t-.7f)/.45f));
+            visual.localScale = originalScale * (1f + (t < .3f ? .25f * Mathf.Sin(t / .3f * Mathf.PI) : 0f)) * (1-Mathf.Clamp01((t-.7f)/.45f));
+            if (t >= .18f)
+            {
+                flash.Clear();
+                foreach (var renderer in renderers) renderer.SetPropertyBlock(flash);
+            }
             if (t > 1.2f) Destroy(gameObject);
             return;
         }
         float hop = Time.time-hitAt;
         visual.localPosition = visualRest + Vector3.up * (hop < .5f ? Mathf.Sin(hop/.5f*Mathf.PI)*.35f : 0);
+        visual.localScale = originalScale * (1f + (hop < .3f ? .25f * Mathf.Sin(hop / .3f * Mathf.PI) : 0f));
         bool red = hop < .18f;
         flash.Clear();
-        if (red) { flash.SetColor("_BaseColor", Color.red); flash.SetColor("_EmissiveColor", Color.red*4); }
+        if (red) { flash.SetColor("_BaseColor", Color.red); flash.SetColor("_EmissiveColor", Color.red*4); flash.SetColor("_EmissionColor", Color.red*4); }
         foreach (var r in renderers) r.SetPropertyBlock(flash);
         if (!agent.isOnNavMesh) return;
+        if (!GrainSegmentClear(safePosition, transform.position))
+        {
+            agent.Warp(safePosition);
+            agent.ResetPath();
+            decisionAt = 0f;
+        }
+        else safePosition = transform.position;
         bool fleeing = Time.time < fleeUntil;
         if (threat) lastThreat = threat.position;
         // Reject even an intermediate path segment that would bring a fleeing bird closer.
@@ -151,13 +177,14 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             Vector3 direction = fleeing ? Quaternion.Euler(0,Random.Range(-70f,70f),0)*away
                 : Quaternion.Euler(0,Random.Range(0f,360f),0)*Vector3.forward;
             Vector3 candidate=transform.position+direction*Random.Range(3f,10f);
-            if (!InsideYard(candidate) || !NavMesh.SamplePosition(candidate,out var hit,2f,agent.areaMask) || !InsideYard(hit.position)) continue;
+            if (!InsideYard(candidate) || !NavMesh.SamplePosition(candidate,out var hit,2f,agent.areaMask) || !InsideYard(hit.position) || !GrainClear(hit.position)) continue;
             if (!fleeing && Vector3.ProjectOnPlane(hit.position-homePosition,Vector3.up).sqrMagnitude > wanderRadius*wanderRadius) continue;
             if (!agent.CalculatePath(hit.position,path) || path.status!=NavMeshPathStatus.PathComplete) continue;
             bool safe=true; Vector3 previous=transform.position;
             foreach(var corner in path.corners)
             {
                 if (fleeing && Vector3.Dot(corner-previous,previous-lastThreat)<-.01f) { safe=false;break; }
+                if (!GrainSegmentClear(previous, corner)) { safe=false; break; }
                 previous=corner;
             }
             if (safe) { agent.SetPath(path);return; }
@@ -169,14 +196,14 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     {
         if (IsDead || damage<=0 || Time.time<nextHit) return false;
         nextHit=Time.time+.25f; hitAt=Time.time; health-=damage;
-        flash.Clear(); flash.SetColor("_BaseColor", Color.red); flash.SetColor("_EmissiveColor", Color.red*4);
+        flash.Clear(); flash.SetColor("_BaseColor", Color.red); flash.SetColor("_EmissiveColor", Color.red*4); flash.SetColor("_EmissionColor", Color.red*4);
         foreach(var r in renderers)r.SetPropertyBlock(flash);
         threat=attacker;lastThreat=source;fleeUntil=Time.time+15f;decisionAt=0;
         knockDirection=Vector3.ProjectOnPlane(transform.position-source,Vector3.up).normalized*2f;
         if (agent.isOnNavMesh)
         {
             var target=transform.position+knockDirection*.4f;
-            if(InsideYard(target) && !NavMesh.Raycast(transform.position,target,out _,agent.areaMask)) agent.Move(knockDirection*.4f);
+            if(InsideYard(target) && GrainSegmentClear(transform.position, target) && !NavMesh.Raycast(transform.position,target,out _,agent.areaMask)) agent.Move(knockDirection*.4f);
         }
         if (health>0) Play(hitSounds);
         else
@@ -191,6 +218,34 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             Died?.Invoke();
         }
         return true;
+    }
+    private bool GrainClear(Vector3 point)
+    {
+        foreach (var pile in grainPiles)
+        {
+            if (!pile || !pile.isActiveAndEnabled) continue;
+            for (int i = 0; i < 5; i++)
+            {
+                Vector3 probe = point + (i == 0 ? Vector3.zero :
+                    Quaternion.Euler(0f, (i - 1) * 90f, 0f) * Vector3.forward * .3f);
+                Vector3 local = pile.transform.InverseTransformPoint(probe);
+                if (Mathf.Abs(local.x) > pile.Size * .5f || Mathf.Abs(local.z) > pile.Size * .5f) continue;
+                if (pile.SampleLocalHeight(local.x, local.z) > .02f && pile.SurfaceHeight(probe) > point.y + .1f)
+                    return false;
+            }
+        }
+        return true;
+    }
+    private bool GrainSegmentClear(Vector3 from, Vector3 to)
+    {
+        int steps = Mathf.Max(1, Mathf.CeilToInt(Vector3.Distance(from, to) / .2f));
+        for (int i = 1; i <= steps; i++)
+            if (!GrainClear(Vector3.Lerp(from, to, (float)i / steps))) return false;
+        return true;
+    }
+    private void OnDestroy()
+    {
+        if (hitMaterials != null) foreach (var material in hitMaterials) if (material) Destroy(material);
     }
     public bool HitByVehicle(BicycleController vehicle)
     {
