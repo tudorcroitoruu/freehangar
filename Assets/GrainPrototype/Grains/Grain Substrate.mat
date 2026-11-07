@@ -19,7 +19,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties: _Brightness
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -49,6 +49,8 @@ Material:
     - _DetailScale: 48
     - _GrainType: -1
     - _KernelMode: 0
+    - _SurfaceHeightStrength: 0.0404
+    - _SurfaceNormalStrength: 3.31
     - _UsePileSurface: 0
     - _UseSpatialGrain: 0
     - _UseSurfaceDetail: 0

@@ -9,6 +9,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
         _Brightness("Brightness", Range(0.1,2)) = 0.8
         _DetailScale("Substrate grain scale", Float) = 48
         _SurfaceNormalStrength("Grain normal strength", Range(0, 4)) = 1.4
+        _SurfaceHeightStrength("Grain height depth", Range(0, 0.08)) = 0.025
         [HideInInspector] _GrainSurfaceDetail("Grain surface normals and height", 2DArray) = "" {}
         [HideInInspector] _UseSurfaceDetail("Textured grain surface", Float) = 0
         [HideInInspector] _GrainType("Particle crop override", Float) = -1
@@ -29,6 +30,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
     float _KernelMode, _Brightness, _DetailScale;
     float _UseSurfaceDetail;
     float _SurfaceNormalStrength;
+    float _SurfaceHeightStrength;
     float _UseSpatialGrain;
     float4 _GrainGrid;
     float4x4 _GrainWorldToLocal;
@@ -213,6 +215,22 @@ Shader "Freehangar/HDRP/Grain Kernels"
         float4 x = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.yz, type);
         float4 y = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xz, type);
         float4 z = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xy, type);
+        // Each species stores its baked height in B. A single parallax offset
+        // adds close-up depth without ray marching or additional geometry.
+        float3 toCamera = GetWorldSpaceViewDir(GetCameraRelativePositionWS(i.world));
+        float depth = _SurfaceHeightStrength * (1 - smoothstep(3, 8, length(toCamera)));
+        UNITY_BRANCH
+        if (depth > .00001)
+        {
+            float3 view = normalize(toCamera);
+            // Limit grazing-angle offsets to avoid stretched / swimming kernels.
+            float2 offsetX = view.yz / max(abs(view.x), .4) * ((x.b - .5) * depth);
+            float2 offsetY = view.xz / max(abs(view.y), .4) * ((y.b - .5) * depth);
+            float2 offsetZ = view.xy / max(abs(view.z), .4) * ((z.b - .5) * depth);
+            x = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.yz + offsetX, type);
+            y = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xz + offsetY, type);
+            z = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xy + offsetZ, type);
+        }
         float2 nx = x.rg * 2 - 1, ny = y.rg * 2 - 1, nz = z.rg * 2 - 1;
         float3 bump = float3(0, nx.x, nx.y) * blend.x + float3(ny.x, 0, ny.y) * blend.y +
             float3(nz.x, nz.y, 0) * blend.z;
