@@ -295,6 +295,25 @@ public class PlayerToolInteractionTests
         var data=new SerializedObject(wall);data.FindProperty("material").enumValueIndex=material;data.FindProperty("barrierId").stringValue="test.wall";data.ApplyModifiedPropertiesWithoutUndo();
         typeof(BreakableGrainBarrier).GetField("exposed",Private).SetValue(wall,true);Physics.SyncTransforms();return wall;
     }
+    [Test]
+    public void PistolMetalPanelsIgnoreWoodDiscoveryAndRecoverIncorrectlyHiddenSaves()
+    {
+        var wall = Wall(1);
+        var data = new SerializedObject(wall);
+        data.FindProperty("barrierId").stringValue = "farm.pistol.box.panel.0";
+        data.FindProperty("alwaysExposed").boolValue = true;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        typeof(BreakableGrainBarrier).GetMethod("Awake", Private).Invoke(wall, null);
+        SaveSystem.Data.foundSecrets = new[] { "farm.pistol.box.panel.0", "farm.pistol.box.wood.panel.0" };
+        Assert.IsFalse(wall.IsBroken);
+        Assert.IsTrue(wall.RestoreSave(0, true, false), "An untouched panel hidden by the shared ID must return.");
+        Assert.IsTrue(wall.GetComponent<BoxCollider>().enabled);
+        Assert.IsFalse(wall.RestoreSave(3, true, false), "A genuinely destroyed panel must stay broken.");
+        Assert.IsTrue(wall.IsBroken);
+        wall.RestoreSave(0, true);
+        SaveSystem.Data.foundSecrets = new[] { "farm.pistol.box.metal.panel.0" };
+        Assert.IsTrue(wall.IsBroken);
+    }
     private Transform Child(string name){var go=new GameObject(name);go.transform.SetParent(root.transform,false);return go.transform;}
 
     [Test]

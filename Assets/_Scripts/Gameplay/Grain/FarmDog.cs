@@ -263,6 +263,9 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
 
     private void AlertChicken()
     {
+        // Give the player three minutes to come to the located chicken, then
+        // release the hunt and use the normal return-home/sleep cycle.
+        if (Time.time - stateAt >= 180f) { GoHome(); return; }
         if (!target || target.IsDead || !target.isActiveAndEnabled) { GoHome(); return; }
         if (!nearbyPlayer)
         {
@@ -281,6 +284,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
 
     private void GoHome()
     {
+        ClearHint();
         target = null;
         rest = HuntInterval(Level);
         if (profile != null) profile.dogRestSeconds = rest;

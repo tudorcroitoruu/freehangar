@@ -13,7 +13,12 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
     [SerializeField] private GrainPile coveringPile;
 
     [SerializeField] private bool alwaysExposed;
-    public bool IsBroken => BuriedFind.WasFound(SaveSystem.Data, barrierId);
+    // Legacy scene copies used the same IDs for the wood and metal enclosures.
+    // Keep their discoveries independent, including in scenes authored with the old IDs.
+    private string PersistentId => !string.IsNullOrEmpty(barrierId) && barrierId.StartsWith("farm.pistol.box.panel.", StringComparison.Ordinal)
+        ? barrierId.Replace(".box.panel.", material == Material.Metal ? ".box.metal.panel." : ".box.wood.panel.")
+        : barrierId;
+    public bool IsBroken => hits >= hitsRequired || BuriedFind.WasFound(SaveSystem.Data, PersistentId);
     private BoxCollider blockingCollider;
     private Renderer[] visuals;
     private int hits;
@@ -28,7 +33,8 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
     {
         hits = Mathf.Clamp(savedHits, 0, hitsRequired);
         SetExposed(alwaysExposed || wasExposed);
-        // Older saves used a different wall's discovery ID for all six box panels.
+        // Per-object hit counts preserve genuine destruction when legacy shared
+        // discovery IDs cannot identify which enclosure was actually broken.
         return alwaysExposed ? !IsBroken : wasActive;
     }
 
@@ -43,7 +49,7 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        if (BuriedFind.WasFound(SaveSystem.Data, barrierId)) { gameObject.SetActive(false); return; }
+        if (IsBroken) { gameObject.SetActive(false); return; }
         if (exposed || Time.time < nextRevealCheck || coveringPile == null || !coveringPile.isActiveAndEnabled) return;
         nextRevealCheck = Time.time + .3f;
         if (AnyFaceUncovered(topHeight + .08f))
@@ -85,7 +91,7 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
     {
         prompt = default;
-        if (!isActiveAndEnabled || !exposed || BuriedFind.WasFound(SaveSystem.Data, barrierId)) return false;
+        if (!isActiveAndEnabled || !exposed || IsBroken) return false;
         string label = material == Material.Wood ? "Wooden Wall" : "Metal Wall";
         Bounds bounds = VisualBounds();
         prompt = new InteractionPromptData(new Vector3(bounds.center.x, bounds.max.y + .15f, bounds.center.z), label, false);
@@ -110,7 +116,7 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
         if (data.foundSecrets == null) data.foundSecrets = Array.Empty<string>();
         int index = data.foundSecrets.Length;
         Array.Resize(ref data.foundSecrets, index + 1);
-        data.foundSecrets[index] = barrierId;
+        data.foundSecrets[index] = PersistentId;
         // Keep destruction in the live profile; normal saves capture the world.
         // Capturing every grain height field synchronously here stalls the finishing strike.
         SpawnBreakParticles();

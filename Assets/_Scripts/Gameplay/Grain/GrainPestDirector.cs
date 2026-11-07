@@ -33,6 +33,53 @@ public sealed class GrainPest : MonoBehaviour
     private float RatGroupBite => economy != null ? economy.RatBiteKg : 1f;
     private float BirdGroupBite => economy != null ? economy.BirdBiteKg : 1f;
     private float nextIdleSound;
+    private float hitEffectAt = -1f;
+    private bool lethalHit;
+    private Vector3 hitRestScale;
+    private Renderer[] hitRenderers;
+    private MaterialPropertyBlock[] hitOriginalBlocks;
+    private MaterialPropertyBlock hitBlock;
+
+    public void PlayHitReaction(bool lethal = false)
+    {
+        if (hitEffectAt >= 0f) return;
+        if (lethal) ScaredAway();
+        lethalHit = lethal;
+        hitEffectAt = Time.time;
+        hitRestScale = transform.localScale;
+        hitRenderers = GetComponentsInChildren<Renderer>(true);
+        hitOriginalBlocks = new MaterialPropertyBlock[hitRenderers.Length];
+        hitBlock = new MaterialPropertyBlock();
+        for (int i = 0; i < hitRenderers.Length; i++)
+        {
+            hitOriginalBlocks[i] = new MaterialPropertyBlock();
+            hitRenderers[i].GetPropertyBlock(hitOriginalBlocks[i]);
+        }
+        UpdateHitReaction();
+    }
+
+    private void UpdateHitReaction()
+    {
+        if (hitEffectAt < 0f) return;
+        float phase = (Time.time - hitEffectAt) * 2f;
+        transform.localScale = hitRestScale * (1f + (phase < .3f ? .25f * Mathf.Sin(phase / .3f * Mathf.PI) : 0f));
+        for (int i = 0; i < hitRenderers.Length; i++)
+        {
+            var renderer = hitRenderers[i];
+            if (!renderer) continue;
+            renderer.SetPropertyBlock(hitOriginalBlocks[i]);
+            if (phase >= .25f) continue;
+            renderer.GetPropertyBlock(hitBlock);
+            hitBlock.SetColor("_HitFlashColor", new Color(4f, 0f, 0f, 1f));
+            hitBlock.SetColor("_BaseColor", Color.red);
+            hitBlock.SetColor("_EmissiveColor", Color.red * 4f);
+            hitBlock.SetColor("_EmissionColor", Color.red * 4f);
+            renderer.SetPropertyBlock(hitBlock);
+        }
+        if (phase < .5f) return;
+        hitEffectAt = -1f;
+        if (lethalHit) Destroy(gameObject);
+    }
     private Vector3 CrowPerchPoint()
     {
         Bounds bounds = Target.WorldBounds;
@@ -42,6 +89,7 @@ public sealed class GrainPest : MonoBehaviour
     }
     private void LateUpdate()
     {
+        UpdateHitReaction();
         RefreshWarning();
         // Follow the container after vehicle motion and cargo seating have been applied.
         if (IsCrow && crowPerched && !fleeing && Target != null && Target.isActiveAndEnabled)
@@ -123,6 +171,7 @@ public sealed class GrainPest : MonoBehaviour
     }
     private void Update()
     {
+        if (lethalHit) return;
         if(PlayerPerks.NoAttacksActive && !fleeing) ScaredAway();
         if (fleeing)
         {
