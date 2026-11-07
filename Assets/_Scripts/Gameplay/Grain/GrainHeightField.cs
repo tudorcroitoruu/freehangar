@@ -18,6 +18,7 @@ public sealed class GrainHeightField
     public Func<int, double, bool> CanRemove;
     public Func<int, double, double> LimitRemoval;
     internal bool PreserveScoopDepression;
+    internal bool CollectExposedSurface;
     public Action<int, int, double> Transferred;
     public float AreaAt(int index) => areas[index];
 
@@ -94,7 +95,7 @@ public sealed class GrainHeightField
             float weight = Mathf.Clamp01(1f - (dx * dx * metric.x * metric.x + dz * dz * metric.z * metric.z) / (radius * radius));
             int i = iz * Resolution + ix;
             if (areas[i] <= .00000001f || weight <= 0 || Heights[i] <= 0) continue;
-            removal[i] = Mathf.Min(Heights[i], depth * weight);
+            removal[i] = CollectExposedSurface ? Heights[i] : Mathf.Min(Heights[i], depth * weight);
             if (LimitRemoval != null)
                 removal[i] = (float)(Math.Min(removal[i] * (double)areas[i], Math.Max(0, LimitRemoval(i, removal[i] * (double)areas[i]))) / areas[i]);
             available += removal[i] * (double)areas[i];

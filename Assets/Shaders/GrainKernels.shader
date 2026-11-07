@@ -10,6 +10,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
         _DetailScale("Substrate grain scale", Float) = 48
         _SurfaceNormalStrength("Grain normal strength", Range(0, 4)) = 1.4
         _SurfaceHeightStrength("Grain height depth", Range(0, 0.08)) = 0.025
+        [HideInInspector] _SurfaceBlend("Pile shape interpolation", Float) = 1
         [HideInInspector] _GrainSurfaceDetail("Grain surface normals and height", 2DArray) = "" {}
         [HideInInspector] _UseSurfaceDetail("Textured grain surface", Float) = 0
         [HideInInspector] _GrainType("Particle crop override", Float) = -1
@@ -31,6 +32,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
     float _UseSurfaceDetail;
     float _SurfaceNormalStrength;
     float _SurfaceHeightStrength;
+    float _SurfaceBlend;
     float _UseSpatialGrain;
     float4 _GrainGrid;
     float4x4 _GrainWorldToLocal;
@@ -125,7 +127,8 @@ Shader "Freehangar/HDRP/Grain Kernels"
         if (t == 9) return float3(.27,.12,.055);
         return float3(.88,.49,.055);
     }
-    struct Attributes { float3 positionOS:POSITION; float3 normalOS:NORMAL; float2 uv1:TEXCOORD1; float2 uv2:TEXCOORD2; UNITY_VERTEX_INPUT_INSTANCE_ID };
+    struct Attributes { float3 positionOS:POSITION; float3 normalOS:NORMAL; float2 uv1:TEXCOORD1; float2 uv2:TEXCOORD2;
+        float3 previousPositionOS:TEXCOORD3; float3 previousNormalOS:TEXCOORD4; UNITY_VERTEX_INPUT_INSTANCE_ID };
     struct Varyings
     {
         float4 positionCS:SV_POSITION; float3 normalWS:TEXCOORD0; float3 local:TEXCOORD1;
@@ -147,6 +150,11 @@ Shader "Freehangar/HDRP/Grain Kernels"
         float overrideType = UNITY_ACCESS_INSTANCED_PROP(GrainInstances, _GrainType);
         if (overrideType >= 0) t = (int)overrideType;
         float3 p = input.positionOS, n = input.normalOS;
+        if (_KernelMode < .5 && _SurfaceBlend < 1)
+        {
+            p = lerp(input.previousPositionOS, p, _SurfaceBlend);
+            n = normalize(lerp(input.previousNormalOS, n, _SurfaceBlend));
+        }
         o.local = normalize(p + .00001);
         if (_KernelMode > .5 && t != 0)
         {

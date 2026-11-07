@@ -9,7 +9,7 @@ public sealed class InteractionHighlight : MonoBehaviour
     private Outline[] outlines = new Outline[0];
     private bool focused, shopVisible;
     private readonly Dictionary<Outline, (Color color, float width)> originalStyles = new();
-    private static readonly Color ShopFocusColor = new Color(1f, .42f, .04f);
+    private static readonly Color ShopFocusColor = new Color(1f, .65f, .04f);
 
     private void Reset() => outlines = GetComponentsInChildren<Outline>(true);
 

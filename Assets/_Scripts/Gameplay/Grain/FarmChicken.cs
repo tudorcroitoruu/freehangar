@@ -23,6 +23,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     private NavMeshAgent agent;
     private Transform threat;
     private Vector3 lastThreat, visualRest, knockDirection;
+    private Vector3 deathSlide;
     private Vector3 originalScale;
     private Renderer[] renderers;
     private MaterialPropertyBlock flash;
@@ -31,7 +32,21 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     private Vector3 homePosition;
     private float decisionAt, fleeUntil, hitAt = -10f, nextHit, deathAt = -1f, nextSound;
     private NavMeshPath path;
-    private GrainPile[] grainPiles;
+    private static GrainPile[] grainPiles;
+    private static float nextPileScan;
+    private float nextRecovery;
+    private static GrainPile[] CurrentPiles
+    {
+        get
+        {
+            if (grainPiles == null || !Application.isPlaying || Time.unscaledTime >= nextPileScan)
+            {
+                grainPiles = FindObjectsByType<GrainPile>(FindObjectsSortMode.None);
+                nextPileScan = Time.unscaledTime + .5f;
+            }
+            return grainPiles;
+        }
+    }
     private Vector3 safePosition;
     private static readonly RaycastHit[] supportHits = new RaycastHit[32];
     private float groundVisualOffset;
@@ -60,6 +75,17 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             nearest = hit.distance;
             found = true;
         }
+        // A ray starting inside a heap cannot hit its upward-facing surface.
+        // Read the live height field as well, including newly poured grain.
+        foreach (var pile in CurrentPiles)
+        {
+            if (!pile || !pile.isActiveAndEnabled || !pile.IsInsideBoundary(point)) continue;
+            Vector3 local = pile.transform.InverseTransformPoint(point);
+            if (Mathf.Abs(local.x) > pile.Size * .5f || Mathf.Abs(local.z) > pile.Size * .5f ||
+                pile.SampleLocalHeight(local.x, local.z) <= .00001f) continue;
+            float height = pile.SurfaceHeight(point);
+            if (!found || height > ground.y) { ground = new Vector3(point.x, height, point.z); found = true; }
+        }
         return found;
     }
     private bool raidAnnounced;
@@ -79,7 +105,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         if (hitCollider != null) hitColliderCenter = hitCollider.center;
         homePosition = transform.position;
         path = new NavMeshPath();
-        grainPiles = FindObjectsByType<GrainPile>(FindObjectsSortMode.None);
+        nextPileScan = 0;
         safePosition = transform.position;
         if (!visual) visual = transform.GetChild(0);
         visualRest = visual.localPosition; originalScale = visual.localScale;
@@ -136,7 +162,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         if (IsDead)
         {
             float t = Time.time - deathAt;
-            visual.localPosition = visualRest + transform.InverseTransformVector(Vector3.up * groundVisualOffset) + transform.InverseTransformDirection(knockDirection) * Mathf.Min(t, .5f)
+            visual.localPosition = visualRest + transform.InverseTransformVector(Vector3.up * groundVisualOffset + deathSlide * Mathf.Clamp01(t / .5f))
                 + Vector3.up * (Mathf.Max(0, 2.4f*t - 4.9f*t*t) + .22f*Mathf.Clamp01(t*2f));
             visual.localRotation = Quaternion.Euler(0, 0, Mathf.Min(90, t*180));
             visual.localScale = originalScale * (1f + (t < .3f ? .25f * Mathf.Sin(t / .3f * Mathf.PI) : 0f)) * (1-Mathf.Clamp01((t-.7f)/.45f));
@@ -161,7 +187,12 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         if (!agent.isOnNavMesh) return;
         if (!GrainSegmentClear(safePosition, transform.position))
         {
-            agent.Warp(safePosition);
+            if (GrainClear(safePosition)) agent.Warp(safePosition);
+            else if (Time.time >= nextRecovery)
+            {
+                nextRecovery = Time.time + .5f;
+                RecoverFromGrain();
+            }
             agent.ResetPath();
             decisionAt = 0f;
         }
@@ -252,15 +283,21 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         foreach(var r in renderers)r.SetPropertyBlock(flash);
         threat=attacker;lastThreat=source;fleeUntil=Time.time+15f;decisionAt=0;
         knockDirection=Vector3.ProjectOnPlane(transform.position-source,Vector3.up).normalized*2f;
+        nextPileScan = 0; // Hits must include grain poured since the last shared scan.
         if (agent.isOnNavMesh)
         {
-            var target=transform.position+knockDirection*.4f;
-            if(InsideYard(target) && GrainSegmentClear(transform.position, target) && !NavMesh.Raycast(transform.position,target,out _,agent.areaMask)) agent.Move(knockDirection*.4f);
+            Vector3 before = transform.position;
+            agent.ResetPath();
+            agent.Move(ClearKnockback(before, knockDirection * .4f));
+            if (!GrainClear(transform.position)) agent.Warp(before);
+            if (GrainClear(transform.position)) safePosition = transform.position;
         }
+        if (TryGroundPoint(transform.position, out var support)) groundVisualOffset = support.y - transform.position.y;
         if (health>0) Play(hitSounds);
         else
         {
             deathAt=Time.time;
+            deathSlide = ClearKnockback(transform.position, knockDirection * .5f);
             idleAudioSource.Stop();
             if(agent.isOnNavMesh)agent.ResetPath(); agent.enabled=false;
             foreach(var c in GetComponentsInChildren<Collider>())c.enabled=false;
@@ -271,9 +308,41 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         }
         return true;
     }
-    private bool GrainClear(Vector3 point)
+    private Vector3 ClearKnockback(Vector3 origin, Vector3 desired)
     {
-        foreach (var pile in grainPiles)
+        Vector3 cleared = Vector3.zero;
+        int steps = Mathf.Max(1, Mathf.CeilToInt(desired.magnitude / .08f));
+        for (int i = 1; i <= steps; i++)
+        {
+            Vector3 offset = desired * ((float)i / steps);
+            Vector3 point = origin + offset;
+            if (!InsideYard(point) || !GrainClear(point) ||
+                (agent.isOnNavMesh && NavMesh.Raycast(origin, point, out _, agent.areaMask))) break;
+            cleared = offset;
+        }
+        return cleared;
+    }
+    private void RecoverFromGrain()
+    {
+        for (float radius = .5f; radius <= 8f; radius *= 2)
+        for (int i = 0; i < 16; i++)
+        {
+            Vector3 candidate = transform.position + Quaternion.Euler(0, i * 22.5f, 0) * Vector3.forward * radius;
+            if (!NavMesh.SamplePosition(candidate, out var hit, .5f, agent.areaMask) ||
+                !InsideYard(hit.position) || !GrainClear(hit.position) ||
+                !TryGroundPoint(hit.position, out var support) || Mathf.Abs(support.y - hit.position.y) > .15f) continue;
+            if (!agent.Warp(hit.position)) continue;
+            safePosition = hit.position;
+            if (!GrainClear(homePosition)) homePosition = safePosition;
+            return;
+        }
+    }
+
+    private bool GrainClear(Vector3 point) => IsGrainClearAt(point);
+
+    public static bool IsGrainClearAt(Vector3 point)
+    {
+        foreach (var pile in CurrentPiles)
         {
             if (!pile || !pile.isActiveAndEnabled) continue;
             for (int i = 0; i < 5; i++)
@@ -282,6 +351,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
                     Quaternion.Euler(0f, (i - 1) * 90f, 0f) * Vector3.forward * .3f);
                 Vector3 local = pile.transform.InverseTransformPoint(probe);
                 if (Mathf.Abs(local.x) > pile.Size * .5f || Mathf.Abs(local.z) > pile.Size * .5f) continue;
+                if (!pile.IsInsideBoundary(probe)) continue;
                 if (pile.SampleLocalHeight(local.x, local.z) > .02f && pile.SurfaceHeight(probe) > point.y + .1f)
                     return false;
             }

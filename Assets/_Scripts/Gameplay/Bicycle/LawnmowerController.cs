@@ -55,7 +55,17 @@ public sealed class LawnmowerController : MonoBehaviour
     {
         // A trapped trailer must stop the kinematic tow vehicle instead of stretching the joint.
         if (trailerJoint == null || hitchTarget == null) return motion;
-        Vector3 gap = hitchTarget.position - trailerJoint.transform.TransformPoint(trailerJoint.anchor);
+        // Compare both anchors at the same physics time. The render-frame hitch target
+        // can lead the interpolated trailer by more than .25 m at normal driving speed.
+        var trailerBody = trailerJoint.GetComponent<Rigidbody>();
+        var connectedBody = trailerJoint.connectedBody;
+        Vector3 trailerAnchor = trailerBody.position + trailerBody.rotation *
+            Vector3.Scale(trailerJoint.anchor, trailerJoint.transform.lossyScale);
+        Vector3 connectedAnchor = connectedBody != null
+            ? connectedBody.position + connectedBody.rotation *
+                Vector3.Scale(trailerJoint.connectedAnchor, connectedBody.transform.lossyScale)
+            : trailerJoint.connectedAnchor;
+        Vector3 gap = connectedAnchor - trailerAnchor;
         gap.y = 0;
         if (gap.magnitude > .25f && Vector3.Dot(motion, gap) > 0) return Vector3.zero;
         float distance = motion.magnitude;

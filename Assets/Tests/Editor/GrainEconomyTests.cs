@@ -63,6 +63,17 @@ public class GrainEconomyTests
     }
 
     [Test]
+    public void ChickenDetectsPileEvenWhenGroundRayStartsInsideIt()
+    {
+        Set("initialHeight", 3f);
+        pile.RebuildPreview();
+        Vector3 buriedPosition = root.transform.position;
+        Assert.IsFalse(FarmChicken.IsGrainClearAt(buriedPosition));
+        Assert.IsTrue(FarmChicken.TryGroundPoint(buriedPosition, out var surface));
+        Assert.That(surface.y, Is.GreaterThanOrEqualTo(pile.SurfaceHeight(buriedPosition) - .001f));
+    }
+
+    [Test]
     public void MagnetSeparatesMatchingCropFromMixedSurfaceAndConservesOtherCrop()
     {
         pile.ConfigureRegions(new[] { new GrainRegion(100f, GrainType.Corn, GrainType.Wheat) });
@@ -94,6 +105,18 @@ public class GrainEconomyTests
     }
 
     [Test]
+    public void MagnetFillsCapacityEvenWithVeryShallowContactDepth()
+    {
+        pile.ConfigureRegions(new[] { new GrainRegion(100, GrainType.Wheat) });
+        var collected = new GrainCargo();
+        var point = new Vector3(0, pile.SurfaceHeight(Vector3.zero), 0);
+        float amount = pile.ScoopCompatibleWith(point, .3f, .00001f, 5, collected, new GrainCargo(), out bool blocked);
+        Assert.IsFalse(blocked);
+        Assert.That(amount, Is.EqualTo(5).Within(.001f));
+        Assert.That(collected[GrainType.Wheat], Is.EqualTo(5).Within(.001f));
+    }
+
+    [Test]
     public void EmptyShovelCannotCollectMixedNonSpatialRecipe()
     {
         pile.SetRecipe(new[] { new GrainLayer(100, GrainType.Corn, GrainType.Wheat) });
@@ -105,6 +128,101 @@ public class GrainEconomyTests
         Assert.That(amount, Is.Zero);
         Assert.That(collected.Total, Is.Zero);
         Assert.That(pile.Kilograms, Is.EqualTo(before));
+    }
+
+    [Test]
+    public void MostlyCornPatchFillsEmptyShovelWithOnlyCornAndLeavesRice()
+    {
+        var region = new GrainRegion(100, GrainType.Corn, GrainType.Rice);
+        typeof(GrainMixture).GetField("parts", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(region.layers[0].mixture, new[] {
+                new GrainMixture.Part(GrainType.Corn, 3), new GrainMixture.Part(GrainType.Rice, 1) });
+        pile.ConfigureRegions(new[] { region });
+        var point = new Vector3(0, pile.SurfaceHeight(Vector3.zero), 0);
+        var surface = new GrainCargo();
+        pile.SampleSurfaceGrain(point, surface);
+        Assert.That(surface[GrainType.Corn], Is.EqualTo(.75f).Within(.00001f));
+        Assert.That(surface[GrainType.Rice], Is.EqualTo(.25f).Within(.00001f));
+        double riceBefore = pile.GrainKilograms(GrainType.Rice);
+        var collected = new GrainCargo();
+        float amount = pile.ScoopCompatibleWith(point, .3f, .01f, 5, collected, new GrainCargo(), out bool blocked);
+        Assert.IsFalse(blocked);
+        Assert.That(amount, Is.EqualTo(5).Within(.001f));
+        Assert.That(collected[GrainType.Corn], Is.EqualTo(amount).Within(.001f));
+        Assert.That(collected[GrainType.Rice], Is.Zero);
+        Assert.That(pile.GrainKilograms(GrainType.Rice), Is.EqualTo(riceBefore).Within(.001));
+    }
+
+    [Test]
+    public void LocalAutoSortRaisesSelectedCropWithoutMovingOrLosingStock()
+    {
+        var field = new GrainHeightField(17, 4, 1, (x, z) => 1);
+        var region = new GrainRegion(100) { layers = new[] {
+            new GrainStratum(50, GrainType.Rice), new GrainStratum(50, GrainType.Corn) } };
+        var spatial = new GrainSpatialField(field, new[] { region }, GrainSpatialField.Arrangement.FrontToBack, 0, 1);
+        var beforeHeights = (float[])field.Heights.Clone();
+        double corn = spatial.VolumeOf(GrainType.Corn), rice = spatial.VolumeOf(GrainType.Rice);
+        Assert.IsTrue(spatial.BringCropToSurface(0, 0, .75f, Vector3.one, GrainType.Corn));
+        var sample = new GrainCargo(); spatial.Sample(0, 0, sample);
+        Assert.That(sample[GrainType.Corn], Is.EqualTo(1).Within(.000001));
+        spatial.Sample(1.5f, 0, sample);
+        Assert.That(sample[GrainType.Rice], Is.EqualTo(1).Within(.000001));
+        Assert.That(spatial.VolumeOf(GrainType.Corn), Is.EqualTo(corn).Within(1e-8));
+        Assert.That(spatial.VolumeOf(GrainType.Rice), Is.EqualTo(rice).Within(1e-8));
+        CollectionAssert.AreEqual(beforeHeights, field.Heights);
+        Assert.IsFalse(spatial.BringCropToSurface(0, 0, .75f, Vector3.one, GrainType.Corn));
+        var depositedRice = new float[GrainCargo.TypeCount]; depositedRice[(int)GrainType.Rice] = 1;
+        spatial.Deposit(8 * field.Resolution + 8, .001, depositedRice);
+        Assert.IsTrue(spatial.BringCropToSurface(0, 0, .75f, Vector3.one, GrainType.Corn),
+            "A new covering layer must invalidate the cached ordering.");
+        spatial.Dispose();
+    }
+
+    [Test]
+    public void MagnetExpandsPastEmptyInnerAreaToReachMatchingStock()
+    {
+        var field = new GrainHeightField(9, 8, 0);
+        var spatial = new GrainSpatialField(field, new[] { new GrainRegion(100, GrainType.Corn) },
+            GrainSpatialField.Arrangement.FrontToBack, 0, 1);
+        var corn = new float[GrainCargo.TypeCount]; corn[(int)GrainType.Corn] = 1;
+        spatial.Deposit(4 * field.Resolution + 7, .25, corn);
+        spatial.ReconcileHeights();
+        float radius = spatial.CollectionRadius(0, 0, 1.25f, 4.5f, Vector3.one, GrainType.Corn, .1);
+        Assert.That(radius, Is.GreaterThan(3).And.LessThanOrEqualTo(4.5f));
+        Assert.That(spatial.CollectionRadius(0, 0, 1.25f, 4.5f, Vector3.one, GrainType.Rice, .1), Is.EqualTo(4.5f));
+        spatial.Dispose();
+    }
+
+    [Test]
+    public void SavedSpillRepairsGhostHeightsAndCollectsConsecutiveCornLayers()
+    {
+        var field = new GrainHeightField(9, 2, 0);
+        var spatial = new GrainSpatialField(field, new[] { new GrainRegion(100, GrainType.Corn) },
+            GrainSpatialField.Arrangement.FrontToBack, 0, 731);
+        int center = 4 * field.Resolution + 4;
+        var corn = new float[GrainCargo.TypeCount]; corn[(int)GrainType.Corn] = 1;
+        var saved = new System.Collections.Generic.List<GrainColumnSave>();
+        for (int i = 0; i < 20; i++) saved.Add(new GrainColumnSave { index = center, volume = .0001, weights = (float[])corn.Clone() });
+        field.Heights[center] = .2f; // Old save: independent mesh height drifted.
+        field.Heights[center + 1] = .000002f; // No remaining typed grain here.
+        spatial.RestoreSave(saved);
+        Assert.That(field.Heights[center + 1], Is.Zero);
+        Assert.That(field.Volume, Is.EqualTo(.002).Within(1e-9));
+        Assert.That(spatial.VolumeOf(GrainType.Corn), Is.EqualTo(.002).Within(1e-9));
+        var allowed = new GrainCargo(); allowed.Add(GrainType.Corn, 1);
+        Assert.That(spatial.MatchingSurfaceVolume(center, 1, allowed), Is.EqualTo(.002).Within(1e-9));
+        var collected = new GrainCargo();
+        typeof(GrainSpatialField).GetField("CollectionFilter", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(spatial, allowed);
+        field.LimitRemoval = (cell, requested) => spatial.MatchingSurfaceVolume(cell, requested, allowed);
+        spatial.BeginCollection(collected, 1);
+        float amount = field.Scoop(0, 0, .1f, 1, 1);
+        spatial.EndCollection();
+        Assert.That(amount, Is.EqualTo(.002).Within(1e-8));
+        Assert.That(collected.Total, Is.EqualTo(amount).Within(1e-8));
+        Assert.That(field.Heights[center], Is.Zero);
+        Assert.That(spatial.VolumeOf(GrainType.Corn), Is.Zero.Within(1e-12));
+        spatial.Dispose();
     }
 
     [Test]

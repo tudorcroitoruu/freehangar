@@ -160,6 +160,22 @@ public sealed class ShovelTool : MonoBehaviour
             var pile = hit.collider.GetComponentInParent<GrainPile>();
             var container = hit.collider.GetComponentInParent<GrainContainer>();
             Vector3 scoopPoint = hit.point;
+            // Prefer compatible stock before choosing the closest pile. Otherwise
+            // an overlapping spill of another crop can steal the entire stroke.
+            if (cargo.Total > 0 && container == null &&
+                (pile != null || (hit.normal.y > .65f && hit.collider.attachedRigidbody == null)))
+            {
+                strokeGrain.Clear();
+                strokeGrain.Add(cargo.Dominant, 1);
+                float nearest = Mathf.Clamp(EffectiveScoopRadius * 3f, 1.25f, 2.5f);
+                foreach (var candidate in FindObjectsByType<GrainPile>(FindObjectsSortMode.None))
+                {
+                    if (!candidate.TryNearestSurface(hit.point, nearest, out var point, strokeGrain) ||
+                        !CanReachPoint(camera, player, point, reach, candidate.GetComponent<Collider>())) continue;
+                    nearest = Vector3.Distance(hit.point, point);
+                    pile = candidate; scoopPoint = point;
+                }
+            }
             if (pile == null && container == null && hit.normal.y > .65f && hit.collider.attachedRigidbody == null)
             {
                 float nearest = 1.25f;
@@ -187,16 +203,6 @@ public sealed class ShovelTool : MonoBehaviour
         if (pendingPile != null)
         {
             if (cargo.Total > 0) strokeGrain.Add(cargo.Dominant, 1);
-            else
-            {
-                pendingPile.SampleSurfaceGrain(targetPoint, strokeGrain);
-                if (strokeGrain.Total > 0)
-                {
-                    GrainType selected = strokeGrain.Dominant;
-                    strokeGrain.Clear();
-                    strokeGrain.Add(selected, 1);
-                }
-            }
         }
         availableAtStart = pendingContainer != null ? Kilograms : Mathf.Max(0, CapacityKg - Kilograms);
         if (pendingPile != null && grainPhysics != null) grainPhysics.BeginScoop();
@@ -415,7 +421,14 @@ public sealed class ShovelTool : MonoBehaviour
                 float collected = pendingPile.ScoopCompatibleWith(point, radius,
                     smallPileScoop ? Mathf.Max(.3f, EffectiveScoopDepth) : EffectiveScoopDepth,
                     Mathf.Min(amount, CapacityKg - Kilograms), scoopCargo, strokeGrain, out bool mixBlocked);
-                if (mixBlocked)
+                if (mixBlocked && scoopReported)
+                {
+                    // One click transfers over several frames. Exhausting its
+                    // selected crop is a completed partial scoop, not a second
+                    // attempt to mix crops. Finish the gesture without a warning.
+                    transferredFraction = 1f;
+                }
+                else if (mixBlocked && Kilograms > .0001f)
                 {
                     GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowedInShovel);
                     CancelAction();
@@ -433,6 +446,8 @@ public sealed class ShovelTool : MonoBehaviour
                 transferredFraction += collected / Mathf.Max(.0001f, availableAtStart);
                 if (collected > 0 && !scoopReported)
                 {
+                    strokeGrain.Clear();
+                    strokeGrain.Add(scoopCargo.Dominant, 1);
                     scoopReported = true;
                     GameplayAudio.Instance?.ShovelGet();
                     GrainScooped?.Invoke();
@@ -630,7 +645,7 @@ public sealed class ShovelTool : MonoBehaviour
         // The leveling references belong to LVL_1. Applying them to the other
         // authored shovel models changes their Editor poses even while idle.
         bool authoredPose = heldLevels != null && heldLevels.UsesAuthoredShovelPose;
-        rotation = motion * (authoredPose ? Quaternion.Slerp(Quaternion.identity, Quaternion.Euler(-4f, -12f, 0), carryBlend) :
+        rotation = motion * (authoredPose ? Quaternion.identity :
             Quaternion.Slerp(Quaternion.identity, levelCarryRotation, carryBlend)) * action;
         if (!authoredPose) rotation = LimitDownwardTilt(rotation);
         if (IsScooping)
@@ -642,7 +657,8 @@ public sealed class ShovelTool : MonoBehaviour
         }
         // Compose every cosmetic rotation at the same handle anchor, preserving its reach limit.
         offset = (IsBusy ? PositionOffset : idle) + restRotation * (action * gripInHands - rotation * gripInHands);
-        if (authoredPose && !IsBusy) offset += new Vector3(-.12f, .025f, .02f) * carryBlend;
+        // Loaded authored shovels keep their empty right-hand pose. Pouring and
+        // scooping already use this same rest pose as their animation endpoint.
     }
 
     private Quaternion LimitDownwardTilt(Quaternion rotation)

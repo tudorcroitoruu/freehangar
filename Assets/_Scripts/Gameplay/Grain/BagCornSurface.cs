@@ -31,12 +31,41 @@ public sealed class BagCornSurface : MonoBehaviour
     private uint randomState;
     private GrainContainer container;
     private readonly GrainAppearance grainAppearance = new GrainAppearance();
+    private readonly GrainAppearance kernelAppearance = new GrainAppearance();
+    private readonly float[] kernelTypes = new float[1023];
+    private int lastGrainType = -1;
+    private static readonly int GrainTypeId = Shader.PropertyToID("_GrainType");
+    private static readonly int KernelModeId = Shader.PropertyToID("_KernelMode");
+
+    private void RefreshGrainAppearance()
+    {
+        GrainType type = container != null ? container.AcceptedGrain : GrainType.Corn;
+        if (lastGrainType != (int)type)
+        {
+            lastGrainType = (int)type;
+            grainAppearance.Set(type);
+            grainAppearance.Block.SetFloat(KernelModeId, 0);
+            kernelAppearance.Set(type);
+            kernelAppearance.Block.SetFloat(KernelModeId, 1);
+            // Explicit instance types avoid any material/default corn override.
+            for (int i = 0; i < kernelTypes.Length; i++) kernelTypes[i] = (int)type;
+            kernelAppearance.Block.SetFloatArray(GrainTypeId, kernelTypes);
+        }
+        if (grainSurface == null) return;
+        // Legacy sack fill surfaces used the bag's fixed corn texture. Bind the
+        // same crop-aware shader as the kernels, in its solid-surface mode.
+        if (kernelMaterial != null && kernelMaterial.HasProperty(KernelModeId) &&
+            grainSurface.sharedMaterial != kernelMaterial) grainSurface.sharedMaterial = kernelMaterial;
+        grainSurface.SetPropertyBlock(grainAppearance.Block);
+    }
     public int KernelCount { get; private set; }
 
     private void OnEnable()
     {
         lastFill = -1;
         container = GetComponent<GrainContainer>();
+        lastGrainType = -1;
+        RefreshGrainAppearance();
         if (sack != null) sack.RefreshBindings();
         RenderPipelineManager.beginCameraRendering += Draw;
     }
@@ -46,6 +75,7 @@ public sealed class BagCornSurface : MonoBehaviour
     private void LateUpdate()
     {
         if (sack == null || grainSurface == null || kernelMesh == null || kernelMaterial == null) return;
+        RefreshGrainAppearance();
         if (lastFill == sack.Fill && lastClose == sack.Close && lastScale == grainSurface.transform.lossyScale)
         {
             if (lastTransform != grainSurface.transform.localToWorldMatrix) UpdateWorldMatrices();
@@ -171,11 +201,10 @@ public sealed class BagCornSurface : MonoBehaviour
     private void Draw(ScriptableRenderContext context, Camera camera)
     {
         if (KernelCount == 0 || kernelMesh == null || kernelMaterial == null || camera.cameraType == CameraType.Preview) return;
-        grainAppearance.Set(container != null ? container.AcceptedGrain : GrainType.Corn);
-        if (grainSurface != null) grainSurface.SetPropertyBlock(grainAppearance.Block);
-        Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, first, Mathf.Min(1023, KernelCount), grainAppearance.Block,
+        RefreshGrainAppearance();
+        Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, first, Mathf.Min(1023, KernelCount), kernelAppearance.Block,
             ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
-        if (KernelCount > 1023) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, second, KernelCount - 1023, grainAppearance.Block,
+        if (KernelCount > 1023) Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, second, KernelCount - 1023, kernelAppearance.Block,
             ShadowCastingMode.Off, true, gameObject.layer, camera, LightProbeUsage.Off);
     }
     private void OnDestroy()

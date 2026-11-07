@@ -236,6 +236,9 @@ public sealed class GrainPile : MonoBehaviour
 
     /// <summary>Find a real grain surface near the blade, rather than the distant aim point.</summary>
     public bool TryNearestSurface(Vector3 worldPoint, float maximumDistance, out Vector3 surface)
+        => TryNearestSurface(worldPoint, maximumDistance, out surface, null);
+
+    public bool TryNearestSurface(Vector3 worldPoint, float maximumDistance, out Vector3 surface, GrainCargo preferred)
     {
         Initialize();
         surface = default;
@@ -244,6 +247,7 @@ public sealed class GrainPile : MonoBehaviour
         bool found = false;
         Vector3 local = transform.InverseTransformPoint(worldPoint);
         float heightScale = WorldScale.y;
+        var recipe = preferred != null && spatial == null ? new GrainCargo() : null;
         // Include the point directly below the blade, then the height-field vertices.
         for (int i = -1; i < field.Heights.Length; i++)
         {
@@ -252,7 +256,14 @@ public sealed class GrainPile : MonoBehaviour
             if (Mathf.Abs(x) > field.Size * .5f || Mathf.Abs(z) > field.Size * .5f) continue;
             float height = i < 0 ? field.Sample(x, z) : field.Heights[i];
             if (height * heightScale < .000001f) continue;
+            if (preferred != null && spatial != null &&
+                (i < 0 || spatial.MatchingSurfaceVolume(i, double.MaxValue, preferred) <= 0)) continue;
             Vector3 candidate = transform.TransformPoint(new Vector3(x, height + GroundOffset(x, z), z));
+            if (recipe != null)
+            {
+                SampleSurfaceGrain(candidate, recipe);
+                if (recipe[preferred.Dominant] <= 0) continue;
+            }
             float distance = (candidate - worldPoint).sqrMagnitude;
             if (distance >= best || !IsInsideBoundary(candidate, .025f)) continue;
             surface = candidate; best = distance; found = true;
@@ -281,6 +292,7 @@ public sealed class GrainPile : MonoBehaviour
         if (field.Heights.Length != saved.heights.Length) throw new System.InvalidOperationException("Saved grain grid does not match " + name);
         for (int i = 0; i < saved.heights.Length; i++) field.Heights[i] = float.IsFinite(saved.heights[i]) ? Mathf.Max(0, saved.heights[i]) : 0;
         spatial?.RestoreSave(saved.columns);
+        SampleDropGround();
         initialKilograms = saved.initialKilograms;
         System.Array.Copy(field.Heights, visualField.Heights, field.Heights.Length);
         visualSettling = false;
@@ -385,14 +397,25 @@ public sealed class GrainPile : MonoBehaviour
         GrainCargo destination, GrainCargo existingCargo, out bool mixBlocked)
     {
         mixBlocked = false;
+        if (!isActiveAndEnabled || !float.IsFinite(capacityKg) || capacityKg <= 0 || !IsInsideBoundary(worldPoint)) return 0;
         Initialize();
         if (field == null) return 0;
+        float collectionRadius = Mathf.Max(radius, Mathf.Clamp(radius * 3f, 1.25f, 2.5f));
         var allowed = new GrainCargo();
         if (existingCargo != null && existingCargo.Total > 0)
             allowed.Add(existingCargo.Dominant, 1);
         else
         {
-            SampleSurfaceGrain(worldPoint, allowed);
+            if (spatial != null)
+            {
+                Vector3 local = transform.InverseTransformPoint(worldPoint);
+                // Choose the majority crop at the actual hit, including soft region
+                // transitions. Search nearby only when the contact has been cleared.
+                spatial.Sample(local.x, local.z, allowed);
+                if (allowed.Total <= .0001f)
+                    spatial.SampleNearestAvailable(local.x, local.z, collectionRadius, WorldScale, allowed);
+            }
+            else SampleSurfaceGrain(worldPoint, allowed);
             if (allowed.Total > 0)
             {
                 GrainType selected = allowed.Dominant;
@@ -402,9 +425,23 @@ public sealed class GrainPile : MonoBehaviour
         }
         if (spatial != null)
         {
+            if (allowed.Total > 0)
+            {
+                Vector3 local = transform.InverseTransformPoint(worldPoint);
+                double collectionDensity = kilogramsPerCubicMetre * VolumeScale / GrainConsumeMultiplier;
+                collectionRadius = spatial.CollectionRadius(local.x, local.z, collectionRadius,
+                    Mathf.Max(collectionRadius, 4.5f), WorldScale, allowed.Dominant, capacityKg / collectionDensity);
+                if (spatial.BringCropToSurface(local.x, local.z, collectionRadius, WorldScale, allowed.Dominant))
+                {
+                    if (Application.isPlaying) surfaceRefreshPending = true;
+                    else RefreshGrainAppearance();
+                }
+            }
             var previousLimit = field.LimitRemoval;
             var previousFilter = spatial.CollectionFilter;
             bool previousPreserve = field.PreserveScoopDepression;
+            bool previousCollectSurface = field.CollectExposedSurface;
+            field.CollectExposedSurface = true;
             field.PreserveScoopDepression = true;
             spatial.CollectionFilter = allowed;
             field.LimitRemoval = (cell, volume) => spatial.MatchingSurfaceVolume(cell,
@@ -412,7 +449,6 @@ public sealed class GrainPile : MonoBehaviour
             // Gather matching surface pockets around the contact instead of requiring
             // a precise hit on every small patch at a mixed-crop boundary. The same
             // compatibility filter and capacity limit apply to the whole footprint.
-            float collectionRadius = Mathf.Max(radius, Mathf.Clamp(radius * 3f, 1.25f, 2.5f));
             try
             {
                 float collected = Scoop(worldPoint, collectionRadius, depth, capacityKg, destination);
@@ -424,6 +460,7 @@ public sealed class GrainPile : MonoBehaviour
                 field.LimitRemoval = previousLimit;
                 spatial.CollectionFilter = previousFilter;
                 field.PreserveScoopDepression = previousPreserve;
+                field.CollectExposedSurface = previousCollectSurface;
             }
         }
         var previousCheck = field.CanRemove;
@@ -585,15 +622,73 @@ public sealed class GrainPile : MonoBehaviour
     private static readonly Unity.Profiling.ProfilerMarker SmoothSurfaceMarker = new Unity.Profiling.ProfilerMarker("GrainPile.SmoothSurface");
     private bool surfaceRefreshPending;
     private float surfaceRefreshElapsed;
+    private const float SurfaceRefreshInterval = 1f / 30f;
+    private static readonly int SurfaceBlendId = Shader.PropertyToID("_SurfaceBlend");
+    private float surfaceBlend = 1f, surfaceBlendStarted;
+    private readonly List<Vector3> blendFromPositions = new List<Vector3>();
+    private readonly List<Vector3> blendFromNormals = new List<Vector3>();
+    private readonly List<Vector3> blendToPositions = new List<Vector3>();
+    private readonly List<Vector3> blendToNormals = new List<Vector3>();
+
+    private void UpdateSurfaceBlend()
+    {
+        if (surfaceBlend >= 1f) return;
+        surfaceBlend = Mathf.Clamp01((Time.time - surfaceBlendStarted) / SurfaceRefreshInterval);
+        appearance.Block.SetFloat(SurfaceBlendId, surfaceBlend);
+        if (surfaceRenderer != null) surfaceRenderer.SetPropertyBlock(appearance.Block);
+    }
+
+    private void PrepareSurfaceBlend()
+    {
+        // Match the displayed position, not the previous target, if a new update
+        // arrives before the last transition finishes. Reuse all backing buffers.
+        bool interpolate = Application.isPlaying && blendToPositions.Count > 0;
+        int oldCount = blendToPositions.Count;
+        Bounds bounds = mesh.bounds;
+        for (int i = 0; i < closedSurfaceVertices.Count; i++)
+        {
+            Vector3 target = closedSurfaceVertices[i], normal = naturalSurfaceNormals[i];
+            Vector3 from = target, fromNormal = normal;
+            if (interpolate && i < oldCount &&
+                Mathf.Abs(blendToPositions[i].x - target.x) < .00001f &&
+                Mathf.Abs(blendToPositions[i].z - target.z) < .00001f)
+            {
+                from = Vector3.Lerp(blendFromPositions[i], blendToPositions[i], surfaceBlend);
+                fromNormal = Vector3.Lerp(blendFromNormals[i], blendToNormals[i], surfaceBlend).normalized;
+            }
+            if (i < blendFromPositions.Count)
+            { blendFromPositions[i] = from; blendFromNormals[i] = fromNormal; }
+            else { blendFromPositions.Add(from); blendFromNormals.Add(fromNormal); }
+            bounds.Encapsulate(from);
+        }
+        int excess = blendFromPositions.Count - closedSurfaceVertices.Count;
+        if (excess > 0)
+        {
+            blendFromPositions.RemoveRange(closedSurfaceVertices.Count, excess);
+            blendFromNormals.RemoveRange(closedSurfaceVertices.Count, excess);
+        }
+        blendToPositions.Clear(); blendToPositions.AddRange(closedSurfaceVertices);
+        blendToNormals.Clear(); blendToNormals.AddRange(naturalSurfaceNormals);
+        mesh.SetUVs(3, blendFromPositions);
+        mesh.SetUVs(4, blendFromNormals);
+        mesh.bounds = bounds;
+        surfaceBlend = interpolate ? 0f : 1f;
+        surfaceBlendStarted = Time.time;
+        appearance.Block.SetFloat(SurfaceBlendId, surfaceBlend);
+        if (surfaceRenderer == null) surfaceRenderer = GetComponent<MeshRenderer>();
+        if (surfaceRenderer != null) surfaceRenderer.SetPropertyBlock(appearance.Block);
+    }
 
     private void LateUpdate()
     {
         if (field == null || !Application.isPlaying) return;
+        UpdateSurfaceBlend();
         surfaceRefreshElapsed += Time.deltaTime;
         // Batch stock texture uploads and full mesh work independently of display FPS.
-        if ((surfaceRefreshPending || visualSettling) && surfaceRefreshElapsed < .05f) return;
+        if ((surfaceRefreshPending || visualSettling) && surfaceRefreshElapsed < SurfaceRefreshInterval) return;
         if (surfaceRefreshPending)
         {
+            spatial?.ReconcileHeights();
             surfaceRefreshPending = false;
             visualSettling = true;
             colliderDirty = true;
@@ -803,6 +898,7 @@ public sealed class GrainPile : MonoBehaviour
         mesh.SetNormals(naturalSurfaceNormals);
         // Grain uses world-space triplanar normals; mesh tangents are not consumed.
         mesh.RecalculateBounds();
+        PrepareSurfaceBlend();
     }
     private readonly List<Vector2Int> clippedEdges = new List<Vector2Int>();
 
@@ -989,6 +1085,10 @@ public sealed class GrainPile : MonoBehaviour
         if (mesh != null) { if (Application.isPlaying) Destroy(mesh); else DestroyImmediate(mesh); }
         if (collisionMesh != null) { if (Application.isPlaying) Destroy(collisionMesh); else DestroyImmediate(collisionMesh); }
         mesh = collisionMesh = null;
+        blendFromPositions.Clear(); blendFromNormals.Clear();
+        blendToPositions.Clear(); blendToNormals.Clear();
+        surfaceBlend = 1f;
+        appearance.Block.SetFloat(SurfaceBlendId, 1f);
         visualField = null; visualSettling = false;
         collisionVertexMap = null; cookedVertices.Clear(); cookedIndices.Clear();
     }

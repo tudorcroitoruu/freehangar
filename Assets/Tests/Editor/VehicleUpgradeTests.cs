@@ -287,6 +287,40 @@ public class VehicleUpgradeTests
             Object.DestroyImmediate(assembly);
         }
     }
+    [TestCase(.52f, 0f, 1f, false)] // Two physics ticks of render lead at 13 m/s.
+    [TestCase(1.3f, 0f, 1f, false)] // A slow render frame must not fake a collision.
+    [TestCase(.52f, .4f, 1f, true)] // A genuinely stretched joint still stops towing.
+    [TestCase(.52f, .4f, -1f, false)] // Reversing toward a stuck trailer remains possible.
+    public void LawnmowerTowLimitUsesPhysicsAnchors(float renderLead, float jointGap,
+        float direction, bool blocked)
+    {
+        root.SetActive(false);
+        root.transform.position = new Vector3(10000, 10000, 10000);
+        var mower = root.AddComponent<LawnmowerController>();
+        var trailer = new GameObject("Trailer");
+        trailer.transform.SetParent(root.transform, false);
+        var trailerBody = trailer.AddComponent<Rigidbody>();
+        trailerBody.isKinematic = true;
+        var joint = trailer.AddComponent<ConfigurableJoint>();
+        var hitch = new GameObject("Hitch");
+        hitch.transform.SetParent(root.transform, false);
+        var hitchBody = hitch.AddComponent<Rigidbody>();
+        hitchBody.isKinematic = true;
+        hitchBody.position = trailerBody.position + Vector3.forward * jointGap;
+        joint.connectedBody = hitchBody;
+        joint.autoConfigureConnectedAnchor = false;
+        joint.anchor = joint.connectedAnchor = Vector3.zero;
+        var target = new GameObject("Render hitch target");
+        target.transform.SetParent(root.transform, false);
+        target.transform.position = hitchBody.position + Vector3.forward * renderLead;
+        mower.trailerJoint = joint;
+        mower.hitchBody = hitchBody;
+        mower.hitchTarget = target.transform;
+
+        Vector3 motion = Vector3.forward * (direction * .2f);
+        Assert.That(mower.ConstrainTowMotion(motion), Is.EqualTo(blocked ? Vector3.zero : motion));
+    }
+
     private GameObject Child(string name)
     {
         var child = new GameObject(name, typeof(RectTransform));

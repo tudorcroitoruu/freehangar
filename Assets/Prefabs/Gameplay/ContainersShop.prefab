@@ -3474,7 +3474,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: bigBag
   productName: Big Bag
-  productPrice: 45
+  productPrice: 90
   toBuy: 1
   toRent: 0
   unlockCondition: 2
@@ -4054,7 +4054,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: largeBag
   productName: Large Bag
-  productPrice: 7
+  productPrice: 14
   toBuy: 1
   toRent: 0
   unlockCondition: 2
@@ -4797,7 +4797,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: smallBag
   productName: Small bag
-  productPrice: 4
+  productPrice: 8
   toBuy: 1
   toRent: 0
   unlockCondition: 3

@@ -53,13 +53,13 @@ MonoBehaviour:
     price: 14
   - productId: largeBag
     prefab: {fileID: 6347959474882097887, guid: 74ea987079d2f16479c245f3ebeddb46, type: 3}
-    price: 7
+    price: 14
   - productId: bigBag
     prefab: {fileID: 1521085326205624577, guid: e081f75f0718b8f418e7a58f44bd497e, type: 3}
-    price: 45
+    price: 90
   - productId: smallBag
     prefab: {fileID: 30410232912704535, guid: ab8b6d4aaac96504497dff8c04cb7891, type: 3}
-    price: 4
+    price: 8
   - productId: crate
     prefab: {fileID: 7210842097477428087, guid: eb731e91ae410754ebc5f7596c6cbf2e, type: 3}
     price: 10

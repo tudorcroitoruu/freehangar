@@ -41,6 +41,80 @@ public sealed class GrainSpatialField
     internal GrainCargo CollectionFilter;
     private float density;
     private bool dirty = true;
+    private readonly List<Segment> sortedLayers = new List<Segment>(32);
+    private readonly int[] sortedCrop;
+    private readonly double[] collectionRings = new double[5];
+
+    public float CollectionRadius(float x, float z, float minimum, float maximum, Vector3 metric,
+        GrainType crop, double requestedVolume)
+    {
+        Array.Clear(collectionRings, 0, collectionRings.Length);
+        float step = (maximum - minimum) / (collectionRings.Length - 1);
+        if (step <= 0) return minimum;
+        for (int cell = 0; cell < columns.Length; cell++)
+        {
+            if (field.AreaAt(cell) <= 0) continue;
+            float dx = (cell % field.Resolution * field.Spacing - field.Size * .5f - x) * metric.x;
+            float dz = (cell / field.Resolution * field.Spacing - field.Size * .5f - z) * metric.z;
+            float distance = Mathf.Sqrt(dx * dx + dz * dz);
+            if (distance >= maximum) continue;
+            int ring = Mathf.Clamp(Mathf.CeilToInt((distance - minimum) / step), 0, collectionRings.Length - 1);
+            foreach (var layer in columns[cell]) collectionRings[ring] += layer.volume * layer.weights[(int)crop];
+        }
+        double available = 0;
+        for (int ring = 0; ring < collectionRings.Length; ring++)
+        {
+            available += collectionRings[ring];
+            if (available >= requestedVolume) return Mathf.Min(maximum, minimum + step * ring + .001f);
+        }
+        return maximum;
+    }
+
+    public bool BringCropToSurface(float x, float z, float radius, Vector3 metric, GrainType crop)
+    {
+        bool changed = false;
+        int type = (int)crop;
+        float radiusSquared = radius * radius;
+        for (int cell = 0; cell < columns.Length; cell++)
+        {
+            float dx = (cell % field.Resolution * field.Spacing - field.Size * .5f - x) * metric.x;
+            float dz = (cell / field.Resolution * field.Spacing - field.Size * .5f - z) * metric.z;
+            if (dx * dx + dz * dz >= radiusSquared || field.AreaAt(cell) <= 0) continue;
+            if (sortedCrop[cell] == type) continue;
+            var stack = columns[cell];
+            bool otherAbove = false, needsSorting = false;
+            for (int s = stack.Count - 1; s >= 0; s--)
+            {
+                var layer = stack[s];
+                if (layer.volume <= 0) continue;
+                float share = layer.weights[type];
+                if (share < 1) otherAbove = true;
+                if (share > 0 && otherAbove) { needsSorting = true; break; }
+            }
+            sortedCrop[cell] = type;
+            if (!needsSorting) continue;
+            sortedLayers.Clear();
+            double selectedVolume = 0;
+            foreach (var layer in stack)
+            {
+                double selected = layer.volume * layer.weights[type];
+                selectedVolume += selected;
+                if (selected <= 0) { sortedLayers.Add(layer); continue; }
+                double remaining = layer.volume - selected;
+                if (remaining <= 0) continue;
+                var weights = new float[GrainCargo.TypeCount];
+                for (int t = 0; t < weights.Length; t++)
+                    if (t != type) weights[t] = (float)(layer.weights[t] * layer.volume / remaining);
+                sortedLayers.Add(new Segment(remaining, weights));
+            }
+            var selectedWeights = new float[GrainCargo.TypeCount]; selectedWeights[type] = 1;
+            sortedLayers.Add(new Segment(selectedVolume, selectedWeights));
+            stack.Clear(); stack.AddRange(sortedLayers);
+            changed = true;
+        }
+        if (changed) dirty = true;
+        return changed;
+    }
     public double InitialVolume { get; }
 
     public List<GrainColumnSave> CaptureSave()
@@ -55,11 +129,29 @@ public sealed class GrainSpatialField
     {
         if (saved == null) return;
         foreach (var column in columns) column.Clear();
+        for (int i = 0; i < sortedCrop.Length; i++) sortedCrop[i] = -1;
         foreach (var segment in saved)
-            if (segment != null && segment.index >= 0 && segment.index < columns.Length && segment.volume >= 0 &&
+            if (segment != null && segment.index >= 0 && segment.index < columns.Length && segment.volume > 0 &&
                 double.IsFinite(segment.volume) && segment.weights?.Length == GrainCargo.TypeCount)
                 columns[segment.index].Add(new Segment(segment.volume, (float[])segment.weights.Clone()));
+        ReconcileHeights();
         dirty = true;
+    }
+
+    // Typed stock is authoritative. Old saves and float subtraction can retain a
+    // positive height after the last grain segment has already been collected.
+    public void ReconcileHeights()
+    {
+        for (int cell = 0; cell < columns.Length; cell++) SyncHeight(cell);
+    }
+
+    private void SyncHeight(int cell)
+    {
+        float area = field.AreaAt(cell);
+        if (area <= 0) return;
+        double volume = 0;
+        foreach (var segment in columns[cell]) volume += segment.volume;
+        field.Heights[cell] = (float)(volume / area);
     }
 
     public GrainSpatialField(GrainHeightField field, GrainRegion[] regions, Arrangement arrangement, float waviness, int seed, Vector2? sectionCenter = null, float sectionRotation = 0)
@@ -67,6 +159,8 @@ public sealed class GrainSpatialField
         this.field = field;
         int count = field.Heights.Length;
         columns = new List<Segment>[count]; order = new int[count];
+        sortedCrop = new int[count];
+        for (int i = 0; i < count; i++) sortedCrop[i] = -1;
         pixels = new[] { new Color[count], new Color[count], new Color[count] };
         var scores = new float[count];
         InitialVolume = field.Volume;
@@ -187,12 +281,22 @@ public sealed class GrainSpatialField
     {
         var stack = columns[cell];
         if (stack.Count == 0 || requested <= 0) return 0;
-        var top = stack[stack.Count - 1];
-        double share = 0;
-        for (int t = 0; t < GrainCargo.TypeCount; t++)
-            if (allowed[(GrainType)t] > .0001f) share += top.weights[t];
-        // Only exposed stock: never pull a crop through a different buried layer.
-        return Math.Min(requested, top.volume * share);
+        double available = 0;
+        for (int s = stack.Count - 1; s >= 0 && available < requested; s--)
+        {
+            var layer = stack[s];
+            if (layer.volume <= 0) continue;
+            double share = 0;
+            bool otherCrop = false;
+            for (int t = 0; t < GrainCargo.TypeCount; t++)
+                if (allowed[(GrainType)t] > .0001f) share += layer.weights[t];
+                else if (layer.weights[t] > 0) otherCrop = true;
+            available += Math.Min(requested - available, layer.volume * share);
+            // Consecutive deposits of the same crop are one collectible surface,
+            // not tiny caps requiring a new stroke for every settling segment.
+            if (otherCrop) break;
+        }
+        return available;
     }
     public double CompatibleSurfaceVolume(int cell, double requested, GrainCargo cargo)
     {
@@ -228,24 +332,31 @@ public sealed class GrainSpatialField
         var stack = columns[cell];
         if (receiver < 0 && CollectionFilter != null && stack.Count > 0)
         {
+            while (volume > 0 && stack.Count > 0)
+            {
             int top = stack.Count - 1;
             var segment = stack[top];
+            if (segment.volume <= 0) { stack.RemoveAt(top); continue; }
             double share = 0;
             for (int t = 0; t < GrainCargo.TypeCount; t++)
                 if (CollectionFilter[(GrainType)t] > .0001f) share += segment.weights[t];
             double taken = Math.Min(volume, segment.volume * share);
-            if (taken <= 0 || share <= 0) return;
+            if (taken <= 0 || share <= 0) break;
             double remaining = segment.volume - taken;
             // Weights may be shared with other columns; replace rather than mutate.
-            var weights = new float[GrainCargo.TypeCount];
+            var weights = share == 1 ? segment.weights : new float[GrainCargo.TypeCount];
             for (int t = 0; t < GrainCargo.TypeCount; t++)
             {
                 double amount = CollectionFilter[(GrainType)t] > .0001f ? taken * segment.weights[t] / share : 0;
                 destination?.Add((GrainType)t, (float)(amount * density));
-                weights[t] = remaining > 1e-12 ? (float)Math.Max(0, (segment.volume * segment.weights[t] - amount) / remaining) : 0;
+                if (share != 1) weights[t] = remaining > 1e-12 ? (float)Math.Max(0, (segment.volume * segment.weights[t] - amount) / remaining) : 0;
             }
             if (remaining <= 1e-12) stack.RemoveAt(top);
             else stack[top] = new Segment(remaining, weights);
+            volume -= taken;
+            if (remaining > 1e-12) break;
+            }
+            SyncHeight(cell);
             dirty = true;
             return;
         }
@@ -264,6 +375,7 @@ public sealed class GrainSpatialField
     private void Push(int cell, double volume, float[] weights)
     {
         if (volume <= 1e-12) return;
+        sortedCrop[cell] = -1;
         var stack = columns[cell]; int top = stack.Count - 1;
         if (top >= 0 && ReferenceEquals(stack[top].weights, weights))
         { var segment = stack[top]; segment.volume += volume; stack[top] = segment; }
@@ -306,6 +418,22 @@ public sealed class GrainSpatialField
         AddTop(iz * field.Resolution + ix, (1-u)*(1-v), cargo); AddTop(iz * field.Resolution + ix + 1, u*(1-v), cargo);
         AddTop((iz+1)*field.Resolution+ix, (1-u)*v, cargo); AddTop((iz+1)*field.Resolution+ix+1, u*v, cargo);
     }
+    public void SampleNearestAvailable(float x, float z, float radius, Vector3 metric, GrainCargo cargo)
+    {
+        cargo.Clear();
+        double best = radius * radius;
+        int nearest = -1;
+        for (int i = 0; i < columns.Length; i++)
+        {
+            if (columns[i].Count == 0 || field.Heights[i] <= .000001f || field.AreaAt(i) <= 0) continue;
+            float dx = (i % field.Resolution * field.Spacing - field.Size * .5f - x) * metric.x;
+            float dz = (i / field.Resolution * field.Spacing - field.Size * .5f - z) * metric.z;
+            double distance = dx * dx + dz * dz;
+            if (distance >= best) continue;
+            best = distance; nearest = i;
+        }
+        if (nearest >= 0) AddTop(nearest, 1, cargo);
+    }
     private void AddTop(int cell, float amount, GrainCargo cargo)
     {
         var stack = columns[cell]; if (stack.Count == 0) return;
@@ -330,6 +458,7 @@ public sealed class GrainSpatialField
             {
                 if (textures[i] == null) textures[i] = new Texture2D(field.Resolution, field.Resolution, TextureFormat.RGBAHalf, false, true)
                 { name = "Spatial grain weights " + i, hideFlags = HideFlags.HideAndDontSave, wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
+                textures[i].filterMode = FilterMode.Bilinear;
                 textures[i].SetPixels(pixels[i]); textures[i].Apply(false, false);
             }
             dirty = false;
