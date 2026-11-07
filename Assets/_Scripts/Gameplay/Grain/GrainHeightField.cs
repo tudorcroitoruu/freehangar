@@ -92,7 +92,7 @@ public sealed class GrainHeightField
             float dx = ix * Spacing - Size * .5f - x, dz = iz * Spacing - Size * .5f - z;
             float weight = Mathf.Clamp01(1f - (dx * dx * metric.x * metric.x + dz * dz * metric.z * metric.z) / (radius * radius));
             int i = iz * Resolution + ix;
-            if (areas[i] <= .00000001f) continue;
+            if (areas[i] <= .00000001f || weight <= 0 || Heights[i] <= 0) continue;
             removal[i] = Mathf.Min(Heights[i], depth * weight);
             if (LimitRemoval != null)
                 removal[i] = (float)(Math.Min(removal[i] * (double)areas[i], Math.Max(0, LimitRemoval(i, removal[i] * (double)areas[i]))) / areas[i]);

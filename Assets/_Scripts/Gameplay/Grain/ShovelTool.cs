@@ -41,6 +41,7 @@ public sealed class ShovelTool : MonoBehaviour
     private float elapsed, transferredFraction, availableAtStart;
     private bool queued;
     private bool scoopReported;
+    private readonly GrainCargo strokeGrain = new GrainCargo();
     private Camera actionCamera;
     private Transform actor;
     private VacuumTool[] vacuums;
@@ -161,11 +162,10 @@ public sealed class ShovelTool : MonoBehaviour
             Vector3 scoopPoint = hit.point;
             if (pile == null && container == null && hit.normal.y > .65f && hit.collider.attachedRigidbody == null)
             {
-                float nearest = .45f;
+                float nearest = 1.25f;
                 foreach (var candidate in FindObjectsByType<GrainPile>(FindObjectsSortMode.None))
                 {
-                    if ((!candidate.IsDroppedPile && candidate.Size * Mathf.Max(candidate.WorldScale.x, candidate.WorldScale.z) > 2f) ||
-                        !candidate.TryNearestSurface(hit.point, nearest, out var point) ||
+                    if (!candidate.TryNearestSurface(hit.point, nearest, out var point) ||
                         !CanReachPoint(camera, player, point, reach, candidate.GetComponent<Collider>())) continue;
                     nearest = Vector3.Distance(hit.point, point); pile = candidate; scoopPoint = point;
                 }
@@ -183,6 +183,21 @@ public sealed class ShovelTool : MonoBehaviour
         }
         elapsed = transferredFraction = 0;
         scoopReported = false;
+        strokeGrain.Clear();
+        if (pendingPile != null)
+        {
+            if (cargo.Total > 0) strokeGrain.Add(cargo.Dominant, 1);
+            else
+            {
+                pendingPile.SampleSurfaceGrain(targetPoint, strokeGrain);
+                if (strokeGrain.Total > 0)
+                {
+                    GrainType selected = strokeGrain.Dominant;
+                    strokeGrain.Clear();
+                    strokeGrain.Add(selected, 1);
+                }
+            }
+        }
         availableAtStart = pendingContainer != null ? Kilograms : Mathf.Max(0, CapacityKg - Kilograms);
         if (pendingPile != null && grainPhysics != null) grainPhysics.BeginScoop();
         IsBusy = true;
@@ -399,7 +414,7 @@ public sealed class ShovelTool : MonoBehaviour
                     : smallPileScoop ? Mathf.Max(.65f, EffectiveScoopRadius) : EffectiveScoopRadius;
                 float collected = pendingPile.ScoopCompatibleWith(point, radius,
                     smallPileScoop ? Mathf.Max(.3f, EffectiveScoopDepth) : EffectiveScoopDepth,
-                    Mathf.Min(amount, CapacityKg - Kilograms), scoopCargo, cargo, out bool mixBlocked);
+                    Mathf.Min(amount, CapacityKg - Kilograms), scoopCargo, strokeGrain, out bool mixBlocked);
                 if (mixBlocked)
                 {
                     GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowedInShovel);

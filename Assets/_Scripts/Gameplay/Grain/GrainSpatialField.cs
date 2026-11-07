@@ -38,6 +38,7 @@ public sealed class GrainSpatialField
     private readonly Color[][] pixels;
     private readonly Texture2D[] textures = new Texture2D[3];
     private GrainCargo destination;
+    internal GrainCargo CollectionFilter;
     private float density;
     private bool dirty = true;
     public double InitialVolume { get; }
@@ -182,6 +183,17 @@ public sealed class GrainSpatialField
     private static double Positive(float value) => float.IsFinite(value) ? Math.Max(.01, value) : .01;
     public void BeginCollection(GrainCargo cargo, float kilogramsPerVolume) { destination = cargo; density = kilogramsPerVolume; }
     public void EndCollection() => destination = null;
+    public double MatchingSurfaceVolume(int cell, double requested, GrainCargo allowed)
+    {
+        var stack = columns[cell];
+        if (stack.Count == 0 || requested <= 0) return 0;
+        var top = stack[stack.Count - 1];
+        double share = 0;
+        for (int t = 0; t < GrainCargo.TypeCount; t++)
+            if (allowed[(GrainType)t] > .0001f) share += top.weights[t];
+        // Only exposed stock: never pull a crop through a different buried layer.
+        return Math.Min(requested, top.volume * share);
+    }
     public double CompatibleSurfaceVolume(int cell, double requested, GrainCargo cargo)
     {
         double result = 0;
@@ -214,6 +226,29 @@ public sealed class GrainSpatialField
     private void Take(int cell, double volume, int receiver)
     {
         var stack = columns[cell];
+        if (receiver < 0 && CollectionFilter != null && stack.Count > 0)
+        {
+            int top = stack.Count - 1;
+            var segment = stack[top];
+            double share = 0;
+            for (int t = 0; t < GrainCargo.TypeCount; t++)
+                if (CollectionFilter[(GrainType)t] > .0001f) share += segment.weights[t];
+            double taken = Math.Min(volume, segment.volume * share);
+            if (taken <= 0 || share <= 0) return;
+            double remaining = segment.volume - taken;
+            // Weights may be shared with other columns; replace rather than mutate.
+            var weights = new float[GrainCargo.TypeCount];
+            for (int t = 0; t < GrainCargo.TypeCount; t++)
+            {
+                double amount = CollectionFilter[(GrainType)t] > .0001f ? taken * segment.weights[t] / share : 0;
+                destination?.Add((GrainType)t, (float)(amount * density));
+                weights[t] = remaining > 1e-12 ? (float)Math.Max(0, (segment.volume * segment.weights[t] - amount) / remaining) : 0;
+            }
+            if (remaining <= 1e-12) stack.RemoveAt(top);
+            else stack[top] = new Segment(remaining, weights);
+            dirty = true;
+            return;
+        }
         while (volume > 1e-12 && stack.Count > 0)
         {
             int top = stack.Count - 1; var segment = stack[top];

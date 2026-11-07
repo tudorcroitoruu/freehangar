@@ -387,26 +387,38 @@ public sealed class GrainPile : MonoBehaviour
         mixBlocked = false;
         Initialize();
         if (field == null) return 0;
+        var allowed = new GrainCargo();
+        if (existingCargo != null && existingCargo.Total > 0)
+            allowed.Add(existingCargo.Dominant, 1);
+        else
+        {
+            SampleSurfaceGrain(worldPoint, allowed);
+            if (allowed.Total > 0)
+            {
+                GrainType selected = allowed.Dominant;
+                allowed.Clear();
+                allowed.Add(selected, 1);
+            }
+        }
         if (spatial != null)
         {
-            var allowed = existingCargo;
-            if (allowed == null || allowed.Total <= .0001f)
-            {
-                allowed = new GrainCargo();
-                SampleSurfaceGrain(worldPoint, allowed);
-            }
             var previousLimit = field.LimitRemoval;
-            field.LimitRemoval = (cell, volume) => spatial.CompatibleSurfaceVolume(cell,
+            var previousFilter = spatial.CollectionFilter;
+            spatial.CollectionFilter = allowed;
+            field.LimitRemoval = (cell, volume) => spatial.MatchingSurfaceVolume(cell,
                 previousLimit != null ? previousLimit(cell, volume) : volume, allowed);
             // Gather matching surface pockets around the contact instead of requiring
             // a precise hit on every small patch at a mixed-crop boundary. The same
             // compatibility filter and capacity limit apply to the whole footprint.
             float collectionRadius = Mathf.Max(radius, Mathf.Clamp(radius * 3f, 1.25f, 2.5f));
-            try { return Scoop(worldPoint, collectionRadius, depth, capacityKg, destination); }
-            finally { field.LimitRemoval = previousLimit; }
+            try
+            {
+                float collected = Scoop(worldPoint, collectionRadius, depth, capacityKg, destination);
+                mixBlocked = collected <= 0 && existingCargo != null && existingCargo.Total > .0001f;
+                return collected;
+            }
+            finally { field.LimitRemoval = previousLimit; spatial.CollectionFilter = previousFilter; }
         }
-        if (existingCargo == null || existingCargo.Total <= .0001f)
-            return Scoop(worldPoint, radius, depth, capacityKg, destination);
         var previousCheck = field.CanRemove;
         bool blocked = false;
         double offset = harvestedKg;
@@ -424,7 +436,7 @@ public sealed class GrainPile : MonoBehaviour
                 CollectRecipe(offset, kg, recipe);
                 offset += kg;
                 for (int t = 0; t < GrainCargo.TypeCount; t++)
-                    if (recipe[(GrainType)t] > 0f && existingCargo[(GrainType)t] <= .0001f)
+                    if (recipe[(GrainType)t] > 0f && allowed[(GrainType)t] <= .0001f)
                         compatible = false;
             }
             if (!compatible) blocked = true;
@@ -565,10 +577,14 @@ public sealed class GrainPile : MonoBehaviour
     private static readonly Unity.Profiling.ProfilerMarker ColliderRefreshMarker = new Unity.Profiling.ProfilerMarker("GrainPile.RefreshCollider");
     private static readonly Unity.Profiling.ProfilerMarker SmoothSurfaceMarker = new Unity.Profiling.ProfilerMarker("GrainPile.SmoothSurface");
     private bool surfaceRefreshPending;
+    private float surfaceRefreshElapsed;
 
     private void LateUpdate()
     {
         if (field == null || !Application.isPlaying) return;
+        surfaceRefreshElapsed += Time.deltaTime;
+        // Batch stock texture uploads and full mesh work independently of display FPS.
+        if ((surfaceRefreshPending || visualSettling) && surfaceRefreshElapsed < .05f) return;
         if (surfaceRefreshPending)
         {
             surfaceRefreshPending = false;
@@ -578,9 +594,10 @@ public sealed class GrainPile : MonoBehaviour
         }
         if (visualSettling && Time.deltaTime > 0)
         {
-            visualSettling = SmoothVisualSurface(Time.deltaTime);
+            visualSettling = SmoothVisualSurface(surfaceRefreshElapsed);
             RefreshSurface();
         }
+        surfaceRefreshElapsed = 0;
         if (colliderDirty && Time.time >= nextCollider) RefreshCollider();
     }
 
@@ -602,7 +619,7 @@ public sealed class GrainPile : MonoBehaviour
 
     private void Update()
     {
-        RefreshGrainAppearance();
+        if (!Application.isPlaying) RefreshGrainAppearance();
         if (!Application.isPlaying)
         {
             DetectWalls();
@@ -708,7 +725,9 @@ public sealed class GrainPile : MonoBehaviour
         d = transform.TransformPoint(closedSurfaceVertices[closedSurfaceTriangles[t + 5]]);
     }
     private GrainWallBoundary closedBoundary;
-    private readonly Dictionary<Vector3Int, Vector3> surfaceNormalSums = new Dictionary<Vector3Int, Vector3>();
+    private readonly Dictionary<Vector3Int, int> surfaceNormalGroups = new Dictionary<Vector3Int, int>();
+    private readonly List<int> surfaceNormalIndices = new List<int>();
+    private readonly List<Vector3> surfaceNormalSums = new List<Vector3>();
     private readonly List<Vector3> naturalSurfaceNormals = new List<Vector3>();
 
     private static Vector3Int SurfaceVertexKey(Vector3 p) => new Vector3Int(
@@ -718,8 +737,9 @@ public sealed class GrainPile : MonoBehaviour
     {
         // Only the render skin changes: stock, collision and scooping keep their
         // original heights. Fade at the ground so cleared areas stay cleared.
-        float scaleY = Mathf.Max(.001f, WorldScale.y);
-        float radius = Mathf.Min(VisualHeightField.Spacing * .5f, .15f / Mathf.Max(.001f, WorldScale.x));
+        Vector3 metric = WorldScale;
+        float scaleY = Mathf.Max(.001f, metric.y);
+        float radius = Mathf.Min(VisualHeightField.Spacing * .5f, .15f / Mathf.Max(.001f, metric.x));
         var surface = VisualHeightField;
         for (int i = 0; i < closedSurfaceVertices.Count; i++)
         {
@@ -732,15 +752,28 @@ public sealed class GrainPile : MonoBehaviour
                 surface.Sample(p.x, p.z - radius) + surface.Sample(p.x, p.z + radius)) * .25f;
             // Round peaks by at most six centimetres, without filling empty holes.
             float rounding = Mathf.Clamp((average - center) * .5f * scaleY, -.06f, 0);
-            float noise = (Mathf.PerlinNoise(p.x * WorldScale.x * 4.3f + 17.1f,
-                p.z * WorldScale.z * 4.3f + 31.7f) - .5f) * .05f;
+            float noise = (Mathf.PerlinNoise(p.x * metric.x * 4.3f + 17.1f,
+                p.z * metric.z * 4.3f + 31.7f) - .5f) * .05f;
             p.y += (rounding + noise) * fade / scaleY;
             closedSurfaceVertices[i] = p;
         }
         mesh.SetVertices(closedSurfaceVertices);
         // Wall clipping duplicates triangle vertices. Average their normals by
         // position, otherwise every clipped triangle produces a hard lighting seam.
+        surfaceNormalGroups.Clear();
+        surfaceNormalIndices.Clear();
         surfaceNormalSums.Clear();
+        foreach (Vector3 p in closedSurfaceVertices)
+        {
+            var key = SurfaceVertexKey(p);
+            if (!surfaceNormalGroups.TryGetValue(key, out int group))
+            {
+                group = surfaceNormalSums.Count;
+                surfaceNormalGroups.Add(key, group);
+                surfaceNormalSums.Add(Vector3.zero);
+            }
+            surfaceNormalIndices.Add(group);
+        }
         for (int t = 0; t < closedSurfaceTriangles.Count; t += 3)
         {
             Vector3 a = closedSurfaceVertices[closedSurfaceTriangles[t]];
@@ -749,19 +782,19 @@ public sealed class GrainPile : MonoBehaviour
             Vector3 normal = Vector3.Cross(b - a, c - a);
             for (int j = 0; j < 3; j++)
             {
-                var key = SurfaceVertexKey(closedSurfaceVertices[closedSurfaceTriangles[t + j]]);
-                surfaceNormalSums.TryGetValue(key, out Vector3 sum);
-                surfaceNormalSums[key] = sum + normal;
+                int group = surfaceNormalIndices[closedSurfaceTriangles[t + j]];
+                surfaceNormalSums[group] += normal;
             }
         }
         naturalSurfaceNormals.Clear();
-        foreach (Vector3 p in closedSurfaceVertices)
+        for (int i = 0; i < surfaceNormalSums.Count; i++)
         {
-            surfaceNormalSums.TryGetValue(SurfaceVertexKey(p), out Vector3 normal);
-            naturalSurfaceNormals.Add(normal.sqrMagnitude > .00000001f ? normal.normalized : Vector3.up);
+            Vector3 normal = surfaceNormalSums[i];
+            surfaceNormalSums[i] = normal.sqrMagnitude > .00000001f ? normal.normalized : Vector3.up;
         }
+        foreach (int group in surfaceNormalIndices) naturalSurfaceNormals.Add(surfaceNormalSums[group]);
         mesh.SetNormals(naturalSurfaceNormals);
-        mesh.RecalculateTangents();
+        // Grain uses world-space triplanar normals; mesh tangents are not consumed.
         mesh.RecalculateBounds();
     }
     private readonly List<Vector2Int> clippedEdges = new List<Vector2Int>();

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="33" result="Failed(Child)" total="33" passed="30" failed="3" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:23Z" duration="0.7547897">
+  <test-suite type="TestSuite" id="1000" name="Grain Cleanup Co." fullname="Grain Cleanup Co." runstate="Runnable" testcasecount="559" result="Failed" site="Child" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:23Z" duration="0.754790" total="33" passed="30" failed="3" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1690" name="Assembly-CSharp-Editor.dll" fullname="D:/Projects/freehangar/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="559" result="Failed" site="Child" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:23Z" duration="0.746542" total="33" passed="30" failed="3" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="5236" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestFixture" id="1207" name="GrainEconomyTests" fullname="GrainEconomyTests" classname="GrainEconomyTests" runstate="Runnable" testcasecount="33" result="Failed" site="Child" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:23Z" duration="0.740639" total="33" passed="30" failed="3" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="ParameterizedMethod" id="1232" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:22Z" duration="0.116591" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1226" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,False)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,False)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="776209581" result="Passed" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:22Z" duration="0.067970" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1227" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,False)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,False)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="367237585" result="Passed" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:22Z" duration="0.003916" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1228" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,False)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,False)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="632465539" result="Passed" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:22Z" duration="0.003598" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1229" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,True)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,True)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="880856469" result="Passed" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:22Z" duration="0.015153" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1230" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,True)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,True)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="1491396576" result="Passed" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:22Z" duration="0.008372" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1231" name="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,True)" fullname="GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,True)" methodname="CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo" classname="GrainEconomyTests" runstate="Runnable" seed="147759644" result="Passed" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:22Z" duration="0.008219" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1211" name="CompatibleShovelScoopStillCollectsGrain" fullname="GrainEconomyTests.CompatibleShovelScoopStillCollectsGrain" methodname="CompatibleShovelScoopStillCollectsGrain" classname="GrainEconomyTests" runstate="Runnable" seed="1921951573" result="Passed" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:22Z" duration="0.009674" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1235" name="DepositingBackIntoAuthoredStockPreservesRecoverableMass" fullname="GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass" classname="GrainEconomyTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:23Z" duration="0.025105" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1233" name="DepositingBackIntoAuthoredStockPreservesRecoverableMass(10.0f)" fullname="GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(10.0f)" methodname="DepositingBackIntoAuthoredStockPreservesRecoverableMass" classname="GrainEconomyTests" runstate="Runnable" seed="949438901" result="Passed" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:22Z" duration="0.012060" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1234" name="DepositingBackIntoAuthoredStockPreservesRecoverableMass(200.0f)" fullname="GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(200.0f)" methodname="DepositingBackIntoAuthoredStockPreservesRecoverableMass" classname="GrainEconomyTests" runstate="Runnable" seed="261157461" result="Passed" start-time="2026-11-07 16:29:22Z" end-time="2026-11-07 16:29:23Z" duration="0.011255" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1220" name="DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass" fullname="GrainEconomyTests.DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass" classname="GrainEconomyTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.045909" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1218" name="DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass(False)" fullname="GrainEconomyTests.DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass(False)" methodname="DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass" classname="GrainEconomyTests" runstate="Runnable" seed="889317092" result="Failed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.016972" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  An exposed edge should slope outward instead of forming a vertical wall.
+  Expected: True
+  But was:  False
+]]></message>
+              <stack-trace><![CDATA[at GrainEconomyTests.DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass (System.Boolean clipped) [0x00214] in D:\Projects\freehangar\Assets\Tests\Editor\GrainEconomyTests.cs:154
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1219" name="DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass(True)" fullname="GrainEconomyTests.DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass(True)" methodname="DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass" classname="GrainEconomyTests" runstate="Runnable" seed="1890120878" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.027296" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1236" name="DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource" fullname="GrainEconomyTests.DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource" methodname="DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource" classname="GrainEconomyTests" runstate="Runnable" seed="536331924" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.014237" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1221" name="DroppedGrainFollowsSlopedGroundAndRestoresWithoutAddingMass" fullname="GrainEconomyTests.DroppedGrainFollowsSlopedGroundAndRestoresWithoutAddingMass" methodname="DroppedGrainFollowsSlopedGroundAndRestoresWithoutAddingMass" classname="GrainEconomyTests" runstate="Runnable" seed="1345640404" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.032738" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1213" name="EmptyShovelSelectsOneCropAtMixedBoundary" fullname="GrainEconomyTests.EmptyShovelSelectsOneCropAtMixedBoundary" methodname="EmptyShovelSelectsOneCropAtMixedBoundary" classname="GrainEconomyTests" runstate="Runnable" seed="1411616496" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.010466" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1248" name="ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass" fullname="GrainEconomyTests.ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass" methodname="ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass" classname="GrainEconomyTests" runstate="Runnable" seed="1603106373" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.008564" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1210" name="IncompatibleShovelScoopLeavesPileAndCargoUnchanged" fullname="GrainEconomyTests.IncompatibleShovelScoopLeavesPileAndCargoUnchanged" classname="GrainEconomyTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.012000" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1208" name="IncompatibleShovelScoopLeavesPileAndCargoUnchanged(False)" fullname="GrainEconomyTests.IncompatibleShovelScoopLeavesPileAndCargoUnchanged(False)" methodname="IncompatibleShovelScoopLeavesPileAndCargoUnchanged" classname="GrainEconomyTests" runstate="Runnable" seed="860625048" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.004396" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1209" name="IncompatibleShovelScoopLeavesPileAndCargoUnchanged(True)" fullname="GrainEconomyTests.IncompatibleShovelScoopLeavesPileAndCargoUnchanged(True)" methodname="IncompatibleShovelScoopLeavesPileAndCargoUnchanged" classname="GrainEconomyTests" runstate="Runnable" seed="1171521116" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.006650" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1245" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.080253" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1240" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(0.0f,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(0.0f,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="516689044" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.004402" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1241" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(-10.0f,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(-10.0f,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="1564780017" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.031478" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1242" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.NaN,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.NaN,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="694275118" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.009528" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1243" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.PositiveInfinity,1.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.PositiveInfinity,1.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="597499301" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.016609" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1244" name="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(100000.0f,10000.0f)" fullname="GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(100000.0f,10000.0f)" methodname="InvalidMultipliersCannotProduceNegativeOrInfiniteCargo" classname="GrainEconomyTests" runstate="Runnable" seed="531048677" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.015018" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1246" name="LargerStartingShovelFillsFreeBagInTwoLoadsWithoutLosingTheRemainder" fullname="GrainEconomyTests.LargerStartingShovelFillsFreeBagInTwoLoadsWithoutLosingTheRemainder" methodname="LargerStartingShovelFillsFreeBagInTwoLoadsWithoutLosingTheRemainder" classname="GrainEconomyTests" runstate="Runnable" seed="1841799570" result="Failed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.060743" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: 10.0f
+  But was:  15.0f
+]]></message>
+            <stack-trace><![CDATA[at GrainEconomyTests.LargerStartingShovelFillsFreeBagInTwoLoadsWithoutLosingTheRemainder () [0x0003b] in D:\Projects\freehangar\Assets\Tests\Editor\GrainEconomyTests.cs:339
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1212" name="MagnetSeparatesMatchingCropFromMixedSurfaceAndConservesOtherCrop" fullname="GrainEconomyTests.MagnetSeparatesMatchingCropFromMixedSurfaceAndConservesOtherCrop" methodname="MagnetSeparatesMatchingCropFromMixedSurfaceAndConservesOtherCrop" classname="GrainEconomyTests" runstate="Runnable" seed="1203402872" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.018538" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1247" name="ManualShovelUpgradeLoadsAreTripledWhileVacuumCapacityIsPreserved" fullname="GrainEconomyTests.ManualShovelUpgradeLoadsAreTripledWhileVacuumCapacityIsPreserved" methodname="ManualShovelUpgradeLoadsAreTripledWhileVacuumCapacityIsPreserved" classname="GrainEconomyTests" runstate="Runnable" seed="567100556" result="Failed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.008907" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: 900
+  But was:  220.0f
+]]></message>
+            <stack-trace><![CDATA[at GrainEconomyTests.ManualShovelUpgradeLoadsAreTripledWhileVacuumCapacityIsPreserved () [0x000a2] in D:\Projects\freehangar\Assets\Tests\Editor\GrainEconomyTests.cs:370
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1239" name="PouredGrainSettlesAsAMoundWithBareEdgesAndPreservesBothCrops" fullname="GrainEconomyTests.PouredGrainSettlesAsAMoundWithBareEdgesAndPreservesBothCrops" classname="GrainEconomyTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.105683" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1237" name="PouredGrainSettlesAsAMoundWithBareEdgesAndPreservesBothCrops(6.5f)" fullname="GrainEconomyTests.PouredGrainSettlesAsAMoundWithBareEdgesAndPreservesBothCrops(6.5f)" methodname="PouredGrainSettlesAsAMoundWithBareEdgesAndPreservesBothCrops" classname="GrainEconomyTests" runstate="Runnable" seed="1159957994" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.047168" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1238" name="PouredGrainSettlesAsAMoundWithBareEdgesAndPreservesBothCrops(25.0f)" fullname="GrainEconomyTests.PouredGrainSettlesAsAMoundWithBareEdgesAndPreservesBothCrops(25.0f)" methodname="PouredGrainSettlesAsAMoundWithBareEdgesAndPreservesBothCrops" classname="GrainEconomyTests" runstate="Runnable" seed="1613422963" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.056894" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1217" name="ScoopCrossingIntoAnotherRecipeLayerDoesNotExcavateEitherLayer" fullname="GrainEconomyTests.ScoopCrossingIntoAnotherRecipeLayerDoesNotExcavateEitherLayer" methodname="ScoopCrossingIntoAnotherRecipeLayerDoesNotExcavateEitherLayer" classname="GrainEconomyTests" runstate="Runnable" seed="658195524" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.007028" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1225" name="ScoopDoesNotRemoveGrainOutsideToolRadius" fullname="GrainEconomyTests.ScoopDoesNotRemoveGrainOutsideToolRadius" classname="GrainEconomyTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.026320" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1222" name="ScoopDoesNotRemoveGrainOutsideToolRadius(200.0f)" fullname="GrainEconomyTests.ScoopDoesNotRemoveGrainOutsideToolRadius(200.0f)" methodname="ScoopDoesNotRemoveGrainOutsideToolRadius" classname="GrainEconomyTests" runstate="Runnable" seed="1551002526" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.007414" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1223" name="ScoopDoesNotRemoveGrainOutsideToolRadius(900.0f)" fullname="GrainEconomyTests.ScoopDoesNotRemoveGrainOutsideToolRadius(900.0f)" methodname="ScoopDoesNotRemoveGrainOutsideToolRadius" classname="GrainEconomyTests" runstate="Runnable" seed="1984395599" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.007200" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1224" name="ScoopDoesNotRemoveGrainOutsideToolRadius(3000.0f)" fullname="GrainEconomyTests.ScoopDoesNotRemoveGrainOutsideToolRadius(3000.0f)" methodname="ScoopDoesNotRemoveGrainOutsideToolRadius" classname="GrainEconomyTests" runstate="Runnable" seed="976450800" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.006908" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-suite type="ParameterizedMethod" id="1216" name="SurfaceRefreshTiming" fullname="GrainEconomyTests.SurfaceRefreshTiming" classname="GrainEconomyTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.144109" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1214" name="SurfaceRefreshTiming(False)" fullname="GrainEconomyTests.SurfaceRefreshTiming(False)" methodname="SurfaceRefreshTiming" classname="GrainEconomyTests" runstate="Runnable" seed="2010900890" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.026648" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[Surface refresh clipped=False: 0.349 ms average
+]]></output>
+          </test-case>
+          <test-case id="1215" name="SurfaceRefreshTiming(True)" fullname="GrainEconomyTests.SurfaceRefreshTiming(True)" methodname="SurfaceRefreshTiming" classname="GrainEconomyTests" runstate="Runnable" seed="1519284729" result="Passed" start-time="2026-11-07 16:29:23Z" end-time="2026-11-07 16:29:23Z" duration="0.113383" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <output><![CDATA[Surface refresh clipped=True: 1.472 ms average
+Saving results to: C:/Users/Fedot/AppData/LocalLow/Harbuz Games/Grain Cleanup Co_\TestResults.xml
+]]></output>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

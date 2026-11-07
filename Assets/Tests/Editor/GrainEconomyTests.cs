@@ -63,6 +63,66 @@ public class GrainEconomyTests
     }
 
     [Test]
+    public void MagnetSeparatesMatchingCropFromMixedSurfaceAndConservesOtherCrop()
+    {
+        pile.ConfigureRegions(new[] { new GrainRegion(100f, GrainType.Corn, GrainType.Wheat) });
+        var existing = new GrainCargo(); existing.Add(GrainType.Corn, 1);
+        double cornBefore = pile.GrainKilograms(GrainType.Corn);
+        double wheatBefore = pile.GrainKilograms(GrainType.Wheat);
+        var collected = new GrainCargo();
+        var point = new Vector3(0, pile.SurfaceHeight(Vector3.zero), 0);
+        float amount = pile.ScoopCompatibleWith(point, .3f, .2f, 5, collected, existing, out bool blocked);
+        Assert.IsFalse(blocked);
+        Assert.That(amount, Is.GreaterThan(0).And.LessThanOrEqualTo(5.001f));
+        Assert.That(collected[GrainType.Corn], Is.EqualTo(amount).Within(.001f));
+        Assert.That(collected[GrainType.Wheat], Is.Zero);
+        Assert.That(pile.GrainKilograms(GrainType.Wheat), Is.EqualTo(wheatBefore).Within(.001));
+        Assert.That(cornBefore - pile.GrainKilograms(GrainType.Corn),
+            Is.EqualTo(amount * pile.GrainConsumeMultiplier).Within(.01));
+    }
+
+    [Test]
+    public void EmptyShovelSelectsOneCropAtMixedBoundary()
+    {
+        pile.ConfigureRegions(new[] { new GrainRegion(100f, GrainType.Corn, GrainType.Wheat) });
+        var collected = new GrainCargo();
+        var point = new Vector3(0, pile.SurfaceHeight(Vector3.zero), 0);
+        float amount = pile.ScoopCompatibleWith(point, .3f, .2f, 5, collected, new GrainCargo(), out bool blocked);
+        Assert.IsFalse(blocked);
+        Assert.Greater(amount, 0);
+        Assert.That(collected[collected.Dominant], Is.EqualTo(collected.Total).Within(.001f));
+    }
+
+    [Test]
+    public void EmptyShovelCannotCollectMixedNonSpatialRecipe()
+    {
+        pile.SetRecipe(new[] { new GrainLayer(100, GrainType.Corn, GrainType.Wheat) });
+        var collected = new GrainCargo();
+        double before = pile.Kilograms;
+        var point = new Vector3(0, pile.SurfaceHeight(Vector3.zero), 0);
+        float amount = pile.ScoopCompatibleWith(point, .3f, .2f, 5, collected, new GrainCargo(), out bool blocked);
+        Assert.IsTrue(blocked);
+        Assert.That(amount, Is.Zero);
+        Assert.That(collected.Total, Is.Zero);
+        Assert.That(pile.Kilograms, Is.EqualTo(before));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void SurfaceRefreshTiming(bool clipped)
+    {
+        if (clipped) Set("excludedFootprint", new Rect(1f, -1f, 2f, 2f));
+        pile.RebuildPreview();
+        var refresh = typeof(GrainPile).GetMethod("RefreshSurface", BindingFlags.Instance | BindingFlags.NonPublic);
+        for (int i = 0; i < 5; i++) refresh.Invoke(pile, null);
+        var timer = System.Diagnostics.Stopwatch.StartNew();
+        for (int i = 0; i < 40; i++) refresh.Invoke(pile, null);
+        timer.Stop();
+        TestContext.WriteLine($"Surface refresh clipped={clipped}: {timer.Elapsed.TotalMilliseconds / 40:F3} ms average");
+        Assert.Greater(root.GetComponent<MeshFilter>().sharedMesh.vertexCount, 0);
+    }
+
+    [Test]
     public void ScoopCrossingIntoAnotherRecipeLayerDoesNotExcavateEitherLayer()
     {
         pile.SetRecipe(new[] { new GrainLayer(.01f, GrainType.Corn), new GrainLayer(100f, GrainType.Wheat) });

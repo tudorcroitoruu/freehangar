@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="6" result="Passed" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 16:30:46Z" end-time="2026-11-07 16:30:46Z" duration="0.1391962">
+  <test-suite type="TestSuite" id="1000" name="Grain Cleanup Co." fullname="Grain Cleanup Co." runstate="Runnable" testcasecount="560" result="Passed" start-time="2026-11-07 16:30:46Z" end-time="2026-11-07 16:30:46Z" duration="0.139196" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1691" name="Assembly-CSharp-Editor.dll" fullname="D:/Projects/freehangar/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="560" result="Passed" start-time="2026-11-07 16:30:46Z" end-time="2026-11-07 16:30:46Z" duration="0.131158" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="39472" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestFixture" id="1207" name="GrainEconomyTests" fullname="GrainEconomyTests" classname="GrainEconomyTests" runstate="Runnable" testcasecount="34" result="Passed" start-time="2026-11-07 16:30:46Z" end-time="2026-11-07 16:30:46Z" duration="0.112230" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1211" name="CompatibleShovelScoopStillCollectsGrain" fullname="GrainEconomyTests.CompatibleShovelScoopStillCollectsGrain" methodname="CompatibleShovelScoopStillCollectsGrain" classname="GrainEconomyTests" runstate="Runnable" seed="999090940" result="Passed" start-time="2026-11-07 16:30:46Z" end-time="2026-11-07 16:30:46Z" duration="0.061721" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1214" name="EmptyShovelCannotCollectMixedNonSpatialRecipe" fullname="GrainEconomyTests.EmptyShovelCannotCollectMixedNonSpatialRecipe" methodname="EmptyShovelCannotCollectMixedNonSpatialRecipe" classname="GrainEconomyTests" runstate="Runnable" seed="631061899" result="Passed" start-time="2026-11-07 16:30:46Z" end-time="2026-11-07 16:30:46Z" duration="0.004131" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1213" name="EmptyShovelSelectsOneCropAtMixedBoundary" fullname="GrainEconomyTests.EmptyShovelSelectsOneCropAtMixedBoundary" methodname="EmptyShovelSelectsOneCropAtMixedBoundary" classname="GrainEconomyTests" runstate="Runnable" seed="1477508742" result="Passed" start-time="2026-11-07 16:30:46Z" end-time="2026-11-07 16:30:46Z" duration="0.012487" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1210" name="IncompatibleShovelScoopLeavesPileAndCargoUnchanged" fullname="GrainEconomyTests.IncompatibleShovelScoopLeavesPileAndCargoUnchanged" classname="GrainEconomyTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-07 16:30:46Z" end-time="2026-11-07 16:30:46Z" duration="0.010003" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1208" name="IncompatibleShovelScoopLeavesPileAndCargoUnchanged(False)" fullname="GrainEconomyTests.IncompatibleShovelScoopLeavesPileAndCargoUnchanged(False)" methodname="IncompatibleShovelScoopLeavesPileAndCargoUnchanged" classname="GrainEconomyTests" runstate="Runnable" seed="1019787187" result="Passed" start-time="2026-11-07 16:30:46Z" end-time="2026-11-07 16:30:46Z" duration="0.003297" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1209" name="IncompatibleShovelScoopLeavesPileAndCargoUnchanged(True)" fullname="GrainEconomyTests.IncompatibleShovelScoopLeavesPileAndCargoUnchanged(True)" methodname="IncompatibleShovelScoopLeavesPileAndCargoUnchanged" classname="GrainEconomyTests" runstate="Runnable" seed="777875886" result="Passed" start-time="2026-11-07 16:30:46Z" end-time="2026-11-07 16:30:46Z" duration="0.003876" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1212" name="MagnetSeparatesMatchingCropFromMixedSurfaceAndConservesOtherCrop" fullname="GrainEconomyTests.MagnetSeparatesMatchingCropFromMixedSurfaceAndConservesOtherCrop" methodname="MagnetSeparatesMatchingCropFromMixedSurfaceAndConservesOtherCrop" classname="GrainEconomyTests" runstate="Runnable" seed="1923354497" result="Passed" start-time="2026-11-07 16:30:46Z" end-time="2026-11-07 16:30:46Z" duration="0.008239" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: C:/Users/Fedot/AppData/LocalLow/Harbuz Games/Grain Cleanup Co_\TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
