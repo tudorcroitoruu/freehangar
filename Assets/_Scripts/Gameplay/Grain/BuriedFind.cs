@@ -60,6 +60,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     [SerializeField] private BreakableGrainBarrier[] enclosingPanels;
     private BoxCollider interactionCollider;
     private Renderer[] visuals;
+    private Renderer hangarKeyVisual;
     private float nextRevealCheck;
     private readonly RaycastHit[] supportHits = new RaycastHit[24];
     private bool revealed;
@@ -104,17 +105,44 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
 
     private void Awake()
     {
+        interactionCollider = GetComponent<BoxCollider>();
+        visuals = GetComponentsInChildren<Renderer>(true);
+        FitHangarKeyCollider();
         // A moved map pickup must not wait for an unrelated, closed hangar.
         if (coveringPile != null)
         {
-            Vector3 local = coveringPile.transform.InverseTransformPoint(transform.position);
+            Vector3 position = hangarKeyVisual != null ? hangarKeyVisual.bounds.center : transform.position;
+            Vector3 local = coveringPile.transform.InverseTransformPoint(position);
             if (Mathf.Abs(local.x) > coveringPile.Size * .5f || Mathf.Abs(local.z) > coveringPile.Size * .5f)
                 coveringPile = null;
         }
-        interactionCollider = GetComponent<BoxCollider>();
-        visuals = GetComponentsInChildren<Renderer>(true);
         interactionCollider.isTrigger = false;
         SetRevealed(false);
+    }
+
+    private void FitHangarKeyCollider()
+    {
+        if (kind != Kind.HangarKey) return;
+        foreach (var filter in GetComponentsInChildren<MeshFilter>(true))
+        {
+            if (filter.name != "Combined key mesh" || filter.sharedMesh == null) continue;
+            hangarKeyVisual = filter.GetComponent<Renderer>();
+            Bounds meshBounds = filter.sharedMesh.bounds;
+            Bounds bounds = default;
+            for (int i = 0; i < 8; i++)
+            {
+                Vector3 corner = meshBounds.center + Vector3.Scale(meshBounds.extents,
+                    new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
+                Vector3 local = transform.InverseTransformPoint(filter.transform.TransformPoint(corner));
+                if (i == 0) bounds = new Bounds(local, Vector3.zero); else bounds.Encapsulate(local);
+            }
+            Vector3 scale = transform.lossyScale;
+            bounds.Expand(new Vector3(.04f / Mathf.Max(.001f, Mathf.Abs(scale.x)),
+                .04f / Mathf.Max(.001f, Mathf.Abs(scale.y)), .04f / Mathf.Max(.001f, Mathf.Abs(scale.z))));
+            interactionCollider.center = bounds.center;
+            interactionCollider.size = bounds.size;
+            break;
+        }
     }
 
     private void Update()
@@ -175,6 +203,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
 
     private Bounds VisualBounds()
     {
+        if (hangarKeyVisual != null) return hangarKeyVisual.bounds;
         Bounds bounds = new Bounds(transform.position, Vector3.zero);
         bool first = true;
         foreach (Renderer visual in visuals)

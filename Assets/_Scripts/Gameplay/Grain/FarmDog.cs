@@ -159,7 +159,9 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         if (!ReadyToNavigate() || !CompletePath(point)) return false;
         agent.isStopped = false;
         agent.speed = runSpeed;
-        return agent.SetPath(path);
+        bool started = agent.SetPath(path);
+        if (started) Play("Run");
+        return started;
     }
 
     private void Chase()
@@ -215,8 +217,8 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
 
     private void Bark(bool announcement = false)
     {
-        announcement |= State == DogState.Alerting || State == DogState.DeliveryAlert;
-        if (barkClip && announcement)
+        // Every bark is audible map-wide; petting still uses its own local source.
+        if (barkClip)
         {
             if (!announcementAudio)
             {
@@ -238,7 +240,6 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
             float volume = Mathf.Lerp(1f, .65f, Mathf.Clamp01(distance / 200f));
             announcementAudio.PlayOneShot(barkClip, volume);
         }
-        else if (strokeAudio && barkClip) strokeAudio.PlayOneShot(barkClip);
         nextBark = Time.time + Random.Range(4f, 8f);
     }
 
@@ -313,7 +314,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         int idle = Animator.StringToHash("Idle");
         float blend = (animationHash == stroke && hash == sleep) || (animationHash == sleep && hash == stroke) ||
             (animationHash == idle && hash == sleep) || (animationHash == sleep && hash == idle)
-            ? strokeSleepBlendSeconds : .15f;
+            ? strokeSleepBlendSeconds : hash == Animator.StringToHash("Run") ? .05f : .15f;
         animationHash = hash;
         animationReadyAt = Time.time + blend;
         animator.CrossFadeInFixedTime(hash, blend);
@@ -321,8 +322,13 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
 
     private void UpdatePresentation()
     {
-        if (State == DogState.Chasing || State == DogState.Returning)
-            Play(agent.enabled && agent.isOnNavMesh && agent.velocity.sqrMagnitude > .03f ? "Run" : "Idle");
+        if (State == DogState.Chasing || State == DogState.Returning || State == DogState.Alerting)
+        {
+            bool navigating = agent.enabled && agent.isOnNavMesh && !agent.isStopped;
+            bool moving = navigating && (agent.velocity.sqrMagnitude > .0004f || agent.pathPending ||
+                (agent.hasPath && agent.remainingDistance > agent.stoppingDistance + .02f));
+            Play(moving ? "Run" : "Idle");
+        }
         if (visual && State == DogState.Attacking)
             visual.localPosition = visualPosition + Vector3.forward * (Mathf.Sin(Mathf.Clamp01((Time.time - stateAt) / .9f) * Mathf.PI) * .18f);
         if (!sleepVfx) return;
@@ -361,6 +367,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     {
         if (agent && agent.enabled && agent.isOnNavMesh) agent.ResetPath();
         if (strokeAudio) strokeAudio.Stop();
+        if (announcementAudio) announcementAudio.Stop();
         if (sleepVfx) sleepVfx.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         if (visual) visual.localPosition = visualPosition;
         if (State == DogState.Petting) State = DogState.Idle;

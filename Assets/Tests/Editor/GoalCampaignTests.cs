@@ -12,6 +12,31 @@ using UnityEngine;
 /// <summary>Exercises the authored Gameplay campaign, without opening or changing the player's scene/save.</summary>
 public class GoalCampaignTests
 {
+    [Test]
+    public void MovedHangarKeyMeshRetainsPickupColliderAtVisibleKey()
+    {
+        var root = new GameObject("Offset hangar key regression"); root.SetActive(false);
+        try
+        {
+            var find = root.AddComponent<BuriedFind>();
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+            typeof(BuriedFind).GetField("kind", flags).SetValue(find, BuriedFind.Kind.HangarKey);
+            var mesh = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            mesh.name = "Combined key mesh"; mesh.transform.SetParent(root.transform, false);
+            mesh.transform.localPosition = new Vector3(3.8f, .55f, 12.03f);
+            mesh.transform.localScale = new Vector3(.44f, 1.14f, .063f);
+            UnityEngine.Object.DestroyImmediate(mesh.GetComponent<Collider>());
+            root.SetActive(true);
+            typeof(BuriedFind).GetMethod("Awake", flags).Invoke(find, null);
+            typeof(BuriedFind).GetMethod("SetRevealed", flags).Invoke(find, new object[] { true });
+            Physics.SyncTransforms();
+            var collider = root.GetComponent<BoxCollider>();
+            Assert.That(Vector3.Distance(collider.bounds.center, mesh.GetComponent<Renderer>().bounds.center), Is.LessThan(.001f));
+            Assert.IsTrue(collider.Raycast(new Ray(mesh.transform.position - Vector3.forward * 2, Vector3.forward), out _, 4));
+        }
+        finally { UnityEngine.Object.DestroyImmediate(root); }
+    }
+
     private GameObject owner;
     private GoalsManager manager;
     private PlayerData data;
