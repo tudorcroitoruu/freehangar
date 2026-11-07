@@ -43,6 +43,20 @@ public sealed class PlayerCombatTools : MonoBehaviour
     private float ImpactPhase => equipped == Tool.Broom ? .45f : equipped == Tool.Axe ? .42f : .5f;
     private float StrikeDuration => equipped == Tool.Broom ? .56f : strikeDuration;
     private float broomImpactTime = -10f;
+    private float meleeImpactTime = -10f;
+    private float meleeImpactStrength, meleeImpactDuration;
+    public Quaternion MeleeCameraKick
+    {
+        get
+        {
+            if (meleeImpactDuration <= 0f) return Quaternion.identity;
+            float t = (Time.time - meleeImpactTime) / meleeImpactDuration;
+            if (t < 0f || t >= 1f) return Quaternion.identity;
+            float fade = (1f - t) * (1f - t) * meleeImpactStrength;
+            return Quaternion.Euler((-1f + Mathf.Sin(t * 24f) * .35f) * fade,
+                Mathf.Sin(t * 29f) * .3f * fade, Mathf.Sin(t * 21f) * .25f * fade);
+        }
+    }
     public Quaternion BroomCameraKick
     {
         get
@@ -217,7 +231,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
         Destroy(effect, 3f);
     }
 
-    private void CancelStrike() { impactPending=false;strikeStart=-10f;reloadSoundPending=false; }
+    private void CancelStrike() { impactPending=false;strikeStart=-10f;reloadSoundPending=false;meleeImpactTime=-10f; }
     private void OnDisable() { CancelStrike(); if (switching) FinishSwitch(); }
 
     private void PerformStrike()
@@ -235,6 +249,12 @@ public sealed class PlayerCombatTools : MonoBehaviour
             nearest=candidate.distance;hit=candidate;found=true;
         }
         if (!found) return;
+        if (equipped == Tool.Axe || equipped == Tool.Hammer)
+        {
+            meleeImpactTime = Time.time;
+            meleeImpactStrength = equipped == Tool.Hammer ? 2f : 1.4f;
+            meleeImpactDuration = equipped == Tool.Hammer ? .22f : .18f;
+        }
         var chicken = hit.collider.GetComponentInParent<FarmChicken>();
         if (chicken != null && (equipped == Tool.Axe || equipped == Tool.Broom))
         {

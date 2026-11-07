@@ -31,7 +31,7 @@ public class GrainInteractionPerformanceTests
         {
             matrices[0] = Matrix4x4.Translate(Vector3.right * i);
             queue.Invoke(kernels, new object[] { null, null, matrices, 1,
-                new Bounds(Vector3.right * i, Vector3.one), null });
+                new Bounds(Vector3.right * i, Vector3.one), null, 1 });
         }
         var buckets = Field<System.Collections.IDictionary>(kernels, "drawBuckets");
         Assert.AreEqual(1, buckets.Count);
@@ -47,6 +47,28 @@ public class GrainInteractionPerformanceTests
             Assert.IsTrue(bounds.Contains(Vector3.right * 999));
         }
         Assert.AreEqual(0, kernels.LastDrawBatches, "Partial patches must wait for a shared flush.");
+    }
+
+    [Test]
+    public void DistantBatchesKeepDistributedSamplesAndShareSubmissionBuffer()
+    {
+        var kernels = root.AddComponent<CornSurfaceKernels>();
+        var queue = typeof(CornSurfaceKernels).GetMethod("QueueBatch", Private);
+        var matrices = new Matrix4x4[1023];
+        for (int i = 0; i < matrices.Length; i++) matrices[i] = Matrix4x4.Translate(Vector3.right * i);
+        for (int batch = 0; batch < 2; batch++)
+            queue.Invoke(kernels, new object[] { null, null, matrices, matrices.Length,
+                new Bounds(Vector3.right * 511, Vector3.one * 1024), null, 16 });
+        var buckets = Field<System.Collections.IDictionary>(kernels, "drawBuckets");
+        Assert.AreEqual(1, buckets.Count);
+        foreach (System.Collections.DictionaryEntry entry in buckets)
+        {
+            var type = entry.Value.GetType();
+            Assert.AreEqual(128, type.GetField("count").GetValue(entry.Value));
+            var packed = (Matrix4x4[])type.GetField("matrices").GetValue(entry.Value);
+            for (int i = 0; i < 128; i++) Assert.AreEqual(matrices[(i % 64) * 16], packed[i]);
+        }
+        Assert.AreEqual(0, kernels.LastDrawBatches);
     }
 
     [Test]

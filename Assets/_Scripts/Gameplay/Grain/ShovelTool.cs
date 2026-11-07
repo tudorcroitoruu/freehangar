@@ -499,7 +499,9 @@ public sealed class ShovelTool : MonoBehaviour
         Vector3 a, b;
         Quaternion ra, rb;
         float t;
-        Quaternion windup = Quaternion.Euler(-9, -3, 7);
+        // LVL_2-4 use authored blade poses: roll toward the sack from the right.
+        float pourRollDirection = pendingContainer != null && heldLevels != null && heldLevels.UsesAuthoredShovelPose ? -1f : 1f;
+        Quaternion windup = Quaternion.Euler(-9, -3, 7 * pourRollDirection);
         Quaternion insert = (pendingContainer != null || dropping) ? Quaternion.Euler(-8, -5, -15) : Quaternion.Euler(8, 3, -7);
         Quaternion lift = (pendingContainer != null || dropping) ? Quaternion.Euler(-15, -8, -25) : Quaternion.Euler(-15, -4, 5);
         if (pendingContainer != null || dropping)
@@ -510,8 +512,8 @@ public sealed class ShovelTool : MonoBehaviour
             Quaternion aim = Quaternion.Inverse(restRotation) *
                 Quaternion.FromToRotation(restTip - restGrip, contact - restGrip) * restRotation;
             aim = Quaternion.RotateTowards(Quaternion.identity, aim, 45f);
-            insert = aim * Quaternion.Euler(-4, 0, -10 - extraPourRoll * .7f);
-            lift = aim * Quaternion.Euler(-7, 0, -18 - extraPourRoll);
+            insert = aim * Quaternion.Euler(-4, 0, (-10 - extraPourRoll * .7f) * pourRollDirection);
+            lift = aim * Quaternion.Euler(-7, 0, (-18 - extraPourRoll) * pourRollDirection);
         }
         if (phase < .16f)
         { a = restTip; b = restTip + new Vector3(.025f, .055f, -.1f); ra = Quaternion.identity; rb = windup; t = phase / .16f; }

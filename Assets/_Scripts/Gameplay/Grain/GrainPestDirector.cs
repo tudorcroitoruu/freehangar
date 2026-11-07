@@ -684,20 +684,39 @@ public sealed class GrainPestDirector : MonoBehaviour
         GameplayCanvas.Instance?.SetWarning(WarningType.CrowsAttack, this, visible && crowLesson);
     }
 
+    private readonly System.Collections.Generic.HashSet<GrainContainer> markedBags = new System.Collections.Generic.HashSet<GrainContainer>();
+    private readonly System.Collections.Generic.List<FarmChicken> markedChickens = new System.Collections.Generic.List<FarmChicken>();
+    private readonly System.Collections.Generic.List<Vector3> markerPositions = new System.Collections.Generic.List<Vector3>();
+    private float nextMarkerRefresh;
+
     private void OnGUI()
     {
+        // IMGUI also invokes Layout/input events; these dots only need Repaint.
+        if (Event.current.type != EventType.Repaint) return;
         if (playerCamera == null) return;
         if (markerTexture == null) return;
-        var marked = new System.Collections.Generic.HashSet<GrainContainer>();
-        var positions = new System.Collections.Generic.List<Vector3>();
-        foreach (var pest in FindObjectsByType<GrainPest>(FindObjectsSortMode.None))
+        if (Time.unscaledTime >= nextMarkerRefresh)
         {
-            if (pest.Target == null || !marked.Add(pest.Target)) continue;
-            positions.Add(pest.Target.WorldBounds.center + Vector3.up * (pest.Target.WorldBounds.extents.y + 1f));
+            nextMarkerRefresh = Time.unscaledTime + .2f;
+            markedBags.Clear();
+            markedChickens.Clear();
+            foreach (var pest in FindObjectsByType<GrainPest>(FindObjectsSortMode.None))
+                if (pest.Target != null) markedBags.Add(pest.Target);
+            foreach (var chicken in FindObjectsByType<FarmChicken>(FindObjectsSortMode.None))
+                if (chicken.IsGrainThreat) markedChickens.Add(chicken);
         }
-        foreach (var chicken in FindObjectsByType<FarmChicken>(FindObjectsSortMode.None))
-            if (chicken.IsGrainThreat) positions.Add(chicken.transform.position + Vector3.up);
-        foreach (var position in positions)
+        // Retain live positions so moving targets and camera turns stay smooth.
+        markerPositions.Clear();
+        foreach (var bag in markedBags)
+        {
+            if (bag == null || !bag.isActiveAndEnabled) continue;
+            var bounds = bag.WorldBounds;
+            markerPositions.Add(bounds.center + Vector3.up * (bounds.extents.y + 1f));
+        }
+        foreach (var chicken in markedChickens)
+            if (chicken != null && chicken.isActiveAndEnabled && !chicken.IsDead)
+                markerPositions.Add(chicken.transform.position + Vector3.up);
+        foreach (var position in markerPositions)
         {
             Vector3 p = playerCamera.WorldToViewportPoint(position);
             Vector2 direction = new Vector2(p.x - .5f, p.y - .5f);

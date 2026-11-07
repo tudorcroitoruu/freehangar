@@ -251,7 +251,7 @@ public class PlayerController : MonoBehaviour
         Vector3 baseline = cameraRestPosition - Vector3.up * Mathf.Max(0, standingHeight - characterController.height);
         characterCamera.transform.localPosition = baseline + Vector3.up * (Mathf.Sin(sprintCameraPhase) * sprintCameraHeight * sprintCameraBlend);
         characterCamera.transform.localRotation = Quaternion.Euler(smoothedPitch + Mathf.Cos(sprintCameraPhase) * sprintCameraPitch * sprintCameraBlend, IsPushing ? pushLookYaw : 0, 0);
-        if (combatTools != null) characterCamera.transform.localRotation *= combatTools.BroomCameraKick;
+        if (combatTools != null) characterCamera.transform.localRotation *= combatTools.BroomCameraKick * combatTools.MeleeCameraKick;
     }
 
     private void HandleGrainScooped()

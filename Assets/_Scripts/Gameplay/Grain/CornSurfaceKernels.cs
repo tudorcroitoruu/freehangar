@@ -634,10 +634,9 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                 float distance = Vector3.Distance(camera.transform.position, surfaceBounds[i].ClosestPoint(camera.transform.position));
                 if (distance > detailDistance) continue;
                 Mesh lod = distance < fullDetailDistance ? nearMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
-                LastDrawTriangles += counts[i] * (int)(lod.GetIndexCount(0) / 3);
                 var material = colorVariants != null && colorVariants.Length == colorCount && colorVariants[i / batchesPerColor] != null
                     ? colorVariants[i / batchesPerColor] : kernelMaterial;
-                DrawBatch(lod, material, batches[i], counts[i], surfaceBounds[i], camera);
+                QueueBatch(lod, material, batches[i], counts[i], surfaceBounds[i], camera, KernelStride(distance));
             }
         foreach (var entry in coveragePatches)
         {
@@ -660,8 +659,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                 var material = colorVariants != null && colorVariants.Length == colorCount && colorVariants[color] != null
                     ? colorVariants[color] : kernelMaterial;
                 int count = Mathf.Min(1023, patch.count - i * 1023);
-                LastDrawTriangles += count * (int)(lod.GetIndexCount(0) / 3);
-                QueueBatch(lod, material, matrices, count, bounds, camera);
+                QueueBatch(lod, material, matrices, count, bounds, camera, KernelStride(distance));
             }
         }
         FlushBatches(camera);
@@ -686,8 +684,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             var material=colorVariants!=null && color<colorVariants.Length && colorVariants[color]!=null?colorVariants[color]:kernelMaterial;
             foreach(var matrices in patch.batches)
             {
-                LastDrawTriangles+=matrices.Length*(int)(lod.GetIndexCount(0)/3);
-                QueueBatch(lod,material,matrices,matrices.Length,patch.bounds,camera);
+                QueueBatch(lod,material,matrices,matrices.Length,patch.bounds,camera,KernelStride(distance));
             }
         }
         FlushBatches(camera);
@@ -696,7 +693,13 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     // Keep patch-level culling, but pack visible patches into full submissions.
     // Flush before changing property blocks: top grains follow the height field,
     // whereas edge grains already contain their final world-space transforms.
-    private void QueueBatch(Mesh lod, Material material, Matrix4x4[] matrices, int count, Bounds bounds, Camera camera)
+    // Keep every kernel in reach of the shovel. Beyond that, progressively use
+    // the typed substrate for coverage instead of submitting subpixel geometry.
+    // Nested strides retain the same samples between LODs and while turning.
+    private static int KernelStride(float distance) =>
+        distance < 4f ? 1 : distance < 7f ? 2 : distance < 11f ? 8 : distance < 17f ? 16 : 32;
+
+    private void QueueBatch(Mesh lod, Material material, Matrix4x4[] matrices, int count, Bounds bounds, Camera camera, int stride = 1)
     {
         var key = (lod, material);
         if (!drawBuckets.TryGetValue(key, out var bucket))
@@ -707,12 +710,15 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         int offset = 0;
         while (offset < count)
         {
-            int copied = Mathf.Min(count - offset, bucket.matrices.Length - bucket.count);
+            int copied = Mathf.Min((count - offset + stride - 1) / stride, bucket.matrices.Length - bucket.count);
             if (bucket.count == 0) bucket.bounds = bounds;
             else bucket.bounds.Encapsulate(bounds);
-            Array.Copy(matrices, offset, bucket.matrices, bucket.count, copied);
+            if (stride == 1) Array.Copy(matrices, offset, bucket.matrices, bucket.count, copied);
+            else
+                for (int i = 0; i < copied; i++)
+                    bucket.matrices[bucket.count + i] = matrices[offset + i * stride];
             bucket.count += copied;
-            offset += copied;
+            offset += copied * stride;
             if (bucket.count == bucket.matrices.Length)
             {
                 DrawBatch(lod, material, bucket.matrices, bucket.count, bucket.bounds, camera);
@@ -735,6 +741,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private void DrawBatch(Mesh lod, Material material, Matrix4x4[] matrices, int count, Bounds bounds, Camera camera)
     {
         LastDrawBatches++;
+        LastDrawTriangles += count * (int)(lod.GetIndexCount(0) / 3);
         var parameters = new RenderParams(material) { worldBounds = bounds, matProps = grainAppearance.Block,
             shadowCastingMode = ShadowCastingMode.Off, receiveShadows = true, layer = gameObject.layer,
             camera = camera, lightProbeUsage = LightProbeUsage.Off };
