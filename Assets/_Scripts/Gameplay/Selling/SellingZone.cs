@@ -213,7 +213,7 @@ public sealed class WeighDeckSpring : MonoBehaviour
         }
         for (int i = 0; i < moving.Count; i++)
             if (moving[i] != null)
-                moving[i].localPosition = rest[i] + moving[i].parent.InverseTransformVector(Vector3.up * (displacement * 2f));
+                moving[i].localPosition = rest[i] + moving[i].parent.InverseTransformVector(Vector3.up * (displacement * 6f));
     }
 
     private void OnDisable()

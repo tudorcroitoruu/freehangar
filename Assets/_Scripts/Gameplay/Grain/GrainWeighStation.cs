@@ -36,7 +36,9 @@ public sealed class GrainWeighStation : MonoBehaviour
         }
         bool wrong = sellingZone.HasVehicleOnScale || (player != null && sellingZone.Contains(player)) ||
             sellingZone.HasBlockingOccupants;
-        SetWrongWarning(wrong);
+        // HUD warnings belong to the aimed red button (PlayerInteractor).
+        // Merely standing on or walking past the scale must not show a popup.
+        SetWrongWarning(false);
         if (wrong)
         {
             SetStatus("", Color.white);

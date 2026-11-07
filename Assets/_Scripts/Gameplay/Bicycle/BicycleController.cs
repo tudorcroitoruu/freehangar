@@ -431,7 +431,9 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         var rider = interactor.GetComponent<PlayerBicycleInteraction>();
         var actor = interactor.GetComponent<PlayerController>();
         if (rider == null || rider.IsRiding || actor == null || actor.characterCamera == null ||
-            Vector3.Distance(actor.transform.position, interactor.Bags != null && interactor.Bags.IsCarrying && GetComponent<VehicleCargoRack>() is VehicleCargoRack promptRack && promptRack.surface != null ? promptRack.surface.position : transform.position) > rider.interactionDistance) return false;
+            (interactor.Bags != null && interactor.Bags.IsCarrying
+                ? !rider.TryFindLoadingVehicle(out var loadingVehicle) || loadingVehicle != this
+                : Vector3.Distance(actor.transform.position, transform.position) > rider.interactionDistance)) return false;
         if (interactor.Bags != null && interactor.Bags.IsCarrying)
         {
             var upgrades = GetComponent<VehicleUpgrade>();

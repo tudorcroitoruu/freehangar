@@ -13,6 +13,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     public AudioClip barkClip;
     public SickscoreGames.HUDNavigationSystem.HUDNavigationElementSettings chickenMarkerSettings;
     private float nextBark;
+    private AudioSource announcementAudio;
     private Outline foundOutline;
     private SickscoreGames.HUDNavigationSystem.HUDNavigationElement foundMarker;
     public GameObject legPrefab;
@@ -167,7 +168,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         { GoHome(); return; }
         if ((target.transform.position - transform.position).sqrMagnitude <= 1.2f * 1.2f)
         {
-            if (Time.time >= nextBark) Bark();
+            if (Time.time >= nextBark) Bark(true);
             if (BringsLeg(Level)) SetState(DogState.Attacking);
             else
             {
@@ -212,9 +213,32 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         if (elapsed >= .9f) SetState(DogState.Chasing);
     }
 
-    private void Bark()
+    private void Bark(bool announcement = false)
     {
-        if (strokeAudio && barkClip) strokeAudio.PlayOneShot(barkClip);
+        announcement |= State == DogState.Alerting || State == DogState.DeliveryAlert;
+        if (barkClip && announcement)
+        {
+            if (!announcementAudio)
+            {
+                announcementAudio = gameObject.AddComponent<AudioSource>();
+                announcementAudio.playOnAwake = false;
+                announcementAudio.spatialBlend = 0f;
+                announcementAudio.dopplerLevel = 0f;
+                announcementAudio.priority = 64;
+            }
+            if (strokeAudio) announcementAudio.outputAudioMixerGroup = strokeAudio.outputAudioMixerGroup;
+            if (!nearbyPlayer)
+            {
+                var player = FindFirstObjectByType<PlayerController>();
+                if (player) nearbyPlayer = player.transform;
+            }
+            float distance = nearbyPlayer ? Vector3.Distance(transform.position, nearbyPlayer.position) : 0f;
+            // A confirmation must remain audible across the map, while still
+            // sounding a little quieter when the dog is far away.
+            float volume = Mathf.Lerp(1f, .65f, Mathf.Clamp01(distance / 200f));
+            announcementAudio.PlayOneShot(barkClip, volume);
+        }
+        else if (strokeAudio && barkClip) strokeAudio.PlayOneShot(barkClip);
         nextBark = Time.time + Random.Range(4f, 8f);
     }
 
@@ -260,6 +284,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
             profile.dogHasDelivery = false;
             transform.rotation = homeRotation;
             SetState(DogState.Sleeping);
+            if (delivered) Bark(true);
             return;
         }
         if (Time.time < nextDecision) return;

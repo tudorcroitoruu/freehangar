@@ -9,6 +9,27 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
     public BicycleController bicycle;
     public Transform instrument;
     public float interactionDistance = 2.5f;
+    [Min(.1f)] public float cargoLoadingDistance = 3.5f;
+    [Min(0f)] public float cargoAimRadius = .45f;
+    private readonly RaycastHit[] cargoAimHits = new RaycastHit[32];
+
+    public bool TryFindLoadingVehicle(out BicycleController vehicle)
+    {
+        vehicle = null;
+        if (view == null || bags == null || !bags.IsCarrying || riding) return false;
+        int count = Physics.SphereCastNonAlloc(PlayerAim.CenterRay(view), cargoAimRadius,
+            cargoAimHits, cargoLoadingDistance, ~0, QueryTriggerInteraction.Ignore);
+        if (count == cargoAimHits.Length) return false;
+        float nearest = float.PositiveInfinity;
+        for (int i = 0; i < count; i++)
+        {
+            var hit = cargoAimHits[i];
+            if (hit.transform.IsChildOf(transform) || hit.distance >= nearest) continue;
+            nearest = hit.distance;
+            vehicle = VehicleCargoOwner.Resolve(hit.collider);
+        }
+        return vehicle != null && vehicle.isActiveAndEnabled && !vehicle.IsRidden;
+    }
     [Min(0)] public float cameraReturnDelay = 3f;
     [Min(.05f)] public float cameraReturnSmoothTime = .6f;
     [Min(0)] public float boostStaminaPerSecond = 12f;
@@ -58,6 +79,13 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
 
         if (player != null && player.IsCarrying && (bags == null || !bags.IsCarrying)) return false;
         if (!input || Time.timeScale <= 0) return false;
+        if (bags != null && bags.IsCarrying)
+        {
+            if (!TryFindLoadingVehicle(out var loadingVehicle)) return false;
+            bicycle = loadingVehicle;
+            if (FarmInput.Down("Interact")) { TryLoadBag(); return true; }
+            return false;
+        }
         if(!Physics.Raycast(view.transform.position,view.transform.forward,out var hit,interactionDistance,~0,QueryTriggerInteraction.Ignore)) return false;
         // Select the aimed vehicle, keeping the existing serialized bicycle as the default.
         var aimedVehicle = VehicleCargoOwner.Resolve(hit.collider);

@@ -86,7 +86,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.NotFitInWheelBarrow || hungerBlocksPrompt || aimedPrompt.WeighingEmpty || aimedPrompt.WeighingWrong || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
         {
             Target = aimedTarget;
-            SetHighlightedTarget(null);
+            SetHighlightedTarget(aimedTarget is SellingWeighButton ? aimedTarget : null);
             HidePrompt();
             return;
         }
@@ -243,6 +243,13 @@ public sealed class PlayerInteractor : MonoBehaviour
     private IInteractable FindTarget()
     {
         actionOrigin = null;
+        // A loaded bag belongs to its vehicle while carrying another bag. Use
+        // exactly the same forgiving aim query as the E loading action.
+        if (bicycle != null && bicycle.TryFindLoadingVehicle(out var loadingVehicle))
+        {
+            actionOrigin = loadingVehicle.transform;
+            return loadingVehicle;
+        }
         int count = Physics.RaycastNonAlloc(PlayerAim.CenterRay(viewCamera), hits, interactionDistance,
             interactionMask, QueryTriggerInteraction.Ignore);
         if (count == hits.Length) return null;
