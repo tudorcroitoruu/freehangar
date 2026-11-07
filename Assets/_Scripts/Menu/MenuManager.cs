@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 [DefaultExecutionOrder(-1000)]
 public class MenuManager : MonoBehaviour
@@ -17,13 +19,21 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject continueButton;
     [SerializeField] private GameObject menuScreen;
     [SerializeField] private GameObject settingsScreen;
+    [SerializeField] private SelectedUI[] mainButtons;
+    [Space, Header("New Game")]
     [SerializeField] private GameObject newGamePopup;
+    [SerializeField] private SelectedUI[] newGamePopupButtons;
+    [Space, Header("Quit Game")]
     [SerializeField] private GameObject quitGamePopup;
+    [SerializeField] private SelectedUI[] quitGamePopupButtons;
     [Header("Transitions")]
     [SerializeField] private string gameplayScene = "Gameplay";
     [SerializeField, Min(0f)] private float minimumLoadingSeconds = 1f;
     private bool transitionRequested;
     private int newGamePopupOpenedFrame;
+    private SelectedUI[] activePopupButtons;
+    private int selectedPopupIndex, popupOpenedFrame, lastPopupDirection;
+    private float nextPopupMoveAt;
 
     [Header("Background cameras (in playback order)")]
     [SerializeField] private Camera[] menuCameras = new Camera[3];
@@ -90,6 +100,7 @@ public class MenuManager : MonoBehaviour
         SetScreenActive(menuScreen, false);
         SetScreenActive(newGamePopup, true);
         newGamePopupOpenedFrame = Time.frameCount;
+        InitializePopupSelection(newGamePopup, ref newGamePopupButtons);
     }
 
     public void ConfirmNewGame()
@@ -104,11 +115,13 @@ public class MenuManager : MonoBehaviour
         if ((settingsScreen != null && settingsScreen.activeSelf) || (quitGamePopup != null && quitGamePopup.activeSelf) ||
             (newGamePopup != null && newGamePopup.activeSelf))
             AudioManager.Instance?.PlayCancel();
+        ClearPopupSelection();
         SetScreenActive(menuScreen, true);
         SetScreenActive(settingsScreen, false);
         SetScreenActive(quitGamePopup, false);
         SetScreenActive(newGamePopup, false);
-        SetScreenActive(continueButton, SaveSystem.HasSavedGame);
+        RefreshContinueButtonState();
+        if (menuScreen != null) InitializePopupSelection(menuScreen, ref mainButtons);
     }
 
     public void ShowSettingsScreen()
@@ -118,6 +131,7 @@ public class MenuManager : MonoBehaviour
         if (settingsScreen == null || settingsScreen.activeSelf) return;
         AudioManager.Instance?.PlayConfirm();
         SetScreenActive(menuScreen, false);
+        ClearPopupSelection();
         SetScreenActive(quitGamePopup, false);
         SetScreenActive(settingsScreen, true);
     }
@@ -131,6 +145,119 @@ public class MenuManager : MonoBehaviour
         SetScreenActive(settingsScreen, false);
         SetScreenActive(menuScreen, true);
         SetScreenActive(quitGamePopup, true);
+        InitializePopupSelection(quitGamePopup, ref quitGamePopupButtons);
+    }
+
+    private void InitializePopupSelection(GameObject popup, ref SelectedUI[] buttons)
+    {
+        ClearPopupSelection();
+        if (buttons == null || buttons.Length == 0) buttons = popup.GetComponentsInChildren<SelectedUI>(true);
+        activePopupButtons = buttons;
+        foreach (var item in buttons)
+            if (item != null) item.PointerEntered += OnPopupPointerEntered;
+        popupOpenedFrame = Time.frameCount;
+        lastPopupDirection = 0;
+        selectedPopupIndex = -1;
+        for (int i = 0; i < buttons.Length; i++)
+            if (SelectPopupButton(i)) break;
+    }
+
+    private void RefreshContinueButtonState()
+    {
+        if ((mainButtons == null || mainButtons.Length == 0) && menuScreen != null)
+            mainButtons = menuScreen.GetComponentsInChildren<SelectedUI>(true);
+        var selected = mainButtons != null && mainButtons.Length > 0 ? mainButtons[0] :
+            continueButton != null ? continueButton.GetComponent<SelectedUI>() : null;
+        var button = selected != null ? selected.button != null ? selected.button : selected.GetComponent<Button>() :
+            continueButton != null ? continueButton.GetComponent<Button>() : null;
+        bool hasSave = SaveSystem.HasSavedGame;
+        SetScreenActive(selected != null ? selected.gameObject : continueButton, true);
+        if (button != null) button.interactable = hasSave;
+        if (selected != null)
+        {
+            if (!hasSave)
+            {
+                selected.OnPointerExit(null);
+                selected.OnDeselect(null);
+                selected.Deselect();
+            }
+            selected.enabled = hasSave;
+        }
+    }
+
+    private bool SelectPopupButton(int index)
+    {
+        var selected = activePopupButtons[index];
+        var button = selected != null ? selected.button != null ? selected.button : selected.GetComponent<Button>() : null;
+        if (selected == null || !selected.isActiveAndEnabled || button == null || !button.IsActive() || !button.IsInteractable()) return false;
+        foreach (var item in activePopupButtons)
+            if (item != null)
+            {
+                if (item != selected)
+                {
+                    item.OnPointerExit(null);
+                    item.OnDeselect(null);
+                }
+                item.Deselect();
+            }
+        selectedPopupIndex = index;
+        selected.Select();
+        EventSystem.current?.SetSelectedGameObject(button.gameObject);
+        return true;
+    }
+
+    private void OnPopupPointerEntered(SelectedUI item)
+    {
+        if (activePopupButtons == null || transitionRequested || LoadingScreen.IsLoading) return;
+        int index = System.Array.IndexOf(activePopupButtons, item);
+        if (index >= 0) SelectPopupButton(index);
+    }
+
+    // PadMenuCursor delegates the authored menu button groups here to share mouse/pad selection.
+    public bool HandleConfirmationInput(Gamepad pad)
+    {
+        bool popupOpen = (newGamePopup != null && newGamePopup.activeInHierarchy) ||
+            (quitGamePopup != null && quitGamePopup.activeInHierarchy);
+        bool mainMenuOpen = !popupOpen && menuScreen != null && menuScreen.activeInHierarchy &&
+            (settingsScreen == null || !settingsScreen.activeInHierarchy);
+        if ((!popupOpen && !mainMenuOpen) || activePopupButtons == null || activePopupButtons.Length == 0) return false;
+        if (pad == null || Time.frameCount <= popupOpenedFrame || transitionRequested ||
+            LoadingScreen.IsLoading || GameSettingsManager.IsRebindingInputCaptured) return true;
+        float axis = mainMenuOpen ? -pad.dpad.ReadValue().y : pad.dpad.ReadValue().x;
+        if (Mathf.Abs(axis) < .5f) axis = mainMenuOpen ? -pad.leftStick.ReadValue().y : pad.leftStick.ReadValue().x;
+        int direction = Mathf.Abs(axis) >= .5f ? axis > 0 ? 1 : -1 : 0;
+        if (direction != 0 && (direction != lastPopupDirection || Time.unscaledTime >= nextPopupMoveAt))
+        {
+            nextPopupMoveAt = Time.unscaledTime + (direction != lastPopupDirection ? .35f : .12f);
+            for (int step = 1; step <= activePopupButtons.Length; step++)
+            {
+                int index = (selectedPopupIndex + direction * step + activePopupButtons.Length * 2) % activePopupButtons.Length;
+                if (SelectPopupButton(index)) break;
+            }
+        }
+        lastPopupDirection = direction;
+        if (pad.buttonSouth.wasPressedThisFrame && selectedPopupIndex >= 0)
+        {
+            var selected = activePopupButtons[selectedPopupIndex];
+            var button = selected != null ? selected.button != null ? selected.button : selected.GetComponent<Button>() : null;
+            if (button != null && button.IsActive() && button.IsInteractable()) button.onClick.Invoke();
+        }
+        return true;
+    }
+
+    private void ClearPopupSelection()
+    {
+        if (activePopupButtons != null)
+            foreach (var item in activePopupButtons)
+                if (item != null)
+                {
+                    item.PointerEntered -= OnPopupPointerEntered;
+                    item.OnPointerExit(null);
+                    item.OnDeselect(null);
+                    item.Deselect();
+                }
+        activePopupButtons = null;
+        selectedPopupIndex = -1;
     }
 
     public void QuitGame()
@@ -212,10 +339,11 @@ public class MenuManager : MonoBehaviour
         Cursor.visible = true;
         // Reset the page selection when this menu scene opens again.
         SetScreenActive(newGamePopup, false);
-        SetScreenActive(continueButton, SaveSystem.HasSavedGame);
+        RefreshContinueButtonState();
         SetScreenActive(menuScreen, true);
         SetScreenActive(settingsScreen, false);
         SetScreenActive(quitGamePopup, false);
+        if (menuScreen != null) InitializePopupSelection(menuScreen, ref mainButtons);
         cameras.Clear();
         cameraTargets.Clear();
         suspendedCameras.Clear();
@@ -375,6 +503,7 @@ public class MenuManager : MonoBehaviour
 
     private void OnDisable()
     {
+        ClearPopupSelection();
         if (playback != null) StopCoroutine(playback);
         playback = null;
         if (cameraCanvas != null)

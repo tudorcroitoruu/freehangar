@@ -3,6 +3,9 @@ using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 
 public class MenuSessionTests
 {
@@ -118,7 +121,7 @@ public class MenuSessionTests
     public void NoSaveHidesContinueAndRejectsContinueRequests()
     {
         PlayerPrefs.DeleteKey("/save");Open();
-        Assert.IsFalse(continueButton.activeSelf);
+        Assert.IsTrue(continueButton.activeSelf);
         var data=SaveSystem.Data;menu.ContinueGame();
         Assert.AreSame(data,SaveSystem.Data);Assert.IsFalse(newGame.activeSelf);
     }
@@ -135,6 +138,188 @@ public class MenuSessionTests
         menu.ShowMenuScreen();
         Assert.IsFalse(newGame.activeSelf);Assert.IsTrue(main.activeSelf);
         menu.ConfirmNewGame();Assert.AreSame(data,SaveSystem.Data);
+    }
+
+    [TestCase(false, false)]
+    [TestCase(false, true)]
+    [TestCase(true, false)]
+    [TestCase(true, true)]
+    public void ConfirmationSelectsArrayFirstNavigatesHorizontallyAndSubmitsSelectedButton(bool quitting, bool stick)
+    {
+        var popup = quitting ? quit : newGame;
+        var second = PopupButton(popup, "Second", out var secondMarker);
+        var first = PopupButton(popup, "First", out var firstMarker);
+        Set(quitting ? "quitGamePopupButtons" : "newGamePopupButtons", new[] { first, second });
+        int firstClicks = 0, secondClicks = 0;
+        first.button.onClick.AddListener(() => firstClicks++);
+        second.button.onClick.AddListener(() => secondClicks++);
+        Open();
+        if (quitting) menu.ShowQuitGamePopup(); else menu.NewGame();
+        Assert.IsTrue(firstMarker.activeSelf);
+        Assert.IsFalse(secondMarker.activeSelf);
+        var pad = InputSystem.AddDevice<Gamepad>();
+        try
+        {
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.South));
+            InputSystem.Update();
+            menu.HandleConfirmationInput(pad);
+            Assert.AreEqual(0, firstClicks, "The opening press must not confirm the popup.");
+            Set("popupOpenedFrame", -1);
+            InputSystem.QueueStateEvent(pad, default(GamepadState));
+            InputSystem.Update();
+            var right = stick ? new GamepadState { leftStick = Vector2.right } : new GamepadState().WithButton(GamepadButton.DpadRight);
+            InputSystem.QueueStateEvent(pad, right);
+            InputSystem.Update();
+            menu.HandleConfirmationInput(pad);
+            Assert.IsFalse(firstMarker.activeSelf);
+            Assert.IsTrue(secondMarker.activeSelf);
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.South));
+            InputSystem.Update();
+            menu.HandleConfirmationInput(pad);
+            Assert.AreEqual(0, firstClicks);
+            Assert.AreEqual(1, secondClicks);
+            var left = stick ? new GamepadState { leftStick = Vector2.left } : new GamepadState().WithButton(GamepadButton.DpadLeft);
+            InputSystem.QueueStateEvent(pad, left);
+            InputSystem.Update();
+            menu.HandleConfirmationInput(pad);
+            Assert.IsTrue(firstMarker.activeSelf);
+            Assert.IsFalse(secondMarker.activeSelf);
+            menu.ShowMenuScreen();
+            if (quitting) menu.ShowQuitGamePopup(); else menu.NewGame();
+            Assert.IsTrue(firstMarker.activeSelf, "Reopening must reset to the first array entry.");
+            Assert.IsFalse(secondMarker.activeSelf);
+        }
+        finally { InputSystem.RemoveDevice(pad); }
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void PopupHoverSharesGamepadSelectionAndNavigationClearsPreviousHover(bool quitting)
+    {
+        var popup = quitting ? quit : newGame;
+        var first = PopupButton(popup, "First", out var firstMarker);
+        var second = PopupButton(popup, "Second", out var secondMarker);
+        typeof(SelectedUI).GetField("selectOnHover", Private).SetValue(second, true);
+        Set(quitting ? "quitGamePopupButtons" : "newGamePopupButtons", new[] { first, second });
+        int firstClicks = 0, secondClicks = 0;
+        first.button.onClick.AddListener(() => firstClicks++);
+        second.button.onClick.AddListener(() => secondClicks++);
+        Open();
+        if (quitting) menu.ShowQuitGamePopup(); else menu.NewGame();
+        second.OnPointerEnter(null);
+        Assert.IsFalse(firstMarker.activeSelf);
+        Assert.IsTrue(secondMarker.activeSelf);
+        Set("popupOpenedFrame", -1);
+        var pad = InputSystem.AddDevice<Gamepad>();
+        try
+        {
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.South));
+            InputSystem.Update();
+            menu.HandleConfirmationInput(pad);
+            Assert.AreEqual(0, firstClicks);
+            Assert.AreEqual(1, secondClicks);
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.DpadLeft));
+            InputSystem.Update();
+            menu.HandleConfirmationInput(pad);
+            Assert.IsTrue(firstMarker.activeSelf);
+            Assert.IsFalse(secondMarker.activeSelf, "Stationary mouse hover must not leave a second highlight after gamepad navigation.");
+        }
+        finally { InputSystem.RemoveDevice(pad); }
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void MainButtonsShareHoverSelectionWithVerticalGamepadNavigation(bool stick)
+    {
+        var first = PopupButton(main, "First", out var firstMarker);
+        var second = PopupButton(main, "Second", out var secondMarker);
+        typeof(SelectedUI).GetField("selectOnHover", Private).SetValue(second, true);
+        Set("mainButtons", new[] { first, second });
+        int secondClicks = 0;
+        second.button.onClick.AddListener(() => secondClicks++);
+        Open();
+        Assert.IsTrue(firstMarker.activeSelf);
+        Assert.IsFalse(secondMarker.activeSelf);
+        second.OnPointerEnter(null);
+        Assert.IsFalse(firstMarker.activeSelf);
+        Assert.IsTrue(secondMarker.activeSelf);
+        Set("popupOpenedFrame", -1);
+        var pad = InputSystem.AddDevice<Gamepad>();
+        try
+        {
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.South));
+            InputSystem.Update();
+            menu.HandleConfirmationInput(pad);
+            Assert.AreEqual(1, secondClicks);
+            var up = stick ? new GamepadState { leftStick = Vector2.up } : new GamepadState().WithButton(GamepadButton.DpadUp);
+            InputSystem.QueueStateEvent(pad, up);
+            InputSystem.Update();
+            menu.HandleConfirmationInput(pad);
+            Assert.IsTrue(firstMarker.activeSelf);
+            Assert.IsFalse(secondMarker.activeSelf);
+            var down = stick ? new GamepadState { leftStick = Vector2.down } : new GamepadState().WithButton(GamepadButton.DpadDown);
+            InputSystem.QueueStateEvent(pad, down);
+            InputSystem.Update();
+            menu.HandleConfirmationInput(pad);
+            Assert.IsFalse(firstMarker.activeSelf);
+            Assert.IsTrue(secondMarker.activeSelf);
+            menu.ShowQuitGamePopup();
+            Assert.IsFalse(firstMarker.activeSelf);
+            Assert.IsFalse(secondMarker.activeSelf);
+            menu.ShowMenuScreen();
+            Assert.IsTrue(firstMarker.activeSelf);
+            Assert.IsFalse(secondMarker.activeSelf);
+        }
+        finally { InputSystem.RemoveDevice(pad); }
+    }
+
+    [Test]
+    public void NoSaveDisablesContinueHoverAndGamepadSelectionAndSaveRestoresIt()
+    {
+        var first = PopupButton(main, "Continue", out var firstMarker);
+        var second = PopupButton(main, "New game", out var secondMarker);
+        typeof(SelectedUI).GetField("selectOnHover", Private).SetValue(first, true);
+        Set("mainButtons", new[] { first, second });
+        PlayerPrefs.DeleteKey("/save");
+        Open();
+        Assert.IsTrue(first.gameObject.activeSelf);
+        Assert.IsFalse(first.button.interactable);
+        Assert.IsFalse(first.enabled);
+        Assert.IsFalse(firstMarker.activeSelf);
+        Assert.IsTrue(secondMarker.activeSelf);
+        first.OnPointerEnter(null);
+        Assert.IsFalse(firstMarker.activeSelf);
+        Assert.IsTrue(secondMarker.activeSelf);
+        Set("popupOpenedFrame", -1);
+        var pad = InputSystem.AddDevice<Gamepad>();
+        try
+        {
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.DpadUp));
+            InputSystem.Update();
+            menu.HandleConfirmationInput(pad);
+            Assert.IsFalse(firstMarker.activeSelf);
+            Assert.IsTrue(secondMarker.activeSelf);
+        }
+        finally { InputSystem.RemoveDevice(pad); }
+        PlayerPrefs.SetString("/save", "menu-test-placeholder");
+        menu.ShowMenuScreen();
+        Assert.IsTrue(first.button.interactable);
+        Assert.IsTrue(first.enabled);
+        Assert.IsTrue(firstMarker.activeSelf);
+        Assert.IsFalse(secondMarker.activeSelf);
+    }
+
+    private SelectedUI PopupButton(GameObject popup, string name, out GameObject marker)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(Button), typeof(SelectedUI));
+        go.transform.SetParent(popup.transform);
+        var selected = go.GetComponent<SelectedUI>();
+        selected.button = go.GetComponent<Button>();
+        marker = new GameObject("Selection");
+        marker.transform.SetParent(go.transform);
+        typeof(SelectedUI).GetField("selectedImage", Private).SetValue(selected, marker);
+        selected.Deselect();
+        return selected;
     }
 
     private void Open(){menuObject.SetActive(true);typeof(MenuManager).GetMethod("OnEnable",Private).Invoke(menu,null);}

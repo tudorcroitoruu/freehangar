@@ -12,6 +12,7 @@ public sealed class ButtonMaterialFocus : MonoBehaviour, ISelectHandler, IDesele
     private static readonly int ColorId = Shader.PropertyToID("_Color");
     private void Awake()
     {
+        if (GetComponentInParent<SelectedUI>() != null) return;
         graphic = GetComponent<Button>().targetGraphic;
         if (!graphic || !graphic.material || graphic.material.shader.name != "UI/Image Margin Fade") return;
         original = graphic.material;
@@ -26,7 +27,9 @@ public sealed class ButtonMaterialFocus : MonoBehaviour, ISelectHandler, IDesele
     private void Refresh()
     {
         if (!instance) return;
-        instance.SetColor(ColorId, (selected || hovered) && GetComponent<Button>().IsInteractable() ? Color.white : tint);
+        bool highlightMaterial = GetComponentInParent<SelectedUI>() == null &&
+            (selected || hovered) && GetComponent<Button>().IsInteractable();
+        instance.SetColor(ColorId, highlightMaterial ? Color.white : tint);
         graphic.SetMaterialDirty();
     }
     private void OnDisable() { selected = hovered = false; Refresh(); }

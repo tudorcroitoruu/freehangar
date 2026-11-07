@@ -93,6 +93,7 @@ public class SelectedUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     [SerializeField] private Text buttonText;
     [SerializeField] private GameObject selectedImage;
     [SerializeField] private GameObject unselectedImage;
+    public Button button;
     [Header("Scale")]
     [SerializeField] private bool shouldScale;
     [Tooltip("Object scaled for selection and hover. Defaults to this object's transform.")]

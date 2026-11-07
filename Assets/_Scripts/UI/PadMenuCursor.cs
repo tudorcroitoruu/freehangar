@@ -57,14 +57,15 @@ public sealed class PadMenuCursor : MonoBehaviour
             foreach (var toggle in root.GetComponentsInChildren<Toggle>())
                 if (toggle.transform.parent && toggle.transform.parent.parent && toggle.transform.parent.parent.name == "Dropdown List")
                     navigationRoot = toggle.transform.parent.parent;
-        // Install material instances on dynamically created controls as well as scene buttons.
+        // SelectedUI owns its authored selection visuals; other buttons use material focus.
         if (buffer.Length < Selectable.allSelectableCount) buffer = new Selectable[Selectable.allSelectableCount + 32];
         int count = Selectable.AllSelectablesNoAlloc(buffer);
         controls.Clear();
         for (int i = 0; i < count; i++)
         {
             var item = buffer[i];
-            if (item is Button && !item.TryGetComponent<ButtonMaterialFocus>(out _))
+            if (item is Button && item.GetComponentInParent<SelectedUI>() == null &&
+                !item.TryGetComponent<ButtonMaterialFocus>(out _))
                 item.gameObject.AddComponent<ButtonMaterialFocus>();
             if (root && item.transform.IsChildOf(navigationRoot) && item.IsActive() && item.IsInteractable()) controls.Add(item);
         }
@@ -82,6 +83,13 @@ public sealed class PadMenuCursor : MonoBehaviour
         bool padInput = pad != null && HasNavigationInput(pad);
         if (padInput && !pointerInput) pointerOwnsFocus = false;
         owner.sendNavigationEvents = !padInput && !FarmInput.UsingPad && previousNavigation;
+        if (MenuManager.IsMenuOpen && MenuManager.Instance.HandleConfirmationInput(pad))
+        {
+            owner.sendNavigationEvents = false;
+            scope = root;
+            lastDirection = Vector2.zero;
+            return;
+        }
         var selected = owner.currentSelectedGameObject ? owner.currentSelectedGameObject.GetComponent<Selectable>() : null;
         if (scope != root || !selected || !controls.Contains(selected))
         {
