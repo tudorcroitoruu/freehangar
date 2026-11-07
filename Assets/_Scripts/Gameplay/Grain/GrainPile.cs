@@ -97,6 +97,7 @@ public sealed class GrainPile : MonoBehaviour
         // Show a one-kilogram transition at layer boundaries, also in the substrate shader.
         if (spatial != null) spatial.Sample(0, 0, surfaceGrain); else CollectRecipe(offset, 1, surfaceGrain);
         appearance.Set(surfaceGrain);
+        appearance.SetSurfaceDetail();
         ApplySpatialAppearance(appearance.Block);
         if (surfaceRenderer == null) surfaceRenderer = GetComponent<MeshRenderer>();
         if (surfaceRenderer != null) surfaceRenderer.SetPropertyBlock(appearance.Block);
@@ -654,7 +655,7 @@ public sealed class GrainPile : MonoBehaviour
             OffsetBoundaryGround();
             mesh.Clear();
             CloseClippedEdges();
-            mesh.RecalculateNormals(); mesh.RecalculateTangents(); mesh.RecalculateBounds();
+            FinishNaturalSurface();
             if (!Application.isPlaying) colliderDirty = true;
             return;
         }
@@ -679,9 +680,7 @@ public sealed class GrainPile : MonoBehaviour
         // Bare ground must not retain a golden rectangle or a phantom grain collider.
         // Authored stock can also rise at its footprint edge after a deposit.
         CloseDroppedEdges(surface);
-        mesh.RecalculateNormals();
-        mesh.RecalculateTangents();
-        mesh.RecalculateBounds();
+        FinishNaturalSurface();
         if (!Application.isPlaying) colliderDirty = true;
     }
 
@@ -709,6 +708,62 @@ public sealed class GrainPile : MonoBehaviour
         d = transform.TransformPoint(closedSurfaceVertices[closedSurfaceTriangles[t + 5]]);
     }
     private GrainWallBoundary closedBoundary;
+    private readonly Dictionary<Vector3Int, Vector3> surfaceNormalSums = new Dictionary<Vector3Int, Vector3>();
+    private readonly List<Vector3> naturalSurfaceNormals = new List<Vector3>();
+
+    private static Vector3Int SurfaceVertexKey(Vector3 p) => new Vector3Int(
+        Mathf.RoundToInt(p.x * 10000), Mathf.RoundToInt(p.y * 10000), Mathf.RoundToInt(p.z * 10000));
+
+    private void FinishNaturalSurface()
+    {
+        // Only the render skin changes: stock, collision and scooping keep their
+        // original heights. Fade at the ground so cleared areas stay cleared.
+        float scaleY = Mathf.Max(.001f, WorldScale.y);
+        float radius = Mathf.Min(VisualHeightField.Spacing * .5f, .15f / Mathf.Max(.001f, WorldScale.x));
+        var surface = VisualHeightField;
+        for (int i = 0; i < closedSurfaceVertices.Count; i++)
+        {
+            Vector3 p = closedSurfaceVertices[i];
+            float aboveGround = (p.y - GroundOffset(p.x, p.z)) * scaleY;
+            float fade = Mathf.SmoothStep(0, 1, Mathf.Clamp01(aboveGround / .18f));
+            if (fade <= 0) continue;
+            float center = surface.Sample(p.x, p.z);
+            float average = (surface.Sample(p.x - radius, p.z) + surface.Sample(p.x + radius, p.z) +
+                surface.Sample(p.x, p.z - radius) + surface.Sample(p.x, p.z + radius)) * .25f;
+            // Round peaks by at most six centimetres, without filling empty holes.
+            float rounding = Mathf.Clamp((average - center) * .5f * scaleY, -.06f, 0);
+            float noise = (Mathf.PerlinNoise(p.x * WorldScale.x * 4.3f + 17.1f,
+                p.z * WorldScale.z * 4.3f + 31.7f) - .5f) * .05f;
+            p.y += (rounding + noise) * fade / scaleY;
+            closedSurfaceVertices[i] = p;
+        }
+        mesh.SetVertices(closedSurfaceVertices);
+        // Wall clipping duplicates triangle vertices. Average their normals by
+        // position, otherwise every clipped triangle produces a hard lighting seam.
+        surfaceNormalSums.Clear();
+        for (int t = 0; t < closedSurfaceTriangles.Count; t += 3)
+        {
+            Vector3 a = closedSurfaceVertices[closedSurfaceTriangles[t]];
+            Vector3 b = closedSurfaceVertices[closedSurfaceTriangles[t + 1]];
+            Vector3 c = closedSurfaceVertices[closedSurfaceTriangles[t + 2]];
+            Vector3 normal = Vector3.Cross(b - a, c - a);
+            for (int j = 0; j < 3; j++)
+            {
+                var key = SurfaceVertexKey(closedSurfaceVertices[closedSurfaceTriangles[t + j]]);
+                surfaceNormalSums.TryGetValue(key, out Vector3 sum);
+                surfaceNormalSums[key] = sum + normal;
+            }
+        }
+        naturalSurfaceNormals.Clear();
+        foreach (Vector3 p in closedSurfaceVertices)
+        {
+            surfaceNormalSums.TryGetValue(SurfaceVertexKey(p), out Vector3 normal);
+            naturalSurfaceNormals.Add(normal.sqrMagnitude > .00000001f ? normal.normalized : Vector3.up);
+        }
+        mesh.SetNormals(naturalSurfaceNormals);
+        mesh.RecalculateTangents();
+        mesh.RecalculateBounds();
+    }
     private readonly List<Vector2Int> clippedEdges = new List<Vector2Int>();
 
     private void CloseClippedEdges()

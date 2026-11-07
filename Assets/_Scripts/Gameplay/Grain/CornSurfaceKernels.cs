@@ -8,6 +8,8 @@ using UnityEngine.Rendering;
 public sealed class CornSurfaceKernels : MonoBehaviour
 {
     [SerializeField] private GrainPile pile;
+    [SerializeField, Tooltip("Render the continuous textured pile without decorative kernel instances.")]
+    private bool textureOnly;
     [SerializeField] private Mesh kernelMesh;
     [SerializeField] private Material kernelMaterial;
     [SerializeField] private Material[] colorVariants;
@@ -87,6 +89,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     public void CopyAppearanceFrom(CornSurfaceKernels source)
     {
+        textureOnly = source.textureOnly;
         kernelMesh = source.kernelMesh; kernelMaterial = source.kernelMaterial;
         colorVariants = source.colorVariants; spacing = source.spacing;
         pile = GetComponent<GrainPile>();
@@ -95,7 +98,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private void OnEnable()
     {
         if (pile == null) pile = GetComponent<GrainPile>();
-        if (!Application.isPlaying || !TryReuseBatches()) Rebuild();
+        if (!textureOnly && (!Application.isPlaying || !TryReuseBatches())) Rebuild();
         rebuildRequested = false;
         RenderPipelineManager.beginCameraRendering += Draw;
     }
@@ -116,6 +119,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private void Build()
     {
+        if (textureOnly) { KernelCount = SideKernelCount = 0; return; }
         if (pile == null || kernelMesh == null || kernelMaterial == null) return;
         // Component OnEnable order is not guaranteed when a scene is loaded.
         // The generated surface and cell cache both depend on the pile's field.
@@ -571,6 +575,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (textureOnly) { LastUpdatedKernels = LastDrawTriangles = LastDrawBatches = 0; return; }
         if (rebuildRequested) { rebuildRequested = false; Rebuild(); }
         if (pile != null && (revision != pile.SurfaceRevision || lastTransform != transform.localToWorldMatrix)) Build();
         else if (HasPendingSurfaceUpdates) ProcessPendingCells();
@@ -617,6 +622,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     {
         LastDrawTriangles = 0;
         LastDrawBatches = 0;
+        if (textureOnly) return;
         if (batches == null || kernelMesh == null || kernelMaterial == null || camera.cameraType == CameraType.Preview) return;
         if ((camera.cullingMask & (1 << gameObject.layer)) == 0) return;
         var renderer = pile.GetComponent<MeshRenderer>();

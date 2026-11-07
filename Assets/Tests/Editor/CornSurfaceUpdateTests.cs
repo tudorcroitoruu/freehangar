@@ -44,6 +44,18 @@ public class CornSurfaceUpdateTests
         for (int i = 0; i < field.Heights.Length; i++) field.Heights[i] *= factor;
     }
 
+    [Test] public void TextureOnlyPileDoesNotGenerateOrUpdateKernels()
+    {
+        Set(surface, "textureOnly", true);
+        surface.Rebuild();
+        nextFrame();
+        Assert.AreEqual(0, surface.KernelCount);
+        Assert.AreEqual(0, surface.SideKernelCount);
+        Assert.AreEqual(0, surface.LastUpdatedKernels);
+        Assert.AreEqual(0, surface.LastDrawBatches);
+        Assert.IsNull(Get<Vector2[]>(surface, "samples"));
+    }
+
     private void Drain()
     {
         int frames = 0;

@@ -3,6 +3,18 @@ using UnityEngine;
 /// <summary>Reusable property block, with no material instantiation or per-frame arrays.</summary>
 public sealed class GrainAppearance
 {
+    private static Texture2DArray surfaceDetail;
+    private static bool surfaceDetailLoaded;
+    public void SetSurfaceDetail()
+    {
+        if (!surfaceDetailLoaded)
+        {
+            surfaceDetail = Resources.Load<Texture2DArray>("GrainSurfaceDetail");
+            surfaceDetailLoaded = true;
+        }
+        Block.SetFloat("_UseSurfaceDetail", surfaceDetail != null ? 1f : 0f);
+        if (surfaceDetail != null) Block.SetTexture("_GrainSurfaceDetail", surfaceDetail);
+    }
     private MaterialPropertyBlock block;
     // Native rendering objects must be created on the main thread, not in MonoBehaviour field initializers.
     public MaterialPropertyBlock Block => block ?? (block = new MaterialPropertyBlock());

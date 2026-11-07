@@ -8,6 +8,9 @@ Shader "Freehangar/HDRP/Grain Kernels"
         [Toggle] _KernelMode("3D kernel (off for pile substrate)", Float) = 1
         _Brightness("Brightness", Range(0.1,2)) = 0.8
         _DetailScale("Substrate grain scale", Float) = 48
+        _SurfaceNormalStrength("Grain normal strength", Range(0, 4)) = 1.4
+        [HideInInspector] _GrainSurfaceDetail("Grain surface normals and height", 2DArray) = "" {}
+        [HideInInspector] _UseSurfaceDetail("Textured grain surface", Float) = 0
         [HideInInspector] _GrainType("Particle crop override", Float) = -1
         [HideInInspector] _UseSpatialGrain("Spatial grain", Float) = 0
         [HideInInspector] _GrainMapA("Spatial grain A", 2D) = "black" {}
@@ -24,6 +27,8 @@ Shader "Freehangar/HDRP/Grain Kernels"
     CBUFFER_START(UnityPerMaterial)
     float4 _GrainWeightsA, _GrainWeightsB, _GrainWeightsC;
     float _KernelMode, _Brightness, _DetailScale;
+    float _UseSurfaceDetail;
+    float _SurfaceNormalStrength;
     float _UseSpatialGrain;
     float4 _GrainGrid;
     float4x4 _GrainWorldToLocal;
@@ -36,6 +41,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
     TEXTURE2D(_GrainMapB); SAMPLER(sampler_GrainMapB);
     TEXTURE2D(_GrainMapC); SAMPLER(sampler_GrainMapC);
     TEXTURE2D(_PileSurfaceHeights);
+    TEXTURE2D_ARRAY(_GrainSurfaceDetail); SAMPLER(sampler_GrainSurfaceDetail);
 
     float3 FollowPile(float3 origin, inout float3 offset, inout float3 normal)
     {
@@ -195,6 +201,25 @@ Shader "Freehangar/HDRP/Grain Kernels"
         if (t == 0) color *= .91 + .09 * smoothstep(-.8,.5,p.z);
         return color * variation * _Brightness;
     }
+    void TexturedGrainSurface(Varyings i, out float3 color, out float3 normal)
+    {
+        float3 n = normalize(i.normalWS);
+        float3 blend = pow(abs(n), 4);
+        blend /= max(dot(blend, 1), .0001);
+        float2 cell = floor(i.world.xz * _DetailScale);
+        int type = Species(Hash(float3(cell, 17)), i.world);
+        float3 uv = i.world * (_DetailScale / 8.0);
+        // World-space triplanar projection keeps normal detail on excavated walls.
+        float4 x = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.yz, type);
+        float4 y = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xz, type);
+        float4 z = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xy, type);
+        float2 nx = x.rg * 2 - 1, ny = y.rg * 2 - 1, nz = z.rg * 2 - 1;
+        float3 bump = float3(0, nx.x, nx.y) * blend.x + float3(ny.x, 0, ny.y) * blend.y +
+            float3(nz.x, nz.y, 0) * blend.z;
+        normal = normalize(n + (bump - n * dot(n, bump)) * _SurfaceNormalStrength);
+        float height = dot(float3(x.b, y.b, z.b), blend);
+        color = GrainColor(type) * (.74 + .26 * height) * _Brightness;
+    }
     ENDHLSL
     SubShader
     {
@@ -243,7 +268,9 @@ Shader "Freehangar/HDRP/Grain Kernels"
                 surface.materialFeatures = MATERIALFEATUREFLAGS_LIT_STANDARD;
                 surface.baseColor = GrainAlbedo(i);
                 surface.normalWS = normalize(i.normalWS);
-                surface.geomNormalWS = surface.normalWS;
+                if (_KernelMode < .5 && _UseSurfaceDetail > .5)
+                    TexturedGrainSurface(i, surface.baseColor, surface.normalWS);
+                surface.geomNormalWS = normalize(i.normalWS);
                 surface.perceptualSmoothness = 0.15;
                 surface.ambientOcclusion = 1;
                 surface.specularOcclusion = 1;
@@ -274,6 +301,11 @@ Shader "Freehangar/HDRP/Grain Kernels"
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
                 NormalData normal;
                 normal.normalWS = normalize(i.normalWS);
+                if (_KernelMode < .5 && _UseSurfaceDetail > .5)
+                {
+                    float3 unusedColor;
+                    TexturedGrainSurface(i, unusedColor, normal.normalWS);
+                }
                 normal.perceptualRoughness = 0.85;
                 float4 encoded;
                 EncodeIntoNormalBuffer(normal, encoded);
