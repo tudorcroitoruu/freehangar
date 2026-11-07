@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public sealed class PadMenuCursor : MonoBehaviour
 {
     internal static int DropdownClosedFrame { get; private set; } = -1;
-    private Image focusBackground;
     private EventSystem owner;
     private bool previousNavigation;
     private bool pointerOwnsFocus;
@@ -48,7 +47,6 @@ public sealed class PadMenuCursor : MonoBehaviour
         var root = Pause.Instance && Pause.Instance.paused ? Pause.Instance.NavigationRoot :
             MenuManager.IsMenuOpen ? MenuManager.Instance.NavigationRoot :
             UIPopups.BasePopupUI.CurrentPopup ? UIPopups.BasePopupUI.CurrentPopup.transform : null;
-        UpdateFocusBackground(root);
         Transform navigationRoot = root;
         if (root)
             foreach (var toggle in root.GetComponentsInChildren<Toggle>())
@@ -163,50 +161,6 @@ public sealed class PadMenuCursor : MonoBehaviour
         pad.dpad.ReadValue().sqrMagnitude >= .25f || pad.leftStick.ReadValue().sqrMagnitude >= .25f ||
         pad.buttonSouth.wasPressedThisFrame || pad.buttonEast.wasPressedThisFrame ||
         pad.leftShoulder.wasPressedThisFrame || pad.rightShoulder.wasPressedThisFrame;
-    private void UpdateFocusBackground(Transform root)
-    {
-        var settings = root ? root.GetComponentInChildren<GameSettingsManager>() : null;
-        var current = EventSystem.current ? EventSystem.current.currentSelectedGameObject : null;
-        bool show = settings && current && current.transform.IsChildOf(root) && current.activeInHierarchy;
-        // Tabs already own their textured selected state.
-        if (show && current.GetComponent<SelectedUI>()) show = false;
-        if (!show) { if (focusBackground) focusBackground.gameObject.SetActive(false); return; }
-        var tab = settings.FirstSectionTab ? settings.FirstSectionTab.GetComponent<SelectedUI>() : null;
-        var source = tab ? tab.SelectionBackground : null;
-        if (!source) return;
-        if (!focusBackground)
-        {
-            var go = new GameObject("Controller selected background", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
-            focusBackground = go.GetComponent<Image>();
-            go.GetComponent<LayoutElement>().ignoreLayout = true;
-            focusBackground.raycastTarget = false;
-        }
-        // Use the tab's authored texture/material, without copying tab scripts or events.
-        focusBackground.sprite = source.sprite;
-        focusBackground.material = source.material;
-        focusBackground.color = source.color;
-        focusBackground.type = source.type;
-        // Each settings row is a direct child of its page's vertical layout.
-        // Walk past sliders, arrow buttons and value containers to highlight the whole row.
-        RectTransform target = null;
-        for (Transform ancestor = current.transform; ancestor && ancestor != root; ancestor = ancestor.parent)
-        {
-            if (ancestor.parent && ancestor.parent.GetComponent<VerticalLayoutGroup>())
-            {
-                target = ancestor as RectTransform;
-                break;
-            }
-        }
-        if (!target) { focusBackground.gameObject.SetActive(false); return; }
-        var rect = focusBackground.rectTransform;
-        if (rect.parent != target) rect.SetParent(target, false);
-        rect.SetAsFirstSibling();
-        rect.anchorMin = Vector2.zero;
-        rect.anchorMax = Vector2.one;
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
-        focusBackground.gameObject.SetActive(true);
-    }
     private void Restore() { if (owner) owner.sendNavigationEvents = previousNavigation; owner = null; }
     private void OnDisable() => Restore();
 }
