@@ -20,8 +20,10 @@ public sealed class StaminaManager : MonoBehaviour
     private float shovelActionCost = 10f;
     [SerializeField, Min(0f), Tooltip("Stamina required and consumed by one successful jump.")]
     private float jumpActionCost = 10f;
-    [Tooltip("Stamina consumed per second while carrying a bag.")]
+    [Tooltip("Stamina consumed per second while carrying a bag at the reference grain weight.")]
     [SerializeField, Min(0f)] private float workConsumptionPerSecond = 10f;
+    [SerializeField, Min(.01f), Tooltip("Grain kg at which bag carrying consumes the full work rate. Lighter/heavier loads scale proportionally.")]
+    private float bagReferenceWeightKg = 50f;
     [SerializeField, Min(0f), Tooltip("Additional stamina consumed per second while sprinting.")]
     private float sprintConsumptionPerSecond = 10f;
     [SerializeField, Min(0f)] private float recoveryPerSecond = 15f;
@@ -219,6 +221,13 @@ public sealed class StaminaManager : MonoBehaviour
         recoveryDelayRemaining = Mathf.Max(0f, recoveryDelayRemaining - deltaTime);
         CurrentStamina = Mathf.Clamp(CurrentStamina + recoveryPerSecond * 1.5f * restingTime, 0f, CurrentMaxStamina);
         UpdateStaminaBar();
+    }
+
+    public void TickBagCarry(float grainKg, float deltaTime, bool sprinting = false)
+    {
+        bool loaded = float.IsFinite(grainKg) && grainKg > 0f;
+        float rate = loaded ? workConsumptionPerSecond * grainKg / Mathf.Max(.01f, bagReferenceWeightKg) : 0f;
+        Tick(loaded, deltaTime, consumptionPerSecond: rate, sprinting: sprinting);
     }
 
     private void UpdateStaminaBar()

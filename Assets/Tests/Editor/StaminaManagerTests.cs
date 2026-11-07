@@ -28,6 +28,42 @@ public class StaminaManagerTests
     }
 
     [Test]
+    [TestCase(10f, 98f)]
+    [TestCase(50f, 90f)]
+    [TestCase(100f, 80f)]
+    public void CarryDrainScalesWithGrainWeight(float kilograms, float remaining)
+    {
+        stamina.RestoreSave(100f, 0f);
+        stamina.TickBagCarry(kilograms, 1f);
+        Assert.That(stamina.CurrentStamina, Is.EqualTo(remaining).Within(.001f));
+        Assert.IsTrue(stamina.IsWorking);
+    }
+
+    [Test]
+    public void CarryingExhaustsWithoutRegeneratingAndEmptyHandsRecover()
+    {
+        stamina.RestoreSave(5f, 0f);
+        stamina.TickBagCarry(50f, 1f);
+        Assert.IsTrue(stamina.IsExhausted);
+        stamina.TickBagCarry(50f, 3f);
+        Assert.AreEqual(0f, stamina.CurrentStamina);
+        stamina.TickBagCarry(0f, 3f);
+        Assert.Greater(stamina.CurrentStamina, 0f);
+    }
+
+    [Test]
+    public void BagCarryRespectsZeroTimeAndInfiniteStamina()
+    {
+        stamina.RestoreSave(50f, 0f);
+        stamina.TickBagCarry(100f, 0f);
+        Assert.AreEqual(50f, stamina.CurrentStamina);
+        SaveSystem.Data.infiniteStaminaUntilUtc = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 60;
+        stamina.TickBagCarry(100f, 100f);
+        Assert.AreEqual(stamina.CurrentMaxStamina, stamina.CurrentStamina);
+        Assert.IsFalse(stamina.IsExhausted);
+    }
+
+    [Test]
     public void HungerReducesCapacityAndCurrentStaminaWithoutChangingBaseMaximum()
     {
         stamina.SetHungerPercent(10f);

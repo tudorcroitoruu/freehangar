@@ -212,7 +212,13 @@ public class PlayerController : MonoBehaviour
                 shovelTool.Tick(Time.deltaTime);
             }
         }
-        if (staminaManager != null) staminaManager.Tick(false, Time.deltaTime, sprinting: sprintMoving);
+        if (staminaManager != null)
+        {
+            var bag = bagInteraction != null ? bagInteraction.CarriedBag : null;
+            staminaManager.TickBagCarry(bag != null ? bag.Kilograms : 0f, Time.deltaTime, sprintMoving);
+            if (bag != null && bag.Kilograms > 0f && staminaManager.IsExhausted)
+                bagInteraction.DropFromExhaustion();
+        }
     }
 
     public void ResetLook()

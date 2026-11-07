@@ -136,6 +136,9 @@ public sealed class BagInteraction : MonoBehaviour
     private bool Take(GrainContainer bag)
     {
         if (!bag.CanCarry || IsShovelEquipped) return false;
+        var player = GetComponent<PlayerController>();
+        if (!WorldSaveRuntime.IsRestoring && bag.Kilograms > 0f && player != null &&
+            player.Stamina != null && player.Stamina.IsExhausted) return false;
         if (bag.TryGetComponent<VehicleCargoPlacement>(out var placement)) placement.ReleaseScale();
         var sourceWheelbarrow = bag.GetComponentInParent<WheelbarrowCargo>();
         carried = bag;
@@ -219,6 +222,16 @@ public sealed class BagInteraction : MonoBehaviour
         if (!WorldSaveRuntime.IsRestoring) GoalChecker.ReportProgress(GoalType.SackPlaced);
         GameplayAudio.Instance?.Drop();
         return true;
+    }
+
+    public void DropFromExhaustion()
+    {
+        if (carried == null) return;
+        if (Drop()) return;
+        // Exhaustion must release the load even when all placement candidates
+        // are blocked. Use the same physical release fallback as OnDisable.
+        Release(carried.WorldBounds.center);
+        GameplayAudio.Instance?.Drop();
     }
 
     private void Release(Vector3 center)
