@@ -200,6 +200,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         string action;
         bool available = true;
         bool containerTooLarge = false;
+        bool cannotLoad = false;
         if (pusher == interactor)
         {
             action = "Release wheelbarrow";
@@ -207,14 +208,16 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         else if (interactor.Bags != null && interactor.Bags.IsCarrying)
         {
             available = CanLoad(interactor.Bags);
+            cannotLoad = !interactor.Bags.CarriedBag.CanLoadOnVehicle;
             containerTooLarge = interactor.Bags.CarriedBag.CanLoadOnVehicle &&
                 (interactor.Bags.CarriedBag.IsBigBag || LoadingVolume(interactor.Bags.CarriedBag, interactor.Bags.CarriedVolume) > CapacityVolume + .0001f);
-            action = !interactor.Bags.CarriedBag.CanLoadOnVehicle ? "Finish filling and close bag" : available ? "Load bag" :
+            action = cannotLoad ? "" : available ? "Load bag" :
                 containerTooLarge ? "" : "Wheelbarrow full";
         }
         else action = interactor.Items != null && interactor.Items.IsCarrying ? "Put down item and push" : "Push wheelbarrow";
         prompt = new InteractionPromptData(transform.TransformPoint(trayCenter + Vector3.up * .35f), action, available);
         prompt.NotFitInWheelBarrow = containerTooLarge;
+        prompt.CannotLoadInWheelbarrow = cannotLoad;
         prompt.ShowProgress = available && interactor.Bags != null && interactor.Bags.IsCarrying;
         prompt.Progress = CapacityVolume > 0f ? Mathf.Clamp01(occupiedVolume / CapacityVolume) : 0f;
         prompt.VehicleFull = !available && interactor.Bags != null && interactor.Bags.IsCarrying &&
