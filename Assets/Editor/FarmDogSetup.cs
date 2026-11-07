@@ -70,6 +70,8 @@ public static class FarmDogSetup
         if (gameplayAudio)
             audio.outputAudioMixerGroup = new SerializedObject(gameplayAudio).FindProperty("effectsGroup").objectReferenceValue as UnityEngine.Audio.AudioMixerGroup;
         dog.strokeAudio = audio;
+        dog.barkClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/Gameplay/Animals/Dog/Bark.mp3");
+        dog.chickenMarkerSettings = AssetDatabase.LoadAssetAtPath<SickscoreGames.HUDNavigationSystem.HUDNavigationElementSettings>("Assets/Sickscore Games/HUD-Navigation-System/FreeHangar/Settings_Crows.asset");
         var settings = ScriptableObject.CreateInstance<DogUpgradeSettings>();
         AssetDatabase.CreateAsset(settings, Folder + "/DogUpgradeSettings.asset");
         Undo.AddComponent<DogUpgradeInteractable>(go).settings = settings;

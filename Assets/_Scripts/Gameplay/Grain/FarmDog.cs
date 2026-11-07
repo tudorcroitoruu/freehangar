@@ -5,11 +5,16 @@ using UnityEngine.AI;
 [DisallowMultipleComponent, RequireComponent(typeof(NavMeshAgent))]
 public sealed class FarmDog : MonoBehaviour, IInteractable
 {
-    public enum DogState { Idle, Sleeping, Petting, Chasing, Attacking, Returning }
+    public enum DogState { Idle, Sleeping, Petting, Chasing, Attacking, Returning, Alerting, DeliveryAlert }
     public Animator animator;
     public Transform visual, mouth, deliveryPoint;
     public ParticleSystem sleepVfx;
     public AudioSource strokeAudio;
+    public AudioClip barkClip;
+    public SickscoreGames.HUDNavigationSystem.HUDNavigationElementSettings chickenMarkerSettings;
+    private float nextBark;
+    private Outline foundOutline;
+    private SickscoreGames.HUDNavigationSystem.HUDNavigationElement foundMarker;
     public GameObject legPrefab;
     [Range(1, 5)] public int startingLevel = 1;
     [Min(.1f)] public float petDuration = 2f;
@@ -79,11 +84,18 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         else if (State == DogState.Chasing) Chase();
         else if (State == DogState.Attacking) Attack();
         else if (State == DogState.Returning) ReturnHome();
+        else if (State == DogState.Alerting) AlertChicken();
+        else if (State == DogState.DeliveryAlert)
+        {
+            if (Time.time - stateAt >= 60f) SetState(DogState.Sleeping);
+            else if (Time.time >= nextBark) Bark();
+        }
         else if (Time.time >= nextDecision)
         {
             if (Level > 1 && rest <= 0 && FindChicken())
             {
                 huntStarted = Time.time;
+                Bark();
                 SetState(DogState.Chasing);
             }
             else
@@ -154,7 +166,20 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         if (!target || target.IsDead || !target.isActiveAndEnabled || Time.time - huntStarted > 90f || Level <= 1)
         { GoHome(); return; }
         if ((target.transform.position - transform.position).sqrMagnitude <= 1.2f * 1.2f)
-        { SetState(DogState.Attacking); return; }
+        {
+            if (Time.time >= nextBark) Bark();
+            if (BringsLeg(Level)) SetState(DogState.Attacking);
+            else
+            {
+                SetState(DogState.Alerting);
+                foundOutline = target.gameObject.AddComponent<Outline>();
+                foundOutline.OutlineMode = Outline.Mode.OutlineAll;
+                foundOutline.OutlineColor = Color.yellow;
+                foundMarker = target.gameObject.AddComponent<SickscoreGames.HUDNavigationSystem.HUDNavigationElement>();
+                foundMarker.Settings = chickenMarkerSettings;
+            }
+            return;
+        }
         if (Time.time < nextDecision) return;
         nextDecision = Time.time + .3f;
         if (!MoveTo(target.transform.position)) GoHome();
@@ -162,6 +187,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
 
     private void Attack()
     {
+        if (!BringsLeg(Level)) { SetState(DogState.Chasing); return; }
         float elapsed = Time.time - stateAt;
         if (!target || target.IsDead) { GoHome(); return; }
         Vector3 toward = Vector3.ProjectOnPlane(target.transform.position - transform.position, Vector3.up);
@@ -186,6 +212,36 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         if (elapsed >= .9f) SetState(DogState.Chasing);
     }
 
+    private void Bark()
+    {
+        if (strokeAudio && barkClip) strokeAudio.PlayOneShot(barkClip);
+        nextBark = Time.time + Random.Range(4f, 8f);
+    }
+
+    private void ClearHint()
+    {
+        if (foundOutline) { foundOutline.enabled = false; Destroy(foundOutline); }
+        if (foundMarker) { foundMarker.enabled = false; Destroy(foundMarker); }
+    }
+
+    private void AlertChicken()
+    {
+        if (!target || target.IsDead || !target.isActiveAndEnabled) { GoHome(); return; }
+        if (!nearbyPlayer)
+        {
+            var player = FindFirstObjectByType<PlayerController>();
+            if (player) nearbyPlayer = player.transform;
+        }
+        if (nearbyPlayer && (nearbyPlayer.position - target.transform.position).sqrMagnitude <= 16f)
+        { GoHome(); return; }
+        if (Time.time >= nextBark) Bark();
+        if (Time.time < nextDecision) return;
+        nextDecision = Time.time + .5f;
+        if ((target.transform.position - transform.position).sqrMagnitude > 4f)
+        { if (!MoveTo(target.transform.position)) GoHome(); }
+        else if (agent.enabled && agent.isOnNavMesh) agent.ResetPath();
+    }
+
     private void GoHome()
     {
         target = null;
@@ -198,6 +254,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     {
         if ((transform.position - home).sqrMagnitude < .7f * .7f)
         {
+            bool delivered = cargo != null;
             if (cargo) cargo.PutDown(deliveryPoint ? deliveryPoint.position : home + Vector3.up * .15f);
             cargo = null;
             profile.dogHasDelivery = false;
@@ -253,7 +310,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
     {
         prompt = default;
-        if (State == DogState.Petting) return false;
+        if (!CanPet) return false;
         prompt = new InteractionPromptData(transform.position + Vector3.up,
             CanPet ? "Stroke dog" :
             State == DogState.Chasing || State == DogState.Attacking || State == DogState.Returning ? "Dog is hunting" : "", CanPet);
