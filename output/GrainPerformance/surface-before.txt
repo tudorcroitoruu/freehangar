@@ -1,0 +1,12 @@
+Live scene surface rebuild timings; stock unchanged
+Dropped grain pile: mean=0.344 ms; bytes/call=0; vertices=1089
+Dropped grain pile: mean=0.330 ms; bytes/call=0; vertices=1089
+Dropped grain pile: mean=0.324 ms; bytes/call=0; vertices=1089
+Dropped grain pile: mean=0.324 ms; bytes/call=0; vertices=1089
+Dropped grain pile: mean=0.323 ms; bytes/call=0; vertices=1089
+Dropped grain pile: mean=0.322 ms; bytes/call=0; vertices=1089
+Dropped grain pile: mean=0.341 ms; bytes/call=0; vertices=1089
+Hangar 2 - Almost full grain bank: mean=9.967 ms; bytes/call=0; vertices=17153
+Dropped grain pile: mean=0.330 ms; bytes/call=0; vertices=1089
+Dropped grain pile: mean=0.329 ms; bytes/call=0; vertices=1089
+Corn pile - scoop with left click: mean=7.207 ms; bytes/call=0; vertices=16403

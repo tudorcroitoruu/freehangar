@@ -171,6 +171,7 @@ public sealed class GrainPile : MonoBehaviour
 
     private void SampleDropGround()
     {
+        surfaceDetails.Clear();
         groundField = null;
         if (!IsDroppedPile) return;
         // Ground is geometry, never collectible grain. Re-sample on restoration too.
@@ -612,7 +613,9 @@ public sealed class GrainPile : MonoBehaviour
     private static readonly Unity.Profiling.ProfilerMarker SmoothSurfaceMarker = new Unity.Profiling.ProfilerMarker("GrainPile.SmoothSurface");
     private bool surfaceRefreshPending;
     private float surfaceRefreshElapsed;
-    private const float SurfaceRefreshInterval = 1f / 30f;
+    // GPU interpolation advances every rendered frame between these snapshots.
+    // Rebuilding the full skin at 30 Hz consumed several ms even after a scoop ended.
+    private const float SurfaceRefreshInterval = 1f / 10f;
     private static readonly int SurfaceBlendId = Shader.PropertyToID("_SurfaceBlend");
     private float surfaceBlend = 1f, surfaceBlendStarted;
     private readonly List<Vector3> blendFromPositions = new List<Vector3>();
@@ -624,6 +627,11 @@ public sealed class GrainPile : MonoBehaviour
     {
         if (surfaceBlend >= 1f) return;
         surfaceBlend = Mathf.Clamp01((Time.time - surfaceBlendStarted) / SurfaceRefreshInterval);
+        if (surfaceBlend >= 1f)
+        {
+            previousSurfaceBounds = targetSurfaceBounds;
+            mesh.bounds = targetSurfaceBounds;
+        }
         appearance.Block.SetFloat(SurfaceBlendId, surfaceBlend);
         if (surfaceRenderer != null) surfaceRenderer.SetPropertyBlock(appearance.Block);
     }
@@ -635,6 +643,7 @@ public sealed class GrainPile : MonoBehaviour
         bool interpolate = Application.isPlaying && blendToPositions.Count > 0;
         int oldCount = blendToPositions.Count;
         Bounds bounds = mesh.bounds;
+        if (interpolate) bounds.Encapsulate(previousSurfaceBounds);
         for (int i = 0; i < closedSurfaceVertices.Count; i++)
         {
             Vector3 target = closedSurfaceVertices[i], normal = naturalSurfaceNormals[i];
@@ -643,13 +652,17 @@ public sealed class GrainPile : MonoBehaviour
                 Mathf.Abs(blendToPositions[i].x - target.x) < .00001f &&
                 Mathf.Abs(blendToPositions[i].z - target.z) < .00001f)
             {
-                from = Vector3.Lerp(blendFromPositions[i], blendToPositions[i], surfaceBlend);
-                fromNormal = Vector3.Lerp(blendFromNormals[i], blendToNormals[i], surfaceBlend).normalized;
+                if (surfaceBlend >= 1f)
+                { from = blendToPositions[i]; fromNormal = blendToNormals[i]; }
+                else
+                {
+                    from = Vector3.Lerp(blendFromPositions[i], blendToPositions[i], surfaceBlend);
+                    fromNormal = Vector3.Lerp(blendFromNormals[i], blendToNormals[i], surfaceBlend).normalized;
+                }
             }
             if (i < blendFromPositions.Count)
             { blendFromPositions[i] = from; blendFromNormals[i] = fromNormal; }
             else { blendFromPositions.Add(from); blendFromNormals.Add(fromNormal); }
-            bounds.Encapsulate(from);
         }
         int excess = blendFromPositions.Count - closedSurfaceVertices.Count;
         if (excess > 0)
@@ -661,6 +674,8 @@ public sealed class GrainPile : MonoBehaviour
         blendToNormals.Clear(); blendToNormals.AddRange(naturalSurfaceNormals);
         mesh.SetUVs(3, blendFromPositions);
         mesh.SetUVs(4, blendFromNormals);
+        targetSurfaceBounds = mesh.bounds;
+        previousSurfaceBounds = bounds;
         mesh.bounds = bounds;
         surfaceBlend = interpolate ? 0f : 1f;
         surfaceBlendStarted = Time.time;
@@ -675,7 +690,8 @@ public sealed class GrainPile : MonoBehaviour
         UpdateSurfaceBlend();
         surfaceRefreshElapsed += Time.deltaTime;
         // Batch stock texture uploads and full mesh work independently of display FPS.
-        if ((surfaceRefreshPending || visualSettling) && surfaceRefreshElapsed < SurfaceRefreshInterval) return;
+        if ((surfaceRefreshPending || visualSettling) && surfaceRefreshElapsed < SurfaceRefreshInterval)
+        { TryRefreshSettledCollider(Time.time); return; }
         if (surfaceRefreshPending)
         {
             spatial?.ReconcileHeights();
@@ -690,7 +706,7 @@ public sealed class GrainPile : MonoBehaviour
             RefreshSurface();
         }
         surfaceRefreshElapsed = 0;
-        if (colliderDirty && Time.time >= nextCollider) RefreshCollider();
+        TryRefreshSettledCollider(Time.time);
     }
 
     private bool SmoothVisualSurface(float deltaTime)
@@ -731,7 +747,14 @@ public sealed class GrainPile : MonoBehaviour
             }
         }
         AdvanceSettling(Time.deltaTime);
-        if (!surfaceRefreshPending && colliderDirty && Time.time >= nextCollider) RefreshCollider();
+    }
+
+    private void TryRefreshSettledCollider(float now)
+    {
+        // Follow the displayed skin even while simulation is still moving. The
+        // bake rate and movement threshold coalesce insignificant animation steps.
+        if (colliderDirty && !surfaceRefreshPending && now >= nextCollider)
+            RefreshCollider();
     }
 
     private void AdvanceSettling(float deltaTime)
@@ -756,13 +779,14 @@ public sealed class GrainPile : MonoBehaviour
         using var measurement = SurfaceRefreshMarker.Auto();
         kilograms = Kilograms;
         SurfaceRevision++;
+        colliderDirty = true;
         var surface = VisualHeightField;
         if (!Application.isPlaying) System.Array.Copy(field.Heights, surface.Heights, field.Heights.Length);
+        if (TryRefreshLocalSurface(surface)) return;
         if (HasClippedSurface)
         {
             boundary.UpdateHeights(surface, .045f / WorldScale.y);
             OffsetBoundaryGround();
-            mesh.Clear();
             CloseClippedEdges();
             FinishNaturalSurface();
             if (!Application.isPlaying) colliderDirty = true;
@@ -773,7 +797,6 @@ public sealed class GrainPile : MonoBehaviour
         float surfaceRecess = .045f / WorldScale.y;
         for (int i = 0; i < vertices.Length; i++) vertices[i].y = surface.Heights[i] + GroundOffset(i) - surfaceRecess;
         // Remove the previous closure before assigning the top grid again.
-        mesh.Clear();
         if (surfaceUV == null || surfaceUV.Length != vertices.Length)
         {
             surfaceUV = new Vector2[vertices.Length];
@@ -802,7 +825,6 @@ public sealed class GrainPile : MonoBehaviour
         Initialize();
     }
 
-    private int[] collisionVertexMap;
     private readonly List<Vector3> closedSurfaceVertices = new List<Vector3>();
     private readonly List<Vector2> closedSurfaceUV = new List<Vector2>();
     private readonly List<int> closedSurfaceTriangles = new List<int>();
@@ -821,9 +843,176 @@ public sealed class GrainPile : MonoBehaviour
     private readonly List<int> surfaceNormalIndices = new List<int>();
     private readonly List<Vector3> surfaceNormalSums = new List<Vector3>();
     private readonly List<Vector3> naturalSurfaceNormals = new List<Vector3>();
+    private readonly List<Vector3Int> cachedNormalKeys = new List<Vector3Int>();
+    private int topSurfaceVertexCount;
+    private struct HeightSample
+    {
+        public int a, b, c;
+        public Vector3 weights;
+        public float Read(float[] heights) => heights[a] * weights.x + heights[b] * weights.y + heights[c] * weights.z;
+        public static HeightSample At(GrainHeightField field, float x, float z)
+        {
+            float gx = (x + field.Size * .5f) / field.Spacing, gz = (z + field.Size * .5f) / field.Spacing;
+            if (gx < 0 || gz < 0 || gx > field.Resolution - 1 || gz > field.Resolution - 1) return default;
+            int ix = Mathf.Min((int)gx, field.Resolution - 2), iz = Mathf.Min((int)gz, field.Resolution - 2);
+            int i = iz * field.Resolution + ix;
+            float u = gx - ix, v = gz - iz;
+            return u + v <= 1f
+                ? new HeightSample { a = i, b = i + 1, c = i + field.Resolution, weights = new Vector3(1-u-v, u, v) }
+                : new HeightSample { a = i + field.Resolution + 1, b = i + field.Resolution, c = i + 1, weights = new Vector3(u+v-1, 1-u, 1-v) };
+        }
+    }
+    private struct SurfaceDetail
+    {
+        public Vector2 position;
+        public float ground, noise;
+        public HeightSample center, left, right, back, front;
+    }
+    private readonly List<SurfaceDetail> surfaceDetails = new List<SurfaceDetail>();
+    private Vector3 surfaceDetailScale;
+    private Bounds previousSurfaceBounds, targetSurfaceBounds;
+    private float[] renderedHeights;
+    private bool[] changedHeights, changedVertices, changedGroups;
+    private int[] renderedTriangles, groupFaceOffsets, groupFaces;
+    private int renderedTriangleCount;
+    private int[] normalFaceCursor;
+    private Vector3[] faceNormals;
+    private int[] detailOffsets, detailVertices, renderHeightSources;
+    private bool[] dirtyFaces;
+    private readonly List<int> dirtySurfaceVertices = new List<int>();
+    private readonly List<int> dirtySurfaceFaces = new List<int>();
+    private readonly List<int> dirtySurfaceGroups = new List<int>();
 
-    private static Vector3Int SurfaceVertexKey(Vector3 p) => new Vector3Int(
-        Mathf.RoundToInt(p.x * 10000), Mathf.RoundToInt(p.y * 10000), Mathf.RoundToInt(p.z * 10000));
+    private static void ReserveSurfaceBuffer<T>(ref T[] buffer, int count)
+    {
+        if (buffer == null || buffer.Length < count) buffer = new T[Mathf.NextPowerOfTwo(Mathf.Max(1, count))];
+    }
+
+    private void BuildSurfaceDependencies()
+    {
+        if (HasClippedSurface) { detailOffsets = null; return; }
+        int count = VisualHeightField.Heights.Length;
+        detailOffsets = new int[count + 1];
+        renderHeightSources = new int[closedSurfaceVertices.Count];
+        void Visit(int vertex, System.Action<int, int> add)
+        {
+            var d = surfaceDetails[vertex];
+            void Sample(HeightSample s) { add(s.a, vertex); add(s.b, vertex); add(s.c, vertex); }
+            Sample(d.center); Sample(d.left); Sample(d.right); Sample(d.back); Sample(d.front);
+            if (renderHeightSources[vertex] >= 0) add(renderHeightSources[vertex], vertex);
+        }
+        System.Action<int, int> countDependency = (sample, vertex) => detailOffsets[sample + 1]++;
+        for (int i = 0; i < renderHeightSources.Length; i++)
+        {
+            var p = closedSurfaceVertices[i];
+            bool top = i < topSurfaceVertexCount || (i - topSurfaceVertexCount) % 4 < 2;
+            int x = Mathf.RoundToInt((p.x + field.Size * .5f) / field.Spacing);
+            int z = Mathf.RoundToInt((p.z + field.Size * .5f) / field.Spacing);
+            renderHeightSources[i] = top ? z * field.Resolution + x : -1;
+            Visit(i, countDependency);
+        }
+        for (int i = 1; i < detailOffsets.Length; i++) detailOffsets[i] += detailOffsets[i - 1];
+        detailVertices = new int[detailOffsets[count]];
+        var cursor = (int[])detailOffsets.Clone();
+        System.Action<int, int> storeDependency = (sample, vertex) => detailVertices[cursor[sample]++] = vertex;
+        for (int i = 0; i < renderHeightSources.Length; i++)
+            Visit(i, storeDependency);
+        dirtyFaces = new bool[faceNormals.Length];
+    }
+
+    private bool TryRefreshLocalSurface(GrainHeightField surface)
+    {
+        if (HasClippedSurface || detailOffsets == null || surfaceDetailScale != WorldScale ||
+            renderedHeights == null || renderedHeights.Length != surface.Heights.Length ||
+            surfaceDetails.Count != blendToPositions.Count || cachedNormalKeys.Count != blendToPositions.Count) return false;
+        float inset = .045f / surfaceDetailScale.y;
+        // Near the ground, triangles and skirt edges can appear/disappear. Use the
+        // full topology path there. Interior deformation retains the exact indices.
+        for (int i = 0; i < renderedHeights.Length; i++)
+            if (renderedHeights[i] != surface.Heights[i] && Mathf.Min(renderedHeights[i], surface.Heights[i]) <= inset * 2f)
+                return false;
+        System.Array.Clear(changedVertices, 0, changedVertices.Length);
+        System.Array.Clear(changedGroups, 0, changedGroups.Length);
+        dirtySurfaceVertices.Clear(); dirtySurfaceFaces.Clear(); dirtySurfaceGroups.Clear();
+        for (int i = 0; i < renderedHeights.Length; i++)
+        {
+            if (renderedHeights[i] == surface.Heights[i]) continue;
+            renderedHeights[i] = surface.Heights[i];
+            for (int j = detailOffsets[i]; j < detailOffsets[i + 1]; j++)
+            {
+                int vertex = detailVertices[j];
+                if (changedVertices[vertex]) continue;
+                changedVertices[vertex] = true; dirtySurfaceVertices.Add(vertex);
+            }
+        }
+        if (dirtySurfaceVertices.Count == 0) return true;
+        float scaleY = Mathf.Max(.001f, surfaceDetailScale.y);
+        foreach (int vertex in dirtySurfaceVertices)
+        {
+            var d = surfaceDetails[vertex];
+            var p = blendToPositions[vertex];
+            int source = renderHeightSources[vertex];
+            p.y = source >= 0 ? surface.Heights[source] + d.ground - inset : d.ground - inset;
+            float fade = Mathf.SmoothStep(0, 1, Mathf.Clamp01((p.y - d.ground) * scaleY / .18f));
+            if (fade > 0)
+            {
+                float average = (d.left.Read(surface.Heights) + d.right.Read(surface.Heights) +
+                    d.back.Read(surface.Heights) + d.front.Read(surface.Heights)) * .25f;
+                float rounding = Mathf.Clamp((average - d.center.Read(surface.Heights)) * .5f * scaleY, -.06f, 0);
+                p.y += (rounding + d.noise) * fade / scaleY;
+            }
+            closedSurfaceVertices[vertex] = p;
+            int group = surfaceNormalIndices[vertex];
+            for (int j = groupFaceOffsets[group]; j < groupFaceOffsets[group + 1]; j++)
+            {
+                int face = groupFaces[j];
+                if (dirtyFaces[face]) continue;
+                dirtyFaces[face] = true; dirtySurfaceFaces.Add(face);
+            }
+        }
+        foreach (int face in dirtySurfaceFaces)
+        {
+            int t = face * 3;
+            var a = closedSurfaceVertices[renderedTriangles[t]];
+            var b = closedSurfaceVertices[renderedTriangles[t + 1]];
+            var c = closedSurfaceVertices[renderedTriangles[t + 2]];
+            faceNormals[face] = Vector3.Cross(b - a, c - a);
+            dirtyFaces[face] = false;
+            for (int j = 0; j < 3; j++)
+            {
+                int group = surfaceNormalIndices[renderedTriangles[t + j]];
+                if (changedGroups[group]) continue;
+                changedGroups[group] = true; dirtySurfaceGroups.Add(group);
+            }
+        }
+        foreach (int group in dirtySurfaceGroups)
+        {
+            Vector3 normal = Vector3.zero;
+            for (int j = groupFaceOffsets[group]; j < groupFaceOffsets[group + 1]; j++) normal += faceNormals[groupFaces[j]];
+            normal = normal.sqrMagnitude > .00000001f ? normal.normalized : Vector3.up;
+            surfaceNormalSums[group] = normal;
+            for (int j = groupFaceOffsets[group]; j < groupFaceOffsets[group + 1]; j++)
+            for (int corner = 0; corner < 3; corner++)
+            {
+                int vertex = renderedTriangles[groupFaces[j] * 3 + corner];
+                if (surfaceNormalIndices[vertex] == group) naturalSurfaceNormals[vertex] = normal;
+            }
+        }
+        mesh.SetVertices(closedSurfaceVertices); mesh.SetNormals(naturalSurfaceNormals);
+        mesh.RecalculateBounds(); PrepareSurfaceBlend();
+        if (!Application.isPlaying) colliderDirty = true;
+        return true;
+    }
+
+    private bool SampleChanged(HeightSample sample) =>
+        changedHeights[sample.a] || changedHeights[sample.b] || changedHeights[sample.c];
+
+    private Vector3Int SurfaceVertexKey(int index)
+    {
+        Vector3 p = closedSurfaceVertices[index];
+        bool top = index < topSurfaceVertexCount || (index - topSurfaceVertexCount) % 4 < 2;
+        return new Vector3Int(Mathf.RoundToInt(p.x * 10000), top ? 1 : 0, Mathf.RoundToInt(p.z * 10000));
+    }
 
     private void FinishNaturalSurface()
     {
@@ -833,71 +1022,154 @@ public sealed class GrainPile : MonoBehaviour
         float scaleY = Mathf.Max(.001f, metric.y);
         float radius = Mathf.Min(VisualHeightField.Spacing * .5f, .15f / Mathf.Max(.001f, metric.x));
         var surface = VisualHeightField;
+        if (surfaceDetailScale != metric) { surfaceDetails.Clear(); surfaceDetailScale = metric; }
+        bool layoutChanged = blendToPositions.Count != closedSurfaceVertices.Count || cachedNormalKeys.Count != closedSurfaceVertices.Count;
+        for (int i = 0; i < closedSurfaceVertices.Count && !layoutChanged; i++)
+            layoutChanged = cachedNormalKeys[i] != SurfaceVertexKey(i);
+        bool topologyChanged = renderedTriangles == null || renderedTriangleCount != closedSurfaceTriangles.Count || layoutChanged;
+        for (int i = 0; i < closedSurfaceTriangles.Count && !topologyChanged; i++)
+            topologyChanged = renderedTriangles[i] != closedSurfaceTriangles[i];
+        bool rebuildDependencies = layoutChanged || surfaceDetails.Count != closedSurfaceVertices.Count || detailOffsets == null;
+        bool refreshAll = topologyChanged || surfaceDetails.Count != closedSurfaceVertices.Count ||
+            renderedHeights == null || renderedHeights.Length != surface.Heights.Length;
+        if (renderedHeights == null || renderedHeights.Length != surface.Heights.Length)
+        {
+            renderedHeights = new float[surface.Heights.Length];
+            changedHeights = new bool[surface.Heights.Length];
+        }
+        for (int i = 0; i < renderedHeights.Length; i++)
+        {
+            changedHeights[i] = refreshAll || renderedHeights[i] != surface.Heights[i];
+            renderedHeights[i] = surface.Heights[i];
+        }
+        if (changedVertices == null || changedVertices.Length != closedSurfaceVertices.Count)
+            changedVertices = new bool[closedSurfaceVertices.Count];
         for (int i = 0; i < closedSurfaceVertices.Count; i++)
         {
             Vector3 p = closedSurfaceVertices[i];
-            float aboveGround = (p.y - GroundOffset(p.x, p.z)) * scaleY;
+            Vector2 xz = new Vector2(p.x, p.z);
+            SurfaceDetail detail;
+            if (i < surfaceDetails.Count && surfaceDetails[i].position == xz) detail = surfaceDetails[i];
+            else
+            {
+                detail = new SurfaceDetail { position = xz, ground = GroundOffset(p.x, p.z),
+                    noise = (Mathf.PerlinNoise(p.x * metric.x * 4.3f + 17.1f, p.z * metric.z * 4.3f + 31.7f) - .5f) * .05f,
+                    center = HeightSample.At(surface, p.x, p.z), left = HeightSample.At(surface, p.x-radius, p.z),
+                    right = HeightSample.At(surface, p.x+radius, p.z), back = HeightSample.At(surface, p.x, p.z-radius),
+                    front = HeightSample.At(surface, p.x, p.z+radius) };
+                if (i < surfaceDetails.Count) surfaceDetails[i] = detail; else surfaceDetails.Add(detail);
+            }
+            // A local scoop changes only a small part of the field. Retain the
+            // exact previous skin elsewhere, including its noise and peak rounding.
+            bool changed = refreshAll || SampleChanged(detail.center) || SampleChanged(detail.left) ||
+                SampleChanged(detail.right) || SampleChanged(detail.back) || SampleChanged(detail.front);
+            changedVertices[i] = changed;
+            if (!changed) { closedSurfaceVertices[i] = blendToPositions[i]; continue; }
+            float aboveGround = (p.y - detail.ground) * scaleY;
             float fade = Mathf.SmoothStep(0, 1, Mathf.Clamp01(aboveGround / .18f));
             if (fade <= 0) continue;
-            float center = surface.Sample(p.x, p.z);
-            float average = (surface.Sample(p.x - radius, p.z) + surface.Sample(p.x + radius, p.z) +
-                surface.Sample(p.x, p.z - radius) + surface.Sample(p.x, p.z + radius)) * .25f;
+            float center = detail.center.Read(surface.Heights);
+            float average = (detail.left.Read(surface.Heights) + detail.right.Read(surface.Heights) +
+                detail.back.Read(surface.Heights) + detail.front.Read(surface.Heights)) * .25f;
             // Round peaks by at most six centimetres, without filling empty holes.
             float rounding = Mathf.Clamp((average - center) * .5f * scaleY, -.06f, 0);
-            float noise = (Mathf.PerlinNoise(p.x * metric.x * 4.3f + 17.1f,
-                p.z * metric.z * 4.3f + 31.7f) - .5f) * .05f;
-            p.y += (rounding + noise) * fade / scaleY;
+            p.y += (rounding + detail.noise) * fade / scaleY;
             closedSurfaceVertices[i] = p;
         }
-        mesh.SetVertices(closedSurfaceVertices);
+        if (surfaceDetails.Count > closedSurfaceVertices.Count)
+            surfaceDetails.RemoveRange(closedSurfaceVertices.Count, surfaceDetails.Count - closedSurfaceVertices.Count);
         // Wall clipping duplicates triangle vertices. Average their normals by
         // position, otherwise every clipped triangle produces a hard lighting seam.
-        surfaceNormalGroups.Clear();
-        surfaceNormalIndices.Clear();
-        surfaceNormalSums.Clear();
-        foreach (Vector3 p in closedSurfaceVertices)
+        bool rebuildGroups = topologyChanged;
+        if (rebuildGroups)
         {
-            var key = SurfaceVertexKey(p);
-            if (!surfaceNormalGroups.TryGetValue(key, out int group))
+            surfaceNormalGroups.Clear(); surfaceNormalIndices.Clear(); surfaceNormalSums.Clear();
+            cachedNormalKeys.Clear();
+            for (int i = 0; i < closedSurfaceVertices.Count; i++)
             {
-                group = surfaceNormalSums.Count;
-                surfaceNormalGroups.Add(key, group);
-                surfaceNormalSums.Add(Vector3.zero);
+                var key = SurfaceVertexKey(i);
+                cachedNormalKeys.Add(key);
+                if (!surfaceNormalGroups.TryGetValue(key, out int group))
+                {
+                    group = surfaceNormalSums.Count;
+                    surfaceNormalGroups.Add(key, group);
+                    surfaceNormalSums.Add(Vector3.zero);
+                }
+                surfaceNormalIndices.Add(group);
             }
-            surfaceNormalIndices.Add(group);
         }
+        if (topologyChanged)
+        {
+            renderedTriangleCount = closedSurfaceTriangles.Count;
+            ReserveSurfaceBuffer(ref renderedTriangles, renderedTriangleCount);
+            closedSurfaceTriangles.CopyTo(renderedTriangles);
+            ReserveSurfaceBuffer(ref faceNormals, renderedTriangleCount / 3);
+            ReserveSurfaceBuffer(ref changedGroups, surfaceNormalSums.Count);
+            ReserveSurfaceBuffer(ref dirtyFaces, renderedTriangleCount / 3);
+            // CSR adjacency retains the original triangle accumulation order,
+            // so updating a subset gives the same normals as a complete rebuild.
+            ReserveSurfaceBuffer(ref groupFaceOffsets, surfaceNormalSums.Count + 1);
+            System.Array.Clear(groupFaceOffsets, 0, surfaceNormalSums.Count + 1);
+            for (int i = 0; i < renderedTriangleCount; i++) groupFaceOffsets[surfaceNormalIndices[renderedTriangles[i]] + 1]++;
+            for (int i = 1; i <= surfaceNormalSums.Count; i++) groupFaceOffsets[i] += groupFaceOffsets[i - 1];
+            ReserveSurfaceBuffer(ref normalFaceCursor, surfaceNormalSums.Count + 1);
+            System.Array.Copy(groupFaceOffsets, normalFaceCursor, surfaceNormalSums.Count + 1);
+            ReserveSurfaceBuffer(ref groupFaces, renderedTriangleCount);
+            for (int i = 0; i < renderedTriangleCount; i++)
+                groupFaces[normalFaceCursor[surfaceNormalIndices[renderedTriangles[i]]]++] = i / 3;
+            naturalSurfaceNormals.Clear();
+            for (int i = 0; i < closedSurfaceVertices.Count; i++) naturalSurfaceNormals.Add(Vector3.up);
+        }
+        System.Array.Clear(changedGroups, 0, changedGroups.Length);
         for (int t = 0; t < closedSurfaceTriangles.Count; t += 3)
         {
+            if (!changedVertices[closedSurfaceTriangles[t]] && !changedVertices[closedSurfaceTriangles[t + 1]] &&
+                !changedVertices[closedSurfaceTriangles[t + 2]]) continue;
             Vector3 a = closedSurfaceVertices[closedSurfaceTriangles[t]];
             Vector3 b = closedSurfaceVertices[closedSurfaceTriangles[t + 1]];
             Vector3 c = closedSurfaceVertices[closedSurfaceTriangles[t + 2]];
             Vector3 normal = Vector3.Cross(b - a, c - a);
+            faceNormals[t / 3] = normal;
             for (int j = 0; j < 3; j++)
             {
                 int group = surfaceNormalIndices[closedSurfaceTriangles[t + j]];
-                surfaceNormalSums[group] += normal;
+                changedGroups[group] = true;
             }
         }
-        naturalSurfaceNormals.Clear();
         for (int i = 0; i < surfaceNormalSums.Count; i++)
         {
-            Vector3 normal = surfaceNormalSums[i];
+            if (!changedGroups[i]) continue;
+            Vector3 normal = Vector3.zero;
+            for (int f = groupFaceOffsets[i]; f < groupFaceOffsets[i + 1]; f++) normal += faceNormals[groupFaces[f]];
             surfaceNormalSums[i] = normal.sqrMagnitude > .00000001f ? normal.normalized : Vector3.up;
         }
-        foreach (int group in surfaceNormalIndices) naturalSurfaceNormals.Add(surfaceNormalSums[group]);
+        for (int i = 0; i < surfaceNormalIndices.Count; i++)
+            if (changedGroups[surfaceNormalIndices[i]]) naturalSurfaceNormals[i] = surfaceNormalSums[surfaceNormalIndices[i]];
+        if (topologyChanged) mesh.Clear();
+        mesh.SetVertices(closedSurfaceVertices);
+        if (topologyChanged)
+        {
+            mesh.SetUVs(0, closedSurfaceUV);
+            mesh.SetTriangles(closedSurfaceTriangles, 0, false);
+        }
         mesh.SetNormals(naturalSurfaceNormals);
         // Grain uses world-space triplanar normals; mesh tangents are not consumed.
         mesh.RecalculateBounds();
         PrepareSurfaceBlend();
+        if (rebuildDependencies) BuildSurfaceDependencies();
     }
     private readonly List<Vector2Int> clippedEdges = new List<Vector2Int>();
+    private int[] clippedRenderMap;
+    private readonly List<int> clippedRenderSources = new List<int>();
 
     private void CloseClippedEdges()
     {
-        if (closedBoundary != boundary)
+        if (closedBoundary != boundary || clippedRenderMap == null || clippedRenderMap.Length != boundary.Positions.Count)
         {
             closedBoundary = boundary;
             clippedEdges.Clear();
+            clippedRenderMap = new int[boundary.Positions.Count];
+            clippedRenderSources.Clear();
             // Clipping splits vertices per triangle. Weld X/Z keys only for finding
             // perimeter edges; do not alter the top surface or its volume weights.
             var pointIds = new Dictionary<Vector2Int, int>();
@@ -907,7 +1179,12 @@ public sealed class GrainPile : MonoBehaviour
             {
                 Vector3 p = boundary.Positions[index];
                 var key = new Vector2Int(Mathf.RoundToInt(p.x * 100000), Mathf.RoundToInt(p.z * 100000));
-                if (!pointIds.TryGetValue(key, out int id)) { id = pointIds.Count; pointIds.Add(key, id); }
+                if (!pointIds.TryGetValue(key, out int id))
+                {
+                    id = pointIds.Count; pointIds.Add(key, id);
+                    clippedRenderSources.Add(index);
+                }
+                clippedRenderMap[index] = id;
                 return id;
             }
             for (int i = 0; i < boundary.Positions.Count; i += 3)
@@ -924,14 +1201,21 @@ public sealed class GrainPile : MonoBehaviour
             foreach (var entry in counts)
                 if (entry.Value == 1) clippedEdges.Add(edges[entry.Key]);
         }
-        closedSurfaceVertices.Clear(); closedSurfaceVertices.AddRange(boundary.Positions);
-        closedSurfaceUV.Clear(); closedSurfaceUV.AddRange(boundary.UV);
-        closedSurfaceTriangles.Clear(); closedSurfaceTriangles.AddRange(boundary.Triangles);
+        // Clipping emits separate vertices for every triangle. Share their X/Z
+        // samples so deformation, normals and blend uploads run once per point.
+        // Triangle coverage and the authoritative collision/stock field stay intact.
+        closedSurfaceVertices.Clear(); closedSurfaceUV.Clear();
+        foreach (int source in clippedRenderSources)
+        {
+            closedSurfaceVertices.Add(boundary.Positions[source]);
+            closedSurfaceUV.Add(boundary.UV[source]);
+        }
+        closedSurfaceTriangles.Clear();
+        foreach (int index in boundary.Triangles) closedSurfaceTriangles.Add(clippedRenderMap[index]);
         sideTriangleStart = closedSurfaceTriangles.Count;
+        topSurfaceVertexCount = closedSurfaceVertices.Count;
         float inset = .045f / WorldScale.y;
-        foreach (var edge in clippedEdges) AddGroundEdge(edge.x, edge.y, inset);
-        mesh.SetVertices(closedSurfaceVertices); mesh.SetUVs(0, closedSurfaceUV);
-        mesh.SetTriangles(closedSurfaceTriangles, 0);
+        foreach (var edge in clippedEdges) AddGroundEdge(clippedRenderMap[edge.x], clippedRenderMap[edge.y], inset);
     }
     private void CloseDroppedEdges(GrainHeightField surface)
     {
@@ -939,6 +1223,7 @@ public sealed class GrainPile : MonoBehaviour
         closedSurfaceUV.Clear(); closedSurfaceUV.AddRange(surfaceUV);
         closedSurfaceTriangles.Clear(); closedSurfaceTriangles.AddRange(activeTriangles);
         sideTriangleStart = closedSurfaceTriangles.Count;
+        topSurfaceVertexCount = closedSurfaceVertices.Count;
         int n = field.Resolution;
         float inset = .045f / WorldScale.y;
         for (int i = 0; i < n - 1; i++)
@@ -948,8 +1233,6 @@ public sealed class GrainPile : MonoBehaviour
             AddGroundEdge((n - 1) * n + i, (n - 1) * n + i + 1, inset);
             AddGroundEdge((i + 1) * n + n - 1, i * n + n - 1, inset);
         }
-        mesh.SetVertices(closedSurfaceVertices); mesh.SetUVs(0, closedSurfaceUV);
-        mesh.SetTriangles(closedSurfaceTriangles, 0);
     }
     private void AddGroundEdge(int a, int b, float inset)
     {
@@ -986,66 +1269,22 @@ public sealed class GrainPile : MonoBehaviour
     {
         using var measurement = ColliderRefreshMarker.Auto();
         nextCollider = Time.time + 1f / colliderRate;
-        colliderDirty = false;
-        collisionIndices.Clear();
-        if (HasClippedSurface)
+        bool animating = settling || visualSettling || surfaceBlend < 1f;
+        colliderDirty = animating;
+        collisionIndices.Clear(); collisionVertices.Clear();
+        // Use the renderer's positions and interpolation. Normal groups weld
+        // duplicate skirt/clipped vertices without joining top and bottom.
+        for (int i = 0; i < surfaceNormalSums.Count; i++) collisionVertices.Add(Vector3.zero);
+        for (int i = 0; i < closedSurfaceVertices.Count; i++)
         {
-            boundary.UpdateHeights(field, 0);
-            OffsetBoundaryGround();
-            if (collisionVertexMap == null || collisionVertexMap.Length != boundary.Positions.Count || collisionVertices.Count == 0)
-            {
-                // The render skin splits every triangle for flat shading. Physics needs
-                // only one vertex at each X/Z location on this continuous height field.
-                collisionVertexMap = new int[boundary.Positions.Count];
-                collisionVertices.Clear();
-                var unique = new Dictionary<Vector2Int, int>();
-                for (int i = 0; i < boundary.Positions.Count; i++)
-                {
-                    Vector3 point = boundary.Positions[i];
-                    var key = new Vector2Int(Mathf.RoundToInt(point.x * 100000f), Mathf.RoundToInt(point.z * 100000f));
-                    if (!unique.TryGetValue(key, out int index))
-                    {
-                        index = collisionVertices.Count; unique.Add(key, index); collisionVertices.Add(point);
-                    }
-                    collisionVertexMap[i] = index;
-                }
-            }
-            int topCount = 0;
-            foreach (int index in collisionVertexMap) topCount = Mathf.Max(topCount, index + 1);
-            if (collisionVertices.Count > topCount) collisionVertices.RemoveRange(topCount, collisionVertices.Count - topCount);
-            for (int i = 0; i < boundary.Positions.Count; i++) collisionVertices[collisionVertexMap[i]] = boundary.Positions[i];
-            foreach (int index in boundary.Triangles) collisionIndices.Add(collisionVertexMap[index]);
+            Vector3 point = surfaceBlend < 1f
+                ? Vector3.Lerp(blendFromPositions[i], blendToPositions[i], surfaceBlend)
+                : closedSurfaceVertices[i];
+            collisionVertices[surfaceNormalIndices[i]] = point;
         }
-        else
-        {
-            collisionVertices.Clear();
-            for (int i = 0; i < vertices.Length; i++)
-            {
-                Vector3 point = vertices[i]; point.y = field.Heights[i] + GroundOffset(i); collisionVertices.Add(point);
-            }
-            for (int t = 0; t < field.Triangles.Length; t += 3)
-            {
-                int a = field.Triangles[t], b = field.Triangles[t + 1], c = field.Triangles[t + 2];
-                if (field.Heights[a] <= .00001f && field.Heights[b] <= .00001f && field.Heights[c] <= .00001f) continue;
-                collisionIndices.Add(a); collisionIndices.Add(b); collisionIndices.Add(c);
-            }
-        }
-        // Include the exposed sides, using physical rather than smoothed heights.
-        for (int t = sideTriangleStart; t < closedSurfaceTriangles.Count; t += 6)
-        {
-            int start = collisionVertices.Count;
-            for (int corner = 0; corner < 4; corner++)
-            {
-                Vector3 point = closedSurfaceVertices[closedSurfaceTriangles[t] + corner];
-                point.y = GroundOffset(point.x, point.z);
-                if (corner < 2) point.y += field.Sample(point.x, point.z);
-                collisionVertices.Add(point);
-            }
-            collisionIndices.Add(start); collisionIndices.Add(start + 2); collisionIndices.Add(start + 1);
-            collisionIndices.Add(start + 1); collisionIndices.Add(start + 2); collisionIndices.Add(start + 3);
-        }
+        foreach (int vertex in closedSurfaceTriangles) collisionIndices.Add(surfaceNormalIndices[vertex]);
         bool changed = cookedVertices.Count != collisionVertices.Count || cookedIndices.Count != collisionIndices.Count;
-        float tolerance = .001f / Mathf.Max(.0001f, WorldScale.y);
+        float tolerance = (animating ? .025f : .001f) / Mathf.Max(.0001f, WorldScale.y);
         for (int i = 0; i < collisionVertices.Count && !changed; i++)
             changed = Mathf.Abs(collisionVertices[i].y - cookedVertices[i].y) >= tolerance ||
                 collisionVertices[i].x != cookedVertices[i].x || collisionVertices[i].z != cookedVertices[i].z;
@@ -1075,12 +1314,15 @@ public sealed class GrainPile : MonoBehaviour
         if (mesh != null) { if (Application.isPlaying) Destroy(mesh); else DestroyImmediate(mesh); }
         if (collisionMesh != null) { if (Application.isPlaying) Destroy(collisionMesh); else DestroyImmediate(collisionMesh); }
         mesh = collisionMesh = null;
+        surfaceDetails.Clear(); cachedNormalKeys.Clear();
+        renderedHeights = null; renderedTriangles = null;
+        detailOffsets = null;
         blendFromPositions.Clear(); blendFromNormals.Clear();
         blendToPositions.Clear(); blendToNormals.Clear();
         surfaceBlend = 1f;
         appearance.Block.SetFloat(SurfaceBlendId, 1f);
         visualField = null; visualSettling = false;
-        collisionVertexMap = null; cookedVertices.Clear(); cookedIndices.Clear();
+        cookedVertices.Clear(); cookedIndices.Clear();
     }
 
     private void OnDrawGizmosSelected()

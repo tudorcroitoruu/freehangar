@@ -1,0 +1,11 @@
+Live scene surface rebuild timings; stock unchanged
+Hangar 5 - Grain bank to entrance: mean=6.762 ms; bytes/call=0; vertices=16823
+  cloned settling steps=0; total=0.330 ms; mass delta=0
+Hangar 3 - Almost full grain bank: mean=6.244 ms; bytes/call=0; vertices=17153
+  cloned settling steps=0; total=0.009 ms; mass delta=0
+Corn pile - scoop with left click: mean=1.259 ms; bytes/call=0; vertices=3310
+  cloned settling steps=0; total=0.004 ms; mass delta=0
+Hangar 2 - Almost full grain bank: mean=6.111 ms; bytes/call=0; vertices=17153
+  cloned settling steps=0; total=0.004 ms; mass delta=0
+Hangar 4 - Grain bank to entrance: mean=6.043 ms; bytes/call=0; vertices=17153
+  cloned settling steps=0; total=0.005 ms; mass delta=0

@@ -285,6 +285,90 @@ public class GrainEconomyTests
         Assert.Greater(root.GetComponent<MeshFilter>().sharedMesh.vertexCount, 0);
     }
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public void ColliderFollowsDisplayedSurfaceDuringSettling(bool clipped)
+    {
+        if (clipped) Set("excludedFootprint", new Rect(1, -1, 2, 2));
+        pile.RebuildPreview();
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        var field = (GrainHeightField)typeof(GrainPile).GetField("field", flags).GetValue(pile);
+        var mesh = root.GetComponent<MeshCollider>().sharedMesh;
+        var before = mesh.vertices;
+        var update = typeof(GrainPile).GetMethod("TryRefreshSettledCollider", flags);
+        field.Heights[field.Heights.Length / 2] += .5f;
+        typeof(GrainPile).GetMethod("RefreshSurface", flags).Invoke(pile, null);
+        Set("colliderDirty", true); Set("settling", true); Set("surfaceRefreshPending", true);
+        update.Invoke(pile, new object[] { float.MaxValue });
+        CollectionAssert.AreEqual(before, mesh.vertices);
+        Set("surfaceRefreshPending", false); Set("visualSettling", true);
+        update.Invoke(pile, new object[] { float.MaxValue });
+        CollectionAssert.AreNotEqual(before, mesh.vertices);
+        var groups = (System.Collections.Generic.List<int>)typeof(GrainPile).GetField("surfaceNormalIndices", flags).GetValue(pile);
+        var displayed = root.GetComponent<MeshFilter>().sharedMesh.vertices;
+        var cooked = mesh.vertices;
+        for (int i = 0; i < displayed.Length; i++) Assert.That(cooked[groups[i]], Is.EqualTo(displayed[i]));
+        Assert.IsTrue((bool)typeof(GrainPile).GetField("colliderDirty", flags).GetValue(pile));
+        Assert.IsTrue((bool)typeof(GrainPile).GetField("visualSettling", flags).GetValue(pile));
+        Set("settling", false); Set("visualSettling", false);
+        update.Invoke(pile, new object[] { float.MaxValue });
+        CollectionAssert.AreEqual(cooked, mesh.vertices);
+        Assert.IsFalse((bool)typeof(GrainPile).GetField("colliderDirty", flags).GetValue(pile));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void IncrementalSurfaceMatchesFullRebuildThroughRepeatedDeformation(bool clipped)
+    {
+        if (clipped) Set("excludedFootprint", new Rect(1, -1, 2, 2));
+        root.transform.localScale = new Vector3(1.3f, .7f, 1.1f);
+        pile.RebuildPreview();
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        var refresh = typeof(GrainPile).GetMethod("RefreshSurface", flags);
+        var field = (GrainHeightField)typeof(GrainPile).GetField("field", flags).GetValue(pile);
+        var mesh = root.GetComponent<MeshFilter>().sharedMesh;
+        int center = field.Heights.Length / 2;
+        for (int step = 0; step < 16; step++)
+        {
+            // Interior excavation, a new hole, and filling that hole again.
+            field.Heights[center + step % 3] = step == 8 ? 0 : .8f + step * .03f;
+            refresh.Invoke(pile, null);
+            var positions = mesh.vertices; var normals = mesh.normals; var triangles = mesh.triangles;
+            ((System.Collections.IList)typeof(GrainPile).GetField("cachedNormalKeys", flags).GetValue(pile)).Clear();
+            refresh.Invoke(pile, null);
+            CollectionAssert.AreEqual(positions, mesh.vertices, "positions at step " + step);
+            CollectionAssert.AreEqual(normals, mesh.normals, "normals at step " + step);
+            CollectionAssert.AreEqual(triangles, mesh.triangles, "triangles at step " + step);
+        }
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void CachedSurfaceMatchesFreshCalculationAfterExcavation(bool clipped)
+    {
+        if (clipped) Set("excludedFootprint", new Rect(1, -1, 2, 2));
+        pile.RebuildPreview();
+        pile.ConfigureRegions(new[] { new GrainRegion(100, GrainType.Corn) });
+        var point = new Vector3(0, pile.SurfaceHeight(Vector3.zero), 0);
+        var cargo = new GrainCargo();
+        pile.ScoopCompatibleWith(point, .4f, .2f, 5, cargo, new GrainCargo(), out _);
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        var refresh = typeof(GrainPile).GetMethod("RefreshSurface", flags);
+        refresh.Invoke(pile, null);
+        var mesh = root.GetComponent<MeshFilter>().sharedMesh;
+        var vertices = mesh.vertices;
+        var normals = mesh.normals;
+        var triangles = mesh.triangles;
+        double mass = pile.Kilograms;
+        foreach (string name in new[] { "surfaceDetails", "cachedNormalKeys" })
+            ((System.Collections.IList)typeof(GrainPile).GetField(name, flags).GetValue(pile)).Clear();
+        refresh.Invoke(pile, null);
+        CollectionAssert.AreEqual(vertices, mesh.vertices);
+        CollectionAssert.AreEqual(normals, mesh.normals);
+        CollectionAssert.AreEqual(triangles, mesh.triangles);
+        Assert.That(pile.Kilograms, Is.EqualTo(mass));
+    }
+
     [Test]
     public void ScoopCrossingIntoAnotherRecipeLayerDoesNotExcavateEitherLayer()
     {

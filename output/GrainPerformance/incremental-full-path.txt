@@ -1,0 +1,5 @@
+129 grid, local deformation: 2.7916 ms
+PASS geometry False
+PASS deformation False
+PASS geometry True
+PASS deformation True

@@ -1,0 +1,23 @@
+Live scene surface rebuild timings; stock unchanged
+Dropped grain pile: mean=0.285 ms; bytes/call=0; vertices=1089
+  cloned settling steps=0; total=0.252 ms; mass delta=0
+Dropped grain pile: mean=0.283 ms; bytes/call=0; vertices=1089
+  cloned settling steps=0; total=0.001 ms; mass delta=0
+Dropped grain pile: mean=0.286 ms; bytes/call=0; vertices=1089
+  cloned settling steps=0; total=0.001 ms; mass delta=0
+Dropped grain pile: mean=0.292 ms; bytes/call=0; vertices=1089
+  cloned settling steps=0; total=0.001 ms; mass delta=0
+Dropped grain pile: mean=0.286 ms; bytes/call=0; vertices=1089
+  cloned settling steps=0; total=0.001 ms; mass delta=0
+Dropped grain pile: mean=0.294 ms; bytes/call=0; vertices=1089
+  cloned settling steps=0; total=0.001 ms; mass delta=0
+Dropped grain pile: mean=0.289 ms; bytes/call=0; vertices=1089
+  cloned settling steps=0; total=0.001 ms; mass delta=0
+Hangar 2 - Almost full grain bank: mean=7.011 ms; bytes/call=0; vertices=17153
+  cloned settling steps=0; total=0.004 ms; mass delta=0
+Dropped grain pile: mean=0.286 ms; bytes/call=0; vertices=1089
+  cloned settling steps=0; total=0.001 ms; mass delta=0
+Dropped grain pile: mean=0.284 ms; bytes/call=0; vertices=1089
+  cloned settling steps=0; total=0.002 ms; mass delta=0
+Corn pile - scoop with left click: mean=1.543 ms; bytes/call=0; vertices=3310
+  cloned settling steps=0; total=0.003 ms; mass delta=0
