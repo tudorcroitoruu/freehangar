@@ -60,9 +60,18 @@ public sealed class PlayerCombatTools : MonoBehaviour
     private float switchStarted = -10f;
     private Tool outgoingTool;
     private bool switching;
+    private bool driving;
     private readonly System.Collections.Generic.Dictionary<Tool, Transform> switchPivots = new();
     public bool IsSwitching => switching;
     public Tool Equipped => equipped;
+
+    public void SetDriving(bool value)
+    {
+        driving = value;
+        CancelStrike();
+        if (switching) FinishSwitch();
+        else ApplyVisuals();
+    }
 
     private Transform SwitchPivot(Tool tool)
     {
@@ -162,7 +171,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
 
     public bool TryStartStrike()
     {
-        if (switching || !isActiveAndEnabled || !IsUnlocked(equipped) || equipped == Tool.Shovel || viewCamera == null ||
+        if (driving || switching || !isActiveAndEnabled || !IsUnlocked(equipped) || equipped == Tool.Shovel || viewCamera == null ||
             Time.timeScale<=0 || Time.time < strikeStart + StrikeDuration ||
             (bags!=null && bags.IsCarrying) || (interactor!=null && (interactor.HandsOccupied || interactor.DiscoveryBusy))) return false;
         if (equipped == Tool.Pistol)
@@ -273,7 +282,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
 
     public bool TryEquip(Tool tool)
     {
-        if (switching) return false;
+        if (driving || switching) return false;
         if(!IsUnlocked(tool) || (interactor!=null && interactor.DiscoveryBusy))return false;
         if (bags != null && bags.IsCarrying && !bags.TryInteract()) return false;
         if (interactor != null && interactor.Items != null && interactor.Items.IsCarrying && !interactor.Items.TryPlace()) return false;
@@ -348,12 +357,12 @@ public sealed class PlayerCombatTools : MonoBehaviour
             SetHeldLayer(heldSledgehammer, layer);
         }
         Tool shown = switching && Time.time - switchStarted < .16f ? outgoingTool : equipped;
-        if (shovelTool != null) shovelTool.enabled=!switching && equipped==Tool.Shovel;
-        if (shovelHands != null) shovelHands.gameObject.SetActive(shown == Tool.Shovel);
-        if (heldPistol != null) heldPistol.gameObject.SetActive(shown == Tool.Pistol);
-        if (heldBroom != null) heldBroom.gameObject.SetActive(shown == Tool.Broom);
-        if (heldAxe != null) heldAxe.gameObject.SetActive(shown == Tool.Axe);
-        if (heldSledgehammer != null) heldSledgehammer.gameObject.SetActive(shown == Tool.Hammer);
+        if (shovelTool != null) shovelTool.enabled=!driving && !switching && equipped==Tool.Shovel;
+        if (shovelHands != null) shovelHands.gameObject.SetActive(!driving && shown == Tool.Shovel);
+        if (heldPistol != null) heldPistol.gameObject.SetActive(!driving && shown == Tool.Pistol);
+        if (heldBroom != null) heldBroom.gameObject.SetActive(!driving && shown == Tool.Broom);
+        if (heldAxe != null) heldAxe.gameObject.SetActive(!driving && shown == Tool.Axe);
+        if (heldSledgehammer != null) heldSledgehammer.gameObject.SetActive(!driving && shown == Tool.Hammer);
     }
 
     private static void SetHeldLayer(Transform root, int layer)

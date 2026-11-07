@@ -3,11 +3,12 @@ using UnityEngine;
 
 public class VehicleCargoPlacementTests
 {
-    [Test]
-    public void EmptyStarterWheelbarrowAcceptsFinishedStarterBagAndReportsOversizeSeparately()
+    [TestCase("FreeBag")]
+    [TestCase("SmallBag")]
+    public void EmptyStarterWheelbarrowAcceptsFinishedStarterBagAndReportsOversizeSeparately(string bagId)
     {
         var root = new GameObject("Wheelbarrow regression");
-        var item = Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/FreeBag.prefab"));
+        var item = Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/" + bagId + ".prefab"));
         var previousData = SaveSystem.Data;
         try
         {
@@ -33,7 +34,7 @@ public class VehicleCargoPlacementTests
             typeof(WheelbarrowCargo).GetField("occupiedVolume", flags).SetValue(barrow, 0f);
             typeof(BagInteraction).GetField("carriedVolume", flags).SetValue(carry, 2f);
             barrow.TryGetPrompt(interactor, out prompt);
-            Assert.IsFalse(prompt.ShowKey); Assert.IsFalse(prompt.VehicleFull);
+            Assert.AreEqual(bagId == "SmallBag", prompt.ShowKey); Assert.IsFalse(prompt.VehicleFull);
         }
         finally { Object.DestroyImmediate(item); Object.DestroyImmediate(root); SaveSystem.Data = previousData; }
     }

@@ -13,6 +13,7 @@ public sealed class InteractionPrompt : MonoBehaviour
     [SerializeField] private TMP_Text keycap;
     [SerializeField] private Sprite axeIcon;
     [SerializeField] private Sprite hammerIcon;
+    [SerializeField] private Sprite restrictedIcon;
     private Image keyBackground;
     private Sprite originalKeySprite;
     private bool originalKeyAspect;
@@ -73,7 +74,8 @@ public sealed class InteractionPrompt : MonoBehaviour
         if (keyBackground != null)
         {
             Sprite icon = data.RequiredTool == PlayerCombatTools.Tool.Axe ? axeIcon :
-                data.RequiredTool == PlayerCombatTools.Tool.Hammer ? hammerIcon : null;
+                data.RequiredTool == PlayerCombatTools.Tool.Hammer ? hammerIcon :
+                !data.HasAvailableInput && !data.ShowProgress ? restrictedIcon : null;
             keyBackground.sprite = icon != null ? icon : originalKeySprite;
             keyBackground.preserveAspect = icon != null || originalKeyAspect;
         }

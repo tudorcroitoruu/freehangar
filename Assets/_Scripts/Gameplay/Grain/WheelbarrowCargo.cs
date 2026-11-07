@@ -156,12 +156,15 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     }
 
     private static float Volume(Vector3 size) => Mathf.Max(.001f, size.x * size.y * size.z);
-    private static float Volume(GrainContainer bag)
+    private float LoadingVolume(GrainContainer bag, float worldVolume) =>
+        Tier == 0 && bag.CargoTypeId == "SmallBag" ? CapacityVolume / CargoSlotCount : worldVolume;
+
+    private float Volume(GrainContainer bag)
     {
         var box = bag.GetComponent<BoxCollider>();
-        if (box == null) return Volume(bag.WorldBounds.size);
+        if (box == null) return LoadingVolume(bag, Volume(bag.WorldBounds.size));
         Vector3 scale = bag.transform.lossyScale;
-        return Mathf.Max(.001f, Mathf.Abs(box.size.x * scale.x * box.size.y * scale.y * box.size.z * scale.z));
+        return LoadingVolume(bag, Mathf.Max(.001f, Mathf.Abs(box.size.x * scale.x * box.size.y * scale.y * box.size.z * scale.z)));
     }
 
     public void NotifyBagTaken(GrainContainer bag)
@@ -178,7 +181,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     {
         if (carrier == null || !carrier.IsCarrying || carrier.CarriedBag == null || pusher != null) return false;
         if (carrier.CarriedBag.IsBigBag || !carrier.CarriedBag.CanLoadOnVehicle) return false;
-        float volume = carrier.CarriedVolume;
+        float volume = LoadingVolume(carrier.CarriedBag, carrier.CarriedVolume);
         return occupiedVolume + volume <= CapacityVolume + .0001f && bags.Count < CargoSlotCount;
     }
 
@@ -203,13 +206,13 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         {
             available = CanLoad(interactor.Bags);
             action = !interactor.Bags.CarriedBag.CanLoadOnVehicle ? "Finish filling and close bag" : available ? "Load bag" :
-                (interactor.Bags.CarriedBag.IsBigBag || interactor.Bags.CarriedVolume > CapacityVolume + .0001f) ? "Container too large for wheelbarrow" : "Wheelbarrow full";
+                (interactor.Bags.CarriedBag.IsBigBag || LoadingVolume(interactor.Bags.CarriedBag, interactor.Bags.CarriedVolume) > CapacityVolume + .0001f) ? "Container too large for wheelbarrow" : "Wheelbarrow full";
         }
         else action = interactor.Items != null && interactor.Items.IsCarrying ? "Put down item and push" : "Push wheelbarrow";
         prompt = new InteractionPromptData(transform.TransformPoint(trayCenter + Vector3.up * .35f),
-            action + $"  ({occupiedVolume:0.00}/{CapacityVolume:0.00} m³)", available);
+            action + $"  ({occupiedVolume:0.00}/{CapacityVolume:0.00} mÂ³)", available);
         prompt.VehicleFull = !available && interactor.Bags != null && interactor.Bags.IsCarrying &&
-            !interactor.Bags.CarriedBag.IsBigBag && interactor.Bags.CarriedBag.CanLoadOnVehicle && interactor.Bags.CarriedVolume <= CapacityVolume + .0001f;
+            !interactor.Bags.CarriedBag.IsBigBag && interactor.Bags.CarriedBag.CanLoadOnVehicle && LoadingVolume(interactor.Bags.CarriedBag, interactor.Bags.CarriedVolume) <= CapacityVolume + .0001f;
         return true;
     }
 
@@ -223,7 +226,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         {
             if (!CanLoad(interactor.Bags)) return false;
             GrainContainer bag = interactor.Bags.CarriedBag;
-            float volume = interactor.Bags.CarriedVolume;
+            float volume = LoadingVolume(bag, interactor.Bags.CarriedVolume);
             int index = FreeSlotIndex();
             GameObject anchor = new GameObject("Bag slot " + index);
             anchor.transform.SetParent(transform, false);

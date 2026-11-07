@@ -38,6 +38,24 @@ public class PlayerToolInteractionTests
         Assert.IsTrue(tools.TryEquip(PlayerCombatTools.Tool.Shovel));
         Assert.AreEqual(2, shovel.Kilograms);
     }
+    [TestCase(PlayerCombatTools.Tool.Axe)]
+    [TestCase(PlayerCombatTools.Tool.Hammer)]
+    [TestCase(PlayerCombatTools.Tool.Broom)]
+    public void DrivingHidesToolsAndRestoresSelection(PlayerCombatTools.Tool selected)
+    {
+        Assert.IsTrue(tools.TryEquip(selected));
+        tools.SetDriving(true);
+        Assert.IsFalse(axe.gameObject.activeSelf);
+        Assert.IsFalse(hammer.gameObject.activeSelf);
+        Assert.IsFalse(broom.gameObject.activeSelf);
+        Assert.IsFalse(tools.TryStartStrike());
+        Assert.IsFalse(tools.TryEquip(PlayerCombatTools.Tool.Shovel));
+        Assert.AreEqual(selected, tools.Equipped);
+        tools.SetDriving(false);
+        Assert.AreEqual(selected == PlayerCombatTools.Tool.Axe, axe.gameObject.activeSelf);
+        Assert.AreEqual(selected == PlayerCombatTools.Tool.Hammer, hammer.gameObject.activeSelf);
+        Assert.AreEqual(selected == PlayerCombatTools.Tool.Broom, broom.gameObject.activeSelf);
+    }
     [Test] public void LockedToolsCannotBeEquipped()
     {
         SaveSystem.Data.foundSecrets=System.Array.Empty<string>();
