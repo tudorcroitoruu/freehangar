@@ -11,6 +11,7 @@ public class WorldSaveTests
     public void CompressedAndLegacySavesPreserveRewardAndWorldTogether()
     {
         var profile = new PlayerData { cash = 73, world = new WorldSaveData { scene = "Gameplay" },
+            foundSecrets = new[] { "test.cash-box", "test.bottle" }, mobilityUntilUtc = 123456789,
             goals = new[] { new GoalSettingsSave { goalId = "test", completed = true, rewardClaimed = true } } };
         profile.world.items.Add(new WorldObjectSave { id = "pile", pile = new PileSave { heights = new[] { .25f, .75f } } });
         string json = JsonUtility.ToJson(profile);
@@ -21,6 +22,8 @@ public class WorldSaveTests
             string decoded = (string)typeof(SaveSystem).GetMethod("DecodePlayerSave", flags).Invoke(null, new object[] { stored });
             var restored = SaveSystem.DeserializePlayerData(decoded);
             Assert.AreEqual(73, restored.cash);
+            CollectionAssert.AreEqual(profile.foundSecrets, restored.foundSecrets);
+            Assert.AreEqual(profile.mobilityUntilUtc, restored.mobilityUntilUtc);
             Assert.IsTrue(restored.goals[0].completed);
             Assert.IsTrue(restored.goals[0].rewardClaimed);
             CollectionAssert.AreEqual(new[] { .25f, .75f }, restored.world.items[0].pile.heights);

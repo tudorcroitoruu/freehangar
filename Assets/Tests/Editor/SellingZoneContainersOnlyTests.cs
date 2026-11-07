@@ -5,6 +5,44 @@ using UnityEngine;
 
 public class SellingZoneContainersOnlyTests
 {
+    [Test]
+    public void SpringTextFollowsDeckAndHeavyLoadCannotBurySurface()
+    {
+        var station = new GameObject("Spring regression");
+        try
+        {
+            var deckObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            deckObject.name = "Inset weighing deck";
+            deckObject.transform.SetParent(station.transform, false);
+            deckObject.transform.localPosition = Vector3.up * .045f;
+            deckObject.transform.localScale = new Vector3(3.8f, .09f, 4.8f);
+            var text = new GameObject("Deck instruction", typeof(RectTransform)).transform;
+            text.SetParent(station.transform, false); text.localPosition = Vector3.up * .105f;
+            Vector3 textRest = text.position;
+            var spring = station.AddComponent<WeighDeckSpring>();
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+            typeof(WeighDeckSpring).GetMethod("Start", flags).Invoke(spring, null);
+            var visual = deckObject.transform.Find("Suspended deck visual");
+            Vector3 visualRest = visual.position;
+            typeof(WeighDeckSpring).GetField("pollAt", flags).SetValue(spring, float.PositiveInfinity);
+            typeof(WeighDeckSpring).GetField("load", flags).SetValue(spring, 1000f);
+            typeof(WeighDeckSpring).GetField("velocity", flags).SetValue(spring, -10f);
+            var tick = typeof(WeighDeckSpring).GetMethod("FixedUpdate", flags);
+            for (int i = 0; i < 300; i++)
+            {
+                tick.Invoke(spring, null);
+                Vector3 offset = visual.position - visualRest;
+                Assert.That(offset.y, Is.GreaterThanOrEqualTo(-.04001f));
+                Assert.That(Vector3.Distance(text.position - textRest, offset), Is.LessThan(.0001f));
+            }
+            // Start was invoked manually in EditMode; exercise its teardown pair too.
+            typeof(WeighDeckSpring).GetMethod("OnDestroy", flags).Invoke(spring, null);
+            Assert.AreSame(station.transform, text.parent);
+            Assert.That(Vector3.Distance(text.position, textRest), Is.LessThan(.0001f));
+        }
+        finally { Object.DestroyImmediate(station); }
+    }
+
     private GameObject root;
     private SellingZone zone;
     private PlayerInteractor player;

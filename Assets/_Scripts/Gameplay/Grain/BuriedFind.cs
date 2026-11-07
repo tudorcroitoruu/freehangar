@@ -289,10 +289,24 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         int index = data.foundSecrets.Length;
         Array.Resize(ref data.foundSecrets, index + 1);
         data.foundSecrets[index] = findId;
-        SaveSystem.SaveData();
+        SaveReward();
         Collected?.Invoke(this, data);
         if (kind == Kind.HangarKey) GoalChecker.ReportValue(GoalType.HangarKeyCollected, 1, targetHangar);
         return true;
+    }
+
+    private async void SaveReward()
+    {
+        // Boxes and bottles share the goal-reward save path: capture Unity state
+        // now, then serialize/compress its isolated snapshot off the gameplay thread.
+        // The receipt, audio and perk must not wait for a large grain-world save.
+        try { await SaveSystem.SaveGoalCompletionAsync(); }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+            // Preserve the earned reward if background serialization fails.
+            SaveSystem.SaveData();
+        }
     }
 
     private string Receipt() => kind == Kind.CashChest && variedChestRewards && chestRewardRolled ? PlayerPerks.Receipt(rolledChestReward,cashReward,chestPerkSeconds) : kind == Kind.VehicleKey ? $"{vehicleKeyName.ToUpperInvariant()} KEY FOUND" : kind == Kind.HangarKey ? $"HANGAR {targetHangar} KEY\nUse at Hangar {targetHangar}" :

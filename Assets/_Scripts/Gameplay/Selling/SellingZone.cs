@@ -139,6 +139,8 @@ public sealed class WeighDeckSpring : MonoBehaviour
     private readonly HashSet<Object> previousOccupants = new HashSet<Object>();
     private readonly List<Transform> moving = new List<Transform>();
     private readonly List<Vector3> rest = new List<Vector3>();
+    private readonly List<(Transform node, Transform parent, Vector3 position, Quaternion rotation, Vector3 scale)> attached =
+        new List<(Transform, Transform, Vector3, Quaternion, Vector3)>();
     private BoxCollider deck;
     private MeshRenderer originalRenderer;
     private GameObject visualDeck;
@@ -161,6 +163,15 @@ public sealed class WeighDeckSpring : MonoBehaviour
         moving.Add(visualDeck.transform);
         foreach (Transform node in deck.transform.parent)
             if (node.name == "Deck fastener" || node.name == "Deck instruction") moving.Add(node);
+        // Parent the lettering/fasteners to the actual moving visual so TMP and
+        // differently scaled transforms cannot drift away from the deck animation.
+        for (int i = 1; i < moving.Count; i++)
+        {
+            var node = moving[i];
+            attached.Add((node, node.parent, node.localPosition, node.localRotation, node.localScale));
+            node.SetParent(visualDeck.transform, true);
+        }
+        if (moving.Count > 1) moving.RemoveRange(1, moving.Count - 1);
         foreach (var node in moving) rest.Add(node.localPosition);
     }
 
@@ -202,18 +213,25 @@ public sealed class WeighDeckSpring : MonoBehaviour
             load = nextLoad;
         }
         float dt = Time.fixedDeltaTime;
-        float target = -Mathf.Min(.025f, load * .007f);
+        const float visualMultiplier = 6f;
+        // The authored deck is only 9 cm thick. Limit the final world-space
+        // travel, including amplification, so it cannot sink through its base.
+        float maximumCompression = Mathf.Min(.04f, deck.bounds.size.y * .45f);
+        float lowerStop = -maximumCompression / visualMultiplier;
+        float target = -Mathf.Min(maximumCompression * .6f / visualMultiplier, load * .007f);
         // Substeps keep the damped spring stable at larger physics timesteps.
         int steps = Mathf.Max(1, Mathf.CeilToInt(dt / .01f));
         float step = dt / steps;
         for (int i = 0; i < steps; i++)
         {
             velocity += ((target - displacement) * 140f - velocity * 8f) * step;
-            displacement = Mathf.Clamp(displacement + velocity * step, -.04f, .012f);
+            displacement = Mathf.Clamp(displacement + velocity * step, lowerStop, .012f);
+            if (displacement <= lowerStop && velocity < 0f) velocity = 0f;
+            if (displacement >= .012f && velocity > 0f) velocity = 0f;
         }
         for (int i = 0; i < moving.Count; i++)
             if (moving[i] != null)
-                moving[i].localPosition = rest[i] + moving[i].parent.InverseTransformVector(Vector3.up * (displacement * 6f));
+                moving[i].localPosition = rest[i] + moving[i].parent.InverseTransformVector(Vector3.up * (displacement * visualMultiplier));
     }
 
     private void OnDisable()
@@ -225,7 +243,19 @@ public sealed class WeighDeckSpring : MonoBehaviour
 
     private void OnDestroy()
     {
+        foreach (var item in attached)
+        {
+            if (item.node == null || item.parent == null) continue;
+            item.node.SetParent(item.parent, false);
+            item.node.localPosition = item.position;
+            item.node.localRotation = item.rotation;
+            item.node.localScale = item.scale;
+        }
         if (originalRenderer != null) originalRenderer.enabled = true;
-        if (visualDeck != null) Destroy(visualDeck);
+        if (visualDeck != null)
+        {
+            if (Application.isPlaying) Destroy(visualDeck);
+            else DestroyImmediate(visualDeck);
+        }
     }
 }

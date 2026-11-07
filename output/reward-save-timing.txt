@@ -1,0 +1,1 @@
+Read-only persisted save: 27693469 JSON characters; serialization 430.97 ms; compression/encryption 642.15 ms

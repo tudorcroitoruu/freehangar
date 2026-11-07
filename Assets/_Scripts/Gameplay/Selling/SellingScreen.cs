@@ -143,6 +143,8 @@ public class SellingScreen : MonoBehaviour
             return;
         }
         // GameplayCanvas plays the coin cue in sync with the balance transfer.
+        // The gameplay source survives Close() and can play alongside the cash cue.
+        GameplayAudio.Instance?.UpgradeResult(true);
         GameAchievements.GrainSold(quotedCash);
         var soldQuantities = new Dictionary<GrainType, float>();
         foreach (var entry in quotedWeights)
