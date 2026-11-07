@@ -45,6 +45,9 @@ public class GameplayCanvas : MonoBehaviour
     [Space, Header("Interactor")]
     public InteractionPrompt interactionPrompt;
 
+    [Space, Header("Stamina")] 
+    public StaminaManager staminaManager;
+
     [Space, Header("Hints")]
     [SerializeField] private GameObject[] walkingHints;
     [SerializeField] private GameObject[] drivingHints;

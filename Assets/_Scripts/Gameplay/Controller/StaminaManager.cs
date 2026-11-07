@@ -9,6 +9,7 @@ public sealed class StaminaManager : MonoBehaviour
     public float SavedHunger => hungryPercent;
     public void RestoreSave(float stamina, float hunger)
     {
+        pendingHungerReduction = 0f;
         SetHungerPercent(hunger);
         if (float.IsFinite(stamina) && stamina >= 0) CurrentStamina = Mathf.Clamp(stamina, 0, CurrentMaxStamina);
         UpdateStaminaBar();
@@ -41,6 +42,7 @@ public sealed class StaminaManager : MonoBehaviour
     [SerializeField] private Image staminaBarBackground;
 
     private float recoveryDelayRemaining;
+    private float pendingHungerReduction, hungerReductionPerSecond;
     private RectTransform backgroundRect;
     private float initialBackgroundSizeDeltaX;
     private PlayerData staminaProfile;
@@ -99,12 +101,45 @@ public sealed class StaminaManager : MonoBehaviour
     private void RefreshUpgrade(int _)
     {
         bool profileChanged = staminaProfile != SaveSystem.Data;
+        if (profileChanged) pendingHungerReduction = 0f;
         staminaProfile = SaveSystem.Data;
         CurrentStamina = profileChanged || HasInfiniteStamina ? CurrentMaxStamina : Mathf.Clamp(CurrentStamina, 0f, CurrentMaxStamina);
         UpdateStaminaBar();
     }
 
-    private void Update() => TickHunger(Time.deltaTime);
+    private void Update()
+    {
+        TickHunger(Time.deltaTime);
+        if (pendingHungerReduction <= 0f || Time.deltaTime <= 0f) return;
+        float reduction = Mathf.Min(pendingHungerReduction, hungerReductionPerSecond * Time.deltaTime);
+        pendingHungerReduction = Mathf.Max(0f, pendingHungerReduction - reduction);
+        ApplyFoodHungerReduction(reduction);
+    }
+
+    public void RestoreStaminaAndReduceHunger(float reductionPercent, float duration)
+    {
+        CurrentStamina = CurrentMaxStamina;
+        if (float.IsFinite(reductionPercent) && reductionPercent > 0f)
+        {
+            if (!float.IsFinite(duration) || duration <= 0f)
+                ApplyFoodHungerReduction(reductionPercent);
+            else
+            {
+                pendingHungerReduction = Mathf.Min(hungryPercent, pendingHungerReduction + reductionPercent);
+                hungerReductionPerSecond = pendingHungerReduction / duration;
+            }
+        }
+        UpdateStaminaBar();
+    }
+
+    private void ApplyFoodHungerReduction(float reduction)
+    {
+        float previousMax = CurrentMaxStamina;
+        SetHungerPercent(hungryPercent - reduction);
+        CurrentStamina = Mathf.Clamp(CurrentStamina + CurrentMaxStamina - previousMax, 0f, CurrentMaxStamina);
+        UpdateStaminaBar();
+        UpdateHungryIcon();
+    }
 
     public void TickHunger(float deltaTime)
     {

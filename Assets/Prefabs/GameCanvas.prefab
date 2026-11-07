@@ -2610,6 +2610,7 @@ MonoBehaviour:
   moneyChangeTransferDelay: 0.5
   moneyChangeHoldSeconds: 0.35
   interactionPrompt: {fileID: 3029976341701256075}
+  staminaManager: {fileID: 1005262196254572464}
   walkingHints:
   - {fileID: 712842178049406897}
   - {fileID: 4643289136625261255}
@@ -2633,7 +2634,7 @@ MonoBehaviour:
   boostersParent: {fileID: 8887181608423940080}
   boosterHandlerPrefab: {fileID: 109275875164959317, guid: d7532332d1202dd4a908cff5ad23bb7e, type: 3}
   warningPopup: {fileID: 8853995741842851025}
-  achievementsPopup: {fileID: 0}
+  achievementsPopup: {fileID: 5493925631014947371}
 --- !u!114 &7200805050012345678
 MonoBehaviour:
   m_ObjectHideFlags: 0

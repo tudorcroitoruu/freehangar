@@ -3,6 +3,8 @@ using UnityEngine;
 public sealed class ChickenLegPickup : MonoBehaviour, IInteractable
 {
     private const float SpinDegreesPerSecond = 90f;
+    [SerializeField, Min(0f)] private float hungerReductionPercent = 15f;
+    [SerializeField, Min(0f)] private float hungerReductionDuration = 1f;
     private bool collected;
     private bool carried;
     private float expiresAt;
@@ -45,10 +47,10 @@ public sealed class ChickenLegPickup : MonoBehaviour, IInteractable
     public bool TryInteract(PlayerInteractor interactor)
     {
         if (collected || carried || interactor == null || Time.timeScale <= 0) return false;
-        var stamina = interactor.GetComponent<StaminaManager>();
+        var stamina = GameplayCanvas.Instance != null ? GameplayCanvas.Instance.staminaManager : null;
         if (stamina == null) return false;
         collected = true;
-        stamina.RestoreSave(stamina.CurrentMaxStamina, stamina.HungryPercent);
+        stamina.RestoreStaminaAndReduceHunger(hungerReductionPercent, hungerReductionDuration);
         Destroy(gameObject);
         return true;
     }

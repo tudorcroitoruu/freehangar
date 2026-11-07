@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5956389233392659851}
   - component: {fileID: 236766314296989539}
+  - component: {fileID: 7123145308776805952}
   m_Layer: 0
   m_Name: ChickenLeg
   m_TagString: Untagged
@@ -30,7 +31,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4450304535651039473}
+  - {fileID: 3531409204045948742}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &236766314296989539
@@ -45,6 +46,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eaca72191ddc3974fbe08d9647820f04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChickenLegPickup
+--- !u!114 &7123145308776805952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5209372551336037794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f51fec49dc09194698499dbeff3e27a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionHighlight
+  outlines:
+  - {fileID: 7702504477988153680}
 --- !u!1001 &681796532046934225
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -64,9 +79,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1022165900115240324, guid: 60c1dab9a63be2c46a8ebcdcbe5241cb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7702504477988153680}
   m_SourcePrefab: {fileID: 100100000, guid: 60c1dab9a63be2c46a8ebcdcbe5241cb, type: 3}
---- !u!4 &4450304535651039473 stripped
+--- !u!1 &529538187687810389 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1022165900115240324, guid: 60c1dab9a63be2c46a8ebcdcbe5241cb, type: 3}
+  m_PrefabInstance: {fileID: 681796532046934225}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7702504477988153680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529538187687810389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.89411765, b: 0.6509804, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
+--- !u!4 &3531409204045948742 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4067928730322081687, guid: 60c1dab9a63be2c46a8ebcdcbe5241cb, type: 3}
   m_PrefabInstance: {fileID: 681796532046934225}
