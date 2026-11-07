@@ -37,13 +37,15 @@ public sealed class BagCornSurface : MonoBehaviour
     private static readonly int GrainTypeId = Shader.PropertyToID("_GrainType");
     private static readonly int KernelModeId = Shader.PropertyToID("_KernelMode");
 
-    private void RefreshGrainAppearance()
+    public void RefreshGrainAppearance()
     {
+        if (container == null) container = GetComponent<GrainContainer>();
         GrainType type = container != null ? container.AcceptedGrain : GrainType.Corn;
         if (lastGrainType != (int)type)
         {
             lastGrainType = (int)type;
             grainAppearance.Set(type);
+            grainAppearance.Block.SetFloat(GrainTypeId, (int)type);
             grainAppearance.Block.SetFloat(KernelModeId, 0);
             kernelAppearance.Set(type);
             kernelAppearance.Block.SetFloat(KernelModeId, 1);

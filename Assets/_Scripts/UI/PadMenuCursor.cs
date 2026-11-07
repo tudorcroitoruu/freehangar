@@ -17,6 +17,17 @@ public sealed class PadMenuCursor : MonoBehaviour
     private float repeatAt;
     private readonly List<Selectable> controls = new List<Selectable>();
     private Selectable[] buffer = new Selectable[128];
+    private GameObject lastSoundSelection;
+
+    private void LateUpdate()
+    {
+        var selected = EventSystem.current ? EventSystem.current.currentSelectedGameObject : null;
+        if (selected == lastSoundSelection) return;
+        lastSoundSelection = selected;
+        if (selected && selected.activeInHierarchy && !LoadingScreen.IsLoading &&
+            selected.TryGetComponent<Selectable>(out var control) && control.IsInteractable())
+            AudioManager.Instance?.PlaySelectStandard(0);
+    }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Install()

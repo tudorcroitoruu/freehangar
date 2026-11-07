@@ -173,8 +173,13 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
 
     // Initialise newly spawned demonstration cargo without reporting player work.
     public void SetDemonstrationFill(float amount)
+        => SetDemonstrationFill(acceptedGrain, amount);
+
+    public void SetDemonstrationFill(GrainType grain, float amount)
     {
-        if (!isActiveAndEnabled || !float.IsFinite(amount)) return;
+        if (!isActiveAndEnabled || !float.IsFinite(amount) || (int)grain < 0 ||
+            (int)grain >= GrainCargo.TypeCount) return;
+        acceptedGrain = grain;
         kilograms = Mathf.Clamp(amount, 0f, capacityKg);
         ApplyFill();
     }
@@ -230,6 +235,7 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     private void ApplyFill()
     {
         if (sack != null) sack.Fill = kilograms / capacityKg;
+        if (TryGetComponent<BagCornSurface>(out var surface)) surface.RefreshGrainAppearance();
         if (fitFillCollider && fillCollider != null)
         {
             float fill = kilograms / capacityKg;

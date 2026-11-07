@@ -311,7 +311,7 @@ MonoBehaviour:
   soundEffectsAudioSource: {fileID: 8031809758516748392}
   otherAudioSource: {fileID: 8181006730887900472}
   selectClips:
-  - {fileID: 8300000, guid: 1d87cb9bfbae7c84b943acee5dd9d509, type: 3}
+  - {fileID: 8300000, guid: 30a72618fc0832d46a0fc86d5d91040c, type: 3}
   confirmClips:
   - {fileID: 8300000, guid: 1d87cb9bfbae7c84b943acee5dd9d509, type: 3}
   cancelClips:

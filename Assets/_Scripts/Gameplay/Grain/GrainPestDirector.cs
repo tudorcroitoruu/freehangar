@@ -286,6 +286,7 @@ public sealed class GrainPestDirector : MonoBehaviour
     private const string CrowIntroId = "farm.pests.crow.intro";
     private bool crowIntroDone, crowLesson;
     private bool introRunning, introDone, showBroomHint;
+    private GrainContainer[] preparedRatBags;
     private PlayerController introController;
     private bool introControllerWasEnabled;
 
@@ -546,7 +547,8 @@ public sealed class GrainPestDirector : MonoBehaviour
     }
     private IEnumerator Introduce()
     {
-        if (encounterActive) EndEncounter();
+        PrepareRatIntroduction();
+        if (preparedRatBags == null) yield break;
         introRunning = true;
         crowLesson = false;
         if (player == null || playerCamera == null || tutorialBagTemplate == null || !player.BeginDiscovery(this))
@@ -556,20 +558,7 @@ public sealed class GrainPestDirector : MonoBehaviour
         introControllerWasEnabled = introController != null && introController.enabled;
         if (introControllerWasEnabled) introController.enabled = false;
         yield return new WaitForSeconds(1.7f);
-        var building = hangar3.GetComponentInParent<HangarGrainVisibility>();
-        if (building == null) { RestoreIntroController(); player.EndDiscovery(this); introRunning = false; yield break; }
-        var bags = new GrainContainer[2];
-        for (int i = 0; i < bags.Length; i++)
-        {
-            var go = Instantiate(tutorialBagTemplate.gameObject);
-            go.name = "Rat tutorial grain bag";
-            go.transform.position = building.transform.position + building.transform.forward * 19.5f +
-                building.transform.right * (i == 0 ? -2f : 2f);
-            go.SetActive(true);
-            bags[i] = go.GetComponent<GrainContainer>();
-            bags[i].SetDemonstrationFill(bags[i].CapacityKg * .5f);
-        }
-        foreach (var bag in bags) SpawnRatGroup(bag, true);
+        var bags = preparedRatBags;
         for (int i = 0; i < bags.Length; i++)
         {
             Vector3 delta = bags[i].WorldBounds.center - playerCamera.transform.position;
@@ -601,6 +590,33 @@ public sealed class GrainPestDirector : MonoBehaviour
         }
         introDone = true; introRunning = false; showBroomHint = true; Schedule();
     }
+    public void PrepareRatIntroduction()
+    {
+        if (preparedRatBags != null || introDone || hangar3 == null || tutorialBagTemplate == null ||
+            ratPrefab == null || SaveSystem.Data == null || PlayerPerks.NoAttacksActive) return;
+        bool seen = BuriedFind.WasFound(SaveSystem.Data, IntroId);
+#if UNITY_EDITOR
+        if (replayIntroForTesting) seen = false;
+#endif
+        if (seen) return;
+        var building = hangar3.GetComponentInParent<HangarGrainVisibility>();
+        if (building == null) return;
+        if (encounterActive) EndEncounter();
+        preparedRatBags = new GrainContainer[2];
+        for (int i = 0; i < preparedRatBags.Length; i++)
+        {
+            var go = Instantiate(tutorialBagTemplate.gameObject);
+            go.name = "Rat tutorial grain bag";
+            go.transform.position = building.transform.position + building.transform.forward * 19.5f +
+                building.transform.right * (i == 0 ? -2f : 2f);
+            go.SetActive(true);
+            var bag = go.GetComponent<GrainContainer>();
+            bag.SetDemonstrationFill(GrainType.Rice, bag.CapacityKg * .5f);
+            preparedRatBags[i] = bag;
+            SpawnRatGroup(bag, true);
+        }
+    }
+
     private IEnumerator IntroduceCrows()
     {
         if (encounterActive) EndEncounter();
@@ -620,7 +636,7 @@ public sealed class GrainPestDirector : MonoBehaviour
         go.transform.position = root.position + root.forward * 28f;
         go.SetActive(true);
         var bag = go.GetComponent<GrainContainer>();
-        bag.SetDemonstrationFill(bag.CapacityKg * .5f);
+        bag.SetDemonstrationFill(GrainType.Rice, bag.CapacityKg * .5f);
         Quaternion startLook = playerCamera.transform.rotation;
         Quaternion targetLook = Quaternion.LookRotation(bag.WorldBounds.center - playerCamera.transform.position);
         float turn = 0;

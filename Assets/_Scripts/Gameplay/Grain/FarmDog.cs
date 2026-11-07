@@ -14,6 +14,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     public SickscoreGames.HUDNavigationSystem.HUDNavigationElementSettings chickenMarkerSettings;
     private float nextBark;
     private AudioSource announcementAudio;
+    private AudioLowPassFilter barkDistanceFilter;
     private Outline foundOutline;
     private SickscoreGames.HUDNavigationSystem.HUDNavigationElement foundMarker;
     public GameObject legPrefab;
@@ -217,16 +218,27 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
 
     private void Bark(bool announcement = false)
     {
-        // Every bark is audible map-wide; petting still uses its own local source.
+        // Keep distant calls audible, with direction and attenuation from the dog.
         if (barkClip)
         {
             if (!announcementAudio)
             {
-                announcementAudio = gameObject.AddComponent<AudioSource>();
+                var barkEmitter = new GameObject("Dog bark");
+                barkEmitter.transform.SetParent(transform, false);
+                announcementAudio = barkEmitter.AddComponent<AudioSource>();
                 announcementAudio.playOnAwake = false;
-                announcementAudio.spatialBlend = 0f;
+                announcementAudio.spatialBlend = 1f;
+                announcementAudio.spread = 0f;
+                announcementAudio.minDistance = 4f;
+                announcementAudio.maxDistance = 250f;
+                announcementAudio.rolloffMode = AudioRolloffMode.Custom;
+                announcementAudio.SetCustomCurve(AudioSourceCurveType.CustomRolloff,
+                    new AnimationCurve(new Keyframe(0f, 1f), new Keyframe(.08f, .8f),
+                        new Keyframe(.3f, .5f), new Keyframe(1f, .22f)));
                 announcementAudio.dopplerLevel = 0f;
                 announcementAudio.priority = 64;
+                barkDistanceFilter = barkEmitter.AddComponent<AudioLowPassFilter>();
+                barkDistanceFilter.lowpassResonanceQ = 1f;
             }
             if (strokeAudio) announcementAudio.outputAudioMixerGroup = strokeAudio.outputAudioMixerGroup;
             if (!nearbyPlayer)
@@ -235,10 +247,10 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
                 if (player) nearbyPlayer = player.transform;
             }
             float distance = nearbyPlayer ? Vector3.Distance(transform.position, nearbyPlayer.position) : 0f;
-            // A confirmation must remain audible across the map, while still
-            // sounding a little quieter when the dog is far away.
-            float volume = Mathf.Lerp(1f, .65f, Mathf.Clamp01(distance / 200f));
-            announcementAudio.PlayOneShot(barkClip, volume);
+            // Distant barks lose high frequencies without filtering petting audio.
+            barkDistanceFilter.cutoffFrequency = Mathf.Lerp(22000f, 2800f,
+                Mathf.Clamp01(distance / 200f));
+            announcementAudio.PlayOneShot(barkClip);
         }
         nextBark = Time.time + Random.Range(4f, 8f);
     }

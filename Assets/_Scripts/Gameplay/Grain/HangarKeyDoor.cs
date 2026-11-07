@@ -55,6 +55,9 @@ public sealed class HangarKeyDoor : MonoBehaviour, IInteractable
         var data = SaveSystem.Data;
         if (data == null) return false;
         if (!SaveSystem.TryOpenHangar(hangarNumber)) return false;
+        // Populate the tutorial while the doors still hide the interior.
+        if (hangarNumber == 3)
+            FindFirstObjectByType<GrainPestDirector>()?.PrepareRatIntroduction();
         loadedProfile = data; IsUnlocked = true;
         if (grainVisibility != null) grainVisibility.SetHangarOpen(true);
         RefreshLabel();

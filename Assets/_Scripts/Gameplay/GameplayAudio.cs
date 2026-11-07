@@ -132,8 +132,9 @@ public sealed class GameplayAudio : MonoBehaviour
         source.minDistance = 2f;
         source.maxDistance = 24f;
         source.outputAudioMixerGroup = effectsGroup;
+        if (clip == ratHit) source.pitch = Random.Range(.85f, 1.15f);
         source.PlayOneShot(clip, volume);
-        Destroy(go, Mathf.Min(clip.length, maxSeconds) + .2f);
+        Destroy(go, Mathf.Min(clip.length / source.pitch, maxSeconds) + .2f);
     }
 
     private static AudioClip Choose(AudioClip[] clips) => clips != null && clips.Length > 0 ? clips[Random.Range(0, clips.Length)] : null;
