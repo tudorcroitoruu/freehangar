@@ -157,6 +157,25 @@ public class CentralEconomyTests
     private static void Set(object target,string field,object value) => target.GetType().GetField(field,BindingFlags.Instance|BindingFlags.NonPublic).SetValue(target,value);
 
     [Test]
+    public void FeedingWarningStopsWhenCargoMovesAwayOrRatFlees()
+    {
+        var container = root.GetComponentInChildren<GrainContainer>();
+        container.SetDemonstrationFill(20);
+        var pestObject = new GameObject("Feeding rat");
+        pestObject.transform.SetParent(root.transform);
+        var pest = pestObject.AddComponent<GrainPest>();
+        pest.Initialize(container, false, null, null);
+        pest.transform.position = container.WorldBounds.center;
+        Set(pest, "feedingNow", true);
+        Assert.IsTrue(pest.IsFeeding);
+        container.transform.position += Vector3.forward * 30;
+        Assert.IsFalse(pest.IsFeeding);
+        pest.transform.position = container.WorldBounds.center;
+        pest.ScaredAway();
+        Assert.IsFalse(pest.IsFeeding);
+    }
+
+    [Test]
     public void ExistingPestsReadEditedBiteSettingsOnTheirNextBite()
     {
         var container=root.GetComponentInChildren<GrainContainer>();container.SetDemonstrationFill(20);

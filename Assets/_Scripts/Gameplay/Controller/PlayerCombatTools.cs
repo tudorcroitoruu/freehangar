@@ -75,6 +75,18 @@ public sealed class PlayerCombatTools : MonoBehaviour
     private Tool outgoingTool;
     private bool switching;
     private bool driving;
+    private bool carryingHidden;
+    private bool CarryingCargo => (bags != null && bags.IsCarrying) || (player != null && player.IsCarrying);
+
+    private void RefreshCarryingVisuals()
+    {
+        bool carrying = CarryingCargo;
+        if (carryingHidden == carrying) return;
+        carryingHidden = carrying;
+        CancelStrike();
+        if (switching) FinishSwitch();
+        else ApplyVisuals();
+    }
     private readonly System.Collections.Generic.Dictionary<Tool, Transform> switchPivots = new();
     public bool IsSwitching => switching;
     public Tool Equipped => equipped;
@@ -149,6 +161,8 @@ public sealed class PlayerCombatTools : MonoBehaviour
 
     public void Tick(bool acceptInput, bool wasLocked)
     {
+        RefreshCarryingVisuals();
+        if (CarryingCargo) { CancelStrike(); return; }
         if(!IsUnlocked(equipped)) { equipped=Tool.Shovel;CancelStrike();ApplyVisuals(); }
         if (switching) AdvanceSwitch();
         RestoreSelectedVisuals();
@@ -198,6 +212,8 @@ public sealed class PlayerCombatTools : MonoBehaviour
         {
             if (!heldPistol || Time.time < lastShot + ReloadDuration) return false;
             lastShot = Time.time;
+            // Reuse the broom's short camera shake for each successful shot.
+            broomImpactTime = Time.time;
             reloadSoundPending = true;
             if (pistolShot) pistolAudio.PlayOneShot(pistolShot);
             FirePistol();
@@ -213,8 +229,9 @@ public sealed class PlayerCombatTools : MonoBehaviour
         var muzzle = heldPistol.TransformPoint(new Vector3(0f, -.25f, .145f));
         SpawnPistolSmoke(muzzle, ray.direction);
         RaycastHit nearest = default;
-        foreach (var hit in Physics.RaycastAll(ray, 150f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+        foreach (var hit in Physics.RaycastAll(ray, 150f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide))
         {
+            if (hit.collider.isTrigger && hit.collider.GetComponentInParent<GrainPest>() == null) continue;
             if (hit.transform.IsChildOf(transform) || (nearest.collider && hit.distance >= nearest.distance)) continue;
             nearest = hit;
         }
@@ -244,13 +261,14 @@ public sealed class PlayerCombatTools : MonoBehaviour
     {
         var ray = PlayerAim.CenterRay(viewCamera);
         int count=equipped==Tool.Broom
-            ? Physics.SphereCastNonAlloc(ray,.22f,strikeHits,strikeReach,~0,QueryTriggerInteraction.Ignore)
-            : Physics.RaycastNonAlloc(ray,strikeHits,strikeReach,~0,QueryTriggerInteraction.Ignore);
+            ? Physics.SphereCastNonAlloc(ray,.22f,strikeHits,strikeReach,~0,QueryTriggerInteraction.Collide)
+            : Physics.RaycastNonAlloc(ray,strikeHits,strikeReach,~0,QueryTriggerInteraction.Collide);
         if(count==strikeHits.Length) return;
         RaycastHit hit=default;bool found=false;float nearest=float.PositiveInfinity;
         for(int i=0;i<count;i++)
         {
             var candidate=strikeHits[i];
+            if(candidate.collider.isTrigger && candidate.collider.GetComponentInParent<GrainPest>() == null)continue;
             if(candidate.transform.IsChildOf(transform) || candidate.distance>=nearest)continue;
             nearest=candidate.distance;hit=candidate;found=true;
         }
@@ -384,12 +402,13 @@ public sealed class PlayerCombatTools : MonoBehaviour
             SetHeldLayer(heldSledgehammer, layer);
         }
         Tool shown = switching && Time.time - switchStarted < .16f ? outgoingTool : equipped;
-        if (shovelTool != null) shovelTool.enabled=!driving && !switching && equipped==Tool.Shovel;
-        if (shovelHands != null) shovelHands.gameObject.SetActive(!driving && shown == Tool.Shovel);
-        if (heldPistol != null) heldPistol.gameObject.SetActive(!driving && shown == Tool.Pistol);
-        if (heldBroom != null) heldBroom.gameObject.SetActive(!driving && shown == Tool.Broom);
-        if (heldAxe != null) heldAxe.gameObject.SetActive(!driving && shown == Tool.Axe);
-        if (heldSledgehammer != null) heldSledgehammer.gameObject.SetActive(!driving && shown == Tool.Hammer);
+        bool visible = !driving && !CarryingCargo;
+        if (shovelTool != null) shovelTool.enabled=visible && !switching && equipped==Tool.Shovel;
+        if (shovelHands != null) shovelHands.gameObject.SetActive(visible && shown == Tool.Shovel);
+        if (heldPistol != null) heldPistol.gameObject.SetActive(visible && shown == Tool.Pistol);
+        if (heldBroom != null) heldBroom.gameObject.SetActive(visible && shown == Tool.Broom);
+        if (heldAxe != null) heldAxe.gameObject.SetActive(visible && shown == Tool.Axe);
+        if (heldSledgehammer != null) heldSledgehammer.gameObject.SetActive(visible && shown == Tool.Hammer);
     }
 
     private static void SetHeldLayer(Transform root, int layer)
@@ -401,6 +420,8 @@ public sealed class PlayerCombatTools : MonoBehaviour
 
     private void LateUpdate()
     {
+        // Pickup happens after Tick, so hide the tool before this frame renders.
+        RefreshCarryingVisuals();
         if (equipped == Tool.Pistol && heldPistol)
         {
             float t = Time.time - lastShot;

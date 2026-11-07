@@ -23511,7 +23511,7 @@ MonoBehaviour:
   recoveryDelay: 2
   maxHungryPercent: 70
   hungryPercent: 0
-  hungerIncreasePerMinute: 1
+  hungerIncreasePerMinute: 2
   hungryIcon: {fileID: 1944964609937039340}
   hungryPercentToShowIcon: 10
   staminaBarFill: {fileID: 9223117642901653718}

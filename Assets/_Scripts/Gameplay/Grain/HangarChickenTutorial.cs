@@ -26,13 +26,12 @@ public sealed class HangarChickenTutorial : MonoBehaviour
     {
         if (!template || !SaveSystem.savesLoaded || Time.time < nextRaid) return;
         nextRaid = Time.time + Random.Range(300f, 720f);
-        raiders.RemoveAll(bird => !bird || bird.IsDead);
+        raiders.RemoveAll(bird => !bird || bird.IsDead || !CanRaidPile(SaveSystem.Data, bird.feedingPile));
         if (!FarmChicken.AxeDiscovered || Random.value >= .8f || raiders.Count >= 3) return;
         var piles = new System.Collections.Generic.List<GrainPile>();
         foreach (var pile in FindObjectsByType<GrainPile>(FindObjectsSortMode.None))
         {
-            GoalContext.Resolve(pile, out int hangar, out _);
-            if (!pile.IsDroppedPile && CanRaidHangar(SaveSystem.Data, hangar) && pile.Kilograms > 0) piles.Add(pile);
+            if (CanRaidPile(SaveSystem.Data, pile)) piles.Add(pile);
         }
         if (piles.Count == 0) return;
         var selected = piles[Random.Range(0, piles.Count)];
@@ -73,6 +72,13 @@ public sealed class HangarChickenTutorial : MonoBehaviour
     public static bool CanRaidHangar(PlayerData data, int hangar) => data != null &&
         hangar >= 1 && hangar <= 5 && data.IsHangarOpen(hangar) && data.GetHangarClearedPercent(hangar) < 100f;
 
+    public static bool CanRaidPile(PlayerData data, GrainPile pile)
+    {
+        if (pile == null || !pile.isActiveAndEnabled || pile.IsDroppedPile || pile.CollectibleKilograms <= .001) return false;
+        GoalContext.Resolve(pile, out int hangar, out _);
+        return CanRaidHangar(data, hangar);
+    }
+
     public static bool ShouldAppear(PlayerData data) => CanRaidHangar(data, 2) && !data.hangar2ChickenDefeated;
     private void OnEnable() { if(chicken)chicken.Died+=Complete; }
     private void OnDisable() { if(chicken)chicken.Died-=Complete; }
@@ -81,7 +87,7 @@ public sealed class HangarChickenTutorial : MonoBehaviour
         TickRaids();
         if(Time.time<nextCheck || !SaveSystem.savesLoaded || !chicken || chicken.IsDead)return;
         nextCheck=Time.time+.25f;
-        bool show=ShouldAppear(SaveSystem.Data);
+        bool show=ShouldAppear(SaveSystem.Data) && CanRaidPile(SaveSystem.Data, chicken.feedingPile);
         if(chicken.gameObject.activeSelf!=show)chicken.gameObject.SetActive(show);
     }
     private void Complete()

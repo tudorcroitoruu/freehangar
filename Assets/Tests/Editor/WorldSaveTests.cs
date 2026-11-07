@@ -8,6 +8,43 @@ using Object = UnityEngine.Object;
 public class WorldSaveTests
 {
     [Test]
+    public void SiblingTrailerCargoSaveResolvesBackToItsSlot()
+    {
+        var root = new GameObject("Trailer save test");
+        root.SetActive(false);
+        try
+        {
+            var prefab = Resources.Load<GameObject>("Vehicles/4_Lawnmower_With_Trailer");
+            Assert.IsNotNull(prefab);
+            var rig = Object.Instantiate(prefab, root.transform);
+            var mower = rig.GetComponentInChildren<LawnmowerController>(true);
+            var vehicle = mower.GetComponent<BicycleController>();
+            var slot = new GameObject("Saved slot #1").transform;
+            slot.SetParent(mower.trailerJoint.transform, false);
+            var bag = new GameObject("Saved cargo").transform;
+            bag.SetParent(slot, false);
+            bag.localPosition = new Vector3(.1f, .2f, .3f);
+            var record = new BagSave { id = "test-bag", placement = true };
+            var flags = BindingFlags.Static | BindingFlags.NonPublic;
+            typeof(WorldSaveRuntime).GetMethod("CaptureTrailerSupport", flags)
+                .Invoke(null, new object[] { bag, record });
+            Assert.AreEqual(WorldSaveRuntime.Identity(vehicle.gameObject), record.parent);
+            var world = new WorldSaveData();
+            world.vehicles.Add(new VehicleSave { id = record.parent });
+            world.bags.Add(record);
+            world.NestCargo();
+            var restored = JsonUtility.FromJson<WorldSaveData>(JsonUtility.ToJson(world));
+            Assert.AreEqual(0, restored.bags.Count);
+            var cargo = restored.vehicles[0].bags[0];
+            var support = (Transform)typeof(WorldSaveRuntime).GetMethod("Resolve", flags)
+                .Invoke(null, new object[] { vehicle.transform, cargo.slot, false });
+            Assert.AreSame(slot, support);
+            Assert.AreEqual(bag.localPosition, cargo.localPosition);
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
+
+    [Test]
     public void CompressedAndLegacySavesPreserveRewardAndWorldTogether()
     {
         var profile = new PlayerData { cash = 73, world = new WorldSaveData { scene = "Gameplay" },

@@ -8,7 +8,8 @@ public sealed class GrainPest : MonoBehaviour
     public GrainContainer Target { get; private set; }
     public bool IsCrow { get; private set; }
     public bool IsFeeding => isActiveAndEnabled && feedingNow && !fleeing && !climbing &&
-        Target != null && Target.isActiveAndEnabled && Target.Kilograms > .001f && !PlayerPerks.NoAttacksActive;
+        Target != null && Target.isActiveAndEnabled && Target.Kilograms > .001f &&
+        Target.WorldBounds.SqrDistance(transform.position) <= 1.5f * 1.5f && !PlayerPerks.NoAttacksActive;
     private float nextBite;
     private float speed;
     private Animator animator;
@@ -19,7 +20,7 @@ public sealed class GrainPest : MonoBehaviour
     private float fleeUntil;
     private Vector3 fleeDirection;
     private bool hasSlot, wantsToClimb, climbing, onBag;
-    private float slotAngle, climbStart, climbDelay, biteAmount = 1f, fleeGroundY;
+    private float slotAngle, climbStart, climbDelay, biteAmount = 1f;
     private Vector3 climbFrom;
     private float beginAt, climbDuration, nextShuffle, restUntil;
     private bool crowApproaching;
@@ -86,7 +87,7 @@ public sealed class GrainPest : MonoBehaviour
         float radius = upper ? Mathf.Min(b.extents.x, b.extents.z) * .4f : Mathf.Max(b.extents.x,b.extents.z) + .45f;
         Vector3 result = b.center + radial * radius;
         result.y = upper ? b.max.y + .08f : Target.transform.position.y + .1f;
-        return result;
+        return upper ? result : GroundRat(result);
     }
     public void Initialize(GrainContainer target, bool crow, RuntimeAnimatorController fly, RuntimeAnimatorController eat)
     {
@@ -104,7 +105,21 @@ public sealed class GrainPest : MonoBehaviour
         }
         nextBite = Time.time + BiteInterval;
         nextIdleSound = Time.time + Random.Range(.5f, 2f);
-        var collider = gameObject.AddComponent<SphereCollider>(); collider.radius = .55f;
+        // Pests move by script. Hit detection must not push the dynamic cargo
+        // they overlap while feeding or climbing.
+        foreach (var body in GetComponentsInChildren<Rigidbody>(true))
+        {
+            body.isKinematic = true;
+            body.useGravity = false;
+        }
+        var collider = gameObject.AddComponent<SphereCollider>();
+        collider.radius = .55f;
+        collider.isTrigger = true;
+    }
+    private Vector3 GroundRat(Vector3 position)
+    {
+        if (FarmChicken.TryGroundPoint(position, out var ground)) position.y = ground.y + .1f;
+        return position;
     }
     private void Update()
     {
@@ -113,10 +128,10 @@ public sealed class GrainPest : MonoBehaviour
         {
             Vector3 flat = Vector3.ProjectOnPlane(fleeDirection, Vector3.up);
             if (flat.sqrMagnitude > .001f)
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(flat), 540f * Time.deltaTime);
+                transform.rotation = Quaternion.LookRotation(flat);
             float acceleration = Mathf.Clamp01((Time.time - (fleeUntil - 3f)) / .3f);
-            transform.position += (IsCrow ? fleeDirection : transform.forward) * speed * acceleration * Time.deltaTime;
-            if (!IsCrow) { Vector3 p = transform.position; p.y = Mathf.MoveTowards(p.y, fleeGroundY, 2.5f * Time.deltaTime); transform.position = p; }
+            Vector3 fleeStep = transform.position + (IsCrow ? fleeDirection : flat.normalized) * speed * acceleration * Time.deltaTime;
+            transform.position = IsCrow ? fleeStep : GroundRat(fleeStep);
             if (Time.time >= fleeUntil) Destroy(gameObject);
             return;
         }
@@ -178,6 +193,7 @@ public sealed class GrainPest : MonoBehaviour
                 else crowApproaching = false;
             }
         }
+        if (!IsCrow && !onBag) destination = GroundRat(destination);
         Vector3 delta = destination - transform.position;
         if (delta.magnitude > (crowApproaching ? .15f : hasSlot ? .18f : IsCrow ? .08f : 1.3f))
         {
@@ -186,8 +202,11 @@ public sealed class GrainPest : MonoBehaviour
             if (!IsCrow && animator != null) animator.SetFloat("Speed", 1f);
             Vector3 step = Vector3.MoveTowards(transform.position, destination, (IsCrow ? Mathf.Max(speed,targetSpeed + 5f) : speed) * Time.deltaTime);
             Vector3 dir = step - transform.position;
-            if (dir.sqrMagnitude > .0001f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.ProjectOnPlane(dir, Vector3.up).sqrMagnitude > .001f ? Vector3.ProjectOnPlane(dir, Vector3.up) : transform.forward), Time.deltaTime * 5f);
-            transform.position = step;
+            Vector3 forward = Vector3.ProjectOnPlane(dir, Vector3.up);
+            if (forward.sqrMagnitude > .0001f)
+                transform.rotation = IsCrow ? Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * 5f)
+                    : Quaternion.LookRotation(forward);
+            transform.position = !IsCrow && !onBag ? GroundRat(step) : step;
             nextBite = Time.time + BiteInterval;
         }
         else
@@ -222,7 +241,6 @@ public sealed class GrainPest : MonoBehaviour
             animator.SetFloat("Speed", 1f);
             animator.CrossFadeInFixedTime("Blend Tree", .12f);
         }
-        fleeGroundY = Target != null ? Target.transform.position.y + .1f : transform.position.y;
         climbing = false; onBag = false; crowPerched = false;
         fleeing = true; Target = null; fleeUntil = Time.time + 3f;
         Vector3 away = threatPosition.HasValue ? transform.position - threatPosition.Value : -transform.forward;
@@ -446,6 +464,7 @@ public sealed class GrainPestDirector : MonoBehaviour
         ratsHud?.Hide();
         crowsHud?.Hide();
         encounterActive = false;
+        showBroomHint = false;
         LastAttackEnded = Time.time;
         Schedule();
     }
@@ -695,7 +714,8 @@ public sealed class GrainPestDirector : MonoBehaviour
             var tools = player.GetComponent<PlayerCombatTools>();
             if (tools != null && tools.Equipped == PlayerCombatTools.Tool.Broom) showBroomHint = false;
         }
-        bool visible = introRunning || showBroomHint;
+        bool feeding = encounterPests.Any(p => p != null && p.IsCrow == crowLesson && p.IsFeeding);
+        bool visible = (introRunning || showBroomHint) && feeding;
         GameplayCanvas.Instance?.SetWarning(WarningType.RatsAttack, this, visible && !crowLesson);
         GameplayCanvas.Instance?.SetWarning(WarningType.CrowsAttack, this, visible && crowLesson);
     }
@@ -717,7 +737,7 @@ public sealed class GrainPestDirector : MonoBehaviour
             markedBags.Clear();
             markedChickens.Clear();
             foreach (var pest in FindObjectsByType<GrainPest>(FindObjectsSortMode.None))
-                if (pest.Target != null) markedBags.Add(pest.Target);
+                if (pest.IsFeeding) markedBags.Add(pest.Target);
             foreach (var chicken in FindObjectsByType<FarmChicken>(FindObjectsSortMode.None))
                 if (chicken.IsGrainThreat) markedChickens.Add(chicken);
         }
@@ -730,7 +750,7 @@ public sealed class GrainPestDirector : MonoBehaviour
             markerPositions.Add(bounds.center + Vector3.up * (bounds.extents.y + 1f));
         }
         foreach (var chicken in markedChickens)
-            if (chicken != null && chicken.isActiveAndEnabled && !chicken.IsDead)
+            if (chicken != null && chicken.IsGrainThreat)
                 markerPositions.Add(chicken.transform.position + Vector3.up);
         foreach (var position in markerPositions)
         {

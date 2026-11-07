@@ -110,6 +110,14 @@ public sealed class WorldSaveRuntime : MonoBehaviour
     }
     private static Transform Resolve(Transform root, string path, bool create = false)
     {
+        const string trailerPrefix = "@trailer:";
+        if (path != null && path.StartsWith(trailerPrefix, StringComparison.Ordinal))
+        {
+            var mower = root.GetComponent<LawnmowerController>();
+            if (mower == null || mower.trailerJoint == null) return null;
+            root = mower.trailerJoint.transform;
+            path = path.Substring(trailerPrefix.Length);
+        }
         foreach (string part in (path ?? "").Split('/'))
         {
             if (part.Length == 0) continue;
@@ -208,6 +216,7 @@ public sealed class WorldSaveRuntime : MonoBehaviour
                 record.slotPosition = go.transform.parent.localPosition; record.slotRotation = go.transform.parent.localRotation;
                 record.slotScale = go.transform.parent.localScale;
             }
+            CaptureTrailerSupport(go.transform, record);
             if (go.TryGetComponent<Rigidbody>(out var body))
             {
                 record.hasBody = true; record.gravity = body.useGravity; record.mass = body.mass;
@@ -311,6 +320,16 @@ public sealed class WorldSaveRuntime : MonoBehaviour
         }
         foreach (var record in saved.Records())
         {
+            // Older saves omitted the sibling trailer's parent identity. Preserve
+            // the cargo, but never leave an unattached kinematic obstacle in the rig.
+            if (record.placement && string.IsNullOrEmpty(record.parent) &&
+                objects.TryGetValue(record.id, out var orphan) && orphan != null)
+            {
+                orphan.GetComponent<VehicleCargoPlacement>()?.ReleaseScale();
+                orphan.transform.SetParent(null, true);
+                if (orphan.TryGetComponent<Rigidbody>(out var orphanBody))
+                { orphanBody.isKinematic = false; orphanBody.useGravity = true; }
+            }
             if (string.IsNullOrEmpty(record.parent) || !objects.TryGetValue(record.id, out var go) || go == null) continue;
             objects.TryGetValue(record.parent, out var parent);
             var slot = parent != null ? Resolve(parent.transform, record.slot, parent.GetComponent<WheelbarrowCargo>() != null) : null;
@@ -331,6 +350,7 @@ public sealed class WorldSaveRuntime : MonoBehaviour
             if (cargo != null) parent.GetComponent<ForkliftController>()?.RestoreLoadedBag(cargo);
             if (cargo != null) parent.GetComponent<GrainBagSupply>()?.RestoreCurrentBag(cargo);
         }
+        foreach (var mower in Find<LawnmowerController>()) mower.RefreshTrailerCollisions();
         if (player != null)
         {
             bool controllerEnabled = player.characterController.enabled; player.characterController.enabled = false;
@@ -394,4 +414,17 @@ public sealed class WorldSaveRuntime : MonoBehaviour
         target.localScale = new Vector3(worldScale.x / parent.x, worldScale.y / parent.y, worldScale.z / parent.z);
     }
     public bool Ready => ready;
+
+    private static void CaptureTrailerSupport(Transform item, WorldObjectSave record)
+    {
+        if (item.parent == null) return;
+        var vehicle = VehicleCargoOwner.Resolve(item.parent);
+        var mower = vehicle != null ? vehicle.GetComponent<LawnmowerController>() : null;
+        if (mower == null || mower.trailerJoint == null ||
+            !item.parent.IsChildOf(mower.trailerJoint.transform)) return;
+        record.parent = Identity(vehicle.gameObject);
+        record.slot = "@trailer:" + Path(item.parent, mower.trailerJoint.transform);
+        record.localPosition = item.localPosition;
+        record.localRotation = item.localRotation;
+    }
 }

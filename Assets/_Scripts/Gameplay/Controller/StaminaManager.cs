@@ -35,7 +35,7 @@ public sealed class StaminaManager : MonoBehaviour
     private float maxHungryPercent = 70f;
     [SerializeField, Range(0f, 100f)] private float hungryPercent;
     [SerializeField, Min(0f), Tooltip("Percentage points of hunger gained per minute of game time. Zero pauses hunger growth.")]
-    private float hungerIncreasePerMinute = 1f;
+    private float hungerIncreasePerMinute = 2f;
 
     [SerializeField] private GameObject hungryIcon;
     [SerializeField] private float hungryPercentToShowIcon = 15f;

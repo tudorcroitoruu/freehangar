@@ -11,7 +11,11 @@ public sealed class ShopHighlightArea : MonoBehaviour
     private void Update()
     {
         if (!player) player = FindFirstObjectByType<PlayerController>();
-        SetInside(player && localBounds.Contains(transform.InverseTransformPoint(player.transform.position)));
+        // Riding moves the view onto the vehicle while the walking body stays
+        // at the mounting point. Shop visibility must follow the player's view.
+        Vector3 position = player && player.characterCamera != null
+            ? player.characterCamera.transform.position : player ? player.transform.position : Vector3.zero;
+        SetInside(player && localBounds.Contains(transform.InverseTransformPoint(position)));
     }
 
     private void SetInside(bool value)

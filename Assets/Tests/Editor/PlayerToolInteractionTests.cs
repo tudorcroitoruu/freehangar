@@ -62,6 +62,34 @@ public class PlayerToolInteractionTests
         Assert.IsFalse(tools.TryEquip(PlayerCombatTools.Tool.Broom));Assert.IsFalse(tools.TryEquip(PlayerCombatTools.Tool.Axe));Assert.IsFalse(tools.TryEquip(PlayerCombatTools.Tool.Hammer));
         Assert.IsTrue(tools.TryEquip(PlayerCombatTools.Tool.Shovel));
     }
+    [TestCase(PlayerCombatTools.Tool.Axe)]
+    [TestCase(PlayerCombatTools.Tool.Hammer)]
+    [TestCase(PlayerCombatTools.Tool.Broom)]
+    public void CarryingBagHidesToolsAndRestoresSelectedTool(PlayerCombatTools.Tool selected)
+    {
+        var bags = root.AddComponent<BagInteraction>();
+        Set("bags", bags);
+        Assert.IsTrue(tools.TryEquip(selected));
+        var bag = Child("Carried bag").gameObject.AddComponent<GrainContainer>();
+        var carried = typeof(BagInteraction).GetField("carried", Private);
+        var refresh = typeof(PlayerCombatTools).GetMethod("RefreshCarryingVisuals", Private);
+        try
+        {
+            carried.SetValue(bags, bag);
+            refresh.Invoke(tools, null);
+            Assert.IsFalse(axe.gameObject.activeSelf);
+            Assert.IsFalse(hammer.gameObject.activeSelf);
+            Assert.IsFalse(broom.gameObject.activeSelf);
+            Assert.IsFalse(tools.TryStartStrike());
+            Assert.AreEqual(selected, tools.Equipped);
+            carried.SetValue(bags, null);
+            refresh.Invoke(tools, null);
+            Assert.AreEqual(selected == PlayerCombatTools.Tool.Axe, axe.gameObject.activeSelf);
+            Assert.AreEqual(selected == PlayerCombatTools.Tool.Hammer, hammer.gameObject.activeSelf);
+            Assert.AreEqual(selected == PlayerCombatTools.Tool.Broom, broom.gameObject.activeSelf);
+        }
+        finally { carried.SetValue(bags, null); }
+    }
     [Test] public void PistolRequiresDiscoveryAndCannotShootThroughWallsOrDuringReload()
     {
         var pistol = Child("Pistol");
@@ -268,6 +296,27 @@ public class PlayerToolInteractionTests
         typeof(BreakableGrainBarrier).GetField("exposed",Private).SetValue(wall,true);Physics.SyncTransforms();return wall;
     }
     private Transform Child(string name){var go=new GameObject(name);go.transform.SetParent(root.transform,false);return go.transform;}
+
+    [Test]
+    public void BroomCanScareNonSolidPestWithoutSolidCargoContact()
+    {
+        var bag = Child("Target bag").gameObject.AddComponent<GrainContainer>();
+        bag.SetDemonstrationFill(20);
+        var rat = Child("Rat");
+        rat.localPosition = Vector3.forward * 2;
+        var body = rat.gameObject.AddComponent<Rigidbody>();
+        var pest = rat.gameObject.AddComponent<GrainPest>();
+        pest.Initialize(bag, false, null, null);
+        var hitbox = rat.GetComponent<SphereCollider>();
+        Assert.IsTrue(hitbox.isTrigger);
+        Assert.IsTrue(body.isKinematic);
+        Assert.IsFalse(body.useGravity);
+        tools.TryEquip(PlayerCombatTools.Tool.Broom);
+        Physics.SyncTransforms();
+        Call("PerformStrike");
+        Assert.IsFalse(hitbox.enabled, "The broom must still hit and scare trigger-based pests.");
+        Assert.IsNull(pest.Target);
+    }
     private void Set(string field,object value)=>typeof(PlayerCombatTools).GetField(field,Private).SetValue(tools,value);
     private void Call(string method)=>typeof(PlayerCombatTools).GetMethod(method,Private).Invoke(tools,null);
 }

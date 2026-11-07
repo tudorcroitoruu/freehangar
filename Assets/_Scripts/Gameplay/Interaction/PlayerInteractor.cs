@@ -69,8 +69,8 @@ public sealed class PlayerInteractor : MonoBehaviour
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
         if (hasAimedPrompt && emptyBagTarget != null && ReferenceEquals(aimedTarget, emptyBagTarget))
             aimedPrompt.SecondaryDescription = emptyBagHoldCompleted
-                ? emptyBagSucceeded ? "Bag emptied" : "No clear ground beside bag"
-                : $"Hold {FarmInput.Label("Interact", "E")} to empty bag ({emptyBagHeld:0.0} / 1.0 s)";
+                ? emptyBagSucceeded ? "Container emptied" : "No clear ground beside container"
+                : $"Hold {FarmInput.Label("Secondary", "F")} to empty all grain ({emptyBagHeld:0.0} / 1.0 s)";
         // Driving owns the interaction prompt. A carried bag also prevents taking
         // another bag; looking at cargo should not continuously warn about that.
         if (PushedWheelbarrow != null ||
@@ -159,13 +159,7 @@ public sealed class PlayerInteractor : MonoBehaviour
             return Bags.TryInteract();
         }
         Target = FindTarget();
-        if (!HandsOccupied && Target is GrainContainer bag && Bags != null && Bags.CanEmpty(bag))
-        {
-            emptyBagTarget = bag;
-            emptyBagHeld = 0f;
-            emptyBagHoldCompleted = false;
-            return true;
-        }
+        CancelBagHold();
         return Target != null && KeyFor(Target) == KeyCode.E && Target.TryGetPrompt(this, out var data) && data.ShowKey && Target.TryInteract(this);
     }
 
@@ -179,18 +173,23 @@ public sealed class PlayerInteractor : MonoBehaviour
 
     private void TickBagHold(IInteractable aimed)
     {
+        if (emptyBagTarget == null && FarmInput.Down("Secondary") && !HandsOccupied &&
+            aimed is GrainContainer bag && Bags != null && Bags.CanEmpty(bag))
+        {
+            emptyBagTarget = bag;
+            emptyBagHeld = 0f;
+            emptyBagHoldCompleted = false;
+            emptyBagSucceeded = false;
+        }
         if (emptyBagTarget == null) return;
         if (!ReferenceEquals(aimed, emptyBagTarget) || HandsOccupied || Bags == null)
         {
             CancelBagHold();
             return;
         }
-        if (!FarmInput.Held("Interact"))
+        if (!FarmInput.Held("Secondary"))
         {
-            var bag = emptyBagTarget;
-            bool tap = !emptyBagHoldCompleted;
             CancelBagHold();
-            if (tap) Bags.TryInteract(bag);
             return;
         }
         if (emptyBagHoldCompleted) return;
@@ -206,6 +205,8 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (!CanInteract || (!FarmInput.Down("Secondary") && !FarmInput.Down("Cargo"))) return false;
         if (PushedWheelbarrow != null) return false;
         var primary = FindTarget();
+        if (FarmInput.Down("Secondary") && !HandsOccupied && primary is GrainContainer bag &&
+            Bags != null && Bags.CanEmpty(bag)) return true;
         if (!(primary is Component component)) return false;
         foreach (var behaviour in ActionBehaviours(component))
             if (behaviour != null && behaviour.isActiveAndEnabled && behaviour is IKeyedInteractable action &&

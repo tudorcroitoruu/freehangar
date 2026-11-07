@@ -91,7 +91,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     private bool raidAnnounced;
     private static int lastRaidAlertFrame = -1;
     public bool IsGrainThreat => isActiveAndEnabled && !IsDead && AxeDiscovered &&
-        feedingPile != null && feedingPile.isActiveAndEnabled && feedingPile.Kilograms > 0f;
+        HangarChickenTutorial.CanRaidPile(SaveSystem.Data, feedingPile);
 
     public bool IsDead => deathAt >= 0f;
     public GameObject LastDrop { get; private set; }
@@ -202,7 +202,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         // Reject even an intermediate path segment that would bring a fleeing bird closer.
         if (fleeing && Vector3.Dot(agent.desiredVelocity, transform.position-lastThreat) < -.01f)
         { agent.ResetPath(); decisionAt = 0; }
-        bool canFeed = AxeDiscovered && feedingPile != null && feedingPile.isActiveAndEnabled;
+        bool canFeed = IsGrainThreat;
         bool eating = !fleeing && canFeed &&
             Vector3.ProjectOnPlane(transform.position-homePosition,Vector3.up).sqrMagnitude < 1f;
         if (eating)

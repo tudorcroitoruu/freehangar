@@ -51,6 +51,36 @@ public class FarmChickenTests
         typeof(FarmChicken).GetField("nextHit",Private).SetValue(chicken,-1f);
         Assert.IsTrue(chicken.Hit(damage,Vector3.back));
     }
+
+    [Test]
+    public void ChickenThreatRequiresOpenHangarAndRemainingGrain()
+    {
+        var pileObject = new GameObject("Raid grain");
+        try
+        {
+            pileObject.SetActive(false);
+            var context = pileObject.AddComponent<GoalContext>();
+            typeof(GoalContext).GetField("hangarId", Private).SetValue(context, 2);
+            var pile = pileObject.AddComponent<GrainPile>();
+            typeof(GrainPile).GetField("initialHeight", Private).SetValue(pile, 0f);
+            pile.Initialize();
+            pileObject.SetActive(true);
+            var empty = pile.CaptureSave();
+            chicken.feedingPile = pile;
+            SaveSystem.Data.openedHangars.Add(2);
+            Assert.IsFalse(chicken.IsGrainThreat, "An open but empty hangar cannot be raided.");
+            var grain = new GrainCargo();
+            grain.Add(GrainType.Corn, 10f);
+            Assert.IsTrue(pile.Deposit(Vector3.zero, grain));
+            Assert.IsTrue(chicken.IsGrainThreat);
+            SaveSystem.Data.openedHangars.Remove(2);
+            Assert.IsFalse(chicken.IsGrainThreat, "A closed hangar cannot be raided.");
+            SaveSystem.Data.openedHangars.Add(2);
+            pile.RestoreSave(empty);
+            Assert.IsFalse(chicken.IsGrainThreat, "An existing raider must stop when the pile becomes empty.");
+        }
+        finally { Object.DestroyImmediate(pileObject); }
+    }
     [Test] public void FourAxeHitsKillAndFurtherHitsAreRejected()
     {
         for(int i=0;i<3;i++) { Strike(28);Assert.IsFalse(chicken.IsDead); }

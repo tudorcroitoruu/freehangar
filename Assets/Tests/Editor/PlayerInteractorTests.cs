@@ -254,6 +254,29 @@ public class PlayerInteractorTests
         return outline;
     }
 
+    [Test]
+    public void LeavingShopWithVehicleCameraClearsOutlinesWhileBodyStaysBehind()
+    {
+        var target = CreateTarget(1);
+        var outline = AddHighlight(target);
+        var shop = Create("Shop area", origin).AddComponent<ShopHighlightArea>();
+        var actor = Create("Walking body", origin);
+        actor.SetActive(false);
+        var player = actor.AddComponent<PlayerController>();
+        var camera = Create("Vehicle camera", origin).AddComponent<Camera>();
+        player.characterCamera = camera;
+        SetField(shop, "player", player);
+        SetField(shop, "localBounds", new Bounds(Vector3.zero, Vector3.one * 10));
+        SetField(shop, "displays", new[] { target.GetComponent<InteractionHighlight>() });
+        var update = typeof(ShopHighlightArea).GetMethod("Update", BindingFlags.Instance | BindingFlags.NonPublic);
+        update.Invoke(shop, null);
+        Assert.IsTrue(outline.enabled);
+        camera.transform.position += Vector3.forward * 30;
+        update.Invoke(shop, null);
+        Assert.IsFalse(outline.enabled);
+        Assert.AreEqual(origin, actor.transform.position);
+    }
+
     private void Focus(IInteractable target) =>
         typeof(PlayerInteractor).GetMethod("SetHighlightedTarget", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(interactor, new object[] { target });
 
