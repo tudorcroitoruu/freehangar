@@ -5,6 +5,7 @@ Shader "Toon/CustomToon"
 	Properties
 	{
 		_TextureSample( "Texture Sample", 2D ) = "white" {}
+        [HDR] _HitFlashColor("Hit flash (alpha = strength)", Color) = (0,0,0,0)
 		_TextureRamp( "Texture Ramp", 2D ) = "white" {}
 
 
@@ -66,6 +67,7 @@ Shader "Toon/CustomToon"
 		SAMPLER(sampler_TextureRamp);
 		CBUFFER_START(UnityPerMaterial)
 			float4 _TextureSample_ST;
+            float4 _HitFlashColor;
 			float4 _TextureRamp_ST;
 			float _ReceiveShadows;
 			float _SpecularHighlights;
@@ -181,7 +183,9 @@ Shader "Toon/CustomToon"
 					lighting += ToonLight(normalWS, L, light.color * light.diffuseDimmer * attenuation * shadow);
 				}
 				// HDRP light buffers use physical units; pre-expose the result once.
-				return float4(albedo * lighting * GetCurrentExposureMultiplier(), 1);
+				// Flash is an exposure-independent emissive overlay, visible even on dark atlas texels.
+                float3 shaded = albedo * lighting * GetCurrentExposureMultiplier();
+                return float4(lerp(shaded, _HitFlashColor.rgb, saturate(_HitFlashColor.a)), 1);
 			}
 			ENDHLSL
 		}
@@ -551,6 +555,7 @@ Shader "Toon/CustomToon"
 
 			CBUFFER_START(UnityPerMaterial)
 			float4 _TextureSample_ST;
+            float4 _HitFlashColor;
 			float _AlphaClip;
 			float _Cutoff;
 			#ifdef ASE_TRANSMISSION
@@ -1263,6 +1268,7 @@ Shader "Toon/CustomToon"
 
 			CBUFFER_START(UnityPerMaterial)
 			float4 _TextureSample_ST;
+            float4 _HitFlashColor;
 			float _AlphaClip;
 			float _Cutoff;
 			#ifdef ASE_TRANSMISSION
@@ -1567,6 +1573,7 @@ Shader "Toon/CustomToon"
 
 			CBUFFER_START(UnityPerMaterial)
 			float4 _TextureSample_ST;
+            float4 _HitFlashColor;
 			float _AlphaClip;
 			float _Cutoff;
 			#ifdef ASE_TRANSMISSION
@@ -1866,6 +1873,7 @@ Shader "Toon/CustomToon"
 
 			CBUFFER_START(UnityPerMaterial)
 			float4 _TextureSample_ST;
+            float4 _HitFlashColor;
 			float _AlphaClip;
 			float _Cutoff;
 			#ifdef ASE_TRANSMISSION
@@ -2296,6 +2304,7 @@ Shader "Toon/CustomToon"
 
 			CBUFFER_START(UnityPerMaterial)
 			float4 _TextureSample_ST;
+            float4 _HitFlashColor;
 			float _AlphaClip;
 			float _Cutoff;
 			#ifdef ASE_TRANSMISSION
@@ -2710,6 +2719,7 @@ Shader "Toon/CustomToon"
 
 			CBUFFER_START(UnityPerMaterial)
 			float4 _TextureSample_ST;
+            float4 _HitFlashColor;
 			float _AlphaClip;
 			float _Cutoff;
 			#ifdef ASE_TRANSMISSION
@@ -3137,6 +3147,7 @@ Shader "Toon/CustomToon"
 
 			CBUFFER_START(UnityPerMaterial)
 			float4 _TextureSample_ST;
+            float4 _HitFlashColor;
 			float _AlphaClip;
 			float _Cutoff;
 			#ifdef ASE_TRANSMISSION
@@ -3721,6 +3732,7 @@ Shader "Toon/CustomToon"
 
 			CBUFFER_START(UnityPerMaterial)
 			float4 _TextureSample_ST;
+            float4 _HitFlashColor;
 			float _AlphaClip;
 			float _Cutoff;
 			#ifdef ASE_TRANSMISSION
@@ -3997,6 +4009,7 @@ Shader "Toon/CustomToon"
 
 			CBUFFER_START(UnityPerMaterial)
 			float4 _TextureSample_ST;
+            float4 _HitFlashColor;
 			float _AlphaClip;
 			float _Cutoff;
 			#ifdef ASE_TRANSMISSION
@@ -4287,6 +4300,7 @@ Shader "Toon/CustomToon"
 
 			CBUFFER_START(UnityPerMaterial)
 			float4 _TextureSample_ST;
+            float4 _HitFlashColor;
 			float _AlphaClip;
 			float _Cutoff;
 			#ifdef ASE_TRANSMISSION

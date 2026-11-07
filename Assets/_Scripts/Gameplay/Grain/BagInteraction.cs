@@ -35,7 +35,7 @@ public sealed class BagInteraction : MonoBehaviour
     public InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;
     private bool IsShovelEquipped => GetComponent<PlayerController>() is PlayerController player ?
         player.IsShovelEquipped : shovel != null && shovel.isActiveAndEnabled;
-    public string PromptAction => carried != null ? "Drop" : target == null ? "" : target.IsClosing ? "Closing…" :
+    public string PromptAction => carried != null ? "Drop" : target == null ? "" : target.IsClosing ? "Closingâ€¦" :
         IsShovelEquipped && target.CanHandle && !target.IsFinished ? "Finish" :
         target.CanCarry ? "Take" : target.IsFull ? "Full" : "Fill";
 
@@ -44,6 +44,7 @@ public sealed class BagInteraction : MonoBehaviour
     public bool TryGetPrompt(GrainContainer bag, out InteractionPromptData data)
     {
         data = default;
+        if (carried == null) bag = TopCargoBag(bag);
         if (!isActiveAndEnabled || bag == null || !bag.isActiveAndEnabled ||
             bag.IsClosing || (bag.IsCarried && bag != carried) || (shovel != null && shovel.IsBusy)) return false;
         if (carried == null) target = bag;
@@ -80,6 +81,7 @@ public sealed class BagInteraction : MonoBehaviour
 
     public bool TryInteract(GrainContainer bag)
     {
+        bag = TopCargoBag(bag);
         if (!isActiveAndEnabled || Time.timeScale <= 0 || viewCamera == null || carryAnchor == null ||
             carried != null || (shovel != null && shovel.IsBusy) || bag == null || bag.IsClosing ||
             (GetComponent<PlayerItemCarry>() is PlayerItemCarry items && items.IsCarrying)) return false;
@@ -98,6 +100,37 @@ public sealed class BagInteraction : MonoBehaviour
         return taken;
     }
 
+    /// <summary>Unload a cargo column from top to bottom, regardless of the aimed bag.</summary>
+    public static GrainContainer TopCargoBag(GrainContainer bag)
+    {
+        if (bag == null || bag.IsCarried) return bag;
+        var vehicle = VehicleCargoOwner.Resolve(bag);
+        var barrow = bag.GetComponentInParent<WheelbarrowCargo>();
+        Transform owner = vehicle != null ? vehicle.transform : barrow != null ? barrow.transform : null;
+        if (owner == null) return bag;
+        // Use the cargo's local support space so tilting a vehicle does not change its stack order.
+        var candidates = owner.GetComponentsInChildren<GrainContainer>();
+        GrainContainer top = bag;
+        for (int pass = 0; pass < candidates.Length; pass++)
+        {
+            var bounds = VehicleCargoRack.ContactBounds(top.transform, owner);
+            GrainContainer next = top;
+            float highest = bounds.center.y;
+            foreach (var candidate in candidates)
+            {
+                if (candidate == top || candidate.IsCarried) continue;
+                var other = VehicleCargoRack.ContactBounds(candidate.transform, owner);
+                bool overlaps = Mathf.Min(bounds.max.x, other.max.x) - Mathf.Max(bounds.min.x, other.min.x) > .02f &&
+                    Mathf.Min(bounds.max.z, other.max.z) - Mathf.Max(bounds.min.z, other.min.z) > .02f;
+                if (!overlaps || other.center.y <= highest + .01f || other.min.y > bounds.max.y + .25f) continue;
+                next = candidate;
+                highest = other.center.y;
+            }
+            if (next == top) break;
+            top = next;
+        }
+        return top;
+    }
     private bool Take(GrainContainer bag)
     {
         if (!bag.CanCarry || IsShovelEquipped) return false;

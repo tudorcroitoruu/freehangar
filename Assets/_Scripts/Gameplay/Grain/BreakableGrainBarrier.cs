@@ -99,7 +99,7 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
 
     public bool TryHit(PlayerCombatTools.Tool tool)
     {
-        if (!isActiveAndEnabled || !exposed || SaveSystem.Data == null || string.IsNullOrEmpty(barrierId)) return false;
+        if (!isActiveAndEnabled || !exposed || SaveSystem.Data == null || string.IsNullOrEmpty(barrierId) || IsBroken) return false;
         if (!AcceptsTool(tool))
             return false;
         GameplayAudio.Instance?.BarrierHit(material == Material.Metal);
@@ -111,8 +111,68 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
         int index = data.foundSecrets.Length;
         Array.Resize(ref data.foundSecrets, index + 1);
         data.foundSecrets[index] = barrierId;
-        SaveSystem.SaveData();
+        // Keep destruction in the live profile; normal saves capture the world.
+        // Capturing every grain height field synchronously here stalls the finishing strike.
+        SpawnBreakParticles();
         gameObject.SetActive(false);
         return true;
+    }
+    private void SpawnBreakParticles()
+    {
+        if (!Application.isPlaying || WorldSaveRuntime.IsRestoring || WorldSaveRuntime.IsSeeking) return;
+        // Detached effects survive disabling the wall. Reuse meshes/materials without allocations
+        // of geometry or rigidbodies; debris is visual only and cannot block the player.
+        int sources = 0;
+        foreach (var visual in visuals)
+        {
+            if (!visual || !visual.enabled || !visual.TryGetComponent<MeshFilter>(out var filter) ||
+                !filter.sharedMesh || !visual.sharedMaterial) continue;
+            if (++sources > 8) break;
+            var debris = new GameObject("Wall mesh debris");
+            debris.transform.position = visual.bounds.center;
+            var particles = debris.AddComponent<ParticleSystem>();
+            particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            var main = particles.main;
+            main.playOnAwake = false;
+            main.loop = false;
+            main.duration = .1f;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.maxParticles = 24;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(.65f, 1.15f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(.8f, 2.4f);
+            main.gravityModifier = .6f;
+            Vector3 meshSize = filter.sharedMesh.bounds.size;
+            float longest = Mathf.Max(.001f, Mathf.Max(meshSize.x, Mathf.Max(meshSize.y, meshSize.z)));
+            main.startSize = new ParticleSystem.MinMaxCurve(.06f / longest, .18f / longest);
+            main.startRotation3D = true;
+            main.startRotationX = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
+            main.startRotationY = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
+            main.startRotationZ = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
+            var emission = particles.emission;
+            emission.rateOverTime = 0f;
+            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 24) });
+            var shape = particles.shape;
+            shape.shapeType = ParticleSystemShapeType.Box;
+            shape.scale = visual.bounds.size;
+            shape.randomDirectionAmount = 1f;
+            var spin = particles.rotationOverLifetime;
+            spin.enabled = true;
+            spin.separateAxes = true;
+            spin.x = new ParticleSystem.MinMaxCurve(-5f, 5f);
+            spin.y = new ParticleSystem.MinMaxCurve(-5f, 5f);
+            spin.z = new ParticleSystem.MinMaxCurve(-5f, 5f);
+            var size = particles.sizeOverLifetime;
+            size.enabled = true;
+            size.size = new ParticleSystem.MinMaxCurve(1f,
+                new AnimationCurve(new Keyframe(0f, 1f), new Keyframe(.65f, 1f), new Keyframe(1f, 0f)));
+            var renderer = debris.GetComponent<ParticleSystemRenderer>();
+            renderer.renderMode = ParticleSystemRenderMode.Mesh;
+            renderer.mesh = filter.sharedMesh;
+            renderer.sharedMaterials = visual.sharedMaterials;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            particles.Play();
+            Destroy(debris, 2f);
+        }
     }
 }

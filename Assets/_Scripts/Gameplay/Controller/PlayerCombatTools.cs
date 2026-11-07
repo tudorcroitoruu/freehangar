@@ -238,7 +238,9 @@ public sealed class PlayerCombatTools : MonoBehaviour
         var chicken = hit.collider.GetComponentInParent<FarmChicken>();
         if (chicken != null && (equipped == Tool.Axe || equipped == Tool.Broom))
         {
-            chicken.Hit(equipped == Tool.Axe ? CombatToolUpgrades.AxeDamage(CombatToolUpgrades.Level(SaveSystem.Data, equipped)) : 3f, transform.position, transform);
+            bool damaged = chicken.Hit(equipped == Tool.Axe ? CombatToolUpgrades.AxeDamage(CombatToolUpgrades.Level(SaveSystem.Data, equipped)) : 3f, transform.position, transform);
+            if (damaged && equipped == Tool.Axe && dustEffect != null)
+            { var fx = Instantiate(dustEffect, hit.point, Quaternion.LookRotation(hit.normal)); Destroy(fx, 4f); }
             return;
         }
         if (equipped == Tool.Broom)
@@ -254,7 +256,12 @@ public sealed class PlayerCombatTools : MonoBehaviour
             return;
         }
         BreakableGrainBarrier wall = hit.collider.GetComponentInParent<BreakableGrainBarrier>();
-        if (wall != null) wall.TryHit(equipped);
+        bool accepted = wall != null && wall.TryHit(equipped);
+        if (dustEffect != null && (accepted || (wall == null && equipped == Tool.Axe)))
+        {
+            var fx = Instantiate(dustEffect, hit.point, Quaternion.LookRotation(hit.normal));
+            Destroy(fx, 4f);
+        }
     }
 
     // Carrying temporarily hides the shovel without changing the selected tool.

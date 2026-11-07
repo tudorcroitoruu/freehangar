@@ -33,7 +33,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     private NavMeshPath path;
     private GrainPile[] grainPiles;
     private Vector3 safePosition;
-    private Material[] hitMaterials;
+
     public bool IsDead => deathAt >= 0f;
     public GameObject LastDrop { get; private set; }
     public static bool AxeDiscovered => BuriedFind.WasFound(SaveSystem.Data, PlayerCombatTools.AxeFindId) ||
@@ -49,14 +49,6 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         if (!visual) visual = transform.GetChild(0);
         visualRest = visual.localPosition; originalScale = visual.localScale;
         renderers = visual.GetComponentsInChildren<Renderer>(true);
-        var materials = new System.Collections.Generic.List<Material>();
-        foreach (var renderer in renderers)
-            foreach (var material in renderer.materials)
-            {
-                material.EnableKeyword("_EMISSION");
-                materials.Add(material);
-            }
-        hitMaterials = materials.ToArray();
         flash = new MaterialPropertyBlock();
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.spatialBlend = 1f; audioSource.maxDistance = 22f;
@@ -102,7 +94,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
                 + Vector3.up * (Mathf.Max(0, 2.4f*t - 4.9f*t*t) + .22f*Mathf.Clamp01(t*2f));
             visual.localRotation = Quaternion.Euler(0, 0, Mathf.Min(90, t*180));
             visual.localScale = originalScale * (1f + (t < .3f ? .25f * Mathf.Sin(t / .3f * Mathf.PI) : 0f)) * (1-Mathf.Clamp01((t-.7f)/.45f));
-            if (t >= .18f)
+            if (t >= .25f)
             {
                 flash.Clear();
                 foreach (var renderer in renderers) renderer.SetPropertyBlock(flash);
@@ -113,9 +105,9 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         float hop = Time.time-hitAt;
         visual.localPosition = visualRest + Vector3.up * (hop < .5f ? Mathf.Sin(hop/.5f*Mathf.PI)*.35f : 0);
         visual.localScale = originalScale * (1f + (hop < .3f ? .25f * Mathf.Sin(hop / .3f * Mathf.PI) : 0f));
-        bool red = hop < .18f;
+        bool red = hop < .25f;
         flash.Clear();
-        if (red) { flash.SetColor("_BaseColor", Color.red); flash.SetColor("_EmissiveColor", Color.red*4); flash.SetColor("_EmissionColor", Color.red*4); }
+        if (red) { flash.SetColor("_HitFlashColor", new Color(4f, 0f, 0f, 1f)); flash.SetColor("_BaseColor", Color.red); flash.SetColor("_EmissiveColor", Color.red*4); flash.SetColor("_EmissionColor", Color.red*4); }
         foreach (var r in renderers) r.SetPropertyBlock(flash);
         if (!agent.isOnNavMesh) return;
         if (!GrainSegmentClear(safePosition, transform.position))
@@ -196,7 +188,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     {
         if (IsDead || damage<=0 || Time.time<nextHit) return false;
         nextHit=Time.time+.25f; hitAt=Time.time; health-=damage;
-        flash.Clear(); flash.SetColor("_BaseColor", Color.red); flash.SetColor("_EmissiveColor", Color.red*4); flash.SetColor("_EmissionColor", Color.red*4);
+        flash.Clear(); flash.SetColor("_HitFlashColor", new Color(4f, 0f, 0f, 1f)); flash.SetColor("_BaseColor", Color.red); flash.SetColor("_EmissiveColor", Color.red*4); flash.SetColor("_EmissionColor", Color.red*4);
         foreach(var r in renderers)r.SetPropertyBlock(flash);
         threat=attacker;lastThreat=source;fleeUntil=Time.time+15f;decisionAt=0;
         knockDirection=Vector3.ProjectOnPlane(transform.position-source,Vector3.up).normalized*2f;
@@ -242,10 +234,6 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         for (int i = 1; i <= steps; i++)
             if (!GrainClear(Vector3.Lerp(from, to, (float)i / steps))) return false;
         return true;
-    }
-    private void OnDestroy()
-    {
-        if (hitMaterials != null) foreach (var material in hitMaterials) if (material) Destroy(material);
     }
     public bool HitByVehicle(BicycleController vehicle)
     {

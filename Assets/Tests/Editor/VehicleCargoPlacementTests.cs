@@ -3,6 +3,38 @@ using UnityEngine;
 
 public class VehicleCargoPlacementTests
 {
+    [Test]
+    public void PickingLowerCargoSelectsTopOfItsColumnOnly()
+    {
+        var root = new GameObject("Wheelbarrow_Small");
+        try
+        {
+            root.AddComponent<WheelbarrowCargo>();
+            GrainContainer MakeBag(string name, Vector3 position)
+            {
+                var item = new GameObject(name);
+                item.transform.SetParent(root.transform, false);
+                item.transform.localPosition = position;
+                item.AddComponent<BoxCollider>().size = Vector3.one;
+                return item.AddComponent<GrainContainer>();
+            }
+            var bottom = MakeBag("Bottom", Vector3.zero);
+            var middle = MakeBag("Middle", Vector3.up);
+            var top = MakeBag("Top", Vector3.up * 2f);
+            var adjacent = MakeBag("Other column", new Vector3(2f, 3f, 0f));
+            root.transform.rotation = Quaternion.Euler(10f, 45f, 5f);
+            Assert.AreSame(top, BagInteraction.TopCargoBag(bottom));
+            Assert.AreSame(top, BagInteraction.TopCargoBag(middle));
+            Assert.AreSame(adjacent, BagInteraction.TopCargoBag(adjacent));
+            top.transform.SetParent(null);
+            Object.DestroyImmediate(top.gameObject);
+            Assert.AreSame(middle, BagInteraction.TopCargoBag(bottom));
+            middle.gameObject.SetActive(false);
+            Assert.AreSame(bottom, BagInteraction.TopCargoBag(bottom));
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
+
     [TestCase("FreeBag")]
     [TestCase("SmallBag")]
     public void EmptyStarterWheelbarrowAcceptsFinishedStarterBagAndReportsOversizeSeparately(string bagId)
