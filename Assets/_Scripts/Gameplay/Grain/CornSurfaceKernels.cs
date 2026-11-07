@@ -504,13 +504,17 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     {
         if (coveragePatches.TryGetValue(coverageCell, out var previous)) KernelCount -= previous.count;
         if (coverageMatrices.Count == 0) { coveragePatches.Remove(coverageCell); return; }
-        var patch = new CoveragePatch { count = coverageMatrices.Count,
-            batches = new Matrix4x4[(coverageMatrices.Count + 1022) / 1023][],
-            bounds = new Bounds(coverageMatrices[0].GetColumn(3), Vector3.zero) };
-        for (int i = 0; i < patch.batches.Length; i++)
+        var patch = previous ?? new CoveragePatch();
+        patch.count = coverageMatrices.Count;
+        patch.bounds = new Bounds(coverageMatrices[0].GetColumn(3), Vector3.zero);
+        int batchCount = (patch.count + 1022) / 1023;
+        if (patch.batches == null || patch.batches.Length < batchCount)
+            System.Array.Resize(ref patch.batches, batchCount);
+        for (int i = 0; i < batchCount; i++)
         {
-            int count = Mathf.Min(1023, coverageMatrices.Count - i * 1023);
-            patch.batches[i] = new Matrix4x4[count];
+            int count = Mathf.Min(1023, patch.count - i * 1023);
+            if (patch.batches[i] == null || patch.batches[i].Length < count)
+                patch.batches[i] = new Matrix4x4[Mathf.Min(1023, Mathf.NextPowerOfTwo(Mathf.Max(16, count)))];
             coverageMatrices.CopyTo(i * 1023, patch.batches[i], 0, count);
         }
         foreach (var matrix in coverageMatrices) patch.bounds.Encapsulate((Vector3)matrix.GetColumn(3));
@@ -595,9 +599,10 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     {
         LastDrawTriangles = 0;
         if (batches == null || kernelMesh == null || kernelMaterial == null || camera.cameraType == CameraType.Preview) return;
+        if ((camera.cullingMask & (1 << gameObject.layer)) == 0) return;
         var renderer = pile.GetComponent<MeshRenderer>();
         if (renderer != null && (renderer.bounds.ClosestPoint(camera.transform.position) - camera.transform.position).sqrMagnitude > drawDistance * drawDistance) return;
-        if (nearMesh == null) { nearMesh = CreateLodMesh(8); mediumMesh = CreateLodMesh(4); distantMesh = CreateLodMesh(4); }
+        if (nearMesh == null) { nearMesh = CreateLodMesh(8); mediumMesh = CreateLodMesh(4); distantMesh = CreateDistantLodMesh(); }
         GeometryUtility.CalculateFrustumPlanes(camera, cameraPlanes);
         grainAppearance.Set(pile.SurfaceGrain);
         pile.ApplySpatialAppearance(grainAppearance.Block);
@@ -635,14 +640,15 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             float distance = Vector3.Distance(camera.transform.position, bounds.ClosestPoint(camera.transform.position));
             if (distance > drawDistance) continue;
             Mesh lod = distance < fullDetailDistance ? nearMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
-            for (int i = 0; i < patch.batches.Length; i++)
+            for (int i = 0; i < (patch.count + 1022) / 1023; i++)
             {
                 var matrices = patch.batches[i];
                 int color = (entry.Key + i) % colorCount;
                 var material = colorVariants != null && colorVariants.Length == colorCount && colorVariants[color] != null
                     ? colorVariants[color] : kernelMaterial;
-                LastDrawTriangles += matrices.Length * (int)(lod.GetIndexCount(0) / 3);
-                DrawBatch(lod, material, matrices, matrices.Length, bounds, camera);
+                int count = Mathf.Min(1023, patch.count - i * 1023);
+                LastDrawTriangles += count * (int)(lod.GetIndexCount(0) / 3);
+                DrawBatch(lod, material, matrices, count, bounds, camera);
             }
         }
         DrawEdges(camera);
@@ -705,6 +711,24 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         var mesh = new Mesh { name = "Corn LOD " + sides * 2, hideFlags = HideFlags.HideAndDontSave };
         mesh.vertices = vertices; mesh.normals = normals; mesh.triangles = indices; mesh.RecalculateBounds();
         return mesh;
+    }
+
+    internal static Mesh CreateDistantLodMesh()
+    {
+        // Four faces instead of the medium LOD's eight. Keep a closed 3D
+        // silhouette; the grain shader still supplies each crop's shape/color.
+        var vertices = new[] {
+            new Vector3(0, 1, 0), new Vector3(0, -.7f, .95f),
+            new Vector3(.79f, -.7f, -.475f), new Vector3(-.79f, -.7f, -.475f)
+        };
+        var normals = new Vector3[vertices.Length];
+        for (int i = 0; i < vertices.Length; i++) normals[i] = vertices[i].normalized;
+        var result = new Mesh { name = "Grain distant LOD 4", hideFlags = HideFlags.HideAndDontSave };
+        result.vertices = vertices;
+        result.normals = normals;
+        result.triangles = new[] { 0, 1, 2, 0, 2, 3, 0, 3, 1, 1, 3, 2 };
+        result.RecalculateBounds();
+        return result;
     }
 
     private void OnDestroy()

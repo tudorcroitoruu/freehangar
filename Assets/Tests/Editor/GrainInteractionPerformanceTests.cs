@@ -22,6 +22,64 @@ public class GrainInteractionPerformanceTests
     private static void UpdateBag(BagCornSurface surface)=>typeof(BagCornSurface).GetMethod("LateUpdate",Private).Invoke(surface,null);
 
     [Test]
+    public void DistantGrainLodHalvesTriangleCountAndHasOutwardFaces()
+    {
+        var medium = (Mesh)typeof(CornSurfaceKernels).GetMethod("CreateLodMesh", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, new object[] { 4 });
+        var distant = (Mesh)typeof(CornSurfaceKernels).GetMethod("CreateDistantLodMesh", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
+        try
+        {
+            Assert.AreEqual(medium.triangles.Length / 2, distant.triangles.Length);
+            var points = distant.vertices;
+            var indices = distant.triangles;
+            Vector3 center = Vector3.zero;
+            foreach (var point in points) center += point / points.Length;
+            for (int i = 0; i < indices.Length; i += 3)
+            {
+                var a = points[indices[i]]; var b = points[indices[i + 1]]; var c = points[indices[i + 2]];
+                Assert.Greater(Vector3.Dot(Vector3.Cross(b - a, c - a), (a + b + c) / 3 - center), 0);
+            }
+        }
+        finally { Object.DestroyImmediate(medium); Object.DestroyImmediate(distant); }
+    }
+
+    [Test]
+    public void ExtraCoverageReusesBuffersWhenKernelCountChanges()
+    {
+        var kernels = root.AddComponent<CornSurfaceKernels>();
+        var matrices = Field<List<Matrix4x4>>(kernels, "coverageMatrices");
+        var patches = Field<System.Collections.IDictionary>(kernels, "coveragePatches");
+        var replace = typeof(CornSurfaceKernels).GetMethod("ReplaceCoveragePatch", Private);
+        matrices.Add(Matrix4x4.identity);
+        replace.Invoke(kernels, null);
+        object patch = patches[0];
+        var batchField = patch.GetType().GetField("batches");
+        var first = ((Matrix4x4[][])batchField.GetValue(patch))[0];
+        matrices.Add(Matrix4x4.Translate(Vector3.one));
+        replace.Invoke(kernels, null);
+        Assert.AreSame(patch, patches[0]);
+        Assert.AreSame(first, ((Matrix4x4[][])batchField.GetValue(patches[0]))[0]);
+        Assert.AreEqual(2, kernels.KernelCount);
+        Assert.AreEqual(matrices[1], first[1]);
+        matrices.RemoveAt(1);
+        replace.Invoke(kernels, null);
+        Assert.AreEqual(1, kernels.KernelCount);
+        Assert.AreSame(first, ((Matrix4x4[][])batchField.GetValue(patches[0]))[0]);
+    }
+    [Test]
+    public void ScoopStopsAtThinSurfaceLayerWithoutRemovingUnderlyingStock()
+    {
+        var field = new GrainHeightField(9, 2, 1, (x, z) => 1);
+        int center = 4 * field.Resolution + 4;
+        double topVolume = .02 * field.AreaAt(center);
+        double before = field.Volume;
+        field.LimitRemoval = (cell, requested) => cell == center ? Math.Min(requested, topVolume) : 0;
+        float removed = field.Scoop(0, 0, .5f, .5f, 1);
+        Assert.That(removed, Is.EqualTo(topVolume).Within(1e-7));
+        Assert.That(field.Heights[center], Is.EqualTo(.98f).Within(1e-6));
+        Assert.That(before - field.Volume, Is.EqualTo(removed).Within(1e-7));
+        Assert.That(field.Heights[center + 1], Is.EqualTo(1));
+    }
+    [Test]
     public void FasterPileRefillConservesMassAndMatchesAtThirtyAndOneTwentyFps()
     {
         GrainHeightField Run(float dt, int frames, float speed)

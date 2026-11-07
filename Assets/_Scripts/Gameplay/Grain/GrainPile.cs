@@ -384,10 +384,24 @@ public sealed class GrainPile : MonoBehaviour
         GrainCargo destination, GrainCargo existingCargo, out bool mixBlocked)
     {
         mixBlocked = false;
-        if (existingCargo == null || existingCargo.Total <= .0001f)
-            return Scoop(worldPoint, radius, depth, capacityKg, destination);
         Initialize();
         if (field == null) return 0;
+        if (spatial != null)
+        {
+            var allowed = existingCargo;
+            if (allowed == null || allowed.Total <= .0001f)
+            {
+                allowed = new GrainCargo();
+                SampleSurfaceGrain(worldPoint, allowed);
+            }
+            var previousLimit = field.LimitRemoval;
+            field.LimitRemoval = (cell, volume) => spatial.CompatibleSurfaceVolume(cell,
+                previousLimit != null ? previousLimit(cell, volume) : volume, allowed);
+            try { return Scoop(worldPoint, radius, depth, capacityKg, destination); }
+            finally { field.LimitRemoval = previousLimit; }
+        }
+        if (existingCargo == null || existingCargo.Total <= .0001f)
+            return Scoop(worldPoint, radius, depth, capacityKg, destination);
         var previousCheck = field.CanRemove;
         bool blocked = false;
         double offset = harvestedKg;
@@ -542,6 +556,9 @@ public sealed class GrainPile : MonoBehaviour
         return pile;
     }
 
+    private static readonly Unity.Profiling.ProfilerMarker SurfaceRefreshMarker = new Unity.Profiling.ProfilerMarker("GrainPile.RefreshSurface");
+    private static readonly Unity.Profiling.ProfilerMarker ColliderRefreshMarker = new Unity.Profiling.ProfilerMarker("GrainPile.RefreshCollider");
+    private static readonly Unity.Profiling.ProfilerMarker SmoothSurfaceMarker = new Unity.Profiling.ProfilerMarker("GrainPile.SmoothSurface");
     private bool surfaceRefreshPending;
 
     private void LateUpdate()
@@ -564,6 +581,7 @@ public sealed class GrainPile : MonoBehaviour
 
     private bool SmoothVisualSurface(float deltaTime)
     {
+        using var measurement = SmoothSurfaceMarker.Auto();
         float blend = surfaceSmoothTime <= 0 ? 1f : 1f - Mathf.Exp(-deltaTime / surfaceSmoothTime);
         float tolerance = .0001f / Mathf.Max(.0001f, WorldScale.y);
         bool pending = false;
@@ -621,6 +639,7 @@ public sealed class GrainPile : MonoBehaviour
 
     private void RefreshSurface()
     {
+        using var measurement = SurfaceRefreshMarker.Auto();
         kilograms = Kilograms;
         SurfaceRevision++;
         var surface = VisualHeightField;
@@ -629,7 +648,7 @@ public sealed class GrainPile : MonoBehaviour
         {
             boundary.UpdateHeights(surface, .045f / WorldScale.y);
             OffsetBoundaryGround();
-            mesh.Clear(); mesh.SetVertices(boundary.Positions); mesh.SetUVs(0, boundary.UV); mesh.SetTriangles(boundary.Triangles, 0);
+            mesh.Clear();
             CloseClippedEdges();
             mesh.RecalculateNormals(); mesh.RecalculateTangents(); mesh.RecalculateBounds();
             if (!Application.isPlaying) colliderDirty = true;
@@ -637,16 +656,15 @@ public sealed class GrainPile : MonoBehaviour
         }
         // The volume skin sits beneath the visible kernels. Bury its zero-height apron
         // below the ground instead of exposing large orange triangles around the pile.
-        for (int i = 0; i < vertices.Length; i++) vertices[i].y = surface.Heights[i] + GroundOffset(i) - .045f / WorldScale.y;
+        float surfaceRecess = .045f / WorldScale.y;
+        for (int i = 0; i < vertices.Length; i++) vertices[i].y = surface.Heights[i] + GroundOffset(i) - surfaceRecess;
         // Remove the previous closure before assigning the top grid again.
         mesh.Clear();
-        mesh.vertices = vertices;
         if (surfaceUV == null || surfaceUV.Length != vertices.Length)
         {
             surfaceUV = new Vector2[vertices.Length];
             for (int i = 0; i < vertices.Length; i++) surfaceUV[i] = new Vector2(vertices[i].x, vertices[i].z);
         }
-        mesh.uv = surfaceUV;
         activeTriangles.Clear();
         for (int t = 0; t < field.Triangles.Length; t += 3)
         {
@@ -655,7 +673,6 @@ public sealed class GrainPile : MonoBehaviour
             activeTriangles.Add(a); activeTriangles.Add(b); activeTriangles.Add(c);
         }
         // Bare ground must not retain a golden rectangle or a phantom grain collider.
-        mesh.SetTriangles(activeTriangles, 0);
         // Authored stock can also rise at its footprint edge after a deposit.
         CloseDroppedEdges(surface);
         mesh.RecalculateNormals();
@@ -726,30 +743,31 @@ public sealed class GrainPile : MonoBehaviour
         closedSurfaceUV.Clear(); closedSurfaceUV.AddRange(boundary.UV);
         closedSurfaceTriangles.Clear(); closedSurfaceTriangles.AddRange(boundary.Triangles);
         sideTriangleStart = closedSurfaceTriangles.Count;
-        foreach (var edge in clippedEdges) AddGroundEdge(edge.x, edge.y, null);
+        float inset = .045f / WorldScale.y;
+        foreach (var edge in clippedEdges) AddGroundEdge(edge.x, edge.y, inset);
         mesh.SetVertices(closedSurfaceVertices); mesh.SetUVs(0, closedSurfaceUV);
         mesh.SetTriangles(closedSurfaceTriangles, 0);
     }
     private void CloseDroppedEdges(GrainHeightField surface)
     {
         closedSurfaceVertices.Clear(); closedSurfaceVertices.AddRange(vertices);
-        mesh.GetUVs(0, closedSurfaceUV);
+        closedSurfaceUV.Clear(); closedSurfaceUV.AddRange(surfaceUV);
         closedSurfaceTriangles.Clear(); closedSurfaceTriangles.AddRange(activeTriangles);
         sideTriangleStart = closedSurfaceTriangles.Count;
         int n = field.Resolution;
+        float inset = .045f / WorldScale.y;
         for (int i = 0; i < n - 1; i++)
         {
-            AddGroundEdge(i + 1, i, surface);
-            AddGroundEdge(i * n, (i + 1) * n, surface);
-            AddGroundEdge((n - 1) * n + i, (n - 1) * n + i + 1, surface);
-            AddGroundEdge((i + 1) * n + n - 1, i * n + n - 1, surface);
+            AddGroundEdge(i + 1, i, inset);
+            AddGroundEdge(i * n, (i + 1) * n, inset);
+            AddGroundEdge((n - 1) * n + i, (n - 1) * n + i + 1, inset);
+            AddGroundEdge((i + 1) * n + n - 1, i * n + n - 1, inset);
         }
         mesh.SetVertices(closedSurfaceVertices); mesh.SetUVs(0, closedSurfaceUV);
         mesh.SetTriangles(closedSurfaceTriangles, 0);
     }
-    private void AddGroundEdge(int a, int b, GrainHeightField surface)
+    private void AddGroundEdge(int a, int b, float inset)
     {
-        float inset = .045f / WorldScale.y;
         Vector3 topA = closedSurfaceVertices[a], topB = closedSurfaceVertices[b];
         Vector3 bottomA = topA, bottomB = topB;
         bottomA.y = GroundOffset(topA.x, topA.z) - inset;
@@ -781,6 +799,7 @@ public sealed class GrainPile : MonoBehaviour
 
     private void RefreshCollider()
     {
+        using var measurement = ColliderRefreshMarker.Auto();
         nextCollider = Time.time + 1f / colliderRate;
         colliderDirty = false;
         collisionIndices.Clear();

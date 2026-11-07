@@ -172,16 +172,6 @@ public sealed class ShovelTool : MonoBehaviour
             }
             if (pile != null && pile.isActiveAndEnabled && pile.IsInsideBoundary(scoopPoint))
             {
-                if (Kilograms > .0001f)
-                {
-                    pile.SampleSurfaceGrain(scoopPoint, scoopCargo);
-                    for (int type = 0; type < GrainCargo.TypeCount; type++)
-                        if (scoopCargo[(GrainType)type] > 0f && cargo[(GrainType)type] <= .0001f)
-                        {
-                            GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowedInShovel);
-                            return false;
-                        }
-                }
                 if (Kilograms >= CapacityKg - .0001f) return false;
                 pendingPile = pile;
                 targetPoint = scoopPoint;

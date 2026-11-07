@@ -220,7 +220,7 @@ MonoBehaviour:
   sack: {fileID: 2813163668604860389}
   grainSurface: {fileID: 6421540240800034623}
   kernelMesh: {fileID: 4300000, guid: 3bb82126ac32c4b478ecf0ded897a536, type: 2}
-  kernelMaterial: {fileID: 2100000, guid: 4d12d273e8f7f9147a56a4a5d414afdf, type: 2}
+  kernelMaterial: {fileID: 2100000, guid: 7bc53afdb3631744fa19a0ae5d5ba9d0, type: 2}
   surfaceUp: {x: 0, y: -0.00000011920929, z: 0.99999994}
   spacing: 0.026
 --- !u!114 &5810430107037155030

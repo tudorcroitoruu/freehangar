@@ -68,96 +68,22 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     public float HighestLoadPoint { get; private set; }
     public bool IsLoadSleeping => loadSleeping;
 
-    private Mesh visibleLoad;
-    private MeshRenderer loadRenderer;
-    private Vector3[] sourceVertices, sourceNormals;
-    private struct LoadVertex { public Vector3 position, normal; public Vector2 uv; }
-    private LoadVertex[] loadVertices;
-    private int indicesPerKernel;
-    private Matrix4x4[] uploadedLoadMatrices;
-    private int uploadedLoadCount = -1;
-
-    private void BuildLoadRenderer()
-    {
-        if (kernelMesh == null || kernelMaterial == null) return;
-        int capacity = maximumKernels + PackedCapacity;
-        uploadedLoadMatrices = new Matrix4x4[capacity];
-        sourceVertices = kernelMesh.vertices; sourceNormals = kernelMesh.normals;
-        var sourceUV = kernelMesh.uv; var sourceIndices = kernelMesh.triangles;
-        indicesPerKernel = sourceIndices.Length;
-        loadVertices = new LoadVertex[capacity * sourceVertices.Length];
-        var indices = new int[capacity * indicesPerKernel];
-        for (int k = 0; k < capacity; k++)
-        {
-            for (int j = 0; j < sourceUV.Length; j++) loadVertices[k * sourceVertices.Length + j].uv = sourceUV[j];
-            for (int j = 0; j < indicesPerKernel; j++) indices[k * indicesPerKernel + j] = k * sourceVertices.Length + sourceIndices[j];
-        }
-        visibleLoad = new Mesh { name = "Held shovel visible grain", indexFormat = IndexFormat.UInt32 };
-        visibleLoad.MarkDynamic();
-        visibleLoad.SetVertexBufferParams(loadVertices.Length,
-            new VertexAttributeDescriptor(VertexAttribute.Position, VertexAttributeFormat.Float32, 3),
-            new VertexAttributeDescriptor(VertexAttribute.Normal, VertexAttributeFormat.Float32, 3),
-            new VertexAttributeDescriptor(VertexAttribute.TexCoord0, VertexAttributeFormat.Float32, 2));
-        visibleLoad.SetVertexBufferData(loadVertices, 0, 0, loadVertices.Length);
-        visibleLoad.SetIndexBufferParams(indices.Length, IndexFormat.UInt32);
-        visibleLoad.SetIndexBufferData(indices, 0, 0, indices.Length);
-        visibleLoad.subMeshCount = 1;
-        visibleLoad.SetSubMesh(0, new SubMeshDescriptor(0, 0), MeshUpdateFlags.DontRecalculateBounds);
-        // Every kernel is constrained to this local bowl envelope. Do not scan unused vertices.
-        visibleLoad.bounds = new Bounds(Vector3.zero, Vector3.one);
-        var filter = GetComponent<MeshFilter>();
-        if (filter == null) filter = gameObject.AddComponent<MeshFilter>();
-        filter.sharedMesh = visibleLoad;
-        loadRenderer = GetComponent<MeshRenderer>();
-        if (loadRenderer == null) loadRenderer = gameObject.AddComponent<MeshRenderer>();
-        loadRenderer.sharedMaterial = kernelMaterial; loadRenderer.enabled = false;
-        loadRenderer.shadowCastingMode = ShadowCastingMode.Off;
-        loadRenderer.lightProbeUsage = LightProbeUsage.Off;
-    }
+    private readonly Matrix4x4[] worldLoadMatrices = new Matrix4x4[1023];
 
     private void DrawLoad(int amount)
     {
         LastUploadedLoadVertices = 0;
-        if (visibleLoad == null) BuildLoadRenderer();
-        if (loadRenderer == null) return;
-        loadRenderer.enabled = amount > 0;
-        if (amount == 0) { uploadedLoadCount = 0; return; }
-        loadRenderer.SetPropertyBlock(loadAppearance.Block);
-        bool countChanged = amount != uploadedLoadCount;
-        int firstChanged = amount, lastChanged = -1;
-        for (int k = 0; k < amount; k++)
+        // Keep each kernel in its own local space for species shaping, then apply its simulated pose.
+        Matrix4x4 world = transform.localToWorldMatrix;
+        for (int start = 0; start < amount; start += worldLoadMatrices.Length)
         {
-            Matrix4x4 matrix = matrices[k];
-            // A count change alters the index range, not every retained kernel.
-            // New slots must still be uploaded even if their cached matrix matches.
-            if (k < uploadedLoadCount && uploadedLoadMatrices[k] == matrix) continue;
-            firstChanged = Mathf.Min(firstChanged, k); lastChanged = k;
-            uploadedLoadMatrices[k] = matrix;
-            Matrix4x4 normal = matrix.inverse.transpose;
-            for (int j = 0; j < sourceVertices.Length; j++)
-            {
-                int index = k * sourceVertices.Length + j;
-                loadVertices[index].position = matrix.MultiplyPoint3x4(sourceVertices[j]);
-                loadVertices[index].normal = normal.MultiplyVector(sourceNormals[j]).normalized;
-            }
+            int batchCount = Mathf.Min(worldLoadMatrices.Length, amount - start);
+            for (int i = 0; i < batchCount; i++)
+                worldLoadMatrices[i] = world * matrices[start + i];
+            Graphics.DrawMeshInstanced(kernelMesh, 0, kernelMaterial, worldLoadMatrices, batchCount,
+                loadAppearance.Block, ShadowCastingMode.Off, true, gameObject.layer, null, LightProbeUsage.Off);
         }
-        if (lastChanged >= firstChanged)
-        {
-            int start = firstChanged * sourceVertices.Length, length = (lastChanged - firstChanged + 1) * sourceVertices.Length;
-            LastUploadedLoadVertices = length;
-            visibleLoad.SetVertexBufferData(loadVertices, start, start, length, 0,
-                MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontValidateIndices);
-        }
-        if (countChanged) visibleLoad.SetSubMesh(0, new SubMeshDescriptor(0, amount * indicesPerKernel), MeshUpdateFlags.DontRecalculateBounds);
-        uploadedLoadCount = amount;
     }
-
-    private void OnDestroy()
-    {
-        if (visibleLoad == null) return;
-        if (Application.isPlaying) Destroy(visibleLoad); else DestroyImmediate(visibleLoad);
-    }
-
     private void Awake()
     {
         tool = GetComponentInParent<ShovelTool>();

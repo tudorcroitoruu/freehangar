@@ -16,6 +16,7 @@ public sealed class GrainHeightField
     private int minX, minZ, maxX, maxZ;
     public Action<int, double> Removed;
     public Func<int, double, bool> CanRemove;
+    public Func<int, double, double> LimitRemoval;
     public Action<int, int, double> Transferred;
     public float AreaAt(int index) => areas[index];
 
@@ -93,6 +94,8 @@ public sealed class GrainHeightField
             int i = iz * Resolution + ix;
             if (areas[i] <= .00000001f) continue;
             removal[i] = Mathf.Min(Heights[i], depth * weight);
+            if (LimitRemoval != null)
+                removal[i] = (float)(Math.Min(removal[i] * (double)areas[i], Math.Max(0, LimitRemoval(i, removal[i] * (double)areas[i]))) / areas[i]);
             available += removal[i] * (double)areas[i];
         }
         if (available <= 0) return 0;
