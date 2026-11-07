@@ -12,9 +12,9 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     [SerializeField] private Material kernelMaterial;
     [SerializeField] private Material[] colorVariants;
     [SerializeField, Range(.025f, .12f)] private float spacing = .0315f;
-    [SerializeField] private float drawDistance = 22f;
+    [SerializeField] private float drawDistance = 42f;
     [SerializeField, Min(3f), Tooltip("Individual kernels fade into the typed pile surface beyond this distance. Does not change stock or pile geometry.")]
-    private float kernelDetailDistance = 6f;
+    private float kernelDetailDistance = 26f;
     [SerializeField, Min(.1f)] private float fullDetailDistance = 1.5f;
     [SerializeField, Min(.2f)] private float mediumDetailDistance = 4f;
     [Tooltip("Advisory kernel budget. Exceeding this never spreads kernels farther apart; surface coverage is preserved.")]
