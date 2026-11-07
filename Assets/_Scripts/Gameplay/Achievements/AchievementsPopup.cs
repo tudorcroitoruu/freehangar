@@ -34,6 +34,13 @@ public class AchievementsPopup : MonoBehaviour
         if (!showingNotification) DisplayNextNotification();
     }
 
+    public void Show(WarningType type, string title, float seconds = 3f)
+    {
+        var preset = achievementsPresets == null ? null : Array.Find(achievementsPresets,
+            item => item != null && item.warningType == type);
+        Show(preset?.icon, title, seconds);
+    }
+
     private void DisplayNextNotification()
     {
         var notification = notifications.Dequeue();

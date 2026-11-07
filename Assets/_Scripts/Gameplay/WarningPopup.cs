@@ -18,7 +18,8 @@ public enum WarningType
     FindAxe,
     FindHammer,
     LockedBag,
-    DogResting
+    DogResting,
+    hangarCleared
 }
 public class WarningPopup : MonoBehaviour
 {

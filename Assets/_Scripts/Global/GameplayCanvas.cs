@@ -278,6 +278,11 @@ public class GameplayCanvas : MonoBehaviour
         if (achievementsPopup != null) achievementsPopup.Show(image, title, seconds);
     }
 
+    public void ShowAchievement(WarningType type, string title, float seconds = 3f)
+    {
+        if (achievementsPopup != null) achievementsPopup.Show(type, title, seconds);
+    }
+
     public void SetWarning(WarningType type, Object source, bool visible)
     {
         if (warningPopup != null) warningPopup.SetWarning(type, source, visible);

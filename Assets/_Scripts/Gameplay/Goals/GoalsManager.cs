@@ -177,7 +177,12 @@ public class GoalsManager : MonoBehaviour
         MarkDirty();
         FlushSave();
         if (awaitingNextGoal) RefreshGoal();
-        foreach (var goal in completed) GoalCompleted?.Invoke(goal);
+        foreach (var goal in completed)
+        {
+            if (goal.goalType == GoalType.HangarCleared)
+                GameplayCanvas.Instance?.ShowAchievement(WarningType.hangarCleared, $"Hangar {goal.hangarId} cleared");
+            GoalCompleted?.Invoke(goal);
+        }
     }
 
     private void AdvanceGoalTransition(float deltaTime)

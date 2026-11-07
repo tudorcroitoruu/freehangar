@@ -16308,6 +16308,10 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 51e79647032edfc46af6ec55c1b97182, type: 3}
     title: New container unlocked
     message: 
+  - warningType: 13
+    icon: {fileID: 21300000, guid: 72a6ee0d5810b6d4985e2c590c76c751, type: 3}
+    title: Hangar Cleared
+    message: 
   achievementsCanvasGroup: {fileID: 5206203822002397463}
   achievementsImage: {fileID: 5380183351052426598}
   achievementsTitle: {fileID: 5065245231482610721}
