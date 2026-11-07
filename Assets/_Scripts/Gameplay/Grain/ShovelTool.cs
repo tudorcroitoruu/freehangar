@@ -178,7 +178,7 @@ public sealed class ShovelTool : MonoBehaviour
                     for (int type = 0; type < GrainCargo.TypeCount; type++)
                         if (scoopCargo[(GrainType)type] > 0f && cargo[(GrainType)type] <= .0001f)
                         {
-                            GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowed);
+                            GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowedInShovel);
                             return false;
                         }
                 }
@@ -204,12 +204,19 @@ public sealed class ShovelTool : MonoBehaviour
         if(ActiveVacuum != null && !ActiveVacuum.Emptying)IsBusy=false;
         if (IsBusy || Kilograms <= .0001f || !isActiveAndEnabled || camera == null || player == null ||
             bladeTip == null || transform.parent == null || Time.timeScale <= 0) return false;
-        if (FindHit(camera, player, out var pourHit) &&
-            CanPourInto(pourHit.collider.GetComponentInParent<GrainContainer>()))
+        var targetContainer = FindHit(camera, player, out var pourHit)
+            ? pourHit.collider.GetComponentInParent<GrainContainer>() : null;
+        if (targetContainer != null && targetContainer.isActiveAndEnabled &&
+            targetContainer.HasAssignedGrain && cargo[targetContainer.AcceptedGrain] <= .0001f)
+        {
+            GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowedInContainer);
+            return false;
+        }
+        if (CanPourInto(targetContainer))
         {
             actionCamera = camera; actor = player;
             pendingPile = null;
-            pendingContainer = pourHit.collider.GetComponentInParent<GrainContainer>();
+            pendingContainer = targetContainer;
             targetPoint = pendingContainer.PourPoint + Vector3.up * .35f + camera.transform.right * .3f;
             dropping = false; dropCommitted = false; queued = false;
             pourSoundPlayed = false;
@@ -405,7 +412,7 @@ public sealed class ShovelTool : MonoBehaviour
                     Mathf.Min(amount, CapacityKg - Kilograms), scoopCargo, cargo, out bool mixBlocked);
                 if (mixBlocked)
                 {
-                    GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowed);
+                    GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowedInShovel);
                     CancelAction();
                     return;
                 }

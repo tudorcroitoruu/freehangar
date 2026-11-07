@@ -3230,6 +3230,10 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: ed6a3d57b9710a4488b1dc68418124c0, type: 3}
     title: Mix grain block
     message: Shovel contain another type of grains.
+  - warningType: 16
+    icon: {fileID: 21300000, guid: 6819a9a56d080c548b7ac4a1a1b470e9, type: 3}
+    title: Mix grain block
+    message: Container contain another type of grains.
   warningCanvasGroup: {fileID: 737507088087375577}
   warningImage: {fileID: 6193481453998981383}
   warningTitle: {fileID: 11493426258684311}
