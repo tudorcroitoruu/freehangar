@@ -41,7 +41,7 @@ public sealed class GrainPile : MonoBehaviour
         }
         else { output.Clear(); CollectRecipe(Application.isPlaying ? harvestedKg : previewHarvestedKg, 1, output); }
     }
-    [Header("Grain recipe — top to bottom")]
+    [Header("Grain recipe â€” top to bottom")]
     [SerializeField] private GrainLayer[] grainLayers = { new GrainLayer(52, GrainType.Corn) };
     [SerializeField, Min(0), Tooltip("Editor only: preview the recipe after collecting this many kg. Does not excavate or change gameplay mass.")]
     private float previewHarvestedKg;
@@ -437,31 +437,21 @@ public sealed class GrainPile : MonoBehaviour
                     else RefreshGrainAppearance();
                 }
             }
-            var previousLimit = field.LimitRemoval;
-            var previousFilter = spatial.CollectionFilter;
-            bool previousPreserve = field.PreserveScoopDepression;
-            bool previousCollectSurface = field.CollectExposedSurface;
-            field.CollectExposedSurface = true;
-            field.PreserveScoopDepression = true;
-            spatial.CollectionFilter = allowed;
-            field.LimitRemoval = (cell, volume) => spatial.MatchingSurfaceVolume(cell,
-                previousLimit != null ? previousLimit(cell, volume) : volume, allowed);
-            // Gather matching surface pockets around the contact instead of requiring
-            // a precise hit on every small patch at a mixed-crop boundary. The same
-            // compatibility filter and capacity limit apply to the whole footprint.
-            try
+            Vector3 contact = transform.InverseTransformPoint(worldPoint);
+            float pickupDensity = kilogramsPerCubicMetre * VolumeScale / GrainConsumeMultiplier;
+            double removed = spatial.CollectMatching(contact.x, contact.z, collectionRadius,
+                WorldScale, allowed, capacityKg / (double)pickupDensity, destination, pickupDensity);
+            float collected = (float)(removed * pickupDensity);
+            if (removed > 0)
             {
-                float collected = Scoop(worldPoint, collectionRadius, depth, capacityKg, destination);
-                mixBlocked = collected <= 0 && existingCargo != null && existingCargo.Total > .0001f;
-                return collected;
+                harvestedKg += collected;
+                field.WakeNeighborhood(contact.x, contact.z, collectionRadius + settlingMargin, WorldScale);
+                settling = true;
+                if (Application.isPlaying) surfaceRefreshPending = true;
+                else { RefreshGrainAppearance(); RefreshSurface(); RefreshCollider(); }
             }
-            finally
-            {
-                field.LimitRemoval = previousLimit;
-                spatial.CollectionFilter = previousFilter;
-                field.PreserveScoopDepression = previousPreserve;
-                field.CollectExposedSurface = previousCollectSurface;
-            }
+            mixBlocked = removed <= 0 && existingCargo != null && existingCargo.Total > .0001f;
+            return collected;
         }
         var previousCheck = field.CanRemove;
         bool blocked = false;

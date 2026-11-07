@@ -153,6 +153,35 @@ public class GrainEconomyTests
         Assert.That(pile.GrainKilograms(GrainType.Rice), Is.EqualTo(riceBefore).Within(.001));
     }
 
+    [TestCase(.00000001)]
+    [TestCase(.02)]
+    public void MagnetCollectsEntireMatchingRemainderWithoutHeightRounding(double cornVolume)
+    {
+        var field = new GrainHeightField(9, 2, 0);
+        var spatial = new GrainSpatialField(field, new[] { new GrainRegion(100, GrainType.Rice) },
+            GrainSpatialField.Arrangement.FrontToBack, 0, 1);
+        try
+        {
+            var corn = new float[GrainCargo.TypeCount]; corn[(int)GrainType.Corn] = 1;
+            var rice = new float[GrainCargo.TypeCount]; rice[(int)GrainType.Rice] = 1;
+            int center = 4 * field.Resolution + 4;
+            spatial.RestoreSave(new System.Collections.Generic.List<GrainColumnSave> {
+                new GrainColumnSave { index = center, volume = .2, weights = rice },
+                new GrainColumnSave { index = center, volume = cornVolume, weights = corn },
+                new GrainColumnSave { index = center + 2, volume = cornVolume, weights = corn }
+            });
+            var allowed = new GrainCargo(); allowed.Add(GrainType.Corn, 1);
+            var collected = new GrainCargo();
+            double removed = spatial.CollectMatching(0, 0, 1, Vector3.one, allowed, 1, collected, 720);
+            Assert.That(removed, Is.EqualTo(cornVolume * 2).Within(1e-12));
+            Assert.That(spatial.VolumeOf(GrainType.Corn), Is.Zero.Within(1e-12));
+            Assert.That(spatial.VolumeOf(GrainType.Rice), Is.EqualTo(.2).Within(1e-12));
+            Assert.That(collected[GrainType.Rice], Is.Zero);
+            Assert.That(collected[GrainType.Corn], Is.EqualTo(cornVolume * 2 * 720).Within(.00001));
+        }
+        finally { spatial.Dispose(); }
+    }
+
     [Test]
     public void LocalAutoSortRaisesSelectedCropWithoutMovingOrLosingStock()
     {

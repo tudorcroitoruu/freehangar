@@ -277,6 +277,42 @@ public sealed class GrainSpatialField
     private static double Positive(float value) => float.IsFinite(value) ? Math.Max(.01, value) : .01;
     public void BeginCollection(GrainCargo cargo, float kilogramsPerVolume) { destination = cargo; density = kilogramsPerVolume; }
     public void EndCollection() => destination = null;
+    public double CollectMatching(float x, float z, float radius, Vector3 metric,
+        GrainCargo allowed, double maximumVolume, GrainCargo cargo, float kilogramsPerVolume)
+    {
+        // Typed stock is authoritative. Subtracting two float mesh heights can
+        // round a small matching layer to zero, leaving visible, uncollectible grain.
+        double available = 0;
+        bool InRange(int cell)
+        {
+            float dx = (cell % field.Resolution * field.Spacing - field.Size * .5f - x) * metric.x;
+            float dz = (cell / field.Resolution * field.Spacing - field.Size * .5f - z) * metric.z;
+            return field.AreaAt(cell) > 0 && dx * dx + dz * dz < radius * radius;
+        }
+        for (int cell = 0; cell < columns.Length; cell++)
+            if (InRange(cell)) available += MatchingSurfaceVolume(cell, double.MaxValue, allowed);
+        if (available <= 0 || maximumVolume <= 0) return 0;
+        double fraction = Math.Min(1, maximumVolume / available), removed = 0;
+        var previousFilter = CollectionFilter;
+        BeginCollection(cargo, kilogramsPerVolume);
+        CollectionFilter = allowed;
+        try
+        {
+            for (int cell = 0; cell < columns.Length; cell++)
+            {
+                if (!InRange(cell)) continue;
+                double amount = Math.Min(maximumVolume - removed,
+                    MatchingSurfaceVolume(cell, double.MaxValue, allowed) * fraction);
+                if (amount <= 0) continue;
+                Take(cell, amount, -1);
+                field.AcceptExcavatedHeight(cell);
+                removed += amount;
+            }
+        }
+        finally { CollectionFilter = previousFilter; EndCollection(); }
+        return removed;
+    }
+
     public double MatchingSurfaceVolume(int cell, double requested, GrainCargo allowed)
     {
         var stack = columns[cell];

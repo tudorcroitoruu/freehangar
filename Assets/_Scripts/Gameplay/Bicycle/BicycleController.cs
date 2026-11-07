@@ -242,6 +242,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         Physics.SyncTransforms();
         if (motorEnabled) motor.enabled = true;
         groundAlignment?.Align(1f);
+        GetComponent<LawnmowerController>()?.ReconnectTrailer();
         GameplayAudio.Instance?.VehicleMoving(this, false);
     }
     void OnDisable() { if (coasting) StopCoasting(); GameplayAudio.Instance?.VehicleMoving(this, false); }

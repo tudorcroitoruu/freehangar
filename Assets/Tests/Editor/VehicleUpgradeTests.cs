@@ -321,6 +321,34 @@ public class VehicleUpgradeTests
         Assert.That(mower.ConstrainTowMotion(motion), Is.EqualTo(blocked ? Vector3.zero : motion));
     }
 
+    [Test]
+    public void RestoredLawnmowerReconnectsSiblingTrailerAndCargoAtSavedPosition()
+    {
+        root.SetActive(false);
+        var prefab = Resources.Load<GameObject>("Vehicles/4_Lawnmower_With_Trailer");
+        var assembly = Object.Instantiate(prefab, root.transform);
+        var mower = assembly.GetComponentInChildren<LawnmowerController>(true);
+        var trailer = mower.trailerJoint.GetComponent<Rigidbody>();
+        Assert.IsFalse(trailer.transform.IsChildOf(mower.transform));
+        mower.transform.SetPositionAndRotation(new Vector3(700, 50, -500), Quaternion.Euler(0, 110, 0));
+        Assert.Greater(Vector3.Distance(mower.hitchTarget.position, trailer.position), 100f);
+
+        mower.ReconnectTrailer();
+
+        Vector3 trailerAnchor = trailer.position + trailer.rotation *
+            Vector3.Scale(mower.trailerJoint.anchor, trailer.transform.lossyScale);
+        Assert.Less(Vector3.Distance(trailerAnchor, mower.hitchTarget.position), .001f);
+        Assert.Less(Vector3.Distance(mower.hitchBody.position, mower.hitchTarget.position), .001f);
+        Assert.That(trailer.linearVelocity.sqrMagnitude, Is.LessThan(.000001f));
+        Assert.That(trailer.angularVelocity.sqrMagnitude, Is.LessThan(.000001f));
+        SaveSystem.Data.unlockedVehicles.Add("lawnmower");
+        var rig = mower.GetComponent<BicycleController>();
+        var slot = rig.FreeBagCargoSlot();
+        Assert.IsNotNull(slot);
+        Assert.AreSame(rig, VehicleCargoOwner.Resolve(slot));
+        Assert.Less(Vector3.Distance(slot.position, mower.transform.position), 8f);
+    }
+
     private GameObject Child(string name)
     {
         var child = new GameObject(name, typeof(RectTransform));

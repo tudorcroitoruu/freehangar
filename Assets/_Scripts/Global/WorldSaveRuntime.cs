@@ -304,6 +304,9 @@ public sealed class WorldSaveRuntime : MonoBehaviour
                 target.SetPositionAndRotation(child.position, child.rotation);
                 if (target.TryGetComponent<Rigidbody>(out var rb) && !rb.isKinematic) { rb.linearVelocity = child.velocity; rb.angularVelocity = child.angularVelocity; }
             }
+            // Mower trailers live outside the saved driving object's hierarchy.
+            // Reconnect old saves too, rather than asking the joint to pull across the map.
+            go.GetComponent<LawnmowerController>()?.ReconnectTrailer();
             go.GetComponent<VehicleReset>()?.SetHomePose();
         }
         foreach (var record in saved.Records())

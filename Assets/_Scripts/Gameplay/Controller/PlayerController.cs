@@ -73,6 +73,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 instrumentRestPosition;
     private Quaternion instrumentRestRotation;
     private Vector2 lookInput;
+    private Vector2 shovelSway;
     private float idleTime;
     private Quaternion previousPresentationCamera;
     private float turnRoll;
@@ -431,7 +432,12 @@ public class PlayerController : MonoBehaviour
     private void LateUpdate()
     {
         if (heldInstrument == null || Time.deltaTime <= 0f || IsCarrying)
+        {
+            shovelSway = Vector2.zero;
+            turnRoll = 0f;
+            if (characterCamera != null) previousPresentationCamera = characterCamera.transform.rotation;
             return;
+        }
 
         idleTime += Time.deltaTime * idleFrequency * Mathf.PI * 2f;
         Vector3 idleOffset = new Vector3(Mathf.Sin(idleTime * 0.5f), Mathf.Sin(idleTime), 0f) * idleAmplitude;
@@ -445,7 +451,14 @@ public class PlayerController : MonoBehaviour
         turnRoll = Mathf.Lerp(turnRoll, rollTarget, 1f - Mathf.Exp(-10f * Time.deltaTime));
         if (shovelTool != null && shovelTool.isActiveAndEnabled)
         {
-            shovelTool.ComposePresentation(Time.deltaTime, sway, turnRoll, idleOffset, out Vector3 offset, out Quaternion pose);
+            // Input is a per-frame mouse delta (or an already time-scaled stick).
+            // Normalize to the authored 60 Hz feel, then smooth only cosmetic sway.
+            // Smoothing the final pose would delay blade contact and pouring too.
+            Vector2 targetSway = Vector2.ClampMagnitude(lookInput / (60f * Time.deltaTime), 5f) * instrumentSway;
+            float swayBlend = instrumentSmoothness > 0f
+                ? 1f - Mathf.Exp(-instrumentSmoothness * Time.deltaTime) : 1f;
+            shovelSway = Vector2.Lerp(shovelSway, targetSway, swayBlend);
+            shovelTool.ComposePresentation(Time.deltaTime, shovelSway, turnRoll, idleOffset, out Vector3 offset, out Quaternion pose);
             heldInstrument.localPosition = instrumentRestPosition + offset;
             heldInstrument.localRotation = instrumentRestRotation * pose;
             return;

@@ -28,6 +28,35 @@ public sealed class LawnmowerController : MonoBehaviour
         foreach (var mowerCollider in mowerColliders)
             foreach (var trailerCollider in trailerColliders)
                 Physics.IgnoreCollision(mowerCollider, trailerCollider);
+        ReconnectTrailer();
+    }
+
+    // Teleports/restored saves must move the whole rig before the next physics step.
+    // The jointed trailer and hitch proxy are siblings, not children of the mower.
+    public void ReconnectTrailer()
+    {
+        if (hitchBody == null || hitchTarget == null || trailerJoint == null) return;
+        var trailerBody = trailerJoint.GetComponent<Rigidbody>();
+        if (trailerBody == null) return;
+        hitchBody.position = hitchTarget.position;
+        hitchBody.rotation = hitchTarget.rotation;
+        hitchBody.transform.SetPositionAndRotation(hitchBody.position, hitchBody.rotation);
+        trailerJoint.connectedBody = hitchBody;
+        Quaternion rotation = transform.rotation;
+        Vector3 anchor = hitchBody.position + hitchBody.rotation *
+            Vector3.Scale(trailerJoint.connectedAnchor, hitchBody.transform.lossyScale);
+        Vector3 position = anchor - rotation *
+            Vector3.Scale(trailerJoint.anchor, trailerJoint.transform.lossyScale);
+        trailerBody.position = position;
+        trailerBody.rotation = rotation;
+        trailerBody.transform.SetPositionAndRotation(position, rotation);
+        if (!trailerBody.isKinematic)
+        {
+            trailerBody.linearVelocity = Vector3.zero;
+            trailerBody.angularVelocity = Vector3.zero;
+            trailerBody.WakeUp();
+        }
+        previousPosition = transform.position;
     }
     void FixedUpdate() => UpdateHitch();
     public void UpdateHitch()
