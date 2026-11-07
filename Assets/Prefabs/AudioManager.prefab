@@ -371,6 +371,7 @@ MonoBehaviour:
   hitAir: {fileID: 8300000, guid: 6355c2a4a55b56b419dd3dcbcaf3973c, type: 3}
   closeBag: {fileID: 8300000, guid: 84c9b52a97ea22642886038ee7bba353, type: 3}
   drinkingBottle: {fileID: 8300000, guid: 46f2d612ec97e7643838788bb1e02dfb, type: 3}
+  eat: {fileID: 8300000, guid: a955c3ef944dba7439775d90a6726411, type: 3}
   openDoor: {fileID: 8300000, guid: 644b2a393168e1e46837c857c6839e68, type: 3}
   openRocketDoor: {fileID: 8300000, guid: e563f19a4a340c84891acda09168f3a8, type: 3}
   closeDoor: {fileID: 8300000, guid: badfe749266cf784d8caa63732798a9c, type: 3}

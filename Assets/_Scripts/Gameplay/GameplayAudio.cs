@@ -29,6 +29,7 @@ public sealed class GameplayAudio : MonoBehaviour
     [SerializeField] private AudioClip switchInstruments;
     [SerializeField] private AudioClip closeBag;
     [SerializeField] private AudioClip drinkingBottle;
+    [SerializeField] private AudioClip eat;
     public float BottleDrinkDuration => drinkingBottle != null ? drinkingBottle.length : 1.9f;
     public AudioSource StartBottleDrink()
     {
@@ -144,6 +145,7 @@ public sealed class GameplayAudio : MonoBehaviour
     public void SwitchInstruments() => Play(switchInstruments, .8f);
     public void ToolSwing() => Play(hitAir, .75f);
     public void CloseContainer() => Play(closeBag, .8f);
+    public void Eat() => Play(eat);
     public void PressWeighButton() => Play(pressButton, .8f);
     // Cash_in is mastered very quietly (peak 0.066); compensate without clipping.
     public const float CashInVolume = 8f;

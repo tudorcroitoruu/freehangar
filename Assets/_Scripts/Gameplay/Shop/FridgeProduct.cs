@@ -38,6 +38,7 @@ public class FridgeProduct : MonoBehaviour, IInteractable
         {
             if (foodPrice > 0 && !SaveSystem.SpendMoney(foodPrice)) return false;
             stamina.RestoreSave(stamina.MaxStamina, 0f);
+            GameplayAudio.Instance?.Eat();
             return true;
         }
         finally { purchasing = false; }

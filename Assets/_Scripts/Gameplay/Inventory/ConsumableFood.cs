@@ -39,6 +39,7 @@ public sealed class ConsumableFood : MonoBehaviour, IInteractable
             consumed = false;
             return false;
         }
+        GameplayAudio.Instance?.Eat();
         gameObject.SetActive(false);
         Destroy(gameObject);
         return true;
