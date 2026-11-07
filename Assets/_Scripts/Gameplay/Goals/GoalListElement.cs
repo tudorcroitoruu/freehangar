@@ -23,13 +23,13 @@ public class GoalListElement : MonoBehaviour
             case GoalType.GrainMoved: suffix = " kg"; break;
             default:
                 suffix = "";
-                showProgress = goal.goalAmount > 1f;
+                showProgress = goal.DisplayGoalAmount > 1f;
                 break;
         }
         goalText.richText = true;
         goalText.fontStyle &= ~FontStyles.Bold;
         goalText.text = $"<b>{goal.goalDescription}</b>";
         if (showProgress)
-            goalText.text += $"\n{progress:0.##} / {goal.goalAmount:0.##}{suffix}";
+            goalText.text += $"\n{goal.GetDisplayProgress(progress):0.##} / {goal.DisplayGoalAmount:0.##}{suffix}";
     }
 }

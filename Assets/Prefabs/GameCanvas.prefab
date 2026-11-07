@@ -8830,6 +8830,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 0
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 0
   - goalId: tutorial_place_bag
     goalDescription: Place the bag near the grain
@@ -8842,6 +8844,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 0
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 0
   - goalId: tutorial_fill_corn_bag
     goalDescription: Fill the bag with grain.
@@ -8854,6 +8858,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 15
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 0
   - goalId: tutorial_close_bag
     goalDescription: Close the grain bag.
@@ -8866,6 +8872,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 0
   - goalId: tutorial_grab_and_load_bag
     goalDescription: Grab the bag and load it onto the bicycle
@@ -8878,6 +8886,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 0
   - goalId: tutorial_reach_buyer
     goalDescription: Drive to the grain buyer
@@ -8890,6 +8900,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 0
   - goalId: tutorial_sell_corn
     goalDescription: Sell your first load of grain
@@ -8902,6 +8914,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 0
   - goalId: tutorial_upgrade_shovel
     goalDescription: Visit the base and upgrade your shovel.
@@ -8914,6 +8928,8 @@ MonoBehaviour:
     upgradeType: 6
     progressMode: 1
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 0
   - goalId: h1_load_200kg
     goalDescription: Load 200 kg of grain
@@ -8926,6 +8942,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 200
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 20
   - goalId: h1_earn_500
     goalDescription: Earn $500 from grain sales
@@ -8938,6 +8956,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 500
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 25
   - goalId: upgrade_larger_sack
     goalDescription: Buy a larger bag
@@ -8950,6 +8970,8 @@ MonoBehaviour:
     upgradeType: 1
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 5
   - goalId: h2_collect_key
     goalDescription: Collect the Hangar 2 key
@@ -8962,6 +8984,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 10
   - goalId: h1_clear
     goalDescription: Finish clearing Hangar 1
@@ -8973,7 +8997,9 @@ MonoBehaviour:
     grainType: 0
     upgradeType: 0
     progressMode: 2
-    goalAmount: 100
+    goalAmount: 98
+    useDisplayGoalAmount: 1
+    displayGoalAmount: 100
     rewardAmount: 50
   - goalId: h2_unlock
     goalDescription: Unlock Hangar 2
@@ -8986,6 +9012,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 15
   - goalId: h2_load_2000kg
     goalDescription: Load 2,000 kg of grain.
@@ -8998,6 +9026,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 2000
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 75
   - goalId: h2_load_5000kg
     goalDescription: Load 5000 kg of grain
@@ -9010,6 +9040,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 5000
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 150
   - goalId: p_sell_8500
     goalDescription: Sell 8,500 kg of grains.
@@ -9022,6 +9054,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 8500
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 200
   - goalId: upgrade_larger_truck
     goalDescription: Upgrade the vehicle.
@@ -9034,6 +9068,8 @@ MonoBehaviour:
     upgradeType: 4
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 25
   - goalId: h3_collect_key
     goalDescription: Collect the Hangar 3 key
@@ -9046,6 +9082,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 25
   - goalId: h2_clear
     goalDescription: Finish clearing Hangar 2
@@ -9057,7 +9095,9 @@ MonoBehaviour:
     grainType: 1
     upgradeType: 0
     progressMode: 2
-    goalAmount: 100
+    goalAmount: 98
+    useDisplayGoalAmount: 1
+    displayGoalAmount: 100
     rewardAmount: 350
   - goalId: h3_unlock
     goalDescription: Unlock Hangar 3
@@ -9070,6 +9110,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 75
   - goalId: upgrade_stamina
     goalDescription: Upgrade stamina.
@@ -9082,6 +9124,8 @@ MonoBehaviour:
     upgradeType: 7
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 5
   - goalId: p_sell_14000
     goalDescription: Sell 14,000 kg of grains.
@@ -9094,6 +9138,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 14000
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 300
   - goalId: h3_load_15000kg
     goalDescription: Load 15,000 kg of grain
@@ -9106,6 +9152,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 15000
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 200
   - goalId: h3_load_20000kg
     goalDescription: Load 20,000 kg of grain
@@ -9118,6 +9166,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 20000
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 250
   - goalId: h3_clear
     goalDescription: Finish clearing Hangar 3
@@ -9129,7 +9179,9 @@ MonoBehaviour:
     grainType: 2
     upgradeType: 0
     progressMode: 2
-    goalAmount: 100
+    goalAmount: 98
+    useDisplayGoalAmount: 1
+    displayGoalAmount: 100
     rewardAmount: 650
   - goalId: h4_collect_key
     goalDescription: Collect the Hangar 4 key
@@ -9142,6 +9194,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 50
   - goalId: h4_unlock
     goalDescription: Unlock Hangar 4
@@ -9154,6 +9208,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 150
   - goalId: p_sell_26000
     goalDescription: Sell 26,000 kg of grains.
@@ -9166,6 +9222,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 26000
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 500
   - goalId: h4_load_35000kg
     goalDescription: Load 35,000 kg of grain
@@ -9178,6 +9236,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 35000
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 600
   - goalId: h4_sell_soybeans_5000kg
     goalDescription: Sell 5,000 kg of Soybeans
@@ -9190,6 +9250,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 5000
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 500
   - goalId: h4_clear_98
     goalDescription: Finish clearing Hangar 4
@@ -9202,6 +9264,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 98
+    useDisplayGoalAmount: 1
+    displayGoalAmount: 100
     rewardAmount: 1000
   - goalId: h5_collect_key
     goalDescription: Collect the final hangar key
@@ -9214,6 +9278,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 100
   - goalId: h5_unlock
     goalDescription: Unlock Hangar 5
@@ -9226,6 +9292,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 250
   - goalId: h5_sell_rice_10000kg
     goalDescription: Sell 10,000 kg of rice
@@ -9238,6 +9306,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 10000
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 1000
   - goalId: h5_load_55000kg
     goalDescription: Load 55,000 kg of grain
@@ -9250,6 +9320,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 55000
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 1000
   - goalId: h5_load_65000kg
     goalDescription: Load 65,000 kg of grain
@@ -9262,6 +9334,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 1
     goalAmount: 65000
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 1250
   - goalId: h5_find_out_what_is_behind_Door
     goalDescription: Find out what is behind secret door.
@@ -9274,6 +9348,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 2
     goalAmount: 98
+    useDisplayGoalAmount: 1
+    displayGoalAmount: 100
     rewardAmount: 2000
   currentGoal:
     goalId: tutorial_pick_up_sack
@@ -9287,6 +9363,8 @@ MonoBehaviour:
     upgradeType: 0
     progressMode: 0
     goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
     rewardAmount: 0
   goalAchievedSource: {fileID: 2735182045691801615}
   goalAchievedDelay: 1.5

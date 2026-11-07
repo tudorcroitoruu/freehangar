@@ -27,6 +27,35 @@ public class GoalCheckerTests
         Assert.AreEqual(0, saved.currentAmount);
     }
 
+    [TestCase(0f, 0f)]
+    [TestCase(49f, 50f)]
+    [TestCase(98f, 100f)]
+    [TestCase(100f, 100f)]
+    public void DisplayProgressScalesToTheDisplayTarget(float actual, float displayed)
+    {
+        goal.goalAmount = 98f;
+        goal.useDisplayGoalAmount = true;
+        goal.displayGoalAmount = 100f;
+        Assert.AreEqual(displayed, goal.GetDisplayProgress(actual), .001f);
+    }
+
+    [Test]
+    public void UnconfiguredDisplayTargetUsesActualUnits()
+    {
+        Assert.AreEqual(100f, goal.DisplayGoalAmount);
+        Assert.AreEqual(49f, goal.GetDisplayProgress(49f), .001f);
+    }
+
+    [Test]
+    public void DisabledDisplayOverrideUsesActualUnitsEvenWithDisplayAmountConfigured()
+    {
+        goal.goalAmount = 98f;
+        goal.displayGoalAmount = 100f;
+        goal.useDisplayGoalAmount = false;
+        Assert.AreEqual(98f, goal.DisplayGoalAmount);
+        Assert.AreEqual(49f, goal.GetDisplayProgress(49f), .001f);
+    }
+
     [TestCase(GoalType.GrainCollected)]
     [TestCase(GoalType.GrainLoaded)]
     [TestCase(GoalType.GrainSold)]
@@ -310,6 +339,27 @@ public class GoalsManagerTests
     private void AdvanceTransition(float seconds) => typeof(GoalsManager)
         .GetMethod("AdvanceGoalTransition", BindingFlags.Instance | BindingFlags.NonPublic)
         .Invoke(manager, new object[] { seconds });
+
+    [Test]
+    public void HangarCompletesAtActualTargetAndShowsFullDisplayProgressAfterReload()
+    {
+        var clearance = new GoalSettings { goalId = "clear", goalType = GoalType.HangarCleared,
+            hangarId = 1, goalAmount = 98f, useDisplayGoalAmount = true, displayGoalAmount = 100f,
+            progressMode = GoalProgressMode.CurrentValue, rewardAmount = 5 };
+        Create(clearance);
+        var data = new PlayerData { cash = 0 };
+        manager.Initialize(data);
+        manager.ProcessAction(new GoalAction(GoalType.HangarCleared, 97f, 1, isValue: true));
+        Assert.IsFalse(data.goals[0].completed);
+        manager.ProcessAction(new GoalAction(GoalType.HangarCleared, 98f, 1, isValue: true));
+        Assert.IsTrue(data.goals[0].completed);
+        Assert.AreEqual(98f, data.goals[0].currentAmount);
+        Assert.AreEqual(100f, clearance.GetDisplayProgress(data.goals[0].currentAmount));
+        var reloaded = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(data));
+        manager.Initialize(reloaded);
+        Assert.IsTrue(manager.AllGoalsCompleted);
+        Assert.AreEqual(5, reloaded.cash);
+    }
 
     [Test]
     public void OneActionDoesNotSpillIntoNextSinceActivationGoal()

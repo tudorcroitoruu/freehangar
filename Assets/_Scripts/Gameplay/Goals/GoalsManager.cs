@@ -265,6 +265,13 @@ public class GoalSettings
     public GoalProgressMode progressMode;
     [Tooltip("Target in kg, dollars, event count, or percentage points (0-100), depending on goalType.")]
     [Min(0.001f)] public float goalAmount = 1f;
+    [Tooltip("Use displayGoalAmount for UI instead of goalAmount. Completion still uses goalAmount.")]
+    public bool useDisplayGoalAmount;
+    [Tooltip("Target shown in UI when useDisplayGoalAmount is enabled. Progress is scaled proportionally. Zero uses goalAmount.")]
+    [Min(0f)] public float displayGoalAmount;
+    public float DisplayGoalAmount => useDisplayGoalAmount && float.IsFinite(displayGoalAmount) && displayGoalAmount > 0f
+        ? displayGoalAmount : goalAmount;
+    public float GetDisplayProgress(float progress) => Mathf.Clamp01(progress / goalAmount) * DisplayGoalAmount;
     [Tooltip("Money awarded once for completing this goal.")]
     [Min(0)] public int rewardAmount;
 }
