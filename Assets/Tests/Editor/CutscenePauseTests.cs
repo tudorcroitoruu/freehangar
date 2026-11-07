@@ -1,6 +1,9 @@
 using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 
 public class CutscenePauseTests
 {
@@ -51,5 +54,72 @@ public class CutscenePauseTests
             Object.DestroyImmediate(root); AudioListener.pause = audio; Time.timeScale = scale;
             Cursor.lockState = lockMode; Cursor.visible = visible;
         }
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void PauseButtonsShareHoverWithVerticalNavigationWithoutColorTint(bool stick)
+    {
+        var root = new GameObject("Pause selection test"); root.SetActive(false);
+        var panel = new GameObject("Panel"); panel.transform.SetParent(root.transform);
+        var main = new GameObject("Main"); main.transform.SetParent(panel.transform);
+        bool audio = AudioListener.pause; float scale = Time.timeScale;
+        var lockMode = Cursor.lockState; bool visible = Cursor.visible;
+        var previousPause = Pause.Instance;
+        Gamepad pad = null;
+        try
+        {
+            var pause = root.AddComponent<Pause>(); Set(pause, "pauseScreen", panel); Set(pause, "mainScreen", main);
+            var first = MakePauseButton(main, "First", out var firstMarker);
+            var second = MakePauseButton(main, "Second", out var secondMarker);
+            Set(second, "selectOnHover", true);
+            Set(pause, "mainScreenButtons", new[] { first, second });
+            int secondClicks = 0;
+            second.button.onClick.AddListener(() => secondClicks++);
+            root.SetActive(true);
+            pause.PauseOn();
+            Assert.IsTrue(firstMarker.activeSelf);
+            Assert.IsFalse(secondMarker.activeSelf);
+            Assert.AreEqual(Selectable.Transition.None, first.button.transition);
+            Assert.AreEqual(Selectable.Transition.None, second.button.transition);
+            second.OnPointerEnter(null);
+            Assert.IsFalse(firstMarker.activeSelf);
+            Assert.IsTrue(secondMarker.activeSelf);
+            Set(pause, "mainOpenedFrame", -1);
+            pad = InputSystem.AddDevice<Gamepad>();
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.South));
+            InputSystem.Update();
+            pause.HandleMainScreenInput(pad);
+            Assert.AreEqual(1, secondClicks);
+            var up = stick ? new GamepadState { leftStick = Vector2.up } : new GamepadState().WithButton(GamepadButton.DpadUp);
+            InputSystem.QueueStateEvent(pad, up);
+            InputSystem.Update();
+            pause.HandleMainScreenInput(pad);
+            Assert.IsTrue(firstMarker.activeSelf);
+            Assert.IsFalse(secondMarker.activeSelf);
+            pause.Unpause();
+            pause.PauseOn();
+            Assert.IsTrue(firstMarker.activeSelf);
+            Assert.IsFalse(secondMarker.activeSelf);
+            pause.Unpause();
+        }
+        finally
+        {
+            if (pad != null) InputSystem.RemoveDevice(pad);
+            Object.DestroyImmediate(root); Pause.Instance = previousPause;
+            AudioListener.pause = audio; Time.timeScale = scale;
+            Cursor.lockState = lockMode; Cursor.visible = visible;
+        }
+    }
+
+    private SelectedUI MakePauseButton(GameObject parent, string name, out GameObject marker)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(Button), typeof(SelectedUI));
+        go.transform.SetParent(parent.transform);
+        var selected = go.GetComponent<SelectedUI>(); selected.button = go.GetComponent<Button>();
+        marker = new GameObject("Selected"); marker.transform.SetParent(go.transform);
+        Set(selected, "selectedImage", marker);
+        selected.Deselect();
+        return selected;
     }
 }

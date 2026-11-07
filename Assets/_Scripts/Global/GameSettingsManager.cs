@@ -18,6 +18,11 @@ public class GameSettingsManager : MonoBehaviour
     [Header("Buttons")] 
     [SerializeField] private SelectedUI[] buttons;
     [SerializeField] private GameObject[] sections;
+
+    [SerializeField] private SelectedUI[] videoSettings;
+    [SerializeField] private SelectedUI[] audioSettings;
+
+    [SerializeField] private GameObject[] joystickHints;
     
     [Header("VIDEO - Resolution")]
     [SerializeField] private Button previousResolutionButton;
@@ -141,6 +146,10 @@ public class GameSettingsManager : MonoBehaviour
 //     private IDLSSProvider dlssProvider;
     private bool initialized;
     private bool settingsChanged;
+    private int navigationSection = -1, navigationRow = -1, sectionOpenedFrame;
+    private Vector2 lastSettingsDirection;
+    private float nextSettingsMoveAt;
+    private SelectedUI[] NavigationRows => navigationSection == 0 ? videoSettings : navigationSection == 1 ? audioSettings : null;
 
     private SettingsData settings => SaveSystem.settingsData;
 
@@ -191,17 +200,28 @@ public class GameSettingsManager : MonoBehaviour
 
     private void OnEnable()
     {
+        RefreshJoystickHints();
+        SetRowHoverListeners(videoSettings, true);
+        SetRowHoverListeners(audioSettings, true);
         ShowSection(0);
     }
 
     private void OnDisable()
     {
+        SetJoystickHints(false);
+        SetRowHoverListeners(videoSettings, false);
+        SetRowHoverListeners(audioSettings, false);
+        ClearSettingsRows(videoSettings);
+        ClearSettingsRows(audioSettings);
+        navigationRow = -1;
         CancelRebinding();
         SaveSettings();
     }
 
     private void Update()
     {
+        RefreshJoystickHints();
+        EnsureInitialSettingsSelection();
         if (rebindOperation != null && Gamepad.current?.startButton.wasPressedThisFrame == true) CancelRebinding();
         if (!initialized || IsRebindingInputCaptured)
             return;
@@ -209,6 +229,16 @@ public class GameSettingsManager : MonoBehaviour
         if ((Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame) ||
             Gamepad.current?.selectButton.wasPressedThisFrame == true)
             ResetToDefaults();
+    }
+
+    private void RefreshJoystickHints() => SetJoystickHints(isActiveAndEnabled && Gamepad.all.Count > 0 &&
+        !LoadingScreen.IsLoading && !IsRebindingInputCaptured);
+
+    private void SetJoystickHints(bool visible)
+    {
+        if (joystickHints == null) return;
+        foreach (var hint in joystickHints)
+            if (hint != null && hint.activeSelf != visible) hint.SetActive(visible);
     }
 
     private IEnumerator Start()
@@ -443,13 +473,6 @@ public class GameSettingsManager : MonoBehaviour
             int next = (current + (direction < 0 ? -step : step) + sections.Length) % sections.Length;
             if (!sections[next]) continue;
             ShowSection(next);
-            var first = sections[next].GetComponentsInChildren<UnityEngine.UI.Selectable>();
-            foreach (var control in first)
-                if (control.IsActive() && control.IsInteractable())
-                {
-                    UnityEngine.EventSystems.EventSystem.current?.SetSelectedGameObject(control.gameObject);
-                    break;
-                }
             return;
         }
     }
@@ -467,10 +490,7 @@ public class GameSettingsManager : MonoBehaviour
                 sections[i].SetActive(i == index);
         }
 
-        if (buttons == null)
-            return;
-
-        for (int i = 0; i < buttons.Length; i++)
+        for (int i = 0; i < (buttons?.Length ?? 0); i++)
         {
             if (!buttons[i])
                 continue;
@@ -479,6 +499,127 @@ public class GameSettingsManager : MonoBehaviour
             if (i == index)
                 buttons[i].Select();
         }
+        navigationSection = index;
+        navigationRow = -1;
+        sectionOpenedFrame = Time.frameCount;
+        lastSettingsDirection = Vector2.zero;
+        ClearSettingsRows(videoSettings);
+        ClearSettingsRows(audioSettings);
+        var rows = NavigationRows;
+        if (rows != null && rows.Length > 0) SelectSettingsRow(0);
+        if (index == 2 && mouseSensitivitySlider != null)
+            EventSystem.current?.SetSelectedGameObject(mouseSensitivitySlider.gameObject);
+    }
+
+    private void SetRowHoverListeners(SelectedUI[] rows, bool listen)
+    {
+        if (rows == null) return;
+        foreach (var row in rows)
+            if (row != null)
+            {
+                row.PointerEntered -= OnSettingsRowHovered;
+                if (listen) row.PointerEntered += OnSettingsRowHovered;
+            }
+    }
+
+    private static void ClearSettingsRows(SelectedUI[] rows, SelectedUI keep = null)
+    {
+        if (rows == null) return;
+        foreach (var row in rows)
+            if (row != null && row != keep)
+            {
+                row.OnPointerExit(null);
+                row.OnDeselect(null);
+                row.Deselect();
+            }
+    }
+
+    private bool SelectSettingsRow(int index)
+    {
+        var rows = NavigationRows;
+        if (rows == null || index < 0 || index >= rows.Length || rows[index] == null || !rows[index].isActiveAndEnabled) return false;
+        var row = rows[index];
+        ClearSettingsRows(videoSettings, row);
+        ClearSettingsRows(audioSettings, row);
+        navigationRow = index;
+        row.Select();
+        EventSystem.current?.SetSelectedGameObject(row.gameObject);
+        return true;
+    }
+
+    private void EnsureInitialSettingsSelection()
+    {
+        // A child row may not be active yet during its parent's OnEnable.
+        // Retry only until a row is selected; preserve later mouse/pad choices.
+        if (navigationRow < 0 && (navigationSection == 0 || navigationSection == 1))
+            SelectSettingsRow(0);
+    }
+
+    private void OnSettingsRowHovered(SelectedUI row)
+    {
+        if (!isActiveAndEnabled || IsRebindingInputCaptured || LoadingScreen.IsLoading) return;
+        var rows = NavigationRows;
+        if (rows != null) SelectSettingsRow(Array.IndexOf(rows, row));
+    }
+
+    public bool HandleSettingsInput(Gamepad pad)
+    {
+        if (!isActiveAndEnabled || navigationSection < 0 || navigationSection > 2) return false;
+        EnsureInitialSettingsSelection();
+        var rows = NavigationRows;
+        if (navigationSection < 2 && (rows == null || rows.Length == 0)) return false;
+        if (pad == null || Time.frameCount <= sectionOpenedFrame || IsRebindingInputCaptured || LoadingScreen.IsLoading) return true;
+        if (pad.leftShoulder.wasPressedThisFrame || pad.rightShoulder.wasPressedThisFrame)
+        {
+            CycleSection(pad.rightShoulder.wasPressedThisFrame ? 1 : -1);
+            return true;
+        }
+        Vector2 input = pad.dpad.ReadValue();
+        if (input.sqrMagnitude < .25f) input = pad.leftStick.ReadValue();
+        Vector2 direction = input.sqrMagnitude < .25f ? Vector2.zero :
+            Mathf.Abs(input.x) > Mathf.Abs(input.y) ? new Vector2(Mathf.Sign(input.x), 0f) : new Vector2(0f, Mathf.Sign(input.y));
+        if (direction != Vector2.zero && (direction != lastSettingsDirection || Time.unscaledTime >= nextSettingsMoveAt))
+        {
+            nextSettingsMoveAt = Time.unscaledTime + (direction != lastSettingsDirection ? .35f : .12f);
+            if (direction.y != 0f && rows != null)
+            {
+                int stepDirection = direction.y > 0f ? -1 : 1;
+                for (int step = 1; step <= rows.Length; step++)
+                {
+                    int index = (navigationRow + stepDirection * step + rows.Length * 2) % rows.Length;
+                    if (SelectSettingsRow(index)) break;
+                }
+            }
+            else if (direction.x != 0f) ChangeSelectedSetting(direction.x > 0f ? 1 : -1);
+        }
+        lastSettingsDirection = direction;
+        return true;
+    }
+
+    private void ChangeSelectedSetting(int direction)
+    {
+        if (!initialized || settings == null) return;
+        if (navigationSection == 0)
+        {
+            switch (navigationRow)
+            {
+                case 0: ChangeWindowMode(); break;
+                case 1: ChangeDisplay(direction); break;
+                case 2: ChangeResolution(direction); break;
+                case 3: OnVSyncChanged(direction > 0); break;
+                case 4: ChangeQuality(direction); break;
+            }
+        }
+        else if (navigationSection == 1)
+        {
+            switch (navigationRow)
+            {
+                case 0: ChangeMasterVolume(direction * VolumeStep); break;
+                case 1: ChangeMusicVolume(direction * VolumeStep); break;
+                case 2: ChangeSFXVolume(direction * VolumeStep); break;
+            }
+        }
+        else if (navigationSection == 2) ChangeSensitivity(direction * SensitivityStep);
     }
 
     private void SetupUI()

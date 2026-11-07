@@ -34392,6 +34392,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Pause
   pauseScreen: {fileID: 227224661074085905}
   mainScreen: {fileID: 1848519036564939089}
+  mainScreenButtons:
+  - {fileID: 8351182359804519418}
+  - {fileID: 3954741364812651439}
+  - {fileID: 1809349085414675299}
   settingsScreen: {fileID: 8135263713842088963}
   leaveGamePopup: {fileID: 8992036633783264245}
   confirmLeaveGameButton: {fileID: 9197029876126651900}

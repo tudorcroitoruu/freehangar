@@ -9,8 +9,6 @@ using UnityEngine.UI;
 public sealed class PadMenuCursor : MonoBehaviour
 {
     internal static int DropdownClosedFrame { get; private set; } = -1;
-    private Text hints, leftPageHint, rightPageHint;
-    private Gamepad hintPad;
     private Image focusBackground;
     private EventSystem owner;
     private bool previousNavigation;
@@ -50,7 +48,6 @@ public sealed class PadMenuCursor : MonoBehaviour
         var root = Pause.Instance && Pause.Instance.paused ? Pause.Instance.NavigationRoot :
             MenuManager.IsMenuOpen ? MenuManager.Instance.NavigationRoot :
             UIPopups.BasePopupUI.CurrentPopup ? UIPopups.BasePopupUI.CurrentPopup.transform : null;
-        UpdateHints(root);
         UpdateFocusBackground(root);
         Transform navigationRoot = root;
         if (root)
@@ -83,7 +80,13 @@ public sealed class PadMenuCursor : MonoBehaviour
         bool padInput = pad != null && HasNavigationInput(pad);
         if (padInput && !pointerInput) pointerOwnsFocus = false;
         owner.sendNavigationEvents = !padInput && !FarmInput.UsingPad && previousNavigation;
-        if (MenuManager.IsMenuOpen && MenuManager.Instance.HandleConfirmationInput(pad))
+        bool handledSelection = Pause.Instance && Pause.Instance.paused
+            ? Pause.Instance.HandleMainScreenInput(pad)
+            : MenuManager.IsMenuOpen && MenuManager.Instance.HandleConfirmationInput(pad);
+        var settingsNavigation = root.GetComponentInChildren<GameSettingsManager>();
+        if (!handledSelection && settingsNavigation != null)
+            handledSelection = settingsNavigation.HandleSettingsInput(pad);
+        if (handledSelection)
         {
             owner.sendNavigationEvents = false;
             scope = root;
@@ -203,70 +206,6 @@ public sealed class PadMenuCursor : MonoBehaviour
         rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
         focusBackground.gameObject.SetActive(true);
-    }
-    private void UpdateHints(Transform root)
-    {
-        bool visible = root && Gamepad.all.Count > 0 && !LoadingScreen.IsLoading && !GameSettingsManager.IsRebindingInputCaptured;
-        if (!hints && visible)
-        {
-            var surface = new GameObject("Controller navigation hints", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
-            surface.transform.SetParent(transform, false);
-            var canvas = surface.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 31000;
-            var scaler = surface.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920, 1080);
-            hints = CreateHint(surface.transform, "Movement hints", Color.white);
-            hints.rectTransform.anchorMin = new Vector2(.5f, 0);
-            hints.rectTransform.anchorMax = new Vector2(.5f, 0);
-            hints.rectTransform.pivot = new Vector2(.5f, 0);
-            hints.rectTransform.anchoredPosition = new Vector2(0, 18);
-            hints.rectTransform.sizeDelta = new Vector2(1800, 45);
-            hints.gameObject.AddComponent<Shadow>().effectColor = Color.black;
-        }
-        if (hints) hints.gameObject.SetActive(visible);
-        var settings = visible ? root.GetComponentInChildren<GameSettingsManager>() : null;
-        if (hints && visible)
-        {
-            // Keep labels tied to one connected controller, rather than whichever device sent the last event.
-            if (hintPad == null || !hintPad.added) hintPad = FarmInput.ActivePad ?? Gamepad.current;
-            var pad = hintPad;
-            hints.text = "Left stick / D-pad: Up, Down, Left, Right     " +
-                (pad != null ? pad.buttonSouth.shortDisplayName : "A") + ": Select     " +
-                (pad != null ? pad.buttonEast.shortDisplayName : "B") + ": Back" +
-                (settings ? "     LS / RS: Previous / Next page" : "");
-        }
-        UpdatePageHint(ref leftPageHint, settings ? settings.FirstSectionTab : null, "LS", -1);
-        UpdatePageHint(ref rightPageHint, settings ? settings.LastSectionTab : null, "RS", 1);
-    }
-
-    private static Text CreateHint(Transform parent, string name, Color color)
-    {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Text));
-        go.transform.SetParent(parent, false);
-        var text = go.GetComponent<Text>();
-        text.font = Resources.Load<Font>("Fonts/Baloo2-Bold");
-        text.fontSize = 24;
-        text.fontStyle = FontStyle.Normal;
-        text.alignment = TextAnchor.MiddleCenter;
-        text.color = color;
-        text.raycastTarget = false;
-        return text;
-    }
-
-    private static void UpdatePageHint(ref Text hint, Transform tab, string label, int side)
-    {
-        if (!tab) { if (hint) hint.gameObject.SetActive(false); return; }
-        if (!hint) hint = CreateHint(tab, label + " page hint", new Color(.25f, .12f, .03f));
-        if (hint.transform.parent != tab) hint.transform.SetParent(tab, false);
-        hint.gameObject.SetActive(true);
-        hint.text = "[ " + label + " ]";
-        var rect = hint.rectTransform;
-        rect.anchorMin = rect.anchorMax = new Vector2(side < 0 ? 0 : 1, .5f);
-        rect.pivot = new Vector2(side < 0 ? 1 : 0, .5f);
-        rect.sizeDelta = new Vector2(85, 44);
-        rect.anchoredPosition = new Vector2(side * 12, 0);
     }
     private void Restore() { if (owner) owner.sendNavigationEvents = previousNavigation; owner = null; }
     private void OnDisable() => Restore();
