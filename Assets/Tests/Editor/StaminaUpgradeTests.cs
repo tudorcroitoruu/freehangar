@@ -99,8 +99,13 @@ public class StaminaUpgradeTests
             Assert.IsTrue(button.interactable);
             Assert.AreEqual(1f, canvas.alpha);
             Assert.AreEqual(1f, image.material.GetFloat("_Saturation"));
+            SaveSystem.Data.staminaUpgradeLevel = 3;
+            screen.Refresh();
+            StringAssert.Contains("Mobility +0%", comparison.text);
+            StringAssert.Contains("+3%</color>", comparison.text);
             SaveSystem.Data.staminaUpgradeLevel = settings.MaxUpgrades;
             screen.Refresh();
+            StringAssert.Contains("Mobility +3%", comparison.text);
             Assert.AreEqual("MAX", price.text);
             Assert.IsFalse(button.interactable);
             Assert.IsFalse(popup.activeSelf);
@@ -119,6 +124,24 @@ public class StaminaUpgradeTests
         var shared = Resources.Load<StaminaUpgradeSettings>(StaminaUpgradeSettings.ResourcePath);
         Assert.IsNotNull(shared);
         Assert.IsTrue(shared.IsConfigured);
+        Assert.GreaterOrEqual(shared.MaxUpgrades + 1, 15);
+    }
+
+    [TestCase(0, 0)]
+    [TestCase(3, 0)]
+    [TestCase(4, 3)]
+    [TestCase(8, 3)]
+    [TestCase(9, 6)]
+    [TestCase(13, 6)]
+    [TestCase(14, 9)]
+    [TestCase(20, 9)]
+    public void MobilityUsesDisplayedMilestoneLevels(int upgrades, int percent)
+    {
+        SaveSystem.Data.staminaUpgradeLevel = upgrades;
+        SaveSystem.Data.mobilityUntilUtc = 0;
+        Assert.AreEqual(1f + percent / 100f, PlayerPerks.MobilityMultiplier, .0001f);
+        SaveSystem.Data.mobilityUntilUtc = PlayerPerks.Now + 60;
+        Assert.AreEqual((1f + percent / 100f) * 1.25f, PlayerPerks.MobilityMultiplier, .0001f);
     }
 
     private GameObject Child(string name)

@@ -104,6 +104,12 @@ public class UpgradeStamina : MonoBehaviour
                 string next = settings.Capacity(level + 1).ToString("0.##", CultureInfo.InvariantCulture);
                 staminaModification.text = maxed ? current + " (MAX)" :
                     $"{current}  \u279c  <color=#{ColorUtility.ToHtmlStringRGBA(nextLevelColor)}>{next}</color>";
+                int mobility = StaminaUpgradeSettings.MobilityBonusPercent(level);
+                int nextMobility = StaminaUpgradeSettings.MobilityBonusPercent(level + 1);
+                string mobilityText = !maxed && nextMobility > mobility
+                    ? $"Mobility +{mobility}%  \u279c  <color=#{ColorUtility.ToHtmlStringRGBA(nextLevelColor)}>+{nextMobility}%</color>"
+                    : $"Mobility +{mobility}%";
+                staminaModification.text += $"\n<size=20>{mobilityText}</size>";
             }
         }
         if (price != null) price.text = maxed ? "MAX" : configured ? cost == 0 || usesVoucher ? "Free" : $"$ {EconomyNumberFormat.Accounting(cost)}" : "Unavailable";

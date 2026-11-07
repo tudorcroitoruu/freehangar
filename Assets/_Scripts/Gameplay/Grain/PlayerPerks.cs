@@ -9,7 +9,9 @@ public static class PlayerPerks
     public const int DefaultDurationSeconds=300;
     public static long Now => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
     public static bool NoAttacksActive => Active(SaveSystem.Data?.noAttacksUntilUtc ?? 0,Now);
-    public static float MobilityMultiplier => Active(SaveSystem.Data?.mobilityUntilUtc ?? 0,Now)?1.25f:1f;
+    public static float MobilityMultiplier =>
+        (1f + StaminaUpgradeSettings.MobilityBonusPercent(SaveSystem.Data?.staminaUpgradeLevel ?? 0) / 100f) *
+        (Active(SaveSystem.Data?.mobilityUntilUtc ?? 0,Now) ? 1.25f : 1f);
     public static int SellMultiplier => Active(SaveSystem.Data?.doubleSellCashUntilUtc ?? 0,Now)?2:1;
     public static int SellCash(double baseValue,int multiplier) => (int)Math.Min(int.MaxValue,(long)EconomyNumberFormat.SaleCash(baseValue)*Math.Max(1,multiplier));
     public static bool Active(long until,long now) => until>now;

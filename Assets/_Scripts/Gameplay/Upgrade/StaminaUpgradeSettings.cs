@@ -24,5 +24,8 @@ public sealed class StaminaUpgradeSettings : ScriptableObject
     }
     public int ClampLevel(int level) => Mathf.Clamp(level, 0, MaxUpgrades);
     public float Capacity(int level) => baseStamina + staminaPerUpgrade * ClampLevel(level);
+    // Save data stores purchased upgrades; the popup displays that value plus one.
+    public static int MobilityBonusPercent(int upgradeLevel) =>
+        Mathf.Clamp((Mathf.Clamp(upgradeLevel, 0, 14) + 1) / 5, 0, 3) * 3;
     public int Price(int level) => IsConfigured && level >= 0 && level < MaxUpgrades ? prices[level] : 0;
 }
