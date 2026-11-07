@@ -12,6 +12,7 @@ public struct InteractionPromptData
     public InteractionPromptAction[] AdditionalActions;
     public bool RequiresFreeHands;
     public bool VehicleFull;
+    public bool NotFitInWheelBarrow;
     public bool UseForkliftToMove;
     public bool DogResting;
     public bool ShowPrimaryButton;
@@ -32,6 +33,7 @@ public struct InteractionPromptData
         AdditionalActions = null;
         RequiresFreeHands = false;
         VehicleFull = false;
+        NotFitInWheelBarrow = false;
         UseForkliftToMove = false;
         DogResting = false;
         ShowPrimaryButton = false;

@@ -54,12 +54,13 @@ public sealed class PlayerInteractor : MonoBehaviour
     {
         var prompt = Prompt;
         Target = null;
-        if (!CanInteract) { SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
+        if (!CanInteract) { SetNotFitInWheelBarrowWarning(false); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
         var aimedTarget = FindTarget();
         InteractionPromptData aimedPrompt = default;
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
         SetDogRestingWarning(hasAimedPrompt && aimedPrompt.DogResting);
         SetVehicleFullWarning(hasAimedPrompt && aimedPrompt.VehicleFull);
+        SetNotFitInWheelBarrowWarning(hasAimedPrompt && aimedPrompt.NotFitInWheelBarrow);
         SetUseForkliftWarning(hasAimedPrompt && aimedPrompt.UseForkliftToMove);
         UpdateResetTarget(hasAimedPrompt && aimedPrompt.ShowKey && !aimedPrompt.RequiresFreeHands ? aimedTarget : null);
         if (hasAimedPrompt)
@@ -68,7 +69,7 @@ public sealed class PlayerInteractor : MonoBehaviour
             if (aimedTarget is BicycleController) AddResetAction(ref aimedPrompt);
         }
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
-        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
+        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.NotFitInWheelBarrow || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
         {
             Target = aimedTarget;
             SetHighlightedTarget(null);
@@ -209,7 +210,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         string action = resetTarget.Progress > 0
             ? $"Resetting {resetTarget.HeldSeconds:0.0} / {resetTarget.HoldSeconds:0.0} s"
             : "Hold to reset position";
-        // Reset feedback is text; bagSliderFill is reserved for grain-container filling.
+        // Reset feedback is text; bagSliderFill shows container or cargo filling.
         actions[count] = new InteractionPromptAction(action, KeyCode.R);
         data.AdditionalActions = actions;
     }
@@ -335,11 +336,14 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void SetVehicleFullWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.VehicleFull, this, visible);
 
+    private void SetNotFitInWheelBarrowWarning(bool visible) =>
+        GameplayCanvas.Instance?.SetWarning(WarningType.notFitInWheelBarrow, this, visible);
+
     private void SetUseForkliftWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.UseForkliftToMove, this, visible);
 
     private void SetDogRestingWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.DogResting, this, visible);
 
-    private void OnDisable() { SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
+    private void OnDisable() { SetNotFitInWheelBarrowWarning(false); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
 }

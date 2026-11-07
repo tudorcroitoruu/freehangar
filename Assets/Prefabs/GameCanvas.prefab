@@ -3221,6 +3221,10 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 0c28da6489224b24cb7c275970fef04c, type: 3}
     title: Dog resting
     message: Let the dog rest
+  - warningType: 14
+    icon: {fileID: 21300000, guid: 6a201bbef21689c4ba34dec6c59fee5b, type: 3}
+    title: Too large
+    message: Container is too large for this wheelbarrow.
   warningCanvasGroup: {fileID: 737507088087375577}
   warningImage: {fileID: 6193481453998981383}
   warningTitle: {fileID: 11493426258684311}
