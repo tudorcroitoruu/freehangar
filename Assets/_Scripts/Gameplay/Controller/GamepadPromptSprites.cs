@@ -5,6 +5,11 @@ using UnityEngine.TextCore;
 public static class GamepadPromptSprites
 {
     private static TMP_SpriteAsset asset;
+    private static readonly string[] Names = {
+        "Y", "A", "X", "B", "menu", "view", "LB", "RB",
+        "LT", "RT", "L3", "R3", "LeftStick", "RightStick", "dPad_All", "dPad_Up",
+        "dPad_Down", "dPad_Left", "dPad_Right", "Home"
+    };
     public static void SetKeycap(TMP_Text label, string value)
     {
         if (!label) return;
@@ -28,9 +33,15 @@ public static class GamepadPromptSprites
     {
         string name = control switch
         {
-            "buttonNorth" => "triangle", "buttonSouth" => "cross",
-            "buttonWest" => "square", "buttonEast" => "circle",
-            "start" => "options", "select" => "share", _ => null
+            "buttonNorth" => "Y", "buttonSouth" => "A",
+            "buttonWest" => "X", "buttonEast" => "B",
+            "start" => "menu", "select" => "view",
+            "leftShoulder" => "LB", "rightShoulder" => "RB",
+            "leftTrigger" => "LT", "rightTrigger" => "RT",
+            "leftStickPress" => "L3", "rightStickPress" => "R3",
+            "leftStick" => "LeftStick", "rightStick" => "RightStick",
+            "dpad" => "dPad_All", "dpad/up" => "dPad_Up", "dpad/down" => "dPad_Down",
+            "dpad/left" => "dPad_Left", "dpad/right" => "dPad_Right", _ => null
         };
         if (name == null) return null;
         if (!asset)
@@ -45,13 +56,13 @@ public static class GamepadPromptSprites
             // Initialize TMP's legacy version migration before adding modern glyphs.
             asset.spriteInfoList = new System.Collections.Generic.List<TMP_Sprite>();
             asset.UpdateLookupTables();
-            string[] names = { "triangle", "cross", "square", "circle", "options", "share" };
-            for (int i = 0; i < names.Length; i++)
+            const int tile = 128, columns = 8, rows = 3;
+            for (int i = 0; i < Names.Length; i++)
             {
                 var glyph = new TMP_SpriteGlyph((uint)i, new GlyphMetrics(64, 64, 0, 52, 64),
-                    new GlyphRect(i * 64, 0, 64, 64), 1, 0);
+                    new GlyphRect(i % columns * tile, (rows - 1 - i / columns) * tile, tile, tile), 1, 0);
                 asset.spriteGlyphTable.Add(glyph);
-                asset.spriteCharacterTable.Add(new TMP_SpriteCharacter((uint)(0xe000 + i), glyph) { name = names[i], scale = 1 });
+                asset.spriteCharacterTable.Add(new TMP_SpriteCharacter((uint)(0xe000 + i), glyph) { name = Names[i], scale = 1 });
             }
             asset.UpdateLookupTables();
             MaterialReferenceManager.AddSpriteAsset(TMP_TextUtilities.GetHashCode(asset.name), asset);

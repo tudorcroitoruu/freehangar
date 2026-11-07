@@ -98,7 +98,7 @@ public static class FarmInput
         var a = Action(action);
         if (a == null) return keyboard;
         foreach (var control in a.controls)
-            if (control.device == ActivePad) return GamepadPromptSprites.Label(control.name) ?? (control.name switch
+            if (control.device == ActivePad) return GamepadPromptSprites.Label(control.parent?.name == "dpad" ? "dpad/" + control.name : control.name) ?? (control.name switch
             {
                 "leftTrigger" => "L2", "rightTrigger" => "R2",
                 "leftShoulder" => "L1", "rightShoulder" => "R1",
