@@ -3252,6 +3252,10 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: d8de98f94d278ab459a60ad342f4913b, type: 3}
     title: Cannot load
     message: Finish filling and close bag.
+  - warningType: 21
+    icon: {fileID: 21300000, guid: 53e47783cd0224b4cb7111f1b05d1120, type: 3}
+    title: Missing key!
+    message: Requires key for this chest.
   warningCanvasGroup: {fileID: 737507088087375577}
   warningImage: {fileID: 6193481453998981383}
   warningTitle: {fileID: 11493426258684311}

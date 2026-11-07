@@ -15,6 +15,9 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     [SerializeField] private string vehicleKeyName;
     [SerializeField] private string chestKeyLabel;
     public string RequiredChestKeyId => requiredKeyId;
+    public string ChestKeyHint => string.IsNullOrEmpty(matchingKeyColor)
+        ? "Requires a key for this chest."
+        : $"Requires the {matchingKeyColor.ToLowerInvariant()} key for this chest.";
     public void ConfigureChestKey(string id,string label) { kind=Kind.Key;findId=id;chestKeyLabel=label; }
     public void ConfigureMatchingChest(string id,string keyId,string label,GrainPile pile,Material keyMaterial)
     {
@@ -208,7 +211,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         if (!isActiveAndEnabled || opening || !revealed || string.IsNullOrEmpty(findId) || WasFound(SaveSystem.Data, findId)) return false;
         bool hasProfile = SaveSystem.savesLoaded && SaveSystem.Data != null;
         bool hasKey = kind != Kind.CashChest || WasFound(SaveSystem.Data, requiredKeyId) || (!string.IsNullOrEmpty(matchingHangarKeyId) && WasFound(SaveSystem.Data, matchingHangarKeyId));
-        string action = !hasProfile ? "Load save to collect" : !hasKey ? (string.IsNullOrEmpty(matchingKeyColor) ? "Requires chest key" : $"Requires {matchingKeyColor} key") :
+        string action = !hasProfile ? "Load save to collect" : !hasKey ? "" :
             kind == Kind.VehicleKey ? $"Take {vehicleKeyName} key" :
             kind == Kind.Key ? $"Take {(string.IsNullOrEmpty(chestKeyLabel) ? "chest" : chestKeyLabel)} key" :
             kind == Kind.HangarKey ? $"Take HANGAR {targetHangar} key" :
@@ -224,6 +227,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         prompt = new InteractionPromptData(new Vector3(bounds.center.x, bounds.max.y + .15f, bounds.center.z),
             action, hasProfile && hasKey);
         prompt.InteractionKey = KeyCode.E;
+        prompt.NeedKeyForChest = hasProfile && !hasKey;
         if (interactor != null && (kind == Kind.CashChest || IsBottle))
             prompt.RequiresFreeHands = (interactor.Bags != null && interactor.Bags.IsCarrying) ||
                 (interactor.Items != null && interactor.Items.IsCarrying) || interactor.PushedWheelbarrow != null;

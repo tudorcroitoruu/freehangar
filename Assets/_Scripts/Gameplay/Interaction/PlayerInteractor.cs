@@ -16,6 +16,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     private InteractionHighlight highlight;
     private CombatToolUpgradeInteractable focusedToolDesk;
     private ShopProduct focusedLockedBag;
+    private BuriedFind focusedLockedChest;
     private Transform actionOrigin;
     public BagInteraction Bags { get; private set; }
     public PlayerItemCarry Items { get; private set; }
@@ -56,7 +57,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     {
         var prompt = Prompt;
         Target = null;
-        if (!CanInteract) { SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
+        if (!CanInteract) { SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetNeedKeyForChestWarning(null); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
         var aimedTarget = FindTarget();
         InteractionPromptData aimedPrompt = default;
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
@@ -72,6 +73,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         SetVehicleFullWarning(hasAimedPrompt && aimedPrompt.VehicleFull);
         SetNotFitInWheelBarrowWarning(hasAimedPrompt && aimedPrompt.NotFitInWheelBarrow);
         SetCannotLoadInWheelbarrowWarning(hasAimedPrompt && aimedPrompt.CannotLoadInWheelbarrow);
+        SetNeedKeyForChestWarning(hasAimedPrompt && aimedPrompt.NeedKeyForChest ? aimedTarget as BuriedFind : null);
         SetNotHungryWarning(hasAimedPrompt && aimedPrompt.NotHungry);
         SetWeighingWarnings(hasAimedPrompt && aimedPrompt.WeighingEmpty, hasAimedPrompt && aimedPrompt.WeighingWrong);
         SetUseForkliftWarning(hasAimedPrompt && aimedPrompt.UseForkliftToMove);
@@ -84,7 +86,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
         // Being full blocks eating, not independent actions such as stamina upgrades.
         bool hungerBlocksPrompt = aimedPrompt.NotHungry && !aimedPrompt.HasAvailableInput;
-        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.NotFitInWheelBarrow || aimedPrompt.CannotLoadInWheelbarrow || hungerBlocksPrompt || aimedPrompt.WeighingEmpty || aimedPrompt.WeighingWrong || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
+        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.NotFitInWheelBarrow || aimedPrompt.CannotLoadInWheelbarrow || aimedPrompt.NeedKeyForChest || hungerBlocksPrompt || aimedPrompt.WeighingEmpty || aimedPrompt.WeighingWrong || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
         {
             Target = aimedTarget;
             SetHighlightedTarget(aimedTarget is SellingWeighButton ? aimedTarget : null);
@@ -366,6 +368,15 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void SetCannotLoadInWheelbarrowWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.cannotLoadInWheelbarrow, this, visible);
 
+    private void SetNeedKeyForChestWarning(BuriedFind chest)
+    {
+        var hud = GameplayCanvas.Instance;
+        if (hud == null || focusedLockedChest == chest) return;
+        if (focusedLockedChest != null) hud.SetWarning(WarningType.needKeyForChest, focusedLockedChest, false);
+        focusedLockedChest = chest;
+        if (chest != null) hud.SetWarning(WarningType.needKeyForChest, chest, true);
+    }
+
     private void SetNotHungryWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.notHungry, this, visible);
 
@@ -381,5 +392,5 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void SetDogRestingWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.DogResting, this, visible);
 
-    private void OnDisable() { SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
+    private void OnDisable() { SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetNeedKeyForChestWarning(null); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
 }
