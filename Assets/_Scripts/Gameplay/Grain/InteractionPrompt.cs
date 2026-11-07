@@ -17,7 +17,8 @@ public sealed class InteractionPrompt : MonoBehaviour
     private Sprite originalKeySprite;
     private bool originalKeyAspect;
     [SerializeField, Tooltip("Right mouse button indicator for pouring (legacy serialized field name).")]
-    private GameObject mouseLeft;
+    private GameObject mouseRight;
+    [SerializeField] private GameObject mouseLeft;
 
     [SerializeField] private GameObject bagSliderFill;
     [SerializeField] private Image bagFill;
@@ -82,12 +83,16 @@ public sealed class InteractionPrompt : MonoBehaviour
             descriptionTwo.text = data.SecondaryDescription ?? "";
             descriptionTwo.gameObject.SetActive(!string.IsNullOrEmpty(data.SecondaryDescription));
         }
-        bool padPrimary = FarmInput.UsingPad && data.ShowPrimaryButton;
-        bool showKey = padPrimary || (data.ShowKey && !data.ShowPrimaryButton);
+        bool showMouseLeft = data.RequiredTool == PlayerCombatTools.Tool.Axe ||
+            data.RequiredTool == PlayerCombatTools.Tool.Hammer || (data.ShowPrimaryButton && data.PrimaryIsAttack);
+        bool padPrimary = !showMouseLeft && FarmInput.UsingPad && data.ShowPrimaryButton;
+        bool showKey = !showMouseLeft && (padPrimary || (data.ShowKey && !data.ShowPrimaryButton));
         string key = padPrimary ? FarmInput.Label(data.PrimaryIsAttack ? "Attack" : "Unload", "") : KeyLabel(data.InteractionKey);
         if (keycap != null && showKey) GamepadPromptSprites.SetKeycap(keycap, key);
         if (keycap != null && keycap.gameObject.activeSelf != showKey) keycap.gameObject.SetActive(showKey);
-        if (mouseLeft != null && mouseLeft.activeSelf != (data.ShowPrimaryButton && !padPrimary)) mouseLeft.SetActive(data.ShowPrimaryButton && !padPrimary);
+        if (mouseLeft != null && mouseLeft.activeSelf != showMouseLeft) mouseLeft.SetActive(showMouseLeft);
+        bool showMouseRight = !showMouseLeft && data.ShowPrimaryButton && !padPrimary;
+        if (mouseRight != null && mouseRight.activeSelf != showMouseRight) mouseRight.SetActive(showMouseRight);
         if (bagSliderFill != null && bagSliderFill.activeSelf != data.ShowProgress) bagSliderFill.SetActive(data.ShowProgress);
         if (bagFill != null) bagFill.fillAmount = Mathf.Clamp01(data.Progress);
         if (bagFillStatus != null && bagFillStatus.text != data.ProgressText) bagFillStatus.text = data.ProgressText;
@@ -145,7 +150,9 @@ public sealed class InteractionPrompt : MonoBehaviour
             row.secondaryDescription = secondary != null ? secondary.GetComponent<TMP_Text>() : null;
             var text = CopyOf(description != null ? description.transform : null, panel, clone);
             var key = CopyOf(keycap != null ? keycap.transform : null, panel, clone);
-            var mouse = CopyOf(mouseLeft != null ? mouseLeft.transform : null, panel, clone);
+            var mouse = CopyOf(mouseRight != null ? mouseRight.transform : null, panel, clone);
+            var leftMouse = CopyOf(mouseLeft != null ? mouseLeft.transform : null, panel, clone);
+            if (leftMouse != null) leftMouse.gameObject.SetActive(false);
             var progress = CopyOf(bagSliderFill != null ? bagSliderFill.transform : null, panel, clone);
             row.description = text != null ? text.GetComponent<TMP_Text>() : null;
             row.key = key != null ? key.GetComponent<TMP_Text>() : null;
