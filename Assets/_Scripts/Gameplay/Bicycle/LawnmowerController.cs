@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>Four-wheel visuals and a physics hitch for the mower's shared driving rig.</summary>
 [RequireComponent(typeof(MotorollerController))]
@@ -15,6 +16,42 @@ public sealed class LawnmowerController : MonoBehaviour
     Vector3 previousPosition;
     float rearAngle;
     readonly RaycastHit[] trailerObstacles = new RaycastHit[24];
+    readonly List<Collider> trailerContacts = new List<Collider>();
+    readonly List<Collider> mowerContacts = new List<Collider>();
+    readonly List<(Collider cargo, Collider hull)> ignoredCargoContacts = new List<(Collider, Collider)>();
+
+    // Stowed bags retain separate kinematic bodies for interaction. They must not
+    // act as external obstacles to the dynamic trailer that carries them.
+    public void RefreshTrailerCollisions()
+    {
+        if (trailerJoint == null) return;
+        var body = trailerJoint.GetComponent<Rigidbody>();
+        trailerJoint.GetComponentsInChildren(true, trailerContacts);
+        GetComponentsInChildren(true, mowerContacts);
+        for (int i = ignoredCargoContacts.Count - 1; i >= 0; i--)
+        {
+            var pair = ignoredCargoContacts[i];
+            if (pair.cargo != null && pair.hull != null &&
+                pair.cargo.transform.IsChildOf(trailerJoint.transform)) continue;
+            if (pair.cargo != null && pair.hull != null) Physics.IgnoreCollision(pair.cargo, pair.hull, false);
+            ignoredCargoContacts.RemoveAt(i);
+        }
+        foreach (var hull in trailerContacts)
+        {
+            if (hull.attachedRigidbody != body) continue;
+            foreach (var mower in mowerContacts)
+                if (mower.enabled && hull.enabled && !Physics.GetIgnoreCollision(mower, hull))
+                    Physics.IgnoreCollision(mower, hull);
+            foreach (var cargo in trailerContacts)
+            {
+                if (cargo.attachedRigidbody == body || !cargo.enabled || !hull.enabled ||
+                    Physics.GetIgnoreCollision(cargo, hull)) continue;
+                Physics.IgnoreCollision(cargo, hull);
+                var pair = (cargo, hull);
+                if (!ignoredCargoContacts.Contains(pair)) ignoredCargoContacts.Add(pair);
+            }
+        }
+    }
 
     void Awake()
     {
@@ -57,11 +94,13 @@ public sealed class LawnmowerController : MonoBehaviour
             trailerBody.WakeUp();
         }
         previousPosition = transform.position;
+        RefreshTrailerCollisions();
     }
     void FixedUpdate() => UpdateHitch();
     public void UpdateHitch()
     {
         if (hitchBody == null || hitchTarget == null) return;
+        RefreshTrailerCollisions();
         hitchBody.MovePosition(hitchTarget.position);
         hitchBody.MoveRotation(hitchTarget.rotation);
     }

@@ -58,6 +58,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     private BoxCollider interactionCollider;
     private Renderer[] visuals;
     private float nextRevealCheck;
+    private readonly RaycastHit[] supportHits = new RaycastHit[24];
     private bool revealed;
     private bool opening;
     private bool committed;
@@ -117,8 +118,13 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     {
         if (opening) return;
         if (WasFound(SaveSystem.Data, findId)) { gameObject.SetActive(false); return; }
-        if (revealed || Time.time < nextRevealCheck) return;
+        if (Time.time < nextRevealCheck) return;
         nextRevealCheck = Time.time + .3f;
+        if (revealed)
+        {
+            if (kind == Kind.CashChest) CheckChestSupport();
+            return;
+        }
         if (kind == Kind.Pistol && (!WasFound(SaveSystem.Data, PlayerCombatTools.HammerFindId) ||
             enclosingPanels == null || !Array.Exists(enclosingPanels, panel => panel && panel.IsBroken))) return;
         if (coveringPile == null) { SetRevealed(true); return; }
@@ -127,6 +133,41 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         Bounds bounds = VisualBounds();
         float surface = coveringPile.SurfaceHeight(bounds.center);
         if (surface <= bounds.max.y + .08f) SetRevealed(true);
+    }
+
+    private void CheckChestSupport()
+    {
+        if (coveringPile != null && !coveringPile.isActiveAndEnabled) return;
+        Bounds bounds = interactionCollider.bounds;
+        // Check the footprint, not just its center: a partly excavated chest can
+        // still rest on the remaining edge of the pile.
+        for (int z = -1; z <= 1; z++)
+        for (int x = -1; x <= 1; x++)
+        {
+            Vector3 point = new Vector3(bounds.center.x + bounds.extents.x * .85f * x,
+                bounds.min.y, bounds.center.z + bounds.extents.z * .85f * z);
+            if (coveringPile != null && coveringPile.IsInsideBoundary(point) &&
+                coveringPile.SurfaceHeight(point) >= bounds.min.y - .08f) return;
+        }
+        int count = Physics.BoxCastNonAlloc(new Vector3(bounds.center.x, bounds.min.y + .04f, bounds.center.z),
+            new Vector3(bounds.extents.x * .85f, .025f, bounds.extents.z * .85f),
+            Vector3.down, supportHits, Quaternion.identity, .15f, ~0, QueryTriggerInteraction.Ignore);
+        if (count == supportHits.Length) return;
+        for (int i = 0; i < count; i++)
+        {
+            var hit = supportHits[i];
+            if (hit.transform.IsChildOf(transform)) continue;
+            var pile = hit.collider.GetComponentInParent<GrainPile>();
+            // Grain colliders refresh less frequently than excavation. Do not
+            // keep a chest floating on an old collider after its stock is removed.
+            if (pile != null && pile.SurfaceHeight(hit.point) < bounds.min.y - .08f) continue;
+            return;
+        }
+        if (body == null) body = GetComponent<Rigidbody>();
+        if (body == null) body = gameObject.AddComponent<Rigidbody>();
+        body.useGravity = true;
+        body.isKinematic = false;
+        body.WakeUp();
     }
 
     private Bounds VisualBounds()

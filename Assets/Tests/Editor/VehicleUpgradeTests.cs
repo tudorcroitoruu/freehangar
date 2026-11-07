@@ -349,6 +349,44 @@ public class VehicleUpgradeTests
         Assert.Less(Vector3.Distance(slot.position, mower.transform.position), 8f);
     }
 
+    [Test]
+    public void LoadedCargoCannotPushItsTrailerAndRegainsCollisionWhenUnloaded()
+    {
+        root.SetActive(false);
+        var mower = root.AddComponent<LawnmowerController>();
+        var trailer = new GameObject("Dynamic trailer");
+        var bag = new GameObject("Kinematic loaded bag");
+        var ground = new GameObject("External ground");
+        try
+        {
+            trailer.AddComponent<Rigidbody>();
+            var hull = trailer.AddComponent<BoxCollider>();
+            mower.trailerJoint = trailer.AddComponent<ConfigurableJoint>();
+            bag.transform.SetParent(trailer.transform);
+            bag.AddComponent<Rigidbody>().isKinematic = true;
+            var bagCollider = bag.AddComponent<BoxCollider>();
+            var groundCollider = ground.AddComponent<BoxCollider>();
+            Assert.IsFalse(Physics.GetIgnoreCollision(bagCollider, hull));
+            mower.RefreshTrailerCollisions();
+            Assert.IsTrue(Physics.GetIgnoreCollision(bagCollider, hull));
+            Assert.IsFalse(Physics.GetIgnoreCollision(hull, groundCollider));
+            Assert.IsFalse(Physics.GetIgnoreCollision(bagCollider, groundCollider));
+            // Loading reenables colliders; the next physics step must restore filtering.
+            Physics.IgnoreCollision(bagCollider, hull, false);
+            mower.RefreshTrailerCollisions();
+            Assert.IsTrue(Physics.GetIgnoreCollision(bagCollider, hull));
+            bag.transform.SetParent(null);
+            mower.RefreshTrailerCollisions();
+            Assert.IsFalse(Physics.GetIgnoreCollision(bagCollider, hull));
+        }
+        finally
+        {
+            Object.DestroyImmediate(bag);
+            Object.DestroyImmediate(trailer);
+            Object.DestroyImmediate(ground);
+        }
+    }
+
     private GameObject Child(string name)
     {
         var child = new GameObject(name, typeof(RectTransform));
