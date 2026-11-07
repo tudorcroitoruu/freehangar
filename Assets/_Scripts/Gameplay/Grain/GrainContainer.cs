@@ -201,6 +201,14 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
 
     public void SetCarried(bool carried) => IsCarried = carried;
 
+    public void EmptyAfterPour()
+    {
+        kilograms = 0f;
+        IsClosing = false;
+        if (sack != null) sack.Close = 0f;
+        ApplyFill();
+    }
+
     public ContainerSave CaptureSave() => new ContainerSave { kilograms = kilograms, grain = (int)acceptedGrain,
         closure = sack != null ? sack.Close : 0, closing = IsClosing, achievementId = AchievementIdentity };
 

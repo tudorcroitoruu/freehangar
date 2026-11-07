@@ -24,6 +24,10 @@ public sealed class PlayerInteractor : MonoBehaviour
     public IInteractable Target { get; private set; }
     private Object discoveryOwner;
     private VehicleReset resetTarget;
+    private GrainContainer emptyBagTarget;
+    private float emptyBagHeld;
+    private bool emptyBagHoldCompleted;
+    private bool emptyBagSucceeded;
     public bool DiscoveryBusy => discoveryOwner != null;
     public bool BeginDiscovery(Object owner)
     {
@@ -57,10 +61,16 @@ public sealed class PlayerInteractor : MonoBehaviour
     {
         var prompt = Prompt;
         Target = null;
+        if (!CanInteract) CancelBagHold();
         if (!CanInteract) { SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetNeedKeyForChestWarning(null); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
         var aimedTarget = FindTarget();
+        TickBagHold(aimedTarget);
         InteractionPromptData aimedPrompt = default;
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
+        if (hasAimedPrompt && emptyBagTarget != null && ReferenceEquals(aimedTarget, emptyBagTarget))
+            aimedPrompt.SecondaryDescription = emptyBagHoldCompleted
+                ? emptyBagSucceeded ? "Bag emptied" : "No clear ground beside bag"
+                : $"Hold {FarmInput.Label("Interact", "E")} to empty bag ({emptyBagHeld:0.0} / 1.0 s)";
         // Driving owns the interaction prompt. A carried bag also prevents taking
         // another bag; looking at cargo should not continuously warn about that.
         if (PushedWheelbarrow != null ||
@@ -149,7 +159,46 @@ public sealed class PlayerInteractor : MonoBehaviour
             return Bags.TryInteract();
         }
         Target = FindTarget();
+        if (!HandsOccupied && Target is GrainContainer bag && Bags != null && Bags.CanEmpty(bag))
+        {
+            emptyBagTarget = bag;
+            emptyBagHeld = 0f;
+            emptyBagHoldCompleted = false;
+            return true;
+        }
         return Target != null && KeyFor(Target) == KeyCode.E && Target.TryGetPrompt(this, out var data) && data.ShowKey && Target.TryInteract(this);
+    }
+
+    private void CancelBagHold()
+    {
+        emptyBagTarget = null;
+        emptyBagHeld = 0f;
+        emptyBagHoldCompleted = false;
+        emptyBagSucceeded = false;
+    }
+
+    private void TickBagHold(IInteractable aimed)
+    {
+        if (emptyBagTarget == null) return;
+        if (!ReferenceEquals(aimed, emptyBagTarget) || HandsOccupied || Bags == null)
+        {
+            CancelBagHold();
+            return;
+        }
+        if (!FarmInput.Held("Interact"))
+        {
+            var bag = emptyBagTarget;
+            bool tap = !emptyBagHoldCompleted;
+            CancelBagHold();
+            if (tap) Bags.TryInteract(bag);
+            return;
+        }
+        if (emptyBagHoldCompleted) return;
+        if (!Bags.CanEmpty(emptyBagTarget)) { CancelBagHold(); return; }
+        emptyBagHeld += Time.deltaTime;
+        if (emptyBagHeld < 1f) return;
+        emptyBagHoldCompleted = true;
+        emptyBagSucceeded = Bags.TryEmpty(emptyBagTarget);
     }
 
     public bool TryAdditionalInput()
@@ -392,5 +441,5 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void SetDogRestingWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.DogResting, this, visible);
 
-    private void OnDisable() { SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetNeedKeyForChestWarning(null); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
+    private void OnDisable() { CancelBagHold(); SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetNeedKeyForChestWarning(null); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
 }

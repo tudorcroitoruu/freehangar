@@ -41,6 +41,41 @@ public sealed class BagInteraction : MonoBehaviour
 
     private void LateUpdate() => RestoreShovelIfNeeded();
 
+    public bool CanEmpty(GrainContainer bag) => isActiveAndEnabled && carried == null &&
+        bag != null && bag.isActiveAndEnabled && !bag.IsEmpty && !bag.IsCarried && !bag.IsClosing &&
+        (shovel == null || !shovel.IsBusy) && VehicleCargoOwner.Resolve(bag) == null &&
+        bag.GetComponentInParent<WheelbarrowCargo>() == null;
+
+    public bool TryEmpty(GrainContainer bag)
+    {
+        if (!CanEmpty(bag)) return false;
+        var source = FindFirstObjectByType<GrainPile>();
+        if (source == null) return false;
+        Bounds bounds = bag.WorldBounds;
+        for (int side = 0; side < 4; side++)
+        {
+            Vector3 direction = Quaternion.Euler(0, side * 90f, 0) * Vector3.forward;
+            Vector3 origin = bounds.center + direction * (Mathf.Max(bounds.extents.x, bounds.extents.z) + .75f);
+            origin.y = bounds.max.y + .25f;
+            if (!Physics.Raycast(origin, Vector3.down, out var hit, bounds.size.y + 3f, ~0, QueryTriggerInteraction.Ignore) ||
+                hit.normal.y < .65f || hit.collider.GetComponentInParent<GrainContainer>() != null ||
+                hit.collider.transform.IsChildOf(transform)) continue;
+            if (Physics.Linecast(bounds.center, hit.point + Vector3.up * .1f, out var obstacle, ~0, QueryTriggerInteraction.Ignore) &&
+                !obstacle.collider.transform.IsChildOf(bag.transform) && obstacle.collider != hit.collider) continue;
+            var cargo = new GrainCargo();
+            cargo.Add(bag.AcceptedGrain, bag.Kilograms);
+            var pile = GrainPile.CreateDroppedPile(hit.point, source, bag.Kilograms);
+            if (!pile.Deposit(hit.point, cargo, GrainPile.DropRadius(bag.Kilograms)))
+            {
+                Destroy(pile.gameObject);
+                continue;
+            }
+            bag.EmptyAfterPour();
+            return true;
+        }
+        return false;
+    }
+
     public bool TryGetPrompt(GrainContainer bag, out InteractionPromptData data)
     {
         data = default;
@@ -63,6 +98,12 @@ public sealed class BagInteraction : MonoBehaviour
         data.ShowPrimaryButton = canPour;
         data.UseForkliftToMove = useForklift;
         var interactor = GetComponent<PlayerInteractor>();
+        if (CanEmpty(bag) && (interactor == null || !interactor.HandsOccupied))
+        {
+            data.ShowKey = true;
+            data.UseForkliftToMove = false;
+            data.SecondaryDescription = "Hold " + FarmInput.Label("Interact", "E") + " to empty bag";
+        }
         data.RequiresFreeHands = bag != carried && bag.CanCarry && !canFinish && !data.ShowPrimaryButton &&
             interactor != null && interactor.HandsOccupied;
         data.Progress = bag.CapacityKg > 0f ? Mathf.Clamp01(bag.Kilograms / bag.CapacityKg) : 0f;
