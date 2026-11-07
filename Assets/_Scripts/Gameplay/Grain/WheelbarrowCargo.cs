@@ -125,6 +125,8 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     public float OccupiedVolume => occupiedVolume;
     public int BagCount => bags.Count;
     public int CargoSlotCount => Tier == 0 ? 3 : Tier == 1 ? 5 : 6;
+    public bool AcceptsContainer(GrainContainer bag) => bag != null && !bag.IsBigBag &&
+        bag.TransportLevel <= (Tier == 0 ? 3 : 5);
 
     private void Awake()
     {
@@ -157,8 +159,8 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
 
     private static float Volume(Vector3 size) => Mathf.Max(.001f, size.x * size.y * size.z);
     private float LoadingVolume(GrainContainer bag, float worldVolume) =>
-        Tier == 0 && (bag.CargoTypeId == "SmallBag" || bag.CargoTypeId == "LargeBag")
-            ? CapacityVolume / CargoSlotCount : worldVolume;
+        // Slot occupancy is independent of carried/restored model scale and rotation.
+        AcceptsContainer(bag) ? CapacityVolume / CargoSlotCount : worldVolume;
 
     private float Volume(GrainContainer bag)
     {
@@ -181,7 +183,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     public bool CanLoad(BagInteraction carrier)
     {
         if (carrier == null || !carrier.IsCarrying || carrier.CarriedBag == null || pusher != null) return false;
-        if (carrier.CarriedBag.IsBigBag || !carrier.CarriedBag.CanLoadOnVehicle) return false;
+        if (!AcceptsContainer(carrier.CarriedBag) || !carrier.CarriedBag.CanLoadOnVehicle) return false;
         float volume = LoadingVolume(carrier.CarriedBag, carrier.CarriedVolume);
         return occupiedVolume + volume <= CapacityVolume + .0001f && bags.Count < CargoSlotCount;
     }
@@ -210,7 +212,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
             available = CanLoad(interactor.Bags);
             cannotLoad = !interactor.Bags.CarriedBag.CanLoadOnVehicle;
             containerTooLarge = interactor.Bags.CarriedBag.CanLoadOnVehicle &&
-                (interactor.Bags.CarriedBag.IsBigBag || LoadingVolume(interactor.Bags.CarriedBag, interactor.Bags.CarriedVolume) > CapacityVolume + .0001f);
+                (!AcceptsContainer(interactor.Bags.CarriedBag) || LoadingVolume(interactor.Bags.CarriedBag, interactor.Bags.CarriedVolume) > CapacityVolume + .0001f);
             action = cannotLoad ? "" : available ? "Load bag" :
                 containerTooLarge ? "" : "Wheelbarrow full";
         }
@@ -221,7 +223,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         prompt.ShowProgress = available && interactor.Bags != null && interactor.Bags.IsCarrying;
         prompt.Progress = CapacityVolume > 0f ? Mathf.Clamp01(occupiedVolume / CapacityVolume) : 0f;
         prompt.VehicleFull = !available && interactor.Bags != null && interactor.Bags.IsCarrying &&
-            !interactor.Bags.CarriedBag.IsBigBag && interactor.Bags.CarriedBag.CanLoadOnVehicle && LoadingVolume(interactor.Bags.CarriedBag, interactor.Bags.CarriedVolume) <= CapacityVolume + .0001f;
+            AcceptsContainer(interactor.Bags.CarriedBag) && interactor.Bags.CarriedBag.CanLoadOnVehicle && LoadingVolume(interactor.Bags.CarriedBag, interactor.Bags.CarriedVolume) <= CapacityVolume + .0001f;
         return true;
     }
 

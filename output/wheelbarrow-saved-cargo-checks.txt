@@ -1,0 +1,1 @@
+PASS Medium and Max: load and stow all five container types with restored cargo

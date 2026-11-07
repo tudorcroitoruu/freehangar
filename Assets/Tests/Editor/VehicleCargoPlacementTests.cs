@@ -3,6 +3,40 @@ using UnityEngine;
 
 public class VehicleCargoPlacementTests
 {
+    [TestCase("Medium")]
+    [TestCase("Max")]
+    public void UpgradedWheelbarrowLoadsThroughBarrelAfterCargoRestore(string tier)
+    {
+        foreach (string id in new[] { "FreeBag", "SmallBag", "LargeBag", "Crate", "Barrel" })
+        {
+            var root = new GameObject("Wheelbarrow_" + tier);
+            GameObject item = null;
+            try
+            {
+                var barrow = root.AddComponent<WheelbarrowCargo>();
+                var savedSlot = new GameObject("Bag slot 0").transform; savedSlot.SetParent(root.transform);
+                var savedBag = new GameObject("Saved bag"); savedBag.transform.SetParent(savedSlot);
+                savedBag.AddComponent<BoxCollider>().size = Vector3.one * 4;
+                barrow.RestoreLoadedBag(savedBag.AddComponent<GrainContainer>(), savedSlot);
+                var actor = new GameObject("Carrier"); actor.transform.SetParent(root.transform);
+                var carry = actor.AddComponent<BagInteraction>();
+                const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+                typeof(BagInteraction).GetField("carryAnchor", flags).SetValue(carry, actor.transform);
+                item = Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/" + id + ".prefab"));
+                VehicleCargoPreview.PrepareContainer(item, 1, 1);
+                var bag = item.GetComponent<GrainContainer>();
+                Assert.IsTrue(carry.RestoreCarried(bag), tier + " pickup " + id);
+                Assert.IsTrue(barrow.CanLoad(carry), tier + " load " + id);
+                var slot = new GameObject("Bag slot 1").transform; slot.SetParent(root.transform);
+                Assert.IsTrue(carry.TryStow(slot), tier + " stow " + id);
+                barrow.RestoreLoadedBag(bag, slot);
+                Assert.That(barrow.BagCount, Is.EqualTo(2));
+                Assert.That(barrow.OccupiedVolume, Is.EqualTo(2f * barrow.CapacityVolume / barrow.CargoSlotCount).Within(.0001f));
+            }
+            finally { if (item != null) Object.DestroyImmediate(item); Object.DestroyImmediate(root); }
+        }
+    }
+
     [Test]
     public void PickingLowerCargoSelectsTopOfItsColumnOnly()
     {
