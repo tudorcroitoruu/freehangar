@@ -150,8 +150,7 @@ public sealed class GameplayAudio : MonoBehaviour
     public void CashIn() => Play(cashIn, CashInVolume);
     public void UpgradeResult(bool success)
     {
-        // Successful purchases are voiced by the HUD when its balance transfer starts.
-        if (!success) Play(upgradeFailed, .8f);
+        Play(success ? upgradeSuccess : upgradeFailed, .8f);
     }
     public void BarrierHit(bool metal) => Play(metal ? hammerMetal : (Choose(axeWoodHits) ?? hammerWood), .8f);
     public void PickUp() => Play(pickUp, .7f);

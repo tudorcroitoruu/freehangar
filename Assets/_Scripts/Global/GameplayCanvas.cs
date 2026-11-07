@@ -27,6 +27,7 @@ public class GameplayCanvas : MonoBehaviour
     private double displayedMoney, moneyAnimationStart;
     private int targetMoney;
     private float moneyAnimationElapsed;
+    private float moneySoundRemaining;
     
     [Header("Money Change")]
     [SerializeField] private CanvasGroup moneyChangeCanvas;
@@ -396,6 +397,7 @@ public class GameplayCanvas : MonoBehaviour
         targetMoney = amount;
         moneyAnimationStart = displayedMoney;
         moneyAnimationElapsed = 0f;
+        moneySoundRemaining = 0f;
         if (!moneyInitialized)
         {
             displayedMoney = amount;
@@ -457,8 +459,13 @@ public class GameplayCanvas : MonoBehaviour
         moneyChangeDelayRemaining -= delayTime;
         deltaTime -= delayTime;
         if (moneyChangeDelayRemaining > 0f || deltaTime <= 0f) return;
-        // Sync the cue with the balance transfer, after the popup's fade and delay.
-        if (moneyAnimationElapsed == 0f) AudioManager.Instance?.PlayCoinChange();
+        // Tick throughout either direction of the transfer, without catch-up bursts after a slow frame.
+        moneySoundRemaining -= deltaTime;
+        if (moneySoundRemaining <= 0f)
+        {
+            AudioManager.Instance?.PlayCoinChange();
+            moneySoundRemaining = .06f;
+        }
         moneyAnimationElapsed += deltaTime;
         float progress = moneyAnimationSeconds > 0f ? Mathf.Clamp01(moneyAnimationElapsed / moneyAnimationSeconds) : 1f;
         // Keep the interpolated value in double precision, including large balances.
