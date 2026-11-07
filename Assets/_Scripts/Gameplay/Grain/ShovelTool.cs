@@ -377,7 +377,7 @@ public sealed class ShovelTool : MonoBehaviour
         float phase = Mathf.Clamp01(elapsed / actionDuration);
         UpdatePose(phase);
         float fraction = Mathf.SmoothStep(0, 1, pendingPile != null
-            ? Mathf.InverseLerp(.38f, .56f, phase) : Mathf.InverseLerp(.32f, .67f, phase));
+            ? Mathf.InverseLerp(.32f, .66f, phase) : Mathf.InverseLerp(.32f, .67f, phase));
         if (dropping)
         {
             // Bound mesh rebuilds while distributing the load over the pouring motion.

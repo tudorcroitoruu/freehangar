@@ -17,6 +17,7 @@ public sealed class GrainHeightField
     public Action<int, double> Removed;
     public Func<int, double, bool> CanRemove;
     public Func<int, double, double> LimitRemoval;
+    internal bool PreserveScoopDepression;
     public Action<int, int, double> Transferred;
     public float AreaAt(int index) => areas[index];
 
@@ -113,6 +114,10 @@ public sealed class GrainHeightField
         {
             float previous = Heights[i];
             Heights[i] = Mathf.Max(0, previous - removal[i] * fraction);
+            // Selective magnet cleanup establishes a new resting surface. Otherwise
+            // deficit equalization immediately drags neighbouring crops into the cut.
+            if (PreserveScoopDepression && previous > Heights[i])
+                referenceHeights[i] = Mathf.Min(referenceHeights[i], Heights[i]);
             if (previous > Heights[i]) Removed?.Invoke(i, (previous - Heights[i]) * (double)areas[i]);
             removed += (previous - Heights[i]) * (double)areas[i];
         }

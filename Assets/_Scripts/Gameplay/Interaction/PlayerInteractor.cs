@@ -58,6 +58,14 @@ public sealed class PlayerInteractor : MonoBehaviour
         var aimedTarget = FindTarget();
         InteractionPromptData aimedPrompt = default;
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
+        // Driving owns the interaction prompt. A carried bag also prevents taking
+        // another bag; looking at cargo should not continuously warn about that.
+        if (PushedWheelbarrow != null ||
+            (Bags != null && Bags.IsCarrying && aimedTarget is GrainContainer))
+        {
+            hasAimedPrompt = false;
+            aimedPrompt = default;
+        }
         SetDogRestingWarning(hasAimedPrompt && aimedPrompt.DogResting);
         SetVehicleFullWarning(hasAimedPrompt && aimedPrompt.VehicleFull);
         SetNotFitInWheelBarrowWarning(hasAimedPrompt && aimedPrompt.NotFitInWheelBarrow);

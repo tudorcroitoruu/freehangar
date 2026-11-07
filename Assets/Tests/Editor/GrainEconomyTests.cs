@@ -107,6 +107,22 @@ public class GrainEconomyTests
         Assert.That(pile.Kilograms, Is.EqualTo(before));
     }
 
+    [Test]
+    public void MagnetCutDoesNotImmediatelyRefillDuringSettling()
+    {
+        pile.ConfigureRegions(new[] { new GrainRegion(100, GrainType.Corn) });
+        var selected = new GrainCargo(); selected.Add(GrainType.Corn, 1);
+        var point = new Vector3(0, pile.SurfaceHeight(Vector3.zero), 0);
+        float removed = pile.ScoopCompatibleWith(point, .3f, .2f, 5, new GrainCargo(), selected, out _);
+        Assert.Greater(removed, 0);
+        float cutHeight = pile.SurfaceHeight(point);
+        double cutMass = pile.Kilograms;
+        var settle = typeof(GrainPile).GetMethod("AdvanceSettling", BindingFlags.Instance | BindingFlags.NonPublic);
+        for (int i = 0; i < 120; i++) settle.Invoke(pile, new object[] { 1f / 60f });
+        Assert.That(pile.SurfaceHeight(point), Is.LessThanOrEqualTo(cutHeight + .001f));
+        Assert.That(pile.Kilograms, Is.EqualTo(cutMass).Within(.001));
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public void SurfaceRefreshTiming(bool clipped)

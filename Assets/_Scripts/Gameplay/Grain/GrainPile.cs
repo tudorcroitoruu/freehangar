@@ -404,6 +404,8 @@ public sealed class GrainPile : MonoBehaviour
         {
             var previousLimit = field.LimitRemoval;
             var previousFilter = spatial.CollectionFilter;
+            bool previousPreserve = field.PreserveScoopDepression;
+            field.PreserveScoopDepression = true;
             spatial.CollectionFilter = allowed;
             field.LimitRemoval = (cell, volume) => spatial.MatchingSurfaceVolume(cell,
                 previousLimit != null ? previousLimit(cell, volume) : volume, allowed);
@@ -417,7 +419,12 @@ public sealed class GrainPile : MonoBehaviour
                 mixBlocked = collected <= 0 && existingCargo != null && existingCargo.Total > .0001f;
                 return collected;
             }
-            finally { field.LimitRemoval = previousLimit; spatial.CollectionFilter = previousFilter; }
+            finally
+            {
+                field.LimitRemoval = previousLimit;
+                spatial.CollectionFilter = previousFilter;
+                field.PreserveScoopDepression = previousPreserve;
+            }
         }
         var previousCheck = field.CanRemove;
         bool blocked = false;
