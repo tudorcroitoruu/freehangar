@@ -51,6 +51,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     private Vector3 pourDestination;
     private System.Random random;
     private ShovelTool tool;
+    private PlayerInteractor interactor;
     private GrainType pourGrain;
     private readonly GrainAppearance loadAppearance = new GrainAppearance();
     private readonly GrainAppearance streamAppearance = new GrainAppearance();
@@ -87,6 +88,7 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     private void Awake()
     {
         tool = GetComponentInParent<ShovelTool>();
+        interactor = GetComponentInParent<PlayerInteractor>();
         positions = new Vector3[maximumKernels]; velocities = new Vector3[maximumKernels];
         pairOrder = new int[maximumKernels]; pairOrderCount = 0;
         rotations = new Quaternion[maximumKernels]; matrices = new Matrix4x4[maximumKernels + PackedCapacity];
@@ -160,6 +162,15 @@ public sealed class ShovelGrainPhysics : MonoBehaviour
     private void LateUpdate()
     {
         if (positions == null || kernelMesh == null || kernelMaterial == null) return;
+        // Discovery hides held Renderers, but instanced kernels have no Renderer.
+        // Freeze the load too, so the drinking camera motion cannot spill it.
+        if (interactor != null && interactor.DiscoveryBusy)
+        {
+            previousPosition = transform.position;
+            previousRotation = transform.rotation;
+            previousVelocity = Vector3.zero;
+            return;
+        }
         if (Time.deltaTime > 0) Simulate(Mathf.Min(Time.deltaTime, .05f));
         UpdateLoad();
         streamCount = 0;

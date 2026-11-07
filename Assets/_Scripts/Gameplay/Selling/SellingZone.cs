@@ -136,6 +136,7 @@ public sealed class WeighDeckSpring : MonoBehaviour
 {
     private readonly Collider[] occupants = new Collider[128];
     private readonly HashSet<Object> unique = new HashSet<Object>();
+    private readonly HashSet<Object> previousOccupants = new HashSet<Object>();
     private readonly List<Transform> moving = new List<Transform>();
     private readonly List<Vector3> rest = new List<Vector3>();
     private BoxCollider deck;
@@ -176,31 +177,39 @@ public sealed class WeighDeckSpring : MonoBehaviour
                 Quaternion.identity, ~0, QueryTriggerInteraction.Ignore);
             unique.Clear();
             float nextLoad = 0f;
+            float arrivalImpulse = 0f;
             for (int i = 0; i < count; i++)
             {
                 var hit = occupants[i];
                 var player = hit.GetComponentInParent<PlayerController>();
                 var bag = hit.GetComponentInParent<GrainContainer>();
+                var vehicle = hit.GetComponentInParent<BicycleController>();
+                var wheelbarrow = hit.GetComponentInParent<WheelbarrowCargo>();
                 // Count a dropped bag when it reaches the deck, not while held above it.
                 if (player == null && bag != null &&
                     (bag.IsCarried || bag.WorldBounds.min.y > bounds.max.y + .12f ||
                      bag.GetComponentInParent<PlayerController>() != null)) continue;
-                Object owner = player != null ? (Object)player : bag;
+                Object owner = vehicle != null ? (Object)vehicle : wheelbarrow != null ? (Object)wheelbarrow :
+                    player != null ? (Object)player : bag;
                 if (owner == null || !unique.Add(owner)) continue;
-                nextLoad += player != null ? 1f : .7f;
+                float weight = vehicle != null ? 5f : wheelbarrow != null ? 2f : player != null ? 1f : .7f;
+                nextLoad += weight;
+                if (!previousOccupants.Contains(owner)) arrivalImpulse += weight * .14f;
             }
-            if (nextLoad > load) velocity -= Mathf.Min(.065f, (nextLoad - load) * .035f);
+            velocity -= Mathf.Min(.32f, arrivalImpulse);
+            previousOccupants.Clear();
+            previousOccupants.UnionWith(unique);
             load = nextLoad;
         }
         float dt = Time.fixedDeltaTime;
-        float target = -Mathf.Min(.012f, load * .003f);
+        float target = -Mathf.Min(.025f, load * .007f);
         // Substeps keep the damped spring stable at larger physics timesteps.
         int steps = Mathf.Max(1, Mathf.CeilToInt(dt / .01f));
         float step = dt / steps;
         for (int i = 0; i < steps; i++)
         {
-            velocity += ((target - displacement) * 180f - velocity * 12f) * step;
-            displacement = Mathf.Clamp(displacement + velocity * step, -.025f, .008f);
+            velocity += ((target - displacement) * 140f - velocity * 8f) * step;
+            displacement = Mathf.Clamp(displacement + velocity * step, -.04f, .012f);
         }
         for (int i = 0; i < moving.Count; i++)
             if (moving[i] != null)
@@ -211,6 +220,7 @@ public sealed class WeighDeckSpring : MonoBehaviour
     {
         for (int i = 0; i < moving.Count; i++) if (moving[i] != null) moving[i].localPosition = rest[i];
         displacement = velocity = load = 0f;
+        previousOccupants.Clear();
     }
 
     private void OnDestroy()

@@ -230,11 +230,16 @@ public class GoalsManager : MonoBehaviour
         dirty = true;
     }
 
-    private void FlushSave()
+    private async void FlushSave()
     {
         if (!dirty || loadedData == null || loadedData != SaveSystem.Data || !SaveSystem.savesLoaded) return;
-        SaveSystem.SaveData();
         dirty = false;
+        try { await SaveSystem.SaveGoalCompletionAsync(); }
+        catch (Exception error)
+        {
+            dirty = true;
+            Debug.LogException(error, this);
+        }
     }
 
     private void OnDisable()

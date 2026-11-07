@@ -12,8 +12,10 @@ public class FridgeProduct : MonoBehaviour, IInteractable
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
     {
         var stamina = Stamina;
-        int foodPrice = stamina != null ? Mathf.CeilToInt(stamina.HungryPercent) : 0;
-        bool needsFood = stamina != null && stamina.HungryPercent > 0f;
+        // Hunger accrues fractionally every frame. Do not sell another meal for
+        // the first tiny increment immediately after the player has eaten.
+        bool needsFood = stamina != null && stamina.HungryPercent >= 1f;
+        int foodPrice = needsFood ? Mathf.CeilToInt(stamina.HungryPercent) : 0;
         bool canAfford = SaveSystem.Data != null && SaveSystem.Money >= foodPrice;
         string price = $"${foodPrice}";
         if (!canAfford) price = $"<color=#D92D2D>{price}</color>";
@@ -21,7 +23,7 @@ public class FridgeProduct : MonoBehaviour, IInteractable
             (promptAnchor != null ? promptAnchor.position : transform.position) + promptOffset,
             "Eat & reduce hunger", needsFood && canAfford && !purchasing)
         {
-            SecondaryDescription = $"Price: {price}",
+            SecondaryDescription = needsFood ? $"Price: {price}" : "",
             NotHungry = !needsFood
         };
         return isActiveAndEnabled && interactor != null && stamina != null && stamina.isActiveAndEnabled;

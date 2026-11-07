@@ -181,6 +181,55 @@ public static class SaveSystem
     public static bool HasSavedGame => PlayerPrefs.HasKey(savePath);
 
     static int key = 5;
+    private static long saveRevision;
+    private const string CompressedSavePrefix = "gzip1:";
+
+    // Capture Unity objects on the main thread, then serialize an isolated snapshot.
+    public static async Task SaveGoalCompletionAsync()
+    {
+        if (Data == null) return;
+        var profile = Data;
+        long revision = ++saveRevision;
+        WorldSaveRuntime.CaptureIntoPlayerData();
+        var world = profile.world;
+        PlayerData snapshot;
+        try
+        {
+            profile.world = null;
+            snapshot = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(profile));
+        }
+        finally { profile.world = world; }
+        snapshot.world = world;
+        string previous = PlayerPrefs.GetString(savePath, "");
+        MoneyChanged?.Invoke(Money);
+        var encoded = await Task.Run(() =>
+        {
+            string current = EncodePlayerSave(JsonUtility.ToJson(snapshot));
+            // Compact the previous legacy snapshot too, so the first autosave does
+            // not flush another multi-megabyte backup to PlayerPrefs.
+            string previousJson = string.IsNullOrEmpty(previous) ? null : EncryptDecrypt(previous);
+            string backup = previousJson == null ? null : previousJson.StartsWith(CompressedSavePrefix, StringComparison.Ordinal)
+                ? previous : EncodePlayerSave(previousJson);
+            return (current, backup);
+        });
+        // A menu/quit save, a new game, or a later goal always wins over old work.
+        if (revision != saveRevision || Data != profile || !Application.isPlaying) return;
+        if (encoded.backup != null) PlayerPrefs.SetString(savePath + "_Backup", encoded.backup);
+        PlayerPrefs.SetString(savePath, encoded.current);
+        PlayerPrefs.SetString(savePath + "_Settings", EncryptDecrypt(JsonUtility.ToJson(settingsData)));
+        PlayerPrefs.SetString("levelsCompleted", EncryptDecrypt(JsonUtility.ToJson(activityData)));
+        PlayerPrefs.Save();
+    }
+
+    private static string EncodePlayerSave(string json) =>
+        EncryptDecrypt(CompressedSavePrefix + Convert.ToBase64String(CompressString(json)));
+
+    private static string DecodePlayerSave(string stored)
+    {
+        string decoded = EncryptDecrypt(stored);
+        return decoded.StartsWith(CompressedSavePrefix, StringComparison.Ordinal)
+            ? DecompressString(Convert.FromBase64String(decoded.Substring(CompressedSavePrefix.Length))) : decoded;
+    }
     
     public static void SaveData()
     {
@@ -190,6 +239,7 @@ public static class SaveSystem
 
     internal static void WriteData(bool createSave = false)
     {
+        ++saveRevision;
         if (Data == null) return;
         string json = JsonUtility.ToJson(Data); //Global Data
         string jsonSettings = JsonUtility.ToJson(settingsData); //Settings Data (on new save it willhave same settings)
@@ -199,7 +249,7 @@ public static class SaveSystem
         if (createSave || HasSavedGame || WorldSaveRuntime.Instance != null)
         {
             if (PlayerPrefs.HasKey(savePath)) PlayerPrefs.SetString(savePath + "_Backup", PlayerPrefs.GetString(savePath));
-            PlayerPrefs.SetString(savePath, EncryptDecrypt(json));
+            PlayerPrefs.SetString(savePath, EncodePlayerSave(json));
         }
         PlayerPrefs.SetString(savePath +"_Settings", EncryptDecrypt(jsonSettings));
         PlayerPrefs.SetString("levelsCompleted", EncryptDecrypt(jsonActivity));
@@ -266,7 +316,7 @@ public static class SaveSystem
                 string jsonSettings = PlayerPrefs.GetString(savePath +"_Settings");
                 string jsonActivity = PlayerPrefs.GetString("levelsCompleted");
                 
-                Data = DeserializePlayerData(EncryptDecrypt(json));
+                Data = DeserializePlayerData(DecodePlayerSave(json));
                 settingsData = JsonUtility.FromJson<SettingsData>(EncryptDecrypt(jsonSettings));
                 activityData = JsonUtility.FromJson<ActivityData>(EncryptDecrypt(jsonActivity));
             }
@@ -275,7 +325,7 @@ public static class SaveSystem
                 // Preserve the previous complete snapshot if the latest write was damaged.
                 string backup = PlayerPrefs.GetString(savePath + "_Backup", "");
                 if (string.IsNullOrEmpty(backup)) throw;
-                Data = DeserializePlayerData(EncryptDecrypt(backup));
+                Data = DeserializePlayerData(DecodePlayerSave(backup));
                 if (Data == null) throw new InvalidDataException("Both save records are unreadable.");
                 Debug.LogWarning("Recovered the previous SaveSystem snapshot.");
             }

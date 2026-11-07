@@ -117,7 +117,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             if (t > 1.2f) Destroy(gameObject);
             return;
         }
-        float hop = Time.time-hitAt;
+        float hop = (Time.time-hitAt) * 2f;
         visual.localPosition = visualRest + Vector3.up * (hop < .5f ? Mathf.Sin(hop/.5f*Mathf.PI)*.35f : 0);
         visual.localScale = originalScale * (1f + (hop < .3f ? .25f * Mathf.Sin(hop / .3f * Mathf.PI) : 0f));
         bool red = hop < .25f;
@@ -170,7 +170,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         else if (Time.time >= decisionAt) ChooseDestination(fleeing);
         var animation = eating && eatAnimation != null ? eatAnimation : agent.velocity.sqrMagnitude > .04f ? (fleeing ? runAnimation : walkAnimation) : idleAnimation;
         if (animator && animator.runtimeAnimatorController != animation) animator.runtimeAnimatorController = animation;
-        if (animator) animator.speed = animation == walkAnimation ? 1.5f : 1f;
+        if (animator) animator.speed = fleeing && animation == runAnimation ? 2f : animation == walkAnimation ? 1.5f : 1f;
         if (Time.time >= nextSound)
         {
             if (idleSounds != null && idleSounds.Length > 0) idleAudioSource.PlayOneShot(idleSounds[Random.Range(0,idleSounds.Length)]);
@@ -181,7 +181,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     private void ChooseDestination(bool fleeing)
     {
         decisionAt = Time.time + Random.Range(3f, 5f);
-        agent.speed = fleeing ? 4f : 1.1f;
+        agent.speed = fleeing ? 8f : 1.1f;
         if (!fleeing && Vector3.ProjectOnPlane(transform.position-homePosition,Vector3.up).sqrMagnitude > wanderRadius*wanderRadius)
         {
             if (agent.CalculatePath(homePosition,path) && path.status==NavMeshPathStatus.PathComplete) agent.SetPath(path);
