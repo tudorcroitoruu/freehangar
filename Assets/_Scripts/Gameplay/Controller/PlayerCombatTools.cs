@@ -240,7 +240,8 @@ public sealed class PlayerCombatTools : MonoBehaviour
         if (interactor != null && interactor.PushedWheelbarrow != null) return false;
         // Showing the already-selected tool is not a tool switch and must preserve its load.
         if(tool==equipped) { ApplyVisuals();return true; }
-        if (shovelTool != null && (shovelTool.Kilograms > 0f || shovelTool.IsBusy)) return false;
+        // Stowing a loaded shovel preserves its cargo; only an active transfer blocks switching.
+        if (shovelTool != null && shovelTool.IsBusy) return false;
         if (tool != Tool.Shovel && GetHeldModel(tool) == null) return false;
         if (shovelTool != null) shovelTool.CancelAction();
         reloadSoundPending = false;

@@ -23,6 +23,21 @@ public class PlayerToolInteractionTests
         var camera=Child("Camera").gameObject.AddComponent<Camera>();camera.enabled=false;Set("viewCamera",camera);
     }
     [TearDown] public void Cleanup(){Object.DestroyImmediate(root);if(wallObject!=null)Object.DestroyImmediate(wallObject);SaveSystem.Data=previousData;Time.timeScale=previousScale;}
+    [TestCase(PlayerCombatTools.AxeFindId)]
+    [TestCase(PlayerCombatTools.LegacyAxeFindId)]
+    public void CollectedAxeCanBeEquippedWithLoadedShovelBeforeOpeningHangarTwo(string discoveryId)
+    {
+        SaveSystem.Data = new PlayerData { foundSecrets = new[] { discoveryId } };
+        Assert.IsFalse(SaveSystem.Data.IsHangarOpen(2));
+        CreateShovelPlayer(out var shovel);
+        shovel.Cargo.Add(GrainType.Corn, 2);
+        Assert.IsTrue(tools.TryEquip(PlayerCombatTools.Tool.Axe));
+        Assert.AreEqual(PlayerCombatTools.Tool.Axe, tools.Equipped);
+        Assert.IsTrue(axe.gameObject.activeSelf);
+        Assert.AreEqual(2, shovel.Kilograms);
+        Assert.IsTrue(tools.TryEquip(PlayerCombatTools.Tool.Shovel));
+        Assert.AreEqual(2, shovel.Kilograms);
+    }
     [Test] public void LockedToolsCannotBeEquipped()
     {
         SaveSystem.Data.foundSecrets=System.Array.Empty<string>();
@@ -151,7 +166,10 @@ public class PlayerToolInteractionTests
             Assert.IsTrue(player.IsShovelEquipped, "Restore the selected shovel even when it contains grain.");
             Assert.AreEqual(2, shovel.Kilograms);
         }
-        Assert.IsFalse(tools.TryEquip(PlayerCombatTools.Tool.Axe), "A real switch must still require an empty shovel.");
+        Assert.IsTrue(tools.TryEquip(PlayerCombatTools.Tool.Axe));
+        Assert.AreEqual(2, shovel.Kilograms, "Stowing the shovel must preserve its grain.");
+        Assert.IsTrue(tools.TryEquip(PlayerCombatTools.Tool.Shovel));
+        Assert.AreEqual(2, shovel.Kilograms);
     }
 
     [Test]
