@@ -54,13 +54,14 @@ public sealed class PlayerInteractor : MonoBehaviour
     {
         var prompt = Prompt;
         Target = null;
-        if (!CanInteract) { SetNotFitInWheelBarrowWarning(false); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
+        if (!CanInteract) { SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
         var aimedTarget = FindTarget();
         InteractionPromptData aimedPrompt = default;
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
         SetDogRestingWarning(hasAimedPrompt && aimedPrompt.DogResting);
         SetVehicleFullWarning(hasAimedPrompt && aimedPrompt.VehicleFull);
         SetNotFitInWheelBarrowWarning(hasAimedPrompt && aimedPrompt.NotFitInWheelBarrow);
+        SetNotHungryWarning(hasAimedPrompt && aimedPrompt.NotHungry);
         SetUseForkliftWarning(hasAimedPrompt && aimedPrompt.UseForkliftToMove);
         UpdateResetTarget(hasAimedPrompt && aimedPrompt.ShowKey && !aimedPrompt.RequiresFreeHands ? aimedTarget : null);
         if (hasAimedPrompt)
@@ -69,7 +70,7 @@ public sealed class PlayerInteractor : MonoBehaviour
             if (aimedTarget is BicycleController) AddResetAction(ref aimedPrompt);
         }
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
-        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.NotFitInWheelBarrow || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
+        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.NotFitInWheelBarrow || aimedPrompt.NotHungry || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
         {
             Target = aimedTarget;
             SetHighlightedTarget(null);
@@ -339,11 +340,14 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void SetNotFitInWheelBarrowWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.notFitInWheelBarrow, this, visible);
 
+    private void SetNotHungryWarning(bool visible) =>
+        GameplayCanvas.Instance?.SetWarning(WarningType.notHungry, this, visible);
+
     private void SetUseForkliftWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.UseForkliftToMove, this, visible);
 
     private void SetDogRestingWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.DogResting, this, visible);
 
-    private void OnDisable() { SetNotFitInWheelBarrowWarning(false); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
+    private void OnDisable() { SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
 }

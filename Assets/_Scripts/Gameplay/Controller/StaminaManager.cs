@@ -13,6 +13,7 @@ public sealed class StaminaManager : MonoBehaviour
         SetHungerPercent(hunger);
         if (float.IsFinite(stamina) && stamina >= 0) CurrentStamina = Mathf.Clamp(stamina, 0, CurrentMaxStamina);
         UpdateStaminaBar();
+        UpdateHungryIcon();
     }
     [SerializeField, Min(.01f)] private float maxStamina = 100f;
     [SerializeField] private StaminaUpgradeSettings upgradeSettings;

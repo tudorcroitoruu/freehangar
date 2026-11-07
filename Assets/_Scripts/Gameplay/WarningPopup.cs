@@ -22,7 +22,8 @@ public enum WarningType
     hangarCleared,
     notFitInWheelBarrow,
     mixGrainNotAllowedInShovel,
-    mixGrainNotAllowedInContainer
+    mixGrainNotAllowedInContainer,
+    notHungry
 }
 public class WarningPopup : MonoBehaviour
 {

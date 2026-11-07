@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3002113091367630071}
   - component: {fileID: 4517608667673207867}
   - component: {fileID: 4215796039902522434}
+  - component: {fileID: 63810042382017651}
   m_Layer: 0
   m_Name: UpgradeStaminaFridge
   m_TagString: Untagged
@@ -91,6 +92,20 @@ MonoBehaviour:
   - {fileID: 3318136670133357816}
   - {fileID: 0}
   - {fileID: 0}
+--- !u!114 &63810042382017651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4884136845764901395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc8572acc1967ac42b15ce08e2eb632c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::FridgeProduct
+  promptAnchor: {fileID: 525624103476311196}
+  promptOffset: {x: 0, y: 0.3, z: 0}
 --- !u!1001 &3402456041497595042
 PrefabInstance:
   m_ObjectHideFlags: 0

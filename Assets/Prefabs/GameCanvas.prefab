@@ -3234,6 +3234,10 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 6819a9a56d080c548b7ac4a1a1b470e9, type: 3}
     title: Mix grain block
     message: Container contain another type of grains.
+  - warningType: 17
+    icon: {fileID: 21300000, guid: 9f9276166852bf34d80f4c610f33e8dc, type: 3}
+    title: Not hungry
+    message: There is no need in spending money on food.
   warningCanvasGroup: {fileID: 737507088087375577}
   warningImage: {fileID: 6193481453998981383}
   warningTitle: {fileID: 11493426258684311}
