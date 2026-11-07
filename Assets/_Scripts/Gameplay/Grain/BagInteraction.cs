@@ -277,19 +277,44 @@ public sealed class BagInteraction : MonoBehaviour
             int count = Physics.RaycastNonAlloc(origin, Vector3.down, castHits, 5f, ~0, QueryTriggerInteraction.Ignore);
             if (count == castHits.Length) continue;
             float nearest = float.PositiveInfinity; Vector3 ground = default; bool found = false;
+            GrainPile supportPile = null;
             for (int i = 0; i < count; i++)
             {
-                if (Ignore(castHits[i].collider) || castHits[i].distance >= nearest || castHits[i].normal.y < .65f) continue;
+                var pile = castHits[i].collider.GetComponentInParent<GrainPile>();
+                if (Ignore(castHits[i].collider) || castHits[i].distance >= nearest || castHits[i].normal.y < (pile != null ? .1f : .65f)) continue;
                 nearest = castHits[i].distance; ground = castHits[i].point; found = true;
+                supportPile = pile;
             }
             if (!found) continue;
             center = ground + Vector3.up * (height + .03f);
+            if (supportPile != null)
+            {
+                // Seat the upright bag above the highest grain under its footprint.
+                float top = supportPile.SurfaceHeight(ground);
+                for (int corner = 0; corner < 8; corner++)
+                {
+                    Vector3 point = ground + rotation * new Vector3(
+                        (corner & 1) == 0 ? -half.x : half.x,
+                        (corner & 2) == 0 ? -half.y : half.y,
+                        (corner & 4) == 0 ? -half.z : half.z);
+                    if (supportPile.IsInsideBoundary(point)) top = Mathf.Max(top, supportPile.SurfaceHeight(point));
+                }
+                center.y = top + height + .06f;
+            }
             count = Physics.OverlapBoxNonAlloc(center, half, overlaps, rotation, ~0, QueryTriggerInteraction.Ignore);
             bool clear = count < overlaps.Length;
             for (int i = 0; i < count && clear; i++) if (!Ignore(overlaps[i])) clear = false;
             if (!clear) continue;
             // Check the path too, so a clear spot behind a wall is not considered reachable.
             Vector3 start = viewCamera.transform.position;
+            if (supportPile != null)
+            {
+                // Lift over a rising pile, then move across it; both legs are checked.
+                Vector3 raised = start;
+                raised.y = Mathf.Max(start.y, center.y + .1f);
+                if (!DropPathClear(start, raised, half, rotation)) continue;
+                start = raised;
+            }
             Vector3 delta = center - start;
             // Preserve the bag's height: a width-sized sphere clips the floor for flat/empty bags.
             count = Physics.BoxCastNonAlloc(start, half, delta.normalized, castHits, rotation,
@@ -300,6 +325,17 @@ public sealed class BagInteraction : MonoBehaviour
         }
         center = default;
         return false;
+    }
+
+    private bool DropPathClear(Vector3 start, Vector3 end, Vector3 half, Quaternion rotation)
+    {
+        Vector3 delta = end - start;
+        if (delta.sqrMagnitude < .000001f) return true;
+        int count = Physics.BoxCastNonAlloc(start, half, delta.normalized, castHits, rotation,
+            delta.magnitude, ~0, QueryTriggerInteraction.Ignore);
+        if (count == castHits.Length) return false;
+        for (int i = 0; i < count; i++) if (!Ignore(castHits[i].collider)) return false;
+        return true;
     }
 
     private bool Ignore(Collider collider) => collider == null || collider.transform.IsChildOf(transform) ||

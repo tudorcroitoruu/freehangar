@@ -145,6 +145,8 @@ public class CornSurfaceUpdateTests
         CollectionAssert.AreEqual(expectedShape, field.Heights, "Coverage must not change the excavation shape.");
         foreach (System.Collections.DictionaryEntry entry in patches)
         {
+            Assert.That((int)entry.Value.GetType().GetField("count").GetValue(entry.Value), Is.LessThanOrEqualTo(1024),
+                "A steep cell must not grow an unbounded decorative kernel population.");
             var matrices = (Matrix4x4[][])entry.Value.GetType().GetField("batches").GetValue(entry.Value);
             foreach (var batch in matrices)
             foreach (var matrix in batch)
@@ -158,5 +160,8 @@ public class CornSurfaceUpdateTests
         Array.Clear(field.Heights, 0, field.Heights.Length); update(); Drain();
         Assert.That(surface.KernelCount, Is.Zero);
         Assert.That(patches.Count, Is.Zero);
+        foreach (var batch in Get<bool[][]>(surface, "visibleBatchSamples"))
+            foreach (bool visible in batch) Assert.IsFalse(visible, "Cleared kernels must not be submitted to rendering.");
+        foreach (bool live in Get<bool[]>(surface, "liveBatches")) Assert.IsFalse(live);
     }
 }

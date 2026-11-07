@@ -43,6 +43,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private int[] cellSampleHeads, nextCellSample;
     private int[] pendingCells, activeBatchCounts;
     private bool[] visibleSamples;
+    private bool[][] visibleBatchSamples;
     private int pendingHead, pendingCount, pendingSample = -1;
     private float[] initialTriangleAreas;
     private readonly Dictionary<int, CoveragePatch> coveragePatches = new Dictionary<int, CoveragePatch>();
@@ -328,6 +329,8 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         pendingHead = pendingCount = 0; pendingSample = -1;
         activeBatchCounts = (int[])counts.Clone();
         visibleSamples = new bool[samples.Length];
+        visibleBatchSamples = new bool[batches.Length][];
+        for (int b = 0; b < batches.Length; b++) visibleBatchSamples[b] = new bool[counts[b]];
         sampleCells = new int[samples.Length]; sampleBatches = new int[samples.Length]; sampleSlots = new int[samples.Length];
         cellSampleHeads = new int[previousHeights.Length];
         nextCellSample = new int[samples.Length];
@@ -348,6 +351,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             int color = paletteIndices[i], batch = color * batchesPerColor + paletteCounts[color] / 1023, slot = paletteCounts[color]++ % 1023;
             sampleBatches[i] = batch; sampleSlots[i] = slot;
             visibleSamples[i] = field.Sample(p.x, p.y) >= .001f;
+            visibleBatchSamples[batch][slot] = visibleSamples[i];
             if (!visibleSamples[i]) activeBatchCounts[batch]--;
             int cell = sampleCells[i];
             nextCellSample[i] = cellSampleHeads[cell];
@@ -438,6 +442,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                     activeBatchCounts[batch] += visible ? 1 : -1;
                     KernelCount += visible ? 1 : -1;
                     visibleSamples[i] = visible;
+                    visibleBatchSamples[batch][sampleSlots[i]] = visible;
                     liveBatches[batch] = activeBatchCounts[batch] > 0;
                 }
                 // Initial bounds already span the surface down to ground. Only deposits
@@ -489,6 +494,9 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             // Existing grains still cover the original area. Add only the density lost to stretching.
             if (area <= originalArea) continue;
             float desiredCount = (area - originalArea) / (EffectiveSpacing * EffectiveSpacing * .866f);
+            // Excavation can turn a small grid cell into a tall cliff. Bound the
+            // decorative geometry rather than adding thousands of kernels per face.
+            desiredCount = Mathf.Min(desiredCount, 512f);
             Quaternion slope = Quaternion.FromToRotation(Vector3.up, cross.normalized);
             if (gpuSurface) slope = Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up);
             // Stable barycentric samples: changing the slope must not reshuffle
@@ -629,13 +637,13 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         }
         LastDrawTriangles = 0;
         for (int i = 0; i < batches.Length; i++)
-            if (counts[i] > 0 && (gpuSurface || liveBatches[i]) && GeometryUtility.TestPlanesAABB(cameraPlanes, surfaceBounds[i]))
+            if (counts[i] > 0 && liveBatches[i] && GeometryUtility.TestPlanesAABB(cameraPlanes, surfaceBounds[i]))
             {
                 float distance = Vector3.Distance(camera.transform.position, surfaceBounds[i].ClosestPoint(camera.transform.position));
                 if (distance > detailDistance) continue;
                 var material = colorVariants != null && colorVariants.Length == colorCount && colorVariants[i / batchesPerColor] != null
                     ? colorVariants[i / batchesPerColor] : kernelMaterial;
-                QueueDistanceBatch(material, batches[i], counts[i], surfaceBounds[i], camera);
+                QueueDistanceBatch(material, batches[i], counts[i], surfaceBounds[i], camera, visibleBatchSamples[i]);
             }
         foreach (var entry in coveragePatches)
         {
@@ -707,7 +715,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         return bucket;
     }
 
-    private void QueueDistanceBatch(Material material, Matrix4x4[] matrices, int count, Bounds bounds, Camera camera)
+    private void QueueDistanceBatch(Material material, Matrix4x4[] matrices, int count, Bounds bounds, Camera camera, bool[] visibility = null)
     {
         Vector3 view = camera.transform.position;
         Vector3 closest = bounds.ClosestPoint(view);
@@ -717,8 +725,10 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         var near = GetDrawBucket(nearMesh, material);
         var medium = GetDrawBucket(mediumMesh, material);
         var far = GetDrawBucket(distantMesh, material);
+        bool nearBoundsAdded = false, mediumBoundsAdded = false, farBoundsAdded = false;
         for (int i = 0; i < count; i += stride)
         {
+            if (visibility != null && !visibility[i]) continue;
             var matrix = matrices[i];
             dx = matrix.m03 - view.x; dz = matrix.m23 - view.z;
             float distance = Mathf.Sqrt(dx * dx + dz * dz);
@@ -740,8 +750,15 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             Mesh mesh = distance < fullDetailDistance + stagger ? nearMesh :
                 distance < Mathf.Max(fullDetailDistance + 1f, mediumDetailDistance) + stagger ? mediumMesh : distantMesh;
             var bucket = mesh == nearMesh ? near : mesh == mediumMesh ? medium : far;
-            if (bucket.count == 0) bucket.bounds = bounds;
-            else bucket.bounds.Encapsulate(bounds);
+            bool boundsAdded = mesh == nearMesh ? nearBoundsAdded : mesh == mediumMesh ? mediumBoundsAdded : farBoundsAdded;
+            if (!boundsAdded || bucket.count == 0)
+            {
+                if (bucket.count == 0) bucket.bounds = bounds;
+                else bucket.bounds.Encapsulate(bounds);
+                if (mesh == nearMesh) nearBoundsAdded = true;
+                else if (mesh == mediumMesh) mediumBoundsAdded = true;
+                else farBoundsAdded = true;
+            }
             bucket.matrices[bucket.count++] = matrix;
             if (bucket.count == bucket.matrices.Length)
             {
