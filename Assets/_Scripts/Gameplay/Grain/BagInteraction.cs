@@ -118,11 +118,13 @@ public sealed class BagInteraction : MonoBehaviour
             float highest = bounds.center.y;
             foreach (var candidate in candidates)
             {
-                if (candidate == top || candidate.IsCarried) continue;
+                if (candidate == top || !candidate.isActiveAndEnabled || candidate.IsCarried) continue;
                 var other = VehicleCargoRack.ContactBounds(candidate.transform, owner);
                 bool overlaps = Mathf.Min(bounds.max.x, other.max.x) - Mathf.Max(bounds.min.x, other.min.x) > .02f &&
                     Mathf.Min(bounds.max.z, other.max.z) - Mathf.Max(bounds.min.z, other.min.z) > .02f;
-                if (!overlaps || other.center.y <= highest + .01f || other.min.y > bounds.max.y + .25f) continue;
+                // Authored cargo poses can leave gaps between collider bounds. They still
+                // belong to the same column and must be unloaded from the top first.
+                if (!overlaps || other.center.y <= highest + .01f) continue;
                 next = candidate;
                 highest = other.center.y;
             }
