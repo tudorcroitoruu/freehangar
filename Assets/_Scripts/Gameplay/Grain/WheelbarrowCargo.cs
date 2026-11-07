@@ -366,8 +366,37 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         extents.y = Mathf.Max(.01f, extents.y - .03f);
         int count = Physics.OverlapBoxNonAlloc(center, extents, blockers, rotation, ~0, QueryTriggerInteraction.Ignore);
         if (count == blockers.Length) return false;
+        float supportedHeight = target.y;
         for (int i = 0; i < count; i++)
-            if (!blockers[i].transform.IsChildOf(transform) && !blockers[i].transform.IsChildOf(pusher.transform)) return false;
+        {
+            var obstacle = blockers[i];
+            if (obstacle.transform.IsChildOf(transform) || obstacle.transform.IsChildOf(pusher.transform)) continue;
+            if (obstacle.GetComponentInParent<GrainPile>() == null) return false;
+            // Shallow grain supports the tray instead of blocking it like a wall.
+            bool foundSupport = false;
+            for (int z = -1; z <= 1; z++)
+            for (int x = -1; x <= 1; x++)
+            {
+                Vector3 sample = center + rotation * new Vector3(x * extents.x, 0, z * extents.z);
+                sample.y = Mathf.Max(target.y + 2f, obstacle.bounds.max.y + .1f);
+                if (!obstacle.Raycast(new Ray(sample, Vector3.down), out var support, sample.y - target.y + 3f)) continue;
+                foundSupport = true;
+                if (support.normal.y <= .65f || support.point.y + .02f - transform.position.y > .25f) return false;
+                supportedHeight = Mathf.Max(supportedHeight, support.point.y + .02f);
+            }
+            if (!foundSupport) return false;
+        }
+        // Recheck solid obstacles at the raised position too.
+        if (supportedHeight > target.y)
+        {
+            center.y += supportedHeight - target.y;
+            count = Physics.OverlapBoxNonAlloc(center, extents, blockers, rotation, ~0, QueryTriggerInteraction.Ignore);
+            if (count == blockers.Length) return false;
+            for (int i = 0; i < count; i++)
+                if (!blockers[i].transform.IsChildOf(transform) && !blockers[i].transform.IsChildOf(pusher.transform) &&
+                    blockers[i].GetComponentInParent<GrainPile>() == null) return false;
+            target.y = supportedHeight;
+        }
         return true;
     }
 
