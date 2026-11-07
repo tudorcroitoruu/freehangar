@@ -41,7 +41,11 @@ public class SellingZone : MonoBehaviour
     }
 
     private void Reset() => GetComponent<BoxCollider>().isTrigger = true;
-    private void Awake() => area = GetComponent<BoxCollider>();
+    private void Awake()
+    {
+        area = GetComponent<BoxCollider>();
+        if (GetComponent<WeighDeckSpring>() == null) gameObject.AddComponent<WeighDeckSpring>();
+    }
     private void OnDisable()
     {
         if (sellingScreen != null && sellingScreen.Zone == this) sellingScreen.Close();
@@ -123,5 +127,95 @@ public class SellingZone : MonoBehaviour
         Vector3 scale = transform.lossyScale;
         Vector3 half = Vector3.Scale(area.size * .5f, new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z)));
         return Physics.OverlapBox(transform.TransformPoint(area.center), half, transform.rotation, ~0, QueryTriggerInteraction.Collide);
+    }
+}
+
+/// <summary>Small visual suspension response; weighing and collision geometry stay authoritative.</summary>
+[DisallowMultipleComponent]
+public sealed class WeighDeckSpring : MonoBehaviour
+{
+    private readonly Collider[] occupants = new Collider[128];
+    private readonly HashSet<Object> unique = new HashSet<Object>();
+    private readonly List<Transform> moving = new List<Transform>();
+    private readonly List<Vector3> rest = new List<Vector3>();
+    private BoxCollider deck;
+    private MeshRenderer originalRenderer;
+    private GameObject visualDeck;
+    private float displacement, velocity, load, pollAt;
+
+    private void Start()
+    {
+        foreach (var node in transform.root.GetComponentsInChildren<Transform>(true))
+            if (node.name == "Inset weighing deck") { deck = node.GetComponent<BoxCollider>(); break; }
+        if (deck == null) { enabled = false; return; }
+        originalRenderer = deck.GetComponent<MeshRenderer>();
+        var filter = deck.GetComponent<MeshFilter>();
+        if (originalRenderer == null || filter == null) { enabled = false; return; }
+        visualDeck = new GameObject("Suspended deck visual");
+        visualDeck.transform.SetParent(deck.transform, false);
+        visualDeck.AddComponent<MeshFilter>().sharedMesh = filter.sharedMesh;
+        var renderer = visualDeck.AddComponent<MeshRenderer>();
+        renderer.sharedMaterials = originalRenderer.sharedMaterials;
+        originalRenderer.enabled = false;
+        moving.Add(visualDeck.transform);
+        foreach (Transform node in deck.transform.parent)
+            if (node.name == "Deck fastener" || node.name == "Deck instruction") moving.Add(node);
+        foreach (var node in moving) rest.Add(node.localPosition);
+    }
+
+    private void FixedUpdate()
+    {
+        if (deck == null || WorldSaveRuntime.IsRestoring || WorldSaveRuntime.IsSeeking) return;
+        if (Time.time >= pollAt)
+        {
+            pollAt = Time.time + .08f;
+            var bounds = deck.bounds;
+            Vector3 center = new Vector3(bounds.center.x, bounds.max.y + .6f, bounds.center.z);
+            int count = Physics.OverlapBoxNonAlloc(center,
+                new Vector3(bounds.extents.x, .65f, bounds.extents.z), occupants,
+                Quaternion.identity, ~0, QueryTriggerInteraction.Ignore);
+            unique.Clear();
+            float nextLoad = 0f;
+            for (int i = 0; i < count; i++)
+            {
+                var hit = occupants[i];
+                var player = hit.GetComponentInParent<PlayerController>();
+                var bag = hit.GetComponentInParent<GrainContainer>();
+                // Count a dropped bag when it reaches the deck, not while held above it.
+                if (player == null && bag != null &&
+                    (bag.IsCarried || bag.WorldBounds.min.y > bounds.max.y + .12f ||
+                     bag.GetComponentInParent<PlayerController>() != null)) continue;
+                Object owner = player != null ? (Object)player : bag;
+                if (owner == null || !unique.Add(owner)) continue;
+                nextLoad += player != null ? 1f : .7f;
+            }
+            if (nextLoad > load) velocity -= Mathf.Min(.065f, (nextLoad - load) * .035f);
+            load = nextLoad;
+        }
+        float dt = Time.fixedDeltaTime;
+        float target = -Mathf.Min(.012f, load * .003f);
+        // Substeps keep the damped spring stable at larger physics timesteps.
+        int steps = Mathf.Max(1, Mathf.CeilToInt(dt / .01f));
+        float step = dt / steps;
+        for (int i = 0; i < steps; i++)
+        {
+            velocity += ((target - displacement) * 180f - velocity * 12f) * step;
+            displacement = Mathf.Clamp(displacement + velocity * step, -.025f, .008f);
+        }
+        for (int i = 0; i < moving.Count; i++)
+            if (moving[i] != null)
+                moving[i].localPosition = rest[i] + moving[i].parent.InverseTransformVector(Vector3.up * displacement);
+    }
+
+    private void OnDisable()
+    {
+        for (int i = 0; i < moving.Count; i++) if (moving[i] != null) moving[i].localPosition = rest[i];
+        displacement = velocity = load = 0f;
+    }
+
+    private void OnDestroy()
+    {
+        if (originalRenderer != null) originalRenderer.enabled = true;
+        if (visualDeck != null) Destroy(visualDeck);
     }
 }

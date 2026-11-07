@@ -1,0 +1,8 @@
+Generated using built-in image_gen.
+Steel prompt: Seamless square industrial galvanized steel diamond tread plate; orthographic overhead, fine metal grain and scratches, dusty crevices, neutral silver grey, uniform diffuse lighting, no objects/text/borders.
+Button prompt: Seamless red industrial powder-coated metal; saturated vermilion, fine orange-peel paint grain, restrained hairline scuffs, flat orthographic surface, uniform diffuse lighting, no text/symbols/borders.
+Requested 2048; actual generated dimensions: 1254x1254 each (original steel: 256x256).
+Assets: Assets/NewMap/WeighStation/SteelTreadHD.png and RedButtonPaint.png.
+Embossed steel references new steel texture. Button.fbx Material #44 (verified red diffuse RGB 1, .0012, .0012) remapped to Weigh button red paint.mat. This remap affects instances of this button model.
+Texture sampling: trilinear, anisotropy 8, mipmaps retained, compression quality 100.
+Validation: source image dimensions and GUID connections inspected; git diff --check passed. Unity import and in-game appearance not verified.Follow-up: built-in image_gen prompt: Seamless neutral light grey powder-coated industrial metal, fine orange-peel microtexture, faint scratches, uniform orthographic scan without gradients or directional streaks. Saved Assets/NewMap/WeighStation/PaintedMetalHD.png. PaintedMetalHDNormal and SteelTreadHDNormal use Unity height-to-normal import conversion. All station materials use HDRP triplanar world mapping. Ten cube fasteners changed to cylinder meshes. Visual-only deck spring leaves weighing/collision geometry fixed; occupancy/landing drives bounded damped movement. Build passed; Play Mode appearance and spring response not verified.

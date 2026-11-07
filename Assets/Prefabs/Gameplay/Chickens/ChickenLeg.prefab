@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eaca72191ddc3974fbe08d9647820f04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChickenLegPickup
-  hungerReductionPercent: 35
+  hungerReductionPercent: 15
   hungerReductionDuration: 1
 --- !u!114 &7123145308776805952
 MonoBehaviour:
