@@ -8240,6 +8240,7 @@ MonoBehaviour:
   buttonText: {fileID: 0}
   selectedImage: {fileID: 48282343475145370}
   unselectedImage: {fileID: 5663372588311984560}
+  button: {fileID: 0}
   shouldScale: 0
   scaleTarget: {fileID: 0}
   scaleSize: 1.1
@@ -8964,8 +8965,8 @@ MonoBehaviour:
     useDisplayGoalAmount: 0
     displayGoalAmount: 0
     rewardAmount: 20
-  - goalId: h1_earn_500
-    goalDescription: Earn $500 from grain sales
+  - goalId: h1_earn_400
+    goalDescription: Earn $400 from grain sales
     navigationIndicator: {fileID: 0}
     stage: 1
     hangarId: 0
@@ -8974,7 +8975,7 @@ MonoBehaviour:
     grainType: 0
     upgradeType: 0
     progressMode: 1
-    goalAmount: 500
+    goalAmount: 400
     useDisplayGoalAmount: 0
     displayGoalAmount: 0
     rewardAmount: 25
@@ -12686,6 +12687,7 @@ MonoBehaviour:
   buttonText: {fileID: 0}
   selectedImage: {fileID: 1214393585199942373}
   unselectedImage: {fileID: 0}
+  button: {fileID: 0}
   shouldScale: 0
   scaleTarget: {fileID: 0}
   scaleSize: 1.1
@@ -14882,6 +14884,7 @@ MonoBehaviour:
   buttonText: {fileID: 0}
   selectedImage: {fileID: 1496802259746690463}
   unselectedImage: {fileID: 7943658855602646732}
+  button: {fileID: 0}
   shouldScale: 0
   scaleTarget: {fileID: 0}
   scaleSize: 1.1
@@ -15290,6 +15293,7 @@ MonoBehaviour:
   buttonText: {fileID: 0}
   selectedImage: {fileID: 310389153255324733}
   unselectedImage: {fileID: 0}
+  button: {fileID: 0}
   shouldScale: 0
   scaleTarget: {fileID: 0}
   scaleSize: 1.1
@@ -21928,6 +21932,7 @@ MonoBehaviour:
   buttonText: {fileID: 0}
   selectedImage: {fileID: 3897967802871464401}
   unselectedImage: {fileID: 0}
+  button: {fileID: 0}
   shouldScale: 0
   scaleTarget: {fileID: 0}
   scaleSize: 1.1
@@ -23482,6 +23487,7 @@ MonoBehaviour:
   shovelActionCost: 10
   jumpActionCost: 10
   workConsumptionPerSecond: 10
+  bagReferenceWeightKg: 50
   sprintConsumptionPerSecond: 10
   recoveryPerSecond: 5
   recoveryDelay: 2
@@ -26466,6 +26472,7 @@ MonoBehaviour:
   buttonText: {fileID: 0}
   selectedImage: {fileID: 5236218939270750099}
   unselectedImage: {fileID: 9145857497751499510}
+  button: {fileID: 0}
   shouldScale: 0
   scaleTarget: {fileID: 0}
   scaleSize: 1.1
@@ -28833,6 +28840,7 @@ MonoBehaviour:
   buttonText: {fileID: 0}
   selectedImage: {fileID: 1036713694200126452}
   unselectedImage: {fileID: 2455218537045455171}
+  button: {fileID: 0}
   shouldScale: 0
   scaleTarget: {fileID: 0}
   scaleSize: 1.1
