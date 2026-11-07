@@ -197,7 +197,12 @@ public class AudioManager : MonoBehaviour
             source.PlayOneShot(clip);
     }
 
-    public void PlayCoinChange() => PlayGameplayClip(coinChangeClip);
+    public void PlayCoinChange()
+    {
+        AudioSource source = otherAudioSource != null ? otherAudioSource : soundEffectsAudioSource;
+        if (source != null && coinChangeClip != null)
+            source.PlayOneShot(coinChangeClip, .5f);
+    }
 
     private static void PlayClip(AudioSource source, AudioClip[] clips, int index, bool randomClip = false)
     {
