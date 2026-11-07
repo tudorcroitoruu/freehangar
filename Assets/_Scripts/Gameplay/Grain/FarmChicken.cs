@@ -33,6 +33,35 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     private NavMeshPath path;
     private GrainPile[] grainPiles;
     private Vector3 safePosition;
+    private static readonly RaycastHit[] supportHits = new RaycastHit[32];
+    private float groundVisualOffset;
+    private CapsuleCollider hitCollider;
+    private Vector3 hitColliderCenter;
+
+    // Baked navigation can retain the height of grain that has since been removed.
+    public static bool TryGroundPoint(Vector3 point, out Vector3 ground)
+    {
+        ground = point;
+        int count = Physics.RaycastNonAlloc(point + Vector3.up * .5f, Vector3.down,
+            supportHits, 8f, ~0, QueryTriggerInteraction.Ignore);
+        if (count == supportHits.Length) return false;
+        float nearest = float.PositiveInfinity;
+        bool found = false;
+        for (int i = 0; i < count; i++)
+        {
+            var hit = supportHits[i];
+            if (hit.normal.y < .5f || hit.distance >= nearest ||
+                hit.collider.GetComponentInParent<FarmChicken>() != null ||
+                hit.collider.GetComponentInParent<PlayerController>() != null ||
+                hit.collider.attachedRigidbody != null) continue;
+            ground = hit.point;
+            var pile = hit.collider.GetComponentInParent<GrainPile>();
+            if (pile != null) ground.y = pile.SurfaceHeight(point);
+            nearest = hit.distance;
+            found = true;
+        }
+        return found;
+    }
     private bool raidAnnounced;
     private static int lastRaidAlertFrame = -1;
     public bool IsGrainThreat => isActiveAndEnabled && !IsDead && AxeDiscovered &&
@@ -46,6 +75,8 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        hitCollider = GetComponent<CapsuleCollider>();
+        if (hitCollider != null) hitColliderCenter = hitCollider.center;
         homePosition = transform.position;
         path = new NavMeshPath();
         grainPiles = FindObjectsByType<GrainPile>(FindObjectsSortMode.None);
@@ -105,7 +136,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         if (IsDead)
         {
             float t = Time.time - deathAt;
-            visual.localPosition = visualRest + transform.InverseTransformDirection(knockDirection) * Mathf.Min(t, .5f)
+            visual.localPosition = visualRest + transform.InverseTransformVector(Vector3.up * groundVisualOffset) + transform.InverseTransformDirection(knockDirection) * Mathf.Min(t, .5f)
                 + Vector3.up * (Mathf.Max(0, 2.4f*t - 4.9f*t*t) + .22f*Mathf.Clamp01(t*2f));
             visual.localRotation = Quaternion.Euler(0, 0, Mathf.Min(90, t*180));
             visual.localScale = originalScale * (1f + (t < .3f ? .25f * Mathf.Sin(t / .3f * Mathf.PI) : 0f)) * (1-Mathf.Clamp01((t-.7f)/.45f));
@@ -118,7 +149,10 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             return;
         }
         float hop = (Time.time-hitAt) * 2f;
-        visual.localPosition = visualRest + Vector3.up * (hop < .5f ? Mathf.Sin(hop/.5f*Mathf.PI)*.35f : 0);
+        if (TryGroundPoint(transform.position, out var ground)) groundVisualOffset = ground.y - transform.position.y;
+        if (hitCollider != null) hitCollider.center = hitColliderCenter + transform.InverseTransformVector(Vector3.up * groundVisualOffset);
+        visual.localPosition = visualRest + transform.InverseTransformVector(Vector3.up * groundVisualOffset)
+            + Vector3.up * (hop < .5f ? Mathf.Sin(hop/.5f*Mathf.PI)*.35f : 0);
         visual.localScale = originalScale * (1f + (hop < .3f ? .25f * Mathf.Sin(hop / .3f * Mathf.PI) : 0f));
         bool red = hop < .25f;
         flash.Clear();
@@ -149,7 +183,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             {
                 // Follow the remaining surface as the edge recedes instead of repeatedly
                 // scooping the original, eventually empty feeding point.
-                Vector3 beak = transform.position + transform.forward * .4f + Vector3.up * .35f;
+                Vector3 beak = transform.position + transform.forward * .4f + Vector3.up * (.35f + groundVisualOffset);
                 if (feedingPile.TryNearestSurface(beak, 1.2f, out var bite))
                 {
                     feedingPoint = bite;
@@ -232,7 +266,7 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             foreach(var c in GetComponentsInChildren<Collider>())c.enabled=false;
             if(animator)animator.enabled=false;
             if(deathSound)audioSource.PlayOneShot(deathSound);
-            if(dropPrefab)LastDrop=Instantiate(dropPrefab,transform.position+Vector3.up*.15f,Quaternion.identity);
+            if(dropPrefab)LastDrop=Instantiate(dropPrefab,transform.position+Vector3.up*(.15f+groundVisualOffset),Quaternion.identity);
             Died?.Invoke();
         }
         return true;

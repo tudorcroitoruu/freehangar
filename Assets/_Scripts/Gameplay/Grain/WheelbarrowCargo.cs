@@ -157,7 +157,8 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
 
     private static float Volume(Vector3 size) => Mathf.Max(.001f, size.x * size.y * size.z);
     private float LoadingVolume(GrainContainer bag, float worldVolume) =>
-        Tier == 0 && bag.CargoTypeId == "SmallBag" ? CapacityVolume / CargoSlotCount : worldVolume;
+        Tier == 0 && (bag.CargoTypeId == "SmallBag" || bag.CargoTypeId == "LargeBag")
+            ? CapacityVolume / CargoSlotCount : worldVolume;
 
     private float Volume(GrainContainer bag)
     {

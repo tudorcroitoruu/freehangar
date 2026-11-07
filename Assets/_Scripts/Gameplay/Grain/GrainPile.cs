@@ -397,7 +397,11 @@ public sealed class GrainPile : MonoBehaviour
             var previousLimit = field.LimitRemoval;
             field.LimitRemoval = (cell, volume) => spatial.CompatibleSurfaceVolume(cell,
                 previousLimit != null ? previousLimit(cell, volume) : volume, allowed);
-            try { return Scoop(worldPoint, radius, depth, capacityKg, destination); }
+            // Gather matching surface pockets around the contact instead of requiring
+            // a precise hit on every small patch at a mixed-crop boundary. The same
+            // compatibility filter and capacity limit apply to the whole footprint.
+            float collectionRadius = Mathf.Max(radius, Mathf.Clamp(radius * 3f, 1.25f, 2.5f));
+            try { return Scoop(worldPoint, collectionRadius, depth, capacityKg, destination); }
             finally { field.LimitRemoval = previousLimit; }
         }
         if (existingCargo == null || existingCargo.Total <= .0001f)

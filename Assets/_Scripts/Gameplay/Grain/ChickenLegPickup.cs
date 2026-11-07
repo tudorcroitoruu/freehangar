@@ -51,6 +51,7 @@ public sealed class ChickenLegPickup : MonoBehaviour, IInteractable
         if (stamina == null) return false;
         collected = true;
         stamina.RestoreStaminaAndReduceHunger(hungerReductionPercent, hungerReductionDuration);
+        GameplayAudio.Instance?.Eat();
         Destroy(gameObject);
         return true;
     }

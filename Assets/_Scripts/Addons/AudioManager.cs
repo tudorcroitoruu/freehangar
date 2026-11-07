@@ -226,6 +226,10 @@ public class AudioManager : MonoBehaviour
 
     private IEnumerator ResumeRegularMusicAfterSpecial(MusicMode special)
     {
+        // Play may be queued while a streaming clip loads in the background.
+        while (musicMode == special && musicAudioSource != null && musicAudioSource.clip != null &&
+               musicAudioSource.clip.loadState == AudioDataLoadState.Loading)
+            yield return null;
         while (musicMode == special && musicAudioSource != null && (AudioListener.pause || musicAudioSource.isPlaying))
             yield return null;
         if (musicMode != special) yield break;
@@ -243,6 +247,9 @@ public class AudioManager : MonoBehaviour
             musicAudioSource.clip = next;
             musicAudioSource.volume = 0f;
             musicAudioSource.Play();
+            while (musicMode == MusicMode.Regular && next.loadState == AudioDataLoadState.Loading)
+                yield return null;
+            if (musicMode != MusicMode.Regular) yield break;
             float fade = 0f;
             while (musicMode == MusicMode.Regular && (AudioListener.pause || musicAudioSource.isPlaying) && fade < 1f)
             {

@@ -133,6 +133,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
         stableSeed = float3(unity_InstanceID, 13, 7);
         #endif
         if (_UsePileSurface > .5) stableSeed = float3(origin.x, 0, origin.z);
+        else if (_KernelDistanceFade.y > 0) stableSeed = origin;
         float seed = Hash(stableSeed * 31.7);
         int t = Species(seed, origin);
         float overrideType = UNITY_ACCESS_INSTANCED_PROP(GrainInstances, _GrainType);

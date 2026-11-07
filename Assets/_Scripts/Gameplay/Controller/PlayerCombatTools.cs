@@ -173,6 +173,12 @@ public sealed class PlayerCombatTools : MonoBehaviour
         {
             impactPending = false;
             if (equipped == Tool.Broom) broomImpactTime = Time.time;
+            if (equipped == Tool.Axe || equipped == Tool.Hammer)
+            {
+                meleeImpactTime = Time.time;
+                meleeImpactStrength = equipped == Tool.Hammer ? 2f : 1.4f;
+                meleeImpactDuration = equipped == Tool.Hammer ? .22f : .18f;
+            }
             PerformStrike();
         }
     }
@@ -249,12 +255,6 @@ public sealed class PlayerCombatTools : MonoBehaviour
             nearest=candidate.distance;hit=candidate;found=true;
         }
         if (!found) return;
-        if (equipped == Tool.Axe || equipped == Tool.Hammer)
-        {
-            meleeImpactTime = Time.time;
-            meleeImpactStrength = equipped == Tool.Hammer ? 2f : 1.4f;
-            meleeImpactDuration = equipped == Tool.Hammer ? .22f : .18f;
-        }
         var chicken = hit.collider.GetComponentInParent<FarmChicken>();
         if (chicken != null && (equipped == Tool.Axe || equipped == Tool.Broom))
         {

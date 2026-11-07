@@ -37,6 +37,7 @@ public class VehicleCargoPlacementTests
 
     [TestCase("FreeBag")]
     [TestCase("SmallBag")]
+    [TestCase("LargeBag")]
     public void EmptyStarterWheelbarrowAcceptsFinishedStarterBagAndReportsOversizeSeparately(string bagId)
     {
         var root = new GameObject("Wheelbarrow regression");
@@ -66,7 +67,7 @@ public class VehicleCargoPlacementTests
             typeof(WheelbarrowCargo).GetField("occupiedVolume", flags).SetValue(barrow, 0f);
             typeof(BagInteraction).GetField("carriedVolume", flags).SetValue(carry, 2f);
             barrow.TryGetPrompt(interactor, out prompt);
-            Assert.AreEqual(bagId == "SmallBag", prompt.ShowKey); Assert.IsFalse(prompt.VehicleFull);
+            Assert.AreEqual(bagId == "SmallBag" || bagId == "LargeBag", prompt.ShowKey); Assert.IsFalse(prompt.VehicleFull);
         }
         finally { Object.DestroyImmediate(item); Object.DestroyImmediate(root); SaveSystem.Data = previousData; }
     }

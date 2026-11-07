@@ -71,7 +71,9 @@ public sealed class PlayerInteractor : MonoBehaviour
             if (aimedTarget is BicycleController) AddResetAction(ref aimedPrompt);
         }
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
-        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.NotFitInWheelBarrow || aimedPrompt.NotHungry || aimedPrompt.WeighingEmpty || aimedPrompt.WeighingWrong || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
+        // Being full blocks eating, not independent actions such as stamina upgrades.
+        bool hungerBlocksPrompt = aimedPrompt.NotHungry && !aimedPrompt.HasAvailableInput;
+        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.NotFitInWheelBarrow || hungerBlocksPrompt || aimedPrompt.WeighingEmpty || aimedPrompt.WeighingWrong || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
         {
             Target = aimedTarget;
             SetHighlightedTarget(null);
@@ -347,7 +349,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void SetWeighingWarnings(bool empty, bool wrong)
     {
         GameplayCanvas.Instance?.SetWarning(WarningType.weighingEmpty, this, empty);
-        GameplayCanvas.Instance?.SetWarning(WarningType.weighingWrong, this, wrong);
+        GameplayCanvas.Instance?.SetWarning(WarningType.weighingWrong, this, wrong && !HandsOccupied);
     }
 
     private void SetUseForkliftWarning(bool visible) =>

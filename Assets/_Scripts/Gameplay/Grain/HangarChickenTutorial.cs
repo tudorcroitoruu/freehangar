@@ -54,6 +54,7 @@ public sealed class HangarChickenTutorial : MonoBehaviour
                     template.transform.position.y, Random.Range(template.yard.min.z, template.yard.max.z));
             if (!UnityEngine.AI.NavMesh.SamplePosition(point, out var hit, 3f, UnityEngine.AI.NavMesh.AllAreas)) continue;
             point = hit.position;
+            if (!FarmChicken.TryGroundPoint(point, out var support) || Mathf.Abs(support.y - point.y) > .15f) continue;
             if (!template.InsideYard(point)) continue;
             if (Physics.CheckCapsule(point + Vector3.up * .3f, point + Vector3.up * .5f, .27f,
                     ~0, QueryTriggerInteraction.Ignore)) continue;

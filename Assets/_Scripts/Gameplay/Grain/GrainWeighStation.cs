@@ -60,5 +60,6 @@ public sealed class GrainWeighStation : MonoBehaviour
     }
 
     private void SetWrongWarning(bool visible) =>
-        GameplayCanvas.Instance?.SetWarning(WarningType.weighingWrong, this, visible);
+        GameplayCanvas.Instance?.SetWarning(WarningType.weighingWrong, this,
+            visible && (player == null || !player.HandsOccupied));
 }

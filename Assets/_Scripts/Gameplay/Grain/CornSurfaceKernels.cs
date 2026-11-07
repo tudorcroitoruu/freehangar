@@ -633,10 +633,9 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             {
                 float distance = Vector3.Distance(camera.transform.position, surfaceBounds[i].ClosestPoint(camera.transform.position));
                 if (distance > detailDistance) continue;
-                Mesh lod = distance < fullDetailDistance ? nearMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
                 var material = colorVariants != null && colorVariants.Length == colorCount && colorVariants[i / batchesPerColor] != null
                     ? colorVariants[i / batchesPerColor] : kernelMaterial;
-                QueueBatch(lod, material, batches[i], counts[i], surfaceBounds[i], camera, KernelStride(distance));
+                QueueDistanceBatch(material, batches[i], counts[i], surfaceBounds[i], camera);
             }
         foreach (var entry in coveragePatches)
         {
@@ -651,7 +650,6 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             if (!GeometryUtility.TestPlanesAABB(cameraPlanes, bounds)) continue;
             float distance = Vector3.Distance(camera.transform.position, bounds.ClosestPoint(camera.transform.position));
             if (distance > detailDistance) continue;
-            Mesh lod = distance < fullDetailDistance ? nearMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
             for (int i = 0; i < (patch.count + 1022) / 1023; i++)
             {
                 var matrices = patch.batches[i];
@@ -659,7 +657,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                 var material = colorVariants != null && colorVariants.Length == colorCount && colorVariants[color] != null
                     ? colorVariants[color] : kernelMaterial;
                 int count = Mathf.Min(1023, patch.count - i * 1023);
-                QueueBatch(lod, material, matrices, count, bounds, camera, KernelStride(distance));
+                QueueDistanceBatch(material, matrices, count, bounds, camera);
             }
         }
         FlushBatches(camera);
@@ -679,12 +677,11 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             if(patch==null || !GeometryUtility.TestPlanesAABB(cameraPlanes,patch.bounds))continue;
             float distance=Vector3.Distance(camera.transform.position,patch.bounds.ClosestPoint(camera.transform.position));
             if(distance>detailDistance)continue;
-            var lod=distance<fullDetailDistance?nearMesh:distance<mediumDetailDistance?mediumMesh:distantMesh;
             int color=edge%Mathf.Max(1,colorCount);
             var material=colorVariants!=null && color<colorVariants.Length && colorVariants[color]!=null?colorVariants[color]:kernelMaterial;
             foreach(var matrices in patch.batches)
             {
-                QueueBatch(lod,material,matrices,matrices.Length,patch.bounds,camera,KernelStride(distance));
+                QueueDistanceBatch(material,matrices,matrices.Length,patch.bounds,camera);
             }
         }
         FlushBatches(camera);
@@ -697,7 +694,62 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     // the typed substrate for coverage instead of submitting subpixel geometry.
     // Nested strides retain the same samples between LODs and while turning.
     private static int KernelStride(float distance) =>
-        distance < 4f ? 1 : distance < 7f ? 2 : distance < 11f ? 8 : distance < 17f ? 16 : 32;
+        distance < 5f ? 1 : distance < 8f ? 2 : distance < 10f ? 4 : distance < 13f ? 8 : distance < 19f ? 16 : 32;
+
+    private DrawBucket GetDrawBucket(Mesh mesh, Material material)
+    {
+        var key = (mesh, material);
+        if (!drawBuckets.TryGetValue(key, out var bucket))
+        {
+            bucket = new DrawBucket();
+            drawBuckets.Add(key, bucket);
+        }
+        return bucket;
+    }
+
+    private void QueueDistanceBatch(Material material, Matrix4x4[] matrices, int count, Bounds bounds, Camera camera)
+    {
+        Vector3 view = camera.transform.position;
+        Vector3 closest = bounds.ClosestPoint(view);
+        // Horizontal distance is stable as the GPU animates pile heights.
+        float dx = closest.x - view.x, dz = closest.z - view.z;
+        int stride = KernelStride(Mathf.Sqrt(dx * dx + dz * dz));
+        var near = GetDrawBucket(nearMesh, material);
+        var medium = GetDrawBucket(mediumMesh, material);
+        var far = GetDrawBucket(distantMesh, material);
+        for (int i = 0; i < count; i += stride)
+        {
+            var matrix = matrices[i];
+            dx = matrix.m03 - view.x; dz = matrix.m23 - view.z;
+            float distance = Mathf.Sqrt(dx * dx + dz * dz);
+            // Nested sample groups fade over metres, not in whole rectangular batches.
+            float end = (i & 1) != 0 ? 5f : (i & 2) != 0 ? 8f : (i & 4) != 0 ? 10f :
+                (i & 8) != 0 ? 13f : (i & 16) != 0 ? 19f : float.PositiveInfinity;
+            float fade = float.IsPositiveInfinity(end) ? 1f :
+                1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(end - 2f, end, distance));
+            if (fade <= .001f) continue;
+            // Keep the world origin unchanged: FollowPile still samples the same cell.
+            if (fade < 1f)
+            {
+                matrix.m00 *= fade; matrix.m01 *= fade; matrix.m02 *= fade;
+                matrix.m10 *= fade; matrix.m11 *= fade; matrix.m12 *= fade;
+                matrix.m20 *= fade; matrix.m21 *= fade; matrix.m22 *= fade;
+            }
+            // Spread individual mesh switches across a band instead of a patch edge.
+            float stagger = ((i * 73) & 255) / 255f;
+            Mesh mesh = distance < fullDetailDistance + stagger ? nearMesh :
+                distance < Mathf.Max(fullDetailDistance + 1f, mediumDetailDistance) + stagger ? mediumMesh : distantMesh;
+            var bucket = mesh == nearMesh ? near : mesh == mediumMesh ? medium : far;
+            if (bucket.count == 0) bucket.bounds = bounds;
+            else bucket.bounds.Encapsulate(bounds);
+            bucket.matrices[bucket.count++] = matrix;
+            if (bucket.count == bucket.matrices.Length)
+            {
+                DrawBatch(mesh, material, bucket.matrices, bucket.count, bucket.bounds, camera);
+                bucket.count = 0;
+            }
+        }
+    }
 
     private void QueueBatch(Mesh lod, Material material, Matrix4x4[] matrices, int count, Bounds bounds, Camera camera, int stride = 1)
     {
