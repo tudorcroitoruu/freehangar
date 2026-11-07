@@ -16227,7 +16227,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AchievementsPopup
   achievementsPresets:
   - warningType: 8
-    icon: {fileID: 21300000, guid: 193b0b030eb649a49aaa9dceb86d9e8b, type: 3}
+    icon: {fileID: 21300000, guid: 51e79647032edfc46af6ec55c1b97182, type: 3}
     title: New container unlocked
     message: 
   achievementsCanvasGroup: {fileID: 5206203822002397463}
