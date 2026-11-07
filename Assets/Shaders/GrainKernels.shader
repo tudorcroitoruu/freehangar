@@ -15,6 +15,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
         [HideInInspector] _GrainMapC("Spatial grain C", 2D) = "black" {}
         [HideInInspector] _PileSurfaceHeights("Animated pile heights", 2D) = "black" {}
         [HideInInspector] _UsePileSurface("Follow animated pile", Float) = 0
+        [HideInInspector] _KernelDistanceFade("Kernel distance fade", Vector) = (0,0,0,0)
     }
     HLSLINCLUDE
     #pragma target 4.5
@@ -27,6 +28,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
     float4 _GrainGrid;
     float4x4 _GrainWorldToLocal;
     float _UsePileSurface;
+    float4 _KernelDistanceFade;
     float4 _PileSurfaceGrid; // size, resolution
     float4x4 _PileSurfaceWorldToLocal, _PileSurfaceLocalToWorld;
     CBUFFER_END
@@ -154,11 +156,19 @@ Shader "Freehangar/HDRP/Grain Kernels"
         }
         o.world = GetAbsolutePositionWS(TransformObjectToWorld(p));
         o.normalWS = TransformObjectToWorldNormal(n);
+        float3 kernelOrigin = origin;
         if (_UsePileSurface > .5 && _KernelMode > .5)
         {
             float3 offset = o.world - origin;
             float3 surfaceOrigin = FollowPile(origin, offset, o.normalWS);
+            kernelOrigin = surfaceOrigin;
             o.world = surfaceOrigin + offset;
+        }
+        if (_KernelMode > .5 && _KernelDistanceFade.y > 0)
+        {
+            float viewDistance = length(GetWorldSpaceViewDir(GetCameraRelativePositionWS(kernelOrigin)));
+            float detail = 1 - smoothstep(_KernelDistanceFade.x, _KernelDistanceFade.y, viewDistance);
+            o.world = kernelOrigin + (o.world - kernelOrigin) * detail;
         }
         o.positionCS = TransformWorldToHClip(GetCameraRelativePositionWS(o.world));
         o.lightmapUV = float4(input.uv1, input.uv2); o.species = t; o.variation = .86 + Hash(stableSeed * 73.3) * .28;

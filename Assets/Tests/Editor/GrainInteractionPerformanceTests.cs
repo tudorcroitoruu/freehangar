@@ -22,6 +22,34 @@ public class GrainInteractionPerformanceTests
     private static void UpdateBag(BagCornSurface surface)=>typeof(BagCornSurface).GetMethod("LateUpdate",Private).Invoke(surface,null);
 
     [Test]
+    public void SmallCoveragePatchesShareOneSubmissionBuffer()
+    {
+        var kernels = root.AddComponent<CornSurfaceKernels>();
+        var queue = typeof(CornSurfaceKernels).GetMethod("QueueBatch", Private);
+        var matrices = new Matrix4x4[1];
+        for (int i = 0; i < 1000; i++)
+        {
+            matrices[0] = Matrix4x4.Translate(Vector3.right * i);
+            queue.Invoke(kernels, new object[] { null, null, matrices, 1,
+                new Bounds(Vector3.right * i, Vector3.one), null });
+        }
+        var buckets = Field<System.Collections.IDictionary>(kernels, "drawBuckets");
+        Assert.AreEqual(1, buckets.Count);
+        foreach (System.Collections.DictionaryEntry entry in buckets)
+        {
+            object bucket = entry.Value;
+            var type = bucket.GetType();
+            Assert.AreEqual(1000, type.GetField("count").GetValue(bucket));
+            var packed = (Matrix4x4[])type.GetField("matrices").GetValue(bucket);
+            for (int i = 0; i < 1000; i++) Assert.AreEqual(Matrix4x4.Translate(Vector3.right * i), packed[i]);
+            var bounds = (Bounds)type.GetField("bounds").GetValue(bucket);
+            Assert.IsTrue(bounds.Contains(Vector3.zero));
+            Assert.IsTrue(bounds.Contains(Vector3.right * 999));
+        }
+        Assert.AreEqual(0, kernels.LastDrawBatches, "Partial patches must wait for a shared flush.");
+    }
+
+    [Test]
     public void DistantGrainLodHalvesTriangleCountAndHasOutwardFaces()
     {
         var medium = (Mesh)typeof(CornSurfaceKernels).GetMethod("CreateLodMesh", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, new object[] { 4 });

@@ -13,6 +13,8 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     [SerializeField] private Material[] colorVariants;
     [SerializeField, Range(.025f, .12f)] private float spacing = .0315f;
     [SerializeField] private float drawDistance = 22f;
+    [SerializeField, Min(3f), Tooltip("Individual kernels fade into the typed pile surface beyond this distance. Does not change stock or pile geometry.")]
+    private float kernelDetailDistance = 6f;
     [SerializeField, Min(.1f)] private float fullDetailDistance = 1.5f;
     [SerializeField, Min(.2f)] private float mediumDetailDistance = 4f;
     [Tooltip("Advisory kernel budget. Exceeding this never spreads kernels farther apart; surface coverage is preserved.")]
@@ -71,6 +73,14 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private readonly GrainAppearance grainAppearance = new GrainAppearance();
     public int LastUpdatedKernels { get; private set; }
     public int LastDrawTriangles { get; private set; }
+    public int LastDrawBatches { get; private set; }
+    private sealed class DrawBucket
+    {
+        public readonly Matrix4x4[] matrices = new Matrix4x4[1023];
+        public int count;
+        public Bounds bounds;
+    }
+    private readonly Dictionary<(Mesh, Material), DrawBucket> drawBuckets = new Dictionary<(Mesh, Material), DrawBucket>();
 
     public int KernelCount { get; private set; }
 
@@ -598,6 +608,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
     private void Draw(ScriptableRenderContext context, Camera camera)
     {
         LastDrawTriangles = 0;
+        LastDrawBatches = 0;
         if (batches == null || kernelMesh == null || kernelMaterial == null || camera.cameraType == CameraType.Preview) return;
         if ((camera.cullingMask & (1 << gameObject.layer)) == 0) return;
         var renderer = pile.GetComponent<MeshRenderer>();
@@ -606,6 +617,8 @@ public sealed class CornSurfaceKernels : MonoBehaviour
         GeometryUtility.CalculateFrustumPlanes(camera, cameraPlanes);
         grainAppearance.Set(pile.SurfaceGrain);
         pile.ApplySpatialAppearance(grainAppearance.Block);
+        float detailDistance = Mathf.Min(drawDistance, Mathf.Max(3f, kernelDetailDistance));
+        grainAppearance.Block.SetVector("_KernelDistanceFade", new Vector4(detailDistance * .75f, detailDistance, 0, 0));
         grainAppearance.Block.SetFloat("_UsePileSurface", gpuSurface ? 1 : 0);
         if (gpuSurface)
         {
@@ -619,7 +632,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             if (counts[i] > 0 && (gpuSurface || liveBatches[i]) && GeometryUtility.TestPlanesAABB(cameraPlanes, surfaceBounds[i]))
             {
                 float distance = Vector3.Distance(camera.transform.position, surfaceBounds[i].ClosestPoint(camera.transform.position));
-                if (distance > drawDistance) continue;
+                if (distance > detailDistance) continue;
                 Mesh lod = distance < fullDetailDistance ? nearMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
                 LastDrawTriangles += counts[i] * (int)(lod.GetIndexCount(0) / 3);
                 var material = colorVariants != null && colorVariants.Length == colorCount && colorVariants[i / batchesPerColor] != null
@@ -638,7 +651,7 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             }
             if (!GeometryUtility.TestPlanesAABB(cameraPlanes, bounds)) continue;
             float distance = Vector3.Distance(camera.transform.position, bounds.ClosestPoint(camera.transform.position));
-            if (distance > drawDistance) continue;
+            if (distance > detailDistance) continue;
             Mesh lod = distance < fullDetailDistance ? nearMesh : distance < Mathf.Max(fullDetailDistance, mediumDetailDistance) ? mediumMesh : distantMesh;
             for (int i = 0; i < (patch.count + 1022) / 1023; i++)
             {
@@ -648,15 +661,17 @@ public sealed class CornSurfaceKernels : MonoBehaviour
                     ? colorVariants[color] : kernelMaterial;
                 int count = Mathf.Min(1023, patch.count - i * 1023);
                 LastDrawTriangles += count * (int)(lod.GetIndexCount(0) / 3);
-                DrawBatch(lod, material, matrices, count, bounds, camera);
+                QueueBatch(lod, material, matrices, count, bounds, camera);
             }
         }
+        FlushBatches(camera);
         DrawEdges(camera);
     }
 
     private void DrawEdges(Camera camera)
     {
         if(edgePatches==null)return;
+        float detailDistance = Mathf.Min(drawDistance, Mathf.Max(3f, kernelDetailDistance));
         // These instances already lie on vertical faces. Height-field displacement
         // would otherwise move them back up onto the top of the pile.
         grainAppearance.Block.SetFloat("_UsePileSurface",0);
@@ -665,20 +680,61 @@ public sealed class CornSurfaceKernels : MonoBehaviour
             var patch=edgePatches[edge];
             if(patch==null || !GeometryUtility.TestPlanesAABB(cameraPlanes,patch.bounds))continue;
             float distance=Vector3.Distance(camera.transform.position,patch.bounds.ClosestPoint(camera.transform.position));
-            if(distance>drawDistance)continue;
+            if(distance>detailDistance)continue;
             var lod=distance<fullDetailDistance?nearMesh:distance<mediumDetailDistance?mediumMesh:distantMesh;
             int color=edge%Mathf.Max(1,colorCount);
             var material=colorVariants!=null && color<colorVariants.Length && colorVariants[color]!=null?colorVariants[color]:kernelMaterial;
             foreach(var matrices in patch.batches)
             {
                 LastDrawTriangles+=matrices.Length*(int)(lod.GetIndexCount(0)/3);
-                DrawBatch(lod,material,matrices,matrices.Length,patch.bounds,camera);
+                QueueBatch(lod,material,matrices,matrices.Length,patch.bounds,camera);
             }
+        }
+        FlushBatches(camera);
+    }
+
+    // Keep patch-level culling, but pack visible patches into full submissions.
+    // Flush before changing property blocks: top grains follow the height field,
+    // whereas edge grains already contain their final world-space transforms.
+    private void QueueBatch(Mesh lod, Material material, Matrix4x4[] matrices, int count, Bounds bounds, Camera camera)
+    {
+        var key = (lod, material);
+        if (!drawBuckets.TryGetValue(key, out var bucket))
+        {
+            bucket = new DrawBucket();
+            drawBuckets.Add(key, bucket);
+        }
+        int offset = 0;
+        while (offset < count)
+        {
+            int copied = Mathf.Min(count - offset, bucket.matrices.Length - bucket.count);
+            if (bucket.count == 0) bucket.bounds = bounds;
+            else bucket.bounds.Encapsulate(bounds);
+            Array.Copy(matrices, offset, bucket.matrices, bucket.count, copied);
+            bucket.count += copied;
+            offset += copied;
+            if (bucket.count == bucket.matrices.Length)
+            {
+                DrawBatch(lod, material, bucket.matrices, bucket.count, bucket.bounds, camera);
+                bucket.count = 0;
+            }
+        }
+    }
+
+    private void FlushBatches(Camera camera)
+    {
+        foreach (var entry in drawBuckets)
+        {
+            var bucket = entry.Value;
+            if (bucket.count == 0) continue;
+            DrawBatch(entry.Key.Item1, entry.Key.Item2, bucket.matrices, bucket.count, bucket.bounds, camera);
+            bucket.count = 0;
         }
     }
 
     private void DrawBatch(Mesh lod, Material material, Matrix4x4[] matrices, int count, Bounds bounds, Camera camera)
     {
+        LastDrawBatches++;
         var parameters = new RenderParams(material) { worldBounds = bounds, matProps = grainAppearance.Block,
             shadowCastingMode = ShadowCastingMode.Off, receiveShadows = true, layer = gameObject.layer,
             camera = camera, lightProbeUsage = LightProbeUsage.Off };
