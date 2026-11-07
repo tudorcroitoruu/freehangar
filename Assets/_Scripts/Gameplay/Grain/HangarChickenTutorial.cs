@@ -17,7 +17,7 @@ public sealed class HangarChickenTutorial : MonoBehaviour
         storage.SetActive(false);
         template = Instantiate(chicken, storage.transform);
         template.gameObject.SetActive(false);
-        nextRaid = Time.time + Random.Range(300f, 480f);
+        nextRaid = Time.time + Random.Range(300f, 720f);
         int count = FindObjectsByType<FarmChicken>(FindObjectsSortMode.None).Length;
         int target = Random.Range(8, 11);
         for (int i = count; i < target; i++) Spawn(null);
@@ -25,7 +25,7 @@ public sealed class HangarChickenTutorial : MonoBehaviour
     private void TickRaids()
     {
         if (!template || !SaveSystem.savesLoaded || Time.time < nextRaid) return;
-        nextRaid = Time.time + Random.Range(300f, 480f);
+        nextRaid = Time.time + Random.Range(300f, 720f);
         raiders.RemoveAll(bird => !bird || bird.IsDead);
         if (!FarmChicken.AxeDiscovered || Random.value >= .8f || raiders.Count >= 3) return;
         var piles = new System.Collections.Generic.List<GrainPile>();

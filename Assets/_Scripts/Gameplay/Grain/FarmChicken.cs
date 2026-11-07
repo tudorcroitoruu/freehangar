@@ -33,6 +33,10 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
     private NavMeshPath path;
     private GrainPile[] grainPiles;
     private Vector3 safePosition;
+    private bool raidAnnounced;
+    private static int lastRaidAlertFrame = -1;
+    public bool IsGrainThreat => isActiveAndEnabled && !IsDead && AxeDiscovered &&
+        feedingPile != null && feedingPile.isActiveAndEnabled && feedingPile.Kilograms > 0f;
 
     public bool IsDead => deathAt >= 0f;
     public GameObject LastDrop { get; private set; }
@@ -87,6 +91,17 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
 
     private void Update()
     {
+        if (!raidAnnounced && IsGrainThreat && !LoadingScreen.IsLoading &&
+            !WorldSaveRuntime.IsRestoring && !WorldSaveRuntime.IsSeeking && AudioManager.Instance != null)
+        {
+            raidAnnounced = true;
+            // A raid can spawn several chickens in the same frame; announce the group once.
+            if (lastRaidAlertFrame != Time.frameCount)
+            {
+                lastRaidAlertFrame = Time.frameCount;
+                AudioManager.Instance.PlayAttackMusic();
+            }
+        }
         if (IsDead)
         {
             float t = Time.time - deathAt;
@@ -132,9 +147,20 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             if(toward.sqrMagnitude>.001f)transform.rotation=Quaternion.LookRotation(toward);
             if(Time.time>=nextBite)
             {
-                var bite=feedingPoint; bite.y=feedingPile.SurfaceHeight(bite);
-                feedingPile.Scoop(bite,.35f,.15f,.2f);
-                nextBite=Time.time+3f;
+                // Follow the remaining surface as the edge recedes instead of repeatedly
+                // scooping the original, eventually empty feeding point.
+                Vector3 beak = transform.position + transform.forward * .4f + Vector3.up * .35f;
+                if (feedingPile.TryNearestSurface(beak, 1.2f, out var bite))
+                {
+                    feedingPoint = bite;
+                    // Include height-field samples even on the coarser hangar grids.
+                    Vector3 scale = feedingPile.WorldScale;
+                    float cellDiagonal = feedingPile.HeightField.Spacing *
+                        new Vector2(scale.x, scale.z).magnitude;
+                    float radius = Mathf.Max(.35f, cellDiagonal * .6f);
+                    feedingPile.Scoop(bite, radius, .15f, .2f / 3f);
+                }
+                nextBite=Time.time+1f;
             }
         }
         else if (!fleeing && canFeed)

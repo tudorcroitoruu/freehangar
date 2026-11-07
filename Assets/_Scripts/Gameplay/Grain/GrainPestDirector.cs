@@ -689,10 +689,17 @@ public sealed class GrainPestDirector : MonoBehaviour
         if (playerCamera == null) return;
         if (markerTexture == null) return;
         var marked = new System.Collections.Generic.HashSet<GrainContainer>();
+        var positions = new System.Collections.Generic.List<Vector3>();
         foreach (var pest in FindObjectsByType<GrainPest>(FindObjectsSortMode.None))
         {
             if (pest.Target == null || !marked.Add(pest.Target)) continue;
-            Vector3 p = playerCamera.WorldToViewportPoint(pest.Target.WorldBounds.center + Vector3.up * (pest.Target.WorldBounds.extents.y + 1f));
+            positions.Add(pest.Target.WorldBounds.center + Vector3.up * (pest.Target.WorldBounds.extents.y + 1f));
+        }
+        foreach (var chicken in FindObjectsByType<FarmChicken>(FindObjectsSortMode.None))
+            if (chicken.IsGrainThreat) positions.Add(chicken.transform.position + Vector3.up);
+        foreach (var position in positions)
+        {
+            Vector3 p = playerCamera.WorldToViewportPoint(position);
             Vector2 direction = new Vector2(p.x - .5f, p.y - .5f);
             if (p.z < 0f) direction = -direction;
             if (direction.sqrMagnitude < .0001f && p.z < 0f) direction = Vector2.down;
