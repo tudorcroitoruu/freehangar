@@ -3184,7 +3184,7 @@ MonoBehaviour:
   - warningType: 2
     icon: {fileID: 21300000, guid: 8f975711fbce5d440a2c0fe7f1d11fbf, type: 3}
     title: Cannot Enter
-    message: This vehicle cannot enter the hangar.
+    message: "This vehicle cannot enter the hangar.\nUse wheelbarrow instead"
   - warningType: 3
     icon: {fileID: 21300000, guid: 8f434169ee7756b4a81881acf9073a17, type: 3}
     title: Vehicle Full
@@ -36041,8 +36041,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This vehicle cannot enter the hangar. Use a bicycle, motoroller, forklift
-    or wheelbarrow.
+  m_text: "This vehicle cannot enter the hangar.\nUse wheelbarrow instead"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 338c2dc1628b2934e9edfa53ff181cc3, type: 2}
   m_sharedMaterial: {fileID: -908128036296132962, guid: 338c2dc1628b2934e9edfa53ff181cc3, type: 2}

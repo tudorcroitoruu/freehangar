@@ -149,7 +149,7 @@ public sealed class BagInteraction : MonoBehaviour
         originalScale = originalParent != null ? bag.transform.localScale : originalWorldScale;
         worldExtents = bag.WorldBounds.extents;
         var box = bag.GetComponent<BoxCollider>();
-        localCenter = box != null ? box.center : bag.transform.InverseTransformPoint(bag.WorldBounds.center);
+        localCenter = bag.LocalBounds.center;
         carriedVolume = box != null ? Mathf.Abs(box.size.x * originalWorldScale.x *
             box.size.y * originalWorldScale.y * box.size.z * originalWorldScale.z) :
             bag.WorldBounds.size.x * bag.WorldBounds.size.y * bag.WorldBounds.size.z;
@@ -260,9 +260,16 @@ public sealed class BagInteraction : MonoBehaviour
         Vector3 forward = Vector3.ProjectOnPlane(viewCamera.transform.forward, Vector3.up).normalized;
         if (forward.sqrMagnitude < .1f) forward = transform.forward;
         Vector3 right = Vector3.Cross(Vector3.up, forward);
-        // A conservative upright box supports both imported sack sizes at any yaw.
-        float radius = new Vector2(worldExtents.x, worldExtents.z).magnitude;
-        Vector3 half = new Vector3(radius, worldExtents.y, radius);
+        // Match the restored bag's dimensions and orientation instead of inflating
+        // both horizontal axes to its diagonal (which prevented close placement).
+        Bounds bounds = carried.LocalBounds;
+        Vector3 half = Vector3.Scale(bounds.extents, new Vector3(
+            Mathf.Abs(originalWorldScale.x), Mathf.Abs(originalWorldScale.y), Mathf.Abs(originalWorldScale.z)));
+        Quaternion rotation = Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up) * uprightRotation;
+        Vector3 axisX = rotation * Vector3.right, axisY = rotation * Vector3.up, axisZ = rotation * Vector3.forward;
+        float radius = Mathf.Abs(Vector3.Dot(forward, axisX)) * half.x +
+            Mathf.Abs(Vector3.Dot(forward, axisY)) * half.y + Mathf.Abs(Vector3.Dot(forward, axisZ)) * half.z;
+        float height = Mathf.Abs(axisX.y) * half.x + Mathf.Abs(axisY.y) * half.y + Mathf.Abs(axisZ.y) * half.z;
         for (int option = 0; option < 3; option++)
         {
             Vector3 candidate = transform.position + forward * (1f + radius) + right * (option == 0 ? 0 : option == 1 ? .65f : -.65f);
@@ -276,8 +283,8 @@ public sealed class BagInteraction : MonoBehaviour
                 nearest = castHits[i].distance; ground = castHits[i].point; found = true;
             }
             if (!found) continue;
-            center = ground + Vector3.up * (half.y + .12f);
-            count = Physics.OverlapBoxNonAlloc(center, half, overlaps, Quaternion.identity, ~0, QueryTriggerInteraction.Ignore);
+            center = ground + Vector3.up * (height + .03f);
+            count = Physics.OverlapBoxNonAlloc(center, half, overlaps, rotation, ~0, QueryTriggerInteraction.Ignore);
             bool clear = count < overlaps.Length;
             for (int i = 0; i < count && clear; i++) if (!Ignore(overlaps[i])) clear = false;
             if (!clear) continue;
@@ -285,7 +292,7 @@ public sealed class BagInteraction : MonoBehaviour
             Vector3 start = viewCamera.transform.position;
             Vector3 delta = center - start;
             // Preserve the bag's height: a width-sized sphere clips the floor for flat/empty bags.
-            count = Physics.BoxCastNonAlloc(start, half, delta.normalized, castHits, Quaternion.identity,
+            count = Physics.BoxCastNonAlloc(start, half, delta.normalized, castHits, rotation,
                 delta.magnitude, ~0, QueryTriggerInteraction.Ignore);
             clear = count < castHits.Length;
             for (int i = 0; i < count && clear; i++) if (!Ignore(castHits[i].collider)) clear = false;

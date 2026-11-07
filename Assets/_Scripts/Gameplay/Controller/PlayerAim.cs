@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public sealed class PlayerAim : MonoBehaviour
 {
     private PlayerController player;
+    private PlayerBicycleInteraction rider;
     private Canvas canvas;
     private RectTransform dot;
     private Texture2D texture;
@@ -15,6 +16,7 @@ public sealed class PlayerAim : MonoBehaviour
     private void Awake()
     {
         player = GetComponent<PlayerController>();
+        rider = GetComponent<PlayerBicycleInteraction>();
         var root = new GameObject("Aim dot HUD", typeof(RectTransform), typeof(Canvas));
         root.transform.SetParent(transform, false);
         canvas = root.GetComponent<Canvas>();
@@ -47,6 +49,7 @@ public sealed class PlayerAim : MonoBehaviour
     {
         var camera = player != null ? player.characterCamera : null;
         canvas.enabled = player != null && player.isActiveAndEnabled && camera != null && camera.isActiveAndEnabled
+            && (rider == null || !rider.IsRiding)
             && Time.timeScale > 0 && Cursor.lockState == CursorLockMode.Locked;
         if (!canvas.enabled) return;
         dot.anchorMin = dot.anchorMax = camera.rect.center;

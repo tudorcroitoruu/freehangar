@@ -351,6 +351,17 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         if ((hit & CollisionFlags.Sides) != 0 && Vector3.ProjectOnPlane(transform.position-before,Vector3.up).magnitude < Mathf.Abs(Speed)*dt*.3f) Speed = 0;
         if ((hit & CollisionFlags.Above) != 0) fallSpeed = 0;
         groundAlignment.Align(dt);
+        // CharacterController collision resolution and ground alignment can displace
+        // the vehicle sideways, beyond the originally requested motion.
+        if (HangarVehicleAccess.Blocks(before, transform.position, clearance, this))
+        {
+            motor.enabled = false;
+            transform.position = before;
+            motor.enabled = true;
+            Speed = 0f;
+            fallSpeed = 0f;
+            Physics.SyncTransforms();
+        }
         steering.localRotation = steerRest * Quaternion.Euler(0, steer, 0);
         float travelled = Vector3.Dot(transform.position-before, transform.forward);
         wheelAngle += travelled / Mathf.Max(.05f,wheelRadius * transform.lossyScale.y) * Mathf.Rad2Deg;
@@ -463,7 +474,7 @@ public static class HangarVehicleAccess
              !vehicle.TryGetComponent<PickupController>(out _) &&
              !vehicle.TryGetComponent<LawnmowerController>(out _) &&
              (!vehicle.motorDriven || vehicle.TryGetComponent<MotorollerController>(out _))))) return false;
-        if ((to-from).sqrMagnitude < .0000001f) return false;
+        if (to.x == from.x && to.z == from.z) return false;
         if (Time.time >= nextScan)
         {
             hangars.Clear();
@@ -483,8 +494,17 @@ public static class HangarVehicleAccess
             var bounds = new Bounds(Vector3.zero,new Vector3(20f,24f,30.5f));
             bounds.Expand(new Vector3(clearance*2f/Mathf.Max(.01f,Mathf.Abs(scale.x)),0,
                 clearance*2f/Mathf.Max(.01f,Mathf.Abs(scale.z))));
-            // Allow vehicles already inside when the scene loads to drive out.
-            if (bounds.Contains(a)) continue;
+            // A vehicle already inside may escape, but cannot use a small boundary
+            // penetration as permission to continue farther into the hangar.
+            if (bounds.Contains(a))
+            {
+                if (!bounds.Contains(b)) continue;
+                float beforeDepth = Mathf.Min(bounds.extents.x - Mathf.Abs(a.x), bounds.extents.z - Mathf.Abs(a.z));
+                float afterDepth = Mathf.Min(bounds.extents.x - Mathf.Abs(b.x), bounds.extents.z - Mathf.Abs(b.z));
+                if (afterDepth < beforeDepth) continue;
+                GameplayCanvas.Instance?.ShowWarning(WarningType.BlockHangarEntry);
+                return true;
+            }
             Vector3 delta = b-a;
             if (bounds.Contains(b) || (bounds.IntersectRay(new Ray(a,delta.normalized),out float distance) && distance <= delta.magnitude))
             {

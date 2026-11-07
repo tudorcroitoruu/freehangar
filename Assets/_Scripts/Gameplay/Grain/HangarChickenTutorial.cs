@@ -32,7 +32,7 @@ public sealed class HangarChickenTutorial : MonoBehaviour
         foreach (var pile in FindObjectsByType<GrainPile>(FindObjectsSortMode.None))
         {
             GoalContext.Resolve(pile, out int hangar, out _);
-            if (hangar > 0 && SaveSystem.Data.IsHangarOpen(hangar) && pile.Kilograms > 0) piles.Add(pile);
+            if (!pile.IsDroppedPile && CanRaidHangar(SaveSystem.Data, hangar) && pile.Kilograms > 0) piles.Add(pile);
         }
         if (piles.Count == 0) return;
         var selected = piles[Random.Range(0, piles.Count)];
@@ -68,7 +68,10 @@ public sealed class HangarChickenTutorial : MonoBehaviour
         }
         return null;
     }
-    public static bool ShouldAppear(PlayerData data) => data != null && data.IsHangarOpen(2) && !data.hangar2ChickenDefeated;
+    public static bool CanRaidHangar(PlayerData data, int hangar) => data != null &&
+        hangar >= 1 && hangar <= 5 && data.IsHangarOpen(hangar) && data.GetHangarClearedPercent(hangar) < 100f;
+
+    public static bool ShouldAppear(PlayerData data) => CanRaidHangar(data, 2) && !data.hangar2ChickenDefeated;
     private void OnEnable() { if(chicken)chicken.Died+=Complete; }
     private void OnDisable() { if(chicken)chicken.Died-=Complete; }
     private void Update()
