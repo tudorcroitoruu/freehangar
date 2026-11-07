@@ -457,6 +457,8 @@ public class GameplayCanvas : MonoBehaviour
         moneyChangeDelayRemaining -= delayTime;
         deltaTime -= delayTime;
         if (moneyChangeDelayRemaining > 0f || deltaTime <= 0f) return;
+        // Sync the cue with the balance transfer, after the popup's fade and delay.
+        if (moneyAnimationElapsed == 0f) AudioManager.Instance?.PlayCoinChange();
         moneyAnimationElapsed += deltaTime;
         float progress = moneyAnimationSeconds > 0f ? Mathf.Clamp01(moneyAnimationElapsed / moneyAnimationSeconds) : 1f;
         // Keep the interpolated value in double precision, including large balances.

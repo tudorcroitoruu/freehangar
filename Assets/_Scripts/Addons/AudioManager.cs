@@ -18,6 +18,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip[] selectClips;
     [SerializeField] private AudioClip[] confirmClips;
     [SerializeField] private AudioClip[] cancelClips;
+    [SerializeField] private AudioClip coinChangeClip;
 
     [Header("Game Result Sound Effects")]
     [FormerlySerializedAs("levelLoseClip")]
@@ -195,6 +196,8 @@ public class AudioManager : MonoBehaviour
         if (source != null && clip != null)
             source.PlayOneShot(clip);
     }
+
+    public void PlayCoinChange() => PlayGameplayClip(coinChangeClip);
 
     private static void PlayClip(AudioSource source, AudioClip[] clips, int index, bool randomClip = false)
     {

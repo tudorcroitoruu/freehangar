@@ -142,9 +142,7 @@ public class SellingScreen : MonoBehaviour
             if (sellButton != null) sellButton.interactable = CanPay();
             return;
         }
-        if (GameplayAudio.Instance != null) GameplayAudio.Instance.CashIn();
-        else if (cashInClip != null)
-            GlobalManager.PlaySound3D(cashInClip, Vector3.zero, GameplayAudio.CashInVolume, 0f, cashInMixerGroup);
+        // GameplayCanvas plays the coin cue in sync with the balance transfer.
         GameAchievements.GrainSold(quotedCash);
         var soldQuantities = new Dictionary<GrainType, float>();
         foreach (var entry in quotedWeights)

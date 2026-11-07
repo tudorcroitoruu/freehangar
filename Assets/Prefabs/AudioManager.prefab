@@ -318,6 +318,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3208b36c10b438b4d993a09a25025067, type: 3}
   loseClip: {fileID: 8300000, guid: 053cb6a59f375784fbd361fc4b2242a0, type: 3}
   winClip: {fileID: 8300000, guid: 73e95dc13d8132b44be03fb91dd8b7ff, type: 3}
+  coinChangeClip: {fileID: 8300000, guid: 4e6801ecf8077914b8c6e087f0caf132, type: 3}
   musicClips:
   - {fileID: 8300000, guid: d4a4c2b55fbc3cc4cbcec431762a8620, type: 3}
   - {fileID: 8300000, guid: 70d9fce8758b4ec45a1d6148c0ac8487, type: 3}
