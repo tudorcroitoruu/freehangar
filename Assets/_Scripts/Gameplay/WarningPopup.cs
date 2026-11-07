@@ -20,7 +20,8 @@ public enum WarningType
     LockedBag,
     DogResting,
     hangarCleared,
-    notFitInWheelBarrow
+    notFitInWheelBarrow,
+    mixGrainNotAllowed
 }
 public class WarningPopup : MonoBehaviour
 {

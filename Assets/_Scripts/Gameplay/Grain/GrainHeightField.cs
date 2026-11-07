@@ -15,6 +15,7 @@ public sealed class GrainHeightField
     private readonly bool[] disturbed;
     private int minX, minZ, maxX, maxZ;
     public Action<int, double> Removed;
+    public Func<int, double, bool> CanRemove;
     public Action<int, int, double> Transferred;
     public float AreaAt(int index) => areas[index];
 
@@ -96,6 +97,14 @@ public sealed class GrainHeightField
         }
         if (available <= 0) return 0;
         float fraction = (float)Math.Min(1, maxVolume / available);
+        // Validate the whole batch before changing heights or transferring material.
+        if (CanRemove != null)
+            for (int i = 0; i < Heights.Length; i++)
+            {
+                float next = Mathf.Max(0, Heights[i] - removal[i] * fraction);
+                double volume = (Heights[i] - next) * (double)areas[i];
+                if (volume > 0 && !CanRemove(i, volume)) return 0;
+            }
         double removed = 0;
         for (int i = 0; i < Heights.Length; i++)
         {

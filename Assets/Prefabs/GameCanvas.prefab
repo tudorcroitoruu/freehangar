@@ -2580,6 +2580,7 @@ MonoBehaviour:
   keycap: {fileID: 6902854521414314670}
   axeIcon: {fileID: 21300000, guid: add56af62cb972d48a834de40a428c42, type: 3}
   hammerIcon: {fileID: 21300000, guid: ed14aaec73c521d4b9f61d64a3ca8ac0, type: 3}
+  restrictedIcon: {fileID: 0}
   mouseRight: {fileID: 1401144034268598406}
   mouseLeft: {fileID: 6472195158931776823}
   bagSliderFill: {fileID: 2274562060591844815}
@@ -3225,6 +3226,10 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 6a201bbef21689c4ba34dec6c59fee5b, type: 3}
     title: Too large
     message: Container is too large for this wheelbarrow.
+  - warningType: 15
+    icon: {fileID: 21300000, guid: ed6a3d57b9710a4488b1dc68418124c0, type: 3}
+    title: Mix grain block
+    message: Shovel contain another type of grains.
   warningCanvasGroup: {fileID: 737507088087375577}
   warningImage: {fileID: 6193481453998981383}
   warningTitle: {fileID: 11493426258684311}

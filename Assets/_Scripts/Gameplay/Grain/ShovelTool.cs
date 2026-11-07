@@ -170,9 +170,19 @@ public sealed class ShovelTool : MonoBehaviour
                     nearest = Vector3.Distance(hit.point, point); pile = candidate; scoopPoint = point;
                 }
             }
-            if (pile != null && pile.isActiveAndEnabled && Kilograms < CapacityKg - .0001f &&
-                pile.IsInsideBoundary(scoopPoint))
+            if (pile != null && pile.isActiveAndEnabled && pile.IsInsideBoundary(scoopPoint))
             {
+                if (Kilograms > .0001f)
+                {
+                    pile.SampleSurfaceGrain(scoopPoint, scoopCargo);
+                    for (int type = 0; type < GrainCargo.TypeCount; type++)
+                        if (scoopCargo[(GrainType)type] > 0f && cargo[(GrainType)type] <= .0001f)
+                        {
+                            GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowed);
+                            return false;
+                        }
+                }
+                if (Kilograms >= CapacityKg - .0001f) return false;
                 pendingPile = pile;
                 targetPoint = scoopPoint;
                 smallPileScoop = pile.IsDroppedPile || pile.Size * Mathf.Max(pile.WorldScale.x, pile.WorldScale.z) <= 2f;
@@ -390,7 +400,15 @@ public sealed class ShovelTool : MonoBehaviour
                 float radius = pendingPile.IsDroppedPile
                     ? Mathf.Max(EffectiveScoopRadius, pendingPile.Size * Mathf.Max(pendingPile.WorldScale.x, pendingPile.WorldScale.z) * 1.5f)
                     : smallPileScoop ? Mathf.Max(.65f, EffectiveScoopRadius) : EffectiveScoopRadius;
-                float collected = pendingPile.Scoop(point, radius, smallPileScoop ? Mathf.Max(.3f, EffectiveScoopDepth) : EffectiveScoopDepth, Mathf.Min(amount, CapacityKg - Kilograms), scoopCargo);
+                float collected = pendingPile.ScoopCompatibleWith(point, radius,
+                    smallPileScoop ? Mathf.Max(.3f, EffectiveScoopDepth) : EffectiveScoopDepth,
+                    Mathf.Min(amount, CapacityKg - Kilograms), scoopCargo, cargo, out bool mixBlocked);
+                if (mixBlocked)
+                {
+                    GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowed);
+                    CancelAction();
+                    return;
+                }
                 GoalContext.Resolve(pendingPile, out int hangar, out _);
                 for (int type = 0; type < GrainCargo.TypeCount; type++)
                 {

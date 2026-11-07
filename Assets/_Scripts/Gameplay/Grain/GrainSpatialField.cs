@@ -182,6 +182,20 @@ public sealed class GrainSpatialField
     private static double Positive(float value) => float.IsFinite(value) ? Math.Max(.01, value) : .01;
     public void BeginCollection(GrainCargo cargo, float kilogramsPerVolume) { destination = cargo; density = kilogramsPerVolume; }
     public void EndCollection() => destination = null;
+    public bool CanCollectInto(int cell, double volume, GrainCargo cargo)
+    {
+        var stack = columns[cell];
+        for (int s = stack.Count - 1; s >= 0 && volume > 1e-12; s--)
+        {
+            var segment = stack[s];
+            double taken = Math.Min(volume, segment.volume);
+            if (taken > 0)
+                for (int t = 0; t < GrainCargo.TypeCount; t++)
+                    if (segment.weights[t] > 0f && cargo[(GrainType)t] <= .0001f) return false;
+            volume -= taken;
+        }
+        return true;
+    }
     private void Remove(int cell, double volume) => Take(cell, volume, -1);
     private void Transfer(int from, int to, double volume) => Take(from, volume, to);
     private void Take(int cell, double volume, int receiver)

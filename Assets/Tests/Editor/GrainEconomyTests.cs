@@ -33,6 +33,51 @@ public class GrainEconomyTests
 
     [TestCase(false)]
     [TestCase(true)]
+    public void IncompatibleShovelScoopLeavesPileAndCargoUnchanged(bool spatial)
+    {
+        if (spatial) pile.ConfigureRegions(new[] { new GrainRegion(100f, GrainType.Wheat) });
+        else pile.SetRecipe(new[] { new GrainLayer(100f, GrainType.Wheat) });
+        var existing = new GrainCargo(); existing.Add(GrainType.Corn, 1f);
+        var collected = new GrainCargo();
+        var point = new Vector3(0f, pile.SurfaceHeight(Vector3.zero), 0f);
+        double before = pile.Kilograms;
+        float amount = pile.ScoopCompatibleWith(point, 1f, .2f, 5f, collected, existing, out bool blocked);
+        Assert.IsTrue(blocked);
+        Assert.AreEqual(0f, amount);
+        Assert.AreEqual(before, pile.Kilograms);
+        Assert.AreEqual(0f, collected.Total);
+        Assert.AreEqual(1f, existing[GrainType.Corn]);
+    }
+
+    [Test]
+    public void CompatibleShovelScoopStillCollectsGrain()
+    {
+        pile.SetRecipe(new[] { new GrainLayer(100f, GrainType.Corn) });
+        var existing = new GrainCargo(); existing.Add(GrainType.Corn, 1f);
+        var collected = new GrainCargo();
+        var point = new Vector3(0f, pile.SurfaceHeight(Vector3.zero), 0f);
+        float amount = pile.ScoopCompatibleWith(point, 1f, .2f, 5f, collected, existing, out bool blocked);
+        Assert.IsFalse(blocked);
+        Assert.Greater(amount, 0f);
+        Assert.That(collected[GrainType.Corn], Is.EqualTo(amount).Within(.001f));
+    }
+
+    [Test]
+    public void ScoopCrossingIntoAnotherRecipeLayerDoesNotExcavateEitherLayer()
+    {
+        pile.SetRecipe(new[] { new GrainLayer(.01f, GrainType.Corn), new GrainLayer(100f, GrainType.Wheat) });
+        var existing = new GrainCargo(); existing.Add(GrainType.Corn, 1f);
+        var collected = new GrainCargo();
+        var point = new Vector3(0f, pile.SurfaceHeight(Vector3.zero), 0f);
+        double before = pile.Kilograms;
+        pile.ScoopCompatibleWith(point, 1f, .2f, 5f, collected, existing, out bool blocked);
+        Assert.IsTrue(blocked);
+        Assert.AreEqual(before, pile.Kilograms);
+        Assert.AreEqual(0f, collected.Total);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
     public void DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass(bool clipped)
     {
         Set("initialHeight", 0f);

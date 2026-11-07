@@ -379,6 +379,42 @@ public sealed class GrainPile : MonoBehaviour
 
     public float Scoop(Vector3 worldPoint, float radius, float depth, float capacityKg) => Scoop(worldPoint, radius, depth, capacityKg, null);
 
+    /// <summary>Reject a batch introducing another crop before removing any mass.</summary>
+    public float ScoopCompatibleWith(Vector3 worldPoint, float radius, float depth, float capacityKg,
+        GrainCargo destination, GrainCargo existingCargo, out bool mixBlocked)
+    {
+        mixBlocked = false;
+        if (existingCargo == null || existingCargo.Total <= .0001f)
+            return Scoop(worldPoint, radius, depth, capacityKg, destination);
+        Initialize();
+        if (field == null) return 0;
+        var previousCheck = field.CanRemove;
+        bool blocked = false;
+        double offset = harvestedKg;
+        var recipe = spatial == null ? new GrainCargo() : null;
+        float density = kilogramsPerCubicMetre * VolumeScale / GrainConsumeMultiplier;
+        field.CanRemove = (cell, volume) =>
+        {
+            if (previousCheck != null && !previousCheck(cell, volume)) return false;
+            bool compatible = true;
+            if (spatial != null) compatible = spatial.CanCollectInto(cell, volume, existingCargo);
+            else
+            {
+                recipe.Clear();
+                float kg = (float)(volume * density);
+                CollectRecipe(offset, kg, recipe);
+                offset += kg;
+                for (int t = 0; t < GrainCargo.TypeCount; t++)
+                    if (recipe[(GrainType)t] > 0f && existingCargo[(GrainType)t] <= .0001f)
+                        compatible = false;
+            }
+            if (!compatible) blocked = true;
+            return compatible;
+        };
+        try { return Scoop(worldPoint, radius, depth, capacityKg, destination); }
+        finally { field.CanRemove = previousCheck; mixBlocked = blocked; }
+    }
+
     public float Scoop(Vector3 worldPoint, float radius, float depth, float capacityKg, GrainCargo destination)
     {
         if (!isActiveAndEnabled || !float.IsFinite(capacityKg) || !(capacityKg > 0f)) return 0;
