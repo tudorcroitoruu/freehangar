@@ -3,6 +3,30 @@ using UnityEngine;
 
 public sealed class FarmDogTests
 {
+    [Test]
+    public void DeliveryRejectsAChickenLegHiddenBehindAWall()
+    {
+        var dogObject = new GameObject("Delivery dog"); dogObject.SetActive(false);
+        var player = new GameObject("Delivery player");
+        var wall = new GameObject("Delivery wall");
+        try
+        {
+            var dog = dogObject.AddComponent<FarmDog>();
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            typeof(FarmDog).GetField("nearbyPlayer", flags).SetValue(dog, player.transform);
+            var visible = typeof(FarmDog).GetMethod("DeliveryVisible", flags);
+            var collider = wall.AddComponent<BoxCollider>();
+            collider.size = new Vector3(3, 3, .2f);
+            wall.transform.position = new Vector3(0, 1.5f, 2);
+            Physics.SyncTransforms();
+            Assert.IsFalse((bool)visible.Invoke(dog, new object[] { new Vector3(0, 0, 4) }));
+            collider.enabled = false;
+            Physics.SyncTransforms();
+            Assert.IsTrue((bool)visible.Invoke(dog, new object[] { new Vector3(0, 0, 4) }));
+        }
+        finally { Object.DestroyImmediate(wall); Object.DestroyImmediate(player); Object.DestroyImmediate(dogObject); }
+    }
+
     private PlayerData previous;
     [SetUp] public void Setup() { previous = SaveSystem.Data; SaveSystem.Data = new PlayerData(); }
     [TearDown] public void Cleanup() { SaveSystem.Data = previous; }

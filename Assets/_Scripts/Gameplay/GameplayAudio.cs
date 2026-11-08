@@ -172,7 +172,7 @@ public sealed class GameplayAudio : MonoBehaviour
 
     public void StartRocket() => RocketLaunchAudio.Begin(rocket, effectsGroup);
 
-    private void SetLoop(Transform owner, AudioClip clip, bool moving, float pitch, float volume, float blend = .8f)
+    private void SetLoop(Transform owner, AudioClip clip, bool moving, float pitch, float volume, float blend = .8f, bool engine = false)
     {
         if (owner == null || clip == null) return;
         if (!loops.TryGetValue(owner, out var source) || source == null)
@@ -185,12 +185,16 @@ public sealed class GameplayAudio : MonoBehaviour
             source.minDistance = 2f;
             source.maxDistance = 30f;
             source.outputAudioMixerGroup = effectsGroup;
+            source.pitch = pitch;
+            source.volume = engine ? 0f : volume;
+            if (engine) source.dopplerLevel = 0f;
             loops[owner] = source;
         }
         if (!moving) { if (source.isPlaying) source.Stop(); return; }
         if (source.clip != clip) { source.Stop(); source.clip = clip; }
-        source.pitch = pitch;
-        source.volume = volume;
+        float response = engine ? 1f - Mathf.Exp(-3f * Time.deltaTime) : 1f;
+        source.pitch = Mathf.Lerp(source.pitch, pitch, response);
+        source.volume = Mathf.Lerp(source.volume, volume, response);
         if (!source.isPlaying) source.Play();
     }
 
@@ -201,13 +205,23 @@ public sealed class GameplayAudio : MonoBehaviour
 
     public void VehicleMoving(BicycleController vehicle, bool moving)
     {
-        bool motor = vehicle.GetComponent<MotorollerController>() != null;
+        bool motor = vehicle.motorDriven || vehicle.GetComponent<MotorollerController>() != null;
         bool pickup = vehicle.GetComponent<PickupController>() != null;
         AudioClip clip = pickup ? pickupMotor : motor ? motorollerAndTrike : bicycleMove;
         float pitch = pickup ? vehicle.name.Contains("Last") ? 1.1f : vehicle.name.Contains("Bigger") ? 1f : .9f :
             motor ? vehicle.GetComponent<TrikeController>() != null ? .88f : 1.08f : 1f;
         if(vehicle.TryGetComponent<ForkliftController>(out var forklift)) pitch *= forklift.EnginePitchMultiplier;
-        SetLoop(vehicle.transform, clip, moving, pitch, motor ? .55f : .45f);
+        if (motor || pickup)
+        {
+            // Wheel travel can be tiny for one frame at high frame rates or over bumps.
+            // Keep the engine running at idle instead of replaying its startup on each frame.
+            bool running = vehicle.isActiveAndEnabled && (vehicle.IsRidden || vehicle.IsCoasting) &&
+                (!vehicle.TryGetComponent<VehicleReset>(out var reset) || !reset.IsResetting);
+            float rpm = Mathf.Sqrt(Mathf.Clamp01(Mathf.Abs(vehicle.Speed) / Mathf.Max(1f, vehicle.maximumSpeed)));
+            SetLoop(vehicle.transform, clip, running, pitch * Mathf.Lerp(.65f, 1.25f, rpm),
+                Mathf.Lerp(.22f, .55f, rpm), .8f, true);
+        }
+        else SetLoop(vehicle.transform, clip, moving, pitch, .45f);
     }
 }
 

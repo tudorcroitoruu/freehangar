@@ -398,8 +398,8 @@ MonoBehaviour:
   resetVehicle: {fileID: 8300000, guid: 475cd1d870a626d46ab143bcf88f22ed, type: 3}
   bicycleMove: {fileID: 8300000, guid: 82cf4d9dce0d75b4f8d730605297fff0, type: 3}
   bicycleScratch: {fileID: 8300000, guid: 26e039b91e196e24c93fd92db5eb3c19, type: 3}
-  motorollerAndTrike: {fileID: 8300000, guid: 021da535b25777142a3525dace8e34f2, type: 3}
-  pickupMotor: {fileID: 8300000, guid: 46e85c57aa0248d4e9c78116752e4aa2, type: 3}
+  motorollerAndTrike: {fileID: 8300000, guid: fc6774203ce1470394e4640d3b53f413, type: 3}
+  pickupMotor: {fileID: 8300000, guid: 69e85fafbaf243eebf1f687bcfc9fac8, type: 3}
   wheelbarrow: {fileID: 8300000, guid: 6ed89dabca1f250478b14194e24cbdff, type: 3}
   vehicleHits:
   - {fileID: 8300000, guid: f971dda3bce24cf46b0cd5738183fbbf, type: 3}

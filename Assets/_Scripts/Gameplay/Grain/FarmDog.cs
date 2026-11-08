@@ -36,7 +36,8 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     private FarmChicken target;
     private ChickenLegPickup cargo;
     private Vector3 home, visualPosition;
-    private Vector3 deliveryDestination, deliveryPlayerPosition;
+    private Vector3 deliveryDestination, deliveryPlayerPosition, deliveryPlayerForward;
+    private readonly RaycastHit[] deliverySightHits = new RaycastHit[32];
     private bool hasDeliveryDestination;
     private Quaternion homeRotation;
     private float rest, stateAt, nextPet, nextDecision, huntStarted, nextNavigationRetry;
@@ -298,13 +299,16 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     {
         Vector3 best = transform.position;
         float nearest = float.PositiveInfinity;
+        Vector3 forward = DeliveryForward();
+        Vector3 preferred = playerPosition + forward * 2f;
         void Consider(Vector3 candidate)
         {
             if (!NavMesh.SamplePosition(candidate, out var hit, 2f, agent.areaMask)) return;
-            float distance = (hit.position - playerPosition).sqrMagnitude;
+            float distance = (hit.position - preferred).sqrMagnitude;
+            if (Vector3.Dot(hit.position - playerPosition, forward) < .5f) distance += 100f;
             if (distance >= nearest || !FarmChicken.IsGrainClearAt(hit.position - Vector3.up * .2f) ||
                 !FarmChicken.TryGroundPoint(hit.position, out var support) ||
-                Mathf.Abs(support.y - hit.position.y) > .15f || !CompletePath(hit.position)) return;
+                Mathf.Abs(support.y - hit.position.y) > .15f || !DeliveryVisible(hit.position) || !CompletePath(hit.position)) return;
             // The baked mesh can still pass through freshly poured grain.
             var corners = path.corners;
             for (int segment = 1; segment < corners.Length; segment++)
@@ -317,9 +321,10 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
             best = hit.position;
             nearest = distance;
         }
-        // A reachable point at the dog's feet is a fallback for isolated platforms.
+        Consider(preferred);
+        // Even the fallback must be visible to the player.
         Consider(transform.position);
-        for (float radius = 0f; radius <= 40f && radius <= Mathf.Sqrt(nearest) + 2f; radius += 2f)
+        for (float radius = 0f; radius <= 40f && radius <= Mathf.Sqrt(nearest) + 4f; radius += 2f)
         {
             int count = radius == 0f ? 1 : 24;
             for (int i = 0; i < count; i++)
@@ -336,6 +341,33 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         return float.IsFinite(nearest);
     }
 
+    private Vector3 DeliveryForward()
+    {
+        var player = nearbyPlayer ? nearbyPlayer.GetComponent<PlayerController>() : null;
+        var view = player != null ? player.characterCamera : null;
+        Vector3 forward = Vector3.ProjectOnPlane(view ? view.transform.forward : nearbyPlayer ? nearbyPlayer.forward : transform.forward, Vector3.up);
+        return forward.sqrMagnitude > .001f ? forward.normalized : nearbyPlayer ? nearbyPlayer.forward : transform.forward;
+    }
+
+    private bool DeliveryVisible(Vector3 point)
+    {
+        if (!nearbyPlayer) return true;
+        var player = nearbyPlayer.GetComponent<PlayerController>();
+        var view = player != null ? player.characterCamera : null;
+        Vector3 eye = view ? view.transform.position : nearbyPlayer.position + Vector3.up * 1.6f;
+        Vector3 delta = point + Vector3.up * .15f - eye;
+        if (delta.sqrMagnitude < .001f) return true;
+        int count = Physics.RaycastNonAlloc(eye, delta.normalized, deliverySightHits, delta.magnitude, ~0, QueryTriggerInteraction.Ignore);
+        if (count == deliverySightHits.Length) return false;
+        for (int i = 0; i < count; i++)
+        {
+            Transform obstacle = deliverySightHits[i].transform;
+            if (obstacle.IsChildOf(nearbyPlayer) || obstacle.IsChildOf(transform)) continue;
+            return false;
+        }
+        return true;
+    }
+
     private void DeliverToPlayer()
     {
         if (!cargo) { profile.dogHasDelivery = false; GoHome(); return; }
@@ -348,9 +380,11 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         nextDecision = Time.time + .75f;
         Vector3 playerPosition = nearbyPlayer && nearbyPlayer.gameObject.activeInHierarchy ? nearbyPlayer.position : home;
         if (!hasDeliveryDestination || (playerPosition - deliveryPlayerPosition).sqrMagnitude > 1f ||
+            Vector3.Dot(DeliveryForward(), deliveryPlayerForward) < .94f || !DeliveryVisible(deliveryDestination) ||
             !FarmChicken.IsGrainClearAt(deliveryDestination - Vector3.up * .2f))
         {
             deliveryPlayerPosition = playerPosition;
+            deliveryPlayerForward = DeliveryForward();
             hasDeliveryDestination = TryDeliveryDestination(playerPosition, out deliveryDestination);
         }
         if (!hasDeliveryDestination) return;

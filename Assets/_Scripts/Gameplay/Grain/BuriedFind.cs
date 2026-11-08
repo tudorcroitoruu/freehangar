@@ -86,6 +86,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     [SerializeField] private BreakableGrainBarrier[] enclosingPanels;
     private BoxCollider interactionCollider;
     private Renderer[] visuals;
+    private TMPro.TMP_Text[] labels;
     private Renderer hangarKeyVisual;
     private float nextRevealCheck;
     private readonly RaycastHit[] supportHits = new RaycastHit[24];
@@ -133,6 +134,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     {
         interactionCollider = GetComponent<BoxCollider>();
         visuals = GetComponentsInChildren<Renderer>(true);
+        labels = GetComponentsInChildren<TMPro.TMP_Text>(true);
         FitHangarKeyCollider();
         // A moved map pickup must not wait for an unrelated, closed hangar.
         if (coveringPile != null)
@@ -244,6 +246,8 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     private void SetRevealed(bool value)
     {
         revealed = value;
+        // TMP can re-enable its renderer while rebuilding text. Hide the component too.
+        if (labels != null) foreach (var label in labels) if (label != null) label.enabled = value;
         if (value && settleOnReveal && coveringPile != null)
         {
             Bounds bounds = VisualBounds();
