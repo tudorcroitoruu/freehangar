@@ -82,7 +82,7 @@ MonoBehaviour:
     image: {fileID: 21300000, guid: 935b1c7d7c91fe24b8cf51fdea4f2bc5, type: 3}
     slots: 2
     movementSpeed: 12
-    price: 25
+    price: 50
     requiresKey: 0
     keySprite: {fileID: 21300000, guid: 1212dffbc42c5d343bfc5376b120c46d, type: 3}
     keyId: 
