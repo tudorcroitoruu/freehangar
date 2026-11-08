@@ -37,7 +37,7 @@ public sealed class BagInteraction : MonoBehaviour
         player.IsShovelEquipped : shovel != null && shovel.isActiveAndEnabled;
     public string PromptAction => carried != null ? "Drop" : target == null ? "" : target.IsClosing ? "Closingâ€¦" :
         IsShovelEquipped && target.CanHandle && !target.IsFinished ? "Finish" :
-        target.CanCarry ? "Take" : target.IsFull ? "Full" : "Fill";
+        target.CanCarry ? $"Take {target.DisplayName}" : target.IsFull ? "Full" : "Fill";
 
     private void LateUpdate() => RestoreShovelIfNeeded();
 
@@ -90,7 +90,7 @@ public sealed class BagInteraction : MonoBehaviour
         bool canCarry = bag.CanCarry || bag == carried;
         bool canPour = shovelEquipped && shovel != null && bag != carried && shovel.CanPourInto(bag);
         bool useForklift = bag.IsBigBag && !canCarry && !canPour && !canFinish;
-        string action = canPour ? "Fill" : bag == carried ? "Drop" : canFinish ? "Finish" : canCarry ? "Take" :
+        string action = canPour ? "Fill" : bag == carried ? "Drop" : canFinish ? "Finish" : canCarry ? $"Take {bag.DisplayName}" :
             useForklift ? "" : bag.IsFull ? "Full" : "Fill";
         data = new InteractionPromptData(position, blocked ? "Make room to drop" : action,
             !canPour && (canFinish || canCarry) && !blocked);

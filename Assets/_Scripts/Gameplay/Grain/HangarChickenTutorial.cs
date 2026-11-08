@@ -70,7 +70,8 @@ public sealed class HangarChickenTutorial : MonoBehaviour
         return null;
     }
     public static bool CanRaidHangar(PlayerData data, int hangar) => data != null &&
-        hangar >= 1 && hangar <= 5 && data.IsHangarOpen(hangar) && data.GetHangarClearedPercent(hangar) < 100f;
+        // All five HangarCleared goals complete at 98%, allowing small grain remnants.
+        hangar >= 1 && hangar <= 5 && data.IsHangarOpen(hangar) && data.GetHangarClearedPercent(hangar) < 98f;
 
     public static bool CanRaidPile(PlayerData data, GrainPile pile)
     {

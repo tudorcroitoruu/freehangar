@@ -426,7 +426,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'BARREL
 
-    120 KG'
+    150 kg'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
   m_sharedMaterial: {fileID: -1400682523365752988, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
@@ -623,7 +623,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7620629733754216061}
   m_Layer: 0
-  m_Name: Sign - Small Bag 25 kg
+  m_Name: Sign - Small Bag 30 kg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1340,7 +1340,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'CRATE
 
-    80 KG'
+    100 kg'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
   m_sharedMaterial: {fileID: -1400682523365752988, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
@@ -2637,7 +2637,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'BIG BAG
 
-    500 KG'
+    500 kg'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
   m_sharedMaterial: {fileID: -1400682523365752988, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
@@ -2820,7 +2820,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'LARGE BAG
 
-    50 KG'
+    60 kg'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
   m_sharedMaterial: {fileID: -1400682523365752988, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
@@ -3055,7 +3055,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3370028959587717547}
   m_Layer: 0
-  m_Name: Sign - Large Bag 50 kg
+  m_Name: Sign - Large Bag 60 kg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3818,7 +3818,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2992294978939821267}
   m_Layer: 0
-  m_Name: Sign - Crate 80 kg
+  m_Name: Sign - Crate 100 kg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3964,7 +3964,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1581261802681552754}
   m_Layer: 0
-  m_Name: Sign - Barrel 120 kg
+  m_Name: Sign - Barrel 150 kg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4208,7 +4208,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'SMALL BAG
 
-    25 KG'
+    30 kg'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
   m_sharedMaterial: {fileID: -1400682523365752988, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}

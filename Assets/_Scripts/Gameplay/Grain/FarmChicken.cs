@@ -148,6 +148,15 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
 
     private void Update()
     {
+        // Retire existing raiders as well as blocking new spawns. Do not award a kill
+        // or food drop for a raid cancelled by hangar completion.
+        if (!IsDead && feedingPile != null && SaveSystem.savesLoaded &&
+            !WorldSaveRuntime.IsRestoring && !WorldSaveRuntime.IsSeeking &&
+            !HangarChickenTutorial.CanRaidPile(SaveSystem.Data, feedingPile))
+        {
+            gameObject.SetActive(false);
+            return;
+        }
         if (!raidAnnounced && IsGrainThreat && !LoadingScreen.IsLoading &&
             !WorldSaveRuntime.IsRestoring && !WorldSaveRuntime.IsSeeking && AudioManager.Instance != null)
         {

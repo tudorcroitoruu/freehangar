@@ -17,6 +17,16 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     [SerializeField, Range(1,2), Tooltip("Pickup bay space: 1 for a small container, 2 for a full Big Bag bay.")] private int pickupSpaceUnits = 1;
     public int PickupSpaceUnits => Mathf.Clamp(pickupSpaceUnits,1,2);
     public int TransportLevel => Mathf.Max(1, transportLevel);
+    public string DisplayName => CargoTypeId switch
+    {
+        "FreeBag" => "Free bag",
+        "SmallBag" => "Small bag",
+        "LargeBag" => "Large bag",
+        "Crate" => "Crate",
+        "Barrel" => "Barrel",
+        "BigBag" => "Big bag",
+        _ => "Container"
+    };
     [SerializeField, Min(.01f)] private float capacityKg = 50f;
     [SerializeField, Min(0f)] private float kilograms;
     [SerializeField, Tooltip("Whether the player can carry this container, regardless of its fill level. Disable for Big Bag.")]

@@ -5,6 +5,21 @@ using UnityEngine.AI;
 
 public class FarmChickenTests
 {
+    [TestCase(97.99f, true)]
+    [TestCase(98f, false)]
+    [TestCase(99f, false)]
+    [TestCase(100f, false)]
+    public void RaidsStopAtHangarGoalCompletion(float clearance, bool expected)
+    {
+        var data = new PlayerData();
+        for (int hangar = 1; hangar <= 5; hangar++)
+        {
+            data.TryOpenHangar(hangar);
+            data.TryRecordHangarClearance(hangar, clearance);
+            Assert.AreEqual(expected, HangarChickenTutorial.CanRaidHangar(data, hangar), $"Hangar {hangar}");
+        }
+    }
+
     private GameObject root;
     private FarmChicken chicken;
     private PlayerData previousData;
