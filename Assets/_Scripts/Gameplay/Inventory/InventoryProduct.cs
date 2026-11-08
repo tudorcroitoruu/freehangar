@@ -6,6 +6,9 @@ public class InventoryProduct : MonoBehaviour, IInteractable
     public enum DeliveryMode { Hands, AtSpawnPoint }
     [SerializeField] private string productID;
     [SerializeField] private string productName;
+    [SerializeField] private Transform promptAnchor;
+    [SerializeField] private Vector3 promptOffset = Vector3.up * .5f;
+    private Vector3 PromptPosition => (promptAnchor != null ? promptAnchor.position : transform.position) + promptOffset;
 
     [SerializeField] private GameObject[] visual;
     [SerializeField] private bool unlimitedCount;
@@ -49,7 +52,7 @@ public class InventoryProduct : MonoBehaviour, IInteractable
         string blockedReason = available ? GetDeliveryBlockReason(interactor, out requiresFreeHands) : null;
         string action = unlimitedCount ? $"Take 1 {productName}" : count > 0 ? $"Take 1 {productName}\nLeft: {count}" : $"{productName}\nOwn: 0";
         prompt = new InteractionPromptData(
-            transform.position + Vector3.up * .5f,
+            PromptPosition,
             action,
             available && string.IsNullOrEmpty(blockedReason));
         prompt.RequiresFreeHands = requiresFreeHands;

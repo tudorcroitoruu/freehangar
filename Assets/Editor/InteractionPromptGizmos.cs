@@ -19,6 +19,12 @@ public static class InteractionPromptGizmos
     [DrawGizmo(GizmoType.Selected)]
     private static void DrawContainer(GrainContainer target, GizmoType _) => Draw(target, "Container prompt");
 
+    [DrawGizmo(GizmoType.Selected)]
+    private static void DrawInventoryProduct(InventoryProduct target, GizmoType _) => Draw(target, "Inventory product prompt");
+
+    [DrawGizmo(GizmoType.Selected)]
+    private static void DrawShopProduct(ShopProduct target, GizmoType _) => Draw(target, "Shop product prompt");
+
     private static void Draw(MonoBehaviour target, string label)
     {
         using (var data = new SerializedObject(target))

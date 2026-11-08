@@ -85,6 +85,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InventoryProduct
   productID: freeBags
   productName: Free Bags
+  promptAnchor: {fileID: 0}
+  promptOffset: {x: 0, y: -0.3, z: 0}
   visual:
   - {fileID: 1348315383213445090}
   unlimitedCount: 1
@@ -2268,6 +2270,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: barrel
   productName: Barrel
+  promptAnchor: {fileID: 0}
+  promptOffset: {x: 0, y: 0.5, z: 0.13}
   productPrice: 14
   toBuy: 1
   toRent: 0
@@ -3258,6 +3262,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: crate
   productName: Crate
+  promptAnchor: {fileID: 0}
+  promptOffset: {x: 0, y: 0.5, z: 0}
   productPrice: 10
   toBuy: 1
   toRent: 0
@@ -3474,6 +3480,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: bigBag
   productName: Big Bag
+  promptAnchor: {fileID: 0}
+  promptOffset: {x: 0, y: 0.69, z: 0.21}
   productPrice: 90
   toBuy: 1
   toRent: 0
@@ -4054,6 +4062,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: largeBag
   productName: Large Bag
+  promptAnchor: {fileID: 0}
+  promptOffset: {x: 0, y: 0.5, z: 0}
   productPrice: 14
   toBuy: 1
   toRent: 0
@@ -4797,6 +4807,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopProduct
   productID: smallBag
   productName: Small bag
+  promptAnchor: {fileID: 0}
+  promptOffset: {x: 0, y: 0.5, z: 0}
   productPrice: 8
   toBuy: 1
   toRent: 0

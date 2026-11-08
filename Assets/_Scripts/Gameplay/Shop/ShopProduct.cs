@@ -9,6 +9,9 @@ public class ShopProduct : MonoBehaviour, IInteractable
 
     [SerializeField] private string productID;
     [SerializeField] private string productName;
+    [SerializeField] private Transform promptAnchor;
+    [SerializeField] private Vector3 promptOffset = Vector3.up * .5f;
+    private Vector3 PromptPosition => (promptAnchor != null ? promptAnchor.position : transform.position) + promptOffset;
     [SerializeField, Min(0), Tooltip("Legacy fallback. A ShopManager with Economy Settings uses the container price from that asset instead.")]
     private int productPrice;
     [SerializeField] private bool toBuy = true;
@@ -164,7 +167,7 @@ public class ShopProduct : MonoBehaviour, IInteractable
 
         if (Locked)
         {
-            prompt = new InteractionPromptData(transform.position + Vector3.up * .5f, $"{productName} — Locked", false);
+            prompt = new InteractionPromptData(PromptPosition, $"{productName} — Locked", false);
             return showWhileLocked;
         }
 
@@ -172,7 +175,7 @@ public class ShopProduct : MonoBehaviour, IInteractable
         string price = $"${EconomyNumberFormat.Accounting(Price)}";
         if (!CanAfford()) price = $"<color=#D92D2D>{price}</color>";
         prompt = new InteractionPromptData(
-            transform.position + Vector3.up * .5f,
+            PromptPosition,
             $"{action} {productName}",
             toBuy) { SecondaryDescription = $"Price: {price}" };
         if (maxActiveInScene > 0)
