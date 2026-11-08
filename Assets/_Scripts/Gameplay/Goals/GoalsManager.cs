@@ -130,7 +130,11 @@ public class GoalsManager : MonoBehaviour
             while (pendingActions.Count > 0)
             {
                 var action = pendingActions.Dequeue();
-                bool changed = false;
+                if (action.type == GoalType.Custom && action.goalId == GoalChecker.LaunchRoomLightGoalId &&
+                    awaitingNextGoal && currentGoal?.goalId == GoalChecker.LaunchRoomDoorGoalId)
+                    AdvanceGoalTransition(float.MaxValue);
+                bool changed = action.type == GoalType.Custom && !action.isValue && action.hangarId == 5 &&
+                    action.goalId == GoalChecker.LaunchRoomDoorGoalId && CompleteGoalsBeforeLaunchRoom();
                 for (int i = currentIndex; i < (allGoalSettings?.Length ?? 0); i++)
                 {
                     var goal = allGoalSettings[i];
@@ -143,6 +147,30 @@ public class GoalsManager : MonoBehaviour
             }
         }
         finally { processing = false; }
+    }
+
+    private bool CompleteGoalsBeforeLaunchRoom()
+    {
+        if (allGoalSettings == null) return false;
+        int doorIndex = Array.FindIndex(allGoalSettings, goal => goal.goalId == GoalChecker.LaunchRoomDoorGoalId);
+        if (doorIndex < currentIndex || progress[allGoalSettings[doorIndex].goalId].completed) return false;
+        // Reaching the final room completes earlier objectives without queuing their popups.
+        for (int i = currentIndex; i < doorIndex; i++)
+        {
+            var goal = allGoalSettings[i];
+            var state = progress[goal.goalId];
+            if (!state.rewardClaimed)
+                loadedData.cash = (int)Math.Min(int.MaxValue, (long)loadedData.cash + goal.rewardAmount);
+            state.currentAmount = goal.goalAmount;
+            state.completed = true;
+            state.rewardClaimed = true;
+        }
+        currentIndex = doorIndex;
+        awaitingNextGoal = false;
+        goalDelayRemaining = 0f;
+        SelectCurrentGoal();
+        MarkDirty();
+        return true;
     }
 
     private void CompleteReadyGoals()
@@ -203,6 +231,13 @@ public class GoalsManager : MonoBehaviour
     private void RefreshGoal()
     {
         RefreshNavigationIndicators();
+        if (ownCanvasGroup != null)
+        {
+            bool visible = !AllGoalsCompleted;
+            ownCanvasGroup.alpha = visible ? 1f : 0f;
+            ownCanvasGroup.interactable = visible;
+            ownCanvasGroup.blocksRaycasts = visible;
+        }
         if (Application.isPlaying && currentElement == null && goalListElementPrefab != null)
             currentElement = Instantiate(goalListElementPrefab,
                 goalListElementParent != null ? goalListElementParent : transform, false);

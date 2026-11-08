@@ -16,7 +16,16 @@ public sealed class LaunchRoomInteractable : MonoBehaviour, IInteractable
         Vector3 p = sequence.transform.InverseTransformPoint(interactor.transform.position);
         return p.x > -6.95f && p.x < 6.95f && p.z > 0.15f && p.z < 10.7f;
     }
-    public bool TryInteract(PlayerInteractor interactor)=>sequence!=null&&(isSwitch?(IsInsideRoom(interactor) && sequence.UseSwitch(interactor)):sequence.UseDoor());
+    public bool TryInteract(PlayerInteractor interactor)
+    {
+        bool interacted = sequence != null && (isSwitch
+            ? IsInsideRoom(interactor) && sequence.UseSwitch(interactor)
+            : sequence.UseDoor());
+        if (interacted && !isSwitch)
+            GoalChecker.ReportProgress(GoalType.Custom, hangarId: 5,
+                goalId: GoalChecker.LaunchRoomDoorGoalId);
+        return interacted;
+    }
 }
 
 

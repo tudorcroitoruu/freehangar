@@ -102,6 +102,8 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         if(Running||(!DoorOpen && !BypassRestrictions)||interactor==null||interactor.HandsOccupied||Time.timeScale<=0)return false;
         if(!Application.CanStreamedLevelBeLoaded(endingScene)){Debug.LogError("Launch destination is missing from Build Settings: "+endingScene,this);return false;}
         if(!interactor.BeginDiscovery(this))return false;
+        // Complete the objective before the cinematic hides and disables the HUD.
+        GoalChecker.ReportProgress(GoalType.Custom, hangarId: 5, goalId: GoalChecker.LaunchRoomLightGoalId);
         actor=interactor;Running=true;saveClock=new SavedCutsceneClock();StartCoroutine(saveClock.Run(Launch()));return true;
     }
     private void Suspend(Behaviour b){if(b==null||suspended.ContainsKey(b))return;suspended[b]=b.enabled;b.enabled=false;}

@@ -4,6 +4,8 @@ using UnityEngine;
 /// <summary>Successful gameplay actions report here; GoalsManager owns progression and saving.</summary>
 public static class GoalChecker
 {
+    public const string LaunchRoomDoorGoalId = "h5_find_out_what_is_behind_Door";
+    public const string LaunchRoomLightGoalId = "h5_turn_on_the_light";
     public static event Action<GoalAction> ActionReported;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

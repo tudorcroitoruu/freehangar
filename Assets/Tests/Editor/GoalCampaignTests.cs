@@ -93,7 +93,7 @@ public class GoalCampaignTests
             GoalType.SackLoaded, GoalType.BagsFilled, GoalType.GrainCollected, GoalType.GrainMoved,
             GoalType.GrainLoaded, GoalType.GrainSold, GoalType.MoneyEarned, GoalType.BuyerReached,
             GoalType.ShovelEquipped, GoalType.UpgradePurchased, GoalType.HangarKeyCollected,
-            GoalType.HangarUnlocked, GoalType.HangarCleared
+            GoalType.HangarUnlocked, GoalType.HangarCleared, GoalType.Custom
         };
         var goals = ReadSceneGoals();
         Assert.That(goals.Select(g => g.goalId).Distinct().Count(), Is.EqualTo(goals.Length));
@@ -236,13 +236,19 @@ public class GoalCampaignTests
         if (reloadBetweenHangars) Reload();
 
         HarvestHangar(5);
-        ExpectCurrent("h5_find_out_what_is_behind_Door");
         ClearHangar(5, 98);
+        manager.ProcessAction(new GoalAction(GoalType.Custom, 1, 5, goalId: GoalChecker.LaunchRoomDoorGoalId));
+        ExpectCurrent(GoalChecker.LaunchRoomLightGoalId);
+        manager.ProcessAction(new GoalAction(GoalType.Custom, 1, 5, goalId: GoalChecker.LaunchRoomLightGoalId));
         Assert.IsTrue(manager.AllGoalsCompleted, manager.CurrentGoal?.goalId);
-        Assert.That(completed, Is.EqualTo(goals.Select(g => g.goalId)), "Each goal must complete once, in order.");
+        Assert.IsTrue(data.goals.All(g => g.completed && g.rewardClaimed));
+        Assert.That(completed.Distinct().Count(), Is.EqualTo(completed.Count));
+        Assert.That(completed.Skip(completed.Count - 2), Is.EqualTo(new[] {
+            GoalChecker.LaunchRoomDoorGoalId, GoalChecker.LaunchRoomLightGoalId }));
+        int completionsBeforeReload = completed.Count;
         Reload();
         Assert.IsTrue(manager.AllGoalsCompleted);
-        Assert.That(completed.Count, Is.EqualTo(goals.Length), "Reload must not repeat completion rewards.");
+        Assert.That(completed.Count, Is.EqualTo(completionsBeforeReload), "Reload must not repeat completion rewards.");
         LastCampaignTrace = string.Join("\n", completed.Select((id, i) => $"{i + 1}. PASS {id}"));
     }
 

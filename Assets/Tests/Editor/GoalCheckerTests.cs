@@ -377,6 +377,58 @@ public class GoalsManagerTests
         .GetMethod("AdvanceGoalTransition", BindingFlags.Instance | BindingFlags.NonPublic)
         .Invoke(manager, new object[] { seconds });
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public void FinalDoorCompletesEarlierGoalsAndAdvancesToLightWithoutDuplicateRewards(bool earlierGoalPending)
+    {
+        var door = new GoalSettings { goalId = GoalChecker.LaunchRoomDoorGoalId, goalType = GoalType.Custom,
+            hangarId = 5, goalAmount = 1, progressMode = GoalProgressMode.LifetimeTotal, rewardAmount = 7 };
+        var light = new GoalSettings { goalId = GoalChecker.LaunchRoomLightGoalId, goalType = GoalType.Custom,
+            hangarId = 5, goalAmount = 1, progressMode = GoalProgressMode.LifetimeTotal, rewardAmount = 11 };
+        Create(Goal("earlier", 10, GoalProgressMode.SinceActivation, 5), door, light);
+        typeof(GoalsManager).GetField("goalAchievedDelay", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(manager, 2f);
+        var data = new PlayerData();
+        manager.Initialize(data);
+        if (earlierGoalPending) manager.ProcessAction(new GoalAction(GoalType.GrainLoaded, 10, 1));
+        manager.ProcessAction(new GoalAction(GoalType.Custom, 1, 5, goalId: door.goalId));
+        Assert.AreEqual(door.goalId, manager.CurrentGoal.goalId);
+        Assert.IsTrue(data.goals.Single(g => g.goalId == "earlier").completed);
+        Assert.IsTrue(data.goals.Single(g => g.goalId == door.goalId).completed);
+        Assert.IsFalse(data.goals.Single(g => g.goalId == light.goalId).completed);
+        Assert.AreEqual(12, data.cash);
+        AdvanceTransition(1f);
+        manager.ProcessAction(new GoalAction(GoalType.Custom, 1, 5, goalId: door.goalId));
+        AdvanceTransition(1.1f);
+        Assert.AreEqual(light.goalId, manager.CurrentGoal.goalId);
+        manager.Initialize(JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(data)));
+        Assert.AreEqual(light.goalId, manager.CurrentGoal.goalId);
+        Assert.AreEqual(12, data.cash);
+        manager.ProcessAction(new GoalAction(GoalType.Custom, 1, 5, goalId: light.goalId));
+        AdvanceTransition(2f);
+        Assert.IsTrue(manager.AllGoalsCompleted);
+        Assert.AreEqual(23, data.cash);
+    }
+
+    [Test]
+    public void LightInteractionDuringDoorCompletionIsSavedBeforeCinematic()
+    {
+        var door = new GoalSettings { goalId = GoalChecker.LaunchRoomDoorGoalId, goalType = GoalType.Custom,
+            hangarId = 5, goalAmount = 1, progressMode = GoalProgressMode.LifetimeTotal };
+        var light = new GoalSettings { goalId = GoalChecker.LaunchRoomLightGoalId, goalType = GoalType.Custom,
+            hangarId = 5, goalAmount = 1, progressMode = GoalProgressMode.LifetimeTotal };
+        Create(door, light);
+        typeof(GoalsManager).GetField("goalAchievedDelay", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(manager, 2f);
+        var data = new PlayerData();
+        manager.Initialize(data);
+        manager.ProcessAction(new GoalAction(GoalType.Custom, 1, 5, goalId: door.goalId));
+        manager.ProcessAction(new GoalAction(GoalType.Custom, 1, 5, goalId: light.goalId));
+        Assert.IsTrue(data.goals.All(g => g.completed && g.rewardClaimed));
+        manager.Initialize(JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(data)));
+        Assert.IsTrue(manager.AllGoalsCompleted);
+    }
+
     [Test]
     public void HangarCompletesAtActualTargetAndShowsFullDisplayProgressAfterReload()
     {

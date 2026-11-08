@@ -9420,8 +9420,8 @@ MonoBehaviour:
     useDisplayGoalAmount: 0
     displayGoalAmount: 0
     rewardAmount: 1250
-  - goalId: h5_find_out_what_is_behind_Door
-    goalDescription: Find out what is behind secret door.
+  - goalId: h5_clear_98
+    goalDescription: Finish clearing Hangar 5
     navigationIndicator: {fileID: 0}
     stage: 4
     hangarId: 5
@@ -9434,6 +9434,34 @@ MonoBehaviour:
     useDisplayGoalAmount: 1
     displayGoalAmount: 100
     rewardAmount: 2000
+  - goalId: h5_find_out_what_is_behind_Door
+    goalDescription: Find out what is behind secret door.
+    navigationIndicator: {fileID: 0}
+    stage: 4
+    hangarId: 5
+    goalType: 0
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
+    rewardAmount: 3000
+  - goalId: h5_turn_on_the_light
+    goalDescription: Turn on the light.
+    navigationIndicator: {fileID: 0}
+    stage: 4
+    hangarId: 5
+    goalType: 0
+    filterByGrainType: 0
+    grainType: 8
+    upgradeType: 0
+    progressMode: 1
+    goalAmount: 1
+    useDisplayGoalAmount: 0
+    displayGoalAmount: 0
+    rewardAmount: 5000
   currentGoal:
     goalId: tutorial_pick_up_sack
     goalDescription: Pick up an empty bag
