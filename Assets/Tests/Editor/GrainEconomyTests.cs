@@ -4,6 +4,29 @@ using UnityEngine;
 
 public class GrainEconomyTests
 {
+    [Test]
+    public void ThinRemnantCleanupRemovesStockButKeepsThickerGrain()
+    {
+        var field = new GrainHeightField(9, 2, 0);
+        var spatial = new GrainSpatialField(field, new[] { new GrainRegion(100, GrainType.Rice) },
+            GrainSpatialField.Arrangement.FrontToBack, 0, 1);
+        try
+        {
+            var rice = new float[GrainCargo.TypeCount]; rice[(int)GrainType.Rice] = 1;
+            spatial.RestoreSave(new System.Collections.Generic.List<GrainColumnSave>
+            {
+                new GrainColumnSave { index = 40, volume = field.AreaAt(40) * .02, weights = rice },
+                new GrainColumnSave { index = 41, volume = field.AreaAt(41) * .1, weights = rice }
+            });
+            Assert.IsTrue(spatial.ClearThinRemnants(Vector3.one));
+            Assert.That(field.Heights[40], Is.Zero);
+            Assert.That(field.Heights[41], Is.EqualTo(.1f).Within(.000001f));
+            Assert.That(spatial.VolumeOf(GrainType.Rice), Is.EqualTo(field.AreaAt(41) * .1).Within(1e-9));
+            Assert.IsFalse(spatial.ClearThinRemnants(Vector3.one));
+        }
+        finally { spatial.Dispose(); }
+    }
+
     [TestCase(49d, false)]
     [TestCase(50d, true)]
     [TestCase(100d, true)]

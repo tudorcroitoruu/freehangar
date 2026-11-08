@@ -700,9 +700,24 @@ public sealed class GrainPile : MonoBehaviour
         return true;
     }
 
+    private float nextRemnantCleanup;
     private void LateUpdate()
     {
         if (field == null || !Application.isPlaying) return;
+        if (!IsDroppedPile && !WorldSaveRuntime.IsRestoring && Time.deltaTime > 0 && Time.time >= nextRemnantCleanup)
+        {
+            nextRemnantCleanup = Time.time + .5f;
+            bool removed = spatial != null && spatial.ClearThinRemnants(WorldScale);
+            if (spatial == null)
+                for (int i = 0; i < field.Heights.Length; i++)
+                    if (field.Heights[i] > 0 && field.Heights[i] * WorldScale.y <= .045f)
+                    {
+                        field.Heights[i] = 0;
+                        field.AcceptExcavatedHeight(i);
+                        removed = true;
+                    }
+            if (removed) surfaceRefreshPending = true;
+        }
         UpdateSurfaceBlend();
         surfaceRefreshElapsed += Time.deltaTime;
         // Batch stock texture uploads and full mesh work independently of display FPS.
@@ -711,7 +726,6 @@ public sealed class GrainPile : MonoBehaviour
         if (surfaceRefreshPending)
         {
             spatial?.ReconcileHeights();
-            spatial?.ConsolidateThinRemnants(WorldScale);
             surfaceRefreshPending = false;
             visualSettling = true;
             colliderDirty = true;

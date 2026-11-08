@@ -150,6 +150,9 @@ Shader "Freehangar/HDRP/Grain Kernels"
         #endif
         if (_UsePileSurface > .5) stableSeed = float3(origin.x, 0, origin.z);
         else if (_KernelDistanceFade.y > 0) stableSeed = origin;
+        // Camera-relative transforms can introduce tiny changes in absolute origins.
+        // Quantize before hashing so a kernel cannot switch crop as the camera moves.
+        stableSeed = round(stableSeed * 1000.0) * .001;
         float seed = Hash(stableSeed * 31.7);
         int t = Species(seed, origin);
         float overrideType = UNITY_ACCESS_INSTANCED_PROP(GrainInstances, _GrainType);
@@ -216,16 +219,16 @@ Shader "Freehangar/HDRP/Grain Kernels"
         if (t == 0) color *= .91 + .09 * smoothstep(-.8,.5,p.z);
         return color * variation * _Brightness;
     }
-    void TexturedGrainSpecies(Varyings i, int type, out float3 color, out float3 normal)
+    void TexturedGrainSpecies(Varyings i, int type, float3 uvDx, float3 uvDy, out float3 color, out float3 normal)
     {
         float3 n = normalize(i.normalWS);
         float3 blend = pow(abs(n), 4);
         blend /= max(dot(blend, 1), .0001);
         float3 uv = i.world * (_DetailScale / 8.0);
         // World-space triplanar projection keeps normal detail on excavated walls.
-        float4 x = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.yz, type);
-        float4 y = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xz, type);
-        float4 z = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xy, type);
+        float4 x = SAMPLE_TEXTURE2D_ARRAY_GRAD(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.yz, type, uvDx.yz, uvDy.yz);
+        float4 y = SAMPLE_TEXTURE2D_ARRAY_GRAD(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xz, type, uvDx.xz, uvDy.xz);
+        float4 z = SAMPLE_TEXTURE2D_ARRAY_GRAD(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xy, type, uvDx.xy, uvDy.xy);
         // Each species stores its baked height in B. A single parallax offset
         // adds close-up depth without ray marching or additional geometry.
         float3 toCamera = GetWorldSpaceViewDir(GetCameraRelativePositionWS(i.world));
@@ -238,9 +241,9 @@ Shader "Freehangar/HDRP/Grain Kernels"
             float2 offsetX = view.yz / max(abs(view.x), .4) * ((x.b - .5) * depth);
             float2 offsetY = view.xz / max(abs(view.y), .4) * ((y.b - .5) * depth);
             float2 offsetZ = view.xy / max(abs(view.z), .4) * ((z.b - .5) * depth);
-            x = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.yz + offsetX, type);
-            y = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xz + offsetY, type);
-            z = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xy + offsetZ, type);
+            x = SAMPLE_TEXTURE2D_ARRAY_GRAD(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.yz + offsetX, type, uvDx.yz, uvDy.yz);
+            y = SAMPLE_TEXTURE2D_ARRAY_GRAD(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xz + offsetY, type, uvDx.xz, uvDy.xz);
+            z = SAMPLE_TEXTURE2D_ARRAY_GRAD(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xy + offsetZ, type, uvDx.xy, uvDy.xy);
         }
         float2 nx = x.rg * 2 - 1, ny = y.rg * 2 - 1, nz = z.rg * 2 - 1;
         float3 bump = float3(0, nx.x, nx.y) * blend.x + float3(ny.x, 0, ny.y) * blend.y +
@@ -253,10 +256,13 @@ Shader "Freehangar/HDRP/Grain Kernels"
     {
         float4 a, b, c;
         GrainWeights(i.world, a, b, c);
+        // Derivatives must be evaluated before divergent crop/parallax branches.
+        float3 uvDx = ddx(i.world) * (_DetailScale / 8.0);
+        float3 uvDy = ddy(i.world) * (_DetailScale / 8.0);
         float sum = dot(a, 1) + dot(b, 1) + c.x + c.y;
         if (sum < .00001)
         {
-            TexturedGrainSpecies(i, 0, color, normal);
+            TexturedGrainSpecies(i, 0, uvDx, uvDy, color, normal);
             return;
         }
         color = 0;
@@ -273,7 +279,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
             if (weight > 0)
             {
                 float3 cropColor, cropNormal;
-                TexturedGrainSpecies(i, type, cropColor, cropNormal);
+                TexturedGrainSpecies(i, type, uvDx, uvDy, cropColor, cropNormal);
                 color += cropColor * (weight / sum);
                 normal += cropNormal * (weight / sum);
             }

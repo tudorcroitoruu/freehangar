@@ -154,6 +154,22 @@ public sealed class GrainSpatialField
         field.Heights[cell] = (float)(volume / area);
     }
 
+    public bool ClearThinRemnants(Vector3 metric)
+    {
+        bool changed = false;
+        for (int cell = 0; cell < columns.Length; cell++)
+        {
+            if (columns[cell].Count == 0 || field.Heights[cell] * metric.y > .045f) continue;
+            columns[cell].Clear();
+            sortedCrop[cell] = -1;
+            field.Heights[cell] = 0;
+            field.AcceptExcavatedHeight(cell);
+            changed = true;
+        }
+        dirty |= changed;
+        return changed;
+    }
+
     public bool ConsolidateThinRemnants(Vector3 metric)
     {
         bool changed = false;
