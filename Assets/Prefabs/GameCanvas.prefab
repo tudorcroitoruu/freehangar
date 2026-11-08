@@ -3301,6 +3301,10 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: fb132969e43b46e41925b2e53585e622, type: 3}
     title: Hangar locked
     message: 
+  - warningType: 23
+    icon: {fileID: 21300000, guid: 6d8692533424a894b86c0aea836756c0, type: 3}
+    title: Can't load!
+    message: Finish filling and close the bag.
   warningCanvasGroup: {fileID: 737507088087375577}
   warningImage: {fileID: 6193481453998981383}
   warningTitle: {fileID: 11493426258684311}

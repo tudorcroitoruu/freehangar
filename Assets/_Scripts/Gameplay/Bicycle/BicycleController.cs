@@ -445,7 +445,8 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
             bool compatible = !TryGetComponent<VehicleUpgrade>(out var cargoUpgrade) || cargoUpgrade.AcceptsContainer(interactor.Bags.CarriedBag);
             bool available = ready && compatible && FreeBagCargoSlot(interactor.Bags.CarriedBag) != null && (upgrades == null || upgrades.CanLoadCargo(GetComponent<VehicleCargoRack>() is VehicleCargoRack cargoRack ? cargoRack.BagSlotCost : 1));
             Vector3 loadPosition = GetComponent<VehicleCargoRack>() is VehicleCargoRack loadingRack && loadingRack.surface != null ? loadingRack.surface.position + Vector3.up * .3f : transform.position + Vector3.up;
-            prompt = new InteractionPromptData(loadPosition, !ready ? "Finish filling and close bag" : available ? "Load bag" : !compatible ? "Container level too high" : "Vehicle full", available);
+            prompt = new InteractionPromptData(loadPosition, !ready ? "" : available ? "Load bag" : !compatible ? "Container level too high" : "Vehicle full", available);
+            prompt.CannotLoadHalfEmptyBags = !ready;
             prompt.VehicleFull = ready && compatible && !available;
             return true;
         }

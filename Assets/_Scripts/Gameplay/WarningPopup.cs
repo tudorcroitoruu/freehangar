@@ -28,7 +28,8 @@ public enum WarningType
     weighingWrong,
     cannotLoadInWheelbarrow,
     needKeyForChest,
-    hangarLocked
+    hangarLocked,
+    cannotLoadHalfEmptyBags
 }
 public class WarningPopup : MonoBehaviour
 {

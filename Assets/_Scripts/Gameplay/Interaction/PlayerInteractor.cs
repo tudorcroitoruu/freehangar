@@ -63,6 +63,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         var prompt = Prompt;
         Target = null;
         if (!CanInteract) SetHangarLockedWarning(null);
+        if (!CanInteract) SetCannotLoadHalfEmptyBagsWarning(false);
         if (!CanInteract) CancelBagHold();
         if (!CanInteract) { SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetNeedKeyForChestWarning(null); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
         var aimedTarget = FindTarget();
@@ -92,6 +93,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         SetVehicleFullWarning(hasAimedPrompt && aimedPrompt.VehicleFull);
         SetNotFitInWheelBarrowWarning(hasAimedPrompt && aimedPrompt.NotFitInWheelBarrow);
         SetCannotLoadInWheelbarrowWarning(hasAimedPrompt && aimedPrompt.CannotLoadInWheelbarrow);
+        SetCannotLoadHalfEmptyBagsWarning(hasAimedPrompt && aimedPrompt.CannotLoadHalfEmptyBags);
         SetNeedKeyForChestWarning(hasAimedPrompt && aimedPrompt.NeedKeyForChest ? aimedTarget as BuriedFind : null);
         SetHangarLockedWarning(hasAimedPrompt && !aimedPrompt.ShowKey ? aimedTarget as HangarKeyDoor : null);
         SetNotHungryWarning(hasAimedPrompt && aimedPrompt.NotHungry);
@@ -104,7 +106,7 @@ public sealed class PlayerInteractor : MonoBehaviour
             if (aimedTarget is BicycleController) AddResetAction(ref aimedPrompt);
         }
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
-        if (focusedLockedHangar != null)
+        if (focusedLockedHangar != null || (hasAimedPrompt && aimedPrompt.CannotLoadHalfEmptyBags))
         {
             Target = aimedTarget;
             SetHighlightedTarget(null);
@@ -471,5 +473,8 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void SetDogRestingWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.DogResting, this, visible);
 
-    private void OnDisable() { SetHangarLockedWarning(null); CancelBagHold(); SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetNeedKeyForChestWarning(null); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
+    private void SetCannotLoadHalfEmptyBagsWarning(bool visible) =>
+        GameplayCanvas.Instance?.SetWarning(WarningType.cannotLoadHalfEmptyBags, this, visible);
+
+    private void OnDisable() { SetCannotLoadHalfEmptyBagsWarning(false); SetHangarLockedWarning(null); CancelBagHold(); SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetNeedKeyForChestWarning(null); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
 }
