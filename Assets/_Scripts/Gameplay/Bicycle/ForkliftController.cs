@@ -44,7 +44,7 @@ public sealed class ForkliftController : MonoBehaviour
     private GrainContainer unloadTarget;
     private Transform loadTarget;
     private bool[] originalColliderStates;
-    private readonly Collider[] overlaps=new Collider[48];
+    private Collider[] overlaps=new Collider[48];
     private readonly RaycastHit[] groundHits=new RaycastHit[32];
     private string blocked="";
     private float blockedUntil;
@@ -119,9 +119,16 @@ public sealed class ForkliftController : MonoBehaviour
     }
     private GrainContainer FindBag()
     {
-        int count=Physics.OverlapSphereNonAlloc(forkAnchor.position,Mathf.Max(pickupReach,vehiclePickupReach),overlaps,~0,QueryTriggerInteraction.Ignore);
-        if(count==overlaps.Length)return null;
         candidates.Clear(); nearbyVehicles.Clear();
+        int count;
+        // Detailed pickup meshes can exhaust the original 48-contact buffer.
+        // Grow and retry instead of silently losing every vehicle target.
+        while (true)
+        {
+            count = Physics.OverlapSphereNonAlloc(forkAnchor.position, Mathf.Max(pickupReach, vehiclePickupReach), overlaps, ~0, QueryTriggerInteraction.Ignore);
+            if (count < overlaps.Length) break;
+            System.Array.Resize(ref overlaps, overlaps.Length * 2);
+        }
         for(int i=0;i<count;i++)
         {
             var bag=overlaps[i].GetComponentInParent<GrainContainer>();
@@ -172,12 +179,23 @@ public sealed class ForkliftController : MonoBehaviour
         float distance = float.PositiveInfinity;
         foreach (var vehicle in nearbyVehicles)
         {
-            var slot = vehicle.FreeBagCargoSlot(cargo);
-            if (!CanLoadOntoVehicle(slot)) continue;
+            var first = vehicle.FreeBagCargoSlot(cargo);
+            if (first == null) continue;
+            if (vehicle.TryGetComponent<PickupCargoLayout>(out var layout))
+            {
+                // Bay order is not distance order when approaching from the rear or side.
+                foreach (var slot in layout.largeSlots) Consider(slot);
+            }
+            else Consider(first);
+        }
+        return best;
+
+        void Consider(Transform slot)
+        {
+            if (!CanLoadOntoVehicle(slot)) return;
             float d = (slot.position - forkAnchor.position).sqrMagnitude;
             if (d < distance) { best = slot; distance = d; }
         }
-        return best;
     }
 
     private bool CanLoadOntoVehicle(Transform slot)
@@ -185,9 +203,11 @@ public sealed class ForkliftController : MonoBehaviour
         if (cargo == null || transferring || forkAnchor == null || slot == null || slot.childCount != 0) return false;
         var vehicle = VehicleCargoOwner.Resolve(slot);
         if (vehicle == null || vehicle == rig || vehicle.IsRidden || Mathf.Abs(vehicle.Speed) > .1f ||
-            !VehicleCargoOwner.CanLoadContainer(vehicle, cargo) || vehicle.FreeBagCargoSlot(cargo) != slot) return false;
+            !VehicleCargoOwner.CanLoadContainer(vehicle, cargo)) return false;
+        var first = vehicle.FreeBagCargoSlot(cargo);
+        if (first == null) return false;
         var layout = vehicle.GetComponent<PickupCargoLayout>();
-        if (layout != null && !layout.CanLoadAt(slot, cargo)) return false;
+        if (layout != null ? !layout.CanLoadAt(slot, cargo) : first != slot) return false;
         var rack = vehicle.GetComponent<VehicleCargoRack>();
         int cost = layout != null ? PickupCargoLayout.Units(cargo) : rack != null ? rack.BagSlotCost : 1;
         var upgrade = vehicle.GetComponent<VehicleUpgrade>();

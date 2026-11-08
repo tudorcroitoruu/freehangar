@@ -4,6 +4,68 @@ using UnityEngine;
 
 public class ForkliftCargoTests
 {
+    [TestCase(64, false)]
+    [TestCase(0, true)]
+    [TestCase(64, true)]
+    public void LoadingTargetSurvivesDenseCollidersAndFindsReachablePickupBay(int contacts, bool distantFirstBay)
+    {
+        var root = new GameObject("Forklift loading target regression");
+        var truck = new GameObject("Pickup bays");
+        var bagObject = new GameObject("Partial big bag");
+        try
+        {
+            root.transform.position = new Vector3(28000, 1000, 28000);
+            var forklift = root.AddComponent<ForkliftController>();
+            var anchor = new GameObject("Fork anchor").transform;
+            anchor.SetParent(root.transform, false);
+            var config = new SerializedObject(forklift);
+            config.FindProperty("forkAnchor").objectReferenceValue = anchor;
+            config.ApplyModifiedPropertiesWithoutUndo();
+            for (int i = 0; i < contacts; i++)
+            {
+                var contact = new GameObject("Detailed mesh contact");
+                contact.transform.SetParent(root.transform, false);
+                contact.AddComponent<BoxCollider>().size = Vector3.one * .1f;
+            }
+            truck.transform.position = root.transform.position + Vector3.forward * 2;
+            truck.AddComponent<BicycleController>();
+            truck.AddComponent<BoxCollider>();
+            var layout = truck.AddComponent<PickupCargoLayout>();
+            var first = new GameObject("Front bay").transform;
+            first.SetParent(truck.transform, false);
+            first.localPosition = distantFirstBay ? Vector3.forward * 5 : Vector3.zero;
+            var second = new GameObject("Rear bay").transform;
+            second.SetParent(truck.transform, false);
+            second.localPosition = Vector3.back * .5f;
+            layout.largeSlots = new[] { first, second };
+            layout.EnsureSlots();
+            bagObject.AddComponent<BoxCollider>();
+            var bag = bagObject.AddComponent<GrainContainer>();
+            var data = new SerializedObject(bag);
+            data.FindProperty("cargoTypeId").stringValue = "BigBag";
+            data.FindProperty("pickupSpaceUnits").intValue = 2;
+            data.FindProperty("capacityKg").floatValue = 500;
+            data.FindProperty("kilograms").floatValue = 250;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            bag.transform.position = anchor.position + new Vector3(0, .5f, .4f);
+            Assert.IsTrue(forklift.TryLift(bag));
+            Physics.SyncTransforms();
+            const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            typeof(ForkliftController).GetMethod("FindBag", flags).Invoke(forklift, null);
+            var target = (Transform)typeof(ForkliftController).GetMethod("FindLoadingSlot", flags).Invoke(forklift, null);
+            Assert.AreSame(second, target, "The F action should select the closest reachable free bay.");
+            Assert.IsTrue(forklift.TryLoadOntoVehicle(target));
+            Assert.AreSame(second, bag.transform.parent);
+            Assert.AreEqual(250, bag.Kilograms);
+        }
+        finally
+        {
+            Object.DestroyImmediate(bagObject);
+            Object.DestroyImmediate(truck);
+            Object.DestroyImmediate(root);
+        }
+    }
+
     [TestCase("BigBag",0f,true,true)]
     [TestCase("BigBag",250f,false,true)]
     [TestCase("BigBag",500f,false,true)]
