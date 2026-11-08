@@ -5,6 +5,22 @@ using UnityEngine;
 
 public class ContainerPlacementTests
 {
+    [TestCase(false)]
+    [TestCase(true)]
+    public void PestBodyCanBeShotButNearbyAimMisses(bool crow)
+    {
+        var bag = Create("Pest target", origin + Vector3.forward * 5).AddComponent<GrainContainer>();
+        var pest = Create("Accurate pest hitbox", origin + Vector3.up * 2).AddComponent<GrainPest>();
+        if (!crow) pest.transform.localScale = Vector3.one * 1.5f;
+        pest.Initialize(bag, crow, null, null);
+        Physics.SyncTransforms();
+        var collider = pest.GetComponent<CapsuleCollider>();
+        Vector3 center = pest.transform.TransformPoint(collider.center);
+        Assert.IsTrue(collider.Raycast(new Ray(center - Vector3.forward * 2, Vector3.forward), out _, 3));
+        Assert.IsFalse(collider.Raycast(new Ray(center + Vector3.right * .3f - Vector3.forward * 2,
+            Vector3.forward), out _, 3), "A shot beside the body must miss.");
+    }
+
     [TestCase(false, false)]
     [TestCase(false, true)]
     [TestCase(true, false)]
@@ -24,11 +40,11 @@ public class ContainerPlacementTests
         var container = bag.AddComponent<GrainContainer>();
         var pest = Create("Cargo pest", bag.transform.position).AddComponent<GrainPest>();
         pest.Initialize(container, crow, null, null);
-        var ray = new Ray(origin + Vector3.up * 2 - Vector3.forward * 2, Vector3.forward);
+        var ray = new Ray(origin + Vector3.up * (crow ? 2.28f : 2.12f) - Vector3.forward * 2, Vector3.forward);
         RaycastHit[] Cast()
         {
             Physics.SyncTransforms();
-            return broom ? Physics.SphereCastAll(ray, .22f, 5f, ~0, QueryTriggerInteraction.Collide)
+            return broom ? Physics.SphereCastAll(ray, .12f, 5f, ~0, QueryTriggerInteraction.Collide)
                 : Physics.RaycastAll(ray, 5f, ~0, QueryTriggerInteraction.Collide);
         }
         var hits = Cast();
@@ -74,11 +90,11 @@ public class ContainerPlacementTests
         var crow = crowObject.AddComponent<GrainPest>();
         crow.Initialize(container, true, null, null);
         Physics.SyncTransforms();
-        var ray = new Ray(crowObject.transform.position + Vector3.up * .65f - Vector3.forward * 2,
+        var ray = new Ray(crowObject.transform.position + Vector3.up * .45f - Vector3.forward * 2,
             Vector3.forward);
         Assert.IsTrue(Physics.Raycast(ray, out var shot, 3f, ~0, QueryTriggerInteraction.Collide));
         Assert.That(shot.collider.GetComponent<GrainPest>(), Is.SameAs(crow));
-        Assert.IsTrue(Physics.SphereCast(ray, .22f, out var sweep, 3f, ~0, QueryTriggerInteraction.Collide));
+        Assert.IsTrue(Physics.SphereCast(ray, .12f, out var sweep, 3f, ~0, QueryTriggerInteraction.Collide));
         Assert.That(sweep.collider.GetComponent<GrainPest>(), Is.SameAs(crow));
     }
 

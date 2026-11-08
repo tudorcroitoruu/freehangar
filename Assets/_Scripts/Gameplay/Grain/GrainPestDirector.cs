@@ -49,7 +49,7 @@ public sealed class GrainPest : MonoBehaviour
         Target.WorldBounds.SqrDistance(transform.position) <= 1.5f * 1.5f && !PlayerPerks.NoAttacksActive;
     private float nextBite;
     private float lastSuccessfulFeed;
-    private SphereCollider hitCollider;
+    private CapsuleCollider hitCollider;
     private float speed;
     private Animator animator;
     private RuntimeAnimatorController flying, feeding;
@@ -248,11 +248,13 @@ public sealed class GrainPest : MonoBehaviour
             body.isKinematic = true;
             body.useGravity = false;
         }
-        hitCollider = gameObject.AddComponent<SphereCollider>();
-        // The crow's root is at its feet. Keep its head/body hittable above cargo,
-        // instead of burying half of the hit volume inside the supporting container.
-        hitCollider.center = crow ? new Vector3(0f, .3f, 0f) : Vector3.zero;
-        hitCollider.radius = .55f;
+        hitCollider = gameObject.AddComponent<CapsuleCollider>();
+        // Fit the body, excluding the empty space around wings/tails. Rat size
+        // also receives the spawn's 1.5x transform scale.
+        hitCollider.center = crow ? new Vector3(0f, .28f, 0f) : new Vector3(0f, .12f, .04f);
+        hitCollider.direction = crow ? 1 : 2;
+        hitCollider.radius = crow ? .14f : .09f;
+        hitCollider.height = crow ? .56f : .42f;
         hitCollider.isTrigger = true;
     }
     private Vector3 GroundRat(Vector3 position)

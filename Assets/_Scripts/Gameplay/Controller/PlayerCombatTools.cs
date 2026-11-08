@@ -298,13 +298,13 @@ public sealed class PlayerCombatTools : MonoBehaviour
         Physics.SyncTransforms();
         var ray = PlayerAim.CenterRay(viewCamera);
         int count=equipped==Tool.Broom
-            ? Physics.SphereCastNonAlloc(ray,.22f,strikeHits,strikeReach,~0,QueryTriggerInteraction.Collide)
+            ? Physics.SphereCastNonAlloc(ray,.12f,strikeHits,strikeReach,~0,QueryTriggerInteraction.Collide)
             : Physics.RaycastNonAlloc(ray,strikeHits,strikeReach,~0,QueryTriggerInteraction.Collide);
         var hits = strikeHits;
         if (count == strikeHits.Length)
         {
             hits = equipped == Tool.Broom
-                ? Physics.SphereCastAll(ray, .22f, strikeReach, ~0, QueryTriggerInteraction.Collide)
+                ? Physics.SphereCastAll(ray, .12f, strikeReach, ~0, QueryTriggerInteraction.Collide)
                 : Physics.RaycastAll(ray, strikeReach, ~0, QueryTriggerInteraction.Collide);
             count = hits.Length;
         }
