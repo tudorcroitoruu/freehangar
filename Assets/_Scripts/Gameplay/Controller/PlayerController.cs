@@ -36,6 +36,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float cameraMinAngle = -70f;
     [SerializeField] private float cameraMaxAngle = 80f;
     [SerializeField, Min(0.001f)] private float lookSmoothTime = 0.06f;
+    [SerializeField, Range(.05f, .4f)] private float grainCameraSmoothTime = .2f;
+    [SerializeField, Range(.3f, .7f)] private float grainStepHeight = .55f;
+    [SerializeField, Range(45f, 75f)] private float grainSlopeLimit = 65f;
+    private float grainCameraOffset, grainCameraVelocity;
+    private readonly RaycastHit[] grainGroundHits = new RaycastHit[32];
 
     [Header("Sprint camera motion")]
     [SerializeField, Range(0f, .04f)] private float sprintCameraHeight = .004166667f;
@@ -134,6 +139,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnEnable()
     {
+        grainCameraOffset = grainCameraVelocity = 0;
         if (shovelTool != null) shovelTool.GrainScooped += HandleGrainScooped;
         verticalVelocity = 0f;
         distanceSinceStep = airborneDuration = 0f;
@@ -238,6 +244,7 @@ public class PlayerController : MonoBehaviour
 
     public void ClearSprintCameraMotion()
     {
+        grainCameraOffset = grainCameraVelocity = 0;
         sprintCameraBlend = sprintCameraPhase = 0;
         if (characterCamera == null || characterController == null) return;
         characterCamera.transform.localPosition = cameraRestPosition - Vector3.up * Mathf.Max(0, standingHeight - characterController.height);
@@ -289,6 +296,8 @@ public class PlayerController : MonoBehaviour
         }
         if(!pushingWheelbarrow) currentSpeed *= PlayerPerks.MobilityMultiplier;
         Vector3 velocity = (transform.right * input.x + transform.forward * input.y) * currentSpeed;
+        bool onGrain = HasGrainSupport(transform.position) ||
+            (velocity.sqrMagnitude > .001f && HasGrainSupport(transform.position + velocity.normalized * .45f));
 
         if (characterController.isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;
@@ -311,9 +320,19 @@ public class PlayerController : MonoBehaviour
             targetYaw = transform.eulerAngles.y;
             sprintMoving = canSprint && Mathf.Abs(input.y) > .01f && characterController.velocity.sqrMagnitude > .25f;
             UpdateSprintCamera(sprintMoving, Time.deltaTime);
+            SmoothGrainCamera(previousPosition.y, onGrain, jumped);
             return;
         }
+        float normalStep = characterController.stepOffset;
+        float normalSlope = characterController.slopeLimit;
+        if (onGrain && !jumped && verticalVelocity <= 0)
+        {
+            characterController.stepOffset = Mathf.Min(characterController.height * .45f, Mathf.Max(normalStep, grainStepHeight));
+            characterController.slopeLimit = Mathf.Max(normalSlope, grainSlopeLimit);
+        }
         CollisionFlags collisions = characterController.Move(velocity * Time.deltaTime);
+        characterController.stepOffset = normalStep;
+        characterController.slopeLimit = normalSlope;
         UpdateMovementAudio(wasGrounded, jumped, verticalSpeedBeforeMove, previousPosition, input, canSprint);
         if ((collisions & CollisionFlags.Above) != 0 && verticalVelocity > 0f)
             verticalVelocity = 0f;
@@ -322,6 +341,37 @@ public class PlayerController : MonoBehaviour
         Vector3 actualMovement = Vector3.ProjectOnPlane(characterController.velocity, Vector3.up);
         sprintMoving = canSprint && input.sqrMagnitude > .01f && characterController.isGrounded && actualMovement.sqrMagnitude > .25f;
         UpdateSprintCamera(sprintMoving, Time.deltaTime);
+        SmoothGrainCamera(previousPosition.y, onGrain, jumped);
+    }
+
+    private bool HasGrainSupport(Vector3 position)
+    {
+        float feet = characterController.bounds.min.y;
+        Vector3 origin = new Vector3(position.x, feet + .7f, position.z);
+        int count = Physics.RaycastNonAlloc(origin, Vector3.down, grainGroundHits, 1.1f, ~0, QueryTriggerInteraction.Ignore);
+        if (count == grainGroundHits.Length) return false;
+        Collider nearest = null;
+        float distance = float.PositiveInfinity;
+        for (int i = 0; i < count; i++)
+        {
+            var hit = grainGroundHits[i];
+            if (hit.transform.IsChildOf(transform) || hit.distance >= distance) continue;
+            nearest = hit.collider; distance = hit.distance;
+        }
+        return nearest != null && nearest.GetComponentInParent<GrainPile>() != null;
+    }
+
+    private void SmoothGrainCamera(float previousHeight, bool onGrain, bool jumped)
+    {
+        float rise = transform.position.y - previousHeight;
+        if (jumped || Mathf.Abs(rise) > 1f)
+        { grainCameraOffset = grainCameraVelocity = 0; return; }
+        if (onGrain && verticalVelocity <= 0)
+            grainCameraOffset = Mathf.Clamp(grainCameraOffset - rise, -.3f, .3f);
+        grainCameraOffset = Mathf.SmoothDamp(grainCameraOffset, 0, ref grainCameraVelocity,
+            grainCameraSmoothTime, Mathf.Infinity, Time.deltaTime);
+        // Only smooth presentation. The capsule still contacts the real grain surface.
+        characterCamera.transform.position += Vector3.up * grainCameraOffset;
     }
 
     private void UpdateMovementAudio(bool wasGrounded, bool jumped, float verticalSpeedBeforeMove,

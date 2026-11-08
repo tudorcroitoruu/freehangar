@@ -34,7 +34,6 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         actor = player; Running = true; saveClock = new SavedCutsceneClock(time);
         StartCoroutine(saveClock.Run(Launch())); return true;
     }
-    private bool cleared;
     private readonly HashSet<GameplayCanvas> hud = new HashSet<GameplayCanvas>();
     private void LateUpdate() { if (overlay != null) overlay.GetComponent<Canvas>().enabled = Pause.Instance == null || !Pause.Instance.paused; }
     private Quaternion doorClosed, leverOff, hatchClosed;
@@ -60,13 +59,11 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     {
         get
         {
-            if(BypassRestrictions || cleared)return true;
-            if(hangar==null||!hangar.IsUnlocked||grain==null||!grain.gameObject.activeInHierarchy)return false;
-            grain.Initialize();
-            if(grain.Kilograms>5)return false;
+            if(BypassRestrictions || DoorOpen)return true;
+            if(hangar==null||!hangar.IsUnlocked||clearancePoint==null)return false;
             foreach(var pile in FindObjectsByType<GrainPile>(FindObjectsSortMode.None))
                 if(pile.IsInsideBoundary(clearancePoint.position)&&pile.SurfaceHeight(clearancePoint.position)>clearancePoint.position.y+.15f)return false;
-            cleared=true;return true;
+            return true;
         }
     }
     public bool UseDoor()

@@ -6,6 +6,41 @@ using UnityEngine;
 public class HangarShopProgressTests
 {
     [Test]
+    public void FinalDoorNeedsOnlyLocalClearanceAndRechecksNewGrain()
+    {
+        var root = new GameObject("Final doorway test");
+        root.SetActive(false);
+        var pileObject = new GameObject("Remaining hangar grain");
+        bool bypass = GameManager.Instance != null && GameManager.Instance.bypassFinalRoomRestrictions;
+        try
+        {
+            if (GameManager.Instance != null) GameManager.Instance.bypassFinalRoomRestrictions = false;
+            pileObject.transform.position = new Vector3(25000, 100, 25000);
+            var pile = pileObject.AddComponent<GrainPile>();
+            var sequence = root.AddComponent<HangarLaunchSequence>();
+            sequence.hangar = root.AddComponent<HangarKeyDoor>();
+            sequence.grain = pile;
+            sequence.clearancePoint = new GameObject("Door clearance").transform;
+            sequence.clearancePoint.SetParent(root.transform);
+            sequence.clearancePoint.position = pileObject.transform.position + Vector3.right * 100;
+            Assert.IsFalse(sequence.CanOpen, "Hangar must first be unlocked.");
+            typeof(HangarKeyDoor).GetProperty("IsUnlocked").SetValue(sequence.hangar, true);
+            Assert.Greater(pile.Kilograms, 5);
+            Assert.IsTrue(sequence.CanOpen, "Grain elsewhere must not lock the final room.");
+            sequence.clearancePoint.position = pileObject.transform.position;
+            Assert.IsFalse(sequence.CanOpen, "Clearing once must not bypass newly blocking grain.");
+            sequence.clearancePoint.position += Vector3.right * 100;
+            Assert.IsTrue(sequence.CanOpen);
+        }
+        finally
+        {
+            if (GameManager.Instance != null) GameManager.Instance.bypassFinalRoomRestrictions = bypass;
+            Object.DestroyImmediate(root);
+            Object.DestroyImmediate(pileObject);
+        }
+    }
+
+    [Test]
     public void SecondBagUnlocksWithMotorollerAndStaysUnlockedAfterReload()
     {
         var root = new GameObject("Motoroller bag unlock");

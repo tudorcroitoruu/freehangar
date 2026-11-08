@@ -8,7 +8,7 @@ public sealed class LaunchRoomInteractable : MonoBehaviour, IInteractable
         prompt=default;if(sequence==null||sequence.Running)return false;
         if(isSwitch){if((!sequence.DoorOpen && !sequence.BypassRestrictions) || !IsInsideRoom(interactor))return false;prompt=new InteractionPromptData(transform.position,"Switch on power");prompt.RequiresFreeHands=interactor!=null&&interactor.HandsOccupied;return true;}
         if(sequence.DoorOpen)return false;
-        bool ready=sequence.CanOpen;prompt=new InteractionPromptData(transform.position,ready?"Open door":"Clear Hangar 5 and this doorway",ready);return true;
+        bool ready=sequence.CanOpen;prompt=new InteractionPromptData(transform.position,ready?"Open door":"Clear this doorway",ready);return true;
     }
     private bool IsInsideRoom(PlayerInteractor interactor)
     {

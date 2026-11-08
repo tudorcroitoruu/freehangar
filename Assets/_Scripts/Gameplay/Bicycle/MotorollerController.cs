@@ -26,7 +26,7 @@ public sealed class MotorollerController : MonoBehaviour
     {
         var rig = Movement;
         rig.motorDriven = true;
-        rig.maximumSpeed = maximumSpeed;
+        rig.maximumSpeed = maximumSpeed * (TryGetComponent<ForkliftController>(out _) ? 1.7f : 1f);
         rig.acceleration = acceleration;
         rig.brakingDeceleration = brakingDeceleration;
         rig.wheelRadius = wheelRadius;
