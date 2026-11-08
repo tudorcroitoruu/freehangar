@@ -88,7 +88,8 @@ public sealed class InteractionPrompt : MonoBehaviour
         bool showMouseLeft = data.RequiredTool == PlayerCombatTools.Tool.Axe ||
             data.RequiredTool == PlayerCombatTools.Tool.Hammer || (data.ShowPrimaryButton && data.PrimaryIsAttack);
         bool padPrimary = !showMouseLeft && FarmInput.UsingPad && data.ShowPrimaryButton;
-        bool showKey = !showMouseLeft && (padPrimary || (data.ShowKey && !data.ShowPrimaryButton));
+        bool showKeyboardKey = !FarmInput.UsingPad && data.ShowKeyboardKey;
+        bool showKey = !showMouseLeft && (showKeyboardKey || padPrimary || (data.ShowKey && !data.ShowPrimaryButton));
         string key = padPrimary ? FarmInput.Label(data.PrimaryIsAttack ? "Attack" : "Unload", "") : KeyLabel(data.InteractionKey);
         if (keycap != null && showKey) GamepadPromptSprites.SetKeycap(keycap, key);
         if (keycap != null && keycap.gameObject.activeSelf != showKey) keycap.gameObject.SetActive(showKey);

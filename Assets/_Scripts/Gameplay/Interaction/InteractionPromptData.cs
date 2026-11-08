@@ -8,6 +8,7 @@ public struct InteractionPromptData
     public PlayerCombatTools.Tool RequiredTool;
     public string SecondaryDescription;
     public bool ShowKey;
+    public bool ShowKeyboardKey;
     public KeyCode InteractionKey;
     public InteractionPromptAction[] AdditionalActions;
     public bool RequiresFreeHands;
@@ -34,6 +35,7 @@ public struct InteractionPromptData
         RequiredTool = default;
         SecondaryDescription = "";
         ShowKey = showKey;
+        ShowKeyboardKey = false;
         InteractionKey = KeyCode.E;
         AdditionalActions = null;
         RequiresFreeHands = false;

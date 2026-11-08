@@ -23,6 +23,7 @@ public class FridgeProduct : MonoBehaviour, IInteractable
             (promptAnchor != null ? promptAnchor.position : transform.position) + promptOffset,
             "Eat & reduce hunger", needsFood && canAfford && !purchasing)
         {
+            ShowKeyboardKey = true,
             SecondaryDescription = needsFood ? $"Price: {price}" : "",
             NotHungry = !needsFood
         };
