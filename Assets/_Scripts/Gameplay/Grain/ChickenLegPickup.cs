@@ -38,6 +38,12 @@ public sealed class ChickenLegPickup : MonoBehaviour, IInteractable
         carried = false;
         expiresAt = Time.time + 60f;
         foreach (var c in GetComponentsInChildren<Collider>()) c.enabled = true;
+        var outline = GetComponent<Outline>();
+        if (outline == null) outline = gameObject.AddComponent<Outline>();
+        outline.OutlineMode = Outline.Mode.OutlineAll;
+        outline.OutlineColor = Color.yellow;
+        outline.OutlineWidth = 4f;
+        outline.enabled = true;
     }
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
     {
