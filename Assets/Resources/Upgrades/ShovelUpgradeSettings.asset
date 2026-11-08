@@ -57,7 +57,7 @@ MonoBehaviour:
     weightReductionPerUpgrade: 0.02
     suctionKgPerSecond: 45
     suctionPerUpgrade: 15
-    prices: ac0d0000a00f00008813000064190000
+    prices: ac0d0000a00f00009411000088130000
   - name: High Capacity Vacuum
     image: {fileID: 21300000, guid: a1d9ed617fe4b7048971f33e9d8e230e, type: 3}
     capacityKg: 300
@@ -66,4 +66,4 @@ MonoBehaviour:
     weightReductionPerUpgrade: 0.02
     suctionKgPerSecond: 90
     suctionPerUpgrade: 22.5
-    prices: e02e0000983a0000384a0000c05d0000
+    prices: 70170000581b0000401f000010270000

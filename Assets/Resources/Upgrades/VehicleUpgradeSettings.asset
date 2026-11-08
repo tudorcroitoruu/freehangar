@@ -297,7 +297,7 @@ MonoBehaviour:
     image: {fileID: 21300000, guid: 99519259f3e04c84e9557d9f98415c52, type: 3}
     slots: 16
     movementSpeed: 20
-    price: 18000
+    price: 12000
     requiresKey: 1
     keySprite: {fileID: 21300000, guid: 791b7223b8cdac64c90bfd468afcaaeb, type: 3}
     keyId: 
