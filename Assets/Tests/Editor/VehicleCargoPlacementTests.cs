@@ -3,6 +3,37 @@ using UnityEngine;
 
 public class VehicleCargoPlacementTests
 {
+    [TestCase(false)]
+    [TestCase(true)]
+    public void BigBagKeepsFilledVehiclePoseAtEveryFillLevel(bool bottom)
+    {
+        var slot = new GameObject("Big bag placement slot");
+        var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/BigBag.prefab");
+        var item = Object.Instantiate(prefab, slot.transform);
+        try
+        {
+            slot.transform.SetPositionAndRotation(new Vector3(20, 3, 40), Quaternion.Euler(0, 35, 0));
+            var bag = item.GetComponent<GrainContainer>();
+            var scale = item.transform.localScale;
+            var profile = new VehicleUpgradeSettings.VehicleType { cargoPoses = new[] {
+                new VehicleUpgradeSettings.CargoPose { containerId = "BigBag", slotIndex = 0,
+                    position = new Vector3(.1f, .7f, -.3f), rotation = new Vector3(0, 15, 0), scale = Vector3.one }
+            }};
+            bag.RestoreSave(new ContainerSave { kilograms = bag.CapacityKg, closure = 1 });
+            VehicleCargoPlacement.Place(item.transform, slot.transform, profile, "BigBag", 0, bag.UprightRotation, bottom, scale);
+            var fullPosition = item.transform.position;
+            var fullRotation = item.transform.rotation;
+            foreach (float fraction in new[] { 0f, .25f, 1f })
+            {
+                bag.RestoreSave(new ContainerSave { kilograms = bag.CapacityKg * fraction, closure = 0 });
+                VehicleCargoPlacement.Place(item.transform, slot.transform, profile, "BigBag", 0, bag.UprightRotation, bottom, scale);
+                Assert.Less(Vector3.Distance(fullPosition, item.transform.position), .001f, "Fill or closure must not move the pallet.");
+                Assert.Less(Quaternion.Angle(fullRotation, item.transform.rotation), .01f);
+            }
+        }
+        finally { Object.DestroyImmediate(slot); }
+    }
+
     [TestCase("Medium")]
     [TestCase("Max")]
     public void UpgradedWheelbarrowLoadsThroughBarrelAfterCargoRestore(string tier)

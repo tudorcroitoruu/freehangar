@@ -48,8 +48,57 @@ public sealed class ForkliftController : MonoBehaviour
     private readonly RaycastHit[] groundHits=new RaycastHit[32];
     private string blocked="";
     private float blockedUntil;
+    private struct WheelVisual
+    {
+        public Transform node;
+        public Quaternion rest;
+        public Vector3 axle, steeringAxis;
+        public float radius;
+        public bool front;
+    }
+    private readonly List<WheelVisual> wheelVisuals = new List<WheelVisual>();
+    private readonly List<WheelVisual> steeringVisuals = new List<WheelVisual>();
     public static bool CanLift(GrainContainer bag) => bag!=null && bag.isActiveAndEnabled && bag.IsBigBag && !bag.IsCarried && !bag.IsUnderAttack;
-    private void Awake(){rig=GetComponent<BicycleController>();vehicleColliders=GetComponentsInChildren<Collider>(true);}
+    private void Awake()
+    {
+        rig=GetComponent<BicycleController>();vehicleColliders=GetComponentsInChildren<Collider>(true);
+        InitializeWheelVisuals();
+    }
+    private void InitializeWheelVisuals()
+    {
+        wheelVisuals.Clear(); steeringVisuals.Clear();
+        foreach (var node in GetComponentsInChildren<Transform>(true))
+        {
+            bool front = node.name.Contains("Wheel_F.");
+            bool rear = node.name.Contains("Wheel_R.");
+            if ((front || rear) && !node.name.Contains("LOD"))
+            {
+                // Animate the axle parent once; every wheel LOD follows it.
+                float radius = rig.wheelRadius * transform.lossyScale.y;
+                var renderer = node.GetComponentInChildren<Renderer>(true);
+                if (renderer != null) radius = Mathf.Max(.05f, renderer.bounds.extents.y);
+                wheelVisuals.Add(new WheelVisual { node = node, rest = node.localRotation,
+                    axle = node.InverseTransformDirection(transform.right),
+                    steeringAxis = node.parent.InverseTransformDirection(transform.up), radius = radius, front = front });
+            }
+            else if (node.name.Contains("Steering_Wheel"))
+                steeringVisuals.Add(new WheelVisual { node = node, rest = node.localRotation });
+        }
+    }
+    public void RefreshWheelVisuals()
+    {
+        if (rig == null) return;
+        foreach (var wheel in wheelVisuals)
+        {
+            if (wheel.node == null) continue;
+            float angle = rig.WheelRotationAngle * rig.wheelRadius * transform.lossyScale.y / wheel.radius;
+            wheel.node.localRotation = Quaternion.AngleAxis(wheel.front ? rig.CurrentSteeringAngle : 0, wheel.steeringAxis) *
+                wheel.rest * Quaternion.AngleAxis(angle, wheel.axle);
+        }
+        foreach (var wheel in steeringVisuals)
+            if (wheel.node != null)
+                wheel.node.localRotation = wheel.rest * Quaternion.AngleAxis(-rig.CurrentSteeringAngle * 2.5f, Vector3.right);
+    }
     private bool AcceptInput => rig!=null && rig.IsRidden && Time.timeScale>0 && Application.isFocused && Cursor.lockState==CursorLockMode.Locked && !UpgradeManager.BlocksGameplayInput && !UIPopups.BasePopupUI.HasActivePopup;
     private void Update()
     {
@@ -81,6 +130,7 @@ public sealed class ForkliftController : MonoBehaviour
     }
     private void LateUpdate()
     {
+        RefreshWheelVisuals();
         if(cargo!=null)
         {
             if (transferring)

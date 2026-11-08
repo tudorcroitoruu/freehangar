@@ -39,6 +39,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     public Vector3 RidingCameraOffset => ridingCameraOffset;
     public float RidingCameraPitch => ridingCameraPitch;
     public float CurrentSteeringAngle => currentSteering;
+    public float WheelRotationAngle => wheelAngle;
     float currentSteering, steeringVelocity;
     string CameraSettingsKey => "Bicycle.View." + gameObject.scene.name + "." + gameObject.name;
     [System.Serializable] sealed class ViewSettings { public Vector3 offset; public float pitch; }

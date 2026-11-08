@@ -74,12 +74,31 @@ public sealed class VehicleCargoPlacement : MonoBehaviour
     {
         var pose=profile?.FindCargoPose(containerId,index);
         item.localScale=Vector3.Scale(baseScale,pose?.EffectiveScale ?? Vector3.one);
-        bool empty = item.TryGetComponent<GrainContainer>(out var container) && container.IsEmpty;
+        bool hasContainer = item.TryGetComponent<GrainContainer>(out var container);
+        bool bigBag = hasContainer && container.IsBigBag;
+        bool empty = hasContainer && container.IsEmpty && !bigBag;
         Vector3 defaultRotation = slot.GetComponentInParent<WheelbarrowCargo>() != null
             ? WheelbarrowCargo.DefaultCargoRotation(containerId) : Vector3.zero;
         item.rotation=slot.rotation*baseRotation*Quaternion.Euler(empty ? Vector3.zero : pose?.rotation ?? defaultRotation);
         item.position=slot.position;
-        if(bottom) VehicleCargoRack.SeatBase(item,slot);
+        if (bigBag)
+        {
+            var bounds = container.VehiclePlacementBounds;
+            if (bottom)
+            {
+                Bounds contact = default;
+                for (int i = 0; i < 8; i++)
+                {
+                    var corner = bounds.center + Vector3.Scale(bounds.extents,
+                        new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
+                    var point = slot.InverseTransformPoint(item.TransformPoint(corner));
+                    if (i == 0) contact = new Bounds(point, Vector3.zero); else contact.Encapsulate(point);
+                }
+                item.position += slot.TransformVector(new Vector3(-contact.center.x, -contact.min.y, -contact.center.z));
+            }
+            else item.position += slot.position - item.TransformPoint(bounds.center);
+        }
+        else if(bottom) VehicleCargoRack.SeatBase(item,slot);
         else if(item.TryGetComponent<GrainContainer>(out var cargo)) item.position+=slot.position-cargo.WorldBounds.center;
         if(pose!=null && !empty) item.position+=slot.TransformVector(pose.position);
         if (empty && bottom) StackEmptyBag(item, slot);

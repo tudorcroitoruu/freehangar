@@ -51,20 +51,21 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     [Space, Header("HUD Element")] 
     [SerializeField] private HUDNavigationElement hudElement;
     public Bounds LocalBounds
+        => GetLocalBounds(false);
+    // Vehicle placement must not move the pallet as the sack fills or closes.
+    public Bounds VehiclePlacementBounds => GetLocalBounds(IsBigBag && fitFillCollider);
+    private Bounds GetLocalBounds(bool useClosedShape)
     {
-        get
-        {
-            var box = GetComponent<BoxCollider>();
-            var bounds = box != null ? new Bounds(box.center, box.size) : new Bounds(Vector3.zero, Vector3.one * .5f);
-            if (palletCollider != null)
-                for (int i = 0; i < 8; i++)
-                {
-                    Vector3 corner = palletCollider.center + Vector3.Scale(palletCollider.size * .5f,
-                        new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
-                    bounds.Encapsulate(transform.InverseTransformPoint(palletCollider.transform.TransformPoint(corner)));
-                }
-            return bounds;
-        }
+        var box = GetComponent<BoxCollider>();
+        var bounds = useClosedShape ? closedBounds : box != null ? new Bounds(box.center, box.size) : new Bounds(Vector3.zero, Vector3.one * .5f);
+        if (palletCollider != null)
+            for (int i = 0; i < 8; i++)
+            {
+                Vector3 corner = palletCollider.center + Vector3.Scale(palletCollider.size * .5f,
+                    new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
+                bounds.Encapsulate(transform.InverseTransformPoint(palletCollider.transform.TransformPoint(corner)));
+            }
+        return bounds;
     }
     public Vector3 PromptPosition
     {

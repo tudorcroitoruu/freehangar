@@ -4,6 +4,43 @@ using UnityEngine;
 
 public class ForkliftCargoTests
 {
+    [Test]
+    public void ForkliftAnimatesVisibleWheelParentsAndSteeringWithoutMovingAxles()
+    {
+        var root = new GameObject("Forklift visual regression");
+        try
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Imported/Toon Series/Toon Farm Pack/Prefabs/Vehicles/Agricultural/TFP_Tractor_01C.prefab");
+            Assert.IsNotNull(prefab);
+            var model = Object.Instantiate(prefab, root.transform);
+            model.transform.localRotation = Quaternion.Euler(0, -90, 0);
+            var forklift = root.AddComponent<ForkliftController>();
+            var rig = root.GetComponent<BicycleController>();
+            const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            var wheels = new System.Collections.Generic.List<Transform>();
+            foreach (var node in model.GetComponentsInChildren<Transform>(true))
+                if (((node.name.Contains("Wheel_F.") || node.name.Contains("Wheel_R.")) && !node.name.Contains("LOD")) ||
+                    node.name.Contains("Steering_Wheel")) wheels.Add(node);
+            Assert.AreEqual(5, wheels.Count, "Four visible wheel parents and the steering wheel must be connected.");
+            var rests = wheels.ConvertAll(wheel => wheel.localRotation);
+            var positions = wheels.ConvertAll(wheel => wheel.localPosition);
+            typeof(BicycleController).GetField("wheelAngle", flags).SetValue(rig, 90f);
+            typeof(BicycleController).GetField("currentSteering", flags).SetValue(rig, 20f);
+            forklift.RefreshWheelVisuals();
+            for (int i = 0; i < wheels.Count; i++)
+            {
+                Assert.Greater(Quaternion.Angle(rests[i], wheels[i].localRotation), 1f, wheels[i].name);
+                Assert.AreEqual(positions[i], wheels[i].localPosition, "Axles must stay attached to the chassis.");
+            }
+            typeof(BicycleController).GetField("wheelAngle", flags).SetValue(rig, 0f);
+            typeof(BicycleController).GetField("currentSteering", flags).SetValue(rig, 0f);
+            forklift.RefreshWheelVisuals();
+            for (int i = 0; i < wheels.Count; i++)
+                Assert.Less(Quaternion.Angle(rests[i], wheels[i].localRotation), .01f, "Reverse movement must return to the original pose.");
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
+
     [TestCase(64, false)]
     [TestCase(0, true)]
     [TestCase(64, true)]
