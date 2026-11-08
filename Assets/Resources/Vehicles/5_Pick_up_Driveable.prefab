@@ -602,7 +602,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 103dbdc7e146d6248aeae8d3b67bc69a, type: 2}
-  - {fileID: 2100000, guid: 057404b51d4cbb54e813a4128462ab73, type: 2}
+  - {fileID: 2100000, guid: ece24ecb73e04064fad84c1789df2198, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1336,7 +1336,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 103dbdc7e146d6248aeae8d3b67bc69a, type: 2}
-  - {fileID: 2100000, guid: 057404b51d4cbb54e813a4128462ab73, type: 2}
+  - {fileID: 2100000, guid: ece24ecb73e04064fad84c1789df2198, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1536,7 +1536,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 103dbdc7e146d6248aeae8d3b67bc69a, type: 2}
-  - {fileID: 2100000, guid: 057404b51d4cbb54e813a4128462ab73, type: 2}
+  - {fileID: 2100000, guid: ece24ecb73e04064fad84c1789df2198, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2375,7 +2375,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8708892154946547016}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.043617774, z: 0, w: 0.9990483}
+  m_LocalRotation: {x: 0, y: -0.043619405, z: 0, w: 0.9990483}
   m_LocalPosition: {x: 10.52, y: 0.020976562, z: 22.31}
   m_LocalScale: {x: 1.0000001, y: 1, z: 1.0000001}
   m_ConstrainProportionsScale: 0
@@ -2393,7 +2393,7 @@ Transform:
   - {fileID: 3965299279977106414}
   - {fileID: 2973494500619878703}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -5, z: 0}
 --- !u!143 &8325492870176282803
 CharacterController:
   m_ObjectHideFlags: 0
@@ -2431,6 +2431,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd2db587a0c5ed5438cfe500addebb84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BicycleController
+  hudIndicatorHideDistance: 5
   steering: {fileID: 4703422399122959722}
   frontWheel: {fileID: 8732060320592567658}
   rearWheel: {fileID: 7803571453905731921}

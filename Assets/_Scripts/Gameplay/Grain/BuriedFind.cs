@@ -19,18 +19,30 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         ? "Requires a key for this chest."
         : $"Requires any {matchingKeyColor.ToLowerInvariant()} key.";
     private static readonly string[] ChestKeyFamilies = { "farm.key.iron", "farm.key.copper" };
-    public static bool HasChestKey(PlayerData data, string requiredId)
+    public static bool HasChestKey(PlayerData data, string requiredId) => FindChestKey(data, requiredId) != null;
+    private static string FindChestKey(PlayerData data, string requiredId)
     {
-        if (WasFound(data, requiredId)) return true;
-        if (data?.foundSecrets == null || string.IsNullOrEmpty(requiredId)) return false;
+        if (data?.foundSecrets == null || string.IsNullOrEmpty(requiredId)) return null;
+        if (WasFound(data, requiredId) && !WasFound(data, "consumed.chest.key:" + requiredId)) return requiredId;
         foreach (string family in ChestKeyFamilies)
         {
             if (requiredId != family && !requiredId.StartsWith(family + ".", StringComparison.Ordinal)) continue;
             foreach (string ownedId in data.foundSecrets)
-                if (ownedId == family || (ownedId != null && ownedId.StartsWith(family + ".", StringComparison.Ordinal)))
-                    return true;
+                if ((ownedId == family || (ownedId != null && ownedId.StartsWith(family + ".", StringComparison.Ordinal))) &&
+                    !WasFound(data, "consumed.chest.key:" + ownedId))
+                    return ownedId;
         }
-        return false;
+        return null;
+    }
+    public static bool TryConsumeChestKey(PlayerData data, string requiredId)
+    {
+        string key = FindChestKey(data, requiredId);
+        if (key == null) return false;
+        // Keep collection history so a spent key does not respawn when loading the save.
+        int index = data.foundSecrets.Length;
+        Array.Resize(ref data.foundSecrets, index + 1);
+        data.foundSecrets[index] = "consumed.chest.key:" + key;
+        return true;
     }
     public void ConfigureChestKey(string id,string label) { kind=Kind.Key;findId=id;chestKeyLabel=label; }
     public void ConfigureMatchingChest(string id,string keyId,string label,GrainPile pile,Material keyMaterial)
@@ -253,7 +265,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         prompt = default;
         if (!isActiveAndEnabled || opening || !revealed || string.IsNullOrEmpty(findId) || WasFound(SaveSystem.Data, findId)) return false;
         bool hasProfile = SaveSystem.savesLoaded && SaveSystem.Data != null;
-        bool hasKey = kind != Kind.CashChest || HasChestKey(SaveSystem.Data, requiredKeyId) || (!string.IsNullOrEmpty(matchingHangarKeyId) && WasFound(SaveSystem.Data, matchingHangarKeyId));
+        bool hasKey = kind != Kind.CashChest || HasChestKey(SaveSystem.Data, requiredKeyId) || HasChestKey(SaveSystem.Data, matchingHangarKeyId);
         string action = !hasProfile ? "Load save to collect" : !hasKey ? "" :
             kind == Kind.VehicleKey ? $"Take {vehicleKeyName} key" :
             kind == Kind.Key ? $"Take {(string.IsNullOrEmpty(chestKeyLabel) ? "chest" : chestKeyLabel)} key" :
@@ -309,6 +321,12 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     {
         PlayerData data = SaveSystem.Data;
         if (data == null || WasFound(data, findId)) return false;
+        string chestKey = null;
+        if (kind == Kind.CashChest)
+        {
+            chestKey = FindChestKey(data, requiredKeyId) ?? FindChestKey(data, matchingHangarKeyId);
+            if (chestKey == null) return false;
+        }
         if (kind == Kind.CashChest && variedChestRewards)
         {
             if(!chestRewardRolled) { rolledChestReward=PlayerPerks.Roll(UnityEngine.Random.value);chestRewardRolled=true; }
@@ -328,6 +346,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         {
             if(!PlayerPerks.Grant(data,BottleReward,0,staminaDurationSeconds,PlayerPerks.Now))return false;
         }
+        if (kind == Kind.CashChest) TryConsumeChestKey(data, chestKey);
         if (data.foundSecrets == null) data.foundSecrets = Array.Empty<string>();
         int index = data.foundSecrets.Length;
         Array.Resize(ref data.foundSecrets, index + 1);

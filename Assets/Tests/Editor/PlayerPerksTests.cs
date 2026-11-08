@@ -5,6 +5,20 @@ using System.Reflection;
 
 public class PlayerPerksTests
 {
+    [Test]
+    public void OpeningChestsConsumesOneMatchingKeyAndPreservesCollectionAfterReload()
+    {
+        var data = new PlayerData { foundSecrets = new[] { "farm.key.iron", "farm.key.iron.bonus.2", "farm.key.copper" } };
+        Assert.IsTrue(BuriedFind.TryConsumeChestKey(data, "farm.key.iron"));
+        Assert.IsTrue(BuriedFind.WasFound(data, "farm.key.iron"));
+        data = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(data));
+        Assert.IsTrue(BuriedFind.HasChestKey(data, "farm.key.iron"));
+        Assert.IsTrue(BuriedFind.TryConsumeChestKey(data, "farm.key.iron.bonus.4"));
+        Assert.IsFalse(BuriedFind.HasChestKey(data, "farm.key.iron"));
+        Assert.IsFalse(BuriedFind.TryConsumeChestKey(data, "farm.key.iron"));
+        Assert.IsTrue(BuriedFind.HasChestKey(data, "farm.key.copper"));
+    }
+
     [TestCase("farm.key.iron", "farm.key.iron.bonus.2", true)]
     [TestCase("farm.key.iron.bonus.4", "farm.key.iron", true)]
     [TestCase("farm.key.iron.bonus.2", "farm.key.iron.bonus.4", true)]

@@ -607,7 +607,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 8947ea2c73d7b334785955d3d7321641, type: 2}
-  - {fileID: 2100000, guid: a03dab9186bc7084fb126987b2783344, type: 2}
+  - {fileID: 2100000, guid: ece24ecb73e04064fad84c1789df2198, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -717,7 +717,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 8947ea2c73d7b334785955d3d7321641, type: 2}
-  - {fileID: 2100000, guid: a03dab9186bc7084fb126987b2783344, type: 2}
+  - {fileID: 2100000, guid: ece24ecb73e04064fad84c1789df2198, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -792,7 +792,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1850182445453681032}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.00000029502795, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 18.49, y: 0.020976562, z: 23.19}
   m_LocalScale: {x: 1.2652, y: 1.2652, z: 1.2652}
   m_ConstrainProportionsScale: 0
@@ -851,6 +851,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd2db587a0c5ed5438cfe500addebb84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BicycleController
+  hudIndicatorHideDistance: 5
   steering: {fileID: 4479539762129277379}
   frontWheel: {fileID: 2523735135821134870}
   rearWheel: {fileID: 6709885928042605442}
@@ -2508,7 +2509,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 8947ea2c73d7b334785955d3d7321641, type: 2}
-  - {fileID: 2100000, guid: a03dab9186bc7084fb126987b2783344, type: 2}
+  - {fileID: 2100000, guid: ece24ecb73e04064fad84c1789df2198, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

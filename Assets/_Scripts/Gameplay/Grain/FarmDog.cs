@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>One home companion: petting, timed chicken hunts and delivery back to its bowl.</summary>
+/// <summary>One home companion: petting, timed chicken hunts and delivery near the player.</summary>
 [DisallowMultipleComponent, RequireComponent(typeof(NavMeshAgent))]
 public sealed class FarmDog : MonoBehaviour, IInteractable
 {
-    public enum DogState { Idle, Sleeping, Petting, Chasing, Attacking, Returning, Alerting, DeliveryAlert }
+    public enum DogState { Idle, Sleeping, Petting, Chasing, Attacking, Returning, Alerting, DeliveryAlert, Delivering }
     public Animator animator;
     public Transform visual, mouth, deliveryPoint;
     public ParticleSystem sleepVfx;
@@ -36,6 +36,8 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     private FarmChicken target;
     private ChickenLegPickup cargo;
     private Vector3 home, visualPosition;
+    private Vector3 deliveryDestination, deliveryPlayerPosition;
+    private bool hasDeliveryDestination;
     private Quaternion homeRotation;
     private float rest, stateAt, nextPet, nextDecision, huntStarted, nextNavigationRetry;
     private float animationReadyAt, petEndsAt;
@@ -68,7 +70,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
             {
                 cargo = Instantiate(legPrefab).GetComponent<ChickenLegPickup>();
                 if (cargo) cargo.Carry(mouth);
-                SetState(DogState.Returning);
+                SetState(cargo ? DogState.Delivering : DogState.Returning);
             }
             else SetState(DogState.Sleeping);
         }
@@ -86,11 +88,11 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         else if (State == DogState.Chasing) Chase();
         else if (State == DogState.Attacking) Attack();
         else if (State == DogState.Returning) ReturnHome();
+        else if (State == DogState.Delivering) DeliverToPlayer();
         else if (State == DogState.Alerting) AlertChicken();
         else if (State == DogState.DeliveryAlert)
         {
-            if (Time.time - stateAt >= 60f) SetState(DogState.Sleeping);
-            else if (Time.time >= nextBark) Bark();
+            if (Time.time - stateAt >= 1.2f) GoHome();
         }
         else if (Time.time >= nextDecision)
         {
@@ -288,7 +290,81 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         target = null;
         rest = HuntInterval(Level);
         if (profile != null) profile.dogRestSeconds = rest;
-        SetState(DogState.Returning);
+        hasDeliveryDestination = false;
+        SetState(cargo ? DogState.Delivering : DogState.Returning);
+    }
+
+    private bool TryDeliveryDestination(Vector3 playerPosition, out Vector3 destination)
+    {
+        Vector3 best = transform.position;
+        float nearest = float.PositiveInfinity;
+        void Consider(Vector3 candidate)
+        {
+            if (!NavMesh.SamplePosition(candidate, out var hit, 2f, agent.areaMask)) return;
+            float distance = (hit.position - playerPosition).sqrMagnitude;
+            if (distance >= nearest || !FarmChicken.IsGrainClearAt(hit.position - Vector3.up * .2f) ||
+                !FarmChicken.TryGroundPoint(hit.position, out var support) ||
+                Mathf.Abs(support.y - hit.position.y) > .15f || !CompletePath(hit.position)) return;
+            // The baked mesh can still pass through freshly poured grain.
+            var corners = path.corners;
+            for (int segment = 1; segment < corners.Length; segment++)
+            {
+                int steps = Mathf.Max(1, Mathf.CeilToInt(Vector3.Distance(corners[segment - 1], corners[segment]) / .5f));
+                for (int step = 1; step <= steps; step++)
+                    if (!FarmChicken.IsGrainClearAt(Vector3.Lerp(corners[segment - 1], corners[segment], (float)step / steps) - Vector3.up * .2f))
+                        return;
+            }
+            best = hit.position;
+            nearest = distance;
+        }
+        // A reachable point at the dog's feet is a fallback for isolated platforms.
+        Consider(transform.position);
+        for (float radius = 0f; radius <= 40f && radius <= Mathf.Sqrt(nearest) + 2f; radius += 2f)
+        {
+            int count = radius == 0f ? 1 : 24;
+            for (int i = 0; i < count; i++)
+            {
+                float angle = i * Mathf.PI * 2f / count;
+                Vector3 candidate = playerPosition + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
+                Consider(candidate);
+                // Find ground below a player standing on a high pile or roof too.
+                candidate.y = transform.position.y;
+                Consider(candidate);
+            }
+        }
+        destination = best;
+        return float.IsFinite(nearest);
+    }
+
+    private void DeliverToPlayer()
+    {
+        if (!cargo) { profile.dogHasDelivery = false; GoHome(); return; }
+        if (!nearbyPlayer)
+        {
+            var player = FindFirstObjectByType<PlayerController>();
+            if (player) nearbyPlayer = player.transform;
+        }
+        if (!ReadyToNavigate() || Time.time < nextDecision) return;
+        nextDecision = Time.time + .75f;
+        Vector3 playerPosition = nearbyPlayer && nearbyPlayer.gameObject.activeInHierarchy ? nearbyPlayer.position : home;
+        if (!hasDeliveryDestination || (playerPosition - deliveryPlayerPosition).sqrMagnitude > 1f ||
+            !FarmChicken.IsGrainClearAt(deliveryDestination - Vector3.up * .2f))
+        {
+            deliveryPlayerPosition = playerPosition;
+            hasDeliveryDestination = TryDeliveryDestination(playerPosition, out deliveryDestination);
+        }
+        if (!hasDeliveryDestination) return;
+        if ((transform.position - deliveryDestination).sqrMagnitude <= 1f &&
+            !NavMesh.Raycast(transform.position, deliveryDestination, out _, agent.areaMask))
+        {
+            cargo.PutDown(deliveryDestination + Vector3.up * .15f);
+            cargo = null;
+            profile.dogHasDelivery = false;
+            SetState(DogState.DeliveryAlert);
+            Bark(true);
+            return;
+        }
+        if (!MoveTo(deliveryDestination)) hasDeliveryDestination = false;
     }
 
     private void ReturnHome()
@@ -338,7 +414,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
 
     private void UpdatePresentation()
     {
-        if (State == DogState.Chasing || State == DogState.Returning || State == DogState.Alerting)
+        if (State == DogState.Chasing || State == DogState.Returning || State == DogState.Alerting || State == DogState.Delivering)
         {
             bool navigating = agent.enabled && agent.isOnNavMesh && !agent.isStopped;
             bool moving = navigating && (agent.velocity.sqrMagnitude > .0004f || agent.pathPending ||

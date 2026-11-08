@@ -51,6 +51,13 @@ public class DogScreenStatus : MonoBehaviour
     private void ApplyPreset(FarmDog.DogState state)
     {
         displayedState = state;
+        if (state == FarmDog.DogState.Delivering)
+        {
+            ApplyPreset(FarmDog.DogState.Returning);
+            displayedState = state;
+            if (statusNameText) statusNameText.text = "Bringing chicken leg";
+            return;
+        }
         if (statusNameText && state == FarmDog.DogState.Alerting) statusNameText.text = "Chicken found";
         if (statusNameText && state == FarmDog.DogState.DeliveryAlert) statusNameText.text = "Chicken leg delivered";
         if (presets == null) return;
