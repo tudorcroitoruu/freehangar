@@ -16,6 +16,7 @@ public struct InteractionPromptData
     public bool NotFitInWheelBarrow;
     public bool CannotLoadInWheelbarrow;
     public bool CannotLoadHalfEmptyBags;
+    public bool ContainerLevelTooHigh;
     public bool NeedKeyForChest;
     public bool NotHungry;
     public bool WeighingEmpty;
@@ -44,6 +45,7 @@ public struct InteractionPromptData
         NotFitInWheelBarrow = false;
         CannotLoadInWheelbarrow = false;
         CannotLoadHalfEmptyBags = false;
+        ContainerLevelTooHigh = false;
         NeedKeyForChest = false;
         NotHungry = false;
         WeighingEmpty = false;

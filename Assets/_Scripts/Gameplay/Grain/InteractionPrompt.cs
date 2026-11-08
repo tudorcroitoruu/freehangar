@@ -13,7 +13,6 @@ public sealed class InteractionPrompt : MonoBehaviour
     [SerializeField] private TMP_Text keycap;
     [SerializeField] private Sprite axeIcon;
     [SerializeField] private Sprite hammerIcon;
-    [SerializeField] private Sprite restrictedIcon;
     private Image keyBackground;
     private Sprite originalKeySprite;
     private bool originalKeyAspect;
@@ -57,6 +56,9 @@ public sealed class InteractionPrompt : MonoBehaviour
     public void Show(Camera camera, InteractionPromptData data)
     {
         if (data.RequiresFreeHands || Time.timeScale <= 0f || UIPopups.BasePopupUI.HasActivePopup) { Hide(); return; }
+        bool showToolIcon = data.RequiredTool == PlayerCombatTools.Tool.Axe ||
+            data.RequiredTool == PlayerCombatTools.Tool.Hammer;
+        if (!showToolIcon && !data.HasAvailableInput && !data.ShowProgress) { Hide(); return; }
         if (panel == null || canvasRect == null || camera == null || (string.IsNullOrEmpty(data.Action) && !data.ShowProgress)) { Hide(); return; }
         Vector3 screen = camera.WorldToScreenPoint(data.Position);
         if (screen.z <= 0 || screen.x < 0 || screen.x > Screen.width || screen.y < 0 || screen.y > Screen.height) { Hide(); return; }
@@ -74,8 +76,7 @@ public sealed class InteractionPrompt : MonoBehaviour
         if (keyBackground != null)
         {
             Sprite icon = data.RequiredTool == PlayerCombatTools.Tool.Axe ? axeIcon :
-                data.RequiredTool == PlayerCombatTools.Tool.Hammer ? hammerIcon :
-                !data.HasAvailableInput && !data.ShowProgress ? restrictedIcon : null;
+                data.RequiredTool == PlayerCombatTools.Tool.Hammer ? hammerIcon : null;
             keyBackground.sprite = icon != null ? icon : originalKeySprite;
             keyBackground.preserveAspect = icon != null || originalKeyAspect;
         }
@@ -85,16 +86,15 @@ public sealed class InteractionPrompt : MonoBehaviour
             descriptionTwo.text = data.SecondaryDescription ?? "";
             descriptionTwo.gameObject.SetActive(!string.IsNullOrEmpty(data.SecondaryDescription));
         }
-        bool showMouseLeft = data.RequiredTool == PlayerCombatTools.Tool.Axe ||
-            data.RequiredTool == PlayerCombatTools.Tool.Hammer || (data.ShowPrimaryButton && data.PrimaryIsAttack);
+        bool showMouseLeft = !showToolIcon && data.ShowPrimaryButton && data.PrimaryIsAttack;
         bool padPrimary = !showMouseLeft && FarmInput.UsingPad && data.ShowPrimaryButton;
         bool showKeyboardKey = !FarmInput.UsingPad && data.ShowKeyboardKey;
-        bool showKey = !showMouseLeft && (showKeyboardKey || padPrimary || (data.ShowKey && !data.ShowPrimaryButton));
+        bool showKey = !showToolIcon && !showMouseLeft && (showKeyboardKey || padPrimary || (data.ShowKey && !data.ShowPrimaryButton));
         string key = padPrimary ? FarmInput.Label(data.PrimaryIsAttack ? "Attack" : "Unload", "") : KeyLabel(data.InteractionKey);
         if (keycap != null && showKey) GamepadPromptSprites.SetKeycap(keycap, key);
         if (keycap != null && keycap.gameObject.activeSelf != showKey) keycap.gameObject.SetActive(showKey);
         if (mouseLeft != null && mouseLeft.activeSelf != showMouseLeft) mouseLeft.SetActive(showMouseLeft);
-        bool showMouseRight = !showMouseLeft && data.ShowPrimaryButton && !padPrimary;
+        bool showMouseRight = !showToolIcon && !showMouseLeft && data.ShowPrimaryButton && !padPrimary;
         if (mouseRight != null && mouseRight.activeSelf != showMouseRight) mouseRight.SetActive(showMouseRight);
         if (bagSliderFill != null && bagSliderFill.activeSelf != data.ShowProgress) bagSliderFill.SetActive(data.ShowProgress);
         if (bagFill != null) bagFill.fillAmount = Mathf.Clamp01(data.Progress);

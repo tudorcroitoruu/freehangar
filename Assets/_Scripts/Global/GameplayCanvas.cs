@@ -55,6 +55,7 @@ public class GameplayCanvas : MonoBehaviour
     [SerializeField] private GameObject[] bicycleHints;
     [SerializeField] private GameObject[] forkliftHints;
     [SerializeField] private TMP_Text walkingInteraction;
+    [SerializeField] private TMP_Text leftMouseHintInteraction;
     private BagInteraction playerBags;
     private readonly List<System.Action<bool>> controlHintUpdates = new List<System.Action<bool>>();
     private int hintDevice = -2;
@@ -311,6 +312,9 @@ public class GameplayCanvas : MonoBehaviour
         if (IsToolUnlocked(PlayerCombatTools.Tool.Hammer)) tools |= 8;
         if (IsToolUnlocked(PlayerCombatTools.Tool.Pistol)) tools |= 16;
         var equipped = playerTools != null ? playerTools.Equipped : PlayerCombatTools.Tool.Shovel;
+        string leftMouseAction = equipped == PlayerCombatTools.Tool.Shovel ? "Load into shovel" : "Attack";
+        if (leftMouseHintInteraction != null && leftMouseHintInteraction.text != leftMouseAction)
+            leftMouseHintInteraction.text = leftMouseAction;
         if (tools != displayedTools || equipped != displayedEquipped)
         {
             bool showNewTool = displayedTools < 0 || (tools & ~displayedTools) != 0;

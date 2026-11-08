@@ -46,7 +46,6 @@ public sealed class ForkliftController : MonoBehaviour
     private bool[] originalColliderStates;
     private Collider[] overlaps=new Collider[48];
     private readonly RaycastHit[] groundHits=new RaycastHit[32];
-    private string blocked="";
     private float blockedUntil;
     private struct WheelVisual
     {
@@ -125,7 +124,8 @@ public sealed class ForkliftController : MonoBehaviour
         if (cargo == null || transferring) return;
         if (!TryDrop())
         {
-            blocked="Make room to drop";blockedUntil=Time.time+1.2f;
+            blockedUntil=Time.time+1.2f;
+            GameplayCanvas.Instance?.ShowWarning(WarningType.OccupiedArea, 1.2f);
         }
     }
     private void LateUpdate()
@@ -155,8 +155,13 @@ public sealed class ForkliftController : MonoBehaviour
             }
         }
         if(!AcceptInput || forkAnchor==null)return;
+        if (Time.time < blockedUntil)
+        {
+            GameplayCanvas.Instance?.interactionPrompt?.Hide();
+            return;
+        }
         bool available=cargo!=null && !transferring;
-        string action=Time.time<blockedUntil?blocked:transferring?"Unloading big bag":cargo!=null?"Lower and drop big bag":"Approach a vehicle or drive forks under a big bag";
+        string action=transferring?"Unloading big bag":cargo!=null?"Lower and drop big bag":"Approach a vehicle or drive forks under a big bag";
         var data=new InteractionPromptData(forkAnchor.position+Vector3.up*.8f,action,available){InteractionKey=KeyCode.Q};
         if (!transferring && Time.time >= blockedUntil)
         {

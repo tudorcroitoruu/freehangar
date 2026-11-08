@@ -106,14 +106,19 @@ public sealed class PlayerItemCarry : MonoBehaviour
         if (!IsCarrying) return false;
         bool blocked = Time.time < blockedUntil;
         prompt = new InteractionPromptData(carried.transform.TransformPoint(localCenter),
-            blocked ? "Make room to place" : "Place", !blocked);
+            blocked ? "" : "Place", !blocked);
         return true;
     }
 
     public bool TryPlace()
     {
         if (!isActiveAndEnabled || !IsCarrying || Time.timeScale <= 0f || view == null) return false;
-        if (!FindPosition(out var center)) { blockedUntil = Time.time + 1f; return false; }
+        if (!FindPosition(out var center))
+        {
+            blockedUntil = Time.time + 1f;
+            GameplayCanvas.Instance?.ShowWarning(WarningType.OccupiedArea, 1f);
+            return false;
+        }
         Release(center);
         GameplayAudio.Instance?.Drop();
         return true;

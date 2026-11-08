@@ -2660,7 +2660,6 @@ MonoBehaviour:
   keycap: {fileID: 6902854521414314670}
   axeIcon: {fileID: 21300000, guid: add56af62cb972d48a834de40a428c42, type: 3}
   hammerIcon: {fileID: 21300000, guid: ed14aaec73c521d4b9f61d64a3ca8ac0, type: 3}
-  restrictedIcon: {fileID: 0}
   mouseRight: {fileID: 1401144034268598406}
   mouseLeft: {fileID: 6472195158931776823}
   bagSliderFill: {fileID: 2274562060591844815}
@@ -2709,6 +2708,7 @@ MonoBehaviour:
   - {fileID: 429764560600554374}
   - {fileID: 3089562873267562838}
   walkingInteraction: {fileID: 7031506191501916943}
+  leftMouseHintInteraction: {fileID: 3622129534019802808}
   hintsParent: {fileID: 459435849332738037}
   shovelEquipped: {fileID: 8353208135329761499}
   broomEquipped: {fileID: 2955780447568988104}
@@ -3305,6 +3305,10 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 6d8692533424a894b86c0aea836756c0, type: 3}
     title: Can't load!
     message: Finish filling and close the bag.
+  - warningType: 24
+    icon: {fileID: 21300000, guid: 705811d807164754fadd17290547d925, type: 3}
+    title: Container level too high!
+    message: Upgrade this vehicle to transport this container
   warningCanvasGroup: {fileID: 737507088087375577}
   warningImage: {fileID: 6193481453998981383}
   warningTitle: {fileID: 11493426258684311}

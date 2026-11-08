@@ -93,9 +93,9 @@ public sealed class BagInteraction : MonoBehaviour
         bool useForklift = bag.IsBigBag && !canCarry && !canPour && !canFinish && !underAttack;
         string action = canPour ? "Fill" : bag == carried ? "Drop" : canFinish ? "Finish" : canCarry ? $"Take {bag.DisplayName}" :
             underAttack ? "Under attack" : useForklift ? "" : bag.IsFull ? "Full" : "Fill";
-        data = new InteractionPromptData(position, blocked ? "Make room to drop" : action,
+        data = new InteractionPromptData(position, blocked ? "" : action,
             !canPour && (canFinish || canCarry) && !blocked);
-        data.ShowProgress = !bag.IsFull;
+        data.ShowProgress = !blocked && !bag.IsFull;
         data.ShowPrimaryButton = canPour;
         data.UseForkliftToMove = useForklift;
         var interactor = GetComponent<PlayerInteractor>();
@@ -269,7 +269,12 @@ public sealed class BagInteraction : MonoBehaviour
 
     private bool Drop()
     {
-        if (!FindDropPosition(out Vector3 center)) { blockedUntil = Time.time + 1f; return false; }
+        if (!FindDropPosition(out Vector3 center))
+        {
+            blockedUntil = Time.time + 1f;
+            GameplayCanvas.Instance?.ShowWarning(WarningType.OccupiedArea, 1f);
+            return false;
+        }
         Release(center);
         if (!WorldSaveRuntime.IsRestoring) GoalChecker.ReportProgress(GoalType.SackPlaced);
         GameplayAudio.Instance?.Drop();
