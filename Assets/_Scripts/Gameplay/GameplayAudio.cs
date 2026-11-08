@@ -51,6 +51,7 @@ public sealed class GameplayAudio : MonoBehaviour
     [Header("Grain tools")]
     [SerializeField] private AudioClip[] shovelGets, fillGrain;
     [SerializeField] private AudioClip vacuum;
+    private AudioClip boostedVacuum;
     [Header("Vehicles")]
     [SerializeField] private AudioClip resetVehicle;
     [SerializeField] private AudioClip bicycleMove, bicycleScratch, motorollerAndTrike, pickupMotor, wheelbarrow;
@@ -68,7 +69,11 @@ public sealed class GameplayAudio : MonoBehaviour
         effects.outputAudioMixerGroup = effectsGroup;
     }
 
-    private void OnDestroy() { if (Instance == this) Instance = null; }
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+        if (boostedVacuum != null) Destroy(boostedVacuum);
+    }
 
     private void OnEnable()
     {
@@ -199,8 +204,24 @@ public sealed class GameplayAudio : MonoBehaviour
         if (!source.isPlaying) source.Play();
     }
 
-    public void VacuumMoving(Transform tool, bool moving, bool lastVacuum) =>
-        SetLoop(tool, vacuum, moving, lastVacuum ? 1.18f : .92f, .83f, 0f);
+    public void VacuumMoving(Transform tool, bool moving, bool lastVacuum)
+    {
+        // AudioSource.volume clamps to 1. Apply the extra gain to a private clip
+        // so the requested .83 * 1.6 level is retained for both vacuum models.
+        if (moving && vacuum != null && boostedVacuum == null)
+        {
+            vacuum.LoadAudioData();
+            var samples = new float[vacuum.samples * vacuum.channels];
+            if (vacuum.GetData(samples, 0))
+            {
+                for (int i = 0; i < samples.Length; i++) samples[i] *= .83f * 1.6f;
+                boostedVacuum = AudioClip.Create("Vacuum boosted", vacuum.samples, vacuum.channels, vacuum.frequency, false);
+                boostedVacuum.SetData(samples, 0);
+            }
+        }
+        SetLoop(tool, boostedVacuum != null ? boostedVacuum : vacuum, moving,
+            lastVacuum ? 1.18f : .92f, boostedVacuum != null ? 1f : .83f, 0f);
+    }
     public void WheelbarrowMoving(Transform barrow, bool moving) =>
         SetLoop(barrow, wheelbarrow, moving, 1f, .45f);
 
