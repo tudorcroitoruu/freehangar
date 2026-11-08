@@ -105,6 +105,26 @@ public class SellingZoneContainersOnlyTests
         Assert.AreEqual(kilograms, container.Kilograms);
     }
 
+    [Test]
+    public void UnloadedCrateIsWeighedEvenWhenItsColliderWasDisabledByCargoHandling()
+    {
+        container.GetComponent<BoxCollider>().enabled = false;
+        Physics.SyncTransforms();
+        zone.CollectContainers(collected);
+        Assert.That(collected, Is.EquivalentTo(new[] { container }));
+        Assert.IsTrue(zone.CanWeigh(player));
+        button.TryGetPrompt(player, out var prompt);
+        Assert.IsFalse(prompt.WeighingEmpty);
+        container.SetCarried(true);
+        zone.CollectContainers(collected);
+        Assert.IsEmpty(collected);
+        container.SetCarried(false);
+        container.transform.localPosition = Vector3.right * 20;
+        Physics.SyncTransforms();
+        zone.CollectContainers(collected);
+        Assert.IsEmpty(collected);
+    }
+
     [TestCase(true)]
     [TestCase(false)]
     public void VehicleColliderAtTheEdgeBlocksEvenWithOriginOutsideOrControllerDisabled(bool enabled)

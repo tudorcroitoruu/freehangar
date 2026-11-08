@@ -10,6 +10,8 @@ public class SellingZone : MonoBehaviour
     [SerializeField] private GrainEconomySettings economySettings;
     private BoxCollider area;
     private readonly List<GrainContainer> weighableContainers = new List<GrainContainer>();
+    private GrainContainer[] knownContainers;
+    private float nextContainerScan;
     public bool HasVehicleOnScale
     {
         get
@@ -97,6 +99,23 @@ public class SellingZone : MonoBehaviour
         containers.Clear();
         foreach (var hit in Overlaps())
             AddContainer(containers, hit.GetComponentInParent<GrainContainer>());
+        if (!isActiveAndEnabled || area == null || !area.enabled) return;
+        // Carrying and cargo handling temporarily disable colliders. Use their actual
+        // geometry as well, independently of the physics broadphase registration.
+        if (knownContainers == null || !Application.isPlaying || Time.unscaledTime >= nextContainerScan)
+        {
+            knownContainers = FindObjectsByType<GrainContainer>(FindObjectsSortMode.None);
+            nextContainerScan = Time.unscaledTime + .5f;
+        }
+        foreach (var container in knownContainers)
+        {
+            if (container == null || containers.Contains(container) || !container.isActiveAndEnabled ||
+                !container.WorldBounds.Intersects(area.bounds)) continue;
+            var box = container.GetComponent<BoxCollider>();
+            if (box != null && Physics.ComputePenetration(area, area.transform.position, area.transform.rotation,
+                box, box.transform.position, box.transform.rotation, out _, out _))
+                AddContainer(containers, container);
+        }
     }
 
     private void AddContainer(List<GrainContainer> containers, GrainContainer container)
