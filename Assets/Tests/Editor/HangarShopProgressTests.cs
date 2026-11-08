@@ -6,6 +6,29 @@ using UnityEngine;
 public class HangarShopProgressTests
 {
     [Test]
+    public void FinalDoorAnimationStartsBeforeLaunchClockExists()
+    {
+        var root = new GameObject("Final door animation regression");
+        root.SetActive(false);
+        try
+        {
+            var sequence = root.AddComponent<HangarLaunchSequence>();
+            sequence.roomDoor = new GameObject("Door hinge").transform;
+            sequence.roomDoor.SetParent(root.transform, false);
+            var rest = Quaternion.Euler(0, 35, 0);
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+            typeof(HangarLaunchSequence).GetField("doorClosed", flags).SetValue(sequence, rest);
+            Assert.IsNull(typeof(HangarLaunchSequence).GetField("saveClock", flags).GetValue(sequence));
+            var animation = (System.Collections.IEnumerator)typeof(HangarLaunchSequence).GetMethod("OpenRoom", flags).Invoke(sequence, null);
+            Assert.IsTrue(animation.MoveNext(), "Opening the door must not access the uninitialized launch clock.");
+            Assert.Less(Quaternion.Angle(rest, sequence.roomDoor.localRotation), .01f);
+            sequence.RestoreDoor(true);
+            Assert.Less(Quaternion.Angle(rest * Quaternion.Euler(0, -100, 0), sequence.roomDoor.localRotation), .01f);
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
+
+    [Test]
     public void FinalDoorNeedsOnlyLocalClearanceAndRechecksNewGrain()
     {
         var root = new GameObject("Final doorway test");

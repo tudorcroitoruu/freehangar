@@ -1,54 +1,54 @@
 FIND H4 37 % - Copper chest key id=farm.key.copper.bonus.3 duplicate=1 pos=(-81.57, 0.23, 51.39) pile=Hangar 4 - Grain bank to entrance local=(6.29, 0.19, -1.14) size=24 active=True
-FIND H4 45 % - Free upgrade voucher id=farm.voucher.h3 duplicate=1 pos=(-85.62, 0.12, 36.54) pile=Hangar 4 - Grain bank to entrance local=(-4.85, 0.08, 0.69) size=24 active=True
 FIND H5 24 % - Iron chest key id=farm.key.iron.bonus.4 duplicate=1 pos=(75.38, 0.60, 34.70) pile=Hangar 5 - Grain bank to entrance local=(6.22, 0.56, -3.92) size=24 active=True
-FIND Vehicle key - Trike - HANGAR 2 (15 % from door) id=vehicle.key.trike duplicate=1 pos=(39.57, 0.52, -4.71) pile=Hangar 2 - Almost full grain bank local=(0.00, 0.56, -9.92) size=24 active=True
-FIND Copper chest - HANGAR 4 - key farm.key.copper.bonus.3 id=farm.chest.bonus.3 duplicate=1 pos=(-90.72, 0.84, 43.00) pile=Hangar 4 - Grain bank to entrance local=(0.00, 0.80, 3.00) size=24 active=True
 FIND Copper chest - HANGAR 3 - key farm.key.copper.bonus.1 id=farm.chest.bonus.1 duplicate=1 pos=(-47.66, 0.60, -9.38) pile=Hangar 3 - Almost full grain bank local=(0.00, 0.56, -1.80) size=24 active=True
-FIND H4 19 % - No Attacks bottle (5 min) (1) id=farm.perk.bottle.noattacks.copy.1000089993 duplicate=1 pos=(78.17, 4.21, 43.06) pile= local=(0.00, 0.00, 0.00) size= active=True
 FIND H3 26 % - Iron chest key id=farm.key.iron.bonus.2 duplicate=1 pos=(-42.77, 0.20, -13.04) pile=Hangar 3 - Almost full grain bank local=(-5.39, 0.16, -3.45) size=24 active=True
-FIND Iron chest - HANGAR 4 - key farm.key.iron.bonus.2 id=farm.chest.bonus.2 duplicate=1 pos=(-80.12, 0.78, 43.00) pile=Hangar 4 - Grain bank to entrance local=(0.00, 0.74, -1.80) size=24 active=True
 FIND H2 59 % - Free upgrade voucher (2) id=farm.perk.free-upgrade.copy.1298991774 duplicate=1 pos=(29.50, 12.93, 177.99) pile= local=(0.00, 0.00, 0.00) size= active=True
 FIND H5 12 % - Cash cache id=farm.cache.h5.front duplicate=1 pos=(68.24, 0.13, 47.62) pile=Hangar 5 - Grain bank to entrance local=(-3.46, 0.09, -7.15) size=24 active=True
-FIND H2 88 % - Hangar 3 key id=farm.hangar.key.3 duplicate=1 pos=(54.18, 0.13, -5.71) pile=Hangar 2 - Almost full grain bank local=(-7.30, 0.11, 0.72) size=24 active=True
-FIND H3 14 % - Mobility bottle (5 min) id=farm.perk.bottle.mobility duplicate=1 pos=(-43.04, 0.12, -3.10) pile=Hangar 3 - Almost full grain bank local=(3.00, 0.08, -6.69) size=24 active=True
 FIND H1 96 % - Cash cache id=farm.cache.h1.finish duplicate=1 pos=(5.72, 0.89, 6.10) pile=Corn pile - scoop with left click local=(1.48, 0.40, 1.10) size=6 active=True
 FIND H2 74 % - Infinite Stamina bottle (5 min) id=farm.perk.bottle.infinitestamina duplicate=1 pos=(61.47, 0.12, -10.41) pile=Hangar 2 - Almost full grain bank local=(-6.81, 0.09, 7.73) size=24 active=True
 FIND H2 59 % - Free upgrade voucher (1) id=farm.perk.free-upgrade.copy.602348849 duplicate=1 pos=(5.37, 2.99, 5.11) pile= local=(0.00, 0.00, 0.00) size= active=True
 FIND H3 45 % - Cash cache id=farm.cache.h3 duplicate=1 pos=(-54.87, 0.13, -5.49) pile=Hangar 3 - Almost full grain bank local=(6.69, 0.09, 1.15) size=24 active=True
 FIND H1 58 % - Stamina bottle (5 min) id=farm.stamina.starter duplicate=1 pos=(8.52, 1.19, -2.51) pile=Corn pile - scoop with left click local=(-2.56, 0.54, 0.09) size=6 active=True
 FIND H5 91 % - Cash cache id=farm.cache.h5.finish duplicate=1 pos=(81.92, 2.42, 52.45) pile=Hangar 5 - Grain bank to entrance local=(-7.09, 2.38, -0.96) size=24 active=True
-FIND H3 57 % - Double Sell Cash bottle (5 min) id=farm.perk.bottle.doublesellcash.h3 duplicate=1 pos=(-52.50, 0.12, -16.34) pile=Hangar 3 - Almost full grain bank local=(-3.46, 0.08, 3.46) size=24 active=True
 FIND Vehicle key - Lawnmower - HANGAR 2 (52 % from door) id=vehicle.key.lawnmower duplicate=1 pos=(50.18, 0.67, -10.84) pile=Hangar 2 - Almost full grain bank local=(0.00, 0.74, -0.01) size=24 active=True
 FIND H5 70 % - Cash cache id=farm.cache.h5 duplicate=1 pos=(97.80, 0.13, 35.92) pile=Hangar 5 - Grain bank to entrance local=(5.31, 0.09, 6.23) size=24 active=True
 FIND H5 60 % - Infinite Stamina bottle (5 min) id=farm.perk.bottle.stamina.h5 duplicate=1 pos=(92.70, 0.12, 50.08) pile=Hangar 5 - Grain bank to entrance local=(-5.31, 0.08, 3.92) size=24 active=True
 FIND Vehicle key - Pickup - HANGAR 3 (36 % from door) id=vehicle.key.pickup duplicate=1 pos=(-46.14, 0.56, -8.50) pile=Hangar 3 - Almost full grain bank local=(0.00, 0.52, -3.00) size=24 active=True
-FIND H1 10 % - Cash cache id=farm.cache.starter duplicate=1 pos=(55.97, 9.76, 120.42) pile= local=(0.00, 0.00, 0.00) size= active=True
 FIND H4 19 % - No Attacks bottle (5 min) id=farm.perk.bottle.noattacks duplicate=1 pos=(-72.37, 0.26, 47.00) pile=Hangar 4 - Grain bank to entrance local=(3.00, 0.22, -5.31) size=24 active=True
+FIND Copper chest - HANGAR 2 - key farm.key.copper id=farm.chest.h2 duplicate=1 pos=(47.15, 0.59, -9.09) pile=Hangar 2 - Almost full grain bank local=(0.00, 0.65, -2.84) size=24 active=True
+FIND H4 53 % - Stamina bottle (5 min) id=farm.stamina.h4 duplicate=1 pos=(-89.69, 0.12, 47.00) pile=Hangar 4 - Grain bank to entrance local=(3.00, 0.08, 2.54) size=24 active=True
+FIND H2 43 % - Copper chest key id=farm.key.copper.bonus.1 duplicate=1 pos=(53.45, 0.60, -4.12) pile=Hangar 2 - Almost full grain bank local=(-8.44, 0.66, -0.44) size=24 active=True
+FIND H1 84 % - Hangar 2 key id=farm.hangar.key.2 duplicate=1 pos=(9.10, 0.10, 4.74) pile=Corn pile - scoop with left click local=(0.75, 0.04, -0.40) size=6 active=True
+FIND H4 89 % - Hangar 5 key id=farm.hangar.key.5 duplicate=1 pos=(-106.01, 0.13, 39.62) pile=Hangar 4 - Grain bank to entrance local=(-2.54, 0.09, 9.93) size=24 active=True
+FIND H5 48 % - Double Sell Cash bottle (5 min) id=farm.perk.bottle.doublesellcash duplicate=1 pos=(87.60, 0.13, 39.64) pile=Hangar 5 - Grain bank to entrance local=(2.52, 0.09, 1.61) size=24 active=True
+FIND H1 68 % - Axe id=farm.tool.hammer duplicate=1 pos=(8.26, 0.27, 3.68) pile=Corn pile - scoop with left click local=(0.28, 0.12, 0.02) size=6 active=True
+FIND H1 44 % - Copper chest key id=farm.key.copper duplicate=1 pos=(5.12, 0.34, 4.13) pile=Corn pile - scoop with left click local=(0.59, 0.15, 1.44) size=6 active=True
+FIND H3 88 % - Hangar 4 key id=farm.hangar.key.4 duplicate=1 pos=(-54.93, 0.13, -16.59) pile=Hangar 3 - Almost full grain bank local=(-2.51, 0.09, 4.99) size=24 active=True
+FIND H4 45 % - Free upgrade voucher id=farm.voucher.h3 duplicate=1 pos=(-85.62, 0.12, 36.54) pile=Hangar 4 - Grain bank to entrance local=(-4.85, 0.08, 0.69) size=24 active=True
+FIND Vehicle key - Trike - HANGAR 2 (15 % from door) id=vehicle.key.trike duplicate=1 pos=(39.57, 0.52, -4.71) pile=Hangar 2 - Almost full grain bank local=(0.00, 0.56, -9.92) size=24 active=True
+FIND Copper chest - HANGAR 4 - key farm.key.copper.bonus.3 id=farm.chest.bonus.3 duplicate=1 pos=(-90.72, 0.84, 43.00) pile=Hangar 4 - Grain bank to entrance local=(0.00, 0.80, 3.00) size=24 active=True
+FIND H4 19 % - No Attacks bottle (5 min) (1) id=farm.perk.bottle.noattacks.copy.1000089993 duplicate=1 pos=(78.17, 4.21, 43.06) pile= local=(0.00, 0.00, 0.00) size= active=True
+FIND Iron chest - HANGAR 4 - key farm.key.iron.bonus.2 id=farm.chest.bonus.2 duplicate=1 pos=(-80.12, 0.78, 43.00) pile=Hangar 4 - Grain bank to entrance local=(0.00, 0.74, -1.80) size=24 active=True
+FIND H2 88 % - Hangar 3 key id=farm.hangar.key.3 duplicate=1 pos=(54.18, 0.13, -5.71) pile=Hangar 2 - Almost full grain bank local=(-7.30, 0.11, 0.72) size=24 active=True
+FIND H3 14 % - Mobility bottle (5 min) id=farm.perk.bottle.mobility duplicate=1 pos=(-43.04, 0.12, -3.10) pile=Hangar 3 - Almost full grain bank local=(3.00, 0.08, -6.69) size=24 active=True
+FIND H3 57 % - Double Sell Cash bottle (5 min) id=farm.perk.bottle.doublesellcash.h3 duplicate=1 pos=(-52.50, 0.12, -16.34) pile=Hangar 3 - Almost full grain bank local=(-3.46, 0.08, 3.46) size=24 active=True
+FIND H1 10 % - Cash cache id=farm.cache.starter duplicate=1 pos=(55.97, 9.76, 120.42) pile= local=(0.00, 0.00, 0.00) size= active=True
 FIND H1 10 % - Cash cache (2) id=farm.cache.starter.copy.57788109 duplicate=1 pos=(6.96, 0.12, 10.89) pile= local=(0.00, 0.00, 0.00) size= active=True
 FIND H5 36 % - Mobility bottle (5 min) id=farm.perk.bottle.mobility.h5 duplicate=1 pos=(81.49, 0.12, 48.85) pile=Hangar 5 - Grain bank to entrance local=(-4.38, 0.08, -1.15) size=24 active=True
 FIND Vehicle key - Pickup Bigger - HANGAR 4 (27 % from door) id=vehicle.key.pickupBig duplicate=1 pos=(-72.16, 0.63, 43.00) pile=Hangar 4 - Grain bank to entrance local=(0.00, 0.59, -5.40) size=24 active=True
 FIND Vehicle key - Pickup Cargo - HANGAR 4 (69 % from door) id=vehicle.key.pickupLast duplicate=1 pos=(-93.37, 0.85, 43.00) pile=Hangar 4 - Grain bank to entrance local=(0.00, 0.81, 4.20) size=24 active=True
-FIND Copper chest - HANGAR 2 - key farm.key.copper id=farm.chest.h2 duplicate=1 pos=(47.15, 0.59, -9.09) pile=Hangar 2 - Almost full grain bank local=(0.00, 0.65, -2.84) size=24 active=True
 FIND H3 76 % - Iron chest key id=farm.key.iron duplicate=1 pos=(-56.43, 0.14, -20.37) pile=Hangar 3 - Almost full grain bank local=(-4.93, 0.10, 7.18) size=24 active=True
 FIND Iron chest - HANGAR 2 - key farm.key.iron id=farm.chest.h4 duplicate=1 pos=(53.21, 0.67, -12.59) pile=Hangar 2 - Almost full grain bank local=(0.00, 0.74, 2.83) size=24 active=True
 FIND H1 28 % - Stamina bottle (5 min) id=farm.perk.stamina-hour duplicate=1 pos=(57.01, 7.74, 113.01) pile= local=(0.00, 0.00, 0.00) size= active=True
 FIND H1 10 % - Cash cache (1) id=farm.cache.starter.copy.1017043290 duplicate=1 pos=(100.80, 7.31, 127.50) pile= local=(0.00, 0.00, 0.00) size= active=True
-FIND H4 53 % - Stamina bottle (5 min) id=farm.stamina.h4 duplicate=1 pos=(-89.69, 0.12, 47.00) pile=Hangar 4 - Grain bank to entrance local=(3.00, 0.08, 2.54) size=24 active=True
 FIND H2 32 % - Broom id=farm.tool.broom duplicate=1 pos=(46.50, 0.27, -7.83) pile=Hangar 2 - Almost full grain bank local=(-0.87, 0.27, -3.81) size=24 active=True
 FIND Pistol Find id=farm.tool.pistol duplicate=1 pos=(20.28, 0.42, 55.80) pile= local=(0.00, 0.00, 0.00) size= active=True
-FIND H2 43 % - Copper chest key id=farm.key.copper.bonus.1 duplicate=1 pos=(53.45, 0.60, -4.12) pile=Hangar 2 - Almost full grain bank local=(-8.44, 0.66, -0.44) size=24 active=True
-FIND H1 84 % - Hangar 2 key id=farm.hangar.key.2 duplicate=1 pos=(9.10, 0.10, 4.74) pile=Corn pile - scoop with left click local=(0.75, 0.04, -0.40) size=6 active=True
-FIND H4 89 % - Hangar 5 key id=farm.hangar.key.5 duplicate=1 pos=(-106.01, 0.13, 39.62) pile=Hangar 4 - Grain bank to entrance local=(-2.54, 0.09, 9.93) size=24 active=True
 FIND H2 24 % - Cash cache id=farm.cache.h2 duplicate=1 pos=(41.71, 0.13, -12.33) pile=Hangar 2 - Almost full grain bank local=(6.27, 0.10, -5.35) size=24 active=True
-FIND H5 48 % - Double Sell Cash bottle (5 min) id=farm.perk.bottle.doublesellcash duplicate=1 pos=(87.60, 0.13, 39.64) pile=Hangar 5 - Grain bank to entrance local=(2.52, 0.09, 1.61) size=24 active=True
 FIND H3 08 % - Hammer id=farm.tool.sledgehammer duplicate=1 pos=(-40.33, 0.95, -3.75) pile=Hangar 3 - Almost full grain bank local=(1.16, 0.91, -8.08) size=24 active=True
-FIND H1 68 % - Axe id=farm.tool.hammer duplicate=1 pos=(8.26, 0.27, 3.68) pile=Corn pile - scoop with left click local=(0.28, 0.12, 0.02) size=6 active=True
-FIND H1 44 % - Copper chest key id=farm.key.copper duplicate=1 pos=(5.12, 0.34, 4.13) pile=Corn pile - scoop with left click local=(0.59, 0.15, 1.44) size=6 active=True
 FIND Iron chest - HANGAR 3 - key farm.key.iron.bonus.4 id=farm.chest.bonus.4 duplicate=1 pos=(-53.72, 0.67, -12.88) pile=Hangar 3 - Almost full grain bank local=(0.00, 0.63, 3.00) size=24 active=True
 FIND H2 59 % - Free upgrade voucher id=farm.perk.free-upgrade duplicate=1 pos=(55.22, 0.12, -11.80) pile=Hangar 2 - Almost full grain bank local=(-1.91, 0.09, 3.92) size=24 active=True
 FIND H5 36 % - Mobility bottle (5 min) (1) id=farm.perk.bottle.mobility.h5.copy.1001073798 duplicate=1 pos=(36.02, 0.42, -11.70) pile= local=(0.00, 0.00, 0.00) size= active=True
 FIND H4 60 % - Cash cache id=farm.cache.h4 duplicate=1 pos=(-92.75, 0.13, 34.08) pile=Hangar 4 - Grain bank to entrance local=(-6.69, 0.09, 3.92) size=24 active=True
-FIND H3 88 % - Hangar 4 key id=farm.hangar.key.4 duplicate=1 pos=(-54.93, 0.13, -16.59) pile=Hangar 3 - Almost full grain bank local=(-2.51, 0.09, 4.99) size=24 active=True
 FLOWER GlobalObjectId_V1-2-abef005c3974d1545862da5e63051444-6792124582744860918-955396595 TFP_Flowers_Patch_01_LOD0 pos=(7.40, 1.21, 58.22) minY=1.147959 terrain=0.06809711 hidden=False active=False shader=Toon/CustomToonGrass
 FLOWER GlobalObjectId_V1-2-abef005c3974d1545862da5e63051444-6792124582744860912-182787308 TFP_Flowers_Patch_01_LOD1 pos=(73.46, 5.15, 92.40) minY=5.079725 terrain=5.165215 hidden=False active=True shader=Toon/CustomToonGrass
 FLOWER GlobalObjectId_V1-2-abef005c3974d1545862da5e63051444-2341555157453807433-2062487439 TFP_Flowers_Patch_02_LOD0 pos=(-13.46, 0.51, 50.24) minY=0.4566666 terrain=0.5299702 hidden=False active=True shader=Toon/CustomToonGrass

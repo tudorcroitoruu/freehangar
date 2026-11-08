@@ -83,7 +83,18 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         if(Running||DoorOpen||!CanOpen||Time.timeScale<=0)return false;
         DoorOpen=true;GameplayAudio.Instance?.OpenElectricalDoor();StartCoroutine(OpenRoom());return true;
     }
-    private IEnumerator OpenRoom(){yield return Animate(.8f,t=>roomDoor.localRotation=doorClosed*Quaternion.Euler(0,-100*t,0));}
+    private IEnumerator OpenRoom()
+    {
+        // The launch save clock only exists after using the switch inside the room.
+        // Opening the entrance must work independently of that cinematic.
+        const float duration = .8f;
+        for (float elapsed = 0; elapsed < duration; elapsed += Time.deltaTime)
+        {
+            roomDoor.localRotation = doorClosed * Quaternion.Euler(0, -100 * Mathf.SmoothStep(0, 1, elapsed / duration), 0);
+            yield return null;
+        }
+        roomDoor.localRotation = doorClosed * Quaternion.Euler(0, -100, 0);
+    }
     public bool UseSwitch(PlayerInteractor interactor)
     {
         if(Running||(!DoorOpen && !BypassRestrictions)||interactor==null||interactor.HandsOccupied||Time.timeScale<=0)return false;
