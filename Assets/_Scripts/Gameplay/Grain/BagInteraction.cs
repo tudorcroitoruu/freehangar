@@ -63,7 +63,7 @@ public sealed class BagInteraction : MonoBehaviour
             if (Physics.Linecast(bounds.center, hit.point + Vector3.up * .1f, out var obstacle, ~0, QueryTriggerInteraction.Ignore) &&
                 !obstacle.collider.transform.IsChildOf(bag.transform) && obstacle.collider != hit.collider) continue;
             var cargo = new GrainCargo();
-            cargo.Add(bag.AcceptedGrain, bag.Kilograms);
+            for (int i = 0; i < GrainCargo.TypeCount; i++) cargo.Add((GrainType)i, bag.Contents[(GrainType)i]);
             var pile = GrainPile.CreateDroppedPile(hit.point, source, bag.Kilograms);
             if (!pile.Deposit(hit.point, cargo, GrainPile.DropRadius(bag.Kilograms)))
             {
@@ -259,7 +259,9 @@ public sealed class BagInteraction : MonoBehaviour
         if (!WorldSaveRuntime.IsRestoring && bag.Kilograms > 0)
         {
             GoalChecker.ReportProgress(GoalType.SackLoaded);
-            GoalChecker.ReportProgress(GoalType.GrainLoaded, bag.Kilograms, grainType: bag.AcceptedGrain);
+            for (int i = 0; i < GrainCargo.TypeCount; i++)
+                if (bag.Contents[(GrainType)i] > 0)
+                    GoalChecker.ReportProgress(GoalType.GrainLoaded, bag.Contents[(GrainType)i], grainType: (GrainType)i);
         }
         GameplayAudio.Instance?.Drop();
         return true;

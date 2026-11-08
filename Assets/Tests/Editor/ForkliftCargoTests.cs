@@ -4,6 +4,43 @@ using UnityEngine;
 
 public class ForkliftCargoTests
 {
+    [TestCase("BigBag", true)]
+    [TestCase("SmallBag", false)]
+    [TestCase("LargeBag", false)]
+    [TestCase("Crate", false)]
+    [TestCase("Barrel", false)]
+    public void OnlyBigBagsMixAndPreserveCropWeightsThroughSaveAndPests(string type, bool mixed)
+    {
+        var root = new GameObject("Container mixture test");
+        try
+        {
+            var bag = root.AddComponent<GrainContainer>();
+            var data = new SerializedObject(bag);
+            data.FindProperty("cargoTypeId").stringValue = type;
+            data.FindProperty("capacityKg").floatValue = 100;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            var shovel = new GrainCargo();
+            shovel.Add(GrainType.Rice, 40);
+            Assert.AreEqual(40, shovel.PourInto(bag, 40));
+            shovel.Add(GrainType.Corn, 80);
+            Assert.AreEqual(mixed ? 60 : 0, shovel.PourInto(bag, 80));
+            Assert.AreEqual(mixed ? 20 : 80, shovel.Total);
+            var saved = JsonUtility.FromJson<ContainerSave>(JsonUtility.ToJson(bag.CaptureSave()));
+            bag.EmptyAfterPour();
+            Assert.AreEqual(0, bag.Contents.Total);
+            bag.RestoreSave(saved);
+            Assert.AreEqual(40, bag.Contents[GrainType.Rice]);
+            Assert.AreEqual(mixed ? 60 : 0, bag.Contents[GrainType.Corn]);
+            bag.ConsumeByPest(bag.Kilograms * .25f);
+            Assert.That(bag.Contents[GrainType.Rice], Is.EqualTo(30).Within(.001f));
+            Assert.That(bag.Contents[GrainType.Corn], Is.EqualTo(mixed ? 45 : 0).Within(.001f));
+            bag.RestoreSave(new ContainerSave { kilograms = 25, grain = (int)GrainType.Rice });
+            Assert.AreEqual(25, bag.Contents[GrainType.Rice], "Old saves remain single-crop.");
+            Assert.AreEqual(0, bag.Contents[GrainType.Corn]);
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
+
     [Test]
     public void ForkliftAnimatesVisibleWheelParentsAndSteeringWithoutMovingAxles()
     {

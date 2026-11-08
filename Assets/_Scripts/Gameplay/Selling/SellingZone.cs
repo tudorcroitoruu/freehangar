@@ -122,8 +122,12 @@ public class SellingZone : MonoBehaviour
     {
         if (container != null && container.isActiveAndEnabled && IsUnloaded(container) && !container.IsClosing &&
             float.IsFinite(container.Kilograms) && container.Kilograms > 0 &&
-            TryGetSettings(container.AcceptedGrain, out _) && !containers.Contains(container))
+            !containers.Contains(container))
+        {
+            for (int i = 0; i < GrainCargo.TypeCount; i++)
+                if (container.Contents[(GrainType)i] > 0 && !TryGetSettings((GrainType)i, out _)) return;
             containers.Add(container);
+        }
     }
 
     private static bool IsVehicleCollider(Collider hit) =>

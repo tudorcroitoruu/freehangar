@@ -67,7 +67,7 @@ public sealed class GrainCargo
     public float PourInto(GrainContainer container, float maximumKg)
     {
         if (container == null || !float.IsFinite(maximumKg) || maximumKg <= 0) return 0;
-        GrainType type = container.HasAssignedGrain ? container.AcceptedGrain : Dominant;
+        GrainType type = container.HasAssignedGrain && !container.IsBigBag ? container.AcceptedGrain : Dominant;
         float accepted = container.Add(type, Mathf.Min(this[type], maximumKg));
         if (accepted > 0) { kilograms[(int)type] = Mathf.Max(0, kilograms[(int)type] - accepted); Revision++; }
         return accepted;

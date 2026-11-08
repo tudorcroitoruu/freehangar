@@ -76,6 +76,7 @@ public class WorldObjectSave
 }
 [Serializable] public sealed class ContainerSave
 {
+    public float[] composition;
     public float kilograms, closure;
     public int grain;
     public bool closing;

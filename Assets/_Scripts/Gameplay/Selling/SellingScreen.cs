@@ -20,7 +20,7 @@ public class SellingScreen : MonoBehaviour
     private readonly List<GrainContainer> containers = new List<GrainContainer>();
     private readonly List<GrainContainer> currentContainers = new List<GrainContainer>();
     private readonly Dictionary<GrainContainer, float> quotedWeights = new Dictionary<GrainContainer, float>();
-    private readonly Dictionary<GrainContainer, GrainType> quotedTypes = new Dictionary<GrainContainer, GrainType>();
+    private readonly Dictionary<GrainContainer, float[]> quotedTypes = new Dictionary<GrainContainer, float[]>();
     private readonly Dictionary<GrainType, float> quotedPrices = new Dictionary<GrainType, float>();
     private PlayerInteractor player;
     private CursorLockMode previousCursorLock;
@@ -86,11 +86,16 @@ public class SellingScreen : MonoBehaviour
         var cropValues = new List<double>();
         foreach (var container in containers)
         {
-            var grain = container.AcceptedGrain;
-            quantities.TryGetValue(grain, out float kilograms);
-            quantities[grain] = kilograms + container.Kilograms;
+            var composition = container.CopyComposition();
+            for (int i = 0; i < composition.Length; i++)
+            {
+                if (composition[i] <= 0) continue;
+                var grain = (GrainType)i;
+                quantities.TryGetValue(grain, out float kilograms);
+                quantities[grain] = kilograms + composition[i];
+            }
             quotedWeights[container] = container.Kilograms;
-            quotedTypes[container] = grain;
+            quotedTypes[container] = composition;
         }
         foreach (var entry in quantities)
         {
@@ -119,10 +124,17 @@ public class SellingScreen : MonoBehaviour
         Zone.CollectContainers(currentContainers);
         if (currentContainers.Count != containers.Count) return false;
         foreach (var container in currentContainers)
-            if (!quotedWeights.TryGetValue(container, out float weight) || weight != container.Kilograms ||
-                quotedTypes[container] != container.AcceptedGrain ||
-                !Zone.TryGetSettings(container.AcceptedGrain, out var settings) ||
-                quotedPrices[container.AcceptedGrain] != settings.grainPrice) return false;
+        {
+            if (!quotedWeights.TryGetValue(container, out float weight) || weight != container.Kilograms) return false;
+            for (int i = 0; i < GrainCargo.TypeCount; i++)
+            {
+                var grain = (GrainType)i;
+                float amount = container.Contents[grain];
+                if (quotedTypes[container][i] != amount) return false;
+                if (amount > 0 && (!Zone.TryGetSettings(grain, out var settings) ||
+                    !quotedPrices.TryGetValue(grain, out float price) || price != settings.grainPrice)) return false;
+            }
+        }
         return true;
     }
 
@@ -149,9 +161,14 @@ public class SellingScreen : MonoBehaviour
         var soldQuantities = new Dictionary<GrainType, float>();
         foreach (var entry in quotedWeights)
         {
-            var grain = quotedTypes[entry.Key];
-            soldQuantities.TryGetValue(grain, out float kilograms);
-            soldQuantities[grain] = kilograms + entry.Value;
+            var composition = quotedTypes[entry.Key];
+            for (int i = 0; i < composition.Length; i++)
+            {
+                if (composition[i] <= 0) continue;
+                var grain = (GrainType)i;
+                soldQuantities.TryGetValue(grain, out float kilograms);
+                soldQuantities[grain] = kilograms + composition[i];
+            }
         }
         SoldCargoAnimation.Begin(containers, soldBagEffect);
         // Report only paid sales, after cargo is excluded from world saves.

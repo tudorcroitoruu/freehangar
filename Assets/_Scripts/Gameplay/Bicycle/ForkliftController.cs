@@ -301,7 +301,9 @@ public sealed class ForkliftController : MonoBehaviour
         if (!WorldSaveRuntime.IsRestoring && bag.Kilograms > 0)
         {
             GoalChecker.ReportProgress(GoalType.SackLoaded);
-            GoalChecker.ReportProgress(GoalType.GrainLoaded, bag.Kilograms, grainType: bag.AcceptedGrain);
+            for (int i = 0; i < GrainCargo.TypeCount; i++)
+                if (bag.Contents[(GrainType)i] > 0)
+                    GoalChecker.ReportProgress(GoalType.GrainLoaded, bag.Contents[(GrainType)i], grainType: (GrainType)i);
         }
         GameAchievements.ForkliftDelivered(bag);
         GameplayAudio.Instance?.Drop();

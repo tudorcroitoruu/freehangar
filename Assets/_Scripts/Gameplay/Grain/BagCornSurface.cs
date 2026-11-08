@@ -34,6 +34,7 @@ public sealed class BagCornSurface : MonoBehaviour
     private readonly GrainAppearance kernelAppearance = new GrainAppearance();
     private readonly float[] kernelTypes = new float[1023];
     private int lastGrainType = -1;
+    private int lastCompositionRevision = -1;
     private static readonly int GrainTypeId = Shader.PropertyToID("_GrainType");
     private static readonly int KernelModeId = Shader.PropertyToID("_KernelMode");
 
@@ -41,16 +42,19 @@ public sealed class BagCornSurface : MonoBehaviour
     {
         if (container == null) container = GetComponent<GrainContainer>();
         GrainType type = container != null ? container.AcceptedGrain : GrainType.Corn;
-        if (lastGrainType != (int)type)
+        var composition = container != null ? container.Contents : null;
+        if (lastGrainType != (int)type || (composition != null && lastCompositionRevision != composition.Revision))
         {
+            lastCompositionRevision = composition != null ? composition.Revision : -1;
             lastGrainType = (int)type;
             grainAppearance.Set(type);
             grainAppearance.Block.SetFloat(GrainTypeId, (int)type);
             grainAppearance.Block.SetFloat(KernelModeId, 0);
             kernelAppearance.Set(type);
+            if (composition != null) { grainAppearance.Set(composition); kernelAppearance.Set(composition); }
             kernelAppearance.Block.SetFloat(KernelModeId, 1);
             // Explicit instance types avoid any material/default corn override.
-            for (int i = 0; i < kernelTypes.Length; i++) kernelTypes[i] = (int)type;
+            for (int i = 0; i < kernelTypes.Length; i++) kernelTypes[i] = composition != null ? (int)composition.Sample(Mathf.Repeat(i * .61803398875f, 1)) : (int)type;
             kernelAppearance.Block.SetFloatArray(GrainTypeId, kernelTypes);
         }
         if (grainSurface == null) return;

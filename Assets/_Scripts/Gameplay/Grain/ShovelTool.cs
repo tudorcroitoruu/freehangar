@@ -258,7 +258,7 @@ public sealed class ShovelTool : MonoBehaviour
             bladeTip == null || transform.parent == null || Time.timeScale <= 0) return false;
         var targetContainer = FindPourContainer(camera, player);
         if (targetContainer != null && targetContainer.isActiveAndEnabled &&
-            targetContainer.HasAssignedGrain && cargo[targetContainer.AcceptedGrain] <= .0001f)
+            !targetContainer.IsBigBag && targetContainer.HasAssignedGrain && cargo[targetContainer.AcceptedGrain] <= .0001f)
         {
             GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowedInContainer);
             return false;
@@ -514,12 +514,12 @@ public sealed class ShovelTool : MonoBehaviour
                 pendingContainer.isActiveAndEnabled && pendingContainer.IsOpen &&
                 !pendingContainer.IsClosing && !pendingContainer.IsCarried)
             {
-                if (grainPhysics != null) grainPhysics.SetPourGrain(pendingContainer.HasAssignedGrain ? pendingContainer.AcceptedGrain : cargo.Dominant);
+                if (grainPhysics != null) grainPhysics.SetPourGrain(pendingContainer.HasAssignedGrain && !pendingContainer.IsBigBag ? pendingContainer.AcceptedGrain : cargo.Dominant);
                 float before = Kilograms;
                 cargo.PourInto(pendingContainer, Mathf.Min(amount, Kilograms));
                 if (Kilograms < before - .0001f) PlayPourSound();
                 // Complete floating-point dust through the same capacity/type checks; never discard it.
-                float residue = cargo[pendingContainer.AcceptedGrain];
+                float residue = cargo[pendingContainer.IsBigBag ? cargo.Dominant : pendingContainer.AcceptedGrain];
                 if (fraction >= 1f && residue > 0 && residue < .0001f) cargo.PourInto(pendingContainer, residue);
             }
             if (grainPhysics != null) grainPhysics.SetFill(Kilograms / CapacityKg);

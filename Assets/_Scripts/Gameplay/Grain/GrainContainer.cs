@@ -1,7 +1,7 @@
 using SickscoreGames.HUDNavigationSystem;
 using UnityEngine;
 
-/// <summary>Single-species receiver for sacks, boxes and barrels. Unassigned receivers bind on first fill.</summary>
+/// <summary>Big bags retain mixed crops; other receivers bind to one crop on first fill.</summary>
 [DisallowMultipleComponent]
 public sealed class GrainContainer : MonoBehaviour, IInteractable
 {
@@ -83,7 +83,27 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     public float CapacityKg => capacityKg;
     public bool HasAssignedGrain => restrictGrain || kilograms > .000001f;
     public GrainType AcceptedGrain => acceptedGrain;
-    public bool Accepts(GrainType grain) => !HasAssignedGrain || grain == acceptedGrain;
+    public bool Accepts(GrainType grain) => IsBigBag || !HasAssignedGrain || grain == acceptedGrain;
+    private readonly GrainCargo contents = new GrainCargo();
+    public GrainCargo Contents
+    {
+        get
+        {
+            // Legacy saves and authored containers only have a total and one crop.
+            if (Mathf.Abs(contents.Total - kilograms) > .00001f)
+            { contents.Clear(); contents.Add(acceptedGrain, kilograms); }
+            return contents;
+        }
+    }
+    public string GrainLabel
+    {
+        get
+        {
+            int count = 0;
+            for (int i = 0; i < GrainCargo.TypeCount; i++) if (Contents[(GrainType)i] > 0) count++;
+            return count > 1 ? "Mixed grain" : HasAssignedGrain ? GrainNames.Display(acceptedGrain) : "Empty";
+        }
+    }
     public bool IsOpen => sack == null || sack.Close < .05f;
     public bool IsFull => kilograms >= capacityKg - .001f;
     public bool IsFinished => sack != null && sack.Close >= .999f;
@@ -196,8 +216,10 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
             (int)grain < 0 || (int)grain >= GrainCargo.TypeCount || !(amountKg > 0) || !float.IsFinite(amountKg)) return 0;
         float accepted = Mathf.Min(amountKg, Mathf.Max(0, capacityKg - kilograms));
         bool wasFull = IsFull;
-        if (accepted > 0) acceptedGrain = grain;
-        kilograms += accepted;
+        var stored = Contents;
+        stored.Add(grain, accepted);
+        kilograms = stored.Total;
+        if (accepted > 0) acceptedGrain = stored.Dominant;
         ApplyFill();
         if (accepted > 0)
         {
@@ -231,14 +253,21 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
             (int)grain >= GrainCargo.TypeCount) return;
         acceptedGrain = grain;
         kilograms = Mathf.Clamp(amount, 0f, capacityKg);
+        contents.Clear(); contents.Add(grain, kilograms);
         ApplyFill();
     }
 
     public float ConsumeByPest(float amount)
     {
         if (!isActiveAndEnabled || !float.IsFinite(amount) || amount <= 0f) return 0f;
+        if (!float.IsFinite(amount) || amount <= 0) return 0;
         float removed = Mathf.Min(kilograms, amount);
-        kilograms -= removed;
+        var stored = Contents;
+        var remaining = new GrainCargo();
+        stored.TransferTo(remaining, kilograms - removed);
+        stored.Clear(); remaining.TransferTo(stored, remaining.Total);
+        kilograms = stored.Total;
+        acceptedGrain = stored.Dominant;
         if (removed > 0f && sack != null)
         {
             // Pest damage opens a closed sack so the missing grain can be replaced.
@@ -263,19 +292,41 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     public void EmptyAfterPour()
     {
         kilograms = 0f;
+        contents.Clear();
         IsClosing = false;
         if (sack != null) sack.Close = 0f;
         ApplyFill();
     }
 
     public ContainerSave CaptureSave() => new ContainerSave { kilograms = kilograms, grain = (int)acceptedGrain,
-        closure = sack != null ? sack.Close : 0, closing = IsClosing, achievementId = AchievementIdentity };
+        closure = sack != null ? sack.Close : 0, closing = IsClosing, achievementId = AchievementIdentity, composition = CopyComposition() };
+
+    public float[] CopyComposition()
+    {
+        var result = new float[GrainCargo.TypeCount];
+        for (int i = 0; i < result.Length; i++) result[i] = Contents[(GrainType)i];
+        return result;
+    }
 
     public void RestoreSave(ContainerSave saved)
     {
         if (saved == null) return;
         kilograms = float.IsFinite(saved.kilograms) ? Mathf.Clamp(saved.kilograms, 0, capacityKg) : 0;
         acceptedGrain = (GrainType)Mathf.Clamp(saved.grain, 0, GrainCargo.TypeCount - 1);
+        contents.Clear();
+        if (IsBigBag && saved.composition != null)
+        {
+            for (int i = 0; i < Mathf.Min(GrainCargo.TypeCount, saved.composition.Length); i++)
+                contents.Add((GrainType)i, saved.composition[i]);
+            if (contents.Total > 0)
+            {
+                float scale = kilograms / contents.Total;
+                var normalized = new GrainCargo();
+                for (int i = 0; i < GrainCargo.TypeCount; i++) normalized.Add((GrainType)i, contents[(GrainType)i] * scale);
+                contents.Clear(); normalized.TransferTo(contents, normalized.Total);
+                kilograms = contents.Total; acceptedGrain = contents.Dominant;
+            }
+        }
         achievementIdentity = saved.achievementId;
         RefreshFillPresentation();
         if (sack != null) sack.Close = Mathf.Clamp01(saved.closure);
