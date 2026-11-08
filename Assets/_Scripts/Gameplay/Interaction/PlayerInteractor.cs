@@ -104,8 +104,9 @@ public sealed class PlayerInteractor : MonoBehaviour
             HidePrompt();
             return;
         }
-        // Being full blocks eating, not independent actions such as stamina upgrades.
-        bool hungerBlocksPrompt = aimedPrompt.NotHungry && !aimedPrompt.HasAvailableInput;
+        // A fridge's eating prompt stays hidden while the not-hungry warning is active.
+        bool hungerBlocksPrompt = aimedPrompt.NotHungry &&
+            (aimedTarget is FridgeProduct || !aimedPrompt.HasAvailableInput);
         if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.NotFitInWheelBarrow || aimedPrompt.CannotLoadInWheelbarrow || aimedPrompt.NeedKeyForChest || hungerBlocksPrompt || aimedPrompt.WeighingEmpty || aimedPrompt.WeighingWrong || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
         {
             Target = aimedTarget;
