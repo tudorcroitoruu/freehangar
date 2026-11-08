@@ -39,6 +39,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     private Vector3 deliveryDestination, deliveryPlayerPosition, deliveryPlayerForward;
     private readonly RaycastHit[] deliverySightHits = new RaycastHit[32];
     private bool hasDeliveryDestination;
+    private Coroutine deliverySearch;
     private Quaternion homeRotation;
     private float rest, stateAt, nextPet, nextDecision, huntStarted, nextNavigationRetry;
     private float animationReadyAt, petEndsAt;
@@ -295,50 +296,64 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         SetState(cargo ? DogState.Delivering : DogState.Returning);
     }
 
-    private bool TryDeliveryDestination(Vector3 playerPosition, out Vector3 destination)
+    private System.Collections.IEnumerator SearchDeliveryDestination(Vector3 playerPosition)
     {
+        // Yield before doing work so the coroutine handle is assigned even for a short search.
+        yield return null;
         Vector3 best = transform.position;
         float nearest = float.PositiveInfinity;
         Vector3 forward = DeliveryForward();
         Vector3 preferred = playerPosition + forward * 2f;
-        void Consider(Vector3 candidate)
+        int probes = 0, grainProbes = 0;
+        System.Collections.IEnumerator Consider(Vector3 candidate)
         {
-            if (!NavMesh.SamplePosition(candidate, out var hit, 2f, agent.areaMask)) return;
+            while (Time.timeScale <= 0f) yield return null;
+            if (++probes >= 4) { probes = 0; yield return null; }
+            if (!ReadyToNavigate() || !NavMesh.SamplePosition(candidate, out var hit, 2f, agent.areaMask)) yield break;
             float distance = (hit.position - preferred).sqrMagnitude;
             if (Vector3.Dot(hit.position - playerPosition, forward) < .5f) distance += 100f;
             if (distance >= nearest || !FarmChicken.IsGrainClearAt(hit.position - Vector3.up * .2f) ||
                 !FarmChicken.TryGroundPoint(hit.position, out var support) ||
-                Mathf.Abs(support.y - hit.position.y) > .15f || !DeliveryVisible(hit.position) || !CompletePath(hit.position)) return;
+                Mathf.Abs(support.y - hit.position.y) > .15f || !DeliveryVisible(hit.position) || !CompletePath(hit.position)) yield break;
             // The baked mesh can still pass through freshly poured grain.
             var corners = path.corners;
             for (int segment = 1; segment < corners.Length; segment++)
             {
                 int steps = Mathf.Max(1, Mathf.CeilToInt(Vector3.Distance(corners[segment - 1], corners[segment]) / .5f));
                 for (int step = 1; step <= steps; step++)
+                {
+                    if (++grainProbes >= 16) { grainProbes = 0; yield return null; }
                     if (!FarmChicken.IsGrainClearAt(Vector3.Lerp(corners[segment - 1], corners[segment], (float)step / steps) - Vector3.up * .2f))
-                        return;
+                        yield break;
+                }
             }
             best = hit.position;
             nearest = distance;
         }
-        Consider(preferred);
+        yield return Consider(preferred);
         // Even the fallback must be visible to the player.
-        Consider(transform.position);
-        for (float radius = 0f; radius <= 40f && radius <= Mathf.Sqrt(nearest) + 4f; radius += 2f)
+        if (nearest > .25f) yield return Consider(transform.position);
+        for (float radius = 0f; nearest > .25f && radius <= 40f && radius <= Mathf.Sqrt(nearest) + 4f; radius += 2f)
         {
             int count = radius == 0f ? 1 : 24;
             for (int i = 0; i < count; i++)
             {
                 float angle = i * Mathf.PI * 2f / count;
                 Vector3 candidate = playerPosition + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
-                Consider(candidate);
+                yield return Consider(candidate);
                 // Find ground below a player standing on a high pile or roof too.
                 candidate.y = transform.position.y;
-                Consider(candidate);
+                yield return Consider(candidate);
             }
         }
-        destination = best;
-        return float.IsFinite(nearest);
+        deliverySearch = null;
+        if (State != DogState.Delivering || !float.IsFinite(nearest) || !DeliveryVisible(best)) yield break;
+        bool changed = !hasDeliveryDestination || (best - deliveryDestination).sqrMagnitude > .25f;
+        deliveryDestination = best;
+        deliveryPlayerPosition = playerPosition;
+        deliveryPlayerForward = forward;
+        hasDeliveryDestination = true;
+        if (changed && !MoveTo(deliveryDestination)) hasDeliveryDestination = false;
     }
 
     private Vector3 DeliveryForward()
@@ -379,16 +394,15 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         if (!ReadyToNavigate() || Time.time < nextDecision) return;
         nextDecision = Time.time + .75f;
         Vector3 playerPosition = nearbyPlayer && nearbyPlayer.gameObject.activeInHierarchy ? nearbyPlayer.position : home;
-        if (!hasDeliveryDestination || (playerPosition - deliveryPlayerPosition).sqrMagnitude > 1f ||
+        if (deliverySearch == null && (!hasDeliveryDestination || (playerPosition - deliveryPlayerPosition).sqrMagnitude > 1f ||
             Vector3.Dot(DeliveryForward(), deliveryPlayerForward) < .94f || !DeliveryVisible(deliveryDestination) ||
-            !FarmChicken.IsGrainClearAt(deliveryDestination - Vector3.up * .2f))
+            !FarmChicken.IsGrainClearAt(deliveryDestination - Vector3.up * .2f)))
         {
-            deliveryPlayerPosition = playerPosition;
-            deliveryPlayerForward = DeliveryForward();
-            hasDeliveryDestination = TryDeliveryDestination(playerPosition, out deliveryDestination);
+            deliverySearch = StartCoroutine(SearchDeliveryDestination(playerPosition));
         }
         if (!hasDeliveryDestination) return;
         if ((transform.position - deliveryDestination).sqrMagnitude <= 1f &&
+            deliverySearch == null && DeliveryVisible(deliveryDestination) &&
             !NavMesh.Raycast(transform.position, deliveryDestination, out _, agent.areaMask))
         {
             cargo.PutDown(deliveryDestination + Vector3.up * .15f);
@@ -398,7 +412,8 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
             Bark(true);
             return;
         }
-        if (!MoveTo(deliveryDestination)) hasDeliveryDestination = false;
+        if (!agent.pathPending && (!agent.hasPath || agent.pathStatus != NavMeshPathStatus.PathComplete) &&
+            !MoveTo(deliveryDestination)) hasDeliveryDestination = false;
     }
 
     private void ReturnHome()
@@ -422,6 +437,11 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     private void SetState(DogState state)
     {
         if (State == state && animationHash != 0) return;
+        if (state != DogState.Delivering && deliverySearch != null)
+        {
+            StopCoroutine(deliverySearch);
+            deliverySearch = null;
+        }
         State = state; stateAt = Time.time; nextDecision = 0;
         if (state == DogState.Sleeping) nextNearbyWake = Time.time + Random.Range(20f, 40f);
         hitApplied = false;
@@ -492,6 +512,8 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
 
     private void OnDisable()
     {
+        if (deliverySearch != null) StopCoroutine(deliverySearch);
+        deliverySearch = null;
         if (agent && agent.enabled && agent.isOnNavMesh) agent.ResetPath();
         if (strokeAudio) strokeAudio.Stop();
         if (announcementAudio) announcementAudio.Stop();
