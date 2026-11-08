@@ -146,7 +146,7 @@ public class GlobalManager : MonoBehaviour
         AudioSource source = tempGO.AddComponent<AudioSource>();
         source.clip = clip;
         source.spatialBlend = Mathf.Clamp01(spatialBlend);
-        source.outputAudioMixerGroup = outputGroup;
+        source.outputAudioMixerGroup = outputGroup != null ? outputGroup : SoundManager.EffectsOutput;
 
         // One-shot gain supports quiet clips that need amplification above 1.
         source.PlayOneShot(clip, volume);

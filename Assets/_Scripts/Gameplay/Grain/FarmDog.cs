@@ -244,7 +244,8 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
                 barkDistanceFilter = barkEmitter.AddComponent<AudioLowPassFilter>();
                 barkDistanceFilter.lowpassResonanceQ = 1f;
             }
-            if (strokeAudio) announcementAudio.outputAudioMixerGroup = strokeAudio.outputAudioMixerGroup;
+            announcementAudio.outputAudioMixerGroup = strokeAudio != null && strokeAudio.outputAudioMixerGroup != null
+                ? strokeAudio.outputAudioMixerGroup : SoundManager.EffectsOutput;
             if (!nearbyPlayer)
             {
                 var player = FindFirstObjectByType<PlayerController>();

@@ -112,8 +112,10 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         renderers = visual.GetComponentsInChildren<Renderer>(true);
         flash = new MaterialPropertyBlock();
         audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.outputAudioMixerGroup = SoundManager.EffectsOutput;
         audioSource.spatialBlend = 1f; audioSource.maxDistance = 22f;
         idleAudioSource = gameObject.AddComponent<AudioSource>();
+        idleAudioSource.outputAudioMixerGroup = SoundManager.EffectsOutput;
         idleAudioSource.spatialBlend = 1f;
         idleAudioSource.rolloffMode = AudioRolloffMode.Linear;
         idleAudioSource.minDistance = 3f;

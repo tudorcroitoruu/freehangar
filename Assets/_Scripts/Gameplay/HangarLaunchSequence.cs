@@ -120,6 +120,8 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         cinematic.nearClipPlane=.03f;var hd=cameraObject.AddComponent<HDAdditionalCameraData>();var originalHD=original.GetComponent<HDAdditionalCameraData>();if(originalHD!=null)originalHD.CopyTo(hd);
         Suspend(original);voice=cameraObject.AddComponent<AudioSource>();voice.spatialBlend=0;voice.playOnAwake=false;CreateOverlay();
         footsteps = cameraObject.AddComponent<AudioSource>(); footsteps.spatialBlend = 0; footsteps.playOnAwake = false;
+        voice.outputAudioMixerGroup = SoundManager.EffectsOutput;
+        footsteps.outputAudioMixerGroup = SoundManager.EffectsOutput;
         yield return MoveCamera(switchView,.75f);
         yield return Animate(.55f,t=>switchHandle.localRotation=leverOff*Quaternion.Euler(125*t,0,0));
         GameplayAudio.Instance?.SwitchElectrical();

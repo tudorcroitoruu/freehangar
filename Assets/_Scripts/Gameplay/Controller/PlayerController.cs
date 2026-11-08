@@ -429,7 +429,8 @@ public class PlayerController : MonoBehaviour
         previousFootstep = index;
         if (movementAudioSource != null)
         {
-            source.outputAudioMixerGroup = movementAudioSource.outputAudioMixerGroup;
+            source.outputAudioMixerGroup = movementAudioSource.outputAudioMixerGroup != null
+                ? movementAudioSource.outputAudioMixerGroup : SoundManager.EffectsOutput;
             source.volume = movementAudioSource.volume;
         }
         if (footstepClips[index] != null) source.PlayOneShot(footstepClips[index]);

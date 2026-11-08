@@ -154,6 +154,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
             pistolRestPosition = heldPistol.localPosition;
             pistolRestRotation = heldPistol.localRotation;
             pistolAudio = gameObject.AddComponent<AudioSource>();
+            pistolAudio.outputAudioMixerGroup = SoundManager.EffectsOutput;
             pistolAudio.playOnAwake = false;
         }
         ApplyVisuals();
