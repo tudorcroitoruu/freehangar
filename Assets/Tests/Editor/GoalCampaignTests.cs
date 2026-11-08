@@ -107,7 +107,7 @@ public class GoalCampaignTests
             {
                 Assert.That(goal.hangarId, Is.Zero, goal.goalId);
                 Assert.IsTrue(new[] { GoalUpgradeType.Shovel, GoalUpgradeType.LargerSack,
-                    GoalUpgradeType.LargerTruck }.Contains(goal.upgradeType), goal.goalId);
+                    GoalUpgradeType.LargerTruck, GoalUpgradeType.Stamina }.Contains(goal.upgradeType), goal.goalId);
             }
         }
     }
@@ -218,6 +218,9 @@ public class GoalCampaignTests
         UnlockHangar(3);
         if (reloadBetweenHangars) Reload();
 
+        data.purchasedGoalUpgrades.Add(GoalUpgradeType.Stamina);
+        Report(GoalType.UpgradePurchased, value: true, upgrade: GoalUpgradeType.Stamina);
+
         HarvestHangar(3);
         ExpectCurrent("h3_clear");
         ClearHangar(3, 100);
@@ -264,12 +267,53 @@ public class GoalCampaignTests
     private void HarvestHangar(int number, float alreadySoldCorn = 0)
     {
         var economy = GrainEconomySettings.Default;
-        var stock = economy.hangars.Single(h => h.hangarId == number);
+        var stock = ReadAuthoredStock(number);
         for (int i = 0; i < GrainCargo.TypeCount; i++)
         {
-            float kg = (float)economy.ForecastCrop((GrainType)i, stock).SaleableKg;
+            // Leave 22% for pests, cleanup and handling losses, rather than assuming a perfect harvest.
+            float kg = (float)(stock.physicalGrainKg[i] / economy.ConsumeMultiplier * .78);
             LoadAndSell((GrainType)i, kg - (i == 0 ? alreadySoldCorn : 0));
         }
+    }
+
+    private static GrainEconomySettings.HangarStock ReadAuthoredStock(int number)
+    {
+        string scene = File.ReadAllText("Assets/Scenes/Gameplay.unity");
+        var blocks = Regex.Matches(scene, @"(?ms)^--- !u!\d+ &(\d+)[^\r\n]*\r?\n.*?(?=^--- !u!|\z)")
+            .Cast<Match>().ToDictionary(m => long.Parse(m.Groups[1].Value), m => m.Value);
+        long Reference(string block, string field) => long.Parse(Regex.Match(block,
+            @"(?m)^  " + field + @": \{fileID: (\d+)").Groups[1].Value);
+        var contexts = blocks.Values.Where(b => b.Contains("guid: eb8c8fd97f6b7fa45b024eed93702617"))
+            .ToDictionary(b => Reference(b, "m_GameObject"), b => int.Parse(Regex.Match(b, @"hangarId: (\d+)").Groups[1].Value));
+        var transforms = blocks.Values.Where(b => b.Contains("\nTransform:") && b.Contains("  m_GameObject:"))
+            .ToDictionary(b => Reference(b, "m_GameObject"));
+        int Hangar(string pile)
+        {
+            long go = Reference(pile, "m_GameObject");
+            while (go != 0)
+            {
+                if (contexts.TryGetValue(go, out int hangar) && hangar > 0) return hangar;
+                long parent = Reference(transforms[go], "m_Father");
+                go = parent == 0 ? 0 : Reference(blocks[parent], "m_GameObject");
+            }
+            return 0;
+        }
+        string pile = blocks.Values.Single(b => b.Contains("guid: def2a2e4d587bab4d809a66ba02b6bf0") && Hangar(b) == number);
+        double mass = double.Parse(Regex.Match(pile, @"(?m)^  kilograms: ([^\r\n]+)").Groups[1].Value, CultureInfo.InvariantCulture);
+        var stock = new GrainEconomySettings.HangarStock { hangarId = number, physicalGrainKg = new double[GrainCargo.TypeCount] };
+        string layout = pile.Substring(0, pile.IndexOf("  previewClearedPercent:", StringComparison.Ordinal));
+        foreach (Match region in Regex.Matches(layout, @"(?ms)^  - percent: ([\d.]+)\r?\n(.*?)(?=^  - percent:|\z)"))
+        {
+            var grains = Regex.Matches(region.Groups[2].Value, @"grain: (\d+)\r?\n\s+weight: ([\d.]+)").Cast<Match>().ToArray();
+            double totalWeight = grains.Sum(g => double.Parse(g.Groups[2].Value, CultureInfo.InvariantCulture));
+            Assert.That(totalWeight, Is.GreaterThan(0));
+            double fraction = double.Parse(region.Groups[1].Value, CultureInfo.InvariantCulture) / 100;
+            foreach (var grain in grains)
+                stock.physicalGrainKg[int.Parse(grain.Groups[1].Value)] += mass * fraction *
+                    double.Parse(grain.Groups[2].Value, CultureInfo.InvariantCulture) / totalWeight;
+        }
+        Assert.That(stock.physicalGrainKg.Sum(), Is.EqualTo(mass).Within(.01), "Scene crop regions must cover the whole pile.");
+        return stock;
     }
 
     private void CollectKey(int number)

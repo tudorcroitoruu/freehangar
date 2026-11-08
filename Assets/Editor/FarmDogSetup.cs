@@ -54,7 +54,12 @@ public static class FarmDogSetup
         var mouth = new GameObject("Carried chicken leg").transform;
         mouth.SetParent(model.transform, false); mouth.localPosition = new Vector3(0, .55f, .55f);
         var head = model.GetComponentsInChildren<Transform>().FirstOrDefault(t => t.name == "Def_Head");
-        if (head) mouth.SetParent(head, true);
+        if (head)
+        {
+            mouth.SetParent(head, false);
+            mouth.localPosition = new Vector3(0f, .22f, .015f);
+            mouth.localRotation = Quaternion.Euler(-100.6f, 0f, 0f);
+        }
         dog.mouth = mouth;
         var delivery = new GameObject("Dog reward drop point").transform;
         delivery.SetParent(go.transform.parent, true);

@@ -5,6 +5,10 @@ public sealed class ChickenLegPickup : MonoBehaviour, IInteractable
     private const float SpinDegreesPerSecond = 90f;
     [SerializeField, Min(0f)] private float hungerReductionPercent = 15f;
     [SerializeField, Min(0f)] private float hungerReductionDuration = 1f;
+    [SerializeField] private Vector3 mouthGripPoint;
+    [SerializeField] private Vector3 mouthEulerAngles;
+    private Vector3 uncarriedScale;
+    private Quaternion uncarriedRotation;
     private bool collected;
     private bool carried;
     private float expiresAt;
@@ -24,16 +28,27 @@ public sealed class ChickenLegPickup : MonoBehaviour, IInteractable
     public bool Carry(Transform mouth)
     {
         if (collected || carried || mouth == null) return false;
+        uncarriedScale = transform.lossyScale;
+        uncarriedRotation = transform.rotation;
         carried = true;
         foreach (var c in GetComponentsInChildren<Collider>()) c.enabled = false;
         transform.SetParent(mouth, false);
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
+        Vector3 parentScale = mouth.lossyScale;
+        transform.localScale = new Vector3(uncarriedScale.x / Mathf.Max(.001f, Mathf.Abs(parentScale.x)),
+            uncarriedScale.y / Mathf.Max(.001f, Mathf.Abs(parentScale.y)),
+            uncarriedScale.z / Mathf.Max(.001f, Mathf.Abs(parentScale.z)));
+        transform.localRotation = Quaternion.Euler(mouthEulerAngles);
+        transform.localPosition = -(transform.localRotation * Vector3.Scale(mouthGripPoint, transform.localScale));
         return true;
     }
     public void PutDown(Vector3 position)
     {
         transform.SetParent(null, true);
+        if (carried)
+        {
+            transform.localScale = uncarriedScale;
+            transform.rotation = uncarriedRotation;
+        }
         transform.position = position;
         carried = false;
         expiresAt = Time.time + 60f;

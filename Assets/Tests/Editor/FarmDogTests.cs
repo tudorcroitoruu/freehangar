@@ -99,4 +99,29 @@ public sealed class FarmDogTests
         }
         finally { Object.DestroyImmediate(root); Object.DestroyImmediate(mouth); Object.DestroyImmediate(player); }
     }
+
+    [Test]
+    public void ChickenLegGripStaysAtMouthWithoutInheritingDogScale()
+    {
+        var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Chickens/ChickenLeg.prefab");
+        var item = Object.Instantiate(prefab);
+        var mouth = new GameObject("Scaled animated mouth");
+        try
+        {
+            mouth.transform.localScale = Vector3.one * 1.5f;
+            mouth.transform.SetPositionAndRotation(new Vector3(2, 1, 3), Quaternion.Euler(15, 40, 0));
+            Vector3 originalScale = item.transform.lossyScale;
+            var leg = item.GetComponent<ChickenLegPickup>();
+            var data = new UnityEditor.SerializedObject(leg);
+            Vector3 grip = data.FindProperty("mouthGripPoint").vector3Value;
+            Assert.IsTrue(leg.Carry(mouth.transform));
+            Assert.That(Vector3.Distance(item.transform.TransformPoint(grip), mouth.transform.position), Is.LessThan(.0001f));
+            Assert.That(Vector3.Distance(item.transform.lossyScale, originalScale), Is.LessThan(.0001f));
+            mouth.transform.rotation = Quaternion.Euler(35, 70, 10);
+            Assert.That(Vector3.Distance(item.transform.TransformPoint(grip), mouth.transform.position), Is.LessThan(.0001f));
+            leg.PutDown(Vector3.zero);
+            Assert.That(Vector3.Distance(item.transform.lossyScale, originalScale), Is.LessThan(.0001f));
+        }
+        finally { Object.DestroyImmediate(item); Object.DestroyImmediate(mouth); }
+    }
 }

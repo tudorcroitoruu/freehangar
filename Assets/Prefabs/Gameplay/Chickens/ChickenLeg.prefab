@@ -48,6 +48,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChickenLegPickup
   hungerReductionPercent: 15
   hungerReductionDuration: 1
+  mouthGripPoint: {x: 0, y: 0.0014, z: 0.08}
+  mouthEulerAngles: {x: 0, y: 90, z: 0}
 --- !u!114 &7123145308776805952
 MonoBehaviour:
   m_ObjectHideFlags: 0
