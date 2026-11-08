@@ -48,6 +48,7 @@ public sealed class GrainPest : MonoBehaviour
         CanAttack(Target) && (IsCrow || IsNearHangar(Target.transform.position)) &&
         Target.WorldBounds.SqrDistance(transform.position) <= 1.5f * 1.5f && !PlayerPerks.NoAttacksActive;
     private float nextBite;
+    private float lastSuccessfulFeed;
     private SphereCollider hitCollider;
     private float speed;
     private Animator animator;
@@ -141,16 +142,22 @@ public sealed class GrainPest : MonoBehaviour
     }
     private Vector3 CrowPerchPoint()
     {
-        return FeedingPoint(new Vector2(crowLandingOffset.x, crowLandingOffset.z));
+        Vector3 point = FeedingPoint(new Vector2(crowLandingOffset.x, crowLandingOffset.z));
+        // Grain can be deep inside a partly filled barrel/crate. Keep the bird
+        // above the rim rather than hiding its model inside the container.
+        point.y = Mathf.Max(point.y, Target.WorldBounds.max.y) + .03f;
+        return point;
     }
     private Vector3 FeedingPoint(Vector2 offset)
     {
         if (Target.TryGetComponent<BagCornSurface>(out var surface) && surface.TryFeedingPoint(offset, out var point))
             return point;
         var box = Target.GetComponent<BoxCollider>();
-        Bounds bounds = box != null ? box.bounds : Target.WorldBounds;
+        // Collider.bounds is empty while vehicle cargo colliders are disabled.
+        // WorldBounds is calculated from local geometry even during transport.
+        Bounds bounds = Target.WorldBounds;
         Vector3 top = bounds.center + new Vector3(offset.x * bounds.extents.x, bounds.extents.y + 1f, offset.y * bounds.extents.z);
-        if (box != null && box.Raycast(new Ray(top, Vector3.down), out var hit, bounds.size.y + 2f)) return hit.point;
+        if (box != null && box.enabled && box.Raycast(new Ray(top, Vector3.down), out var hit, bounds.size.y + 2f)) return hit.point;
         return new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
     }
     private void LateUpdate()
@@ -172,6 +179,7 @@ public sealed class GrainPest : MonoBehaviour
         if (!IsCrow && !onBag) return;
         if (PlayerPerks.NoAttacksActive || Time.time < nextBite) return;
         Target.ConsumeByPest(biteAmount * (IsCrow ? BirdGroupBite : RatGroupBite));
+        lastSuccessfulFeed = Time.time;
         if (!CanAttack(Target)) { ScaredAway(); return; }
         if (!IsCrow && animator != null) animator.SetTrigger("IdleBreak");
         nextBite = Time.time + BiteInterval;
@@ -193,6 +201,7 @@ public sealed class GrainPest : MonoBehaviour
         biteAmount = 1f / count;
     }
     public bool IsClimbing => climbing;
+    public void SetGroupBiteShare(int count) => biteAmount = 1f / Mathf.Max(1, count);
     public bool IsOnBag => onBag;
     public void ConfigureBagSlot(int index, int count, bool climb)
     {
@@ -218,6 +227,7 @@ public sealed class GrainPest : MonoBehaviour
     public void Initialize(GrainContainer target, bool crow, RuntimeAnimatorController fly, RuntimeAnimatorController eat)
     {
         Target = target; previousTargetPosition = target.transform.position; IsCrow = crow; speed = crow ? 7f : Random.Range(1.8f, 2.6f);
+        lastSuccessfulFeed = Time.time;
         biteAmount = 1f;
         beginAt = Time.time + Random.Range(.1f, 1.5f);
         climbDuration = 1.45f;
@@ -250,9 +260,28 @@ public sealed class GrainPest : MonoBehaviour
         if (FarmChicken.TryGroundPoint(position, out var ground)) position.y = ground.y + .1f;
         return position;
     }
+    public static bool RatApproachClear(Vector3 from, Vector3 to)
+    {
+        int steps = Mathf.Max(1, Mathf.CeilToInt(Vector3.Distance(from, to) / .3f));
+        for (int i = 0; i <= steps; i++)
+        {
+            Vector3 point = Vector3.Lerp(from, to, (float)i / steps);
+            if (!FarmChicken.TryGroundPoint(point, out var ground) ||
+                !FarmChicken.IsGrainClearAt(ground)) return false;
+        }
+        return true;
+    }
     private void Update()
     {
+        if (!IsCrow && !FarmChicken.IsGrainClearAt(transform.position - Vector3.up * .1f))
+        {
+            ClearWarning();
+            feedingNow = false;
+            Destroy(gameObject);
+            return;
+        }
         if (lethalHit || hitEffectAt >= 0f) return;
+        if (!fleeing && Time.time - lastSuccessfulFeed > 30f) ScaredAway();
         if(PlayerPerks.NoAttacksActive && !fleeing) ScaredAway();
         if (fleeing)
         {
@@ -266,7 +295,7 @@ public sealed class GrainPest : MonoBehaviour
             return;
         }
         if (!CanAttack(Target) || (!IsCrow && !IsNearHangar(Target.transform.position))) { ScaredAway(); return; }
-        if (Time.time >= nextIdleSound)
+        if (Time.time >= nextIdleSound && (!IsCrow || IsFeeding))
         {
             GameplayAudio.Instance?.PestIdle(IsCrow, transform.position);
             nextIdleSound = Time.time + Random.Range(IsCrow ? 5f : 6f, IsCrow ? 9f : 10f);
@@ -301,6 +330,7 @@ public sealed class GrainPest : MonoBehaviour
                 Vector3 end = SlotPoint(true);
                 Vector3 p = Vector3.Lerp(climbFrom, end, Mathf.SmoothStep(0,1,t));
                 p.y += Mathf.Sin(t * Mathf.PI) * .18f;
+                if (!FarmChicken.IsGrainClearAt(p - Vector3.up * .1f)) { ScaredAway(); return; }
                 transform.position = p;
                 Vector3 inward = Target.WorldBounds.center - p; inward.y = 0;
                 if (inward.sqrMagnitude > .001f) transform.rotation = Quaternion.LookRotation(inward) * Quaternion.Euler(-35f * Mathf.Sin(Mathf.PI*t),0,0);
@@ -331,6 +361,7 @@ public sealed class GrainPest : MonoBehaviour
             if (IsCrow && animator != null && flying != null && animator.runtimeAnimatorController != flying) animator.runtimeAnimatorController = flying;
             if (!IsCrow && animator != null) animator.SetFloat("Speed", 1f);
             Vector3 step = Vector3.MoveTowards(transform.position, destination, (IsCrow ? Mathf.Max(speed,targetSpeed + 5f) : speed) * Time.deltaTime);
+            if (!IsCrow && !onBag && !RatApproachClear(transform.position, step)) { ScaredAway(); return; }
             Vector3 dir = step - transform.position;
             Vector3 forward = Vector3.ProjectOnPlane(dir, Vector3.up);
             if (forward.sqrMagnitude > .0001f)
@@ -681,20 +712,38 @@ public sealed class GrainPestDirector : MonoBehaviour
     private void SpawnRatGroup(GrainContainer bag, bool nearby)
     {
         const int count = 6;
+        var occupiedSlots = new System.Collections.Generic.HashSet<int>();
         for (int i = 0; i < count; i++)
         {
+            Bounds bounds = bag.WorldBounds;
+            float radius = Mathf.Max(bounds.extents.x, bounds.extents.z) + .45f;
+            Vector3 spawn = default;
+            int slot = 0;
+            bool found = false;
+            int firstSlot = Random.Range(0, 24);
+            for (int attempt = 0; attempt < 24; attempt++)
+            {
+                slot = (firstSlot + attempt) % 24;
+                if (occupiedSlots.Contains(slot)) continue;
+                float angle = slot * Mathf.PI * 2f / 24f;
+                Vector3 radial = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+                Vector3 approach = bounds.center + radial * radius;
+                approach.y = bag.transform.position.y + .1f;
+                Vector3 candidate = bounds.center + radial * (nearby ? radius : radius + 3f);
+                candidate.y = approach.y;
+                if (!FarmChicken.TryGroundPoint(candidate, out var ground) ||
+                    !GrainPest.RatApproachClear(ground, approach)) continue;
+                spawn = ground + Vector3.up * .1f;
+                found = true;
+                break;
+            }
+            if (!found) continue;
             var rat = Spawn(bag, false);
             if (rat == null) continue;
-            rat.ConfigureBagSlot(i, count, true);
-            if (nearby)
-            {
-                float angle = i * Mathf.PI * 2f / count;
-                Bounds b = bag.WorldBounds;
-                float radius = Mathf.Max(b.extents.x,b.extents.z) + .45f;
-                Vector3 point = b.center + new Vector3(Mathf.Cos(angle),0,Mathf.Sin(angle))*radius;
-                point.y = bag.transform.position.y + .1f;
-                rat.transform.position = point;
-            }
+            rat.transform.position = spawn;
+            occupiedSlots.Add(slot);
+            rat.ConfigureBagSlot(slot, 24, true);
+            rat.SetGroupBiteShare(count);
         }
     }
     private GrainPest Spawn(GrainContainer target, bool crow)

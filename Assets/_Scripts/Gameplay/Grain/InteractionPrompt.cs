@@ -101,7 +101,7 @@ public sealed class InteractionPrompt : MonoBehaviour
         int extraCount = data.AdditionalActions?.Length ?? 0;
         EnsureActionRows(extraCount);
         for (int i = 0; i < actionRows.Count; i++)
-        {
+        {H
             var row = actionRows[i];
             bool active = i < extraCount;
             row.panel.gameObject.SetActive(active);

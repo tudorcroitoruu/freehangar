@@ -6,6 +6,27 @@ using UnityEngine;
 public class ContainerPlacementTests
 {
     [Test]
+    public void CrowPerchUsesCargoPositionWhenItsColliderIsDisabled()
+    {
+        var cargo = Create("Transported barrel", origin + Vector3.up * 2);
+        var box = cargo.AddComponent<BoxCollider>();
+        box.center = Vector3.up * .5f;
+        box.size = new Vector3(.7f, 1f, .7f);
+        var container = cargo.AddComponent<GrainContainer>();
+        var bird = Create("Crow", origin + Vector3.up * 4).AddComponent<GrainPest>();
+        bird.Initialize(container, true, null, null);
+        var perch = typeof(GrainPest).GetMethod("CrowPerchPoint", BindingFlags.Instance | BindingFlags.NonPublic);
+        Physics.SyncTransforms();
+        Vector3 enabledPoint = (Vector3)perch.Invoke(bird, null);
+        box.enabled = false;
+        Physics.SyncTransforms();
+        Vector3 disabledPoint = (Vector3)perch.Invoke(bird, null);
+        Assert.That(Vector3.Distance(enabledPoint, disabledPoint), Is.LessThan(.001f));
+        Assert.That(disabledPoint.y, Is.GreaterThan(container.WorldBounds.max.y));
+        Assert.That(Vector3.Distance(disabledPoint, cargo.transform.position), Is.LessThan(2f));
+    }
+
+    [Test]
     public void CrowAboveCargoCanBeHitAtHeadHeightByRayAndBroomSweep()
     {
         var cargo = Create("Elevated barrel", origin + Vector3.up * 2);
