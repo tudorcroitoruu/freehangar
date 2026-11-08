@@ -8,6 +8,41 @@ using Object = UnityEngine.Object;
 public class WorldSaveTests
 {
     [Test]
+    public void FinishingRunRemovesContinueAndBackupButPreservesSettings()
+    {
+        const BindingFlags flags = BindingFlags.Static | BindingFlags.NonPublic;
+        var path = typeof(SaveSystem).GetField("savePath", flags);
+        var completed = typeof(SaveSystem).GetField("completedRun", flags);
+        var revision = typeof(SaveSystem).GetField("saveRevision", flags);
+        var previousPath = path.GetValue(null);
+        var previousCompleted = completed.GetValue(null);
+        var previousRevision = revision.GetValue(null);
+        var previousData = SaveSystem.Data;
+        string testKey = "ending-test-" + Guid.NewGuid();
+        try
+        {
+            path.SetValue(null, testKey);
+            PlayerPrefs.SetString(testKey, "finished run");
+            PlayerPrefs.SetString(testKey + "_Backup", "old run");
+            PlayerPrefs.SetString(testKey + "_Settings", "keep settings");
+            SaveSystem.CompleteRun();
+            Assert.IsFalse(SaveSystem.HasSavedGame);
+            Assert.IsFalse(PlayerPrefs.HasKey(testKey + "_Backup"));
+            Assert.AreEqual("keep settings", PlayerPrefs.GetString(testKey + "_Settings"));
+            Assert.IsTrue((bool)completed.GetValue(null));
+            Assert.Greater((long)revision.GetValue(null), (long)previousRevision);
+            SaveSystem.SaveGoalCompletionAsync().GetAwaiter().GetResult();
+            Assert.IsFalse(SaveSystem.HasSavedGame, "Late autosaves cannot resurrect the finished run.");
+        }
+        finally
+        {
+            PlayerPrefs.DeleteKey(testKey); PlayerPrefs.DeleteKey(testKey + "_Backup"); PlayerPrefs.DeleteKey(testKey + "_Settings");
+            path.SetValue(null, previousPath); completed.SetValue(null, previousCompleted); revision.SetValue(null, previousRevision);
+            SaveSystem.Data = previousData;
+        }
+    }
+
+    [Test]
     public void SiblingTrailerCargoSaveResolvesBackToItsSlot()
     {
         var root = new GameObject("Trailer save test");

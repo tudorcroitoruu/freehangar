@@ -181,6 +181,18 @@ public static class SaveSystem
 
     static string savePath = "/save";
     public static bool HasSavedGame => PlayerPrefs.HasKey(savePath);
+    private static bool completedRun;
+
+    public static void CompleteRun()
+    {
+        // Invalidate pending background saves before deleting the finished run.
+        ++saveRevision;
+        completedRun = true;
+        PlayerPrefs.DeleteKey(savePath);
+        PlayerPrefs.DeleteKey(savePath + "_Backup");
+        Data = new PlayerData();
+        PlayerPrefs.Save();
+    }
 
     static int key = 5;
     private static long saveRevision;
@@ -189,7 +201,7 @@ public static class SaveSystem
     // Capture Unity objects on the main thread, then serialize an isolated snapshot.
     public static async Task SaveGoalCompletionAsync()
     {
-        if (Data == null) return;
+        if (Data == null || completedRun) return;
         var profile = Data;
         long revision = ++saveRevision;
         WorldSaveRuntime.CaptureIntoPlayerData();
@@ -235,7 +247,7 @@ public static class SaveSystem
     
     public static void SaveData()
     {
-        WorldSaveRuntime.CaptureIntoPlayerData();
+        if (!completedRun) WorldSaveRuntime.CaptureIntoPlayerData();
         WriteData();
     }
 
@@ -248,7 +260,7 @@ public static class SaveSystem
         string jsonActivity = JsonUtility.ToJson(activityData); //Activity Data (PS5)
         
         // Opening the menu or changing settings must not create a resumable game.
-        if (createSave || HasSavedGame || WorldSaveRuntime.Instance != null)
+        if (!completedRun && (createSave || HasSavedGame || WorldSaveRuntime.Instance != null))
         {
             if (PlayerPrefs.HasKey(savePath)) PlayerPrefs.SetString(savePath + "_Backup", PlayerPrefs.GetString(savePath));
             PlayerPrefs.SetString(savePath, EncodePlayerSave(json));
@@ -390,7 +402,7 @@ public static class SaveSystem
     }*/
     public static async Task<PlayerData> MakeNewSave()
     {
-
+        completedRun = false;
         Data = new PlayerData();
         Data.playerName = "PLAYER_" + Random.Range(1000,10000);
 

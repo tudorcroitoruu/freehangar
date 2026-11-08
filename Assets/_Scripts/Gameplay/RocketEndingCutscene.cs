@@ -23,6 +23,8 @@ public sealed class RocketEndingCutscene : MonoBehaviour
     [SerializeField, Min(.1f)] private float finalFadeSeconds = 1.5f;
     [SerializeField, Min(.1f)] private float endingTextFadeSeconds = .8f;
     [SerializeField, Min(0)] private float friendsTextDelaySeconds = 2f;
+    [SerializeField, Min(0)] private float endingCardHoldSeconds = 3f;
+    private bool returningToMenu;
     [Header("Flight")]
     [SerializeField, Range(1,16)] private int companionCount = 8;
     [SerializeField] private float rocketScale = .9f, flightSpeed = 4f;
@@ -232,7 +234,41 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         if (overlay != null) overlay.enabled = Pause.Instance == null || !Pause.Instance.paused;
     }
 
-    private void Update() => Advance(Time.deltaTime);
+    private void Update()
+    {
+        if (returningToMenu) return;
+        Advance(Time.deltaTime);
+        if (Completed && IsPlaying && Application.isPlaying)
+        {
+            returningToMenu = true;
+            StartCoroutine(ReturnToMenu());
+        }
+    }
+
+    private System.Collections.IEnumerator ReturnToMenu()
+    {
+        yield return new WaitForSecondsRealtime(endingCardHoldSeconds);
+        float duration = Mathf.Max(.1f, finalFadeSeconds);
+        for (float time = 0; time < duration; time += Time.unscaledDeltaTime)
+        {
+            float alpha = 1 - Mathf.SmoothStep(0, 1, time / duration);
+            continuedText.alpha = friendsText.alpha = alpha;
+            black.color = Color.black;
+            yield return null;
+        }
+        continuedText.alpha = friendsText.alpha = 0;
+        black.color = Color.black;
+        yield return null;
+        if (!Application.CanStreamedLevelBeLoaded("Menu"))
+        {
+            Debug.LogError("Ending cannot return: Menu scene is missing from Build Settings.", this);
+            yield break;
+        }
+        SaveSystem.CompleteRun();
+        Time.timeScale = 1;
+        var loading = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Menu");
+        if (loading != null) yield return loading;
+    }
 
     private void Advance(float deltaTime)
     {
