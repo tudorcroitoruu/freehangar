@@ -1,9 +1,11 @@
+using SickscoreGames.HUDNavigationSystem;
 using UnityEngine;
 
 /// <summary>Arcade bicycle movement with collision, slope support and separately animated parts.</summary>
 [RequireComponent(typeof(CharacterController)), DisallowMultipleComponent]
 public sealed class BicycleController : MonoBehaviour, IInteractable
 {
+    [SerializeField] private HUDNavigationElement hudElement;
     [SerializeField, Min(0f)] private float hudIndicatorHideDistance = 5f;
     public Transform steering, frontWheel, rearWheel, crank, leftPedal, rightPedal, riderView;
     public Transform[] cargoSlots;
@@ -249,6 +251,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     void OnDisable() { if (coasting) StopCoasting(); GameplayAudio.Instance?.VehicleMoving(this, false); }
     public void SetRidden(bool value)
     {
+        if (hudElement != null) hudElement.enabled = !value;
         Initialize(); if (IsRidden == value) return;
         bool wasCoasting = coasting;
         IsRidden = value; steeringVelocity = 0; PedalingCameraPitch = 0;

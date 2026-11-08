@@ -1335,6 +1335,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd2db587a0c5ed5438cfe500addebb84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BicycleController
+  hudElement: {fileID: 9107458172141890813}
+  hudIndicatorHideDistance: 5
   steering: {fileID: 1401512911442356809}
   frontWheel: {fileID: 8461351384446630138}
   rearWheel: {fileID: 4718173005654072054}
