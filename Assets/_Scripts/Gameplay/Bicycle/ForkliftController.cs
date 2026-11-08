@@ -165,7 +165,23 @@ public sealed class ForkliftController : MonoBehaviour
             else if (cargo == null && unloadTarget != null)
                 data = new InteractionPromptData(unloadTarget.WorldBounds.center, "Unload big bag from vehicle", true) { InteractionKey = KeyCode.F };
         }
-        GameplayCanvas.Instance?.interactionPrompt?.Show(Camera.main,data);
+        var camera = rig.riderView != null ? rig.riderView.GetComponentInChildren<Camera>() : null;
+        if (camera == null) camera = Camera.main;
+        if (camera != null && data.InteractionKey == KeyCode.F)
+        {
+            // Nearby cargo slots can be below or beside the driver's view.
+            // Keep the available transfer action inside the visible prompt area.
+            Vector3 viewport = camera.WorldToViewportPoint(data.Position);
+            if (viewport.z <= camera.nearClipPlane)
+                viewport = new Vector3(.5f, .35f, 2f);
+            else
+            {
+                viewport.x = Mathf.Clamp(viewport.x, .2f, .8f);
+                viewport.y = Mathf.Clamp(viewport.y, .2f, .8f);
+            }
+            data.Position = camera.ViewportToWorldPoint(viewport);
+        }
+        GameplayCanvas.Instance?.interactionPrompt?.Show(camera,data);
     }
     private GrainContainer FindBag()
     {
