@@ -5,6 +5,24 @@ using UnityEngine.UI;
 
 public class ShovelUpgradeTests
 {
+    [TestCase(GrainType.Rice)]
+    [TestCase(GrainType.Wheat)]
+    [TestCase(GrainType.Soybeans)]
+    public void VacuumStreamKeepsEachTransferredCrop(GrainType grain)
+    {
+        var vacuum = root.AddComponent<VacuumTool>();
+        var batch = new GrainCargo();
+        batch.Add(grain, 1);
+        var emit = typeof(VacuumTool).GetMethod("Emit", BindingFlags.Instance | BindingFlags.NonPublic);
+        emit.Invoke(vacuum, new object[] { Vector3.zero, Vector3.one, false, 16, batch });
+        batch.Clear();
+        batch.Add(GrainType.Corn, 1);
+        emit.Invoke(vacuum, new object[] { Vector3.zero, Vector3.one, true, 16, batch });
+        var species = (float[])typeof(VacuumTool).GetField("species", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(vacuum);
+        for (int i = 0; i < 16; i++) Assert.That(species[i], Is.EqualTo((float)grain));
+        for (int i = 16; i < 32; i++) Assert.That(species[i], Is.EqualTo((float)GrainType.Corn));
+    }
+
     [TestCase(.00001f, 0f)]
     [TestCase(.049f, 0f)]
     [TestCase(.05f, .05f)]

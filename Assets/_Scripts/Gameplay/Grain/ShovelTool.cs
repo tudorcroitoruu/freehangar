@@ -103,6 +103,8 @@ public sealed class ShovelTool : MonoBehaviour
     // Keep the old private preload setter for editor fixtures; cargo owns runtime mass.
     public float Kilograms { get => cargo.Total; private set { cargo.Clear(); cargo.Add(GrainType.Corn, value); } }
     public GrainCargo Cargo => cargo;
+    internal GrainCargo VacuumCollectedCargo => scoopCargo;
+    private float nextVacuumMixWarning;
     private void ClearTinyRemainder()
     {
         // Only called between actions: don't discard the small increments of an active scoop.
@@ -546,7 +548,13 @@ public sealed class ShovelTool : MonoBehaviour
         if(pile==null||!pile.isActiveAndEnabled||!pile.IsInsideBoundary(hit.point))return 0;
         point=hit.point;point.y=pile.SurfaceHeight(point);
         scoopCargo.Clear();
-        float collected=pile.Scoop(point,ActiveVacuum.suctionRadius,ActiveVacuum.suctionDepth,Mathf.Min(maximum,Mathf.Max(0,CapacityKg-Kilograms)),scoopCargo);
+        float collected=pile.ScoopCompatibleWith(point,ActiveVacuum.suctionRadius,ActiveVacuum.suctionDepth,
+            Mathf.Min(maximum,Mathf.Max(0,CapacityKg-Kilograms)),scoopCargo,cargo,out bool mixBlocked);
+        if (mixBlocked && Time.time >= nextVacuumMixWarning)
+        {
+            nextVacuumMixWarning = Time.time + 1.5f;
+            GameplayCanvas.Instance?.ShowWarning(WarningType.mixGrainNotAllowedInShovel);
+        }
         GoalContext.Resolve(pile,out int hangar,out _);
         for(int i=0;i<GrainCargo.TypeCount;i++)
         {

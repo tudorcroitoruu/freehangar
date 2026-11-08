@@ -34,6 +34,10 @@ public sealed class ShovelUpgradeInteractable : MonoBehaviour, IKeyedInteractabl
             var model = shovelModels[i];
             // A model must never disable this component or one of its ancestors.
             if (model == null || transform.IsChildOf(model.transform)) continue;
+            // Shop previews may be copied from held models, whose overlay layer ignores walls.
+            int heldLayer = LayerMask.NameToLayer("HeldTools");
+            foreach (var child in model.GetComponentsInChildren<Transform>(true))
+                if (child.gameObject.layer == heldLayer) child.gameObject.layer = 0;
             bool active = i == type;
             if (model.activeSelf != active) model.SetActive(active);
         }

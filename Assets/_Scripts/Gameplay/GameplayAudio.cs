@@ -166,6 +166,7 @@ public sealed class GameplayAudio : MonoBehaviour
     public void PerkFound() => Play(perkFound, .8f);
     public void ShovelGet() => Play(Choose(shovelGets), .75f);
     public void FillGrain() => Play(Choose(fillGrain), .65f);
+    public void VacuumGrainIntake() => Play(Choose(fillGrain), .3f);
     public void VehicleHit(Vector3 point) => PlayAt(Choose(vehicleHits), point, .85f);
     public void VehicleResetComplete() => Play(resetVehicle, .8f);
     public void BicycleScratch(Vector3 point) => PlayAt(bicycleScratch, point, .25f, 1f);
@@ -199,7 +200,7 @@ public sealed class GameplayAudio : MonoBehaviour
     }
 
     public void VacuumMoving(Transform tool, bool moving, bool lastVacuum) =>
-        SetLoop(tool, vacuum, moving, lastVacuum ? 1.18f : .92f, .5f, .25f);
+        SetLoop(tool, vacuum, moving, lastVacuum ? 1.18f : .92f, .5f, 0f);
     public void WheelbarrowMoving(Transform barrow, bool moving) =>
         SetLoop(barrow, wheelbarrow, moving, 1f, .45f);
 
