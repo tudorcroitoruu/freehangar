@@ -4,6 +4,10 @@ using UnityEngine;
 /// <summary>Metres and cubic metres. A fixed grid; no individual grain physics.</summary>
 public sealed class GrainHeightField
 {
+    // Keep the empty apron buried, but give nonempty remnants a visible skin.
+    // This affects rendering only; stock and collection keep their actual heights.
+    public static float RecessedSurfaceHeight(float height, float recess) =>
+        height <= .00001f ? -recess : Mathf.Max(recess * .1f, height - recess);
     public int Resolution { get; }
     public float Size { get; }
     public float Spacing { get; }

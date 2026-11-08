@@ -17,7 +17,21 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     public string RequiredChestKeyId => requiredKeyId;
     public string ChestKeyHint => string.IsNullOrEmpty(matchingKeyColor)
         ? "Requires a key for this chest."
-        : $"Requires the {matchingKeyColor.ToLowerInvariant()} key for this chest.";
+        : $"Requires any {matchingKeyColor.ToLowerInvariant()} key.";
+    private static readonly string[] ChestKeyFamilies = { "farm.key.iron", "farm.key.copper" };
+    public static bool HasChestKey(PlayerData data, string requiredId)
+    {
+        if (WasFound(data, requiredId)) return true;
+        if (data?.foundSecrets == null || string.IsNullOrEmpty(requiredId)) return false;
+        foreach (string family in ChestKeyFamilies)
+        {
+            if (requiredId != family && !requiredId.StartsWith(family + ".", StringComparison.Ordinal)) continue;
+            foreach (string ownedId in data.foundSecrets)
+                if (ownedId == family || (ownedId != null && ownedId.StartsWith(family + ".", StringComparison.Ordinal)))
+                    return true;
+        }
+        return false;
+    }
     public void ConfigureChestKey(string id,string label) { kind=Kind.Key;findId=id;chestKeyLabel=label; }
     public void ConfigureMatchingChest(string id,string keyId,string label,GrainPile pile,Material keyMaterial)
     {
@@ -239,7 +253,7 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
         prompt = default;
         if (!isActiveAndEnabled || opening || !revealed || string.IsNullOrEmpty(findId) || WasFound(SaveSystem.Data, findId)) return false;
         bool hasProfile = SaveSystem.savesLoaded && SaveSystem.Data != null;
-        bool hasKey = kind != Kind.CashChest || WasFound(SaveSystem.Data, requiredKeyId) || (!string.IsNullOrEmpty(matchingHangarKeyId) && WasFound(SaveSystem.Data, matchingHangarKeyId));
+        bool hasKey = kind != Kind.CashChest || HasChestKey(SaveSystem.Data, requiredKeyId) || (!string.IsNullOrEmpty(matchingHangarKeyId) && WasFound(SaveSystem.Data, matchingHangarKeyId));
         string action = !hasProfile ? "Load save to collect" : !hasKey ? "" :
             kind == Kind.VehicleKey ? $"Take {vehicleKeyName} key" :
             kind == Kind.Key ? $"Take {(string.IsNullOrEmpty(chestKeyLabel) ? "chest" : chestKeyLabel)} key" :

@@ -162,7 +162,8 @@ public sealed class GrainWallBoundary
         for (int i = 0; i < Positions.Count; i++)
         {
             Binding b = bindings[i]; Vector3 p = Positions[i];
-            p.y = b.weights.x * field.Heights[b.a] + b.weights.y * field.Heights[b.b] + b.weights.z * field.Heights[b.c] - recess;
+            float height = b.weights.x * field.Heights[b.a] + b.weights.y * field.Heights[b.b] + b.weights.z * field.Heights[b.c];
+            p.y = GrainHeightField.RecessedSurfaceHeight(height, recess);
             Positions[i] = p;
         }
         Triangles.Clear();

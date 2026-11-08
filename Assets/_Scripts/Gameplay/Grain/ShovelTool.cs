@@ -41,6 +41,7 @@ public sealed class ShovelTool : MonoBehaviour
     private float elapsed, transferredFraction, availableAtStart;
     private bool queued;
     private bool scoopReported;
+    private bool scoopSoundPlayed;
     private readonly GrainCargo strokeGrain = new GrainCargo();
     private Camera actionCamera;
     private Transform actor;
@@ -208,6 +209,7 @@ public sealed class ShovelTool : MonoBehaviour
         }
         elapsed = transferredFraction = 0;
         scoopReported = false;
+        scoopSoundPlayed = false;
         strokeGrain.Clear();
         if (pendingPile != null)
         {
@@ -459,6 +461,12 @@ public sealed class ShovelTool : MonoBehaviour
                     strokeGrain.Clear();
                     strokeGrain.Add(scoopCargo.Dominant, 1);
                     scoopReported = true;
+                }
+                // Dust below the automatic cleanup threshold is not a usable load.
+                // Wait for the accumulated scoop, rather than sounding on its first tiny increment.
+                if (collected > 0 && Kilograms >= .05f && !scoopSoundPlayed)
+                {
+                    scoopSoundPlayed = true;
                     GameplayAudio.Instance?.ShovelGet();
                     GrainScooped?.Invoke();
                 }

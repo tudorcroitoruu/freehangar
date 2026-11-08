@@ -78,9 +78,9 @@ Shader "Freehangar/HDRP/Grain Kernels"
         UNITY_DEFINE_INSTANCED_PROP(float, _GrainType)
     UNITY_INSTANCING_BUFFER_END(GrainInstances)
     float Hash(float3 p) { return frac(sin(dot(p, float3(127.1,311.7,74.7))) * 43758.5453); }
-    int Species(float seed, float3 world)
+    void GrainWeights(float3 world, out float4 a, out float4 b, out float4 c)
     {
-        float4 a = _GrainWeightsA, b = _GrainWeightsB, c = _GrainWeightsC;
+        a = _GrainWeightsA; b = _GrainWeightsB; c = _GrainWeightsC;
         if (_UseSpatialGrain > .5)
         {
             float3 local = mul(_GrainWorldToLocal, float4(world,1)).xyz;
@@ -89,6 +89,11 @@ Shader "Freehangar/HDRP/Grain Kernels"
             b = SAMPLE_TEXTURE2D_LOD(_GrainMapB, sampler_GrainMapB, uv, 0);
             c = SAMPLE_TEXTURE2D_LOD(_GrainMapC, sampler_GrainMapC, uv, 0);
         }
+    }
+    int Species(float seed, float3 world)
+    {
+        float4 a, b, c;
+        GrainWeights(world, a, b, c);
         float sum = dot(a, 1) + dot(b, 1) + c.x + c.y;
         if (sum < 0.00001) return 0;
         float target = seed * sum, accumulated = 0;
@@ -211,13 +216,11 @@ Shader "Freehangar/HDRP/Grain Kernels"
         if (t == 0) color *= .91 + .09 * smoothstep(-.8,.5,p.z);
         return color * variation * _Brightness;
     }
-    void TexturedGrainSurface(Varyings i, out float3 color, out float3 normal)
+    void TexturedGrainSpecies(Varyings i, int type, out float3 color, out float3 normal)
     {
         float3 n = normalize(i.normalWS);
         float3 blend = pow(abs(n), 4);
         blend /= max(dot(blend, 1), .0001);
-        float2 cell = floor(i.world.xz * _DetailScale);
-        int type = Species(Hash(float3(cell, 17)), i.world);
         float3 uv = i.world * (_DetailScale / 8.0);
         // World-space triplanar projection keeps normal detail on excavated walls.
         float4 x = SAMPLE_TEXTURE2D_ARRAY(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.yz, type);
@@ -245,6 +248,37 @@ Shader "Freehangar/HDRP/Grain Kernels"
         normal = normalize(n + (bump - n * dot(n, bump)) * _SurfaceNormalStrength);
         float height = dot(float3(x.b, y.b, z.b), blend);
         color = GrainColor(type) * (.74 + .26 * height) * _Brightness;
+    }
+    void TexturedGrainSurface(Varyings i, out float3 color, out float3 normal)
+    {
+        float4 a, b, c;
+        GrainWeights(i.world, a, b, c);
+        float sum = dot(a, 1) + dot(b, 1) + c.x + c.y;
+        if (sum < .00001)
+        {
+            TexturedGrainSpecies(i, 0, color, normal);
+            return;
+        }
+        color = 0;
+        normal = 0;
+        // Blend the substrate instead of switching texture slices per tiny XZ cell.
+        // This also avoids vertical crop stripes on excavated faces. The separate
+        // kernel geometry still selects individual species from these same weights.
+        [unroll]
+        for (int type = 0; type < 10; type++)
+        {
+            float weight = type < 4 ? a[min(type, 3)] :
+                type < 8 ? b[clamp(type - 4, 0, 3)] : c[clamp(type - 8, 0, 3)];
+            UNITY_BRANCH
+            if (weight > 0)
+            {
+                float3 cropColor, cropNormal;
+                TexturedGrainSpecies(i, type, cropColor, cropNormal);
+                color += cropColor * (weight / sum);
+                normal += cropNormal * (weight / sum);
+            }
+        }
+        normal = normalize(normal);
     }
     ENDHLSL
     SubShader

@@ -275,9 +275,12 @@ public sealed class PlayerCombatTools : MonoBehaviour
         }
         if (!found) return;
         var chicken = hit.collider.GetComponentInParent<FarmChicken>();
-        if (chicken != null && (equipped == Tool.Axe || equipped == Tool.Broom))
+        if (chicken != null && (equipped == Tool.Axe || equipped == Tool.Broom || equipped == Tool.Hammer))
         {
-            bool damaged = chicken.Hit(equipped == Tool.Axe ? CombatToolUpgrades.AxeDamage(CombatToolUpgrades.Level(SaveSystem.Data, equipped)) : 3f, transform.position, transform);
+            float damage = equipped == Tool.Axe
+                ? CombatToolUpgrades.AxeDamage(CombatToolUpgrades.Level(SaveSystem.Data, equipped))
+                : equipped == Tool.Hammer ? 4f : 3f;
+            bool damaged = chicken.Hit(damage, transform.position, transform);
             if (damaged && equipped == Tool.Axe && dustEffect != null)
             { var fx = Instantiate(dustEffect, hit.point, Quaternion.LookRotation(hit.normal)); Destroy(fx, 4f); }
             return;

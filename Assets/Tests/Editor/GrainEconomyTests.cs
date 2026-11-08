@@ -4,6 +4,17 @@ using UnityEngine;
 
 public class GrainEconomyTests
 {
+    [TestCase(.0001f)]
+    [TestCase(.001f)]
+    [TestCase(.02f)]
+    [TestCase(.045f)]
+    public void ThinGrainSkinStaysAboveGround(float height)
+    {
+        Assert.That(GrainHeightField.RecessedSurfaceHeight(height, .045f), Is.GreaterThan(0));
+        Assert.That(GrainHeightField.RecessedSurfaceHeight(0, .045f), Is.LessThan(0));
+        Assert.That(GrainHeightField.RecessedSurfaceHeight(1, .045f), Is.EqualTo(.955f).Within(.000001f));
+    }
+
     private GameObject root;
     private GrainPile pile;
     private GrainEconomySettings economy;

@@ -56,6 +56,23 @@ public class Pause : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
+    private void OnApplicationFocus(bool focused)
+    {
+        if (!focused) PauseForFocusLoss();
+    }
+
+    private void OnApplicationPause(bool suspended)
+    {
+        if (suspended) PauseForFocusLoss();
+    }
+
+    private void PauseForFocusLoss()
+    {
+        if (!Application.isPlaying || !isActiveAndEnabled || MenuManager.IsMenuOpen || LoadingScreen.IsLoading ||
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "Gameplay") return;
+        PauseGameplay(true);
+    }
+
     private void Update()
     {
         if (MenuManager.IsMenuOpen || exitToMenu || restarting || GameSettingsManager.IsRebindingInputCaptured || LoadingScreen.IsLoading ||
@@ -205,8 +222,13 @@ public class Pause : MonoBehaviour
 
     public void PauseOn()
     {
+        PauseGameplay(false);
+    }
+
+    private void PauseGameplay(bool focusLost)
+    {
         // Sale/upgrade screens own Escape, including the frame in which they close.
-        if (paused || UpgradeManager.BlocksGameplayInput || !pauseScreen || !mainScreen || exitToMenu || restarting) return;
+        if (paused || (!focusLost && UpgradeManager.BlocksGameplayInput) || !pauseScreen || !mainScreen || exitToMenu || restarting) return;
         previousCursorLock = Cursor.lockState;
         previousCursorVisible = Cursor.visible;
         previousTimeScale = Time.timeScale;

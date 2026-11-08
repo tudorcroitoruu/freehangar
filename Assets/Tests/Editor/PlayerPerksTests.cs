@@ -5,6 +5,19 @@ using System.Reflection;
 
 public class PlayerPerksTests
 {
+    [TestCase("farm.key.iron", "farm.key.iron.bonus.2", true)]
+    [TestCase("farm.key.iron.bonus.4", "farm.key.iron", true)]
+    [TestCase("farm.key.iron.bonus.2", "farm.key.iron.bonus.4", true)]
+    [TestCase("farm.key.copper.bonus.1", "farm.key.copper.bonus.3", true)]
+    [TestCase("farm.key.copper", "farm.key.iron", false)]
+    [TestCase("farm.hangar.key.3", "farm.key.iron", false)]
+    [TestCase(null, "farm.key.iron", false)]
+    public void ChestKeysAreUniversalWithinTheirMaterial(string owned, string required, bool expected)
+    {
+        var data = new PlayerData { foundSecrets = new[] { owned } };
+        Assert.AreEqual(expected, BuriedFind.HasChestKey(data, required));
+    }
+
     [TestCase(true)]
     [TestCase(false)]
     public void VoucherPaysForOnlyOneSuccessfulToolUpgrade(bool shovel)

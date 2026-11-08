@@ -795,7 +795,7 @@ public sealed class GrainPile : MonoBehaviour
         // The volume skin sits beneath the visible kernels. Bury its zero-height apron
         // below the ground instead of exposing large orange triangles around the pile.
         float surfaceRecess = .045f / WorldScale.y;
-        for (int i = 0; i < vertices.Length; i++) vertices[i].y = surface.Heights[i] + GroundOffset(i) - surfaceRecess;
+        for (int i = 0; i < vertices.Length; i++) vertices[i].y = GrainHeightField.RecessedSurfaceHeight(surface.Heights[i], surfaceRecess) + GroundOffset(i);
         // Remove the previous closure before assigning the top grid again.
         if (surfaceUV == null || surfaceUV.Length != vertices.Length)
         {
@@ -952,7 +952,7 @@ public sealed class GrainPile : MonoBehaviour
             var d = surfaceDetails[vertex];
             var p = blendToPositions[vertex];
             int source = renderHeightSources[vertex];
-            p.y = source >= 0 ? surface.Heights[source] + d.ground - inset : d.ground - inset;
+            p.y = source >= 0 ? GrainHeightField.RecessedSurfaceHeight(surface.Heights[source], inset) + d.ground : d.ground - inset;
             float fade = Mathf.SmoothStep(0, 1, Mathf.Clamp01((p.y - d.ground) * scaleY / .18f));
             if (fade > 0)
             {
