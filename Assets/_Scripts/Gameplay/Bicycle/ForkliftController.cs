@@ -41,6 +41,8 @@ public sealed class ForkliftController : MonoBehaviour
     private Vector3 seatedLocalPosition;
     private float liftBlend;
     private GrainContainer lastDropped;
+    private GrainContainer unloadTarget;
+    private Transform loadTarget;
     private bool[] originalColliderStates;
     private readonly Collider[] overlaps=new Collider[48];
     private readonly RaycastHit[] groundHits=new RaycastHit[32];
@@ -52,12 +54,21 @@ public sealed class ForkliftController : MonoBehaviour
     private void Update()
     {
         if(!AcceptInput || forkAnchor==null)return;
+        unloadTarget = null;
+        loadTarget = null;
+        if (transferring) return;
         if(lastDropped!=null && (lastDropped.WorldBounds.ClosestPoint(forkAnchor.position)-forkAnchor.position).sqrMagnitude>(pickupReach+.3f)*(pickupReach+.3f))lastDropped=null;
+        var bag = FindBag();
         if(cargo==null)
         {
-            var bag=FindBag();
-            // Ground cargo needs fork contact; parked vehicle cargo is transferred from nearby.
-            TryAutoLift(bag);
+            if (bag != null && SourceVehicle(bag) != null) unloadTarget = bag;
+            else TryAutoLift(bag);
+        }
+        else loadTarget = FindLoadingSlot();
+        if (FarmInput.Down("Secondary"))
+        {
+            if (loadTarget != null) TryLoadOntoVehicle(loadTarget);
+            else if (unloadTarget != null) TryLift(unloadTarget);
         }
     }
     public void DropCargo()
@@ -97,6 +108,13 @@ public sealed class ForkliftController : MonoBehaviour
         bool available=cargo!=null && !transferring;
         string action=Time.time<blockedUntil?blocked:transferring?"Unloading big bag":cargo!=null?"Lower and drop big bag":"Approach a vehicle or drive forks under a big bag";
         var data=new InteractionPromptData(forkAnchor.position+Vector3.up*.8f,action,available){InteractionKey=KeyCode.Q};
+        if (!transferring && Time.time >= blockedUntil)
+        {
+            if (cargo != null && loadTarget != null)
+                data = new InteractionPromptData(loadTarget.position + Vector3.up * .8f, "Load big bag onto vehicle", true) { InteractionKey = KeyCode.F };
+            else if (cargo == null && unloadTarget != null)
+                data = new InteractionPromptData(unloadTarget.WorldBounds.center, "Unload big bag from vehicle", true) { InteractionKey = KeyCode.F };
+        }
         GameplayCanvas.Instance?.interactionPrompt?.Show(Camera.main,data);
     }
     private GrainContainer FindBag()
@@ -146,7 +164,78 @@ public sealed class ForkliftController : MonoBehaviour
     public bool TryAutoLift(GrainContainer bag)
     {
         return bag!=null && bag!=lastDropped && forkAnchor!=null &&
-            (SourceVehicle(bag) != null || (bag.WorldBounds.ClosestPoint(forkAnchor.position)-forkAnchor.position).sqrMagnitude<=.04f) && TryLift(bag);
+            SourceVehicle(bag) == null && (bag.WorldBounds.ClosestPoint(forkAnchor.position)-forkAnchor.position).sqrMagnitude<=.04f && TryLift(bag);
+    }
+    private Transform FindLoadingSlot()
+    {
+        Transform best = null;
+        float distance = float.PositiveInfinity;
+        foreach (var vehicle in nearbyVehicles)
+        {
+            var slot = vehicle.FreeBagCargoSlot(cargo);
+            if (!CanLoadOntoVehicle(slot)) continue;
+            float d = (slot.position - forkAnchor.position).sqrMagnitude;
+            if (d < distance) { best = slot; distance = d; }
+        }
+        return best;
+    }
+
+    private bool CanLoadOntoVehicle(Transform slot)
+    {
+        if (cargo == null || transferring || forkAnchor == null || slot == null || slot.childCount != 0) return false;
+        var vehicle = VehicleCargoOwner.Resolve(slot);
+        if (vehicle == null || vehicle == rig || vehicle.IsRidden || Mathf.Abs(vehicle.Speed) > .1f ||
+            !VehicleCargoOwner.CanLoadContainer(vehicle, cargo) || vehicle.FreeBagCargoSlot(cargo) != slot) return false;
+        var layout = vehicle.GetComponent<PickupCargoLayout>();
+        if (layout != null && !layout.CanLoadAt(slot, cargo)) return false;
+        var rack = vehicle.GetComponent<VehicleCargoRack>();
+        int cost = layout != null ? PickupCargoLayout.Units(cargo) : rack != null ? rack.BagSlotCost : 1;
+        var upgrade = vehicle.GetComponent<VehicleUpgrade>();
+        if (upgrade != null && (!upgrade.AcceptsContainer(cargo) || !upgrade.CanLoadCargo(cost))) return false;
+        Vector3 delta = slot.position - forkAnchor.position;
+        if (delta.sqrMagnitude > vehiclePickupReach * vehiclePickupReach || Vector3.Dot(delta, transform.forward) < -.25f) return false;
+        Vector3 origin = forkAnchor.position + Vector3.up * .25f;
+        delta = slot.position + Vector3.up * .25f - origin;
+        int count = Physics.RaycastNonAlloc(origin, delta.normalized, groundHits, delta.magnitude, ~0, QueryTriggerInteraction.Ignore);
+        if (count == groundHits.Length) return false;
+        for (int i = 0; i < count; i++)
+        {
+            var hit = groundHits[i].collider;
+            if (Ignore(hit)) continue;
+            if (VehicleCargoOwner.Resolve(hit) == vehicle && hit.GetComponentInParent<GrainContainer>() == null) continue;
+            return false;
+        }
+        return true;
+    }
+
+    public bool TryLoadOntoVehicle(Transform slot)
+    {
+        if (!CanLoadOntoVehicle(slot)) return false;
+        var bag = cargo;
+        bag.transform.SetParent(slot, true);
+        bag.transform.rotation = Quaternion.AngleAxis(slot.eulerAngles.y, Vector3.up) * bag.UprightRotation;
+        bag.transform.position += slot.position - bag.WorldBounds.center;
+        bool bottom = VehicleCargoOwner.Rack(slot) != null;
+        if (bottom) VehicleCargoRack.SeatBase(bag.transform, slot);
+        VehicleCargoPlacement.Attach(bag.transform, slot, bottom);
+        foreach (var own in vehicleColliders)
+            foreach (var other in cargoColliders)
+                if (own != null && other != null) Physics.IgnoreCollision(own, other, false);
+        for (int i = 0; i < cargoColliders.Length; i++)
+            if (cargoColliders[i] != null) cargoColliders[i].enabled = originalColliderStates[i];
+        cargoBody.isKinematic = true;
+        bag.SetCarried(false);
+        cargo = null; cargoBody = null; cargoColliders = null; originalColliderStates = null;
+        loadTarget = null; unloadTarget = null;
+        Physics.SyncTransforms();
+        if (!WorldSaveRuntime.IsRestoring && bag.Kilograms > 0)
+        {
+            GoalChecker.ReportProgress(GoalType.SackLoaded);
+            GoalChecker.ReportProgress(GoalType.GrainLoaded, bag.Kilograms, grainType: bag.AcceptedGrain);
+        }
+        GameAchievements.ForkliftDelivered(bag);
+        GameplayAudio.Instance?.Drop();
+        return true;
     }
     private BicycleController SourceVehicle(GrainContainer bag)
     {

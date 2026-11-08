@@ -61,8 +61,10 @@ public class ForkliftCargoTests
         finally{Object.DestroyImmediate(bagObject);Object.DestroyImmediate(root);if(floor!=null)Object.DestroyImmediate(floor);}
     }
 
-    [Test]
-    public void ParkedVehicleBagTransfersWithoutSnappingAndCannotDropMidAnimation()
+    [TestCase(0f)]
+    [TestCase(250f)]
+    [TestCase(500f)]
+    public void ParkedVehicleBagTransfersWithoutSnappingAndCannotDropMidAnimation(float kilograms)
     {
         var root = new GameObject("Forklift transfer test");
         var truck = new GameObject("Parked vehicle");
@@ -76,22 +78,47 @@ public class ForkliftCargoTests
             var config = new SerializedObject(forklift);config.FindProperty("forkAnchor").objectReferenceValue=anchor;config.ApplyModifiedPropertiesWithoutUndo();
             var rig = truck.AddComponent<BicycleController>();
             var slot = new GameObject("Cargo slot").transform;slot.SetParent(truck.transform);
+            slot.position = root.transform.position + new Vector3(0, 1.8f, 3.5f);
             rig.cargoSlots = new[] {slot};
             bagObject.AddComponent<BoxCollider>();
             var bag = bagObject.AddComponent<GrainContainer>();
             var data = new SerializedObject(bag);data.FindProperty("cargoTypeId").stringValue="BigBag";
-            data.FindProperty("capacityKg").floatValue=500;data.FindProperty("kilograms").floatValue=500;data.ApplyModifiedPropertiesWithoutUndo();
+            data.FindProperty("capacityKg").floatValue=500;data.FindProperty("kilograms").floatValue=kilograms;data.ApplyModifiedPropertiesWithoutUndo();
             bag.transform.SetParent(slot);bag.transform.position=root.transform.position+new Vector3(0,1.8f,3.5f);
             Vector3 start = bag.transform.position;Physics.SyncTransforms();
-            Assert.IsTrue(forklift.TryAutoLift(bag), "Stowed cargo should not require ground contact.");
+            Assert.IsFalse(forklift.TryAutoLift(bag), "Vehicle unloading must wait for the F action.");
+            Assert.IsTrue(forklift.TryLift(bag), "Explicit unloading should not require ground contact.");
             Assert.IsTrue(forklift.IsTransferring);Assert.AreSame(bag,forklift.Cargo);
             Assert.That(Vector3.Distance(start,bag.transform.position),Is.LessThan(.001f));
             Assert.IsFalse(rig.HasCargo(bag.transform));Assert.IsTrue(bag.IsCarried);
             Assert.IsFalse(forklift.TryDrop());
+            Assert.IsFalse(forklift.TryLoadOntoVehicle(slot), "Cannot transfer again during unloading.");
             typeof(ForkliftController).GetField("transferElapsed",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic).SetValue(forklift,2f);
             typeof(ForkliftController).GetMethod("LateUpdate",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic).Invoke(forklift,null);
             Assert.IsFalse(forklift.IsTransferring);
             Assert.That(bag.WorldBounds.min.y,Is.EqualTo(anchor.position.y+.55f).Within(.001f));
+            var occupied = new GameObject("Other cargo");
+            occupied.transform.SetParent(slot, false);
+            Assert.IsFalse(forklift.TryLoadOntoVehicle(slot), "Occupied slots must preserve the fork load.");
+            Object.DestroyImmediate(occupied);
+            var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            try
+            {
+                wall.transform.position = (anchor.position + slot.position) * .5f + Vector3.up * .25f;
+                wall.transform.localScale = new Vector3(4, 4, .1f);
+                Physics.SyncTransforms();
+                Assert.IsFalse(forklift.TryLoadOntoVehicle(slot), "Walls must block loading.");
+            }
+            finally { Object.DestroyImmediate(wall); }
+            Physics.SyncTransforms();
+            Assert.IsTrue(forklift.TryLoadOntoVehicle(slot), "Empty, partial and full big bags can be loaded.");
+            Assert.IsNull(forklift.Cargo);
+            Assert.IsTrue(rig.HasCargo(bag.transform));
+            Assert.IsFalse(bag.IsCarried);
+            Assert.IsTrue(bag.GetComponent<Rigidbody>().isKinematic);
+            Assert.IsTrue(bag.GetComponent<BoxCollider>().enabled);
+            Assert.That(bag.Kilograms, Is.EqualTo(kilograms));
+            Assert.IsFalse(forklift.TryAutoLift(bag), "Loading must not immediately auto-unload the bag.");
         }
         finally { Object.DestroyImmediate(bagObject);Object.DestroyImmediate(truck);Object.DestroyImmediate(root); }
     }
