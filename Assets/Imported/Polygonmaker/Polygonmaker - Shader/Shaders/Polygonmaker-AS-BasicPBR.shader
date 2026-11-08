@@ -8,6 +8,7 @@ Shader "Polygonmaker/Basic-PBR"
 		[HideInInspector] _AlphaCutoff("Alpha Cutoff ", Range(0, 1)) = 0.5
 		_MainTex("Diffuse", 2D) = "white" {}
 		_Color("Main Color", Color) = (1,1,1,0)
+		[HDR] _HitFlashColor("Hit flash (alpha = strength)", Color) = (0,0,0,0)
 		_ColorR("Color (R)", Color) = (1,1,1,0)
 		_ColorG("Color (G)", Color) = (1,1,1,0)
 		_ColorB("Color (B)", Color) = (1,1,1,0)
@@ -95,6 +96,7 @@ Shader "Polygonmaker/Basic-PBR"
 			float _HDRPboost;
 			float _GlossMapScale;
 			float4 _EmissionColor;
+			float4 _HitFlashColor;
 			float _AlphaCutoff;
 			float _RenderQueueType;
 			float _AddPrecomputedVelocity;
@@ -624,7 +626,7 @@ Shader "Polygonmaker/Basic-PBR"
 				builtinData.backBakeDiffuseLighting = surfaceDescription.BakedBackGI;
 				#endif
 
-				builtinData.emissiveColor = surfaceDescription.Emission;
+				builtinData.emissiveColor = lerp(surfaceDescription.Emission, _HitFlashColor.rgb / max(GetCurrentExposureMultiplier(), 0.0001), saturate(_HitFlashColor.a));
 
 				#if (SHADERPASS == SHADERPASS_DISTORTION)
 				builtinData.distortion = surfaceDescription.Distortion;
@@ -1171,7 +1173,7 @@ Shader "Polygonmaker/Basic-PBR"
 
 				InitBuiltinData( posInput, surfaceDescription.Alpha, bentNormalWS, -fragInputs.tangentToWorld[ 2 ], fragInputs.texCoord1, fragInputs.texCoord2, builtinData );
 
-				builtinData.emissiveColor = surfaceDescription.Emission;
+				builtinData.emissiveColor = lerp(surfaceDescription.Emission, _HitFlashColor.rgb / max(GetCurrentExposureMultiplier(), 0.0001), saturate(_HitFlashColor.a));
 
 				#if (SHADERPASS == SHADERPASS_DISTORTION)
 				builtinData.distortion = surfaceDescription.Distortion;
@@ -3543,7 +3545,7 @@ Shader "Polygonmaker/Basic-PBR"
 				builtinData.backBakeDiffuseLighting = surfaceDescription.BakedBackGI;
 				#endif
 
-				builtinData.emissiveColor = surfaceDescription.Emission;
+				builtinData.emissiveColor = lerp(surfaceDescription.Emission, _HitFlashColor.rgb / max(GetCurrentExposureMultiplier(), 0.0001), saturate(_HitFlashColor.a));
 
 				PostInitBuiltinData(V, posInput, surfaceData, builtinData);
 			}

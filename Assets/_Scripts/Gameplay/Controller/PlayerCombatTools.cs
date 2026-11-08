@@ -243,6 +243,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
         if (pest)
         {
             GameplayAudio.Instance?.PestHit(pest.IsCrow, nearest.point);
+            pest.HitImpulseDirection = ray.direction;
             pest.PlayHitReaction(true);
         }
     }

@@ -62,6 +62,20 @@ public sealed class BagCornSurface : MonoBehaviour
     }
     public int KernelCount { get; private set; }
 
+    public bool TryFeedingPoint(Vector2 offset, out Vector3 point)
+    {
+        point = default;
+        if (sack == null || grainSurface == null || sack.Fill < .0001f || sack.Close >= .4f) return false;
+        if (lastFill != sack.Fill || lastClose != sack.Close || baked == null) Rebuild();
+        if (vertices.Count == 0) return false;
+        float x = samplingBounds.center.x + offset.x * samplingBounds.extents.x;
+        float z = samplingBounds.center.z + offset.y * samplingBounds.extents.z;
+        if (!Sample(x, z, out float height)) return false;
+        Quaternion frame = Quaternion.FromToRotation(Vector3.up, surfaceUp.normalized);
+        point = grainSurface.transform.TransformPoint(frame * new Vector3(x, height, z));
+        return true;
+    }
+
     private void OnEnable()
     {
         lastFill = -1;

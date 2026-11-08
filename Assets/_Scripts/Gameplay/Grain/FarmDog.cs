@@ -376,6 +376,7 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         Vector3 toward = Vector3.ProjectOnPlane(interactor.transform.position - transform.position, Vector3.up);
         if (toward.sqrMagnitude > .01f) transform.rotation = Quaternion.LookRotation(toward);
         if (strokeAudio) strokeAudio.Play();
+        Bark();
         return true;
     }
 

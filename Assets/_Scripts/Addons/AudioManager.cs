@@ -30,6 +30,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip[] musicClips;
     [SerializeField] private AudioClip introMusic;
     [SerializeField] private AudioClip attackMusic;
+    [SerializeField] private AudioClip attackAlert;
+    private float lastAttackAlert = float.NegativeInfinity;
     [SerializeField] private AudioClip interstellarMusic;
     [SerializeField, Range(0f, 1f)] private float pauseChance = .35f;
     [SerializeField, Min(0f)] private float pauseSeconds = 15f;
@@ -139,6 +141,13 @@ public class AudioManager : MonoBehaviour
 
     public void PlayAttackMusic()
     {
+        if (WorldSaveRuntime.IsSeeking || WorldSaveRuntime.IsRestoring || musicMode == MusicMode.Ending) return;
+        if (Time.time - lastAttackAlert > 2f)
+        {
+            PlayGameplayClip(attackAlert);
+            lastAttackAlert = Time.time;
+        }
+        if (musicMode == MusicMode.Attack && musicAudioSource != null && musicAudioSource.isPlaying) return;
         if (attackMusic == null || musicAudioSource == null || musicMode == MusicMode.Ending) return;
         StopMusic();
         musicMode = MusicMode.Attack;

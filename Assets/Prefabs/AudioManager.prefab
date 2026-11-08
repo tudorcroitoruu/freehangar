@@ -329,6 +329,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: a2cb7820473a3d84d9cb5a97ed07a01a, type: 3}
   introMusic: {fileID: 8300000, guid: 201cff4a0d37f8b45b84a277df5be044, type: 3}
   attackMusic: {fileID: 8300000, guid: f34fe41a1cc5c8746b1ff3535824138f, type: 3}
+  attackAlert: {fileID: 8300000, guid: 7a93a7f9941ff3f448c26c124a481d18, type: 3}
   interstellarMusic: {fileID: 8300000, guid: 4c0661ec21967f7479deb141b1d69e04, type: 3}
   pauseChance: 0.35
   pauseSeconds: 15

@@ -8,6 +8,7 @@ public sealed class GrainPest : MonoBehaviour
     public GrainContainer Target { get; private set; }
     public bool IsCrow { get; private set; }
     public bool IsFeeding => isActiveAndEnabled && feedingNow && !fleeing && !climbing &&
+        (IsCrow ? crowPerched : onBag) &&
         Target != null && Target.isActiveAndEnabled && Target.Kilograms > .001f &&
         Target.WorldBounds.SqrDistance(transform.position) <= 1.5f * 1.5f && !PlayerPerks.NoAttacksActive;
     private float nextBite;
@@ -36,17 +37,29 @@ public sealed class GrainPest : MonoBehaviour
     private float hitEffectAt = -1f;
     private bool lethalHit;
     private Vector3 hitRestScale;
+    public Vector3 HitImpulseDirection { private get; set; }
+    private Vector3 hitOrigin, hitVelocity;
     private Renderer[] hitRenderers;
     private MaterialPropertyBlock[] hitOriginalBlocks;
     private MaterialPropertyBlock hitBlock;
 
     public void PlayHitReaction(bool lethal = false)
     {
-        if (hitEffectAt >= 0f) return;
+        if (lethalHit) return;
+        if (hitEffectAt >= 0f)
+        {
+            if (!lethal) return;
+            transform.localScale = hitRestScale;
+            for (int i = 0; i < hitRenderers.Length; i++)
+                if (hitRenderers[i]) hitRenderers[i].SetPropertyBlock(hitOriginalBlocks[i]);
+        }
         if (lethal) ScaredAway();
         lethalHit = lethal;
         hitEffectAt = Time.time;
         hitRestScale = transform.localScale;
+        hitOrigin = transform.position;
+        Vector3 direction = HitImpulseDirection.sqrMagnitude > .001f ? HitImpulseDirection.normalized : -transform.forward;
+        hitVelocity = direction * 3f + Vector3.up * 2f;
         hitRenderers = GetComponentsInChildren<Renderer>(true);
         hitOriginalBlocks = new MaterialPropertyBlock[hitRenderers.Length];
         hitBlock = new MaterialPropertyBlock();
@@ -61,14 +74,16 @@ public sealed class GrainPest : MonoBehaviour
     private void UpdateHitReaction()
     {
         if (hitEffectAt < 0f) return;
-        float phase = (Time.time - hitEffectAt) * 2f;
-        transform.localScale = hitRestScale * (1f + (phase < .3f ? .25f * Mathf.Sin(phase / .3f * Mathf.PI) : 0f));
+        float phase = Time.time - hitEffectAt;
+        transform.localScale = hitRestScale * (1f + (phase < .3f ? .4f * Mathf.Sin(phase / .3f * Mathf.PI) : 0f));
+        if (lethalHit)
+            transform.position = hitOrigin + hitVelocity * phase + Vector3.down * (4.9f * phase * phase);
         for (int i = 0; i < hitRenderers.Length; i++)
         {
             var renderer = hitRenderers[i];
             if (!renderer) continue;
             renderer.SetPropertyBlock(hitOriginalBlocks[i]);
-            if (phase >= .25f) continue;
+            if (phase >= .3f) continue;
             renderer.GetPropertyBlock(hitBlock);
             hitBlock.SetColor("_HitFlashColor", new Color(4f, 0f, 0f, 1f));
             hitBlock.SetColor("_BaseColor", Color.red);
@@ -76,16 +91,23 @@ public sealed class GrainPest : MonoBehaviour
             hitBlock.SetColor("_EmissionColor", Color.red * 4f);
             renderer.SetPropertyBlock(hitBlock);
         }
-        if (phase < .5f) return;
+        if (phase < .6f) return;
         hitEffectAt = -1f;
         if (lethalHit) Destroy(gameObject);
     }
     private Vector3 CrowPerchPoint()
     {
-        Bounds bounds = Target.WorldBounds;
-        Vector3 point = bounds.center + Quaternion.Euler(0,Target.transform.eulerAngles.y,0) * crowLandingOffset;
-        point.y = bounds.max.y - .05f;
-        return point;
+        return FeedingPoint(new Vector2(crowLandingOffset.x, crowLandingOffset.z));
+    }
+    private Vector3 FeedingPoint(Vector2 offset)
+    {
+        if (Target.TryGetComponent<BagCornSurface>(out var surface) && surface.TryFeedingPoint(offset, out var point))
+            return point;
+        var box = Target.GetComponent<BoxCollider>();
+        Bounds bounds = box != null ? box.bounds : Target.WorldBounds;
+        Vector3 top = bounds.center + new Vector3(offset.x * bounds.extents.x, bounds.extents.y + 1f, offset.y * bounds.extents.z);
+        if (box != null && box.Raycast(new Ray(top, Vector3.down), out var hit, bounds.size.y + 2f)) return hit.point;
+        return new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
     }
     private void LateUpdate()
     {
@@ -97,9 +119,12 @@ public sealed class GrainPest : MonoBehaviour
             transform.position = CrowPerchPoint();
             transform.rotation = Quaternion.Euler(0, Target.transform.eulerAngles.y, 0);
         }
+        if (!IsCrow && onBag && !fleeing && Target != null && Target.isActiveAndEnabled)
+            transform.position = SlotPoint(true);
     }
     private void EatFromTarget()
     {
+        if (!IsCrow && !onBag) return;
         if (PlayerPerks.NoAttacksActive || Time.time < nextBite) return;
         Target.ConsumeByPest(biteAmount * (IsCrow ? BirdGroupBite : RatGroupBite));
         if (!IsCrow && animator != null) animator.SetTrigger("IdleBreak");
@@ -130,6 +155,7 @@ public sealed class GrainPest : MonoBehaviour
     }
     private Vector3 SlotPoint(bool upper)
     {
+        if (upper) return FeedingPoint(new Vector2(Mathf.Cos(slotAngle), Mathf.Sin(slotAngle)) * .4f);
         Bounds b = Target.WorldBounds;
         Vector3 radial = new Vector3(Mathf.Cos(slotAngle), 0, Mathf.Sin(slotAngle));
         float radius = upper ? Mathf.Min(b.extents.x, b.extents.z) * .4f : Mathf.Max(b.extents.x,b.extents.z) + .45f;
@@ -260,6 +286,12 @@ public sealed class GrainPest : MonoBehaviour
         }
         else
         {
+            if (!IsCrow && !onBag)
+            {
+                feedingNow = false;
+                if (animator != null) animator.SetFloat("Speed", 0f);
+                return;
+            }
             if (hasSlot)
             {
                 Vector3 inward = Target.WorldBounds.center - transform.position; inward.y = 0;
@@ -581,7 +613,7 @@ public sealed class GrainPestDirector : MonoBehaviour
         {
             var rat = Spawn(bag, false);
             if (rat == null) continue;
-            rat.ConfigureBagSlot(i, count, i == 1 || i == 4);
+            rat.ConfigureBagSlot(i, count, true);
             if (nearby)
             {
                 float angle = i * Mathf.PI * 2f / count;
@@ -607,6 +639,7 @@ public sealed class GrainPestDirector : MonoBehaviour
         pest.Initialize(target, crow, crow ? crowFlyAnimation : ratAnimation, crow ? crowEatAnimation : ratAnimation);
         if (!encounterActive)
         {
+            AudioManager.Instance?.PlayAttackMusic();
             encounterActive = true;
             attackEndsAt = Time.time + Random.Range(Mathf.Max(1f,minAttackDuration),Mathf.Max(minAttackDuration,maxAttackDuration));
         }
