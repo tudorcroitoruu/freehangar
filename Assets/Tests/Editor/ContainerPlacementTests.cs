@@ -5,6 +5,43 @@ using UnityEngine;
 
 public class ContainerPlacementTests
 {
+    [TestCase(true)]
+    [TestCase(false)]
+    public void EmptyGrainActionUsesItsOwnPromptAndKey(bool portable)
+    {
+        var carrier = actor.AddComponent<BagInteraction>();
+        var interactor = actor.AddComponent<PlayerInteractor>();
+        var bag = Create("Container prompt", origin).AddComponent<GrainContainer>();
+        SetField(bag, "canBeCarried", portable);
+        SetField(bag, "cargoTypeId", portable ? "SmallBag" : "BigBag");
+        bag.SetDemonstrationFill(10f);
+
+        Assert.IsTrue(carrier.TryGetPrompt(bag, out var data));
+        var args = new object[] { bag, data };
+        typeof(PlayerInteractor).GetMethod("AddActions", BindingFlags.Instance | BindingFlags.NonPublic)
+            .Invoke(interactor, args);
+        data = (InteractionPromptData)args[1];
+
+        Assert.IsTrue(string.IsNullOrEmpty(data.SecondaryDescription));
+        Assert.IsTrue(data.ShowKey);
+        if (portable)
+        {
+            Assert.AreEqual(KeyCode.E, data.InteractionKey);
+            Assert.AreEqual("Take Small bag", data.Action);
+            Assert.AreEqual(1, data.AdditionalActions.Length);
+            Assert.AreEqual(KeyCode.F, data.AdditionalActions[0].Key);
+            StringAssert.EndsWith("to empty all grain", data.AdditionalActions[0].Action);
+        }
+        else
+        {
+            Assert.AreEqual(KeyCode.F, data.InteractionKey);
+            StringAssert.EndsWith("to empty all grain", data.Action);
+            Assert.IsFalse(data.ShowPrimaryButton);
+            Assert.IsFalse(data.UseForkliftToMove);
+            Assert.IsNull(data.AdditionalActions);
+        }
+    }
+
     [TestCase(.12f, true)]
     [TestCase(1f, false)]
     public void WideWheelbarrowRollsOverLowSupportButStopsAtTallObstacles(float height, bool expected)

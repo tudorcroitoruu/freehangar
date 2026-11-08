@@ -70,9 +70,16 @@ public sealed class PlayerInteractor : MonoBehaviour
         InteractionPromptData aimedPrompt = default;
         bool hasAimedPrompt = aimedTarget != null && aimedTarget.TryGetPrompt(this, out aimedPrompt);
         if (hasAimedPrompt && emptyBagTarget != null && ReferenceEquals(aimedTarget, emptyBagTarget))
-            aimedPrompt.SecondaryDescription = emptyBagHoldCompleted
+        {
+            string emptyAction = emptyBagHoldCompleted
                 ? emptyBagSucceeded ? "Container emptied" : "No clear ground beside container"
                 : $"Hold {FarmInput.Label("Secondary", "F")} to empty all grain ({emptyBagHeld:0.0} / 1.0 s)";
+            if (aimedPrompt.InteractionKey == KeyCode.F) aimedPrompt.Action = emptyAction;
+            else if (aimedPrompt.AdditionalActions != null)
+                for (int i = 0; i < aimedPrompt.AdditionalActions.Length; i++)
+                    if (aimedPrompt.AdditionalActions[i].Key == KeyCode.F)
+                        aimedPrompt.AdditionalActions[i].Action = emptyAction;
+        }
         // Driving owns the interaction prompt. A carried bag also prevents taking
         // another bag; looking at cargo should not continuously warn about that.
         if (PushedWheelbarrow != null ||
@@ -244,9 +251,11 @@ public sealed class PlayerInteractor : MonoBehaviour
 
     private void AddActions(IInteractable primary, ref InteractionPromptData data)
     {
-        data.InteractionKey = KeyFor(primary);
+        if (primary is IKeyedInteractable keyed) data.InteractionKey = keyed.InteractionKey;
         if (!(primary is Component component) || HandsOccupied) return;
-        var actions = new List<InteractionPromptAction>();
+        var actions = data.AdditionalActions != null
+            ? new List<InteractionPromptAction>(data.AdditionalActions)
+            : new List<InteractionPromptAction>();
         foreach (var behaviour in ActionBehaviours(component))
         {
             if (behaviour == null || !behaviour.isActiveAndEnabled || !(behaviour is IKeyedInteractable action) ||

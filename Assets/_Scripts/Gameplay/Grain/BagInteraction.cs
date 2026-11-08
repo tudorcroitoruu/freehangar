@@ -102,7 +102,16 @@ public sealed class BagInteraction : MonoBehaviour
         if (CanEmpty(bag) && (interactor == null || !interactor.HandsOccupied))
         {
             data.UseForkliftToMove = false;
-            data.SecondaryDescription = "Hold " + FarmInput.Label("Secondary", "F") + " to empty all grain";
+            string emptyAction = "Hold " + FarmInput.Label("Secondary", "F") + " to empty all grain";
+            if (!canCarry)
+            {
+                data.Action = emptyAction;
+                data.InteractionKey = KeyCode.F;
+                data.ShowKey = true;
+                data.ShowPrimaryButton = false;
+            }
+            else
+                data.AdditionalActions = new[] { new InteractionPromptAction(emptyAction, KeyCode.F) };
         }
         data.RequiresFreeHands = bag != carried && bag.CanCarry && !canFinish && !data.ShowPrimaryButton &&
             interactor != null && interactor.HandsOccupied;
