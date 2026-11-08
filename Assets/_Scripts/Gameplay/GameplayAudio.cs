@@ -200,7 +200,7 @@ public sealed class GameplayAudio : MonoBehaviour
     }
 
     public void VacuumMoving(Transform tool, bool moving, bool lastVacuum) =>
-        SetLoop(tool, vacuum, moving, lastVacuum ? 1.18f : .92f, .5f, 0f);
+        SetLoop(tool, vacuum, moving, lastVacuum ? 1.18f : .92f, .83f, 0f);
     public void WheelbarrowMoving(Transform barrow, bool moving) =>
         SetLoop(barrow, wheelbarrow, moving, 1f, .45f);
 
