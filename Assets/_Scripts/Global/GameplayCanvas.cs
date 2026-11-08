@@ -121,6 +121,16 @@ public class GameplayCanvas : MonoBehaviour
     [SerializeField] private SelectedUI broomEquipped;
     [SerializeField] private SelectedUI axeEquipped;
     [SerializeField] private SelectedUI hammerEquipped;
+    [SerializeField] private Image broomImage;
+    [SerializeField] private Sprite broomSprite;
+    [SerializeField] private Sprite pistolSprite;
+    [SerializeField] private GameObject swipeImage;
+    [SerializeField, Min(0f)] private float utilityIconScaleSeconds = .2f;
+    private PlayerCombatTools.Tool utilityIconTool = PlayerCombatTools.Tool.Shovel;
+    private Vector3 utilityIconScale;
+    private float utilityIconElapsed;
+    private bool scalingUtilityIcon;
+
     [SerializeField, Min(0f)] private float toolHintsFadeSeconds = .25f;
     private PlayerCombatTools playerTools;
     private int displayedTools = -1;
@@ -143,6 +153,7 @@ public class GameplayCanvas : MonoBehaviour
 
     private void Awake()
     {
+        if (broomImage != null) utilityIconScale = broomImage.rectTransform.localScale;
         if (Instance == null)
             Instance = this;
         ResetFreeHandsWarning();
@@ -184,6 +195,8 @@ public class GameplayCanvas : MonoBehaviour
 
     private void OnDisable()
     {
+        scalingUtilityIcon = false;
+        if (broomImage != null) broomImage.rectTransform.localScale = utilityIconScale;
         GameSettingsManager.InputBindingsChanged -= InvalidateControlHints;
         Pause.PauseOnAction -= HideHudForPause;
         Pause.PauseOffAction -= RestoreHudAfterPause;
@@ -247,6 +260,7 @@ public class GameplayCanvas : MonoBehaviour
         if (achievementsPopup != null) achievementsPopup.Tick(Time.deltaTime);
         if (!hudHiddenByPause) AnimateMoney(Time.unscaledDeltaTime);
         RefreshCollectibleUI();
+        AnimateUtilityIcon();
         if (fadingToolHints && hintsParent != null)
         {
             hintsParent.alpha = toolHintsFadeSeconds > 0f
@@ -304,6 +318,7 @@ public class GameplayCanvas : MonoBehaviour
             SetToolHint(broomEquipped, (tools & 18) != 0, equipped == PlayerCombatTools.Tool.Broom || equipped == PlayerCombatTools.Tool.Pistol);
             SetToolHint(axeEquipped, (tools & 4) != 0, equipped == PlayerCombatTools.Tool.Axe);
             SetToolHint(hammerEquipped, (tools & 8) != 0, equipped == PlayerCombatTools.Tool.Hammer);
+            RefreshUtilityIcon((tools & 2) != 0, (tools & 16) != 0, equipped);
             displayedTools = tools;
             displayedEquipped = equipped;
             if (hintsParent != null && tools == 1)
@@ -362,6 +377,42 @@ public class GameplayCanvas : MonoBehaviour
             : tool == PlayerCombatTools.Tool.Pistol ? BuriedFind.WasFound(data, PlayerCombatTools.PistolFindId)
             : tool == PlayerCombatTools.Tool.Axe ? BuriedFind.WasFound(data, PlayerCombatTools.AxeFindId) || BuriedFind.WasFound(data, PlayerCombatTools.LegacyAxeFindId)
             : BuriedFind.WasFound(data, PlayerCombatTools.HammerFindId);
+    }
+
+    private void RefreshUtilityIcon(bool hasBroom, bool hasPistol, PlayerCombatTools.Tool equipped)
+    {
+        if (swipeImage != null) swipeImage.SetActive(hasBroom && hasPistol);
+        if (!hasBroom && !hasPistol)
+        {
+            utilityIconTool = PlayerCombatTools.Tool.Shovel;
+            scalingUtilityIcon = false;
+            if (broomImage != null) broomImage.rectTransform.localScale = utilityIconScale;
+            return;
+        }
+
+        var tool = utilityIconTool;
+        if (equipped == PlayerCombatTools.Tool.Broom && hasBroom) tool = PlayerCombatTools.Tool.Broom;
+        else if (equipped == PlayerCombatTools.Tool.Pistol && hasPistol) tool = PlayerCombatTools.Tool.Pistol;
+        else if (!hasBroom) tool = PlayerCombatTools.Tool.Pistol;
+        else if (!hasPistol || tool != PlayerCombatTools.Tool.Pistol) tool = PlayerCombatTools.Tool.Broom;
+
+        bool changed = tool != utilityIconTool;
+        utilityIconTool = tool;
+        if (broomImage == null) return;
+        broomImage.sprite = tool == PlayerCombatTools.Tool.Pistol ? pistolSprite : broomSprite;
+        if (!changed) return;
+        utilityIconElapsed = 0f;
+        scalingUtilityIcon = utilityIconScaleSeconds > 0f;
+        broomImage.rectTransform.localScale = scalingUtilityIcon ? Vector3.zero : utilityIconScale;
+    }
+
+    private void AnimateUtilityIcon()
+    {
+        if (!scalingUtilityIcon || broomImage == null) return;
+        utilityIconElapsed += Time.unscaledDeltaTime;
+        float t = utilityIconScaleSeconds > 0f ? Mathf.Clamp01(utilityIconElapsed / utilityIconScaleSeconds) : 1f;
+        broomImage.rectTransform.localScale = utilityIconScale * Mathf.SmoothStep(0f, 1f, t);
+        scalingUtilityIcon = t < 1f;
     }
 
     private static void SetToolHint(SelectedUI hint, bool available, bool selected)
