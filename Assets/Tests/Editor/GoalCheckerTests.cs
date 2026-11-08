@@ -215,6 +215,7 @@ public class GoalCheckerTests
     }
 
     [TestCase(GoalUpgradeType.LargerSack)]
+    [TestCase(GoalUpgradeType.SmallSack)]
     [TestCase(GoalUpgradeType.LargerTruck)]
     public void PurchasedUpgradesRemainCompleteWithoutPickupStock(GoalUpgradeType type)
     {
@@ -225,6 +226,42 @@ public class GoalCheckerTests
         Assert.IsTrue(GoalChecker.TryGetSavedValue(goal, data, out float value));
         Assert.AreEqual(1, value);
         Assert.AreEqual(0, data.GetOwnedProductCount("largeBag"));
+    }
+
+    [Test]
+    public void PreviouslyPurchasedSmallBagCountsAfterPickupAndReload()
+    {
+        var data = new PlayerData { cash = 100 };
+        Assert.IsTrue(data.TryBuyProduct("smallBag", 8));
+        Assert.IsTrue(data.TryTakeProduct("smallBag"));
+        data = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(data));
+        goal.goalType = GoalType.UpgradePurchased;
+        goal.upgradeType = GoalUpgradeType.SmallSack;
+        Assert.AreEqual(0, data.GetOwnedProductCount("smallBag"));
+        Assert.IsTrue(GoalChecker.TryGetSavedValue(goal, data, out float value));
+        Assert.AreEqual(1, value);
+    }
+
+    [Test]
+    public void LegacySmallBagInWorldCountsWithoutShopStock()
+    {
+        var data = new PlayerData { world = new WorldSaveData() };
+        data.world.bags.Add(new BagSave { prefab = "SmallBag" });
+        goal.goalType = GoalType.UpgradePurchased;
+        goal.upgradeType = GoalUpgradeType.SmallSack;
+        Assert.IsTrue(GoalChecker.TryGetSavedValue(goal, data, out float value));
+        Assert.AreEqual(1, value);
+    }
+
+    [Test]
+    public void FreeBagDoesNotSatisfySmallBagGoal()
+    {
+        var data = new PlayerData { world = new WorldSaveData() };
+        data.world.bags.Add(new BagSave { prefab = "FreeBag" });
+        goal.goalType = GoalType.UpgradePurchased;
+        goal.upgradeType = GoalUpgradeType.SmallSack;
+        Assert.IsTrue(GoalChecker.TryGetSavedValue(goal, data, out float value));
+        Assert.AreEqual(0, value);
     }
 
     [Test]

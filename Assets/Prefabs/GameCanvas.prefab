@@ -9007,14 +9007,14 @@ MonoBehaviour:
     displayGoalAmount: 0
     rewardAmount: 25
   - goalId: upgrade_larger_sack
-    goalDescription: Buy a larger bag
+    goalDescription: Buy a Small bag
     navigationIndicator: {fileID: 0}
     stage: 3
     hangarId: 0
     goalType: 13
     filterByGrainType: 0
     grainType: 0
-    upgradeType: 1
+    upgradeType: 8
     progressMode: 2
     goalAmount: 1
     useDisplayGoalAmount: 0

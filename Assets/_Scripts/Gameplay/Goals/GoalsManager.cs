@@ -328,7 +328,8 @@ public enum GoalUpgradeType
     LargerTruck = 4,
     PalletJack = 5,
     Shovel = 6,
-    Stamina = 7
+    Stamina = 7,
+    SmallSack = 8
 }
 
 public enum GoalProgressMode

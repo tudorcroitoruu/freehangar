@@ -152,6 +152,7 @@ public static class SaveSystem
     public static bool TryBuyProduct(string productID, int price)
     {
         if (Data == null || !Data.TryBuyProduct(productID, price)) return false;
+        if (productID == "smallBag") RecordGoalUpgrade(GoalUpgradeType.SmallSack);
         if (productID == "largeBag") RecordGoalUpgrade(GoalUpgradeType.LargerSack);
         MoneyChanged?.Invoke(Money);
         OwnedProductsChanged?.Invoke();
@@ -172,6 +173,7 @@ public static class SaveSystem
         if (Data == null || string.IsNullOrWhiteSpace(productID) || price < 0 || Data.cash < price ||
             tryDeliver == null || !tryDeliver()) return false;
         Data.cash -= price;
+        if (productID == "smallBag") RecordGoalUpgrade(GoalUpgradeType.SmallSack);
         if (productID == "largeBag") RecordGoalUpgrade(GoalUpgradeType.LargerSack);
         MoneyChanged?.Invoke(Money);
         return true;

@@ -86,6 +86,18 @@ public static class GoalChecker
                 if (goal.upgradeType == GoalUpgradeType.Shovel) owned |= data.shovelUpgradeLevel > 0;
                 if (goal.upgradeType == GoalUpgradeType.Stamina) owned |= data.staminaUpgradeLevel > 0;
                 if (goal.upgradeType == GoalUpgradeType.LargerSack) owned |= data.GetOwnedProductCount("largeBag") > 0;
+                if (goal.upgradeType == GoalUpgradeType.SmallSack)
+                {
+                    // Pickup removes stock, but its entry still proves an earlier purchase.
+                    owned |= data.ownedProducts?.Exists(product => product != null && product.productID == "smallBag") ?? false;
+                    if (!owned && data.world != null)
+                        foreach (var record in data.world.Records())
+                            if (record != null && (record.prefab == "SmallBag" || record.prefab == "smallBag"))
+                            {
+                                owned = true;
+                                break;
+                            }
+                }
                 if (goal.upgradeType == GoalUpgradeType.LargerTruck) owned |= (data.unlockedVehicles?.Count ?? 0) > 0;
                 value = owned ? 1 : 0;
                 return true;

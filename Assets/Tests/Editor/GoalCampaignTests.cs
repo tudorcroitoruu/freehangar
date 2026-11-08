@@ -106,7 +106,7 @@ public class GoalCampaignTests
             if (goal.goalType == GoalType.UpgradePurchased)
             {
                 Assert.That(goal.hangarId, Is.Zero, goal.goalId);
-                Assert.IsTrue(new[] { GoalUpgradeType.Shovel, GoalUpgradeType.LargerSack,
+                Assert.IsTrue(new[] { GoalUpgradeType.Shovel, GoalUpgradeType.SmallSack, GoalUpgradeType.LargerSack,
                     GoalUpgradeType.LargerTruck, GoalUpgradeType.Stamina }.Contains(goal.upgradeType), goal.goalId);
             }
         }
@@ -199,8 +199,8 @@ public class GoalCampaignTests
         LoadAndSell(GrainType.Corn, 15);
         data.shovelUpgradeLevel = 1;
         Report(GoalType.UpgradePurchased, value: true, upgrade: GoalUpgradeType.Shovel);
-        data.purchasedGoalUpgrades.Add(GoalUpgradeType.LargerSack);
-        Report(GoalType.UpgradePurchased, value: true, upgrade: GoalUpgradeType.LargerSack);
+        data.purchasedGoalUpgrades.Add(GoalUpgradeType.SmallSack);
+        Report(GoalType.UpgradePurchased, value: true, upgrade: GoalUpgradeType.SmallSack);
         HarvestHangar(1, 15);
         ExpectCurrent("h2_collect_key");
         CollectKey(2);
