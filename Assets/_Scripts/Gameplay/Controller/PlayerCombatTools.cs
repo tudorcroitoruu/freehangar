@@ -230,14 +230,8 @@ public sealed class PlayerCombatTools : MonoBehaviour
         var ray = PlayerAim.CenterRay(viewCamera);
         var muzzle = heldPistol.TransformPoint(new Vector3(0f, -.25f, .145f));
         SpawnPistolSmoke(muzzle, ray.direction);
-        RaycastHit nearest = default;
-        foreach (var hit in Physics.RaycastAll(ray, 150f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide))
-        {
-            if (hit.collider.isTrigger && hit.collider.GetComponentInParent<GrainPest>() == null) continue;
-            if (hit.transform.IsChildOf(transform) || (nearest.collider && hit.distance >= nearest.distance)) continue;
-            nearest = hit;
-        }
-        if (!nearest.collider) return;
+        var hits = Physics.RaycastAll(ray, 150f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide);
+        if (!TrySelectWeaponHit(hits, hits.Length, transform, true, out var nearest)) return;
         SpawnPistolSmoke(nearest.point + nearest.normal * .02f, nearest.normal);
         var chicken = nearest.collider.GetComponentInParent<FarmChicken>();
         if (chicken) chicken.Hit(chicken.health, transform.position, transform);
@@ -248,6 +242,45 @@ public sealed class PlayerCombatTools : MonoBehaviour
             pest.HitImpulseDirection = ray.direction;
             pest.PlayHitReaction(true);
         }
+    }
+
+    public static bool TrySelectWeaponHit(RaycastHit[] hits, int count, Transform attacker,
+        bool allowPickupPests, out RaycastHit selected)
+    {
+        selected = default;
+        bool Eligible(RaycastHit hit) => hit.collider != null &&
+            (attacker == null || !hit.transform.IsChildOf(attacker)) &&
+            (!hit.collider.isTrigger || hit.collider.GetComponentInParent<GrainPest>() != null);
+        for (int i = 0; i < count; i++)
+            if (Eligible(hits[i]) && (selected.collider == null || hits[i].distance < selected.distance))
+                selected = hits[i];
+        if (!allowPickupPests) return selected.collider != null;
+
+        RaycastHit pestHit = default;
+        for (int i = 0; i < count; i++)
+        {
+            var candidate = hits[i];
+            if (!Eligible(candidate) || (pestHit.collider != null && candidate.distance >= pestHit.distance)) continue;
+            var pest = candidate.collider.GetComponentInParent<GrainPest>();
+            var pickup = pest != null ? VehicleCargoOwner.Resolve(pest.Target) : null;
+            if (pickup == null || pickup.GetComponent<PickupController>() == null) continue;
+            bool blocked = false;
+            for (int j = 0; j < count; j++)
+            {
+                var obstacle = hits[j];
+                if (!Eligible(obstacle) || obstacle.distance >= candidate.distance ||
+                    obstacle.collider.GetComponentInParent<GrainPest>() == pest) continue;
+                // Only the attacked pickup and its load are transparent to pest attacks.
+                // Walls, other vehicles and other animals still stop the strike.
+                if (VehicleCargoOwner.Resolve(obstacle.collider) == pickup &&
+                    obstacle.collider.GetComponentInParent<GrainPest>() == null) continue;
+                blocked = true;
+                break;
+            }
+            if (!blocked) pestHit = candidate;
+        }
+        if (pestHit.collider != null) selected = pestHit;
+        return selected.collider != null;
     }
 
     private void SpawnPistolSmoke(Vector3 position, Vector3 direction)
@@ -267,16 +300,15 @@ public sealed class PlayerCombatTools : MonoBehaviour
         int count=equipped==Tool.Broom
             ? Physics.SphereCastNonAlloc(ray,.22f,strikeHits,strikeReach,~0,QueryTriggerInteraction.Collide)
             : Physics.RaycastNonAlloc(ray,strikeHits,strikeReach,~0,QueryTriggerInteraction.Collide);
-        if(count==strikeHits.Length) return;
-        RaycastHit hit=default;bool found=false;float nearest=float.PositiveInfinity;
-        for(int i=0;i<count;i++)
+        var hits = strikeHits;
+        if (count == strikeHits.Length)
         {
-            var candidate=strikeHits[i];
-            if(candidate.collider.isTrigger && candidate.collider.GetComponentInParent<GrainPest>() == null)continue;
-            if(candidate.transform.IsChildOf(transform) || candidate.distance>=nearest)continue;
-            nearest=candidate.distance;hit=candidate;found=true;
+            hits = equipped == Tool.Broom
+                ? Physics.SphereCastAll(ray, .22f, strikeReach, ~0, QueryTriggerInteraction.Collide)
+                : Physics.RaycastAll(ray, strikeReach, ~0, QueryTriggerInteraction.Collide);
+            count = hits.Length;
         }
-        if (!found) return;
+        if (!TrySelectWeaponHit(hits, count, transform, equipped == Tool.Broom, out var hit)) return;
         var chicken = hit.collider.GetComponentInParent<FarmChicken>();
         if (chicken != null && (equipped == Tool.Axe || equipped == Tool.Broom || equipped == Tool.Hammer))
         {

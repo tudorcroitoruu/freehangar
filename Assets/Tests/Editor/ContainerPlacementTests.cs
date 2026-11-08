@@ -5,6 +5,43 @@ using UnityEngine;
 
 public class ContainerPlacementTests
 {
+    [TestCase(false, false)]
+    [TestCase(false, true)]
+    [TestCase(true, false)]
+    [TestCase(true, true)]
+    public void WeaponsReachPickupPestsThroughBedButNotWalls(bool broom, bool crow)
+    {
+        var vehicle = Create("Pickup owner", origin);
+        vehicle.SetActive(false);
+        vehicle.AddComponent<PickupController>();
+        var rig = vehicle.GetComponent<BicycleController>();
+        var bed = Create("Pickup bed side", origin + Vector3.up * 2);
+        bed.AddComponent<BoxCollider>().size = new Vector3(2, 2, .2f);
+        bed.AddComponent<VehicleCargoOwner>().vehicle = rig;
+        var bag = Create("Pickup load", origin + Vector3.up * 2 + Vector3.forward);
+        bag.AddComponent<VehicleCargoOwner>().vehicle = rig;
+        bag.AddComponent<BoxCollider>();
+        var container = bag.AddComponent<GrainContainer>();
+        var pest = Create("Cargo pest", bag.transform.position).AddComponent<GrainPest>();
+        pest.Initialize(container, crow, null, null);
+        var ray = new Ray(origin + Vector3.up * 2 - Vector3.forward * 2, Vector3.forward);
+        RaycastHit[] Cast()
+        {
+            Physics.SyncTransforms();
+            return broom ? Physics.SphereCastAll(ray, .22f, 5f, ~0, QueryTriggerInteraction.Collide)
+                : Physics.RaycastAll(ray, 5f, ~0, QueryTriggerInteraction.Collide);
+        }
+        var hits = Cast();
+        Assert.IsTrue(PlayerCombatTools.TrySelectWeaponHit(hits, hits.Length, null, true, out var hit));
+        Assert.That(hit.collider.GetComponentInParent<GrainPest>(), Is.SameAs(pest));
+        var wall = Create("Unrelated wall", origin + Vector3.up * 2 - Vector3.forward);
+        var wallCollider = wall.AddComponent<BoxCollider>();
+        wallCollider.size = new Vector3(2, 2, .2f);
+        hits = Cast();
+        Assert.IsTrue(PlayerCombatTools.TrySelectWeaponHit(hits, hits.Length, null, true, out hit));
+        Assert.That(hit.collider, Is.SameAs(wallCollider));
+    }
+
     [Test]
     public void CrowPerchUsesCargoPositionWhenItsColliderIsDisabled()
     {
