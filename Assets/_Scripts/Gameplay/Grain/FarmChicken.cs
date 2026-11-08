@@ -88,8 +88,8 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         }
         return found;
     }
-    private bool raidAnnounced;
-    private static int lastRaidAlertFrame = -1;
+    private float lastSuccessfulBite = float.NegativeInfinity;
+    public bool IsFeeding => IsGrainThreat && Time.time >= fleeUntil && Time.time - lastSuccessfulBite < 1.25f;
     public bool IsGrainThreat => isActiveAndEnabled && !IsDead && AxeDiscovered &&
         HangarChickenTutorial.CanRaidPile(SaveSystem.Data, feedingPile);
 
@@ -157,17 +157,6 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
             gameObject.SetActive(false);
             return;
         }
-        if (!raidAnnounced && IsGrainThreat && !LoadingScreen.IsLoading &&
-            !WorldSaveRuntime.IsRestoring && !WorldSaveRuntime.IsSeeking && AudioManager.Instance != null)
-        {
-            raidAnnounced = true;
-            // A raid can spawn several chickens in the same frame; announce the group once.
-            if (lastRaidAlertFrame != Time.frameCount)
-            {
-                lastRaidAlertFrame = Time.frameCount;
-                AudioManager.Instance.PlayAttackMusic();
-            }
-        }
         if (IsDead)
         {
             float t = Time.time - deathAt;
@@ -232,7 +221,8 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
                     float cellDiagonal = feedingPile.HeightField.Spacing *
                         new Vector2(scale.x, scale.z).magnitude;
                     float radius = Mathf.Max(.35f, cellDiagonal * .6f);
-                    feedingPile.Scoop(bite, radius, .15f, .2f / 3f);
+                    if (feedingPile.Scoop(bite, radius, .15f, .2f / 3f) > 0f)
+                        lastSuccessfulBite = Time.time;
                 }
                 nextBite=Time.time+1f;
             }

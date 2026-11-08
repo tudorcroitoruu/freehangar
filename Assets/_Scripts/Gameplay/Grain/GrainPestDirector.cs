@@ -5,11 +5,14 @@ using UnityEngine;
 [DefaultExecutionOrder(500)]
 public sealed class GrainPest : MonoBehaviour
 {
+    public static bool CanAttack(GrainContainer target) => target != null && target.isActiveAndEnabled &&
+        !target.IsCarried && float.IsFinite(target.Kilograms) && target.Kilograms > .01f &&
+        !PlayerPerks.NoAttacksActive;
     public GrainContainer Target { get; private set; }
     public bool IsCrow { get; private set; }
     public bool IsFeeding => isActiveAndEnabled && feedingNow && !fleeing && !climbing &&
         (IsCrow ? crowPerched : onBag) &&
-        Target != null && Target.isActiveAndEnabled && Target.Kilograms > .001f &&
+        CanAttack(Target) &&
         Target.WorldBounds.SqrDistance(transform.position) <= 1.5f * 1.5f && !PlayerPerks.NoAttacksActive;
     private float nextBite;
     private float speed;
@@ -78,6 +81,13 @@ public sealed class GrainPest : MonoBehaviour
         transform.localScale = hitRestScale * (1f + (phase < .3f ? .4f * Mathf.Sin(phase / .3f * Mathf.PI) : 0f));
         if (lethalHit)
             transform.position = hitOrigin + hitVelocity * phase + Vector3.down * (4.9f * phase * phase);
+        else
+        {
+            // Broom hits recoil before fleeing; ordinary movement must not overwrite the hop.
+            float recoilTime = Mathf.Min(phase, .6f);
+            transform.position = hitOrigin + Vector3.ProjectOnPlane(hitVelocity, Vector3.up) * recoilTime +
+                Vector3.up * (.35f * Mathf.Sin(recoilTime / .6f * Mathf.PI));
+        }
         for (int i = 0; i < hitRenderers.Length; i++)
         {
             var renderer = hitRenderers[i];
@@ -124,9 +134,11 @@ public sealed class GrainPest : MonoBehaviour
     }
     private void EatFromTarget()
     {
+        if (!CanAttack(Target)) { ScaredAway(); return; }
         if (!IsCrow && !onBag) return;
         if (PlayerPerks.NoAttacksActive || Time.time < nextBite) return;
         Target.ConsumeByPest(biteAmount * (IsCrow ? BirdGroupBite : RatGroupBite));
+        if (!CanAttack(Target)) { ScaredAway(); return; }
         if (!IsCrow && animator != null) animator.SetTrigger("IdleBreak");
         nextBite = Time.time + BiteInterval;
         if (!IsCrow) restUntil = Time.time + Random.Range(.15f, .75f);
@@ -197,7 +209,7 @@ public sealed class GrainPest : MonoBehaviour
     }
     private void Update()
     {
-        if (lethalHit) return;
+        if (lethalHit || hitEffectAt >= 0f) return;
         if(PlayerPerks.NoAttacksActive && !fleeing) ScaredAway();
         if (fleeing)
         {
@@ -210,7 +222,7 @@ public sealed class GrainPest : MonoBehaviour
             if (Time.time >= fleeUntil) Destroy(gameObject);
             return;
         }
-        if (Target == null || !Target.isActiveAndEnabled || Target.Kilograms <= .001f) { ScaredAway(); return; }
+        if (!CanAttack(Target)) { ScaredAway(); return; }
         if (Time.time >= nextIdleSound)
         {
             GameplayAudio.Instance?.PestIdle(IsCrow, transform.position);
@@ -591,7 +603,7 @@ public sealed class GrainPestDirector : MonoBehaviour
         bool crowsAvailable = hangar4 != null && hangar4.IsUnlocked;
         if (!ratsAvailable && !crowsAvailable) return;
         var targets = FindObjectsByType<GrainContainer>(FindObjectsSortMode.None)
-            .Where(x => x.isActiveAndEnabled && x.Kilograms > .01f).ToArray();
+            .Where(GrainPest.CanAttack).ToArray();
         if (targets.Length == 0) return;
         var vehicleCargo = crowsAvailable ? targets.Where(x =>
         {
@@ -628,7 +640,7 @@ public sealed class GrainPestDirector : MonoBehaviour
     private GrainPest Spawn(GrainContainer target, bool crow)
     {
         var prefab = crow ? crowPrefab : ratPrefab;
-        if (prefab == null || target == null) return null;
+        if (prefab == null || !GrainPest.CanAttack(target)) return null;
         Vector3 direction = Random.insideUnitSphere; direction.y = 0; direction = direction.sqrMagnitude < .01f ? Vector3.forward : direction.normalized;
         Vector3 pos = target.transform.position + direction * (crow ? 14f : 8f) + Vector3.up * (crow ? 9f : .15f);
         var go = Instantiate(prefab, pos, Quaternion.identity);
@@ -639,7 +651,6 @@ public sealed class GrainPestDirector : MonoBehaviour
         pest.Initialize(target, crow, crow ? crowFlyAnimation : ratAnimation, crow ? crowEatAnimation : ratAnimation);
         if (!encounterActive)
         {
-            AudioManager.Instance?.PlayAttackMusic();
             encounterActive = true;
             attackEndsAt = Time.time + Random.Range(Mathf.Max(1f,minAttackDuration),Mathf.Max(minAttackDuration,maxAttackDuration));
         }
@@ -654,7 +665,6 @@ public sealed class GrainPestDirector : MonoBehaviour
         crowLesson = false;
         if (player == null || playerCamera == null || tutorialBagTemplate == null || !player.BeginDiscovery(this))
         { introRunning = false; yield break; }
-        AudioManager.Instance?.PlayAttackMusic();
         introController = player.GetComponent<PlayerController>();
         introControllerWasEnabled = introController != null && introController.enabled;
         if (introControllerWasEnabled) introController.enabled = false;
@@ -724,7 +734,6 @@ public sealed class GrainPestDirector : MonoBehaviour
         introRunning = true; crowLesson = true;
         if (player == null || playerCamera == null || tutorialBagTemplate == null || !player.BeginDiscovery(this))
         { introRunning = false; yield break; }
-        AudioManager.Instance?.PlayAttackMusic();
         introController = player.GetComponent<PlayerController>();
         introControllerWasEnabled = introController != null && introController.enabled;
         if (introControllerWasEnabled) introController.enabled = false;

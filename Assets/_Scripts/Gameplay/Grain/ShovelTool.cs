@@ -74,6 +74,14 @@ public sealed class ShovelTool : MonoBehaviour
     // Keep the old private preload setter for editor fixtures; cargo owns runtime mass.
     public float Kilograms { get => cargo.Total; private set { cargo.Clear(); cargo.Add(GrainType.Corn, value); } }
     public GrainCargo Cargo => cargo;
+    private void ClearTinyRemainder()
+    {
+        // Only called between actions: don't discard the small increments of an active scoop.
+        if (cargo.Total <= 0f || cargo.Total >= .05f) return;
+        cargo.Clear();
+        strokeGrain.Clear();
+        if (grainPhysics != null) grainPhysics.SetFill(0f);
+    }
     private ShovelUpgradeSettings UpgradeSettings
     {
         get
@@ -149,6 +157,7 @@ public sealed class ShovelTool : MonoBehaviour
         }
         if (!isActiveAndEnabled || camera == null || player == null || bladeTip == null || transform.parent == null || Time.timeScale <= 0) return false;
         if (IsBusy) { queued = true; return true; }
+        ClearTinyRemainder();
         actionCamera = camera;
         actor = player;
         pendingPile = null; pendingContainer = null; smallPileScoop = false;
@@ -372,6 +381,7 @@ public sealed class ShovelTool : MonoBehaviour
             IsBusy=ActiveVacuum.Emptying || ActiveVacuum.Sucking;
             return;
         }
+        if (!IsBusy) ClearTinyRemainder();
         if (grainPhysics != null) grainPhysics.SetFill(Kilograms / CapacityKg);
         if (!IsBusy || deltaTime <= 0) return;
         elapsed += deltaTime;
@@ -687,6 +697,7 @@ public sealed class ShovelTool : MonoBehaviour
     {
         if(vacuums!=null)foreach(var vacuum in vacuums)if(vacuum!=null)vacuum.Cancel();
         IsBusy = queued = dropping = smallPileScoop = false;
+        if (!IsVacuum) ClearTinyRemainder();
         dropSurface = null;
         pendingPile = null; pendingContainer = null;
         PositionOffset = Vector3.zero;

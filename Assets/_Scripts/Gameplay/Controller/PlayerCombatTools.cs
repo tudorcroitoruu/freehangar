@@ -287,6 +287,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
             var pest = hit.collider.GetComponentInParent<GrainPest>();
             if (pest != null && pest.ScaredAway(transform.position))
             {
+                pest.HitImpulseDirection = pest.transform.position - transform.position;
                 pest.PlayHitReaction();
                 GameplayAudio.Instance?.PestHit(pest.IsCrow, hit.point);
                 GameAchievements.BroomPestScared(pest.IsCrow);

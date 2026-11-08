@@ -5,6 +5,18 @@ using UnityEngine.UI;
 
 public class ShovelUpgradeTests
 {
+    [TestCase(.00001f, 0f)]
+    [TestCase(.049f, 0f)]
+    [TestCase(.05f, .05f)]
+    [TestCase(1f, 1f)]
+    public void IdleShovelClearsOnlyTinyRemainders(float amount, float expected)
+    {
+        var shovel = root.AddComponent<ShovelTool>();
+        shovel.Cargo.Add(GrainType.Rice, amount);
+        shovel.Tick(.016f);
+        Assert.That(shovel.Kilograms, Is.EqualTo(expected).Within(.000001f));
+    }
+
     private ShovelUpgradeSettings settings;
     private PlayerData previousData;
     private GameObject root;

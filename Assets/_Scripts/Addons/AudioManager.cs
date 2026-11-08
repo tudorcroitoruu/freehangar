@@ -42,6 +42,27 @@ public class AudioManager : MonoBehaviour
     private int lastMusicNumber = -1;
     private float musicVolume = 1f;
     private bool introPlayed;
+    private bool feedingAttackActive;
+    private float nextAttackCheck;
+
+    private void Update()
+    {
+        if (Time.unscaledTime < nextAttackCheck) return;
+        nextAttackCheck = Time.unscaledTime + .25f;
+        if (WorldSaveRuntime.IsSeeking || WorldSaveRuntime.IsRestoring || LoadingScreen.IsLoading) return;
+        bool feeding = false;
+        if (SceneManager.GetActiveScene().name == "Gameplay" && !PlayerPerks.NoAttacksActive)
+        {
+            foreach (var pest in FindObjectsByType<GrainPest>(FindObjectsSortMode.None))
+                if (pest.IsFeeding) { feeding = true; break; }
+            if (!feeding)
+                foreach (var chicken in FindObjectsByType<FarmChicken>(FindObjectsSortMode.None))
+                    if (chicken.IsFeeding) { feeding = true; break; }
+        }
+        if (feeding && !feedingAttackActive) PlayAttackMusic();
+        else if (!feeding) StopAttackMusic();
+        feedingAttackActive = feeding;
+    }
 
     private void Awake()
     {
@@ -152,8 +173,8 @@ public class AudioManager : MonoBehaviour
         StopMusic();
         musicMode = MusicMode.Attack;
         musicAudioSource.clip = attackMusic;
+        musicAudioSource.loop = true;
         musicAudioSource.Play();
-        coroutine = StartCoroutine(ResumeRegularMusicAfterSpecial(MusicMode.Attack));
     }
 
     private void PlayInterstellar()
