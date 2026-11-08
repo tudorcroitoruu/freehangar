@@ -18,8 +18,40 @@ public sealed class PickupController : MonoBehaviour
     void Awake()
     {
         movement = GetComponent<BicycleController>();
+        InitializeParkedCollisions();
         steeringRest = steeringWheel.localRotation;
         ResetRoadCamera();
+    }
+    private void InitializeParkedCollisions()
+    {
+        // A single vehicle-sized box seals the open bed up to roof height and
+        // intercepts weapon hits on cargo pests. Movement still uses Motoroller's
+        // swept envelope; parked contacts follow the actual truck surfaces.
+        var envelope = GetComponent<BoxCollider>();
+        if (envelope == null) return;
+        var lowerLods = new System.Collections.Generic.HashSet<Renderer>();
+        foreach (var group in GetComponentsInChildren<LODGroup>(true))
+        {
+            var lods = group.GetLODs();
+            for (int i = 1; i < lods.Length; i++)
+                foreach (var renderer in lods[i].renderers) lowerLods.Add(renderer);
+            if (lods.Length > 0)
+                foreach (var renderer in lods[0].renderers) lowerLods.Remove(renderer);
+        }
+        bool found = false;
+        foreach (var mesh in GetComponentsInChildren<MeshFilter>(true))
+        {
+            if (mesh.sharedMesh == null || lowerLods.Contains(mesh.GetComponent<Renderer>()) ||
+                mesh.GetComponentInParent<GrainContainer>() != null) continue;
+            var contact = mesh.GetComponent<MeshCollider>();
+            if (contact == null) contact = mesh.gameObject.AddComponent<MeshCollider>();
+            contact.sharedMesh = mesh.sharedMesh;
+            contact.convex = false;
+            contact.isTrigger = false;
+            contact.enabled = true;
+            found = true;
+        }
+        if (found) envelope.enabled = false;
     }
     public void ResetRoadCamera()
     {

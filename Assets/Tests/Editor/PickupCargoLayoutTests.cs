@@ -4,6 +4,34 @@ using UnityEngine;
 
 public class PickupCargoLayoutTests
 {
+    [TestCase("5_Pick_up_Driveable")]
+    [TestCase("6_Pick_Up_Bigger_Driveable")]
+    [TestCase("7_Pick_Up_Last_Driveable")]
+    public void ParkedPickupUsesSurfaceCollidersInsteadOfSolidBedEnvelope(string name)
+    {
+        var parent = new GameObject("Inactive pickup collision test");
+        parent.SetActive(false);
+        try
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Vehicles/" + name + ".prefab");
+            var instance = Object.Instantiate(prefab, parent.transform);
+            var pickup = instance.GetComponent<PickupController>();
+            typeof(PickupController).GetMethod("InitializeParkedCollisions",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(pickup, null);
+            Assert.IsFalse(instance.GetComponent<BoxCollider>().enabled, "The root envelope must not seal the bed.");
+            var contacts = instance.GetComponentsInChildren<MeshCollider>(true);
+            Assert.That(contacts.Length, Is.GreaterThan(0));
+            foreach (var contact in contacts)
+            {
+                Assert.IsNotNull(contact.sharedMesh);
+                Assert.IsFalse(contact.convex, "A convex hull seals open cargo beds too.");
+                Assert.IsFalse(contact.isTrigger);
+                Assert.IsTrue(contact.enabled);
+            }
+        }
+        finally { Object.DestroyImmediate(parent); }
+    }
+
     private GameObject root;
     private PickupCargoLayout layout;
     private void Create(int bays)

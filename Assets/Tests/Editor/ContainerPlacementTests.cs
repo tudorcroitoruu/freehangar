@@ -5,6 +5,25 @@ using UnityEngine;
 
 public class ContainerPlacementTests
 {
+    [Test]
+    public void CrowAboveCargoCanBeHitAtHeadHeightByRayAndBroomSweep()
+    {
+        var cargo = Create("Elevated barrel", origin + Vector3.up * 2);
+        var barrel = cargo.AddComponent<BoxCollider>();
+        barrel.size = new Vector3(.7f, 1f, .7f);
+        var container = cargo.AddComponent<GrainContainer>();
+        var crowObject = Create("Perched crow", origin + Vector3.up * 2.5f);
+        var crow = crowObject.AddComponent<GrainPest>();
+        crow.Initialize(container, true, null, null);
+        Physics.SyncTransforms();
+        var ray = new Ray(crowObject.transform.position + Vector3.up * .65f - Vector3.forward * 2,
+            Vector3.forward);
+        Assert.IsTrue(Physics.Raycast(ray, out var shot, 3f, ~0, QueryTriggerInteraction.Collide));
+        Assert.That(shot.collider.GetComponent<GrainPest>(), Is.SameAs(crow));
+        Assert.IsTrue(Physics.SphereCast(ray, .22f, out var sweep, 3f, ~0, QueryTriggerInteraction.Collide));
+        Assert.That(sweep.collider.GetComponent<GrainPest>(), Is.SameAs(crow));
+    }
+
     [TestCase("Barrel")]
     [TestCase("BigBag")]
     public void DroppedContainerRestoresSolidContacts(string prefabName)

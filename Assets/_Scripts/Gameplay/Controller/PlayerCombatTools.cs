@@ -225,6 +225,8 @@ public sealed class PlayerCombatTools : MonoBehaviour
     }
     private void FirePistol()
     {
+        // Pests and vehicle cargo move by Transform while automatic physics sync is disabled.
+        Physics.SyncTransforms();
         var ray = PlayerAim.CenterRay(viewCamera);
         var muzzle = heldPistol.TransformPoint(new Vector3(0f, -.25f, .145f));
         SpawnPistolSmoke(muzzle, ray.direction);
@@ -260,6 +262,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
 
     private void PerformStrike()
     {
+        Physics.SyncTransforms();
         var ray = PlayerAim.CenterRay(viewCamera);
         int count=equipped==Tool.Broom
             ? Physics.SphereCastNonAlloc(ray,.22f,strikeHits,strikeReach,~0,QueryTriggerInteraction.Collide)

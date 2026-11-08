@@ -48,6 +48,7 @@ public sealed class GrainPest : MonoBehaviour
         CanAttack(Target) && (IsCrow || IsNearHangar(Target.transform.position)) &&
         Target.WorldBounds.SqrDistance(transform.position) <= 1.5f * 1.5f && !PlayerPerks.NoAttacksActive;
     private float nextBite;
+    private SphereCollider hitCollider;
     private float speed;
     private Animator animator;
     private RuntimeAnimatorController flying, feeding;
@@ -181,9 +182,15 @@ public sealed class GrainPest : MonoBehaviour
         transform.position = start;
         crowWaypoint = doorway;
         crowApproaching = true;
-        float angle = index * Mathf.PI * 2f / 3f;
-        crowLandingOffset = new Vector3(Mathf.Cos(angle),0,Mathf.Sin(angle)) * .35f;
-        biteAmount = 1f / 3f;
+        ConfigureCrowGroup(index, 3);
+    }
+    public void ConfigureCrowGroup(int index, int count)
+    {
+        count = Mathf.Max(1, count);
+        float angle = index * Mathf.PI * 2f / count;
+        crowLandingOffset = count == 1 ? Vector3.zero :
+            new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * .65f;
+        biteAmount = 1f / count;
     }
     public bool IsClimbing => climbing;
     public bool IsOnBag => onBag;
@@ -231,9 +238,12 @@ public sealed class GrainPest : MonoBehaviour
             body.isKinematic = true;
             body.useGravity = false;
         }
-        var collider = gameObject.AddComponent<SphereCollider>();
-        collider.radius = .55f;
-        collider.isTrigger = true;
+        hitCollider = gameObject.AddComponent<SphereCollider>();
+        // The crow's root is at its feet. Keep its head/body hittable above cargo,
+        // instead of burying half of the hit volume inside the supporting container.
+        hitCollider.center = crow ? new Vector3(0f, .3f, 0f) : Vector3.zero;
+        hitCollider.radius = .55f;
+        hitCollider.isTrigger = true;
     }
     private Vector3 GroundRat(Vector3 position)
     {
@@ -373,7 +383,7 @@ public sealed class GrainPest : MonoBehaviour
         away.y = 0;
         if (away.sqrMagnitude < .001f) away = -transform.forward;
         fleeDirection = (away.normalized + (IsCrow ? Vector3.up : Vector3.zero)).normalized;
-        GetComponent<Collider>().enabled = false;
+        if (hitCollider != null) hitCollider.enabled = false;
         return true;
     }
 
@@ -657,7 +667,15 @@ public sealed class GrainPestDirector : MonoBehaviour
         bool crow = attackVehicle || (crowsAvailable && (ratTargets.Length == 0 || Random.value < .5f));
         var candidates = attackVehicle ? vehicleCargo : crow ? targets : ratTargets;
         var target = candidates[Random.Range(0, candidates.Length)];
-        if (crow) Spawn(target, true);
+        if (crow)
+        {
+            int count = Random.Range(1, 5);
+            for (int i = 0; i < count; i++)
+            {
+                var bird = Spawn(target, true);
+                if (bird != null) bird.ConfigureCrowGroup(i, count);
+            }
+        }
         else SpawnRatGroup(target, false);
     }
     private void SpawnRatGroup(GrainContainer bag, bool nearby)
