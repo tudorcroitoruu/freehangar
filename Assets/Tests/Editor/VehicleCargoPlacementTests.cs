@@ -203,6 +203,32 @@ public class VehicleCargoPlacementTests
         finally { Object.DestroyImmediate(actor); Object.DestroyImmediate(item); Object.DestroyImmediate(slot); }
     }
 
+    [TestCase(typeof(BicycleController), false)]
+    [TestCase(typeof(MotorollerController), false)]
+    [TestCase(typeof(TrikeController), true)]
+    [TestCase(typeof(LawnmowerController), true)]
+    [TestCase(typeof(PickupController), true)]
+    public void UnfinishedBagsLoadFromTrikeUpIncludingTrailerSlots(System.Type vehicleType, bool allowed)
+    {
+        var vehicle = new GameObject("Vehicle");
+        vehicle.SetActive(false);
+        var trailer = new GameObject("Trailer");
+        var item = Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/FreeBag.prefab"));
+        try
+        {
+            var rig = vehicle.AddComponent<BicycleController>();
+            if (vehicleType != typeof(BicycleController)) vehicle.AddComponent(vehicleType);
+            trailer.AddComponent<VehicleCargoOwner>().vehicle = rig;
+            VehicleCargoPreview.PrepareContainer(item, .5f, 0f);
+            var bag = item.GetComponent<GrainContainer>();
+            Assert.That(VehicleCargoOwner.CanLoadContainer(rig, bag), Is.EqualTo(allowed));
+            Assert.That(VehicleCargoOwner.CanLoadContainer(trailer.transform, bag), Is.EqualTo(allowed));
+            Assert.IsFalse(VehicleCargoOwner.CanLoadContainer(null, bag));
+            Assert.AreEqual(bag.CapacityKg * .5f, bag.Kilograms, .001f);
+        }
+        finally { Object.DestroyImmediate(item); Object.DestroyImmediate(trailer); Object.DestroyImmediate(vehicle); }
+    }
+
     [TestCase(0f)]
     [TestCase(1f)]
     public void OnlyEmptyBagsIgnorePreviewRotation(float fill)

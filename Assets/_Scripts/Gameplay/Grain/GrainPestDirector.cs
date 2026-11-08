@@ -410,7 +410,7 @@ public sealed class GrainPestDirector : MonoBehaviour
     public PlayerInteractor player;
     [SerializeField, Min(1f)] private float minInterval = 60f, maxInterval = 180f;
     [SerializeField, Min(1f)] private float minAttackDuration = 20f, maxAttackDuration = 35f;
-    private float nextAttack, attackEndsAt;
+    private float nextAttack, attackTimeRemaining;
     private bool encounterActive;
     private readonly System.Collections.Generic.List<GrainPest> encounterPests = new System.Collections.Generic.List<GrainPest>();
     public float LastAttackEnded { get; private set; } = -1f;
@@ -616,7 +616,9 @@ public sealed class GrainPestDirector : MonoBehaviour
         if (encounterActive)
         {
             encounterPests.RemoveAll(p => p == null || p.Target == null);
-            if (Time.time >= attackEndsAt || encounterPests.Count == 0) EndEncounter();
+            // Travel, climbing and the introduction must not consume the feeding encounter.
+            if (encounterPests.Any(p => p.IsFeeding)) attackTimeRemaining -= Time.deltaTime;
+            if (attackTimeRemaining <= 0f || encounterPests.Count == 0) EndEncounter();
             return;
         }
         if (Time.time < nextAttack) return;
@@ -678,7 +680,7 @@ public sealed class GrainPestDirector : MonoBehaviour
         if (!encounterActive)
         {
             encounterActive = true;
-            attackEndsAt = Time.time + Random.Range(Mathf.Max(1f,minAttackDuration),Mathf.Max(minAttackDuration,maxAttackDuration));
+            attackTimeRemaining = Random.Range(Mathf.Max(1f,minAttackDuration),Mathf.Max(minAttackDuration,maxAttackDuration));
         }
         encounterPests.Add(pest);
         return pest;
