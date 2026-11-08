@@ -23,6 +23,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     private readonly List<Transform> slots = new List<Transform>(6);
     private readonly Collider[] blockers = new Collider[32];
     private readonly RaycastHit[] groundHits = new RaycastHit[32];
+    private readonly HashSet<Collider> movementSupports = new HashSet<Collider>();
     private readonly List<(Collider player, Collider barrow)> ignoredCollisions = new List<(Collider, Collider)>();
     private Bounds bodyBounds;
     private float handleDistance;
@@ -368,13 +369,16 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         extents.y = Mathf.Max(.01f, extents.y - .03f);
         int count = Physics.OverlapBoxNonAlloc(center, extents, blockers, rotation, ~0, QueryTriggerInteraction.Ignore);
         if (count == blockers.Length) return false;
+        movementSupports.Clear();
         float supportedHeight = target.y;
         for (int i = 0; i < count; i++)
         {
             var obstacle = blockers[i];
             if (obstacle.transform.IsChildOf(transform) || obstacle.transform.IsChildOf(pusher.transform)) continue;
-            if (obstacle.GetComponentInParent<GrainPile>() == null) return false;
-            // Shallow grain supports the tray instead of blocking it like a wall.
+            if (obstacle.attachedRigidbody != null) return false;
+            // The wide final barrow overlaps sloped ground at its corners even
+            // when the center ray is clear. Treat walkable support like grain,
+            // rather than classifying every floor contact as a solid wall.
             bool foundSupport = false;
             for (int z = -1; z <= 1; z++)
             for (int x = -1; x <= 1; x++)
@@ -387,6 +391,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
                 supportedHeight = Mathf.Max(supportedHeight, support.point.y + .02f);
             }
             if (!foundSupport) return false;
+            movementSupports.Add(obstacle);
         }
         // Recheck solid obstacles at the raised position too.
         if (supportedHeight > target.y)
@@ -396,7 +401,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
             if (count == blockers.Length) return false;
             for (int i = 0; i < count; i++)
                 if (!blockers[i].transform.IsChildOf(transform) && !blockers[i].transform.IsChildOf(pusher.transform) &&
-                    blockers[i].GetComponentInParent<GrainPile>() == null) return false;
+                    !movementSupports.Contains(blockers[i])) return false;
             target.y = supportedHeight;
         }
         return true;

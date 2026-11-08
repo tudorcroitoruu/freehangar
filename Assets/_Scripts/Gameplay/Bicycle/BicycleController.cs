@@ -464,32 +464,70 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
 // Movement guard shared by all driveable vehicle rigs. Wheelbarrows do not use this path.
 public static class HangarVehicleAccess
 {
+    public static bool IsCleared(Transform hangar)
+    {
+        if (hangar == null || SaveSystem.Data == null) return false;
+        GoalContext.Resolve(hangar, out int number, out _);
+        if (number == 0 && hangar.TryGetComponent<HangarGrainVisibility>(out var visibility) &&
+            visibility.GrainRoot != null)
+            GoalContext.Resolve(visibility.GrainRoot.transform, out number, out _);
+        // The first hangar predates the locked-hangar visibility components.
+        if (number == 0 && hangar.name == "01_Modular_Hangar") number = 1;
+        return number >= 1 && number <= 5 && SaveSystem.Data.IsHangarOpen(number) &&
+            SaveSystem.Data.GetHangarClearedPercent(number) >= 98f;
+    }
     private static readonly System.Collections.Generic.List<Transform> hangars = new System.Collections.Generic.List<Transform>();
     private static float nextScan;
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Reset() { hangars.Clear(); nextScan = 0; }
+    private static bool SmallVehicleMayEnter(BicycleController vehicle) =>
+        vehicle != null && (vehicle.TryGetComponent<ForkliftController>(out _) ||
+            (!vehicle.TryGetComponent<TrikeController>(out _) &&
+             !vehicle.TryGetComponent<PickupController>(out _) &&
+             !vehicle.TryGetComponent<LawnmowerController>(out _) &&
+             (!vehicle.motorDriven || vehicle.TryGetComponent<MotorollerController>(out _))));
+
+    private static void RefreshHangars()
+    {
+        if (Time.time < nextScan) return;
+        hangars.Clear();
+        foreach (var h in Object.FindObjectsByType<HangarGrainVisibility>(FindObjectsInactive.Include,FindObjectsSortMode.None))
+            if (h != null && !hangars.Contains(h.transform)) hangars.Add(h.transform);
+        var first = GameObject.Find("01_Modular_Hangar");
+        if (first != null && !hangars.Contains(first.transform)) hangars.Add(first.transform);
+        nextScan = Time.time + 2f;
+    }
+
+    public static bool BlocksPlacement(Bounds footprint, BicycleController vehicle)
+    {
+        if (SmallVehicleMayEnter(vehicle)) return false;
+        RefreshHangars();
+        foreach (var hangar in hangars)
+        {
+            if (hangar == null || IsCleared(hangar)) continue;
+            Bounds local = default;
+            for (int i = 0; i < 8; i++)
+            {
+                Vector3 corner = footprint.center + Vector3.Scale(footprint.extents,
+                    new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
+                Vector3 point = hangar.InverseTransformPoint(corner);
+                if (i == 0) local = new Bounds(point, Vector3.zero); else local.Encapsulate(point);
+            }
+            if (local.max.y >= -3f && local.min.y <= 12f && local.max.x >= -10f &&
+                local.min.x <= 10f && local.max.z >= -15.25f && local.min.z <= 15.25f) return true;
+        }
+        return false;
+    }
     public static bool Blocks(Vector3 from, Vector3 to, float clearance, BicycleController vehicle = null)
     {
         // Small vehicles and forklifts may enter. Physical doors, walls and grain still collide.
         // Larger vehicles also share the bicycle/motoroller rig, so exclude their specializations.
-        if (vehicle != null && (vehicle.TryGetComponent<ForkliftController>(out _) ||
-            (!vehicle.TryGetComponent<TrikeController>(out _) &&
-             !vehicle.TryGetComponent<PickupController>(out _) &&
-             !vehicle.TryGetComponent<LawnmowerController>(out _) &&
-             (!vehicle.motorDriven || vehicle.TryGetComponent<MotorollerController>(out _))))) return false;
+        if (SmallVehicleMayEnter(vehicle)) return false;
         if (to.x == from.x && to.z == from.z) return false;
-        if (Time.time >= nextScan)
-        {
-            hangars.Clear();
-            foreach (var h in Object.FindObjectsByType<HangarGrainVisibility>(FindObjectsInactive.Include,FindObjectsSortMode.None))
-                if (h != null && !hangars.Contains(h.transform)) hangars.Add(h.transform);
-            var first = GameObject.Find("01_Modular_Hangar");
-            if (first != null && !hangars.Contains(first.transform)) hangars.Add(first.transform);
-            nextScan = Time.time + 2f;
-        }
+        RefreshHangars();
         foreach (var h in hangars)
         {
-            if (h == null) continue;
+            if (h == null || IsCleared(h)) continue;
             var a = h.InverseTransformPoint(from); var b = h.InverseTransformPoint(to);
             if (a.y > 12f || a.y < -3f) continue;
             a.y = b.y = 0;

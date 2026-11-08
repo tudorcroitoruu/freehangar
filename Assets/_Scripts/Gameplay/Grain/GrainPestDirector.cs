@@ -216,13 +216,35 @@ public sealed class GrainPest : MonoBehaviour
     }
     private Vector3 SlotPoint(bool upper)
     {
-        if (upper) return FeedingPoint(new Vector2(Mathf.Cos(slotAngle), Mathf.Sin(slotAngle)) * .4f);
-        Bounds b = Target.WorldBounds;
-        Vector3 radial = new Vector3(Mathf.Cos(slotAngle), 0, Mathf.Sin(slotAngle));
-        float radius = upper ? Mathf.Min(b.extents.x, b.extents.z) * .4f : Mathf.Max(b.extents.x,b.extents.z) + .45f;
+        if (upper)
+        {
+            Vector3 point = FeedingPoint(new Vector2(Mathf.Cos(slotAngle), Mathf.Sin(slotAngle)) * .4f);
+            point.y = Mathf.Max(point.y, Target.WorldBounds.max.y) + .03f;
+            return point;
+        }
+        return GroundRat(RatApproachPoint(Target, slotAngle));
+    }
+    public static Vector3 RatApproachPoint(GrainContainer target, float angle)
+    {
+        var vehicle = VehicleCargoOwner.Resolve(target);
+        if (vehicle != null && vehicle.GetComponent<PickupController>() != null &&
+            vehicle.TryGetComponent<BoxCollider>(out var envelope))
+        {
+            // The root envelope remains available even when its contacts are disabled.
+            // Approach outside the rear bumper, never underneath an elevated cargo slot.
+            Vector3 local = vehicle.transform.InverseTransformPoint(target.WorldBounds.center);
+            Bounds body = new Bounds(envelope.center, envelope.size);
+            local.x = Mathf.Clamp(local.x + Mathf.Cos(angle) * .35f, body.min.x + .2f, body.max.x - .2f);
+            local.y = body.min.y;
+            local.z = body.min.z - .6f;
+            return vehicle.transform.TransformPoint(local);
+        }
+        Bounds b = target.WorldBounds;
+        Vector3 radial = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+        float radius = Mathf.Max(b.extents.x,b.extents.z) + .45f;
         Vector3 result = b.center + radial * radius;
-        result.y = upper ? b.max.y + .08f : Target.transform.position.y + .1f;
-        return upper ? result : GroundRat(result);
+        result.y = target.transform.position.y + .1f;
+        return result;
     }
     public void Initialize(GrainContainer target, bool crow, RuntimeAnimatorController fly, RuntimeAnimatorController eat)
     {
@@ -316,7 +338,7 @@ public sealed class GrainPest : MonoBehaviour
             if (animator != null) animator.SetFloat("Speed", 0f);
             return;
         }
-        if (hasSlot && !climbing && Time.time >= nextShuffle)
+        if (hasSlot && onBag && !climbing && Time.time >= nextShuffle)
         {
             slotAngle += Random.Range(-.4f, .4f);
             nextShuffle = Time.time + Random.Range(5f, 12f);
@@ -331,6 +353,14 @@ public sealed class GrainPest : MonoBehaviour
                 float t = Mathf.Clamp01((Time.time - climbStart) / climbDuration);
                 Vector3 end = SlotPoint(true);
                 Vector3 p = Vector3.Lerp(climbFrom, end, Mathf.SmoothStep(0,1,t));
+                var vehicle = VehicleCargoOwner.Resolve(Target);
+                if (vehicle != null && vehicle.GetComponent<PickupController>() != null)
+                {
+                    Vector3 edge = climbFrom;
+                    edge.y = Mathf.Max(climbFrom.y, end.y) + .15f;
+                    p = t < .5f ? Vector3.Lerp(climbFrom, edge, Mathf.SmoothStep(0, 1, t * 2)) :
+                        Vector3.Lerp(edge, end, Mathf.SmoothStep(0, 1, (t - .5f) * 2));
+                }
                 p.y += Mathf.Sin(t * Mathf.PI) * .18f;
                 if (!FarmChicken.IsGrainClearAt(p - Vector3.up * .1f)) { ScaredAway(); return; }
                 transform.position = p;
@@ -717,8 +747,6 @@ public sealed class GrainPestDirector : MonoBehaviour
         var occupiedSlots = new System.Collections.Generic.HashSet<int>();
         for (int i = 0; i < count; i++)
         {
-            Bounds bounds = bag.WorldBounds;
-            float radius = Mathf.Max(bounds.extents.x, bounds.extents.z) + .45f;
             Vector3 spawn = default;
             int slot = 0;
             bool found = false;
@@ -729,9 +757,11 @@ public sealed class GrainPestDirector : MonoBehaviour
                 if (occupiedSlots.Contains(slot)) continue;
                 float angle = slot * Mathf.PI * 2f / 24f;
                 Vector3 radial = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
-                Vector3 approach = bounds.center + radial * radius;
-                approach.y = bag.transform.position.y + .1f;
-                Vector3 candidate = bounds.center + radial * (nearby ? radius : radius + 3f);
+                Vector3 approach = GrainPest.RatApproachPoint(bag, angle);
+                var vehicle = VehicleCargoOwner.Resolve(bag);
+                if (vehicle != null && vehicle.GetComponent<PickupController>() != null)
+                    radial = Vector3.ProjectOnPlane(approach - vehicle.transform.position, Vector3.up).normalized;
+                Vector3 candidate = approach + radial * (nearby ? 0f : 3f);
                 candidate.y = approach.y;
                 if (!FarmChicken.TryGroundPoint(candidate, out var ground) ||
                     !GrainPest.RatApproachClear(ground, approach)) continue;

@@ -4,6 +4,67 @@ using UnityEngine;
 
 public class PickupCargoLayoutTests
 {
+    [Test]
+    public void ResetPlacementRejectsUnclearedHangarAndDoorwayOverlap()
+    {
+        var previousData = SaveSystem.Data;
+        const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic;
+        var cache = (System.Collections.Generic.List<Transform>)typeof(HangarVehicleAccess).GetField("hangars", flags).GetValue(null);
+        var previousHangars = cache.ToArray();
+        var scan = typeof(HangarVehicleAccess).GetField("nextScan", flags);
+        var previousScan = scan.GetValue(null);
+        var hangar = new GameObject("01_Modular_Hangar");
+        try
+        {
+            SaveSystem.Data = new PlayerData();
+            hangar.transform.position = new Vector3(10000, 0, 10000);
+            cache.Clear(); cache.Add(hangar.transform);
+            scan.SetValue(null, float.PositiveInfinity);
+            var inside = new Bounds(hangar.transform.position + Vector3.up, new Vector3(2, 2, 4));
+            var doorway = new Bounds(hangar.transform.position + new Vector3(0, 1, 16), new Vector3(2, 2, 4));
+            var outside = new Bounds(hangar.transform.position + new Vector3(0, 1, 20), new Vector3(2, 2, 4));
+            Assert.IsTrue(HangarVehicleAccess.BlocksPlacement(inside, null));
+            Assert.IsTrue(HangarVehicleAccess.BlocksPlacement(doorway, null));
+            Assert.IsFalse(HangarVehicleAccess.BlocksPlacement(outside, null));
+            SaveSystem.Data.TryRecordHangarClearance(1, 98);
+            Assert.IsFalse(HangarVehicleAccess.BlocksPlacement(inside, null));
+        }
+        finally
+        {
+            cache.Clear(); cache.AddRange(previousHangars); scan.SetValue(null, previousScan);
+            SaveSystem.Data = previousData; Object.DestroyImmediate(hangar);
+        }
+    }
+
+    [TestCase(1)]
+    [TestCase(2)]
+    [TestCase(3)]
+    [TestCase(4)]
+    [TestCase(5)]
+    public void VehicleAccessOpensAtHangarCompletion(int number)
+    {
+        var previous = SaveSystem.Data;
+        var hangar = new GameObject(number == 1 ? "01_Modular_Hangar" : "Hangar access test");
+        try
+        {
+            SaveSystem.Data = new PlayerData();
+            SaveSystem.Data.TryOpenHangar(number);
+            if (number != 1)
+            {
+                var context = hangar.AddComponent<GoalContext>();
+                typeof(GoalContext).GetField("hangarId", System.Reflection.BindingFlags.Instance |
+                    System.Reflection.BindingFlags.NonPublic).SetValue(context, number);
+            }
+            SaveSystem.Data.TryRecordHangarClearance(number, 97f);
+            Assert.IsFalse(HangarVehicleAccess.IsCleared(hangar.transform));
+            SaveSystem.Data.TryRecordHangarClearance(number, 98f);
+            Assert.IsTrue(HangarVehicleAccess.IsCleared(hangar.transform));
+            SaveSystem.Data = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(SaveSystem.Data));
+            Assert.IsTrue(HangarVehicleAccess.IsCleared(hangar.transform));
+        }
+        finally { SaveSystem.Data = previous; Object.DestroyImmediate(hangar); }
+    }
+
     [TestCase("5_Pick_up_Driveable")]
     [TestCase("6_Pick_Up_Bigger_Driveable")]
     [TestCase("7_Pick_Up_Last_Driveable")]

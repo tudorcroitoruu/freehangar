@@ -70,7 +70,7 @@ public class Pause : MonoBehaviour
     {
         if (Application.isEditor || !Application.isPlaying || !isActiveAndEnabled || MenuManager.IsMenuOpen || LoadingScreen.IsLoading ||
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "Gameplay") return;
-        PauseGameplay(true);
+        PauseGameplay();
     }
 
     private void Update()
@@ -222,13 +222,15 @@ public class Pause : MonoBehaviour
 
     public void PauseOn()
     {
-        PauseGameplay(false);
+        PauseGameplay();
     }
 
-    private void PauseGameplay(bool focusLost)
+    private void PauseGameplay()
     {
-        // Sale/upgrade screens own Escape, including the frame in which they close.
-        if (paused || (!focusLost && UpgradeManager.BlocksGameplayInput) || !pauseScreen || !mainScreen || exitToMenu || restarting) return;
+        // Existing popups own input and pause state, including on focus loss.
+        // Sale/upgrade screens also reserve the frame in which they close.
+        if (paused || UIPopups.BasePopupUI.HasActivePopup || UpgradeManager.BlocksGameplayInput ||
+            !pauseScreen || !mainScreen || exitToMenu || restarting) return;
         previousCursorLock = Cursor.lockState;
         previousCursorVisible = Cursor.visible;
         previousTimeScale = Time.timeScale;

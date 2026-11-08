@@ -178,6 +178,9 @@ public sealed class VehicleReset : MonoBehaviour
                     new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * ring;
                 if (!TryResetGround(center, out float ground)) continue;
                 center.y = ground + extents.y + .1f;
+                // Reset teleports rather than driving through the movement guard.
+                // Reject the whole vehicle footprint, including partial doorway overlap.
+                if (vehicle != null && HangarVehicleAccess.BlocksPlacement(new Bounds(center, extents * 2f), vehicle)) continue;
                 bool clear = true;
                 for (int corner = 0; corner < 4; corner++)
                 {

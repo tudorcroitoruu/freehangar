@@ -5,6 +5,45 @@ using UnityEngine;
 
 public class ContainerPlacementTests
 {
+    [TestCase(.12f, true)]
+    [TestCase(1f, false)]
+    public void WideWheelbarrowRollsOverLowSupportButStopsAtTallObstacles(float height, bool expected)
+    {
+        var barrow = Create("Wheelbarrow_Max", origin).AddComponent<WheelbarrowCargo>();
+        var pusher = actor.AddComponent<PlayerInteractor>();
+        SetField(barrow, "pusher", pusher);
+        SetField(barrow, "bodyBounds", new Bounds(Vector3.up * .5f, new Vector3(2, 1, 2)));
+        var ledge = Create("Ground at tray edge", origin + new Vector3(1, height * .5f, 0));
+        ledge.AddComponent<BoxCollider>().size = new Vector3(.4f, height, 3);
+        Physics.SyncTransforms();
+        var args = new object[] { origin, Quaternion.identity };
+        bool allowed = (bool)typeof(WheelbarrowCargo).GetMethod("CanMoveTo",
+            BindingFlags.Instance | BindingFlags.NonPublic).Invoke(barrow, args);
+        Assert.That(allowed, Is.EqualTo(expected));
+        if (expected) Assert.That(((Vector3)args[0]).y, Is.GreaterThan(origin.y + height));
+    }
+
+    [Test]
+    public void RatClimbStartsBehindPickupAtGroundHeight()
+    {
+        var vehicle = Create("Pickup climb test", origin);
+        vehicle.SetActive(false);
+        vehicle.transform.rotation = Quaternion.Euler(0, 65, 0);
+        vehicle.AddComponent<PickupController>();
+        var envelope = vehicle.AddComponent<BoxCollider>();
+        envelope.center = Vector3.up;
+        envelope.size = new Vector3(2.4f, 2f, 6f);
+        envelope.enabled = false;
+        var bag = Create("Elevated cargo", vehicle.transform.TransformPoint(new Vector3(.5f, 1.5f, -1)));
+        bag.AddComponent<BoxCollider>();
+        bag.AddComponent<VehicleCargoOwner>().vehicle = vehicle.GetComponent<BicycleController>();
+        var container = bag.AddComponent<GrainContainer>();
+        Vector3 approach = vehicle.transform.InverseTransformPoint(GrainPest.RatApproachPoint(container, 0));
+        Assert.That(approach.y, Is.EqualTo(0).Within(.002f));
+        Assert.That(approach.z, Is.LessThan(-3f));
+        Assert.That(Mathf.Abs(approach.x), Is.LessThan(1.2f));
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public void PestBodyCanBeShotButNearbyAimMisses(bool crow)
