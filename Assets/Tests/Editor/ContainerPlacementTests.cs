@@ -5,6 +5,42 @@ using UnityEngine;
 
 public class ContainerPlacementTests
 {
+    [TestCase(0f, 0f)]
+    [TestCase(0f, 2f)]
+    [TestCase(10f, 0f)]
+    [TestCase(10f, 2f)]
+    [TestCase(50f, 2f)]
+    public void WheelbarrowContainerOffersOnlyTakeRegardlessOfShovelLoad(float kilograms, float shovelLoad)
+    {
+        var shovel = Create("Shovel", origin).AddComponent<ShovelTool>();
+        shovel.Cargo.Add(GrainType.Corn, shovelLoad);
+        var carrier = actor.AddComponent<BagInteraction>();
+        SetField(carrier, "shovel", shovel);
+        var bag = Create("Container", origin).AddComponent<GrainContainer>();
+        bag.SetDemonstrationFill(kilograms);
+        Assert.IsTrue(carrier.TryGetPrompt(bag, out var groundPrompt));
+        bool couldPourOnGround = shovel.CanPourInto(bag);
+
+        var barrow = Create("Wheelbarrow_Small", origin).AddComponent<WheelbarrowCargo>();
+        bag.transform.SetParent(barrow.transform);
+        Assert.IsTrue(carrier.TryGetPrompt(bag, out var prompt));
+        Assert.AreEqual("Take", prompt.Action);
+        Assert.AreEqual(KeyCode.E, prompt.InteractionKey);
+        Assert.IsTrue(prompt.ShowKey);
+        Assert.IsFalse(prompt.ShowPrimaryButton);
+        Assert.IsFalse(prompt.ShowProgress);
+        Assert.IsNull(prompt.AdditionalActions);
+        Assert.IsFalse(shovel.CanPourInto(bag));
+        Assert.AreEqual(shovelLoad, shovel.Kilograms);
+
+        bag.transform.SetParent(null);
+        Assert.IsTrue(carrier.TryGetPrompt(bag, out var unloadedPrompt));
+        Assert.AreEqual(groundPrompt.Action, unloadedPrompt.Action);
+        Assert.AreEqual(groundPrompt.ShowKey, unloadedPrompt.ShowKey);
+        Assert.AreEqual(groundPrompt.ShowPrimaryButton, unloadedPrompt.ShowPrimaryButton);
+        Assert.AreEqual(couldPourOnGround, shovel.CanPourInto(bag));
+    }
+
     [TestCase(true)]
     [TestCase(false)]
     public void EmptyGrainActionUsesItsOwnPromptAndKey(bool portable)

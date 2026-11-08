@@ -174,6 +174,7 @@ public sealed class ShovelTool : MonoBehaviour
         if (!isActiveAndEnabled || container == null || !container.isActiveAndEnabled ||
             !container.IsOpen || container.IsFull || container.IsClosing || container.IsCarried ||
             Kilograms <= .0001f) return false;
+        if (container.GetComponentInParent<WheelbarrowCargo>() != null) return false;
         for (int i = 0; i < GrainCargo.TypeCount; i++)
             if (cargo[(GrainType)i] > .0001f && container.Accepts((GrainType)i)) return true;
         return false;
@@ -512,7 +513,8 @@ public sealed class ShovelTool : MonoBehaviour
             }
             else if (pendingContainer != null && aimedAtContainer &&
                 pendingContainer.isActiveAndEnabled && pendingContainer.IsOpen &&
-                !pendingContainer.IsClosing && !pendingContainer.IsCarried)
+                !pendingContainer.IsClosing && !pendingContainer.IsCarried &&
+                pendingContainer.GetComponentInParent<WheelbarrowCargo>() == null)
             {
                 if (grainPhysics != null) grainPhysics.SetPourGrain(pendingContainer.HasAssignedGrain && !pendingContainer.IsBigBag ? pendingContainer.AcceptedGrain : cargo.Dominant);
                 float before = Kilograms;

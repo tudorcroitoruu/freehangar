@@ -84,6 +84,13 @@ public sealed class BagInteraction : MonoBehaviour
             bag.IsClosing || (bag.IsCarried && bag != carried) || (shovel != null && shovel.IsBusy)) return false;
         if (carried == null) target = bag;
         Vector3 position = bag.PromptPosition;
+        if (bag != carried && bag.GetComponentInParent<WheelbarrowCargo>() != null)
+        {
+            data = new InteractionPromptData(position, "Take", bag.CanCarry);
+            var actor = GetComponent<PlayerInteractor>();
+            data.RequiresFreeHands = actor != null && actor.HandsOccupied;
+            return true;
+        }
         bool blocked = Time.time < blockedUntil;
         bool shovelEquipped = IsShovelEquipped;
         bool canFinish = shovelEquipped && bag.CanHandle && !bag.IsFinished;
@@ -136,7 +143,8 @@ public sealed class BagInteraction : MonoBehaviour
             carried != null || (shovel != null && shovel.IsBusy) || bag == null || bag.IsClosing ||
             (GetComponent<PlayerItemCarry>() is PlayerItemCarry items && items.IsCarrying)) return false;
         target = bag;
-        if (IsShovelEquipped && target.CanHandle && !target.IsFinished) return target.Finish();
+        if (target.GetComponentInParent<WheelbarrowCargo>() == null &&
+            IsShovelEquipped && target.CanHandle && !target.IsFinished) return target.Finish();
         if (!target.CanCarry) return false;
         bool restoreShovel = IsShovelEquipped;
         if (restoreShovel)
