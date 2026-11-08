@@ -85,7 +85,7 @@ public static class EndingCardPrefabSetup
                 ui.fade = fade.GetComponent<Image>(); ui.fade.color = Color.clear; ui.fade.raycastTarget = false;
                 ui.fade.rectTransform.anchorMin = Vector2.zero; ui.fade.rectTransform.anchorMax = Vector2.one;
                 ui.fade.rectTransform.offsetMin = ui.fade.rectTransform.offsetMax = Vector2.zero;
-                ui.countdown = Title(panel.transform, "Get ready for launch", "GET READY FOR LAUNCH\n3...", 36, 145);
+                ui.countdown = Title(panel.transform, "Get ready for launch", "Get Ready For The Launch\n3...", 36, 145);
                 ui.dialogue = Title(panel.transform, "Player dialogue", "— No, no, let me out!", 25, 70);
                 foreach (var text in new[] { ui.countdown, ui.dialogue })
                 {

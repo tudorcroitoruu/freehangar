@@ -149080,11 +149080,7 @@ MonoBehaviour:
   hatchOpenAngle: 90
   roomLight: {fileID: 766816232}
   lampGlow: {fileID: 1841813112}
-  readyVoice: {fileID: 8300000, guid: 4b52b11fb2e84c1498a1c26e239bd542, type: 3}
-  threeVoice: {fileID: 8300000, guid: 3f1f7d17bbc6d2247b9fd775a265940d, type: 3}
-  twoVoice: {fileID: 8300000, guid: a83784995d5eccf478e80db3795b7b8b, type: 3}
-  oneVoice: {fileID: 8300000, guid: 3ebd125d1dc31da46a1668154083ee37, type: 3}
-  protestVoice: {fileID: 8300000, guid: 74354194b0f5bc24a8df98f3810c0280, type: 3}
+  countdownClip: {fileID: 8300000, guid: 8441ddb3e85478c4a81fbf73e9f2abf4, type: 3}
   endingScene: Last Scene
 --- !u!4 &440562748
 Transform:

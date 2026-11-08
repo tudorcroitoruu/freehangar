@@ -16,7 +16,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     public float hatchOpenAngle = 105f;
     public Light roomLight;
     public Renderer lampGlow;
-    public AudioClip readyVoice, threeVoice, twoVoice, oneVoice, protestVoice;
+    [SerializeField] private AudioClip countdownClip;
     public string endingScene = "Last Scene";
     public bool DoorOpen { get; private set; }
     public bool Running { get; private set; }
@@ -52,6 +52,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     private CursorLockMode cursorLock;
     private void Awake()
     {
+        countdownClip?.LoadAudioData();
         doorClosed=roomDoor.localRotation;leverOff=switchHandle.localRotation;
         hatchClosed=rocketDoor.localRotation;revealClosed=revealDoor.localPosition;
         roomLight.enabled=false;if(lampGlow!=null)lampGlow.enabled=false;
@@ -120,12 +121,19 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         cinematic.nearClipPlane=.03f;var hd=cameraObject.AddComponent<HDAdditionalCameraData>();var originalHD=original.GetComponent<HDAdditionalCameraData>();if(originalHD!=null)originalHD.CopyTo(hd);
         Suspend(original);voice=cameraObject.AddComponent<AudioSource>();voice.spatialBlend=0;voice.playOnAwake=false;CreateOverlay();
         footsteps = cameraObject.AddComponent<AudioSource>(); footsteps.spatialBlend = 0; footsteps.playOnAwake = false;
-        voice.outputAudioMixerGroup = SoundManager.EffectsOutput;
-        footsteps.outputAudioMixerGroup = SoundManager.EffectsOutput;
+        voice.outputAudioMixerGroup = SoundManager.CinematicOutput;
+        footsteps.outputAudioMixerGroup = SoundManager.CinematicOutput;
+        SoundManager.instance?.BeginLaunchAudio();
+        AudioManager.Instance?.TransitionToInterstellar();
         yield return MoveCamera(switchView,.75f);
+        // Pause to study the switch before reaching for it.
+        Quaternion switchLook = cinematic.transform.rotation;
+        yield return Animate(1.5f, t => cinematic.transform.rotation = switchLook *
+            Quaternion.Euler(-2f * Mathf.Sin(t * Mathf.PI), 2f * Mathf.Sin(t * Mathf.PI * 2f), 0));
         yield return Animate(.55f,t=>switchHandle.localRotation=leverOff*Quaternion.Euler(125*t,0,0));
         GameplayAudio.Instance?.SwitchElectrical();
-        AudioManager.Instance?.PlayInterstellar();
+        yield return saveClock.Animate(.5f, _ => { });
+        GameplayAudio.Instance?.LightsOn();
         roomLight.enabled=true;if(lampGlow!=null)lampGlow.enabled=true;
         yield return Animate(.7f,t=>roomLight.intensity=Mathf.Lerp(0,180,t));
         GameAchievements.ElectricalRoomPowered();
@@ -133,9 +141,9 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         yield return saveClock.Animate(.15f, _ => { });
         GameplayAudio.Instance?.OpenRocketDoor();
         yield return Animate(1.4f,t=>revealDoor.localPosition=revealClosed+Vector3.up*revealLift*t);
-        // Begin walking as the hatch opens, keeping the movement and door in sync.
-        yield return WalkToOpening(revealView,2.1f);
+        // Inspect the revealed doorway before approaching it at half speed.
         yield return LookAroundOpening();
+        yield return WalkToOpening(revealView,4.2f);
         yield return WalkTo(approachView,2.2f);
         yield return EnterCabin(cabinView,2.5f);
         // Inspect the controls while the hatch closes behind the player.
@@ -148,32 +156,53 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         // The latch catches their attention: turn sharply toward the door.
         if(lookBackView!=null)yield return MoveCamera(lookBackView,.48f);
         yield return saveClock.Animate(.3f, _ => { });
-        subtitle.text="GET READY FOR LAUNCH";Play(readyVoice);
+        subtitle.text = "Get Ready For The Launch";
+        dialogue.text = "";
         yield return saveClock.Animate(.5f, _ => { });
-        subtitle.text="GET READY FOR LAUNCH\n3...";Play(threeVoice);
-        Vector3 windowStart=cinematic.transform.position;
-        Quaternion windowRotation=cinematic.transform.rotation;
-        yield return Animate(1.15f,t=>{
-            cinematic.transform.position=windowStart+windowRotation*Vector3.forward*(.32f*t);
-            cinematic.transform.rotation=windowRotation*Quaternion.Euler(-1.5f*t,2.5f*t,0);
-        });
-        subtitle.text="2...";dialogue.text="— No, no, let me out!";Play(twoVoice);if(protestVoice!=null)voice.PlayOneShot(protestVoice);
-        Vector3 closePosition=cinematic.transform.position;
-        Quaternion closeRotation=cinematic.transform.rotation;
-        yield return Animate(2.2f,t=>{
-            cinematic.transform.position=Vector3.Lerp(closePosition,windowStart,t);
-            cinematic.transform.rotation=Quaternion.Slerp(closeRotation,windowRotation*Quaternion.Euler(3,-4,0),t);
-        });
-        subtitle.text="1...";Play(oneVoice);
-        Quaternion lastLook=cinematic.transform.rotation;
-        yield return Animate(1.1f,t=>cinematic.transform.rotation=Quaternion.Slerp(lastLook,windowRotation,t));
-        var rest=cinematic.transform.localPosition;
-        yield return Animate(.8f,t=>{cinematic.transform.localPosition=rest+new Vector3(Mathf.Sin(t*89),Mathf.Sin(t*117),0)*.025f*t;fade.color=new Color(0,0,0,t);});
+        yield return PlayCountdown();
         subtitle.text="";
         dialogue.text="";
         if (WorldSaveRuntime.Instance != null) WorldSaveRuntime.Instance.DestinationScene = endingScene;
         SaveSystem.SaveData();
         var load=SceneManager.LoadSceneAsync(endingScene,LoadSceneMode.Single);if(load!=null)yield return load;
+    }
+    private IEnumerator PlayCountdown()
+    {
+        // Cue offsets measured in "Last scene 3,2,1": three, two, one, launch.
+        const float twoAt = 1.1f, oneAt = 2.18f, launchAt = 3.3f;
+        float duration = countdownClip != null ? countdownClip.length : 5.1f;
+        Vector3 rest = cinematic.transform.position;
+        Quaternion rotation = cinematic.transform.rotation;
+        bool started = false;
+        bool rocketStarted = false;
+        voice.clip = countdownClip;
+        yield return saveClock.Animate(duration, progress =>
+        {
+            float elapsed = progress * duration;
+            if (!started && !IsSeeking && elapsed < duration && countdownClip != null)
+            {
+                voice.time = elapsed;
+                voice.Play();
+                started = true;
+            }
+            // Follow the audio playhead during playback, and the saved clock when seeking.
+            float cueTime = started && voice.isPlaying ? voice.time : elapsed;
+            if (!rocketStarted && !IsSeeking && cueTime >= oneAt)
+            {
+                GameplayAudio.Instance?.StartRocket();
+                rocketStarted = true;
+            }
+            subtitle.text = cueTime >= launchAt ? "LAUNCH" : cueTime >= oneAt ? "1..." :
+                cueTime >= twoAt ? "2..." : "Get Ready For The Launch\n3...";
+            float peek = Mathf.Sin(Mathf.Clamp01(cueTime / launchAt) * Mathf.PI);
+            cinematic.transform.position = rest + rotation * Vector3.forward * (.32f * peek);
+            cinematic.transform.rotation = rotation * Quaternion.Euler(-1.5f * peek, 2.5f * peek, 0);
+            float fadeProgress = Mathf.Clamp01((cueTime - (duration - .8f)) / .8f);
+            if (cueTime >= launchAt)
+                cinematic.transform.position += new Vector3(Mathf.Sin(cueTime * 89), Mathf.Sin(cueTime * 117), 0) * .025f * fadeProgress;
+            fade.color = new Color(0, 0, 0, fadeProgress);
+        });
+        fade.color = Color.black;
     }
     private IEnumerator TurnToward(Transform target, float duration)
     {
@@ -267,7 +296,6 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         lastStep = step;
         if (!IsSeeking && actor != null) actor.GetComponent<PlayerController>()?.PlayCutsceneFootstep(footsteps);
     }
-    private void Play(AudioClip clip){if(clip!=null && !IsSeeking)voice.PlayOneShot(clip);}
     private IEnumerator MoveCamera(Transform target,float duration){var p=cinematic.transform.position;var r=cinematic.transform.rotation;yield return Animate(duration,t=>cinematic.transform.SetPositionAndRotation(Vector3.Lerp(p,target.position,t),Quaternion.Slerp(r,target.rotation,t)));}
     private IEnumerator Animate(float duration,System.Action<float> action) => saveClock.Animate(duration, t => action(Mathf.SmoothStep(0,1,t)));
     private void CreateOverlay()

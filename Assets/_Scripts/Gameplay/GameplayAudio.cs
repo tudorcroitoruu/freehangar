@@ -58,6 +58,20 @@ public sealed class GameplayAudio : MonoBehaviour
     [SerializeField] private AudioClip[] vehicleHits;
 
     private AudioSource effects;
+    private AudioSource cinematicEffects;
+
+    private void PlayCinematic(AudioClip clip, float volume)
+    {
+        if (clip == null || WorldSaveRuntime.IsSeeking || WorldSaveRuntime.IsRestoring) return;
+        if (cinematicEffects == null)
+        {
+            cinematicEffects = gameObject.AddComponent<AudioSource>();
+            cinematicEffects.playOnAwake = false;
+            cinematicEffects.spatialBlend = 0f;
+        }
+        cinematicEffects.outputAudioMixerGroup = SoundManager.CinematicOutput;
+        cinematicEffects.PlayOneShot(clip, volume);
+    }
     private readonly Dictionary<Transform, AudioSource> loops = new Dictionary<Transform, AudioSource>();
 
     private void Awake()
@@ -164,9 +178,10 @@ public sealed class GameplayAudio : MonoBehaviour
     public void PickUp() => Play(pickUp, .7f);
     public void Drop() => Play(drop, .7f);
     public void OpenElectricalDoor() => Play(openDoor, .8f);
-    public void OpenRocketDoor() => Play(openRocketDoor, .85f);
-    public void CloseRocketDoor() => Play(closeDoor, 1.6f);
-    public void SwitchElectrical() { Play(switchElectrical, .85f); Play(lightsOn, .7f); }
+    public void OpenRocketDoor() => PlayCinematic(openRocketDoor, .85f);
+    public void CloseRocketDoor() => PlayCinematic(closeDoor, 3.2f);
+    public void SwitchElectrical() => PlayCinematic(switchElectrical, .85f);
+    public void LightsOn() => PlayCinematic(lightsOn, .7f);
     public void PaperGet() => Play(paperGet, .8f);
     public void PerkFound() => Play(perkFound, .8f);
     public void ShovelGet() => Play(Choose(shovelGets), .75f);
@@ -176,7 +191,7 @@ public sealed class GameplayAudio : MonoBehaviour
     public void VehicleResetComplete() => Play(resetVehicle, .8f);
     public void BicycleScratch(Vector3 point) => PlayAt(bicycleScratch, point, .25f, 1f);
 
-    public void StartRocket() => RocketLaunchAudio.Begin(rocket, effectsGroup);
+    public void StartRocket() => RocketLaunchAudio.Begin(rocket, SoundManager.CinematicOutput);
 
     private void SetLoop(Transform owner, AudioClip clip, bool moving, float pitch, float volume, float blend = .8f, bool engine = false)
     {
@@ -247,7 +262,7 @@ public sealed class GameplayAudio : MonoBehaviour
     }
 }
 
-/// <summary>Keeps the launch rumble audible across the loading transition until the ending finishes.</summary>
+/// <summary>Keeps the launch rumble across loading, fading away with the exterior camera pullback.</summary>
 public sealed class RocketLaunchAudio : MonoBehaviour
 {
     private static RocketLaunchAudio active;
@@ -267,19 +282,36 @@ public sealed class RocketLaunchAudio : MonoBehaviour
         active.source.outputAudioMixerGroup = group;
         active.source.clip = clip;
         active.source.loop = true;
-        active.source.volume = .7f;
+        active.source.volume = 0f;
         active.source.Play();
     }
 
     private void Update()
     {
+        float targetVolume = .7f;
         if (SceneManager.GetActiveScene().name == "Last Scene")
         {
             enteredEnding = true;
             if (ending == null) ending = FindFirstObjectByType<RocketEndingCutscene>();
-            if (ending != null && ending.Completed) Destroy(gameObject);
+            if (ending != null)
+            {
+                targetVolume *= ending.RocketAudioGain;
+                if (ending.Completed || ending.RocketAudioGain <= 0f)
+                {
+                    source.Stop();
+                    Destroy(gameObject);
+                    return;
+                }
+            }
         }
-        else if (enteredEnding) Destroy(gameObject);
+        else if (enteredEnding || (SceneManager.GetActiveScene().name != "Gameplay" &&
+                 SceneManager.GetActiveScene().name != "LoadingScene"))
+        {
+            source.Stop();
+            Destroy(gameObject);
+            return;
+        }
+        source.volume = Mathf.MoveTowards(source.volume, targetVolume, Time.deltaTime * 1.4f);
     }
 
     private void OnDestroy() { if (active == this) active = null; }

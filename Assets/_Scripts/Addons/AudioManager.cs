@@ -185,7 +185,39 @@ public class AudioManager : MonoBehaviour
         musicMode = MusicMode.Ending;
         if (musicAudioSource == null || interstellarMusic == null) return;
         musicAudioSource.clip = interstellarMusic;
+        musicAudioSource.volume = Mathf.Clamp01(musicVolume * 2f);
         musicAudioSource.Play();
+    }
+
+    public void TransitionToInterstellar()
+    {
+        if (musicMode == MusicMode.Ending || musicAudioSource == null || interstellarMusic == null) return;
+        if (coroutine != null) StopCoroutine(coroutine);
+        musicMode = MusicMode.Ending;
+        coroutine = StartCoroutine(FadeToInterstellar());
+    }
+
+    private IEnumerator FadeToInterstellar()
+    {
+        float initial = musicAudioSource.volume;
+        for (float elapsed = 0; elapsed < .8f; elapsed += Time.deltaTime)
+        {
+            musicAudioSource.volume = Mathf.Lerp(initial, 0, Mathf.SmoothStep(0, 1, elapsed / .8f));
+            yield return null;
+        }
+        musicAudioSource.Stop();
+        musicAudioSource.clip = interstellarMusic;
+        musicAudioSource.loop = false;
+        musicAudioSource.volume = 0;
+        musicAudioSource.Play();
+        float target = Mathf.Clamp01(musicVolume * 2f);
+        for (float elapsed = 0; elapsed < .4f; elapsed += Time.deltaTime)
+        {
+            musicAudioSource.volume = target * Mathf.SmoothStep(0, 1, elapsed / .4f);
+            yield return null;
+        }
+        musicAudioSource.volume = target;
+        coroutine = null;
     }
 
     public void PlayLose() => PlayGameplayClip(loseClip);

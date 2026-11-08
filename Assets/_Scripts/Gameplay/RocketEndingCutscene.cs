@@ -35,6 +35,20 @@ public sealed class RocketEndingCutscene : MonoBehaviour
     public string CurrentShot { get; private set; } = "Ready";
     public Camera CinematicCamera => view;
     public int FlyingRocketCount => ships.Count;
+    public float RocketAudioGain
+    {
+        get
+        {
+            if (hero == null || view == null) return 1f;
+            // Stay at full volume inside and throughout the close exterior shot.
+            // Fade only as the camera physically travels out to the fleet view.
+            float closeDistance = new Vector3(8, 18, 17).magnitude;
+            float farDistance = new Vector3(35, 100, 130).magnitude;
+            float cameraDistance = hero.InverseTransformPoint(view.transform.position).magnitude;
+            return 1f - Mathf.SmoothStep(0f, 1f,
+                Mathf.InverseLerp(closeDistance, farDistance, cameraDistance));
+        }
+    }
     private GameObject staging;
     private Camera view;
     private Transform hero;
@@ -87,6 +101,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
     {
         if (IsPlaying || Completed || rocketPrefab == null || fleetPrefab == null || earth == null || sourceCamera == null || sun == null || endingUiTemplate == null) return false;
         IsPlaying = true; elapsed = 0; sunStarted = false;
+        GameplayAudio.Instance?.StartRocket();
         cursorMode = Cursor.lockState; cursorVisible = Cursor.visible;
         Cursor.lockState = CursorLockMode.Locked; Cursor.visible = false;
         foreach (var camera in FindObjectsByType<Camera>(FindObjectsSortMode.None)) Suspend(camera);
