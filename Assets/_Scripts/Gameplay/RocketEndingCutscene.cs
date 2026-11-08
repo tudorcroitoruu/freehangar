@@ -19,6 +19,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
     [SerializeField] private float cabinSeconds = 6.5f, pullbackSeconds = 6f, fleetSeconds = 8f, sunSeconds = 7f;
     [SerializeField] private float openingFadeSeconds = 1.6f;
     [Header("Ending card")]
+    [SerializeField] private EndingCardUI endingUiTemplate;
     [SerializeField, Min(0)] private float finalSunHoldSeconds = 1f;
     [SerializeField, Min(.1f)] private float finalFadeSeconds = 1.5f;
     [SerializeField, Min(.1f)] private float endingTextFadeSeconds = .8f;
@@ -84,7 +85,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
     private void Start() { WorldSaveRuntime.EnsureScene(gameObject.scene); if (playOnStart) Play(); }
     public bool Play()
     {
-        if (IsPlaying || Completed || rocketPrefab == null || fleetPrefab == null || earth == null || sourceCamera == null || sun == null) return false;
+        if (IsPlaying || Completed || rocketPrefab == null || fleetPrefab == null || earth == null || sourceCamera == null || sun == null || endingUiTemplate == null) return false;
         IsPlaying = true; elapsed = 0; sunStarted = false;
         cursorMode = Cursor.lockState; cursorVisible = Cursor.visible;
         Cursor.lockState = CursorLockMode.Locked; Cursor.visible = false;
@@ -147,28 +148,14 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         sunMaterial.SetColor("_UnlitColor",new Color(8,7.8f,7.3f));
         var discRenderer = disc.GetComponent<Renderer>(); discRenderer.sharedMaterial = sunMaterial;
         discRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        var fadeObject = new GameObject("Ending fade", typeof(Canvas)); fadeObject.transform.SetParent(staging.transform);
-        overlay = fadeObject.GetComponent<Canvas>(); overlay.renderMode = RenderMode.ScreenSpaceOverlay; overlay.sortingOrder = 32760;
-        var scaler = fadeObject.AddComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920,1080); scaler.matchWidthOrHeight = .5f;
-        var panel = new GameObject("Black", typeof(RectTransform), typeof(Image)); panel.transform.SetParent(fadeObject.transform,false);
-        black = panel.GetComponent<Image>(); black.color = Color.black; black.raycastTarget = false;
-        black.rectTransform.anchorMin = Vector2.zero; black.rectTransform.anchorMax = Vector2.one;
-        black.rectTransform.offsetMin = black.rectTransform.offsetMax = Vector2.zero;
-        continuedText = CreateEndingText("TO BE CONTINUED...", 64, 44);
-        friendsText = CreateEndingText("CALL YOUR FRIENDS", 36, -52);
+        var ui = Instantiate(endingUiTemplate, staging.transform);
+        ui.gameObject.SetActive(true);
+        overlay = ui.canvas;
+        black = ui.black;
+        continuedText = ui.continuedText;
+        friendsText = ui.friendsText;
+        continuedText.alpha = friendsText.alpha = 0;
         HideHud(); Evaluate(0); HDCamera.GetOrCreate(view).Reset(); return true;
-    }
-    private TextMeshProUGUI CreateEndingText(string message, float size, float verticalOffset)
-    {
-        var go = new GameObject(message,typeof(RectTransform)); go.transform.SetParent(overlay.transform,false);
-        var text = go.AddComponent<TextMeshProUGUI>(); text.text = message;
-        text.fontSize = size; text.alignment = TextAlignmentOptions.Center; text.characterSpacing = 3;
-        text.color = new Color(1,1,1,0); text.raycastTarget = false;
-        var rect = text.rectTransform; rect.anchorMin = new Vector2(.08f,.5f); rect.anchorMax = new Vector2(.92f,.5f);
-        rect.sizeDelta = new Vector2(0,100); rect.anchoredPosition = new Vector2(0,verticalOffset);
-        text.enableAutoSizing = true; text.fontSizeMin = size*.55f; text.fontSizeMax = size;
-        return text;
     }
     private Transform Spawn(GameObject prefab,string name,Vector3 position,bool interior)
     {

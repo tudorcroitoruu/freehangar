@@ -165,7 +165,7 @@ public sealed class GameplayAudio : MonoBehaviour
     public void Drop() => Play(drop, .7f);
     public void OpenElectricalDoor() => Play(openDoor, .8f);
     public void OpenRocketDoor() => Play(openRocketDoor, .85f);
-    public void CloseRocketDoor() => Play(closeDoor, .8f);
+    public void CloseRocketDoor() => Play(closeDoor, 1.6f);
     public void SwitchElectrical() { Play(switchElectrical, .85f); Play(lightsOn, .7f); }
     public void PaperGet() => Play(paperGet, .8f);
     public void PerkFound() => Play(perkFound, .8f);

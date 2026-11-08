@@ -7895,6 +7895,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RocketEndingCutscene
   playOnStart: 1
+  endingUiTemplate: {fileID: 3833245483390939280, guid: 2fae4dcb98280ec4eb9fdd73f5f42bf9, type: 3}
   rocketPrefab: {fileID: 633861962069134719, guid: f7f7e585426e91e409736d7ea53b68db, type: 3}
   fleetPrefab: {fileID: 6532255470785316633, guid: fd4b89c1b54d65a44b235cceb7d76557, type: 3}
   earth: {fileID: 435678223}

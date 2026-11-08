@@ -7,6 +7,7 @@ using UnityEngine.Rendering.HighDefinition;
 
 public sealed class HangarLaunchSequence : MonoBehaviour
 {
+    [SerializeField] private LaunchCardUI launchUiTemplate;
     public HangarKeyDoor hangar;
     public GrainPile grain;
     public Transform clearancePoint, roomDoor, switchHandle, revealDoor, rocketDoor;
@@ -40,9 +41,10 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     private Vector3 revealClosed;
     private Camera cinematic, original;
     private GameObject overlay;
-    private Text subtitle;
+    private TMPro.TMP_Text subtitle, dialogue;
     private Image fade;
     private AudioSource voice;
+    private AudioSource footsteps;
     private PlayerInteractor actor;
     private readonly Dictionary<Behaviour,bool> suspended = new Dictionary<Behaviour,bool>();
     private readonly Dictionary<GameObject,bool> hidden = new Dictionary<GameObject,bool>();
@@ -115,9 +117,11 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         var cameraObject=new GameObject("Electrical room cinematic camera");cinematic=cameraObject.AddComponent<Camera>();cinematic.CopyFrom(original);cinematic.transform.SetPositionAndRotation(original.transform.position,original.transform.rotation);
         cinematic.nearClipPlane=.03f;var hd=cameraObject.AddComponent<HDAdditionalCameraData>();var originalHD=original.GetComponent<HDAdditionalCameraData>();if(originalHD!=null)originalHD.CopyTo(hd);
         Suspend(original);voice=cameraObject.AddComponent<AudioSource>();voice.spatialBlend=0;voice.playOnAwake=false;CreateOverlay();
+        footsteps = cameraObject.AddComponent<AudioSource>(); footsteps.spatialBlend = 0; footsteps.playOnAwake = false;
         yield return MoveCamera(switchView,.75f);
         yield return Animate(.55f,t=>switchHandle.localRotation=leverOff*Quaternion.Euler(125*t,0,0));
         GameplayAudio.Instance?.SwitchElectrical();
+        AudioManager.Instance?.PlayInterstellar();
         roomLight.enabled=true;if(lampGlow!=null)lampGlow.enabled=true;
         yield return Animate(.7f,t=>roomLight.intensity=Mathf.Lerp(0,180,t));
         GameAchievements.ElectricalRoomPowered();
@@ -149,20 +153,20 @@ public sealed class HangarLaunchSequence : MonoBehaviour
             cinematic.transform.position=windowStart+windowRotation*Vector3.forward*(.32f*t);
             cinematic.transform.rotation=windowRotation*Quaternion.Euler(-1.5f*t,2.5f*t,0);
         });
-        subtitle.text="2...\n<size=25>— No, no, let me out!</size>";Play(twoVoice);if(protestVoice!=null)voice.PlayOneShot(protestVoice);
-        GameplayAudio.Instance?.StartRocket();
+        subtitle.text="2...";dialogue.text="— No, no, let me out!";Play(twoVoice);if(protestVoice!=null)voice.PlayOneShot(protestVoice);
         Vector3 closePosition=cinematic.transform.position;
         Quaternion closeRotation=cinematic.transform.rotation;
         yield return Animate(2.2f,t=>{
             cinematic.transform.position=Vector3.Lerp(closePosition,windowStart,t);
             cinematic.transform.rotation=Quaternion.Slerp(closeRotation,windowRotation*Quaternion.Euler(3,-4,0),t);
         });
-        subtitle.text="1...\n<size=25>— No, no, let me out!</size>";Play(oneVoice);
+        subtitle.text="1...";Play(oneVoice);
         Quaternion lastLook=cinematic.transform.rotation;
         yield return Animate(1.1f,t=>cinematic.transform.rotation=Quaternion.Slerp(lastLook,windowRotation,t));
         var rest=cinematic.transform.localPosition;
         yield return Animate(.8f,t=>{cinematic.transform.localPosition=rest+new Vector3(Mathf.Sin(t*89),Mathf.Sin(t*117),0)*.025f*t;fade.color=new Color(0,0,0,t);});
         subtitle.text="";
+        dialogue.text="";
         if (WorldSaveRuntime.Instance != null) WorldSaveRuntime.Instance.DestinationScene = endingScene;
         SaveSystem.SaveData();
         var load=SceneManager.LoadSceneAsync(endingScene,LoadSceneMode.Single);if(load!=null)yield return load;
@@ -176,6 +180,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
     }
     private IEnumerator WalkToOpening(Transform target, float duration)
     {
+        int lastStep = 0;
         Vector3 start = cinematic.transform.position;
         Quaternion startRotation = cinematic.transform.rotation;
         Vector3 right = cinematic.transform.right;
@@ -189,10 +194,12 @@ public sealed class HangarLaunchSequence : MonoBehaviour
                 Quaternion.Slerp(startRotation, target.rotation, t) * Quaternion.Euler(0, 0, Mathf.Sin(steps) * .2f * envelope));
             float doorProgress = Mathf.SmoothStep(0, 1, Mathf.Clamp01(t * 2.5f));
             rocketDoor.localRotation = hatchClosed * Quaternion.Euler(0, hatchOpenAngle * doorProgress, 0);
+            WalkFootstep(t, ref lastStep);
         });
     }
     private IEnumerator WalkTo(Transform target, float duration)
     {
+        int lastStep = 0;
         Vector3 start = cinematic.transform.position;
         Quaternion startRotation = cinematic.transform.rotation;
         Vector3 right = cinematic.transform.right;
@@ -204,10 +211,12 @@ public sealed class HangarLaunchSequence : MonoBehaviour
                 + Vector3.up * (Mathf.Abs(Mathf.Sin(steps)) * .035f * envelope);
             cinematic.transform.SetPositionAndRotation(Vector3.Lerp(start, target.position, t) + sway,
                 Quaternion.Slerp(startRotation, target.rotation, t) * Quaternion.Euler(0, 0, Mathf.Sin(steps) * .2f * envelope));
+            WalkFootstep(t, ref lastStep);
         });
     }
     private IEnumerator EnterCabin(Transform target, float duration)
     {
+        int lastStep = 0;
         Vector3 start = cinematic.transform.position;
         Quaternion startRotation = cinematic.transform.rotation;
         Vector3 right = cinematic.transform.right;
@@ -215,6 +224,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         {
             float envelope = Mathf.Sin(Mathf.PI * t);
             float steps = t * Mathf.PI * 7f;
+            WalkFootstep(t, ref lastStep);
             Vector3 sway = right * (Mathf.Sin(steps) * .012f * envelope)
                 + Vector3.up * (Mathf.Abs(Mathf.Sin(steps)) * .025f * envelope);
             // One glance to each side, returning naturally to the forward view.
@@ -246,15 +256,24 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         Quaternion from = cinematic.transform.rotation;
         yield return Animate(.45f, t => cinematic.transform.rotation = Quaternion.Slerp(from, center, t));
     }
+    private void WalkFootstep(float progress, ref int lastStep)
+    {
+        int step = Mathf.FloorToInt(progress * 4f + .5f);
+        if (step <= lastStep) return;
+        lastStep = step;
+        if (!IsSeeking && actor != null) actor.GetComponent<PlayerController>()?.PlayCutsceneFootstep(footsteps);
+    }
     private void Play(AudioClip clip){if(clip!=null && !IsSeeking)voice.PlayOneShot(clip);}
     private IEnumerator MoveCamera(Transform target,float duration){var p=cinematic.transform.position;var r=cinematic.transform.rotation;yield return Animate(duration,t=>cinematic.transform.SetPositionAndRotation(Vector3.Lerp(p,target.position,t),Quaternion.Slerp(r,target.rotation,t)));}
     private IEnumerator Animate(float duration,System.Action<float> action) => saveClock.Animate(duration, t => action(Mathf.SmoothStep(0,1,t)));
     private void CreateOverlay()
     {
-        overlay=new GameObject("Launch subtitles",typeof(Canvas),typeof(CanvasScaler));var canvas=overlay.GetComponent<Canvas>();canvas.renderMode=RenderMode.ScreenSpaceOverlay;canvas.sortingOrder=32000;
-        var scaler=overlay.GetComponent<CanvasScaler>();scaler.uiScaleMode=CanvasScaler.ScaleMode.ScaleWithScreenSize;scaler.referenceResolution=new Vector2(1920,1080);
-        var panel=new GameObject("Fade",typeof(RectTransform),typeof(Image));panel.transform.SetParent(overlay.transform,false);fade=panel.GetComponent<Image>();fade.color=Color.clear;fade.raycastTarget=false;var rect=panel.GetComponent<RectTransform>();rect.anchorMin=Vector2.zero;rect.anchorMax=Vector2.one;rect.offsetMin=rect.offsetMax=Vector2.zero;
-        var text=new GameObject("Subtitle",typeof(RectTransform),typeof(Text),typeof(Outline));text.transform.SetParent(overlay.transform,false);subtitle=text.GetComponent<Text>();subtitle.font=Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");subtitle.fontSize=36;subtitle.alignment=TextAnchor.MiddleCenter;subtitle.color=Color.white;subtitle.supportRichText=true;subtitle.raycastTarget=false;rect=text.GetComponent<RectTransform>();rect.anchorMin=new Vector2(.1f,.04f);rect.anchorMax=new Vector2(.9f,.2f);rect.offsetMin=rect.offsetMax=Vector2.zero;
+        var ui = Instantiate(launchUiTemplate);
+        overlay = ui.gameObject;
+        overlay.SetActive(true);
+        fade = ui.fade; fade.color = Color.clear;
+        subtitle = ui.countdown; subtitle.text = "";
+        dialogue = ui.dialogue; dialogue.text = "";
     }
     private void OnDisable()
     {

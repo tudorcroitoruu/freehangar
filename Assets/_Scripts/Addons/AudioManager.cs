@@ -124,7 +124,7 @@ public class AudioManager : MonoBehaviour
         // Keep the current track through scene unloading, including the menu's looping intro.
         // Fill a playlist pause immediately instead of carrying silence into loading.
         if (musicAudioSource != null && musicAudioSource.isPlaying &&
-            (musicMode == MusicMode.Menu || musicMode == MusicMode.Intro || musicMode == MusicMode.Regular)) return;
+            (musicMode == MusicMode.Menu || musicMode == MusicMode.Intro || musicMode == MusicMode.Regular || musicMode == MusicMode.Ending)) return;
         PlayMenuMusic();
     }
 
@@ -177,8 +177,10 @@ public class AudioManager : MonoBehaviour
         musicAudioSource.Play();
     }
 
-    private void PlayInterstellar()
+    public void PlayInterstellar()
     {
+        if (musicMode == MusicMode.Ending && musicAudioSource != null && musicAudioSource.isPlaying &&
+            musicAudioSource.clip == interstellarMusic) return;
         StopMusic();
         musicMode = MusicMode.Ending;
         if (musicAudioSource == null || interstellarMusic == null) return;

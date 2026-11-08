@@ -419,6 +419,22 @@ public class PlayerController : MonoBehaviour
             movementAudioSource.PlayOneShot(clip);
     }
 
+    public void PlayCutsceneFootstep(AudioSource source)
+    {
+        if (source == null || footstepClips == null || footstepClips.Length == 0 ||
+            WorldSaveRuntime.IsSeeking || WorldSaveRuntime.IsRestoring) return;
+        int index = Random.Range(0, footstepClips.Length);
+        if (footstepClips.Length > 1 && index == previousFootstep)
+            index = (index + Random.Range(1, footstepClips.Length)) % footstepClips.Length;
+        previousFootstep = index;
+        if (movementAudioSource != null)
+        {
+            source.outputAudioMixerGroup = movementAudioSource.outputAudioMixerGroup;
+            source.volume = movementAudioSource.volume;
+        }
+        if (footstepClips[index] != null) source.PlayOneShot(footstepClips[index]);
+    }
+
     private void HandleCamera()
     {
         ApplyLook(FarmInput.Look);
