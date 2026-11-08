@@ -5,6 +5,28 @@ using UnityEngine;
 [DefaultExecutionOrder(500)]
 public sealed class GrainPest : MonoBehaviour
 {
+    private static GrainPile[] hangarPiles;
+    private static float nextHangarScan;
+    public static bool IsNearHangar(Vector3 point)
+    {
+        if (hangarPiles == null || Time.unscaledTime >= nextHangarScan)
+        {
+            hangarPiles = FindObjectsByType<GrainPile>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            nextHangarScan = Time.unscaledTime + 1f;
+        }
+        foreach (var pile in hangarPiles)
+        {
+            if (pile == null || pile.IsDroppedPile) continue;
+            GoalContext.Resolve(pile, out int hangar, out _);
+            if (SaveSystem.Data == null || !SaveSystem.Data.IsHangarOpen(hangar)) continue;
+            Vector3 local = pile.transform.InverseTransformPoint(point);
+            float half = pile.Size * .5f;
+            Vector3 nearest = pile.transform.TransformPoint(new Vector3(
+                Mathf.Clamp(local.x, -half, half), local.y, Mathf.Clamp(local.z, -half, half)));
+            if ((point - nearest).sqrMagnitude <= 25f) return true;
+        }
+        return false;
+    }
     public static bool CanAttack(GrainContainer target) => target != null && target.isActiveAndEnabled &&
         !target.IsCarried && float.IsFinite(target.Kilograms) && target.Kilograms > .01f &&
         !PlayerPerks.NoAttacksActive;
@@ -12,7 +34,7 @@ public sealed class GrainPest : MonoBehaviour
     public bool IsCrow { get; private set; }
     public bool IsFeeding => isActiveAndEnabled && feedingNow && !fleeing && !climbing &&
         (IsCrow ? crowPerched : onBag) &&
-        CanAttack(Target) &&
+        CanAttack(Target) && (IsCrow || IsNearHangar(Target.transform.position)) &&
         Target.WorldBounds.SqrDistance(transform.position) <= 1.5f * 1.5f && !PlayerPerks.NoAttacksActive;
     private float nextBite;
     private float speed;
@@ -134,7 +156,7 @@ public sealed class GrainPest : MonoBehaviour
     }
     private void EatFromTarget()
     {
-        if (!CanAttack(Target)) { ScaredAway(); return; }
+        if (!CanAttack(Target) || (!IsCrow && !IsNearHangar(Target.transform.position))) { ScaredAway(); return; }
         if (!IsCrow && !onBag) return;
         if (PlayerPerks.NoAttacksActive || Time.time < nextBite) return;
         Target.ConsumeByPest(biteAmount * (IsCrow ? BirdGroupBite : RatGroupBite));
@@ -222,7 +244,7 @@ public sealed class GrainPest : MonoBehaviour
             if (Time.time >= fleeUntil) Destroy(gameObject);
             return;
         }
-        if (!CanAttack(Target)) { ScaredAway(); return; }
+        if (!CanAttack(Target) || (!IsCrow && !IsNearHangar(Target.transform.position))) { ScaredAway(); return; }
         if (Time.time >= nextIdleSound)
         {
             GameplayAudio.Instance?.PestIdle(IsCrow, transform.position);
@@ -605,6 +627,9 @@ public sealed class GrainPestDirector : MonoBehaviour
         var targets = FindObjectsByType<GrainContainer>(FindObjectsSortMode.None)
             .Where(GrainPest.CanAttack).ToArray();
         if (targets.Length == 0) return;
+        var ratTargets = ratsAvailable ? targets.Where(x => GrainPest.IsNearHangar(x.transform.position)).ToArray()
+            : System.Array.Empty<GrainContainer>();
+        if (ratTargets.Length == 0 && !crowsAvailable) return;
         var vehicleCargo = crowsAvailable ? targets.Where(x =>
         {
             var vehicle = x.GetComponentInParent<BicycleController>();
@@ -612,9 +637,9 @@ public sealed class GrainPestDirector : MonoBehaviour
         }).ToArray() : System.Array.Empty<GrainContainer>();
         // Driving cargo remains eligible even when its colliders are disabled or it is parented to a rack.
         bool attackVehicle = vehicleCargo.Length > 0;
-        var candidates = attackVehicle ? vehicleCargo : targets;
+        bool crow = attackVehicle || (crowsAvailable && (ratTargets.Length == 0 || Random.value < .5f));
+        var candidates = attackVehicle ? vehicleCargo : crow ? targets : ratTargets;
         var target = candidates[Random.Range(0, candidates.Length)];
-        bool crow = attackVehicle || (crowsAvailable && (!ratsAvailable || Random.value < .5f));
         if (crow) Spawn(target, true);
         else SpawnRatGroup(target, false);
     }
@@ -641,6 +666,7 @@ public sealed class GrainPestDirector : MonoBehaviour
     {
         var prefab = crow ? crowPrefab : ratPrefab;
         if (prefab == null || !GrainPest.CanAttack(target)) return null;
+        if (!crow && !GrainPest.IsNearHangar(target.transform.position)) return null;
         Vector3 direction = Random.insideUnitSphere; direction.y = 0; direction = direction.sqrMagnitude < .01f ? Vector3.forward : direction.normalized;
         Vector3 pos = target.transform.position + direction * (crow ? 14f : 8f) + Vector3.up * (crow ? 9f : .15f);
         var go = Instantiate(prefab, pos, Quaternion.identity);

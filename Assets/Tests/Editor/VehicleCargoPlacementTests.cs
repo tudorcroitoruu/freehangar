@@ -170,14 +170,20 @@ public class VehicleCargoPlacementTests
         finally { Object.DestroyImmediate(root); }
     }
 
-    [TestCase(0f, 0f, true)]
-    [TestCase(.5f, 0f, false)]
-    [TestCase(.5f, 1f, false)]
-    [TestCase(1f, 0f, false)]
-    [TestCase(1f, 1f, true)]
-    public void VehicleLoadingRequiresEmptyOrFinishedBag(float fill, float close, bool allowed)
+    [TestCase("FreeBag", 0f, 0f, true)]
+    [TestCase("FreeBag", .5f, 0f, false)]
+    [TestCase("FreeBag", .5f, 1f, false)]
+    [TestCase("FreeBag", 1f, 0f, false)]
+    [TestCase("FreeBag", 1f, 1f, true)]
+    [TestCase("Crate", .5f, 0f, true)]
+    [TestCase("Crate", 1f, 0f, true)]
+    [TestCase("Barrel", .5f, 0f, true)]
+    [TestCase("Barrel", 1f, 0f, true)]
+    [TestCase("BigBag", .5f, 0f, true)]
+    [TestCase("BigBag", 1f, 0f, true)]
+    public void VehicleLoadingAllowsUnfinishedCratesBarrelsAndBigBags(string containerId, float fill, float close, bool allowed)
     {
-        var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/FreeBag.prefab");
+        var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/Prefabs/Gameplay/Containers/{containerId}.prefab");
         var item = Object.Instantiate(prefab);
         var actor = new GameObject("Carrier");
         var slot = new GameObject("Vehicle slot");

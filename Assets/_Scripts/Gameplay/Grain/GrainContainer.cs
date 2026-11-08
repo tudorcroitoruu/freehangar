@@ -83,7 +83,10 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     public bool IsFull => kilograms >= capacityKg - .001f;
     public bool IsFinished => sack != null && sack.Close >= .999f;
     public bool IsEmpty => kilograms <= .001f;
-    public bool CanLoadOnVehicle => !IsClosing && (IsEmpty || (IsFull && (sack == null || IsFinished)));
+    public bool CanLoadOnVehicle => !IsClosing && (IsEmpty || IsBigBag ||
+        string.Equals(CargoTypeId, "Crate", System.StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(CargoTypeId, "Barrel", System.StringComparison.OrdinalIgnoreCase) ||
+        (IsFull && (sack == null || IsFinished)));
     public bool IsClosing { get; private set; }
     public bool IsCarried { get; private set; }
     public bool IsBigBag => string.Equals(CargoTypeId,"BigBag",System.StringComparison.OrdinalIgnoreCase);

@@ -24,6 +24,34 @@ public sealed class ShovelTool : MonoBehaviour
     [SerializeField, Min(.1f)] private float actionDuration = 1.25f;
     [SerializeField] private LayerMask interactionMask = ~0;
     private readonly RaycastHit[] hits = new RaycastHit[32];
+    private readonly RaycastHit[] pourAssistHits = new RaycastHit[32];
+
+    private GrainContainer FindPourContainer(Camera camera, Transform player)
+    {
+        // A direct container hit keeps its normal full/mismatched-grain behavior.
+        if (FindHit(camera, player, out var direct))
+        {
+            var container = direct.collider.GetComponentInParent<GrainContainer>();
+            if (container != null) return container;
+        }
+        Ray ray = PlayerAim.CenterRay(camera);
+        int count = Physics.SphereCastNonAlloc(ray, .35f, pourAssistHits, pourReach,
+            interactionMask, QueryTriggerInteraction.Ignore);
+        if (count == pourAssistHits.Length) return null;
+        GrainContainer best = null;
+        float nearest = float.PositiveInfinity;
+        for (int i = 0; i < count; i++)
+        {
+            var hit = pourAssistHits[i];
+            if (hit.transform.IsChildOf(player) || hit.distance >= nearest) continue;
+            var container = hit.collider.GetComponentInParent<GrainContainer>();
+            if (!CanPourInto(container) || !CanReachPoint(camera, player, container.PourPoint,
+                    pourReach, hit.collider)) continue;
+            best = container;
+            nearest = hit.distance;
+        }
+        return best;
+    }
     private GrainPile pendingPile;
     private bool dropping;
     private Collider dropSurface;
@@ -226,8 +254,7 @@ public sealed class ShovelTool : MonoBehaviour
         if(ActiveVacuum != null && !ActiveVacuum.Emptying)IsBusy=false;
         if (IsBusy || Kilograms <= .0001f || !isActiveAndEnabled || camera == null || player == null ||
             bladeTip == null || transform.parent == null || Time.timeScale <= 0) return false;
-        var targetContainer = FindHit(camera, player, out var pourHit)
-            ? pourHit.collider.GetComponentInParent<GrainContainer>() : null;
+        var targetContainer = FindPourContainer(camera, player);
         if (targetContainer != null && targetContainer.isActiveAndEnabled &&
             targetContainer.HasAssignedGrain && cargo[targetContainer.AcceptedGrain] <= .0001f)
         {
@@ -360,6 +387,11 @@ public sealed class ShovelTool : MonoBehaviour
     public GrainContainer FindBagForHandling(Camera camera, Transform player)
     {
         if (camera == null || player == null) return null;
+        if (Kilograms > .0001f)
+        {
+            var pourTarget = FindPourContainer(camera, player);
+            if (CanPourInto(pourTarget)) return pourTarget;
+        }
         Ray ray = PlayerAim.CenterRay(camera);
         int count = Physics.RaycastNonAlloc(ray, hits, pourReach, interactionMask, QueryTriggerInteraction.Ignore);
         if (count == hits.Length) return null;
@@ -418,7 +450,9 @@ public sealed class ShovelTool : MonoBehaviour
         // limit can leave the blade above low grain when standing, and excavation
         // lowers it further. Neither should require the player to crouch.
         bool scrapeTarget = CanScrapeTarget();
-        if (amount > 0 && actionCamera != null && actor != null && (scrapeTarget || FindHit(actionCamera, actor, out hit)))
+        bool aimedAtContainer = pendingContainer != null && actionCamera != null && actor != null &&
+            FindPourContainer(actionCamera, actor) == pendingContainer;
+        if (amount > 0 && actionCamera != null && actor != null && (aimedAtContainer || scrapeTarget || FindHit(actionCamera, actor, out hit)))
         {
             if (pendingPile != null && phase <= .67f && (scrapeTarget || (hit.collider.GetComponentInParent<GrainPile>() == pendingPile && HasScoopContact())))
             {
@@ -473,7 +507,7 @@ public sealed class ShovelTool : MonoBehaviour
                 if (collected > 0 && grainPhysics != null)
                     grainPhysics.EmitScoop(pendingPile, point, EffectiveScoopRadius, collected / CapacityKg);
             }
-            else if (pendingContainer != null && hit.collider.GetComponentInParent<GrainContainer>() == pendingContainer &&
+            else if (pendingContainer != null && aimedAtContainer &&
                 pendingContainer.isActiveAndEnabled && pendingContainer.IsOpen &&
                 !pendingContainer.IsClosing && !pendingContainer.IsCarried)
             {
