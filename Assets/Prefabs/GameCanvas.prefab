@@ -2637,6 +2637,7 @@ MonoBehaviour:
   broomSprite: {fileID: 21300000, guid: 12f3041d2f5c0bb468b01d9abde5bfbf, type: 3}
   pistolSprite: {fileID: 21300000, guid: 68ff4810f236fc649b47f062ebb81b8b, type: 3}
   swipeImage: {fileID: 9112304624243741742}
+  utilityIconScaleSeconds: 0.2
   toolHintsFadeSeconds: 0.25
   boostersParent: {fileID: 8887181608423940080}
   boosterHandlerPrefab: {fileID: 109275875164959317, guid: d7532332d1202dd4a908cff5ad23bb7e, type: 3}
@@ -23683,6 +23684,7 @@ GameObject:
   - component: {fileID: 8076532928001703941}
   - component: {fileID: 4774270283236368440}
   - component: {fileID: 6527952039220878132}
+  - component: {fileID: 4777423832748561753}
   m_Layer: 5
   m_Name: Compass Bar Mask
   m_TagString: Untagged
@@ -23764,6 +23766,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!114 &4777423832748561753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5253380377602979672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 150, y: 0}
 --- !u!1 &5300650043344157928
 GameObject:
   m_ObjectHideFlags: 0
