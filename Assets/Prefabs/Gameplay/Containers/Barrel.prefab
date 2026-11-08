@@ -285,6 +285,7 @@ MonoBehaviour:
   promptAnchor: {fileID: 0}
   promptOffset: {x: 0, y: -0.2, z: 0}
   palletCollider: {fileID: 0}
+  hudElement: {fileID: 8669059142038341923}
 --- !u!114 &6843274559680828797
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -388,6 +389,27 @@ MonoBehaviour:
   IsInCompassBarRadius: 0
   IsInIndicatorRadius: 0
   IsInMinimapRadius: 0
+--- !u!65 &9000000000000001201
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6691740664109452445}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.7, y: 0.7, z: 0.92}
+  m_Center: {x: 0, y: 0, z: 0.46}
 --- !u!1 &7832400955965419647
 GameObject:
   m_ObjectHideFlags: 0
@@ -497,25 +519,3 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
-
---- !u!65 &9000000000000001201
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6691740664109452445}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.7, y: 0.7, z: 0.92}
-  m_Center: {x: 0, y: 0, z: 0.46}

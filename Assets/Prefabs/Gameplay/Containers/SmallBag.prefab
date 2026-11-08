@@ -90,6 +90,7 @@ MonoBehaviour:
   promptAnchor: {fileID: 0}
   promptOffset: {x: 0, y: 0.12, z: 0}
   palletCollider: {fileID: 0}
+  hudElement: {fileID: 6932614180148041761}
 --- !u!65 &7217535846417915690
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -478,7 +479,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7f7d735edc1e90045b16f4bc22ac33db, type: 2}
+  - {fileID: 2100000, guid: 7bc53afdb3631744fa19a0ae5d5ba9d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

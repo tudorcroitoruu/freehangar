@@ -1,3 +1,4 @@
+using SickscoreGames.HUDNavigationSystem;
 using UnityEngine;
 
 /// <summary>Single-species receiver for sacks, boxes and barrels. Unassigned receivers bind on first fill.</summary>
@@ -46,6 +47,9 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     private Vector3 promptOffset = Vector3.up * .12f;
     private BoxCollider fillCollider;
     [SerializeField, Tooltip("Optional pallet carried and seated with this container.")] private BoxCollider palletCollider;
+
+    [Space, Header("HUD Element")] 
+    [SerializeField] private HUDNavigationElement hudElement;
     public Bounds LocalBounds
     {
         get
@@ -142,6 +146,15 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     }
 
     private void Awake() => RefreshFillPresentation();
+
+    private void OnEnable() => RefreshHudVisibility();
+
+    private void OnTransformParentChanged() => RefreshHudVisibility();
+
+    private void RefreshHudVisibility()
+    {
+        if (hudElement != null) hudElement.enabled = VehicleCargoOwner.Resolve(this) == null;
+    }
 
     /// <summary>Refresh visuals and contact bounds together without depositing grain or awarding progress.</summary>
     public void RefreshFillPresentation()

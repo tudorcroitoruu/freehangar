@@ -57,7 +57,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3da0f01c86f151cd9d43d8e0bc171bb7, type: 2}
+  - {fileID: 2100000, guid: 7bc53afdb3631744fa19a0ae5d5ba9d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -90,8 +90,8 @@ SkinnedMeshRenderer:
   - 0
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -0.0019360036, y: 0.0024540126, z: 0.28009504}
-    m_Extent: {x: 1.3262999, y: 1.4972999, z: 1.306595}
+    m_Center: {x: -0.0019360185, y: 0.0024539828, z: 0.28009504}
+    m_Extent: {x: 0.30099398, y: 0.47199398, z: 0.28128904}
   m_DirtyAABB: 0
 --- !u!1 &3836743703367385037
 GameObject:
@@ -183,8 +183,8 @@ SkinnedMeshRenderer:
   - 0
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -0.0019360036, y: 0.029542387, z: 0.52129835}
-    m_Extent: {x: 1.6877208, y: 1.8868092, z: 1.4558429}
+    m_Center: {x: -0.0019360185, y: 0.029542506, z: 0.52129835}
+    m_Extent: {x: 0.39171654, y: 0.59080505, z: 0.1598385}
   m_DirtyAABB: 0
 --- !u!1 &7210842097477428087
 GameObject:
@@ -276,6 +276,7 @@ MonoBehaviour:
   promptAnchor: {fileID: 0}
   promptOffset: {x: 0, y: 0.12, z: 0}
   palletCollider: {fileID: 0}
+  hudElement: {fileID: 4266988609629847281}
 --- !u!114 &1246728131272513678
 MonoBehaviour:
   m_ObjectHideFlags: 0

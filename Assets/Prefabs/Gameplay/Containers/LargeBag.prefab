@@ -170,7 +170,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6f2e7905eb115a342825255e44360d54, type: 2}
+  - {fileID: 2100000, guid: 7bc53afdb3631744fa19a0ae5d5ba9d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -429,6 +429,7 @@ MonoBehaviour:
   promptAnchor: {fileID: 0}
   promptOffset: {x: 0, y: 0.12, z: 0}
   palletCollider: {fileID: 0}
+  hudElement: {fileID: -6706110695466422771}
 --- !u!65 &2703916515079949562
 BoxCollider:
   m_ObjectHideFlags: 0
