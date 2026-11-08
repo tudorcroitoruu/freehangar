@@ -684,6 +684,22 @@ public sealed class GrainPile : MonoBehaviour
         if (surfaceRenderer != null) surfaceRenderer.SetPropertyBlock(appearance.Block);
     }
 
+    private bool ClearCompletedRemainder()
+    {
+        if (IsDroppedPile || field == null || initialKilograms <= 0) return false;
+        double remaining = Kilograms;
+        if (remaining <= 0 || remaining > initialKilograms * .02) return false;
+        // Completion cleanup is not harvested grain: don't grant cargo, sales or collection rewards.
+        spatial?.RestoreSave(new List<GrainColumnSave>());
+        System.Array.Clear(field.Heights, 0, field.Heights.Length);
+        if (visualField != null) System.Array.Clear(visualField.Heights, 0, visualField.Heights.Length);
+        settling = visualSettling = surfaceRefreshPending = false;
+        RefreshSurface();
+        RefreshCollider();
+        RefreshGrainAppearance();
+        return true;
+    }
+
     private void LateUpdate()
     {
         if (field == null || !Application.isPlaying) return;
@@ -695,6 +711,7 @@ public sealed class GrainPile : MonoBehaviour
         if (surfaceRefreshPending)
         {
             spatial?.ReconcileHeights();
+            spatial?.ConsolidateThinRemnants(WorldScale);
             surfaceRefreshPending = false;
             visualSettling = true;
             colliderDirty = true;
@@ -737,6 +754,7 @@ public sealed class GrainPile : MonoBehaviour
         if (field == null || Time.deltaTime <= 0) return;
         if (!IsDroppedPile && !WorldSaveRuntime.IsRestoring && SaveSystem.savesLoaded && SaveSystem.Data != null)
         {
+            ClearCompletedRemainder();
             float cleared = ClearedPercent;
             if (clearanceProfile != SaveSystem.Data || cleared > reportedClearance)
             {
@@ -1284,7 +1302,9 @@ public sealed class GrainPile : MonoBehaviour
         }
         foreach (int vertex in closedSurfaceTriangles) collisionIndices.Add(surfaceNormalIndices[vertex]);
         bool changed = cookedVertices.Count != collisionVertices.Count || cookedIndices.Count != collisionIndices.Count;
-        float tolerance = (animating ? .025f : .001f) / Mathf.Max(.0001f, WorldScale.y);
+        // Thin visible remnants are only millimetres high; a 2.5 cm tolerance
+        // leaves their collider underground after the render surface has risen.
+        float tolerance = .001f / Mathf.Max(.0001f, WorldScale.y);
         for (int i = 0; i < collisionVertices.Count && !changed; i++)
             changed = Mathf.Abs(collisionVertices[i].y - cookedVertices[i].y) >= tolerance ||
                 collisionVertices[i].x != cookedVertices[i].x || collisionVertices[i].z != cookedVertices[i].z;

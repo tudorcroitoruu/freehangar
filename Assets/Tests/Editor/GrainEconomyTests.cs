@@ -4,6 +4,58 @@ using UnityEngine;
 
 public class GrainEconomyTests
 {
+    [TestCase(49d, false)]
+    [TestCase(50d, true)]
+    [TestCase(100d, true)]
+    public void HangarCleanupClearsOnlyFinalTwoPercent(double initialMultiplier, bool expected)
+    {
+        pile.ConfigureRegions(new[] { new GrainRegion(100, GrainType.Rice) });
+        double remaining = pile.Kilograms;
+        Set("initialKilograms", remaining * initialMultiplier);
+        double harvested = pile.HarvestedKg;
+        bool cleared = (bool)typeof(GrainPile).GetMethod("ClearCompletedRemainder",
+            BindingFlags.Instance | BindingFlags.NonPublic).Invoke(pile, null);
+        Assert.AreEqual(expected, cleared);
+        Assert.That(pile.Kilograms, Is.EqualTo(expected ? 0 : remaining).Within(.000001));
+        Assert.That(pile.HarvestedKg, Is.EqualTo(harvested));
+        if (expected)
+        {
+            Assert.That(pile.GrainKilograms(GrainType.Rice), Is.Zero);
+            Assert.That(pile.ClearedPercent, Is.EqualTo(100));
+            Assert.IsFalse(root.GetComponent<MeshCollider>().enabled);
+        }
+    }
+
+    [Test]
+    public void ThinRemnantsMergeWithoutLosingEitherCropAndRemainCollectible()
+    {
+        var field = new GrainHeightField(9, 2, 0);
+        var spatial = new GrainSpatialField(field, new[] { new GrainRegion(100, GrainType.Rice) },
+            GrainSpatialField.Arrangement.FrontToBack, 0, 1);
+        try
+        {
+            var corn = new float[GrainCargo.TypeCount]; corn[(int)GrainType.Corn] = 1;
+            var rice = new float[GrainCargo.TypeCount]; rice[(int)GrainType.Rice] = 1;
+            spatial.RestoreSave(new System.Collections.Generic.List<GrainColumnSave>
+            {
+                new GrainColumnSave { index = 40, volume = .001, weights = corn },
+                new GrainColumnSave { index = 41, volume = .002, weights = rice }
+            });
+            spatial.ReconcileHeights();
+            Assert.IsTrue(spatial.ConsolidateThinRemnants(Vector3.one));
+            Assert.That(field.Heights[40], Is.Zero);
+            Assert.That(field.Heights[41], Is.GreaterThan(.04f));
+            Assert.That(spatial.VolumeOf(GrainType.Corn), Is.EqualTo(.001).Within(1e-10));
+            Assert.That(spatial.VolumeOf(GrainType.Rice), Is.EqualTo(.002).Within(1e-10));
+            var filter = new GrainCargo(); filter.Add(GrainType.Corn, 1);
+            var cargo = new GrainCargo();
+            Assert.That(spatial.CollectMatching(0, 0, 1, Vector3.one, filter, 1, cargo, 1),
+                Is.EqualTo(.001).Within(1e-10));
+            Assert.That(spatial.VolumeOf(GrainType.Rice), Is.EqualTo(.002).Within(1e-10));
+        }
+        finally { spatial.Dispose(); }
+    }
+
     [TestCase(.0001f)]
     [TestCase(.001f)]
     [TestCase(.02f)]

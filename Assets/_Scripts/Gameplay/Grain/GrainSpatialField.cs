@@ -154,6 +154,41 @@ public sealed class GrainSpatialField
         field.Heights[cell] = (float)(volume / area);
     }
 
+    public bool ConsolidateThinRemnants(Vector3 metric)
+    {
+        bool changed = false;
+        int n = field.Resolution;
+        for (int cell = 0; cell < columns.Length; cell++)
+        {
+            float height = field.Heights[cell];
+            if (columns[cell].Count == 0 || field.AreaAt(cell) <= 0 || height * metric.y > .045f) continue;
+            int x = cell % n, z = cell / n, target = -1;
+            float bestHeight = height;
+            // Adjacent occupied cells only: never pull stock across the whole hangar.
+            for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++)
+            {
+                int nx = x + dx, nz = z + dz;
+                if (nx < 0 || nx >= n || nz < 0 || nz >= n || (dx == 0 && dz == 0)) continue;
+                if (new Vector2(dx * field.Spacing * metric.x, dz * field.Spacing * metric.z).sqrMagnitude > 2.25f) continue;
+                int candidate = nz * n + nx;
+                if (columns[candidate].Count == 0 || field.AreaAt(candidate) <= 0) continue;
+                float candidateHeight = field.Heights[candidate];
+                if (candidateHeight < bestHeight || (candidateHeight == bestHeight && candidate >= cell)) continue;
+                target = candidate; bestHeight = candidateHeight;
+            }
+            if (target < 0) continue;
+            // Transfer complete typed strata, preserving the amount of every crop.
+            foreach (var segment in columns[cell]) Push(target, segment.volume, segment.weights);
+            columns[cell].Clear();
+            sortedCrop[cell] = -1;
+            SyncHeight(cell); SyncHeight(target);
+            field.AcceptExcavatedHeight(cell);
+            changed = true;
+        }
+        dirty |= changed;
+        return changed;
+    }
+
     public GrainSpatialField(GrainHeightField field, GrainRegion[] regions, Arrangement arrangement, float waviness, int seed, Vector2? sectionCenter = null, float sectionRotation = 0)
     {
         this.field = field;
