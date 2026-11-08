@@ -222,6 +222,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5738549280797780337}
     m_Modifications:
+    - target: {fileID: 8210142, guid: 4b21d8abf8d26b449b109c8edb5cc78a, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8210142, guid: 4b21d8abf8d26b449b109c8edb5cc78a, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 131070, guid: 4b21d8abf8d26b449b109c8edb5cc78a, type: 3}
       propertyPath: m_Name
       value: Engine exhaust VFX
