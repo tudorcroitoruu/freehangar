@@ -8,6 +8,30 @@ using Object=UnityEngine.Object;
 
 public class GrainInteractionPerformanceTests
 {
+    [Test]
+    public void ExcavatedRiceRetainsRiceAppearanceWithoutRetainingStock()
+    {
+        var field = new GrainHeightField(9, 4, 1, (x, z) => 1);
+        var spatial = new GrainSpatialField(field, new[] { new GrainRegion(100, GrainType.Rice) },
+            GrainSpatialField.Arrangement.FrontToBack, 0, 731);
+        try
+        {
+            var block = new MaterialPropertyBlock();
+            spatial.Bind(block, root.transform);
+            spatial.PreviewClear(100);
+            spatial.Bind(block, root.transform);
+            var riceMap = (Texture2D)block.GetTexture("_GrainMapB");
+            var cornMap = (Texture2D)block.GetTexture("_GrainMapA");
+            Assert.That(riceMap.GetPixel(4, 4).g, Is.EqualTo(1).Within(.001));
+            Assert.That(cornMap.GetPixel(4, 4).r, Is.Zero);
+            Assert.That(spatial.VolumeOf(GrainType.Rice), Is.Zero);
+            var cargo = new GrainCargo();
+            spatial.Sample(0, 0, cargo);
+            Assert.That(cargo.Total, Is.Zero);
+        }
+        finally { spatial.Dispose(); }
+    }
+
     private const BindingFlags Private=BindingFlags.Instance|BindingFlags.NonPublic;
     private delegate bool HeightSample(float x,float z,out float height);
     private GameObject root;

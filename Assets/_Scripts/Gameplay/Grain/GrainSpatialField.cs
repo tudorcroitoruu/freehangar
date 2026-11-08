@@ -483,6 +483,10 @@ public sealed class GrainSpatialField
             for (int i = 0; i < columns.Length; i++)
             {
                 var stack = columns[i]; var w = stack.Count > 0 ? stack[stack.Count-1].weights : null;
+                // Excavated mesh triangles can still cover an empty column. Retain its
+                // last visible crop instead of zeroing the map (the shader's corn fallback).
+                // These pixels are presentation only; collection still reads columns.
+                if (w == null) continue;
                 for (int channel = 0; channel < 3; channel++)
                 {
                     Color color = Color.clear;
