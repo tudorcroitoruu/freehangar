@@ -68,7 +68,7 @@ public class Pause : MonoBehaviour
 
     private void PauseForFocusLoss()
     {
-        if (!Application.isPlaying || !isActiveAndEnabled || MenuManager.IsMenuOpen || LoadingScreen.IsLoading ||
+        if (Application.isEditor || !Application.isPlaying || !isActiveAndEnabled || MenuManager.IsMenuOpen || LoadingScreen.IsLoading ||
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "Gameplay") return;
         PauseGameplay(true);
     }
