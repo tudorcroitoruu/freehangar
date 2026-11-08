@@ -68,6 +68,8 @@ public class ShopProduct : MonoBehaviour, IInteractable
     [SerializeField] private DeliveryMode deliveryMode = DeliveryMode.Hands;
     [SerializeField, Tooltip("Required when Delivery Mode is At Spawn Point.")]
     private Transform spawnPoint;
+    [SerializeField, Tooltip("Additional delivery positions relative to the spawn point, in its local axes (metres).")]
+    private Vector3[] additionalSpawnOffsets = System.Array.Empty<Vector3>();
 
     [SerializeField] private GameObject objectSpawnHolder;
     [SerializeField, Tooltip("Delivery clearance box in spawn point local axes. Keep its bottom above the floor.")]
@@ -114,11 +116,25 @@ public class ShopProduct : MonoBehaviour, IInteractable
 
     private Vector3 SpawnAreaCenter => spawnPoint.position + spawnPoint.rotation * spawnAreaOffset;
 
-    private bool IsSpawnAreaClear()
+    private bool IsSpawnAreaClear() => TryFindDeliveryPosition(out _);
+
+    private bool TryFindDeliveryPosition(out Vector3 position)
     {
+        position = default;
         if (spawnPoint == null) return false;
         Physics.SyncTransforms();
-        int count = Physics.OverlapBoxNonAlloc(SpawnAreaCenter, SpawnAreaHalfSize, spawnOverlaps,
+        for (int slot = 0; slot <= additionalSpawnOffsets.Length; slot++)
+        {
+            var offset = slot == 0 ? Vector3.zero : additionalSpawnOffsets[slot - 1];
+            position = spawnPoint.position + spawnPoint.rotation * offset;
+            if (IsDeliveryPositionClear(position)) return true;
+        }
+        return false;
+    }
+
+    private bool IsDeliveryPositionClear(Vector3 position)
+    {
+        int count = Physics.OverlapBoxNonAlloc(position + spawnPoint.rotation * spawnAreaOffset, SpawnAreaHalfSize, spawnOverlaps,
             spawnPoint.rotation, spawnBlockingLayers, QueryTriggerInteraction.Ignore);
         // A full buffer may omit a blocker, so treat it as occupied.
         if (count == spawnOverlaps.Length) return false;
@@ -134,7 +150,10 @@ public class ShopProduct : MonoBehaviour, IInteractable
     private void RefreshSpawnHolder()
     {
         if (objectSpawnHolder == null) return;
-        bool visible = !Locked && deliveryMode == DeliveryMode.AtSpawnPoint && IsSpawnAreaClear();
+        // The authored marker belongs to the original slot, not the overflow positions.
+        Physics.SyncTransforms();
+        bool visible = !Locked && deliveryMode == DeliveryMode.AtSpawnPoint && spawnPoint != null &&
+            IsDeliveryPositionClear(spawnPoint.position);
         if (objectSpawnHolder.activeSelf != visible) objectSpawnHolder.SetActive(visible);
     }
 
@@ -148,6 +167,11 @@ public class ShopProduct : MonoBehaviour, IInteractable
         Gizmos.DrawCube(Vector3.zero, SpawnAreaHalfSize * 2f);
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireCube(Vector3.zero, SpawnAreaHalfSize * 2f);
+        foreach (var offset in additionalSpawnOffsets)
+        {
+            Gizmos.matrix = Matrix4x4.TRS(SpawnAreaCenter + spawnPoint.rotation * offset, spawnPoint.rotation, Vector3.one);
+            Gizmos.DrawWireCube(Vector3.zero, SpawnAreaHalfSize * 2f);
+        }
         Gizmos.matrix = Matrix4x4.identity;
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(spawnPoint.position, .1f);
@@ -229,13 +253,13 @@ public class ShopProduct : MonoBehaviour, IInteractable
     {
         var prefab = ProductPrefab;
         if (prefab == null) return false;
-        if (deliveryMode == DeliveryMode.AtSpawnPoint && !IsSpawnAreaClear())
+        var position = spawnPoint != null ? spawnPoint.position : transform.position;
+        if (deliveryMode == DeliveryMode.AtSpawnPoint && !TryFindDeliveryPosition(out position))
         {
             if (spawnPoint != null) GameplayCanvas.Instance?.ShowWarning(WarningType.OccupiedArea);
             return false;
         }
-        var point = spawnPoint != null ? spawnPoint : transform;
-        var instance = Instantiate(prefab, point.position, prefab.transform.rotation);
+        var instance = Instantiate(prefab, position, prefab.transform.rotation);
         if (instance == null) return false;
         // Track the purchased scene object; a failed handoff unregisters it below.
         var registration = inventoryManager.RegisterInstance(instance, productID, maxActiveInScene);

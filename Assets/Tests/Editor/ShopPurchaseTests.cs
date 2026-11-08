@@ -5,6 +5,41 @@ using UnityEngine;
 public class ShopPurchaseTests
 {
     [Test]
+    public void ThreeDeliverySlotsFillIndependentlyAndReuseVacatedSpace()
+    {
+        var previousData = SaveSystem.Data;
+        var root = new GameObject("Multiple delivery slots");
+        root.transform.SetPositionAndRotation(new Vector3(20000, 300, 20000), Quaternion.Euler(0, 35, 0));
+        var manager = root.AddComponent<InventoryManager>();
+        var prefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        prefab.transform.position = root.transform.position + Vector3.right * 20;
+        try
+        {
+            SaveSystem.Data = new PlayerData { cash = 500 };
+            var shop = root.AddComponent<ShopProduct>();
+            ConfigureShop(shop, manager, prefab);
+            SetShopField(shop, "additionalSpawnOffsets", new[] { Vector3.forward * 1.8f, Vector3.back * 1.8f });
+            for (int i = 0; i < 3; i++) Assert.IsTrue(shop.TryInteract(null));
+            Assert.AreEqual(3, manager.SpawnedProducts.Count);
+            Assert.AreEqual(200, SaveSystem.Money);
+            Assert.IsFalse(shop.TryInteract(null), "All three occupied slots must block another purchase.");
+            Assert.AreEqual(200, SaveSystem.Money);
+            var releasedPosition = manager.SpawnedProducts[1].transform.position;
+            manager.SpawnedProducts[1].transform.position += Vector3.up * 10;
+            Assert.IsTrue(shop.TryInteract(null));
+            Assert.That(Vector3.Distance(releasedPosition, manager.SpawnedProducts[3].transform.position), Is.LessThan(.001f));
+            Assert.AreEqual(100, SaveSystem.Money);
+        }
+        finally
+        {
+            DestroyDeliveredProducts(manager);
+            Object.DestroyImmediate(prefab);
+            Object.DestroyImmediate(root);
+            SaveSystem.Data = previousData;
+        }
+    }
+
+    [Test]
     public void OccupiedSpawnAreaBlocksPaymentAndHolderReturnsAfterCargoLeaves()
     {
         var previousData = SaveSystem.Data;

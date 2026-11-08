@@ -3493,6 +3493,9 @@ MonoBehaviour:
   objectPrefab: {fileID: 1521085326205624577, guid: e081f75f0718b8f418e7a58f44bd497e, type: 3}
   deliveryMode: 1
   spawnPoint: {fileID: 2099837709319181489}
+  additionalSpawnOffsets:
+  - {x: 0, y: 0, z: 1.8}
+  - {x: 0, y: 0, z: -1.8}
   objectSpawnHolder: {fileID: 5725461765521348851}
   spawnAreaSize: {x: 1.5, y: 2, z: 1.5}
   spawnAreaOffset: {x: 0, y: 1, z: 0}
