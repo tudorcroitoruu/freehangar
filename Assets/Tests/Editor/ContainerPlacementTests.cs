@@ -5,6 +5,44 @@ using UnityEngine;
 
 public class ContainerPlacementTests
 {
+    [TestCase("Barrel")]
+    [TestCase("BigBag")]
+    public void DroppedContainerRestoresSolidContacts(string prefabName)
+    {
+        var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/Prefabs/Gameplay/Containers/" + prefabName + ".prefab");
+        var instance = Object.Instantiate(prefab, origin, prefab.transform.rotation);
+        objects.Add(instance);
+        var container = instance.GetComponent<GrainContainer>();
+        container.RefreshFillPresentation();
+        var box = instance.GetComponent<BoxCollider>();
+        Assert.IsNotNull(box, "Portable containers need a solid root collider.");
+        Assert.That(box.size.sqrMagnitude, Is.GreaterThan(.01f));
+        var body = instance.AddComponent<Rigidbody>();
+        body.isKinematic = true;
+        body.detectCollisions = false;
+        container.SetCarried(true);
+        foreach (var collider in instance.GetComponentsInChildren<Collider>()) collider.enabled = false;
+        container.SetCarried(false);
+        Assert.IsTrue(box.enabled);
+        Assert.IsFalse(box.isTrigger);
+        Assert.IsTrue(body.detectCollisions);
+        if (prefabName == "BigBag")
+        {
+            var pallet = (BoxCollider)typeof(GrainContainer).GetField("palletCollider",
+                BindingFlags.Instance | BindingFlags.NonPublic).GetValue(container);
+            Assert.IsTrue(pallet.enabled);
+            Assert.IsFalse(pallet.isTrigger);
+        }
+        else
+        {
+            Bounds empty = new Bounds(box.center, box.size);
+            container.Add(container.CapacityKg);
+            Assert.That(box.center, Is.EqualTo(empty.center));
+            Assert.That(box.size, Is.EqualTo(empty.size), "Rigid barrel bounds must not shrink with fill.");
+        }
+    }
+
     private readonly List<GameObject> objects = new List<GameObject>();
     private readonly Vector3 origin = new Vector3(10000, 10000, 10000);
     private Camera view;

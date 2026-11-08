@@ -46,7 +46,7 @@ public sealed class ForkliftController : MonoBehaviour
     private readonly RaycastHit[] groundHits=new RaycastHit[32];
     private string blocked="";
     private float blockedUntil;
-    public static bool CanLift(GrainContainer bag) => bag!=null && bag.isActiveAndEnabled && bag.IsBigBag && !bag.IsCarried;
+    public static bool CanLift(GrainContainer bag) => bag!=null && bag.isActiveAndEnabled && bag.IsBigBag && !bag.IsCarried && !bag.IsUnderAttack;
     private void Awake(){rig=GetComponent<BicycleController>();vehicleColliders=GetComponentsInChildren<Collider>(true);}
     private bool AcceptInput => rig!=null && rig.IsRidden && Time.timeScale>0 && Application.isFocused && Cursor.lockState==CursorLockMode.Locked && !UpgradeManager.BlocksGameplayInput && !UIPopups.BasePopupUI.HasActivePopup;
     private void Update()

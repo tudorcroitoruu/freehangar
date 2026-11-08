@@ -5,6 +5,17 @@ using UnityEngine;
 [DefaultExecutionOrder(500)]
 public sealed class GrainPest : MonoBehaviour
 {
+    private static readonly System.Collections.Generic.HashSet<GrainPest> activePests = new();
+
+    public static bool IsAttacking(GrainContainer container)
+    {
+        if (container == null) return false;
+        foreach (var pest in activePests)
+            if (pest != null && pest.Target == container && pest.IsFeeding) return true;
+        return false;
+    }
+
+    private void OnEnable() => activePests.Add(this);
     private static GrainPile[] hangarPiles;
     private static float nextHangarScan;
     public static bool IsNearHangar(Vector3 point)
@@ -388,7 +399,11 @@ public sealed class GrainPest : MonoBehaviour
         warningCanvas = null;
     }
 
-    private void OnDisable() => ClearWarning();
+    private void OnDisable()
+    {
+        activePests.Remove(this);
+        ClearWarning();
+    }
 
     private IEnumerator PlayFlyAwaySound()
     {

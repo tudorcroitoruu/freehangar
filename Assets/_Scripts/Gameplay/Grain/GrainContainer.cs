@@ -92,7 +92,8 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     public bool IsBigBag => string.Equals(CargoTypeId,"BigBag",System.StringComparison.OrdinalIgnoreCase);
     public bool RequiresForklift => IsBigBag && kilograms > .001f;
     public bool CanBeCarried => canBeCarried && !RequiresForklift;
-    public bool CanCarry => CanBeCarried && isActiveAndEnabled && !IsCarried && !IsClosing;
+    public bool IsUnderAttack => GrainPest.IsAttacking(this);
+    public bool CanCarry => CanBeCarried && isActiveAndEnabled && !IsCarried && !IsClosing && !IsUnderAttack;
     public bool CanHandle => isActiveAndEnabled && sack != null && IsFull && !IsCarried;
 
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
@@ -147,6 +148,28 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     {
         if (sack == null) sack = GetComponent<SackController>();
         fillCollider = GetComponent<BoxCollider>();
+        // The barrel is rigid: its contact shape follows the wooden shell, not the fill level.
+        if (string.Equals(CargoTypeId, "Barrel", System.StringComparison.OrdinalIgnoreCase))
+        {
+            if (fillCollider == null) fillCollider = gameObject.AddComponent<BoxCollider>();
+            fitFillCollider = false;
+            bool found = false;
+            Bounds shell = default;
+            foreach (var mesh in GetComponentsInChildren<MeshFilter>())
+            {
+                if (mesh.sharedMesh == null) continue;
+                Bounds bounds = mesh.sharedMesh.bounds;
+                for (int i = 0; i < 8; i++)
+                {
+                    Vector3 corner = bounds.center + Vector3.Scale(bounds.extents,
+                        new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
+                    Vector3 point = transform.InverseTransformPoint(mesh.transform.TransformPoint(corner));
+                    if (!found) { shell = new Bounds(point, Vector3.zero); found = true; }
+                    else shell.Encapsulate(point);
+                }
+            }
+            if (found) { fillCollider.center = shell.center; fillCollider.size = shell.size; }
+        }
         kilograms = Mathf.Clamp(kilograms, 0, capacityKg);
         ApplyFill();
     }
@@ -212,7 +235,16 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
         return removed;
     }
 
-    public void SetCarried(bool carried) => IsCarried = carried;
+    public void SetCarried(bool carried)
+    {
+        IsCarried = carried;
+        if (carried) return;
+        // Cargo handling temporarily disables contacts. Never release a container without support.
+        var box = GetComponent<BoxCollider>();
+        if (box != null) { box.enabled = true; box.isTrigger = false; }
+        if (palletCollider != null) { palletCollider.enabled = true; palletCollider.isTrigger = false; }
+        if (TryGetComponent<Rigidbody>(out var body)) body.detectCollisions = true;
+    }
 
     public void EmptyAfterPour()
     {

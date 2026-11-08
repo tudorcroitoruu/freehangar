@@ -209,6 +209,7 @@ GameObject:
   - component: {fileID: 6843274559680828797}
   - component: {fileID: 5943660098369467857}
   - component: {fileID: 8669059142038341923}
+  - component: {fileID: 9000000000000001201}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Untagged
@@ -270,7 +271,7 @@ MonoBehaviour:
   restrictGrain: 0
   acceptedGrain: 0
   sack: {fileID: 3753997636445200847}
-  fitFillCollider: 1
+  fitFillCollider: 0
   emptyBounds:
     m_Center: {x: -0.0025382042, y: 0.0026249588, z: 0.12185541}
     m_Extent: {x: 0.33007455, y: 0.28323984, z: 0.12185541}
@@ -496,3 +497,25 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+
+--- !u!65 &9000000000000001201
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6691740664109452445}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.7, y: 0.7, z: 0.92}
+  m_Center: {x: 0, y: 0, z: 0.46}

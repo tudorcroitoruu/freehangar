@@ -141,7 +141,7 @@ public sealed class GameplayAudio : MonoBehaviour
 
     public void PestIdle(bool crow, Vector3 point) => PlayAt(crow ? crowsIdle : ratIdle, point, crow ? .35f : .28f);
     public void PestHit(bool crow, Vector3 point) => PlayAt(crow ? Choose(crowHits) : ratHit, point, .8f);
-    public void CrowFlyAway(Vector3 point) => PlayAt(crowFlyAway, point, .65f);
+    public void CrowFlyAway(Vector3 point) => PlayAt(crowFlyAway, point, .65f / 1.5f);
     public void BroomHit() => Play(Choose(broomHits), .75f);
     public void SwitchInstruments() => Play(switchInstruments, .8f);
     public void ToolSwing() => Play(hitAir, .75f);
