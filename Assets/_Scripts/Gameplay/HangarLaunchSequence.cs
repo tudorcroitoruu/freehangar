@@ -62,9 +62,21 @@ public sealed class HangarLaunchSequence : MonoBehaviour
             if(BypassRestrictions || DoorOpen)return true;
             if(hangar==null||!hangar.IsUnlocked||clearancePoint==null)return false;
             foreach(var pile in FindObjectsByType<GrainPile>(FindObjectsSortMode.None))
-                if(pile.IsInsideBoundary(clearancePoint.position)&&pile.SurfaceHeight(clearancePoint.position)>clearancePoint.position.y+.15f)return false;
+                if (GrainBlocksDoorway(pile, clearancePoint.position)) return false;
             return true;
         }
+    }
+    public static bool GrainBlocksDoorway(GrainPile pile, Vector3 point)
+    {
+        if (pile == null || !pile.isActiveAndEnabled) return false;
+        pile.Initialize();
+        Vector3 local = pile.transform.InverseTransformPoint(point);
+        float half = pile.Size * .5f;
+        if (Mathf.Abs(local.x) > half || Mathf.Abs(local.z) > half || !pile.IsInsideBoundary(point)) return false;
+        // SurfaceHeight includes the pile's world base and underlying floor, even
+        // for an empty cell. Only actual grain can obstruct the doorway.
+        float thickness = pile.SampleLocalHeight(local.x, local.z) * Mathf.Abs(pile.WorldScale.y);
+        return thickness > .01f && pile.SurfaceHeight(point) > point.y + .15f;
     }
     public bool UseDoor()
     {

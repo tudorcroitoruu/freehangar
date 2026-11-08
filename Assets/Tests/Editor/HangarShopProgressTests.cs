@@ -27,8 +27,18 @@ public class HangarShopProgressTests
             typeof(HangarKeyDoor).GetProperty("IsUnlocked").SetValue(sequence.hangar, true);
             Assert.Greater(pile.Kilograms, 5);
             Assert.IsTrue(sequence.CanOpen, "Grain elsewhere must not lock the final room.");
+            pileObject.transform.position += Vector3.up * 10;
+            Assert.IsTrue(sequence.CanOpen, "An unrelated elevated pile base must not block the door.");
+            pileObject.transform.position -= Vector3.up * 10;
             sequence.clearancePoint.position = pileObject.transform.position;
             Assert.IsFalse(sequence.CanOpen, "Clearing once must not bypass newly blocking grain.");
+            var field = (GrainHeightField)typeof(GrainPile).GetField("field", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(pile);
+            var heights = (float[])field.Heights.Clone();
+            System.Array.Clear(field.Heights, 0, field.Heights.Length);
+            sequence.clearancePoint.position -= Vector3.up;
+            Assert.IsTrue(sequence.CanOpen, "An empty pile above the clearance marker is not grain obstruction.");
+            System.Array.Copy(heights, field.Heights, heights.Length);
+            sequence.clearancePoint.position += Vector3.up;
             sequence.clearancePoint.position += Vector3.right * 100;
             Assert.IsTrue(sequence.CanOpen);
         }

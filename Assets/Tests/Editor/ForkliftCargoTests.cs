@@ -4,6 +4,39 @@ using UnityEngine;
 
 public class ForkliftCargoTests
 {
+    [Test]
+    public void RecoveryTriggerReturnsFallenBagWithItsContentsIntact()
+    {
+        var item = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        var floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        var trigger = new GameObject("Below-map recovery test");
+        try
+        {
+            floor.transform.position = new Vector3(27000, 999.9f, 27000);
+            floor.transform.localScale = new Vector3(6, .2f, 6);
+            item.transform.position = new Vector3(27000, 1000.5f, 27000);
+            var bag = item.AddComponent<GrainContainer>();
+            bag.SetDemonstrationFill(GrainType.Rice, 40);
+            var before = JsonUtility.ToJson(bag.CaptureSave());
+            var body = item.AddComponent<Rigidbody>();
+            var recovery = item.AddComponent<CargoFallRecovery>();
+            recovery.RememberSupport(new Vector3(27000, 1000, 27000));
+            item.transform.position += Vector3.down * 100;
+            body.linearVelocity = Vector3.down * 100;
+            var volume = trigger.AddComponent<CargoRecoveryVolume>();
+            Physics.SyncTransforms();
+            typeof(CargoRecoveryVolume).GetMethod("OnTriggerEnter", System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.NonPublic).Invoke(volume, new object[] { item.GetComponent<Collider>() });
+            Assert.That(bag.WorldBounds.min.y, Is.EqualTo(1000.04f).Within(.01f));
+            Assert.AreEqual(Vector3.zero, body.linearVelocity);
+            Assert.AreEqual(CollisionDetectionMode.ContinuousDynamic, body.collisionDetectionMode);
+            Assert.AreEqual(before, JsonUtility.ToJson(bag.CaptureSave()));
+            bag.SetCarried(true);
+            Assert.IsFalse(recovery.Recover(), "Held cargo must not be teleported.");
+        }
+        finally { Object.DestroyImmediate(item); Object.DestroyImmediate(floor); Object.DestroyImmediate(trigger); }
+    }
+
     [TestCase("BigBag", true)]
     [TestCase("SmallBag", false)]
     [TestCase("LargeBag", false)]

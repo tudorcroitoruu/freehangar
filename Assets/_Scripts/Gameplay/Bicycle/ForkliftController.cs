@@ -341,6 +341,7 @@ public sealed class ForkliftController : MonoBehaviour
         Quaternion startRotation = bag.transform.rotation;
         if(bag.TryGetComponent<VehicleCargoPlacement>(out var placement))placement.ReleaseScale();
         cargo=bag;cargoBody=bag.GetComponent<Rigidbody>();if(cargoBody==null)cargoBody=bag.gameObject.AddComponent<Rigidbody>();
+        cargoBody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         cargoBody.isKinematic=true;cargoBody.useGravity=false;cargoColliders=bag.GetComponentsInChildren<Collider>(true);
         originalColliderStates=new bool[cargoColliders.Length];for(int i=0;i<cargoColliders.Length;i++)originalColliderStates[i]=cargoColliders[i].enabled;
         foreach (var collider in cargoColliders) collider.enabled = false;
@@ -369,11 +370,12 @@ public sealed class ForkliftController : MonoBehaviour
         Vector3 origin=new Vector3(bounds.center.x,bounds.max.y+.3f,bounds.center.z);
         int count=Physics.RaycastNonAlloc(origin,Vector3.down,groundHits,4f,~0,QueryTriggerInteraction.Ignore);
         float nearest=float.PositiveInfinity;
+        Vector3 supportPoint = default;
         for(int i=0;i<count;i++)
         {
             var hit=groundHits[i];if(Ignore(hit.collider) || hit.normal.y<.7f || hit.distance>=nearest)continue;
             if(hit.point.y>bounds.min.y+.02f)return false;
-            nearest=hit.distance;found=true;
+            nearest=hit.distance;found=true;supportPoint=hit.point;
         }
         if(!found || count==groundHits.Length)return false;
         count=Physics.OverlapBoxNonAlloc(center,half*.98f,overlaps,Quaternion.identity,~0,QueryTriggerInteraction.Ignore);
@@ -383,7 +385,12 @@ public sealed class ForkliftController : MonoBehaviour
         foreach(var own in vehicleColliders)foreach(var other in cargoColliders)if(own!=null && other!=null)Physics.IgnoreCollision(own,other,false);
         for(int i=0;i<cargoColliders.Length;i++)if(cargoColliders[i]!=null)cargoColliders[i].enabled=originalColliderStates[i];
         lastDropped=bag;bag.SetCarried(false);cargoBody.mass=Mathf.Max(1,bag.Kilograms+1);cargoBody.useGravity=true;cargoBody.isKinematic=false;
+        cargoBody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        cargoBody.linearVelocity = Vector3.zero;
+        cargoBody.angularVelocity = Vector3.zero;
         cargoBody.constraints=RigidbodyConstraints.FreezeRotationX|RigidbodyConstraints.FreezeRotationZ;
+        bag.GetComponent<CargoFallRecovery>()?.RememberSupport(supportPoint);
+        cargoBody.WakeUp();
         cargo=null;cargoBody=null;cargoColliders=null;originalColliderStates=null;Physics.SyncTransforms();GameAchievements.ForkliftDelivered(bag);GameplayAudio.Instance?.Drop();return true;
     }
     private bool Ignore(Collider collider) => collider==null || collider.transform.IsChildOf(transform) || (cargo!=null && collider.transform.IsChildOf(cargo.transform));

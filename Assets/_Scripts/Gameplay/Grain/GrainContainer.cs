@@ -166,7 +166,11 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
         }
     }
 
-    private void Awake() => RefreshFillPresentation();
+    private void Awake()
+    {
+        RefreshFillPresentation();
+        if (Application.isPlaying && GetComponent<CargoFallRecovery>() == null) gameObject.AddComponent<CargoFallRecovery>();
+    }
 
     private void OnEnable() => RefreshHudVisibility();
 
