@@ -27,7 +27,8 @@ public enum WarningType
     weighingEmpty,
     weighingWrong,
     cannotLoadInWheelbarrow,
-    needKeyForChest
+    needKeyForChest,
+    hangarLocked
 }
 public class WarningPopup : MonoBehaviour
 {
@@ -149,6 +150,12 @@ public class WarningPopup : MonoBehaviour
             requests.Find(request => request.type == type)?.source is BuriedFind chest)
         {
             if (warningMessage != null) warningMessage.text = chest.ChestKeyHint;
+            return;
+        }
+        if (type == WarningType.hangarLocked &&
+            requests.Find(request => request.type == type)?.source is HangarKeyDoor door)
+        {
+            if (warningMessage != null) warningMessage.text = door.KeyHint;
             return;
         }
         if (warningMessage != null) warningMessage.text = preset != null ? preset.message : "";

@@ -18,6 +18,7 @@ public sealed class HangarKeyDoor : MonoBehaviour, IInteractable
     public Vector3 EntrancePosition => leftDoor != null && rightDoor != null ? (leftDoor.position + rightDoor.position) * .5f : transform.position;
     public bool IsUnlocked { get; private set; }
     public string KeyId => KeyFor(hangarNumber);
+    public string KeyHint => $"Find its {KeyColor(hangarNumber)} key in the Hangar {hangarNumber - 1}";
     public static string KeyFor(int number) => "farm.hangar.key." + number;
     public static string KeyColor(int number) => number == 2 ? "orange" : number == 3 ? "blue" : number == 4 ? "green" : "gold";
     private void Awake()
