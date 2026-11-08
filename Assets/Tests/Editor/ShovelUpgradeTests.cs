@@ -5,6 +5,22 @@ using UnityEngine.UI;
 
 public class ShovelUpgradeTests
 {
+    [TestCase(.00001f, 0f)]
+    [TestCase(.049f, 0f)]
+    [TestCase(.05f, .05f)]
+    [TestCase(1f, 1f)]
+    public void EndingVacuumActionClearsOnlyTinyResidue(float amount, float expected)
+    {
+        var shovel = root.AddComponent<ShovelTool>();
+        var vacuumObject = new GameObject("Vacuum residue test");
+        vacuumObject.transform.SetParent(root.transform);
+        vacuumObject.AddComponent<VacuumTool>();
+        shovel.Cargo.Add(GrainType.Rice, amount);
+        Assert.IsTrue(shovel.IsVacuum);
+        shovel.CancelAction();
+        Assert.That(shovel.Kilograms, Is.EqualTo(expected).Within(.000001f));
+    }
+
     [TestCase(GrainType.Rice)]
     [TestCase(GrainType.Wheat)]
     [TestCase(GrainType.Soybeans)]

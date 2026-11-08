@@ -130,6 +130,7 @@ public sealed class VacuumTool : MonoBehaviour
         if (!motorRunning) nextIntakeSound = clock;
         suctionBlend=Mathf.MoveTowards(suctionBlend,Sucking?1:0,dt*6);
         shownFill=Emptying ? Mathf.Clamp01(tool.Kilograms/tool.CapacityKg) : Mathf.MoveTowards(shownFill,Mathf.Clamp01(tool.Kilograms/tool.CapacityKg),dt*2);
+        if (tool.Kilograms <= 0f) shownFill = 0f;
         appearance.Set(tool.Cargo);UpdateFill(shownFill);UpdateParticles(dt);
     }
     private void Emit(Vector3 from,Vector3 to,bool pour,int count,GrainCargo grain)

@@ -415,6 +415,7 @@ public sealed class ShovelTool : MonoBehaviour
         {
             if(deltaTime>0)ActiveVacuum.Tick(this,deltaTime);
             IsBusy=ActiveVacuum.Emptying || ActiveVacuum.Sucking;
+            if (!IsBusy) ClearTinyRemainder();
             return;
         }
         if (!IsBusy) ClearTinyRemainder();
@@ -568,6 +569,9 @@ public sealed class ShovelTool : MonoBehaviour
     {
         float fraction = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(VacuumTool.PourStart, VacuumTool.PourEnd, phase));
         float maximum = Mathf.Max(0, availableAtStart * fraction - transferredFraction);
+        // At the end, transfer the actual remaining cargo instead of subtracting
+        // accumulated float increments from the initial amount.
+        if (fraction >= 1f) maximum = Kilograms;
         if (maximum <= 0) return 0;
         float before=Kilograms;
         if(pendingContainer!=null)
@@ -747,7 +751,7 @@ public sealed class ShovelTool : MonoBehaviour
     {
         if(vacuums!=null)foreach(var vacuum in vacuums)if(vacuum!=null)vacuum.Cancel();
         IsBusy = queued = dropping = smallPileScoop = false;
-        if (!IsVacuum) ClearTinyRemainder();
+        ClearTinyRemainder();
         dropSurface = null;
         pendingPile = null; pendingContainer = null;
         PositionOffset = Vector3.zero;
