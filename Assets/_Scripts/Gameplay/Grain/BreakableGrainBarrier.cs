@@ -11,6 +11,8 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
     [SerializeField] private Material material;
     [SerializeField, Min(1)] private int hitsRequired = 3;
     [SerializeField] private GrainPile coveringPile;
+    [SerializeField] private Transform promptAnchor;
+    [SerializeField] private Vector3 promptOffset = Vector3.up * .5f;
 
     [SerializeField] private bool alwaysExposed;
     // Legacy scene copies used the same IDs for the wood and metal enclosures.
@@ -72,7 +74,7 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
     {
         Bounds bounds = new Bounds(transform.position, Vector3.zero);
         bool first = true;
-        foreach (Renderer visual in visuals)
+        foreach (Renderer visual in visuals ?? GetComponentsInChildren<Renderer>(true))
         {
             if (visual == null) continue;
             if (first) { bounds = visual.bounds; first = false; }
@@ -94,12 +96,30 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
         if (!isActiveAndEnabled || !exposed || IsBroken) return false;
         string label = material == Material.Wood ? "Wooden Wall" : "Metal Wall";
         Bounds bounds = VisualBounds();
-        prompt = new InteractionPromptData(new Vector3(bounds.center.x, bounds.max.y + .15f, bounds.center.z), label, false);
+        Vector3 origin = promptAnchor != null ? promptAnchor.position :
+            new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
+        prompt = new InteractionPromptData(origin + promptOffset, label, false);
         prompt.RequiredTool = material == Material.Wood ? PlayerCombatTools.Tool.Axe : PlayerCombatTools.Tool.Hammer;
         return true;
     }
 
     public bool TryInteract(PlayerInteractor interactor) => false;
+
+    private void OnDrawGizmosSelected()
+    {
+        Bounds bounds = VisualBounds();
+        Vector3 origin = promptAnchor != null ? promptAnchor.position :
+            new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
+        Vector3 position = origin + promptOffset;
+        Color previousColor = Gizmos.color;
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(origin, position);
+        Gizmos.DrawWireSphere(position, .08f);
+        Gizmos.color = previousColor;
+#if UNITY_EDITOR
+        UnityEditor.Handles.Label(position + Vector3.up * .12f, "Barrier prompt (promptOffset)");
+#endif
+    }
 
     public bool AcceptsTool(PlayerCombatTools.Tool tool) => material == Material.Wood ? tool == PlayerCombatTools.Tool.Axe : tool == PlayerCombatTools.Tool.Hammer;
 
