@@ -865,7 +865,8 @@ public sealed class GrainPestDirector : MonoBehaviour
                 building.transform.right * (i == 0 ? -2f : 2f);
             go.SetActive(true);
             var bag = go.GetComponent<GrainContainer>();
-            bag.SetDemonstrationFill(GrainType.Rice, bag.CapacityKg * .5f);
+            // Match the oats at Hangar 3's entrance so the lesson bags can be topped up nearby.
+            bag.SetDemonstrationFill(GrainType.Oats, bag.CapacityKg * .5f);
             preparedRatBags[i] = bag;
             SpawnRatGroup(bag, true);
         }
