@@ -8,6 +8,7 @@ public sealed class InteractionPrompt : MonoBehaviour
 {
     [SerializeField] private RectTransform panel;
     [SerializeField] private RectTransform canvasRect;
+    [SerializeField] private Image buttonImageBg;
     [SerializeField] private TMP_Text description;
     [SerializeField] private TMP_Text descriptionTwo;
     [SerializeField] private TMP_Text keycap;
@@ -28,6 +29,7 @@ public sealed class InteractionPrompt : MonoBehaviour
     {
         public RectTransform panel;
         public TMP_Text description, secondaryDescription, key;
+        public Image buttonBackground;
         public GameObject mouse, progress;
         public Image progressFill;
         public Text progressText;
@@ -63,6 +65,7 @@ public sealed class InteractionPrompt : MonoBehaviour
         Vector3 screen = camera.WorldToScreenPoint(data.Position);
         if (screen.z <= 0 || screen.x < 0 || screen.x > Screen.width || screen.y < 0 || screen.y > Screen.height) { Hide(); return; }
         if (!panel.gameObject.activeSelf) panel.gameObject.SetActive(true);
+        if (buttonImageBg != null) buttonImageBg.enabled = !FarmInput.UsingPad;
         CurrentText = data.Action;
         if (keyBackground == null && keycap != null)
         {
@@ -111,6 +114,7 @@ public sealed class InteractionPrompt : MonoBehaviour
                 if (row.progress != null) row.progress.SetActive(false);
                 continue;
             }
+            if (row.buttonBackground != null) row.buttonBackground.enabled = !FarmInput.UsingPad;
             var action = data.AdditionalActions[i];
             if (row.description != null) row.description.text = action.Action;
             if (row.secondaryDescription != null)
@@ -150,6 +154,8 @@ public sealed class InteractionPrompt : MonoBehaviour
             if (secondary != null) secondary.gameObject.SetActive(false);
             foreach (var controller in clone.GetComponentsInChildren<InteractionPrompt>(true)) controller.enabled = false;
             var row = new ActionRow { panel = clone };
+            var buttonBackground = CopyOf(buttonImageBg != null ? buttonImageBg.transform : null, panel, clone);
+            row.buttonBackground = buttonBackground != null ? buttonBackground.GetComponent<Image>() : null;
             row.secondaryDescription = secondary != null ? secondary.GetComponent<TMP_Text>() : null;
             var text = CopyOf(description != null ? description.transform : null, panel, clone);
             var key = CopyOf(keycap != null ? keycap.transform : null, panel, clone);
