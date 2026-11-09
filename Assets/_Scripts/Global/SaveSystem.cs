@@ -731,6 +731,7 @@ public class SettingsData
     public int displayIndex = -1;
     public string displayName;
     public bool vSync;
+    public bool dlss;
     public int frameRateIndex = 3;
     public int qualityIndex = -1;
 

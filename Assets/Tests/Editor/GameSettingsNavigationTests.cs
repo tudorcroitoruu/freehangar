@@ -37,7 +37,7 @@ public class GameSettingsNavigationTests
             sections[i] = new GameObject("Section " + i);
             sections[i].transform.SetParent(root.transform);
         }
-        video = MakeRows(sections[0], 5, out videoMarkers);
+        video = MakeRows(sections[0], 6, out videoMarkers);
         audio = MakeRows(sections[1], 3, out audioMarkers);
         master = MakeSlider(sections[1]); music = MakeSlider(sections[1]); sfx = MakeSlider(sections[1]);
         sensitivity = MakeSlider(sections[2]);
@@ -90,6 +90,22 @@ public class GameSettingsNavigationTests
         root.SetActive(false);
         root.SetActive(true);
         AssertSelection(videoMarkers, 0);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void DLSSRowFollowsVSyncAndOnlyEnablesOnSupportedHardware(bool stick)
+    {
+        manager.ShowSection(0); // EditMode does not invoke the runtime OnEnable lifecycle.
+        for (int i = 0; i < 3; i++) Send(Direction(Vector2.down, stick));
+        Send(Direction(Vector2.down, stick));
+        AssertSelection(videoMarkers, 4);
+        Send(Direction(Vector2.right, stick));
+        Assert.AreEqual(GameSettingsManager.IsDLSSSupported, SaveSystem.settingsData.dlss);
+        Send(Direction(Vector2.left, stick));
+        Assert.IsFalse(SaveSystem.settingsData.dlss);
+        Send(Direction(Vector2.down, stick));
+        AssertSelection(videoMarkers, 5);
     }
 
     [TestCase(false)]

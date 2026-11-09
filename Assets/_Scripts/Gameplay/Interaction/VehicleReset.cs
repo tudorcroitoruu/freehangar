@@ -165,7 +165,15 @@ public sealed class VehicleReset : MonoBehaviour
             else bounds.Encapsulate(collider.bounds);
         }
         if (!found) return false;
-        Vector3 offset = bounds.center - transform.position;
+        return TryFindPlacement(bounds, transform.position, homePosition, transform, vehicle, false, out position);
+    }
+
+    public static bool TryFindPlacement(Bounds bounds, Vector3 origin, Vector3 fallback,
+        Transform ignoredRoot, BicycleController vehicle, bool requireOutsideHangars, out Vector3 position)
+    {
+        Physics.SyncTransforms();
+        position = origin;
+        Vector3 offset = bounds.center - origin;
         Vector3 extents = bounds.extents + new Vector3(.5f, 0f, .5f);
         for (int source = 0; source < 2; source++)
         for (int ring = 0; ring <= 20; ring++)
@@ -174,26 +182,27 @@ public sealed class VehicleReset : MonoBehaviour
             for (int i = 0; i < samples; i++)
             {
                 float angle = i * Mathf.PI * 2f / samples;
-                Vector3 center = (source == 0 ? transform.position : homePosition) + offset +
+                Vector3 center = (source == 0 ? origin : fallback) + offset +
                     new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * ring;
-                if (!TryResetGround(center, out float ground)) continue;
+                if (!TryResetGround(center, ignoredRoot, out float ground)) continue;
                 center.y = ground + extents.y + .1f;
                 // Reset teleports rather than driving through the movement guard.
                 // Reject the whole vehicle footprint, including partial doorway overlap.
-                if (vehicle != null && HangarVehicleAccess.BlocksPlacement(new Bounds(center, extents * 2f), vehicle)) continue;
+                if ((vehicle != null || requireOutsideHangars) && HangarVehicleAccess.BlocksPlacement(
+                    new Bounds(center, extents * 2f), vehicle, requireOutsideHangars)) continue;
                 bool clear = true;
                 for (int corner = 0; corner < 4; corner++)
                 {
                     Vector3 probe = center + new Vector3((corner & 1) == 0 ? -extents.x : extents.x,
                         0f, (corner & 2) == 0 ? -extents.z : extents.z);
-                    if (!TryResetGround(probe, out float height) || Mathf.Abs(height - ground) > .15f)
+                    if (!TryResetGround(probe, ignoredRoot, out float height) || Mathf.Abs(height - ground) > .15f)
                     { clear = false; break; }
                 }
                 if (!clear) continue;
                 foreach (var obstacle in Physics.OverlapBox(center, extents, Quaternion.identity,
                              ~0, QueryTriggerInteraction.Ignore))
                 {
-                    if (obstacle.transform.IsChildOf(transform)) continue;
+                    if (ignoredRoot != null && obstacle.transform.IsChildOf(ignoredRoot)) continue;
                     clear = false; break;
                 }
                 if (!clear) continue;
@@ -204,14 +213,14 @@ public sealed class VehicleReset : MonoBehaviour
         return false;
     }
 
-    private bool TryResetGround(Vector3 point, out float height)
+    private static bool TryResetGround(Vector3 point, Transform ignoredRoot, out float height)
     {
         height = float.NaN;
         float nearest = float.PositiveInfinity;
         foreach (var hit in Physics.RaycastAll(point + Vector3.up * 3f, Vector3.down, 8f,
                      ~0, QueryTriggerInteraction.Ignore))
         {
-            if (hit.transform.IsChildOf(transform) || hit.distance >= nearest) continue;
+            if ((ignoredRoot != null && hit.transform.IsChildOf(ignoredRoot)) || hit.distance >= nearest) continue;
             nearest = hit.distance;
             height = hit.normal.y >= .9f ? hit.point.y : float.NaN;
         }

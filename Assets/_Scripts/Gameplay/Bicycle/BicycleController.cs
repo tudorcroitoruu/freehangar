@@ -558,13 +558,13 @@ public static class HangarVehicleAccess
         nextScan = Time.time + 2f;
     }
 
-    public static bool BlocksPlacement(Bounds footprint, BicycleController vehicle)
+    public static bool BlocksPlacement(Bounds footprint, BicycleController vehicle, bool requireOutsideHangars = false)
     {
-        if (SmallVehicleMayEnter(vehicle)) return false;
+        if (!requireOutsideHangars && SmallVehicleMayEnter(vehicle)) return false;
         RefreshHangars();
         foreach (var hangar in hangars)
         {
-            if (hangar == null || IsCleared(hangar)) continue;
+            if (hangar == null || (!requireOutsideHangars && IsCleared(hangar))) continue;
             Bounds local = default;
             for (int i = 0; i < 8; i++)
             {

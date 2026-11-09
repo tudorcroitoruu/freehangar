@@ -1,4 +1,3 @@
-// DLSS integration is temporarily commented out for future implementation.
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -41,6 +40,12 @@ public class GameSettingsManager : MonoBehaviour
 
     [Header("VIDEO - VSync")]
     [SerializeField] private Toggle vSyncToggle;
+
+    [Header("VIDEO - DLSS")]
+    [SerializeField] private Toggle dlssToggle;
+    [SerializeField] private Text dlssStatusText;
+    public static bool IsDLSSSupported => HDDynamicResolutionPlatformCapabilities.DLSSDetected;
+    private bool displayedDLSSSupport;
 
     [Header("VIDEO - Frame Rate")]
     [SerializeField] private Button previousFrameRateButton;
@@ -94,7 +99,9 @@ public class GameSettingsManager : MonoBehaviour
     private static float originalLodBias;
     private static Volume runtimeQualityVolume;
     private static VolumeProfile runtimeQualityProfile;
-    private static readonly Dictionary<HDAdditionalCameraData, bool> originalDynamicResolutionStates = new();
+    private static readonly Dictionary<HDAdditionalCameraData, (bool dynamicResolution, bool dlss)> originalDynamicResolutionStates = new();
+    private static bool requestedDLSS, appliedDLSSSupport;
+    private static float activeRenderScale = 1f;
     public static HDRenderPipelineAsset ActiveRenderPipeline => runtimePipeline;
     private int QualityPresetCount => qualityPresets?.Length ?? 0;
 
@@ -220,6 +227,7 @@ public class GameSettingsManager : MonoBehaviour
 
     private void Update()
     {
+        if (initialized && displayedDLSSSupport != IsDLSSSupported) UpdateVideoValues();
         RefreshJoystickHints();
         EnsureInitialSettingsSelection();
         if (rebindOperation != null && Gamepad.current?.startButton.wasPressedThisFrame == true) CancelRebinding();
@@ -607,7 +615,8 @@ public class GameSettingsManager : MonoBehaviour
                 case 1: ChangeDisplay(direction); break;
                 case 2: ChangeResolution(direction); break;
                 case 3: OnVSyncChanged(direction > 0); break;
-                case 4: ChangeQuality(direction); break;
+                case 4: OnDLSSChanged(direction > 0); break;
+                case 5: ChangeQuality(direction); break;
             }
         }
         else if (navigationSection == 1)
@@ -828,6 +837,7 @@ public class GameSettingsManager : MonoBehaviour
         if (nextQualityButton) nextQualityButton.onClick.AddListener(NextQuality);
 
         if (vSyncToggle) vSyncToggle.onValueChanged.AddListener(OnVSyncChanged);
+        if (dlssToggle) dlssToggle.onValueChanged.AddListener(OnDLSSChanged);
 
 //         if (upscalingDropdown != null)
 //             upscalingDropdown.onValueChanged.AddListener(
@@ -880,6 +890,7 @@ public class GameSettingsManager : MonoBehaviour
         if (nextQualityButton) nextQualityButton.onClick.RemoveListener(NextQuality);
 
         if (vSyncToggle) vSyncToggle.onValueChanged.RemoveListener(OnVSyncChanged);
+        if (dlssToggle) dlssToggle.onValueChanged.RemoveListener(OnDLSSChanged);
 
 //         if (upscalingDropdown != null)
 //             upscalingDropdown.onValueChanged.RemoveListener(
@@ -1032,6 +1043,20 @@ public class GameSettingsManager : MonoBehaviour
 
     #region VSync
 
+    private void OnDLSSChanged(bool enabled)
+    {
+        if (!initialized || settings == null || (enabled && !IsDLSSSupported))
+        {
+            UpdateVideoValues();
+            return;
+        }
+        if (settings.dlss == enabled) return;
+        settings.dlss = enabled;
+        ApplyQuality();
+        UpdateVideoValues();
+        settingsChanged = true;
+    }
+
     public void EnableVSync() => OnVSyncChanged(true);
     public void DisableVSync() => OnVSyncChanged(false);
 
@@ -1143,17 +1168,11 @@ public class GameSettingsManager : MonoBehaviour
         var pipelineSettings = runtimePipeline.currentPlatformRenderPipelineSettings;
         pipelineSettings.msaaSampleCount = (MSAASamples)(int)preset.msaa;
         pipelineSettings.supportSSAO = preset.screenSpaceAmbientOcclusion;
-        var dynamicResolution = pipelineSettings.dynamicResolutionSettings;
-        // These presets use spatial resolution scaling, not temporal reconstruction.
-        // HDRP defaults to STP and can run it even at 100%, causing trails during walking.
-        // Replace the list instead of clearing it: the cloned asset can share nested lists.
-        dynamicResolution.advancedUpscalerNames = new List<string>();
-        dynamicResolution.upsampleFilter = DynamicResUpscaleFilter.CatmullRom;
-        dynamicResolution.enabled = preset.renderScale < 1f;
-        dynamicResolution.dynResType = DynamicResolutionType.Software;
-        dynamicResolution.forceResolution = true;
-        dynamicResolution.forcedPercentage = Mathf.Clamp(preset.renderScale, 0.25f, 1f) * 100f;
-        pipelineSettings.dynamicResolutionSettings = dynamicResolution;
+        requestedDLSS = settings.dlss;
+        activeRenderScale = preset.renderScale;
+        appliedDLSSSupport = IsDLSSSupported;
+        pipelineSettings.dynamicResolutionSettings = ConfigureUpscaling(pipelineSettings.dynamicResolutionSettings,
+            activeRenderScale, requestedDLSS, appliedDLSSSupport);
         var shadows = pipelineSettings.hdShadowInitParams;
         int shadowResolution = Mathf.NextPowerOfTwo(Mathf.Clamp(preset.shadowResolution, 256, 4096));
         shadows.maxDirectionalShadowMapResolution = shadowResolution;
@@ -1174,16 +1193,45 @@ public class GameSettingsManager : MonoBehaviour
         QualitySettings.lodBias = Mathf.Clamp(preset.lodBias, 0.1f, 4f);
     }
 
+    public static GlobalDynamicResolutionSettings ConfigureUpscaling(GlobalDynamicResolutionSettings options,
+        float renderScale, bool requested, bool supported)
+    {
+        bool dlss = requested && supported;
+        float percentage = Mathf.Clamp(renderScale, .25f, 1f) * 100f;
+        // Replace nested lists, which can be shared with the authored pipeline asset.
+        options.advancedUpscalerNames = dlss ? new List<string> { "DLSS" } : new List<string>();
+        options.upsampleFilter = DynamicResUpscaleFilter.CatmullRom;
+        options.enabled = dlss || percentage < 100f;
+        options.dynResType = DynamicResolutionType.Software;
+        options.forceResolution = !dlss;
+        options.forcedPercentage = percentage;
+        options.minPercentage = dlss ? 25f : percentage;
+        options.maxPercentage = dlss ? 100f : percentage;
+        options.DLSSUseOptimalSettings = true;
+        options.DLSSPerfQualitySetting = 1; // NVIDIA DLSSQuality.Balanced.
+        return options;
+    }
+
     private static void EnableDynamicResolution(ScriptableRenderContext context, List<Camera> cameras)
     {
+        // HDRP can finish detecting the GPU after the inactive settings page initializes.
+        if (runtimePipeline && appliedDLSSSupport != IsDLSSSupported)
+        {
+            appliedDLSSSupport = IsDLSSSupported;
+            var pipelineSettings = runtimePipeline.currentPlatformRenderPipelineSettings;
+            pipelineSettings.dynamicResolutionSettings = ConfigureUpscaling(pipelineSettings.dynamicResolutionSettings,
+                activeRenderScale, requestedDLSS, appliedDLSSSupport);
+            runtimePipeline.currentPlatformRenderPipelineSettings = pipelineSettings;
+        }
         foreach (var camera in cameras)
         {
             if (camera.cameraType != CameraType.Game ||
                 !camera.TryGetComponent<HDAdditionalCameraData>(out var cameraData))
                 continue;
             if (!originalDynamicResolutionStates.ContainsKey(cameraData))
-                originalDynamicResolutionStates.Add(cameraData, cameraData.allowDynamicResolution);
+                originalDynamicResolutionStates.Add(cameraData, (cameraData.allowDynamicResolution, cameraData.allowDeepLearningSuperSampling));
             cameraData.allowDynamicResolution = true;
+            cameraData.allowDeepLearningSuperSampling = requestedDLSS && appliedDLSSSupport;
         }
     }
 
@@ -1235,9 +1283,14 @@ public class GameSettingsManager : MonoBehaviour
         foreach (var entry in originalDynamicResolutionStates)
         {
             if (entry.Key)
-                entry.Key.allowDynamicResolution = entry.Value;
+            {
+                entry.Key.allowDynamicResolution = entry.Value.dynamicResolution;
+                entry.Key.allowDeepLearningSuperSampling = entry.Value.dlss;
+            }
         }
         originalDynamicResolutionStates.Clear();
+        requestedDLSS = appliedDLSSSupport = false;
+        activeRenderScale = 1f;
         if (runtimeQualityVolume) Destroy(runtimeQualityVolume.gameObject);
         if (runtimeQualityProfile)
         {
@@ -1735,6 +1788,13 @@ public class GameSettingsManager : MonoBehaviour
             vSyncToggle.SetIsOnWithoutNotify(settings.vSync);
             vSyncToggle.interactable = initialized;
         }
+        displayedDLSSSupport = IsDLSSSupported;
+        if (dlssToggle)
+        {
+            dlssToggle.SetIsOnWithoutNotify(settings.dlss && displayedDLSSSupport);
+            dlssToggle.interactable = initialized && displayedDLSSSupport;
+        }
+        if (dlssStatusText) dlssStatusText.text = !displayedDLSSSupport ? "Requires NVIDIA RTX" : settings.dlss ? "Balanced" : "Off";
 
         int resolutionCount = availableResolutions?.Length ?? 0;
         if (resolutionValueText && settings.resolutionIndex >= 0 && settings.resolutionIndex < resolutionCount)
@@ -1810,6 +1870,7 @@ public class GameSettingsManager : MonoBehaviour
         settings.displayIndex = defaults.displayIndex;
         settings.displayName = defaults.displayName;
         settings.vSync = defaults.vSync;
+        settings.dlss = defaults.dlss;
         settings.frameRateIndex = defaults.frameRateIndex;
         settings.qualityIndex = defaults.qualityIndex;
 //         settings.upscalingMode = defaults.upscalingMode;

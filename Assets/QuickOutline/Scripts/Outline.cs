@@ -180,6 +180,9 @@ public class Outline : MonoBehaviour {
     foreach (var meshFilter in GetComponentsInChildren<MeshFilter>()) {
 
       // Skip if smooth normals have already been adopted
+      // Runtime warning outlines also cover props without precomputed/readable meshes.
+      // Their shader falls back to vertex normals instead of trying to read CPU mesh data.
+      if (meshFilter.sharedMesh == null || !meshFilter.sharedMesh.isReadable) continue;
       if (!registeredMeshes.Add(meshFilter.sharedMesh)) {
         continue;
       }
@@ -203,6 +206,7 @@ public class Outline : MonoBehaviour {
     foreach (var skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>()) {
 
       // Skip if UV3 has already been reset
+      if (skinnedMeshRenderer.sharedMesh == null || !skinnedMeshRenderer.sharedMesh.isReadable) continue;
       if (!registeredMeshes.Add(skinnedMeshRenderer.sharedMesh)) {
         continue;
       }

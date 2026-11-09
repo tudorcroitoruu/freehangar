@@ -173,6 +173,29 @@ public sealed class VehicleUpgrade : MonoBehaviour
         next.vehicleId = profile.id;
         next.spawnedAssembly = instance;
         next.enabled = true;
+        if (VehicleId == "motoroller" && HangarVehicleAccess.BlocksPlacement(
+                new Bounds(transform.position, Vector3.zero), bicycle, true))
+        {
+            // Renderer local bounds remain valid while the replacement is staged inactive.
+            // Include the whole assembly so a trailer or cargo bed also clears the doorway.
+            Bounds footprint = new Bounds(instance.transform.position, Vector3.zero);
+            foreach (var renderer in instance.GetComponentsInChildren<Renderer>(true))
+            {
+                if (!renderer.enabled || !(renderer is MeshRenderer || renderer is SkinnedMeshRenderer)) continue;
+                Bounds local = renderer.localBounds;
+                for (int i = 0; i < 8; i++)
+                    footprint.Encapsulate(renderer.transform.TransformPoint(local.center + Vector3.Scale(local.extents,
+                        new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1))));
+            }
+            if (!VehicleReset.TryFindPlacement(footprint, instance.transform.position, instance.transform.position,
+                    AssemblyRoot.transform, rideable, true, out var outside))
+            {
+                ReleaseObject(staging);
+                next = null;
+                return false;
+            }
+            instance.transform.position = outside;
+        }
         if (GetComponent<VehicleUpgradeInteractable>() != null && rideable.GetComponent<VehicleUpgradeInteractable>() == null)
             rideable.gameObject.AddComponent<VehicleUpgradeInteractable>();
         instance.transform.SetParent(AssemblyRoot.transform.parent, true);

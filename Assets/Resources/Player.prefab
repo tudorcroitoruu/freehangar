@@ -193,7 +193,7 @@ MonoBehaviour:
   flipYMode: 0
   xrRendering: 1
   fullscreenPassthrough: 0
-  allowDynamicResolution: 0
+  allowDynamicResolution: 1
   customRenderingSettings: 0
   invertFaceCulling: 0
   probeLayerMask:
@@ -2236,7 +2236,7 @@ MonoBehaviour:
   flipYMode: 0
   xrRendering: 1
   fullscreenPassthrough: 0
-  allowDynamicResolution: 0
+  allowDynamicResolution: 1
   customRenderingSettings: 0
   invertFaceCulling: 0
   probeLayerMask:
@@ -2825,6 +2825,9 @@ MonoBehaviour:
   cameraMinAngle: -70
   cameraMaxAngle: 80
   lookSmoothTime: 0.06
+  grainCameraSmoothTime: 0.2
+  grainStepHeight: 0.55
+  grainSlopeLimit: 65
   sprintCameraHeight: 0.004166667
   sprintCameraPitch: 0.15625
   sprintStepFrequency: 2.6

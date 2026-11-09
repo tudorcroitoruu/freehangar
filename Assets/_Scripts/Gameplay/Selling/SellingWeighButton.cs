@@ -19,6 +19,7 @@ public sealed class SellingWeighButton : MonoBehaviour, IInteractable
         if (!isActiveAndEnabled || sellingZone == null || !sellingZone.isActiveAndEnabled || interactor == null ||
             UpgradeManager.BlocksGameplayInput || UIPopups.BasePopupUI.HasActivePopup) return false;
         bool wrong = sellingZone.HasBlockingOccupants || sellingZone.Contains(interactor);
+        if (wrong) sellingZone.PingBlockers();
         sellingZone.CollectContainers(containers);
         bool empty = !wrong && containers.Count == 0;
         bool ready = !wrong && !empty && sellingZone.CanWeigh(interactor);

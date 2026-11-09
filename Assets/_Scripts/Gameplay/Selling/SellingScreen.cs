@@ -65,7 +65,7 @@ public class SellingScreen : MonoBehaviour
     private void Update()
     {
         if (!IsOpen) return;
-        if (!Zone.CanWeigh(player)) { Close(); return; }
+        if (!Zone.CanWeigh(player)) { Zone.PingBlockers(); Close(); return; }
         if (!Application.isFocused || UIPopups.BasePopupUI.HasActivePopup) return;
         if (FarmInput.Down("Secondary") || Input.GetKeyDown(KeyCode.Return)) { Sell(); return; }
         if (FarmInput.Back) Close();
@@ -140,7 +140,8 @@ public class SellingScreen : MonoBehaviour
 
     public void Sell()
     {
-        if (saleInProgress || !IsOpen || !Zone.CanWeigh(player) || UIPopups.BasePopupUI.HasActivePopup) return;
+        if (saleInProgress || !IsOpen || UIPopups.BasePopupUI.HasActivePopup) return;
+        if (!Zone.CanWeigh(player)) { Zone.PingBlockers(); return; }
         if (!QuoteMatches()) { Refresh(); return; }
         if (!CanPay()) return;
         // Lock before AddMoney: its callbacks can invoke Sell again in the same frame.

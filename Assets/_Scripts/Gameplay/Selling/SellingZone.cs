@@ -12,6 +12,10 @@ public class SellingZone : MonoBehaviour
     private readonly List<GrainContainer> weighableContainers = new List<GrainContainer>();
     private GrainContainer[] knownContainers;
     private float nextContainerScan;
+    private readonly List<Transform> blockers = new List<Transform>();
+    private readonly HashSet<InteractionHighlight> pingedBlockers = new HashSet<InteractionHighlight>();
+    private readonly HashSet<InteractionHighlight> currentBlockers = new HashSet<InteractionHighlight>();
+    private float blockerPingUntil, nextBlockerScan;
     public bool HasVehicleOnScale
     {
         get
@@ -25,21 +29,78 @@ public class SellingZone : MonoBehaviour
     {
         get
         {
-            foreach (var hit in Overlaps())
-            {
-                if (IsVehicleCollider(hit) || hit is CharacterController ||
-                    hit.GetComponentInParent<PlayerController>() != null || hit.GetComponentInParent<PlayerInteractor>() != null) return true;
-                var container = hit.GetComponentInParent<GrainContainer>();
-                if (container != null)
-                {
-                    if (!IsUnloaded(container)) return true;
-                    continue;
-                }
-                // Trailers and other movable objects must leave the scale as well.
-                if (!hit.isTrigger && hit.attachedRigidbody != null) return true;
-            }
+            foreach (var hit in Overlaps()) if (BlockingRoot(hit) != null) return true;
             return false;
         }
+    }
+
+    public void CollectBlockers(List<Transform> results)
+    {
+        results.Clear();
+        foreach (var hit in Overlaps())
+        {
+            var blocker = BlockingRoot(hit);
+            if (blocker != null && !results.Contains(blocker)) results.Add(blocker);
+        }
+    }
+
+    private static Transform BlockingRoot(Collider hit)
+    {
+        if (hit.GetComponentInParent<BicycleController>() is BicycleController vehicle) return vehicle.transform;
+        if (hit.GetComponentInParent<WheelbarrowCargo>() is WheelbarrowCargo barrow) return barrow.transform;
+        if (hit.GetComponentInParent<PlayerController>() is PlayerController player) return player.transform;
+        if (hit.GetComponentInParent<PlayerInteractor>() is PlayerInteractor interactor) return interactor.transform;
+        if (hit is CharacterController) return hit.transform;
+        var container = hit.GetComponentInParent<GrainContainer>();
+        if (container != null) return IsUnloaded(container) ? null : container.transform;
+        // A separately jointed trailer highlights its own body, not the towing vehicle outside the scale.
+        return !hit.isTrigger && hit.attachedRigidbody != null ? hit.attachedRigidbody.transform : null;
+    }
+
+    public void PingBlockers()
+    {
+        if (!isActiveAndEnabled) return;
+        blockerPingUntil = Time.unscaledTime + 2f;
+        if (Time.unscaledTime >= nextBlockerScan) RefreshBlockerPings();
+    }
+
+    private void Update()
+    {
+        if (Time.unscaledTime >= blockerPingUntil)
+        {
+            ClearBlockerPings();
+            return;
+        }
+        if (Time.unscaledTime >= nextBlockerScan) RefreshBlockerPings();
+    }
+
+    private void RefreshBlockerPings()
+    {
+        nextBlockerScan = Time.unscaledTime + .1f;
+        CollectBlockers(blockers);
+        currentBlockers.Clear();
+        foreach (var blocker in blockers)
+        {
+            // Outlining the first-person player's held models would obscure the screen.
+            // The existing step-off-scale warning already covers the player.
+            if (blocker.GetComponent<PlayerInteractor>() != null || blocker.GetComponent<PlayerController>() != null) continue;
+            var highlight = blocker.GetComponent<InteractionHighlight>();
+            if (highlight == null) highlight = blocker.gameObject.AddComponent<InteractionHighlight>();
+            highlight.SetWarning(this, true);
+            currentBlockers.Add(highlight);
+        }
+        foreach (var highlight in pingedBlockers)
+            if (highlight != null && !currentBlockers.Contains(highlight)) highlight.SetWarning(this, false);
+        pingedBlockers.Clear();
+        foreach (var highlight in currentBlockers) pingedBlockers.Add(highlight);
+    }
+
+    private void ClearBlockerPings()
+    {
+        foreach (var highlight in pingedBlockers)
+            if (highlight != null) highlight.SetWarning(this, false);
+        pingedBlockers.Clear();
+        currentBlockers.Clear();
     }
 
     private void Reset() => GetComponent<BoxCollider>().isTrigger = true;
@@ -50,6 +111,8 @@ public class SellingZone : MonoBehaviour
     }
     private void OnDisable()
     {
+        ClearBlockerPings();
+        blockerPingUntil = nextBlockerScan = 0;
         if (sellingScreen != null && sellingScreen.Zone == this) sellingScreen.Close();
     }
 
@@ -77,7 +140,7 @@ public class SellingZone : MonoBehaviour
 
     public bool TryOpen(PlayerInteractor interactor)
     {
-        if (!CanWeigh(interactor)) return false;
+        if (!CanWeigh(interactor)) { PingBlockers(); return false; }
         if (sellingScreen == null) sellingScreen = FindFirstObjectByType<SellingScreen>(FindObjectsInactive.Include);
         return sellingScreen != null && sellingScreen.Open(this, interactor);
     }

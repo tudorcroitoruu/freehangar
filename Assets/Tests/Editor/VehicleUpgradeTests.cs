@@ -237,6 +237,63 @@ public class VehicleUpgradeTests
         Assert.IsNull(target.Replacement);
         Assert.IsFalse(target.TryAdvanceToUnlockedVehicle());
     }
+
+    [TestCase(false, true, true)]
+    [TestCase(true, true, true)]
+    [TestCase(false, false, true)]
+    [TestCase(false, false, false)]
+    public void MotorollerUpgradeFindsOutsideGroundBeforePurchase(bool cleared, bool groundAvailable, bool inside)
+    {
+        const BindingFlags flags = BindingFlags.Static | BindingFlags.NonPublic;
+        var cache = (System.Collections.Generic.List<Transform>)typeof(HangarVehicleAccess).GetField("hangars", flags).GetValue(null);
+        var previousHangars = cache.ToArray();
+        var scan = typeof(HangarVehicleAccess).GetField("nextScan", flags);
+        var previousScan = scan.GetValue(null);
+        var hangar = new GameObject("01_Modular_Hangar");
+        var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        VehicleUpgrade replacement = null;
+        try
+        {
+            hangar.transform.position = new Vector3(10000, 0, 10000);
+            cache.Clear(); cache.Add(hangar.transform); scan.SetValue(null, float.PositiveInfinity);
+            if (cleared) SaveSystem.Data.TryRecordHangarClearance(1, 98);
+            ground.transform.position = hangar.transform.position + Vector3.down * .5f;
+            ground.transform.localScale = new Vector3(100, 1, 100);
+            ground.SetActive(groundAvailable);
+            root.transform.position = hangar.transform.position + (inside ? Vector3.zero : Vector3.right * 40);
+            settings.vehicles[0].id = "motoroller";
+            settings.vehicles[1].prefabResourcePath = "Vehicles/3_Trike_Driveable";
+            var target = root.AddComponent<VehicleUpgrade>();
+            SetField(target, "settings", settings); SetField(target, "vehicleId", "motoroller");
+            var args = new object[] { null };
+            bool created = (bool)typeof(VehicleUpgrade).GetMethod("TryCreateReplacement", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, args);
+            replacement = (VehicleUpgrade)args[0];
+            Assert.AreEqual(!inside || groundAvailable, created);
+            Assert.AreEqual(100, SaveSystem.Data.cash);
+            if (!created) { Assert.IsNull(replacement); return; }
+            if (inside)
+            {
+                foreach (var mesh in replacement.GetComponentsInChildren<MeshFilter>(true))
+                {
+                    if (mesh.sharedMesh == null) continue;
+                    var local = mesh.sharedMesh.bounds;
+                    var bounds = new Bounds(mesh.transform.TransformPoint(local.center), Vector3.zero);
+                    for (int corner = 0; corner < 8; corner++)
+                        bounds.Encapsulate(mesh.transform.TransformPoint(local.center + Vector3.Scale(local.extents,
+                            new Vector3((corner & 1) == 0 ? -1 : 1, (corner & 2) == 0 ? -1 : 1, (corner & 4) == 0 ? -1 : 1))));
+                    Assert.IsFalse(HangarVehicleAccess.BlocksPlacement(bounds, null, true), mesh.name);
+                }
+                Assert.Greater(Vector3.Distance(root.transform.position, replacement.transform.position), 10);
+            }
+            else Assert.AreEqual(root.transform.position, replacement.transform.position);
+        }
+        finally
+        {
+            if (replacement != null) Object.DestroyImmediate(replacement.gameObject);
+            Object.DestroyImmediate(ground); Object.DestroyImmediate(hangar);
+            cache.Clear(); cache.AddRange(previousHangars); scan.SetValue(null, previousScan);
+        }
+    }
     [Test]
     public void DefaultVehicleProfilesAndResourcesAreValid()
     {

@@ -168,6 +168,85 @@ public class SellingZoneContainersOnlyTests
         zone.CollectContainers(collected);Assert.AreEqual(1,collected.Count);Assert.IsTrue(zone.CanWeigh(player));
     }
 
+    [Test]
+    public void BlockerTargetsAreUniqueAndExcludeUnloadedCargoAndStaticDeck()
+    {
+        var vehicle = Cube("Blocking vehicle", Vector3.up);
+        vehicle.AddComponent<BicycleController>();
+        var child = Cube("Second vehicle collider", Vector3.up);
+        child.transform.SetParent(vehicle.transform, true);
+        var trailer = Cube("Separate trailer", Vector3.right * 2 + Vector3.up);
+        trailer.AddComponent<Rigidbody>().isKinematic = true;
+        Cube("Static deck", Vector3.zero);
+        Physics.SyncTransforms();
+        var targets = new List<Transform>();
+        zone.CollectBlockers(targets);
+        CollectionAssert.AreEquivalent(new[] { vehicle.transform, trailer.transform }, targets);
+        vehicle.transform.localPosition = Vector3.forward * 20;
+        trailer.transform.localPosition = Vector3.forward * 20;
+        Physics.SyncTransforms();
+        zone.CollectBlockers(targets);
+        Assert.IsEmpty(targets);
+        Assert.IsTrue(zone.CanWeigh(player));
+    }
+
+    [Test]
+    public void BlockedPromptPingsRedAndMovingOffOrTimingOutRestoresOutline()
+    {
+        var obstacle = Cube("Blocking prop", Vector3.up);
+        obstacle.AddComponent<Rigidbody>().isKinematic = true;
+        var outline = obstacle.AddComponent<Outline>();
+        outline.OutlineColor = Color.cyan;
+        outline.OutlineWidth = 2;
+        outline.OutlineMode = Outline.Mode.OutlineVisible;
+        outline.enabled = false;
+        Physics.SyncTransforms();
+        button.TryGetPrompt(player, out var prompt);
+        Assert.IsTrue(prompt.WeighingWrong);
+        var highlight = obstacle.GetComponent<InteractionHighlight>();
+        Assert.IsNotNull(highlight);
+        Assert.IsTrue(highlight.IsWarningVisible);
+        Assert.AreEqual(Color.red, outline.OutlineColor);
+        Assert.IsTrue(outline.enabled);
+        highlight.SetFocused(true);
+        Assert.AreEqual(Color.red, outline.OutlineColor, "Focus must not replace the blocking warning.");
+        obstacle.transform.localPosition = Vector3.forward * 20;
+        Physics.SyncTransforms();
+        typeof(SellingZone).GetMethod("RefreshBlockerPings", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(zone, null);
+        Assert.IsFalse(highlight.IsWarningVisible);
+        Assert.AreEqual(Color.cyan, outline.OutlineColor);
+        Assert.AreEqual(2, outline.OutlineWidth);
+        Assert.AreEqual(Outline.Mode.OutlineVisible, outline.OutlineMode);
+        Assert.IsTrue(outline.enabled, "Keep the ordinary focused outline.");
+        highlight.SetFocused(false);
+        Assert.IsFalse(outline.enabled);
+        obstacle.transform.localPosition = Vector3.up;
+        Physics.SyncTransforms();
+        Set(zone, "nextBlockerScan", 0f);
+        zone.PingBlockers();
+        Set(zone, "blockerPingUntil", -1f);
+        typeof(SellingZone).GetMethod("Update", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(zone, null);
+        Assert.IsFalse(highlight.IsWarningVisible);
+        Assert.IsFalse(outline.enabled);
+        Assert.IsNull(container.GetComponent<InteractionHighlight>(), "Sellable containers must not be marked red.");
+    }
+
+    [Test]
+    public void ClearingOneScaleWarningDoesNotClearAnotherSource()
+    {
+        var obstacle = Cube("Shared blocking prop", Vector3.up);
+        var outline = obstacle.AddComponent<Outline>();
+        var highlight = obstacle.AddComponent<InteractionHighlight>();
+        highlight.SetWarning(zone, true);
+        highlight.SetWarning(button, true);
+        highlight.SetWarning(zone, false);
+        Assert.IsTrue(highlight.IsWarningVisible);
+        Assert.AreEqual(Color.red, outline.OutlineColor);
+        highlight.SetWarning(button, false);
+        Assert.IsFalse(highlight.IsWarningVisible);
+        Assert.IsFalse(outline.enabled);
+    }
+
     private GameObject Child(string name,Vector3 local){var go=new GameObject(name);go.transform.SetParent(root.transform,false);go.transform.localPosition=local;return go;}
     private GameObject Cube(string name,Vector3 local){var go=GameObject.CreatePrimitive(PrimitiveType.Cube);go.name=name;go.transform.SetParent(root.transform,false);go.transform.localPosition=local;return go;}
     private static void Set(object target,string field,object value)=>target.GetType().GetField(field,BindingFlags.Instance|BindingFlags.NonPublic).SetValue(target,value);
