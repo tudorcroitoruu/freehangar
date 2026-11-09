@@ -54,8 +54,8 @@ public class GameplayCanvas : MonoBehaviour
     [SerializeField] private GameObject[] drivingHints;
     [SerializeField] private GameObject[] bicycleHints;
     [SerializeField] private GameObject[] forkliftHints;
-    [SerializeField] private GameObject sellPopupHint;
-    [SerializeField] private GameObject upgradePopupHint;
+    [SerializeField] private GameObject[] sellPopupHint;
+    [SerializeField] private GameObject[] upgradePopupHint;
     [SerializeField] private TMP_Text walkingInteraction;
     [SerializeField] private TMP_Text leftMouseHintInteraction;
     private BagInteraction playerBags;
@@ -66,16 +66,18 @@ public class GameplayCanvas : MonoBehaviour
     private void CacheControlHints()
     {
         if (controlHintUpdates.Count != 0) return;
+        var cachedRows = new HashSet<GameObject>();
         void AddRows(GameObject[] rows)
         {
             if (rows == null) return;
             foreach (var row in rows)
             {
-                if (!row) continue;
+                if (!row || !cachedRows.Add(row)) continue;
                 string action = row.name switch
                 {
                     "Interact" or "GetOff" or "Upgrade" => "Interact",
                     "Sell" => "Secondary",
+                    "ClosePopup" => "Back",
                     "TakeInShovel" => "Attack", "ReleaseFromShovel" => "Unload",
                     "Brake" => "Jump", "MoveFaster" => "Sprint", "ForkliftDrop" => "Cargo",
                     "Steer" => "Move", "Pedal" => "Attack", _ => null
@@ -90,7 +92,8 @@ public class GameplayCanvas : MonoBehaviour
                     {
                         label.gameObject.SetActive(pad || wasActive);
                         GamepadPromptSprites.SetKeycap(label,
-                            pad ? FarmInput.Label(action, keyboard) : keyboard);
+                            pad ? (action == "Back" ? GamepadPromptSprites.Label("buttonEast") ?? "B" :
+                                FarmInput.Label(action, keyboard)) : keyboard);
                     });
                 }
                 foreach (var icon in row.GetComponentsInChildren<Image>(true))
@@ -102,7 +105,7 @@ public class GameplayCanvas : MonoBehaviour
             }
         }
         AddRows(walkingHints); AddRows(drivingHints); AddRows(bicycleHints); AddRows(forkliftHints);
-        AddRows(new[] { sellPopupHint, upgradePopupHint });
+        AddRows(sellPopupHint); AddRows(upgradePopupHint);
         void AddTool(SelectedUI tool, string action)
         {
             if (!tool) return;
@@ -317,10 +320,18 @@ public class GameplayCanvas : MonoBehaviour
             foreach (var hint in walkingHints)
                 if (hint != null && hint.activeSelf != showWalking)
                     hint.SetActive(showWalking);
-        if (sellPopupHint != null && sellPopupHint.activeSelf != selling)
-            sellPopupHint.SetActive(selling);
-        if (upgradePopupHint != null && upgradePopupHint.activeSelf != upgrading)
-            upgradePopupHint.SetActive(upgrading);
+        if (sellPopupHint != null)
+            foreach (var hint in sellPopupHint)
+            {
+                bool visible = selling || (upgrading && upgradePopupHint != null && System.Array.IndexOf(upgradePopupHint, hint) >= 0);
+                if (hint != null && hint.activeSelf != visible) hint.SetActive(visible);
+            }
+        if (upgradePopupHint != null)
+            foreach (var hint in upgradePopupHint)
+            {
+                bool visible = upgrading || (selling && sellPopupHint != null && System.Array.IndexOf(sellPopupHint, hint) >= 0);
+                if (hint != null && hint.activeSelf != visible) hint.SetActive(visible);
+            }
     }
 
     private void RefreshWalkingInteraction()
