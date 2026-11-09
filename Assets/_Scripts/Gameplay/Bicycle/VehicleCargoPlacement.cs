@@ -77,6 +77,15 @@ public sealed class VehicleCargoPlacement : MonoBehaviour
         bool hasContainer = item.TryGetComponent<GrainContainer>(out var container);
         bool bigBag = hasContainer && container.IsBigBag;
         bool empty = hasContainer && container.IsEmpty && !bigBag;
+        var wheelbarrow = slot.GetComponentInParent<WheelbarrowCargo>();
+        if (wheelbarrow != null && hasContainer &&
+            (containerId == "FreeBag" || containerId == "SmallBag" || containerId == "LargeBag"))
+        {
+            // Empty and filled bags occupy the same independent, upright tray slots.
+            slot.localPosition = wheelbarrow.SlotPosition(index);
+            wheelbarrow.PlaceUprightBag(container, slot);
+            return;
+        }
         Vector3 defaultRotation = slot.GetComponentInParent<WheelbarrowCargo>() != null
             ? WheelbarrowCargo.DefaultCargoRotation(containerId) : Vector3.zero;
         item.rotation=slot.rotation*baseRotation*Quaternion.Euler(empty ? Vector3.zero : pose?.rotation ?? defaultRotation);

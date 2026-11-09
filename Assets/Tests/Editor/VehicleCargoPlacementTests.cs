@@ -3,6 +3,61 @@ using UnityEngine;
 
 public class VehicleCargoPlacementTests
 {
+    [TestCase("Small", "FreeBag")]
+    [TestCase("Small", "SmallBag")]
+    [TestCase("Small", "LargeBag")]
+    [TestCase("Medium", "FreeBag")]
+    [TestCase("Medium", "SmallBag")]
+    [TestCase("Medium", "LargeBag")]
+    [TestCase("Max", "FreeBag")]
+    [TestCase("Max", "SmallBag")]
+    [TestCase("Max", "LargeBag")]
+    public void WheelbarrowBagsStayUprightInsideSeparateSlotsAtEveryFill(string tier, string id)
+    {
+        var root = new GameObject("Wheelbarrow_" + tier);
+        try
+        {
+            root.transform.SetPositionAndRotation(new Vector3(1000, 30, 1000), Quaternion.Euler(0, 37, 0));
+            root.transform.localScale = new Vector3(1.9f, 1.38f, 1.64f);
+            var barrow = root.AddComponent<WheelbarrowCargo>();
+            var profile = new VehicleUpgradeSettings.VehicleType { cargoPoses = new[] {
+                new VehicleUpgradeSettings.CargoPose { containerId=id, rotation=new Vector3(-90,0,0),
+                    position=new Vector3(0,.15f,-.1f) } } };
+            var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Gameplay/Containers/" + id + ".prefab");
+            var occupied = new System.Collections.Generic.List<Bounds>();
+            for (int i = 0; i < barrow.CargoSlotCount; i++)
+            {
+                var slot = new GameObject("Bag slot " + i).transform;
+                slot.SetParent(root.transform, false);
+                slot.localPosition = barrow.SlotPosition(i);
+                slot.localRotation = barrow.SlotRotation;
+                var item = Object.Instantiate(prefab, slot);
+                var bag = item.GetComponent<GrainContainer>();
+                var scale = item.transform.localScale;
+                foreach (float fill in new[] { 0f, .5f, 1f, 0f })
+                {
+                    VehicleCargoPreview.PrepareContainer(item, fill, fill == 1 ? 1 : 0);
+                    for (int pass = 0; pass < 3; pass++)
+                        VehicleCargoPlacement.Place(item.transform, slot, profile, id, i, Quaternion.Euler(90,0,0), true, scale);
+                    Assert.Less(Quaternion.Angle(item.transform.rotation, root.transform.rotation * bag.UprightRotation), .01f);
+                    var bounds = VehicleCargoRack.ContactBounds(item.transform, root.transform);
+                    Assert.That(bounds.center.x, Is.EqualTo(slot.localPosition.x).Within(.001f));
+                    Assert.That(bounds.center.z, Is.EqualTo(slot.localPosition.z).Within(.001f));
+                    Assert.That(bounds.min.y, Is.EqualTo(slot.localPosition.y).Within(.001f));
+                    Assert.GreaterOrEqual(bounds.min.x, -.35f);
+                    Assert.LessOrEqual(bounds.max.x, .35f);
+                    Assert.GreaterOrEqual(bounds.min.z, -.72f - .425f);
+                    Assert.LessOrEqual(bounds.max.z, -.72f + .425f);
+                    foreach (var previous in occupied)
+                        Assert.IsFalse(bounds.min.x < previous.max.x && bounds.max.x > previous.min.x &&
+                            bounds.min.z < previous.max.z && bounds.max.z > previous.min.z, "Independent bag footprints must not overlap.");
+                }
+                occupied.Add(VehicleCargoRack.ContactBounds(item.transform, root.transform));
+            }
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public void BigBagKeepsFilledVehiclePoseAtEveryFillLevel(bool bottom)

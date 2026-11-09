@@ -104,16 +104,30 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     public Vector3 SlotPosition(int index)
     {
         index = Mathf.Clamp(index, 0, CargoSlotCount - 1);
-        // Small: two below one; medium: four below one; large: two by three.
-        int rows = Tier == 0 ? 1 : Tier == 1 ? 2 : 3;
-        if (Tier < 2 && index == CargoSlotCount - 1)
-            return trayCenter + SlotRotation * (Vector3.up * .22f);
-        float x = (index % 2 == 0 ? -.25f : .25f) * traySize.x;
+        int rows = (CargoSlotCount + 1) / 2;
+        bool singleLast = CargoSlotCount % 2 != 0 && index == CargoSlotCount - 1;
+        float x = singleLast ? 0f : (index % 2 == 0 ? -.25f : .25f) * traySize.x;
         float z = ((index / 2 + .5f) / rows - .5f) * traySize.z;
         return trayCenter + SlotRotation * new Vector3(x, 0f, z);
     }
-    public static Vector3 DefaultCargoRotation(string id) =>
-        id == "FreeBag" || id == "SmallBag" || id == "LargeBag" ? new Vector3(90f, 0f, 0f) : Vector3.zero;
+    public static Vector3 DefaultCargoRotation(string id) => Vector3.zero;
+
+    public void PlaceUprightBag(GrainContainer bag, Transform slot)
+    {
+        // Ignore legacy sideways poses, including those restored from saved cargo.
+        var item = bag.transform;
+        item.rotation = transform.rotation * bag.UprightRotation;
+        item.position = slot.position;
+        Bounds bounds = VehicleCargoRack.ContactBounds(item, transform);
+        int rows = (CargoSlotCount + 1) / 2;
+        float fit = Mathf.Min(1f, traySize.x * .47f / Mathf.Max(.001f, bounds.size.x),
+            traySize.z * .94f / rows / Mathf.Max(.001f, bounds.size.z));
+        item.localScale *= fit;
+        bounds = VehicleCargoRack.ContactBounds(item, transform);
+        Vector3 seat = transform.InverseTransformPoint(slot.position);
+        item.position += transform.TransformVector(new Vector3(seat.x - bounds.center.x,
+            seat.y - bounds.min.y, seat.z - bounds.center.z));
+    }
     public int SlotIndex(Transform slot) => int.TryParse(slot.name.Replace("Bag slot ", ""), out int index) ? index : 0;
     private int FreeSlotIndex()
     {
