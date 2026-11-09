@@ -423,6 +423,17 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         return false;
     }
 
+    public bool IsWithinMountingDistance(Vector3 position, float distance)
+    {
+        Vector3 closest = transform.position;
+        if (TryGetComponent<LawnmowerController>(out _) && TryGetComponent<MotorollerController>(out var engine))
+        {
+            // Measure from the mower body, not its offset pivot or the attached trailer.
+            closest = engine.ClosestBodyPoint(position);
+        }
+        return Vector3.Distance(position, closest) <= distance;
+    }
+
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
     {
         prompt = default;
@@ -437,7 +448,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         if (rider == null || rider.IsRiding || actor == null || actor.characterCamera == null ||
             (interactor.Bags != null && interactor.Bags.IsCarrying
                 ? !rider.TryFindLoadingVehicle(out var loadingVehicle) || loadingVehicle != this
-                : Vector3.Distance(actor.transform.position, transform.position) > rider.interactionDistance)) return false;
+                : !IsWithinMountingDistance(actor.transform.position, rider.interactionDistance))) return false;
         if (interactor.Bags != null && interactor.Bags.IsCarrying)
         {
             var upgrades = GetComponent<VehicleUpgrade>();

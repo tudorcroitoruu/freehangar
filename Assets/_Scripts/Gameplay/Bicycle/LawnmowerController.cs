@@ -95,12 +95,31 @@ public sealed class LawnmowerController : MonoBehaviour
         }
         previousPosition = transform.position;
         RefreshTrailerCollisions();
+        UpdateTrailerParking();
+    }
+    void UpdateTrailerParking()
+    {
+        if (trailerJoint == null || movement == null) return;
+        var body = trailerJoint.GetComponent<Rigidbody>();
+        if (body == null) return;
+        bool parked = !movement.IsRidden && !movement.IsCoasting;
+        if (body.isKinematic == parked) return;
+        if (parked)
+        {
+            body.linearVelocity = Vector3.zero;
+            body.angularVelocity = Vector3.zero;
+        }
+        // A joint and wheel friction are not a parking brake. Lock the trailer
+        // while unattended so cargo contacts and slopes cannot make it creep.
+        body.isKinematic = parked;
+        if (!parked) body.WakeUp();
     }
     void FixedUpdate() => UpdateHitch();
     public void UpdateHitch()
     {
         if (hitchBody == null || hitchTarget == null) return;
         RefreshTrailerCollisions();
+        UpdateTrailerParking();
         hitchBody.MovePosition(hitchTarget.position);
         hitchBody.MoveRotation(hitchTarget.rotation);
     }

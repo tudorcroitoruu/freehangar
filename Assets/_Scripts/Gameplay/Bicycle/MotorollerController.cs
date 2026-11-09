@@ -20,6 +20,13 @@ public sealed class MotorollerController : MonoBehaviour
     public BicycleController Movement => movement != null ? movement : movement = GetComponent<BicycleController>();
     public float Speed => Movement.Speed;
     public bool IsRidden => Movement.IsRidden;
+    public Vector3 ClosestBodyPoint(Vector3 position)
+    {
+        if (groundAlignment == null) groundAlignment = GetComponent<VehicleGroundAlignment>();
+        Transform pose = groundAlignment != null && groundAlignment.Pose != null ? groundAlignment.Pose : transform;
+        var bounds = new Bounds(collisionCenter, collisionHalfExtents * 2f);
+        return pose.TransformPoint(bounds.ClosestPoint(pose.InverseTransformPoint(position)));
+    }
     private void Awake() { Configure(); lawnmower = GetComponent<LawnmowerController>(); }
     private void OnValidate() => Configure();
     public void Configure()
