@@ -450,6 +450,58 @@ public class WorldSaveTests
     }
 
     [Test]
+    public void ContainerLoadCreditSurvivesRepeatedLoadsAndSaveRestore()
+    {
+        var go = new GameObject("Load credit test");
+        var restored = new GameObject("Restored load credit test");
+        try
+        {
+            var bag = go.AddComponent<GrainContainer>();
+            bag.SetDemonstrationFill(GrainType.Corn, 20);
+            bag.ReportLoadedGoals();
+            var first = bag.CaptureSave();
+            Assert.IsTrue(first.loadGoalCounted);
+            Assert.AreEqual(20, first.creditedLoadKg[(int)GrainType.Corn]);
+            for (int i = 0; i < 10; i++) bag.ReportLoadedGoals();
+            CollectionAssert.AreEqual(first.creditedLoadKg, bag.CaptureSave().creditedLoadKg);
+
+            bag.SetDemonstrationFill(GrainType.Corn, 30);
+            bag.ReportLoadedGoals();
+            Assert.AreEqual(20, first.creditedLoadKg[(int)GrainType.Corn], "Save snapshots must not alias live credit.");
+            var copy = JsonUtility.FromJson<ContainerSave>(JsonUtility.ToJson(bag.CaptureSave()));
+            var other = restored.AddComponent<GrainContainer>();
+            other.RestoreSave(copy);
+            other.ReportLoadedGoals();
+            Assert.IsTrue(other.CaptureSave().loadGoalCounted);
+            Assert.AreEqual(30, other.CaptureSave().creditedLoadKg[(int)GrainType.Corn]);
+            other.EmptyAfterPour();
+            other.SetDemonstrationFill(GrainType.Corn, 20);
+            other.ReportLoadedGoals();
+            Assert.AreEqual(30, other.CaptureSave().creditedLoadKg[(int)GrainType.Corn]);
+        }
+        finally { Object.DestroyImmediate(go); Object.DestroyImmediate(restored); }
+    }
+
+    [Test]
+    public void EmptyContainersAndLegacySavesHaveNoLoadCredit()
+    {
+        var go = new GameObject("Empty load credit test");
+        try
+        {
+            var bag = go.AddComponent<GrainContainer>();
+            bag.ReportLoadedGoals();
+            Assert.IsFalse(bag.CaptureSave().loadGoalCounted);
+            bag.RestoreSave(new ContainerSave { kilograms = 10, grain = (int)GrainType.Wheat });
+            Assert.IsFalse(bag.CaptureSave().loadGoalCounted);
+            bag.ReportLoadedGoals();
+            Assert.IsTrue(bag.CaptureSave().loadGoalCounted);
+            Assert.AreEqual(10, bag.CaptureSave().creditedLoadKg[(int)GrainType.Wheat]);
+            Assert.AreEqual(0, bag.CaptureSave().creditedLoadKg[(int)GrainType.Corn]);
+        }
+        finally { Object.DestroyImmediate(go); }
+    }
+
+    [Test]
     public void CutsceneSeekReconstructsCompletedShotsAndStopsAtSavedFraction()
     {
         var clock = new SavedCutsceneClock(3);

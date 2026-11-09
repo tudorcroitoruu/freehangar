@@ -85,6 +85,25 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     public GrainType AcceptedGrain => acceptedGrain;
     public bool Accepts(GrainType grain) => IsBigBag || !HasAssignedGrain || grain == acceptedGrain;
     private readonly GrainCargo contents = new GrainCargo();
+    private bool loadGoalCounted;
+    private readonly float[] creditedLoadKg = new float[GrainCargo.TypeCount];
+
+    // Keep credit on the container when it leaves a vehicle or moves to another one.
+    public void ReportLoadedGoals()
+    {
+        if (WorldSaveRuntime.IsRestoring || Kilograms <= 0) return;
+        bool reportSack = !loadGoalCounted;
+        loadGoalCounted = true;
+        if (reportSack) GoalChecker.ReportProgress(GoalType.SackLoaded);
+        var cargo = Contents;
+        for (int i = 0; i < GrainCargo.TypeCount; i++)
+        {
+            float amount = cargo[(GrainType)i] - creditedLoadKg[i];
+            if (amount <= 0) continue;
+            creditedLoadKg[i] = cargo[(GrainType)i];
+            GoalChecker.ReportProgress(GoalType.GrainLoaded, amount, grainType: (GrainType)i);
+        }
+    }
     public GrainCargo Contents
     {
         get
@@ -306,7 +325,8 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
     }
 
     public ContainerSave CaptureSave() => new ContainerSave { kilograms = kilograms, grain = (int)acceptedGrain,
-        closure = sack != null ? sack.Close : 0, closing = IsClosing, achievementId = AchievementIdentity, composition = CopyComposition() };
+        closure = sack != null ? sack.Close : 0, closing = IsClosing, achievementId = AchievementIdentity, composition = CopyComposition(),
+        loadGoalCounted = loadGoalCounted, creditedLoadKg = (float[])creditedLoadKg.Clone() };
 
     public float[] CopyComposition()
     {
@@ -335,6 +355,11 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
             }
         }
         achievementIdentity = saved.achievementId;
+        loadGoalCounted = saved.loadGoalCounted;
+        System.Array.Clear(creditedLoadKg, 0, creditedLoadKg.Length);
+        if (saved.creditedLoadKg != null)
+            for (int i = 0; i < Mathf.Min(creditedLoadKg.Length, saved.creditedLoadKg.Length); i++)
+                creditedLoadKg[i] = float.IsFinite(saved.creditedLoadKg[i]) ? Mathf.Max(0, saved.creditedLoadKg[i]) : 0;
         RefreshFillPresentation();
         if (sack != null) sack.Close = Mathf.Clamp01(saved.closure);
         IsClosing = saved.closing && sack != null && !IsFinished;

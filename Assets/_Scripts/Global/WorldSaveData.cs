@@ -81,6 +81,8 @@ public class WorldObjectSave
     public int grain;
     public bool closing;
     public string achievementId;
+    public bool loadGoalCounted;
+    public float[] creditedLoadKg;
 }
 [Serializable] public sealed class PileSave
 {
