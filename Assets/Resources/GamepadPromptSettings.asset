@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efb736f074b64a0fb1322e4e8b418386, type: 3}
+  m_Name: GamepadPromptSettings
+  m_EditorClassIdentifier: 
+  prompts:
+  - control: buttonNorth
+    sprite: {fileID: 21300000, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: buttonSouth
+    sprite: {fileID: 21300002, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: buttonWest
+    sprite: {fileID: 21300004, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: buttonEast
+    sprite: {fileID: 21300006, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: start
+    sprite: {fileID: 21300008, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: select
+    sprite: {fileID: 21300010, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: leftShoulder
+    sprite: {fileID: 21300012, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: rightShoulder
+    sprite: {fileID: 21300014, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: leftTrigger
+    sprite: {fileID: 21300016, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: rightTrigger
+    sprite: {fileID: 21300018, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: leftStickPress
+    sprite: {fileID: 21300020, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: rightStickPress
+    sprite: {fileID: 21300022, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: leftStick
+    sprite: {fileID: 21300024, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: rightStick
+    sprite: {fileID: 21300026, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: dpad
+    sprite: {fileID: 21300028, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: dpad/up
+    sprite: {fileID: 21300030, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: dpad/down
+    sprite: {fileID: 21300032, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: dpad/left
+    sprite: {fileID: 21300034, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: dpad/right
+    sprite: {fileID: 21300036, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+  - control: 
+    sprite: {fileID: 21300038, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}

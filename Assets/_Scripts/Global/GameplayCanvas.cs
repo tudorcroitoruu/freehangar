@@ -74,7 +74,7 @@ public class GameplayCanvas : MonoBehaviour
                     "Interact" or "GetOff" => "Interact",
                     "TakeInShovel" => "Attack", "ReleaseFromShovel" => "Unload",
                     "Brake" => "Jump", "MoveFaster" => "Sprint", "ForkliftDrop" => "Cargo",
-                    "Steer" or "Pedal" => "Move", _ => null
+                    "Steer" => "Move", "Pedal" => "Attack", _ => null
                 };
                 if (action == null) continue;
                 foreach (var label in row.GetComponentsInChildren<TMP_Text>(true))
@@ -85,7 +85,8 @@ public class GameplayCanvas : MonoBehaviour
                     controlHintUpdates.Add(pad =>
                     {
                         label.gameObject.SetActive(pad || wasActive);
-                        label.text = pad ? (action == "Move" ? "LS" : FarmInput.Label(action, keyboard)) : keyboard;
+                        GamepadPromptSprites.SetKeycap(label,
+                            pad ? FarmInput.Label(action, keyboard) : keyboard);
                     });
                 }
                 foreach (var icon in row.GetComponentsInChildren<Image>(true))

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3893323241866068049}
   - component: {fileID: 3893323241863200881}
   - component: {fileID: 3893323241864168113}
-  - component: {fileID: 4710037601703840397}
   - component: {fileID: 1962703497767298681}
   m_Layer: 0
   m_Name: TFP_Fridge_01B_Door_Bottom
@@ -92,27 +91,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4710037601703840397
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3893323241866173553}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.2391243, y: 1.6167792, z: 1.0000004}
-  m_Center: {x: -0.046361923, y: -0.21307689, z: -0.47409326}
 --- !u!114 &1962703497767298681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,8 +224,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.0294356, y: 2.2, z: 1.0000002}
-  m_Center: {x: 0.5887177, y: 1.0999998, z: -0.49999988}
+  m_Size: {x: 1.1094869, y: 2.2, z: 1.0000002}
+  m_Center: {x: 0.62874323, y: 1.0999998, z: -0.4999999}
 --- !u!114 &5053323878606027028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307,7 +285,6 @@ GameObject:
   - component: {fileID: 3893323241866068055}
   - component: {fileID: 3893323241863200887}
   - component: {fileID: 3893323241864168119}
-  - component: {fileID: 8614027946558123720}
   - component: {fileID: 9130420443778052766}
   m_Layer: 0
   m_Name: TFP_Fridge_01B_Door_Top
@@ -388,27 +365,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8614027946558123720
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3893323241866173559}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.13645175, y: 0.60074264, z: 0.9999999}
-  m_Center: {x: -0.00062181056, y: 0.12413448, z: -0.47409302}
 --- !u!114 &9130420443778052766
 MonoBehaviour:
   m_ObjectHideFlags: 0

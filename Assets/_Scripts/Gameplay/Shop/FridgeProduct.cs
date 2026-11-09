@@ -24,6 +24,7 @@ public class FridgeProduct : MonoBehaviour, IInteractable
             "Eat & reduce hunger", needsFood && canAfford && !purchasing)
         {
             ShowKeyboardKey = needsFood,
+            ShowWhenUnavailable = needsFood,
             SecondaryDescription = needsFood ? $"Price: {price}" : "",
             NotHungry = !needsFood
         };

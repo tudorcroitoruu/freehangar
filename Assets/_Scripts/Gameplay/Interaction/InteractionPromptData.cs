@@ -9,6 +9,7 @@ public struct InteractionPromptData
     public string SecondaryDescription;
     public bool ShowKey;
     public bool ShowKeyboardKey;
+    public bool ShowWhenUnavailable;
     public KeyCode InteractionKey;
     public InteractionPromptAction[] AdditionalActions;
     public bool RequiresFreeHands;
@@ -39,6 +40,7 @@ public struct InteractionPromptData
         SecondaryDescription = "";
         ShowKey = showKey;
         ShowKeyboardKey = false;
+        ShowWhenUnavailable = false;
         InteractionKey = KeyCode.E;
         AdditionalActions = null;
         RequiresFreeHands = false;

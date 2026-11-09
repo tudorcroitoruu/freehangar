@@ -60,7 +60,7 @@ public sealed class InteractionPrompt : MonoBehaviour
         if (data.RequiresFreeHands || Time.timeScale <= 0f || UIPopups.BasePopupUI.HasActivePopup) { Hide(); return; }
         bool showToolIcon = data.RequiredTool == PlayerCombatTools.Tool.Axe ||
             data.RequiredTool == PlayerCombatTools.Tool.Hammer;
-        if (!showToolIcon && !data.HasAvailableInput && !data.ShowProgress) { Hide(); return; }
+        if (!showToolIcon && !data.HasAvailableInput && !data.ShowProgress && !data.ShowWhenUnavailable) { Hide(); return; }
         if (panel == null || canvasRect == null || camera == null || (string.IsNullOrEmpty(data.Action) && !data.ShowProgress)) { Hide(); return; }
         Vector3 screen = camera.WorldToScreenPoint(data.Position);
         if (screen.z <= 0 || screen.x < 0 || screen.x > Screen.width || screen.y < 0 || screen.y > Screen.height) { Hide(); return; }
