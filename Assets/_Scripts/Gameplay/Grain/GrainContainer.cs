@@ -176,9 +176,12 @@ public sealed class GrainContainer : MonoBehaviour, IInteractable
 
     private void OnTransformParentChanged() => RefreshHudVisibility();
 
-    private void RefreshHudVisibility()
+    internal void RefreshHudVisibility()
     {
-        if (hudElement != null) hudElement.enabled = VehicleCargoOwner.Resolve(this) == null;
+        if (hudElement == null) return;
+        var wheelbarrow = GetComponentInParent<WheelbarrowCargo>();
+        hudElement.enabled = VehicleCargoOwner.Resolve(this) == null &&
+            (wheelbarrow == null || !wheelbarrow.IsBeingPushed);
     }
 
     /// <summary>Refresh visuals and contact bounds together without depositing grain or awarding progress.</summary>

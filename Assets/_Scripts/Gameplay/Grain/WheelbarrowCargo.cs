@@ -287,6 +287,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         }
         var tools = interactor.GetComponent<PlayerCombatTools>();
         if (tools != null) tools.HideForPushing(hiddenTools);
+        RefreshCargoHudVisibility();
         return true;
     }
 
@@ -424,6 +425,13 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         hiddenTools.Clear();
         pushingPlayer = null;
         pusher = null;
+        RefreshCargoHudVisibility();
+    }
+
+    private void RefreshCargoHudVisibility()
+    {
+        foreach (var bag in GetComponentsInChildren<GrainContainer>(true))
+            bag.RefreshHudVisibility();
     }
 
     public void ResetToPose(Vector3 position, Quaternion rotation)
