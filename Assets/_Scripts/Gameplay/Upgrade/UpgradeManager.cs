@@ -21,6 +21,7 @@ public class UpgradeManager : MonoBehaviour
     private bool cursorCaptured;
 
     public bool IsOpen { get; private set; }
+    public static bool IsAnyOpen => current != null && current.IsOpen;
     public static bool BlocksGameplayInput => (current != null && current.IsOpen) || closedFrame == Time.frameCount || SellingScreen.BlocksGameplayInput;
 
     private void Awake() => Initialize();
@@ -125,7 +126,7 @@ public class UpgradeManager : MonoBehaviour
     private void Update()
     {
         if (!Application.isFocused || UIPopups.BasePopupUI.HasActivePopup) return;
-        HandleInput(FarmInput.Back, FarmInput.Down("Interact"));
+        HandleInput(FarmInput.Back, FarmInput.Down("Interact") || Input.GetKeyDown(KeyCode.F));
     }
 
     private void HandleInput(bool closePressed, bool upgradePressed)

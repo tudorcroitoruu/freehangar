@@ -33,6 +33,7 @@ public class SellingScreen : MonoBehaviour
     private static int closedFrame = -1;
     public SellingZone Zone { get; private set; }
     public bool IsOpen => Zone != null;
+    public static bool IsAnyOpen => current != null && current.IsOpen;
     public static bool BlocksGameplayInput => (current != null && current.IsOpen) || closedFrame == Time.frameCount;
 
     public bool Open(SellingZone zone, PlayerInteractor interactor)

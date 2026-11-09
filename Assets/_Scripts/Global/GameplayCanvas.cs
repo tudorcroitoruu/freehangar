@@ -54,9 +54,12 @@ public class GameplayCanvas : MonoBehaviour
     [SerializeField] private GameObject[] drivingHints;
     [SerializeField] private GameObject[] bicycleHints;
     [SerializeField] private GameObject[] forkliftHints;
+    [SerializeField] private GameObject sellPopupHint;
+    [SerializeField] private GameObject upgradePopupHint;
     [SerializeField] private TMP_Text walkingInteraction;
     [SerializeField] private TMP_Text leftMouseHintInteraction;
     private BagInteraction playerBags;
+    private bool drivingHintsActive;
     private readonly List<System.Action<bool>> controlHintUpdates = new List<System.Action<bool>>();
     private int hintDevice = -2;
 
@@ -71,7 +74,8 @@ public class GameplayCanvas : MonoBehaviour
                 if (!row) continue;
                 string action = row.name switch
                 {
-                    "Interact" or "GetOff" => "Interact",
+                    "Interact" or "GetOff" or "Upgrade" => "Interact",
+                    "Sell" => "Secondary",
                     "TakeInShovel" => "Attack", "ReleaseFromShovel" => "Unload",
                     "Brake" => "Jump", "MoveFaster" => "Sprint", "ForkliftDrop" => "Cargo",
                     "Steer" => "Move", "Pedal" => "Attack", _ => null
@@ -98,6 +102,7 @@ public class GameplayCanvas : MonoBehaviour
             }
         }
         AddRows(walkingHints); AddRows(drivingHints); AddRows(bicycleHints); AddRows(forkliftHints);
+        AddRows(new[] { sellPopupHint, upgradePopupHint });
         void AddTool(SelectedUI tool, string action)
         {
             if (!tool) return;
@@ -201,6 +206,7 @@ public class GameplayCanvas : MonoBehaviour
     {
         CacheControlHints();
         InvalidateControlHints();
+        RefreshPopupHints();
         GameSettingsManager.InputBindingsChanged += InvalidateControlHints;
         Pause.PauseOnAction += HideHudForPause;
         Pause.PauseOffAction += RestoreHudAfterPause;
@@ -259,12 +265,11 @@ public class GameplayCanvas : MonoBehaviour
 
     public void SetDrivingHints(bool driving, bool forklift = false)
     {
+        drivingHintsActive = driving;
         var rider = driving ? FindFirstObjectByType<PlayerBicycleInteraction>() : null;
         bool ridingBicycle = driving && !forklift && rider != null && rider.IsRiding &&
             rider.bicycle != null && !rider.bicycle.motorDriven;
-        if (walkingHints != null)
-            foreach (var hint in walkingHints)
-                if (hint != null) hint.SetActive(!driving);
+        RefreshPopupHints();
         if (drivingHints != null)
             foreach (var hint in drivingHints)
                 if (hint != null) hint.SetActive(driving);
@@ -297,7 +302,26 @@ public class GameplayCanvas : MonoBehaviour
         }
     }
 
-    private void LateUpdate() => RefreshWalkingInteraction();
+    private void LateUpdate()
+    {
+        RefreshWalkingInteraction();
+        RefreshPopupHints();
+    }
+
+    private void RefreshPopupHints()
+    {
+        bool selling = SellingScreen.IsAnyOpen;
+        bool upgrading = UpgradeManager.IsAnyOpen;
+        bool showWalking = !drivingHintsActive && !selling && !upgrading;
+        if (walkingHints != null)
+            foreach (var hint in walkingHints)
+                if (hint != null && hint.activeSelf != showWalking)
+                    hint.SetActive(showWalking);
+        if (sellPopupHint != null && sellPopupHint.activeSelf != selling)
+            sellPopupHint.SetActive(selling);
+        if (upgradePopupHint != null && upgradePopupHint.activeSelf != upgrading)
+            upgradePopupHint.SetActive(upgrading);
+    }
 
     private void RefreshWalkingInteraction()
     {
