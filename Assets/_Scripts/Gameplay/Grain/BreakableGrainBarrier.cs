@@ -95,9 +95,7 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
         prompt = default;
         if (!isActiveAndEnabled || !exposed || IsBroken) return false;
         string label = material == Material.Wood ? "Wooden Wall" : "Metal Wall";
-        Bounds bounds = VisualBounds();
-        Vector3 origin = promptAnchor != null ? promptAnchor.position :
-            new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
+        Vector3 origin = promptAnchor != null ? promptAnchor.position : transform.position;
         prompt = new InteractionPromptData(origin + promptOffset, label, false);
         prompt.RequiredTool = material == Material.Wood ? PlayerCombatTools.Tool.Axe : PlayerCombatTools.Tool.Hammer;
         return true;
@@ -107,9 +105,7 @@ public sealed class BreakableGrainBarrier : MonoBehaviour, IInteractable
 
     private void OnDrawGizmosSelected()
     {
-        Bounds bounds = VisualBounds();
-        Vector3 origin = promptAnchor != null ? promptAnchor.position :
-            new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
+        Vector3 origin = promptAnchor != null ? promptAnchor.position : transform.position;
         Vector3 position = origin + promptOffset;
         Color previousColor = Gizmos.color;
         Gizmos.color = Color.cyan;
