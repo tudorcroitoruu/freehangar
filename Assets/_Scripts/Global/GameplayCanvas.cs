@@ -312,7 +312,7 @@ public class GameplayCanvas : MonoBehaviour
         if (IsToolUnlocked(PlayerCombatTools.Tool.Hammer)) tools |= 8;
         if (IsToolUnlocked(PlayerCombatTools.Tool.Pistol)) tools |= 16;
         var equipped = playerTools != null ? playerTools.Equipped : PlayerCombatTools.Tool.Shovel;
-        string leftMouseAction = equipped == PlayerCombatTools.Tool.Shovel ? "Load into shovel" : "Attack";
+        string leftMouseAction = equipped == PlayerCombatTools.Tool.Shovel ? "Load into shovel" : "Hit/Attack";
         if (leftMouseHintInteraction != null && leftMouseHintInteraction.text != leftMouseAction)
             leftMouseHintInteraction.text = leftMouseAction;
         if (tools != displayedTools || equipped != displayedEquipped)
