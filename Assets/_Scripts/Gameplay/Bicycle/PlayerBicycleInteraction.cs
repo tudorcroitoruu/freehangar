@@ -68,7 +68,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             if (input && forklift != null && FarmInput.Down("Cargo")) forklift.DropCargo();
             if (forklift != null && forklift.IsTransferring) input = false;
             if (vehicleReset != null) vehicleReset.CancelHold();
-            DriveRiding(input ? FarmInput.Move.y : 0,
+            DriveRiding(input ? FarmInput.VehicleThrottle : 0,
                 input ? FarmInput.Move.x : 0,
                 !input || FarmInput.Held("Jump"),
                 input && (FarmInput.Held("Sprint") || Input.GetKey(KeyCode.RightShift)), Time.deltaTime);

@@ -73,6 +73,18 @@ public static class FarmInput
     public static bool Down(string name) => Action(name)?.WasPressedThisFrame() == true;
     public static bool Held(string name) => Action(name)?.IsPressed() == true;
     public static Vector2 Move => Action("Move")?.ReadValue<Vector2>() ?? Vector2.zero;
+    public static float VehicleThrottle
+    {
+        get
+        {
+            float move = Move.y;
+            // Reuse the rebindable R2 action only for controllers while riding.
+            var attack = Action("Attack");
+            float trigger = attack?.activeControl?.device == ActivePad && ActivePad != null
+                ? attack.ReadValue<float>() : 0f;
+            return trigger > 0f ? Mathf.Max(move, trigger) : move;
+        }
+    }
     public static Vector2 Look
     {
         get

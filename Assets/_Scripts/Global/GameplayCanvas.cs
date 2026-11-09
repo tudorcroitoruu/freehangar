@@ -100,14 +100,40 @@ public class GameplayCanvas : MonoBehaviour
         void AddTool(SelectedUI tool, string action)
         {
             if (!tool) return;
+            var tmpLabel = tool.GetComponentInChildren<TMP_Text>(true);
+            if (tmpLabel)
+            {
+                string keyboardText = tmpLabel.text;
+                Color keyboardColor = tmpLabel.color;
+                controlHintUpdates.Add(pad =>
+                {
+                    tmpLabel.color = pad ? Color.white : keyboardColor;
+                    GamepadPromptSprites.SetKeycap(tmpLabel,
+                        pad ? FarmInput.Label(action, keyboardText) : keyboardText);
+                });
+                return;
+            }
             var label = tool.GetComponentInChildren<Text>(true);
             if (!label) return;
             string keyboard = label.text;
-            bool fit = label.resizeTextForBestFit;
+            // Legacy UI Text cannot render TMP sprite tags. Overlay a sprite-capable label.
+            var iconObject = new GameObject("Controller Button", typeof(RectTransform), typeof(TextMeshProUGUI));
+            iconObject.transform.SetParent(label.transform, false);
+            var iconLabel = iconObject.GetComponent<TextMeshProUGUI>();
+            iconLabel.rectTransform.anchorMin = Vector2.zero;
+            iconLabel.rectTransform.anchorMax = Vector2.one;
+            iconLabel.rectTransform.offsetMin = Vector2.zero;
+            iconLabel.rectTransform.offsetMax = Vector2.zero;
+            iconLabel.alignment = TextAlignmentOptions.Center;
+            iconLabel.fontSize = label.fontSize;
+            iconLabel.color = Color.white;
+            iconLabel.raycastTarget = false;
+            bool wasEnabled = label.enabled;
             controlHintUpdates.Add(pad =>
             {
-                label.resizeTextForBestFit = pad || fit;
-                label.text = pad ? FarmInput.Label(action, keyboard) : keyboard;
+                label.enabled = !pad && wasEnabled;
+                iconObject.SetActive(pad && wasEnabled);
+                if (pad) GamepadPromptSprites.SetKeycap(iconLabel, FarmInput.Label(action, keyboard));
             });
         }
         AddTool(shovelEquipped, "Previous"); AddTool(axeEquipped, "Next");

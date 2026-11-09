@@ -205,6 +205,16 @@ public class GameSettingsManager : MonoBehaviour
 //         dlssProvider = dlssProviderBehaviour as IDLSSProvider;
     }
 
+    public void Close()
+    {
+        if (MenuManager.IsMenuOpen && MenuManager.Instance != null)
+            MenuManager.Instance.ShowMenuScreen();
+        else if (Pause.Instance != null && Pause.Instance.paused)
+            Pause.Instance.ShowMainScreen();
+        else
+            gameObject.SetActive(false);
+    }
+
     private void OnEnable()
     {
         RefreshJoystickHints();
