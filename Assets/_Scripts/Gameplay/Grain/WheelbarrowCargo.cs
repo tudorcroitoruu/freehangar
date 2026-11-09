@@ -211,7 +211,8 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
         if (IsUpgrade)
         {
             bool exposed = UpgradeExposed();
-            prompt = new InteractionPromptData(transform.position + Vector3.up, exposed ? "Replace current wheelbarrow" : "Uncover the new wheelbarrow", exposed);
+            prompt = new InteractionPromptData(transform.position + Vector3.up, exposed ? "Replace current wheelbarrow" : "", exposed);
+            prompt.UncoverWheelbarrow = !exposed;
             return true;
         }
         string action;

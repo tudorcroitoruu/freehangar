@@ -3309,6 +3309,10 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 705811d807164754fadd17290547d925, type: 3}
     title: Container level too high!
     message: Upgrade this vehicle to transport this container
+  - warningType: 25
+    icon: {fileID: 21300000, guid: 5195a2b62973ef54a831d817be6a4fb6, type: 3}
+    title: Wheelbarrow coverd.
+    message: Uncover the new wheelbarrow.
   warningCanvasGroup: {fileID: 737507088087375577}
   warningImage: {fileID: 6193481453998981383}
   warningTitle: {fileID: 11493426258684311}

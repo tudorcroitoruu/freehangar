@@ -65,6 +65,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (!CanInteract) SetHangarLockedWarning(null);
         if (!CanInteract) SetCannotLoadHalfEmptyBagsWarning(false);
         if (!CanInteract) SetContainerLevelTooHighWarning(false);
+        if (!CanInteract) SetUncoverWheelbarrowWarning(false);
         if (!CanInteract) CancelBagHold();
         if (!CanInteract) { SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetNeedKeyForChestWarning(null); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); return; }
         var aimedTarget = FindTarget();
@@ -94,6 +95,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         SetVehicleFullWarning(hasAimedPrompt && aimedPrompt.VehicleFull);
         SetNotFitInWheelBarrowWarning(hasAimedPrompt && aimedPrompt.NotFitInWheelBarrow);
         SetCannotLoadInWheelbarrowWarning(hasAimedPrompt && aimedPrompt.CannotLoadInWheelbarrow);
+        SetUncoverWheelbarrowWarning(hasAimedPrompt && aimedPrompt.UncoverWheelbarrow);
         SetCannotLoadHalfEmptyBagsWarning(hasAimedPrompt && aimedPrompt.CannotLoadHalfEmptyBags);
         SetContainerLevelTooHighWarning(hasAimedPrompt && aimedPrompt.ContainerLevelTooHigh);
         SetNeedKeyForChestWarning(hasAimedPrompt && aimedPrompt.NeedKeyForChest ? aimedTarget as BuriedFind : null);
@@ -109,7 +111,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         }
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
         if (focusedLockedHangar != null || (hasAimedPrompt &&
-            (aimedPrompt.CannotLoadHalfEmptyBags || aimedPrompt.ContainerLevelTooHigh)))
+            (aimedPrompt.CannotLoadHalfEmptyBags || aimedPrompt.ContainerLevelTooHigh || aimedPrompt.UncoverWheelbarrow)))
         {
             Target = aimedTarget;
             SetHighlightedTarget(null);
@@ -445,6 +447,9 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void SetCannotLoadInWheelbarrowWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.cannotLoadInWheelbarrow, this, visible);
 
+    private void SetUncoverWheelbarrowWarning(bool visible) =>
+        GameplayCanvas.Instance?.SetWarning(WarningType.uncoverWheelbarrow, this, visible);
+
     private void SetNeedKeyForChestWarning(BuriedFind chest)
     {
         var hud = GameplayCanvas.Instance;
@@ -484,5 +489,5 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void SetContainerLevelTooHighWarning(bool visible) =>
         GameplayCanvas.Instance?.SetWarning(WarningType.containerLevelTooHigh, this, visible);
 
-    private void OnDisable() { SetContainerLevelTooHighWarning(false); SetCannotLoadHalfEmptyBagsWarning(false); SetHangarLockedWarning(null); CancelBagHold(); SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetNeedKeyForChestWarning(null); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
+    private void OnDisable() { SetUncoverWheelbarrowWarning(false); SetContainerLevelTooHighWarning(false); SetCannotLoadHalfEmptyBagsWarning(false); SetHangarLockedWarning(null); CancelBagHold(); SetWeighingWarnings(false, false); SetNotHungryWarning(false); SetNotFitInWheelBarrowWarning(false); SetCannotLoadInWheelbarrowWarning(false); SetNeedKeyForChestWarning(null); SetDogRestingWarning(false); SetVehicleFullWarning(false); SetUseForkliftWarning(false); SetResetTarget(null); Target = null; SetFreeHandsWarning(false); SetHighlightedTarget(null); HidePrompt(); }
 }
