@@ -860,7 +860,8 @@ public sealed class GrainPestDirector : MonoBehaviour
         {
             var go = Instantiate(tutorialBagTemplate.gameObject);
             go.name = "Rat tutorial grain bag";
-            go.transform.position = building.transform.position + building.transform.forward * 19.5f +
+            // Keep both bags within the rats' five-metre range of the grain area.
+            go.transform.position = building.transform.position + building.transform.forward * 18.5f +
                 building.transform.right * (i == 0 ? -2f : 2f);
             go.SetActive(true);
             var bag = go.GetComponent<GrainContainer>();
