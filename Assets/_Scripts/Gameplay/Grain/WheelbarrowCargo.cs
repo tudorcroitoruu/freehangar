@@ -32,6 +32,18 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
     public bool IsBeingPushed => pusher != null;
     private float occupiedVolume;
     private float nextImpactSound;
+    private float impactCameraTime = float.NegativeInfinity;
+    public Quaternion ImpactCameraKick
+    {
+        get
+        {
+            float t = (Time.time - impactCameraTime) / .24f;
+            if (!IsBeingPushed || t < 0f || t >= 1f) return Quaternion.identity;
+            float fade = (1f - t) * (1f - t);
+            return Quaternion.Euler((-1f + Mathf.Sin(t * 28f) * .5f) * fade,
+                Mathf.Sin(t * 35f) * .3f * fade, Mathf.Sin(t * 24f) * .4f * fade);
+        }
+    }
     private PlayerController pushingPlayer;
     private bool instrumentWasActive, shovelWasEnabled;
     private readonly List<GameObject> hiddenTools = new List<GameObject>();
@@ -361,6 +373,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
             Time.time >= nextImpactSound)
         {
             GameplayAudio.Instance?.VehicleHit(transform.position);
+            impactCameraTime = Time.time;
             nextImpactSound = Time.time + .8f;
         }
     }
@@ -425,6 +438,7 @@ public sealed class WheelbarrowCargo : MonoBehaviour, IInteractable
 
     private void StopPushing()
     {
+        impactCameraTime = float.NegativeInfinity;
         GameplayAudio.Instance?.WheelbarrowMoving(transform, false);
         foreach (var pair in ignoredCollisions)
             if (pair.player != null && pair.barrow != null) Physics.IgnoreCollision(pair.player,pair.barrow,false);

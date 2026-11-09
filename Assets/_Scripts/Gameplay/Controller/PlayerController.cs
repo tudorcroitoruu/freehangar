@@ -260,6 +260,7 @@ public class PlayerController : MonoBehaviour
         characterCamera.transform.localPosition = baseline + Vector3.up * (Mathf.Sin(sprintCameraPhase) * sprintCameraHeight * sprintCameraBlend);
         characterCamera.transform.localRotation = Quaternion.Euler(smoothedPitch + Mathf.Cos(sprintCameraPhase) * sprintCameraPitch * sprintCameraBlend, IsPushing ? pushLookYaw : 0, 0);
         if (combatTools != null) characterCamera.transform.localRotation *= combatTools.BroomCameraKick * combatTools.MeleeCameraKick;
+        if (IsPushing) characterCamera.transform.localRotation *= interactor.PushedWheelbarrow.ImpactCameraKick;
     }
 
     private void HandleGrainScooped()

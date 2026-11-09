@@ -155,7 +155,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
         Vector3 roadOffset = pickup != null ? pickup.RoadCameraOffset : Vector3.zero;
         Vector3 roadAngles = pickup != null ? pickup.RoadCameraAngles : Vector3.zero;
         view.transform.localPosition = ClearCargoFromCamera(bicycle.RidingCameraOffset + roadOffset);
-        view.transform.localRotation = Quaternion.Euler(pitch + bicycle.RidingCameraPitch + bicycle.PedalingCameraPitch, yaw, 0) * Quaternion.Euler(roadAngles);
+        view.transform.localRotation = Quaternion.Euler(pitch + bicycle.RidingCameraPitch + bicycle.PedalingCameraPitch, yaw, 0) * Quaternion.Euler(roadAngles) * bicycle.ImpactCameraKick;
     }
 
     Vector3 ClearCargoFromCamera(Vector3 desired)

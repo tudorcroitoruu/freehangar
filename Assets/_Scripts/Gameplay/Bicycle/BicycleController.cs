@@ -40,6 +40,26 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     public float PedalingCameraPitch { get; private set; }
     public Vector3 RidingCameraOffset => ridingCameraOffset;
     public float RidingCameraPitch => ridingCameraPitch;
+    private float impactCameraTime = float.NegativeInfinity;
+    private float impactCameraStrength;
+    public Quaternion ImpactCameraKick
+    {
+        get
+        {
+            float t = (Time.time - impactCameraTime) / .3f;
+            if (!IsRidden || t < 0f || t >= 1f) return Quaternion.identity;
+            float fade = (1f - t) * (1f - t) * impactCameraStrength;
+            return Quaternion.Euler((-1f + Mathf.Sin(t * 28f) * .7f) * fade,
+                Mathf.Sin(t * 35f) * .45f * fade, Mathf.Sin(t * 24f) * .6f * fade);
+        }
+    }
+
+    public void ShakeOnImpact(float impactSpeed)
+    {
+        if (!IsRidden || impactSpeed < 1.5f || Time.time - impactCameraTime < .15f) return;
+        impactCameraTime = Time.time;
+        impactCameraStrength = Mathf.Lerp(.7f, 2.5f, Mathf.InverseLerp(1.5f, 12f, impactSpeed));
+    }
     public float CurrentSteeringAngle => currentSteering;
     public float WheelRotationAngle => wheelAngle;
     float currentSteering, steeringVelocity;
@@ -255,6 +275,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
         Initialize(); if (IsRidden == value) return;
         bool wasCoasting = coasting;
         IsRidden = value; steeringVelocity = 0; PedalingCameraPitch = 0;
+        impactCameraTime = float.NegativeInfinity;
         if(value)
         {
             coasting = false;
@@ -390,6 +411,7 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
 
     private void PlayVehicleImpact(float impactSpeed)
     {
+        ShakeOnImpact(impactSpeed);
         if (impactSpeed < 1.5f || Time.time < nextVehicleHitSound) return;
         GameplayAudio.Instance?.VehicleHit(transform.position);
         nextVehicleHitSound = Time.time + .8f;

@@ -235,7 +235,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
         if (!TrySelectWeaponHit(hits, hits.Length, transform, true, out var nearest)) return;
         SpawnPistolSmoke(nearest.point + nearest.normal * .02f, nearest.normal);
         var chicken = nearest.collider.GetComponentInParent<FarmChicken>();
-        if (chicken) chicken.Hit(chicken.health, transform.position, transform);
+        if (chicken && chicken.Hit(chicken.health, transform.position, transform)) PlayChickenHitKick();
         var pest = nearest.collider.GetComponentInParent<GrainPest>();
         if (pest)
         {
@@ -292,6 +292,12 @@ public sealed class PlayerCombatTools : MonoBehaviour
     }
 
     private void CancelStrike() { impactPending=false;strikeStart=-10f;reloadSoundPending=false;meleeImpactTime=-10f; }
+    private void PlayChickenHitKick()
+    {
+        meleeImpactTime = Time.time;
+        meleeImpactStrength = equipped == Tool.Hammer ? 2.5f : equipped == Tool.Axe ? 2f : 1.2f;
+        meleeImpactDuration = .24f;
+    }
     private void OnDisable() { CancelStrike(); if (switching) FinishSwitch(); }
 
     private void PerformStrike()
@@ -317,6 +323,7 @@ public sealed class PlayerCombatTools : MonoBehaviour
                 ? CombatToolUpgrades.AxeDamage(CombatToolUpgrades.Level(SaveSystem.Data, equipped))
                 : equipped == Tool.Hammer ? 4f : 3f;
             bool damaged = chicken.Hit(damage, transform.position, transform);
+            if (damaged) PlayChickenHitKick();
             if (damaged && equipped == Tool.Axe && dustEffect != null)
             { var fx = Instantiate(dustEffect, hit.point, Quaternion.LookRotation(hit.normal)); Destroy(fx, 4f); }
             return;

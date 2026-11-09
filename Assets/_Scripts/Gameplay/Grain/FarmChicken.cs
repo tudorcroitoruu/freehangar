@@ -371,7 +371,9 @@ public sealed class FarmChicken : MonoBehaviour, IInteractable
         if(!vehicle.motorDriven || Mathf.Abs(vehicle.Speed)<2f)return false;
         float speed=Mathf.Abs(vehicle.Speed);
         float damage=vehicle.GetComponent<PickupController>()!=null && speed>=8f ? 100f : speed*7f;
-        return Hit(damage,vehicle.transform.position,vehicle.transform);
+        bool damaged = Hit(damage,vehicle.transform.position,vehicle.transform);
+        if (damaged) vehicle.ShakeOnImpact(speed);
+        return damaged;
     }
     private void Play(AudioClip[] clips) { if(clips!=null && clips.Length>0)audioSource.PlayOneShot(clips[Random.Range(0,clips.Length)]); }
     public bool TryGetPrompt(PlayerInteractor interactor, out InteractionPromptData prompt)
