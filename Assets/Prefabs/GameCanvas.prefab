@@ -9088,7 +9088,7 @@ MonoBehaviour:
     grainType: 0
     upgradeType: 0
     progressMode: 2
-    goalAmount: 98
+    goalAmount: 99
     useDisplayGoalAmount: 1
     displayGoalAmount: 100
     rewardAmount: 50
@@ -9186,7 +9186,7 @@ MonoBehaviour:
     grainType: 1
     upgradeType: 0
     progressMode: 2
-    goalAmount: 98
+    goalAmount: 99
     useDisplayGoalAmount: 1
     displayGoalAmount: 100
     rewardAmount: 350
@@ -9270,7 +9270,7 @@ MonoBehaviour:
     grainType: 2
     upgradeType: 0
     progressMode: 2
-    goalAmount: 98
+    goalAmount: 99
     useDisplayGoalAmount: 1
     displayGoalAmount: 100
     rewardAmount: 650
@@ -9354,7 +9354,7 @@ MonoBehaviour:
     grainType: 7
     upgradeType: 0
     progressMode: 2
-    goalAmount: 98
+    goalAmount: 99
     useDisplayGoalAmount: 1
     displayGoalAmount: 100
     rewardAmount: 1000
@@ -9438,7 +9438,7 @@ MonoBehaviour:
     grainType: 8
     upgradeType: 0
     progressMode: 2
-    goalAmount: 98
+    goalAmount: 99
     useDisplayGoalAmount: 1
     displayGoalAmount: 100
     rewardAmount: 2000

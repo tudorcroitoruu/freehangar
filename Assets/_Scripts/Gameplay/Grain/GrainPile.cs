@@ -688,7 +688,7 @@ public sealed class GrainPile : MonoBehaviour
     {
         if (IsDroppedPile || field == null || initialKilograms <= 0) return false;
         double remaining = Kilograms;
-        if (remaining <= 0 || remaining > initialKilograms * .02) return false;
+        if (remaining <= 0 || remaining > initialKilograms * .01) return false;
         // Completion cleanup is not harvested grain: don't grant cargo, sales or collection rewards.
         spatial?.RestoreSave(new List<GrainColumnSave>());
         System.Array.Clear(field.Heights, 0, field.Heights.Length);
