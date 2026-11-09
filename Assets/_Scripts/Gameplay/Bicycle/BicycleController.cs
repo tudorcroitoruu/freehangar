@@ -449,12 +449,55 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
             prompt.CannotLoadHalfEmptyBags = !ready;
             prompt.ContainerLevelTooHigh = ready && !compatible;
             prompt.VehicleFull = ready && compatible && !available;
+            SetCargoProgress(ref prompt);
+            if (prompt.VehicleFull) prompt.Action = "";
             return true;
         }
         if (actor.IsCarrying) return false;
         var engine = GetComponent<MotorollerController>();
         prompt = new InteractionPromptData(transform.position + Vector3.up, engine != null ? "Drive " + engine.VehicleName : "Ride bicycle");
+        SetCargoProgress(ref prompt);
         return true;
+    }
+
+    private void SetCargoProgress(ref InteractionPromptData prompt)
+    {
+        int used = 0;
+        int capacity;
+        if (TryGetComponent<PickupCargoLayout>(out var layout))
+        {
+            layout.EnsureSlots();
+            capacity = layout.SmallCapacity;
+            foreach (var slot in cargoSlots)
+                if (slot != null)
+                    foreach (Transform item in slot)
+                        used += item.TryGetComponent<GrainContainer>(out var container)
+                            ? PickupCargoLayout.Units(container) : 1;
+        }
+        else if (TryGetComponent<VehicleCargoRack>(out var rack))
+        {
+            used = rack.UsedSlots;
+            capacity = rack.SlotLimit;
+        }
+        else
+        {
+            capacity = 0;
+            if (cargoSlots != null)
+                foreach (var slot in cargoSlots)
+                    if (slot != null)
+                    {
+                        capacity++;
+                        if (slot.childCount > 0) used++;
+                    }
+            if (exclusiveBagSlot != null)
+            {
+                capacity = Mathf.Max(1, capacity);
+                if (exclusiveBagSlot.childCount > 0) used = capacity;
+            }
+        }
+        prompt.ShowProgress = capacity > 0;
+        prompt.Progress = capacity > 0 ? Mathf.Clamp01((float)used / capacity) : 0f;
+        prompt.ProgressText = capacity > 0 ? $"{Mathf.RoundToInt(prompt.Progress * 100f)}%" : "";
     }
 
     public bool TryInteract(PlayerInteractor interactor)

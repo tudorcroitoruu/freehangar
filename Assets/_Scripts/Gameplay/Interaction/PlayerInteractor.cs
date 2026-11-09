@@ -105,7 +105,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (hasAimedPrompt)
         {
             AddActions(aimedTarget, ref aimedPrompt);
-            if (aimedTarget is BicycleController) AddResetAction(ref aimedPrompt);
+            if (aimedTarget is BicycleController && !aimedPrompt.VehicleFull) AddResetAction(ref aimedPrompt);
         }
         SetFreeHandsWarning(hasAimedPrompt && aimedPrompt.RequiresFreeHands);
         if (focusedLockedHangar != null || (hasAimedPrompt &&
@@ -119,7 +119,9 @@ public sealed class PlayerInteractor : MonoBehaviour
         // A fridge's eating prompt stays hidden while the not-hungry warning is active.
         bool hungerBlocksPrompt = aimedPrompt.NotHungry &&
             (aimedTarget is FridgeProduct || !aimedPrompt.HasAvailableInput);
-        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || aimedPrompt.VehicleFull || aimedPrompt.NotFitInWheelBarrow || aimedPrompt.CannotLoadInWheelbarrow || aimedPrompt.NeedKeyForChest || hungerBlocksPrompt || aimedPrompt.WeighingEmpty || aimedPrompt.WeighingWrong || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
+        bool vehicleFullBlocksPrompt = aimedPrompt.VehicleFull &&
+            !(aimedTarget is BicycleController && aimedPrompt.ShowProgress);
+        if (hasAimedPrompt && (aimedPrompt.RequiresFreeHands || vehicleFullBlocksPrompt || aimedPrompt.NotFitInWheelBarrow || aimedPrompt.CannotLoadInWheelbarrow || aimedPrompt.NeedKeyForChest || hungerBlocksPrompt || aimedPrompt.WeighingEmpty || aimedPrompt.WeighingWrong || aimedPrompt.UseForkliftToMove || aimedPrompt.DogResting))
         {
             Target = aimedTarget;
             SetHighlightedTarget(aimedTarget is SellingWeighButton ? aimedTarget : null);
