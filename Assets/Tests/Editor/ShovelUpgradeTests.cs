@@ -5,6 +5,49 @@ using UnityEngine.UI;
 
 public class ShovelUpgradeTests
 {
+    [TestCase(0f, false, true)]
+    [TestCase(60f, false, false)]
+    [TestCase(60f, true, true)]
+    public void GroundPourAcceptsSteepGrainButRejectsSteepSolidSurfaces(float slope, bool grain, bool expected)
+    {
+        var surface = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        float previousTimeScale = Time.timeScale;
+        try
+        {
+            Time.timeScale = 1f;
+            surface.transform.position = new Vector3(10000, 100, 10000);
+            if (grain)
+            {
+                surface.AddComponent<GrainPile>();
+                // Use a controlled face to reproduce an excavated pile's steep normal.
+                surface.GetComponent<MeshCollider>().enabled = false;
+            }
+            surface.transform.rotation = Quaternion.Euler(slope, 0, 0);
+            surface.transform.localScale = new Vector3(4, .1f, 4);
+            Vector3 face = surface.transform.position + surface.transform.up * .05f;
+            root.transform.position = face + surface.transform.up * 2f;
+            var camera = Child("Pour test camera").AddComponent<Camera>();
+            camera.enabled = false;
+            camera.transform.localPosition = Vector3.zero;
+            camera.transform.LookAt(face);
+            var shovelObject = Child("Pour test shovel");
+            var shovel = shovelObject.AddComponent<ShovelTool>();
+            typeof(ShovelTool).GetField("bladeTip", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(shovel, shovelObject.transform);
+            shovel.Cargo.Add(GrainType.Corn, 1f);
+            Physics.SyncTransforms();
+
+            Assert.That(shovel.TryDrop(camera, root.transform), Is.EqualTo(expected));
+            shovel.CancelAction();
+            Assert.That(shovel.Kilograms, Is.EqualTo(1f), "Targeting/cancellation must retain cargo.");
+        }
+        finally
+        {
+            Object.DestroyImmediate(surface);
+            Time.timeScale = previousTimeScale;
+        }
+    }
+
     [TestCase(.00001f, 0f)]
     [TestCase(.049f, 0f)]
     [TestCase(.05f, .05f)]

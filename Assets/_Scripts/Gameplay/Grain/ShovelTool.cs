@@ -278,10 +278,18 @@ public sealed class ShovelTool : MonoBehaviour
             if(ActiveVacuum != null)ActiveVacuum.BeginEmpty();
             return true;
         }
-        if (!FindDropHit(camera, player, out RaycastHit hit) || hit.normal.y < .65f ||
+        if (!FindDropHit(camera, player, out RaycastHit hit) ||
             hit.collider.GetComponentInParent<GrainContainer>() != null || hit.collider.attachedRigidbody != null) return false;
+        var pile = hit.collider.GetComponentInParent<GrainPile>();
+        // Excavation can leave steep grain faces. They are valid receivers even
+        // when too steep to count as walkable ground; ordinary walls are not.
+        if (pile != null)
+        {
+            if (!pile.isActiveAndEnabled || !pile.IsInsideBoundary(hit.point) || hit.normal.y < 0f) return false;
+        }
+        else if (hit.normal.y < .65f) return false;
         actionCamera = camera; actor = player;
-        dropReceiver = null;
+        dropReceiver = pile;
         pendingPile = null; pendingContainer = null;
         targetPoint = hit.point; dropSurface = hit.collider;
         dropping = true; dropCommitted = false; queued = false;

@@ -48,6 +48,14 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
     private int lastLevel, animationHash;
     private bool initialized, hitApplied;
     private PlayerData profile;
+    [Header("Outdoor discovery hints")]
+    [SerializeField, Min(10f)] private float discoveryHintMinInterval = 90f;
+    [SerializeField, Min(10f)] private float discoveryHintMaxInterval = 150f;
+    [SerializeField, Min(1f)] private float discoveryHintDuration = 20f;
+    private float nextDiscoveryHint, discoveryHintEnds, nextDiscoveryCheck;
+    private BuriedFind discoveryTarget, lastDiscoveryTarget;
+    private InteractionHighlight discoveryHighlight;
+    private readonly RaycastHit[] discoveryRoofHits = new RaycastHit[32];
 
     private void Awake()
     {
@@ -64,6 +72,9 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
         if (Time.timeScale <= 0f || !SaveSystem.savesLoaded || SaveSystem.Data == null) return;
         if (!initialized || profile != SaveSystem.Data)
         {
+            ClearDiscoveryHint();
+            lastDiscoveryTarget = null;
+            ScheduleDiscoveryHint();
             profile = SaveSystem.Data;
             initialized = true;
             lastLevel = Level;
@@ -117,7 +128,72 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
             }
             nextDecision = Time.time + (State == DogState.Chasing ? 0f : 3f);
         }
+        UpdateDiscoveryHint();
         UpdatePresentation();
+    }
+
+    private void ScheduleDiscoveryHint() => nextDiscoveryHint = Time.time +
+        Random.Range(Mathf.Max(10f, discoveryHintMinInterval), Mathf.Max(10f, Mathf.Max(discoveryHintMinInterval, discoveryHintMaxInterval)));
+
+    private void ClearDiscoveryHint()
+    {
+        if (discoveryHighlight) discoveryHighlight.SetDogHint(this, false);
+        discoveryHighlight = null;
+        discoveryTarget = null;
+    }
+
+    private bool IsOutdoorDiscovery(BuriedFind find)
+    {
+        if (!find || !find.CanReceiveDogHint || find.GetComponentInParent<HangarGrainVisibility>() != null) return false;
+        var collider = find.GetComponent<BoxCollider>();
+        if (!collider || !collider.enabled) return false;
+        Vector3 point = collider.bounds.center;
+        if (!FarmChicken.IsGrainClearAt(new Vector3(point.x, collider.bounds.min.y, point.z))) return false;
+        // Cast down from open sky: roof meshes often have no underside collision.
+        int count = Physics.RaycastNonAlloc(point + Vector3.up * 100f, Vector3.down,
+            discoveryRoofHits, 100f, ~0, QueryTriggerInteraction.Ignore);
+        if (count == discoveryRoofHits.Length) return false;
+        for (int i = 0; i < count; i++)
+        {
+            var obstacle = discoveryRoofHits[i].transform;
+            if (obstacle.IsChildOf(find.transform) || obstacle.IsChildOf(transform) ||
+                obstacle.GetComponentInParent<PlayerController>() != null) continue;
+            return false;
+        }
+        return true;
+    }
+
+    private void UpdateDiscoveryHint()
+    {
+        bool resting = State == DogState.Idle || State == DogState.Sleeping;
+        if (discoveryHighlight)
+        {
+            if (!resting || !discoveryTarget || !discoveryTarget.CanReceiveDogHint || Time.time >= discoveryHintEnds)
+                ClearDiscoveryHint();
+            else if (Time.time >= nextDiscoveryCheck)
+            {
+                nextDiscoveryCheck = Time.time + 1f;
+                if (!IsOutdoorDiscovery(discoveryTarget)) ClearDiscoveryHint();
+            }
+        }
+        if (!resting || discoveryHighlight || Time.time < nextDiscoveryHint) return;
+        ScheduleDiscoveryHint();
+        BuriedFind selected = null, fallback = null;
+        int candidates = 0;
+        foreach (var find in FindObjectsByType<BuriedFind>(FindObjectsSortMode.None))
+        {
+            if (!IsOutdoorDiscovery(find)) continue;
+            if (find == lastDiscoveryTarget) { fallback = find; continue; }
+            if (Random.Range(0, ++candidates) == 0) selected = find;
+        }
+        if (!selected) selected = fallback;
+        if (!selected) return;
+        discoveryTarget = lastDiscoveryTarget = selected;
+        discoveryHighlight = selected.GetComponent<InteractionHighlight>() ?? selected.gameObject.AddComponent<InteractionHighlight>();
+        discoveryHighlight.SetDogHint(this, true);
+        discoveryHintEnds = Time.time + discoveryHintDuration;
+        nextDiscoveryCheck = Time.time + 1f;
+        Bark(true);
     }
 
     private void UpdateHomeRest(bool playerNearby)
@@ -513,6 +589,8 @@ public sealed class FarmDog : MonoBehaviour, IInteractable
 
     private void OnDisable()
     {
+        ClearDiscoveryHint();
+        ScheduleDiscoveryHint();
         if (deliverySearch != null) StopCoroutine(deliverySearch);
         deliverySearch = null;
         if (agent && agent.enabled && agent.isOnNavMesh) agent.ResetPath();

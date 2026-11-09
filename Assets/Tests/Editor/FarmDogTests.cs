@@ -4,6 +4,79 @@ using UnityEngine;
 public sealed class FarmDogTests
 {
     [Test]
+    public void DiscoveryHintsExcludeCollectedBuriedAndRoofedFinds()
+    {
+        var dogObject = new GameObject("Hint dog");
+        dogObject.SetActive(false);
+        var pickup = new GameObject("Outdoor find");
+        var roof = new GameObject("Roof");
+        var grainObject = new GameObject("Covering grain");
+        grainObject.SetActive(false);
+        try
+        {
+            pickup.transform.position = new Vector3(10000, 100, 10000);
+            var find = pickup.AddComponent<BuriedFind>();
+            find.ConfigureChestKey("test.outdoor.key", "Test key");
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            typeof(BuriedFind).GetMethod("SetRevealed", flags).Invoke(find, new object[] { true });
+            var dog = dogObject.AddComponent<FarmDog>();
+            var eligible = typeof(FarmDog).GetMethod("IsOutdoorDiscovery", flags);
+            Physics.SyncTransforms();
+            Assert.IsTrue((bool)eligible.Invoke(dog, new object[] { find }));
+
+            SaveSystem.Data.foundSecrets = new[] { find.FindId };
+            Assert.IsFalse((bool)eligible.Invoke(dog, new object[] { find }));
+            SaveSystem.Data.foundSecrets = new string[0];
+            var pileField = typeof(BuriedFind).GetField("coveringPile", flags);
+            pileField.SetValue(find, grainObject.AddComponent<GrainPile>());
+            Assert.IsFalse((bool)eligible.Invoke(dog, new object[] { find }));
+            pileField.SetValue(find, null);
+
+            roof.transform.position = pickup.transform.position + Vector3.up * 3f;
+            roof.AddComponent<BoxCollider>().size = new Vector3(5, .2f, 5);
+            Physics.SyncTransforms();
+            Assert.IsFalse((bool)eligible.Invoke(dog, new object[] { find }));
+            roof.SetActive(false);
+            Physics.SyncTransforms();
+            Assert.IsTrue((bool)eligible.Invoke(dog, new object[] { find }));
+            pickup.SetActive(false);
+            Assert.IsFalse((bool)eligible.Invoke(dog, new object[] { find }));
+        }
+        finally
+        {
+            Object.DestroyImmediate(pickup);
+            Object.DestroyImmediate(roof);
+            Object.DestroyImmediate(grainObject);
+            Object.DestroyImmediate(dogObject);
+        }
+    }
+
+    [Test]
+    public void EndingDogHintPreservesPlayerFocusAndOriginalOutlineStyle()
+    {
+        var pickup = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        var source = new GameObject("Dog hint source");
+        try
+        {
+            var outline = pickup.AddComponent<Outline>();
+            outline.OutlineColor = Color.cyan;
+            outline.OutlineWidth = 2f;
+            var highlight = pickup.AddComponent<InteractionHighlight>();
+            highlight.SetDogHint(source, true);
+            Assert.IsTrue(outline.enabled);
+            Assert.AreEqual(Color.yellow, outline.OutlineColor);
+            highlight.SetFocused(true);
+            highlight.SetDogHint(source, false);
+            Assert.IsTrue(outline.enabled);
+            Assert.AreEqual(Color.cyan, outline.OutlineColor);
+            Assert.AreEqual(2f, outline.OutlineWidth);
+            highlight.SetFocused(false);
+            Assert.IsFalse(outline.enabled);
+        }
+        finally { Object.DestroyImmediate(pickup); Object.DestroyImmediate(source); }
+    }
+
+    [Test]
     public void DeliveryRejectsAChickenLegHiddenBehindAWall()
     {
         var dogObject = new GameObject("Delivery dog"); dogObject.SetActive(false);

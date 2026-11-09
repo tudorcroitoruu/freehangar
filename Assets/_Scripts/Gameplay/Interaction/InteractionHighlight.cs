@@ -10,6 +10,7 @@ public sealed class InteractionHighlight : MonoBehaviour
     private bool focused, shopVisible;
     private readonly Dictionary<Outline, (Color color, float width, Outline.Mode mode)> originalStyles = new();
     private readonly HashSet<Object> warningSources = new();
+    private readonly HashSet<Object> dogHintSources = new();
     public bool IsWarningVisible => isActiveAndEnabled && warningSources.Count > 0;
     private static readonly Color ShopFocusColor = new Color(1f, .65f, .04f);
 
@@ -49,6 +50,20 @@ public sealed class InteractionHighlight : MonoBehaviour
         Apply();
     }
 
+    public void SetDogHint(Object source, bool visible)
+    {
+        if (source == null) return;
+        if (visible)
+        {
+            if (!dogHintSources.Add(source)) return;
+            if (outlines == null || outlines.Length == 0) Reset();
+            if (outlines.Length == 0 && (GetComponentInChildren<MeshRenderer>() != null || GetComponentInChildren<SkinnedMeshRenderer>() != null))
+                outlines = new[] { gameObject.AddComponent<Outline>() };
+        }
+        else if (!dogHintSources.Remove(source)) return;
+        Apply();
+    }
+
     private void LateUpdate()
     {
         if (warningSources.Count > 0) Apply();
@@ -63,15 +78,16 @@ public sealed class InteractionHighlight : MonoBehaviour
             if (!outline) continue;
             // Cache by object so edits to the outline list cannot invalidate saved styles.
             bool warning = IsWarningVisible;
-            if ((shopVisible || warning) && !originalStyles.ContainsKey(outline))
+            bool dogHint = dogHintSources.Count > 0;
+            if ((shopVisible || warning || dogHint) && !originalStyles.ContainsKey(outline))
                 originalStyles.Add(outline, (outline.OutlineColor, outline.OutlineWidth, outline.OutlineMode));
             if (originalStyles.TryGetValue(outline, out var original))
             {
-                outline.OutlineColor = warning ? Color.red : shopVisible ? (focused ? ShopFocusColor : Color.white) : original.color;
-                outline.OutlineWidth = warning ? 5.5f + 1.5f * Mathf.Sin(Time.unscaledTime * Mathf.PI * 3f) : shopVisible ? (focused ? 6f : 2f) : original.width;
-                outline.OutlineMode = warning ? Outline.Mode.OutlineAll : original.mode;
+                outline.OutlineColor = warning ? Color.red : dogHint ? Color.yellow : shopVisible ? (focused ? ShopFocusColor : Color.white) : original.color;
+                outline.OutlineWidth = warning ? 5.5f + 1.5f * Mathf.Sin(Time.unscaledTime * Mathf.PI * 3f) : dogHint ? 5f : shopVisible ? (focused ? 6f : 2f) : original.width;
+                outline.OutlineMode = warning || dogHint ? Outline.Mode.OutlineAll : original.mode;
             }
-            bool show = isActiveAndEnabled && (focused || shopVisible || warning);
+            bool show = isActiveAndEnabled && (focused || shopVisible || warning || dogHint);
             if (outline.enabled != show) outline.enabled = show;
         }
     }

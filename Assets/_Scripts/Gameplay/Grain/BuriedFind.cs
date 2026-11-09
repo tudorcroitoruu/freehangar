@@ -114,6 +114,8 @@ public sealed class BuriedFind : MonoBehaviour, IInteractable
     public Kind FindKind => kind;
     public int TargetHangar => targetHangar;
     public bool IsAnimating => opening;
+    public bool CanReceiveDogHint => isActiveAndEnabled && revealed && !opening && !committed &&
+        coveringPile == null && !string.IsNullOrEmpty(findId) && !WasFound(SaveSystem.Data, findId);
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetProfileRequest()
