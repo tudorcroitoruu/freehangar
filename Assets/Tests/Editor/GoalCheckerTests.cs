@@ -281,6 +281,43 @@ public class GoalCheckerTests
 
 public class GoalsManagerTests
 {
+    [Test]
+    public void CheatCompletesOnlySelectedHangarGrainGoalsAndRewardsOnce()
+    {
+        var previousData = SaveSystem.Data;
+        bool previousLoaded = SaveSystem.savesLoaded;
+        try
+        {
+            SaveSystem.savesLoaded = false;
+            var data = SaveSystem.Data = new PlayerData { cash = 0 };
+            var first = Goal("blocker", 1, GoalProgressMode.SinceActivation);
+            var load = Goal("h2_load_1000kg", 1000, GoalProgressMode.SinceActivation, 20);
+            load.hangarId = 0;
+            var clear = new GoalSettings { goalId = "h2_clear", hangarId = 2,
+                goalType = GoalType.HangarCleared, goalAmount = 100, rewardAmount = 30 };
+            var key = new GoalSettings { goalId = "h2_collect_key", hangarId = 2,
+                goalType = GoalType.HangarKeyCollected, goalAmount = 1 };
+            var other = Goal("h3_load_4500kg", 4500, GoalProgressMode.SinceActivation, 40);
+            Create(first, load, clear, key, other);
+            manager.Initialize(data);
+            manager.CompleteHangarGrainGoals(2);
+            manager.CompleteHangarGrainGoals(2);
+            Assert.That(data.cash, Is.EqualTo(50));
+            Assert.IsTrue(data.goals.Single(g => g.goalId == load.goalId).completed);
+            Assert.IsTrue(data.goals.Single(g => g.goalId == clear.goalId).rewardClaimed);
+            Assert.IsFalse(data.goals.Single(g => g.goalId == key.goalId).completed);
+            Assert.IsFalse(data.goals.Single(g => g.goalId == other.goalId).completed);
+            manager.ProcessAction(new GoalAction(GoalType.GrainLoaded, 1));
+            Assert.That(manager.CurrentGoal, Is.SameAs(key), "Completed future goals must be skipped.");
+            Assert.That(data.cash, Is.EqualTo(50));
+        }
+        finally
+        {
+            SaveSystem.Data = previousData;
+            SaveSystem.savesLoaded = previousLoaded;
+        }
+    }
+
     private GameObject owner;
     private GoalsManager manager;
 

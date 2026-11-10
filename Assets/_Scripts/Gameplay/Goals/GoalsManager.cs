@@ -225,8 +225,47 @@ public class GoalsManager : MonoBehaviour
         RefreshGoal();
     }
 
-    private void SelectCurrentGoal() =>
+    /// <summary>Cheat completion for this hangar's grain objectives, including inactive objectives.</summary>
+    public void CompleteHangarGrainGoals(int hangarId)
+    {
+        if (hangarId < 1 || hangarId > 5 || SaveSystem.Data == null) return;
+        if (!initialized || loadedData != SaveSystem.Data) Initialize(SaveSystem.Data);
+        var completed = new System.Collections.Generic.List<GoalSettings>();
+        foreach (var goal in allGoalSettings ?? Array.Empty<GoalSettings>())
+        {
+            bool matches = goal.goalType == GoalType.HangarCleared && goal.hangarId == hangarId ||
+                (GoalChecker.IsGlobalGrainQuantity(goal.goalType) || goal.goalType == GoalType.MoneyEarned) &&
+                goal.goalId.StartsWith($"h{hangarId}_", StringComparison.Ordinal);
+            if (!matches) continue;
+            var state = progress[goal.goalId];
+            if (state.completed && state.rewardClaimed) continue;
+            if (!state.rewardClaimed)
+                loadedData.cash = (int)Math.Min(int.MaxValue, (long)loadedData.cash + goal.rewardAmount);
+            state.currentAmount = goal.goalAmount;
+            state.completed = state.rewardClaimed = true;
+            completed.Add(goal);
+        }
+        if (completed.Count == 0) return;
+        if (currentGoal != null && progress[currentGoal.goalId].completed)
+        {
+            awaitingNextGoal = false;
+            goalDelayRemaining = 0f;
+            SelectCurrentGoal();
+        }
+        MarkDirty();
+        CompleteReadyGoals();
+        RefreshGoal();
+        foreach (var goal in completed) GoalCompleted?.Invoke(goal);
+    }
+
+    private void SelectCurrentGoal()
+    {
+        while (currentIndex < (allGoalSettings?.Length ?? 0) &&
+               progress[allGoalSettings[currentIndex].goalId].completed &&
+               progress[allGoalSettings[currentIndex].goalId].rewardClaimed)
+            currentIndex++;
         currentGoal = currentIndex < (allGoalSettings?.Length ?? 0) ? allGoalSettings[currentIndex] : null;
+    }
 
     private void RefreshGoal()
     {

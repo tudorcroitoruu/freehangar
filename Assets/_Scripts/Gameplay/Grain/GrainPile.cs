@@ -281,6 +281,32 @@ public sealed class GrainPile : MonoBehaviour
             heights = (float[])field.Heights.Clone(), columns = spatial?.CaptureSave() };
     }
 
+    /// <summary>Remaining saleable stock, using the same conversion as scooping.</summary>
+    public void CopyRemainingGrain(GrainCargo destination)
+    {
+        Initialize();
+        destination.Clear();
+        if (spatial == null) CollectRecipe(harvestedKg, (float)CollectibleKilograms, destination);
+        else
+            for (int i = 0; i < GrainCargo.TypeCount; i++)
+                destination.Add((GrainType)i, (float)(GrainKilograms((GrainType)i) / GrainConsumeMultiplier));
+    }
+
+    /// <summary>Empty only the grain geometry and stock; leave discoveries and other objects intact.</summary>
+    public void ClearGrain()
+    {
+        Initialize();
+        harvestedKg += CollectibleKilograms;
+        spatial?.RestoreSave(new List<GrainColumnSave>());
+        System.Array.Clear(field.Heights, 0, field.Heights.Length);
+        System.Array.Clear(visualField.Heights, 0, visualField.Heights.Length);
+        settling = visualSettling = surfaceRefreshPending = false;
+        SurfaceRevision++;
+        RefreshSurface();
+        RefreshCollider();
+        RefreshGrainAppearance();
+    }
+
     public void RestoreSave(PileSave saved)
     {
         if (saved == null || saved.heights == null) return;

@@ -4,6 +4,37 @@ using UnityEngine;
 
 public class GrainEconomyTests
 {
+    [TestCase(false)]
+    [TestCase(true)]
+    public void CheatClearPreservesItemsAndEmptiesSavedGrain(bool spatialLayout)
+    {
+        if (spatialLayout) pile.ConfigureRegions(new[] { new GrainRegion(50, GrainType.Rice), new GrainRegion(50, GrainType.Wheat) });
+        var item = new GameObject("Uncollected discovery");
+        item.transform.SetParent(root.transform, false);
+        item.transform.localPosition = new Vector3(1, .25f, 1);
+        Vector3 position = item.transform.position;
+        double saleable = pile.CollectibleKilograms;
+        var stock = new GrainCargo();
+        pile.CopyRemainingGrain(stock);
+        Assert.That(stock.Total, Is.EqualTo(saleable).Within(saleable * .00001));
+        if (spatialLayout)
+        {
+            Assert.That(stock[GrainType.Rice], Is.GreaterThan(0));
+            Assert.That(stock[GrainType.Wheat], Is.GreaterThan(0));
+        }
+        pile.ClearGrain();
+        Assert.That(pile.Kilograms, Is.Zero);
+        Assert.That(pile.ClearedPercent, Is.EqualTo(100));
+        Assert.That(item.transform.parent, Is.EqualTo(root.transform));
+        Assert.That(item.transform.position, Is.EqualTo(position));
+        Assert.IsTrue(item.activeSelf);
+        Assert.IsFalse(root.GetComponent<MeshCollider>().enabled);
+        var saved = pile.CaptureSave();
+        pile.RestoreSave(saved);
+        pile.CopyRemainingGrain(stock);
+        Assert.That(stock.Total, Is.Zero, "A second sale or reload must not restore grain.");
+    }
+
     [Test]
     public void ThinRemnantCleanupRemovesStockButKeepsThickerGrain()
     {
