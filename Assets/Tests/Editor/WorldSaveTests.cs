@@ -7,6 +7,52 @@ using Object = UnityEngine.Object;
 
 public class WorldSaveTests
 {
+    [TestCase(false)]
+    [TestCase(true)]
+    public void MowerTrailerPoseSurvivesSaveLoad(bool legacySave)
+    {
+        InEmptyScene(() =>
+        {
+            var root = new GameObject("Trailer pose test");
+            var rig = Object.Instantiate(Resources.Load<GameObject>("Vehicles/4_Lawnmower_With_Trailer"), root.transform);
+            var mower = rig.GetComponentInChildren<LawnmowerController>(true);
+            mower.transform.SetPositionAndRotation(new Vector3(40, 3, -20), Quaternion.Euler(0, 125, 0));
+            mower.ReconnectTrailer();
+            var trailer = mower.trailerJoint.GetComponent<Rigidbody>();
+            var rotation = mower.transform.rotation * Quaternion.Euler(8, 35, -4);
+            var position = mower.hitchBody.transform.TransformPoint(mower.trailerJoint.connectedAnchor) -
+                rotation * Vector3.Scale(mower.trailerJoint.anchor, trailer.transform.lossyScale);
+            trailer.position = position; trailer.rotation = rotation;
+            trailer.transform.SetPositionAndRotation(position, rotation);
+            Physics.SyncTransforms();
+            var bag = new GameObject("Trailer cargo");
+            bag.transform.SetParent(trailer.transform, false);
+            bag.transform.localPosition = new Vector3(0, 1, -2);
+            bag.AddComponent<GrainContainer>();
+            var cargoPosition = bag.transform.position;
+            var adapter = CreateAdapter();
+            var saved = adapter.Capture();
+            if (legacySave) saved.vehicles[0].bodies.Clear();
+            saved = SaveSystem.DeserializePlayerData(JsonUtility.ToJson(new PlayerData { world = saved })).world;
+            mower.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            mower.ReconnectTrailer();
+            for (int i = 0; i < 2; i++)
+            {
+                Restore(adapter, saved);
+                Assert.Less(Vector3.Distance(mower.hitchTarget.position, mower.hitchBody.position), .001f);
+                Assert.Less(Vector3.Distance(trailer.transform.TransformPoint(mower.trailerJoint.anchor),
+                    mower.hitchBody.transform.TransformPoint(mower.trailerJoint.connectedAnchor)), .001f);
+                if (!legacySave)
+                {
+                    Assert.Less(Vector3.Distance(position, trailer.position), .001f, "Restore the sibling trailer's physics position.");
+                    Assert.Less(Quaternion.Angle(rotation, trailer.rotation), .001f, "Keep its saved articulation on slopes and turns.");
+                    Assert.Less(Vector3.Distance(cargoPosition, bag.transform.position), .001f);
+                }
+                else Assert.Less(Quaternion.Angle(mower.transform.rotation, trailer.rotation), .001f);
+            }
+        });
+    }
+
     [Test]
     public void FinishingRunRemovesContinueAndBackupButPreservesSettings()
     {
@@ -193,12 +239,18 @@ public class WorldSaveTests
     {
         var original = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
         var data = SaveSystem.Data; bool loaded = SaveSystem.savesLoaded;
-        var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
-            UnityEditor.SceneManagement.NewSceneMode.Additive);
+        bool separateScene = !string.IsNullOrEmpty(original.path);
+        var originalRoots = new System.Collections.Generic.HashSet<GameObject>(original.GetRootGameObjects());
+        var scene = separateScene
+            ? UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Additive)
+            : original;
         try { SaveSystem.Data = new PlayerData(); SaveSystem.savesLoaded = false; test(); }
         finally
         {
-            UnityEditor.SceneManagement.EditorSceneManager.CloseScene(scene, true);
+            if (separateScene) UnityEditor.SceneManagement.EditorSceneManager.CloseScene(scene, true);
+            else foreach (var root in scene.GetRootGameObjects())
+                if (!originalRoots.Contains(root)) Object.DestroyImmediate(root);
             UnityEngine.SceneManagement.SceneManager.SetActiveScene(original);
             SaveSystem.Data = data; SaveSystem.savesLoaded = loaded;
         }

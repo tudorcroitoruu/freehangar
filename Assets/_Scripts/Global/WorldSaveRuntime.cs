@@ -227,6 +227,14 @@ public sealed class WorldSaveRuntime : MonoBehaviour
                 if (child.gameObject != go && child.GetComponent<GrainContainer>() == null)
                     record.bodies.Add(new BodySave { path = Path(child.transform, go.transform), position = child.position,
                         rotation = child.rotation, velocity = child.linearVelocity, angularVelocity = child.angularVelocity });
+            // The mower's trailer is a sibling, so child-body traversal cannot save it.
+            // Reuse the trailer path resolver used by cargo without changing the save format.
+            var mower = go.GetComponent<LawnmowerController>();
+            if (mower != null && mower.trailerJoint != null &&
+                !mower.trailerJoint.transform.IsChildOf(go.transform) &&
+                mower.trailerJoint.TryGetComponent<Rigidbody>(out var trailer))
+                record.bodies.Add(new BodySave { path = "@trailer:", position = trailer.position,
+                    rotation = trailer.rotation, velocity = trailer.linearVelocity, angularVelocity = trailer.angularVelocity });
             if (result.introPlaying && intro.SavedBicycle != null && go == intro.SavedBicycle.gameObject)
             { record.position = intro.SavedBikePosition; record.rotation = intro.SavedBikeRotation; }
             if (record is BagSave bagRecord) result.bags.Add(bagRecord);
@@ -307,15 +315,19 @@ public sealed class WorldSaveRuntime : MonoBehaviour
                 if (record.hasBody) { body.useGravity = record.gravity; body.mass = Mathf.Max(.001f,record.mass); body.linearDamping = record.linearDamping; body.angularDamping = record.angularDamping; }
                 if (!body.isKinematic) { body.linearVelocity = record.velocity; body.angularVelocity = record.angularVelocity; }
             }
+            // Reconnect before restoring body poses: old saves need the fallback pose,
+            // while newer saves must retain the trailer's articulation and cargo position.
+            go.GetComponent<LawnmowerController>()?.ReconnectTrailer();
             foreach (var child in record.bodies)
             {
                 var target = Resolve(go.transform, child.path); if (target == null) continue;
+                if (target.TryGetComponent<Rigidbody>(out var rb))
+                {
+                    rb.position = child.position; rb.rotation = child.rotation;
+                    if (!rb.isKinematic) { rb.linearVelocity = child.velocity; rb.angularVelocity = child.angularVelocity; }
+                }
                 target.SetPositionAndRotation(child.position, child.rotation);
-                if (target.TryGetComponent<Rigidbody>(out var rb) && !rb.isKinematic) { rb.linearVelocity = child.velocity; rb.angularVelocity = child.angularVelocity; }
             }
-            // Mower trailers live outside the saved driving object's hierarchy.
-            // Reconnect old saves too, rather than asking the joint to pull across the map.
-            go.GetComponent<LawnmowerController>()?.ReconnectTrailer();
             go.GetComponent<VehicleReset>()?.SetHomePose();
         }
         foreach (var record in saved.Records())

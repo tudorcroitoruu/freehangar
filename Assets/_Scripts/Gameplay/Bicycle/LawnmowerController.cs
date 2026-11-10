@@ -75,12 +75,16 @@ public sealed class LawnmowerController : MonoBehaviour
         if (hitchBody == null || hitchTarget == null || trailerJoint == null) return;
         var trailerBody = trailerJoint.GetComponent<Rigidbody>();
         if (trailerBody == null) return;
-        hitchBody.position = hitchTarget.position;
-        hitchBody.rotation = hitchTarget.rotation;
-        hitchBody.transform.SetPositionAndRotation(hitchBody.position, hitchBody.rotation);
+        // Inactive bodies can still report their old physics pose after assignment.
+        // Use the requested pose for both the Transform and the anchor calculation.
+        Vector3 hitchPosition = hitchTarget.position;
+        Quaternion hitchRotation = hitchTarget.rotation;
+        hitchBody.position = hitchPosition;
+        hitchBody.rotation = hitchRotation;
+        hitchBody.transform.SetPositionAndRotation(hitchPosition, hitchRotation);
         trailerJoint.connectedBody = hitchBody;
         Quaternion rotation = transform.rotation;
-        Vector3 anchor = hitchBody.position + hitchBody.rotation *
+        Vector3 anchor = hitchPosition + hitchRotation *
             Vector3.Scale(trailerJoint.connectedAnchor, hitchBody.transform.lossyScale);
         Vector3 position = anchor - rotation *
             Vector3.Scale(trailerJoint.anchor, trailerJoint.transform.lossyScale);

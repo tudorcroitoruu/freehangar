@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Failed(Child)" total="2" passed="0" failed="2" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-10 07:35:01Z" end-time="2026-11-10 07:35:01Z" duration="0,1009497">
+  <test-suite type="TestSuite" id="1000" name="Grain Cleanup Co." fullname="Grain Cleanup Co." runstate="Runnable" testcasecount="738" result="Failed" site="Child" start-time="2026-11-10 07:35:01Z" end-time="2026-11-10 07:35:01Z" duration="0.100950" total="2" passed="0" failed="2" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1905" name="Assembly-CSharp-Editor.dll" fullname="F:/Projects/freehangar/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="738" result="Failed" site="Child" start-time="2026-11-10 07:35:01Z" end-time="2026-11-10 07:35:01Z" duration="0.089168" total="2" passed="0" failed="2" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="1764" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestFixture" id="1881" name="WorldSaveTests" fullname="WorldSaveTests" classname="WorldSaveTests" runstate="Runnable" testcasecount="21" result="Failed" site="Child" start-time="2026-11-10 07:35:01Z" end-time="2026-11-10 07:35:01Z" duration="0.083032" total="2" passed="0" failed="2" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="ParameterizedMethod" id="1884" name="MowerTrailerPoseSurvivesSaveLoad" fullname="WorldSaveTests.MowerTrailerPoseSurvivesSaveLoad" classname="WorldSaveTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2026-11-10 07:35:01Z" end-time="2026-11-10 07:35:01Z" duration="0.079583" total="2" passed="0" failed="2" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1882" name="MowerTrailerPoseSurvivesSaveLoad(False)" fullname="WorldSaveTests.MowerTrailerPoseSurvivesSaveLoad(False)" methodname="MowerTrailerPoseSurvivesSaveLoad" classname="WorldSaveTests" runstate="Runnable" seed="484208517" result="Failed" start-time="2026-11-10 07:35:01Z" end-time="2026-11-10 07:35:01Z" duration="0.070295" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: less than 0.00100000005f
+  But was:  43.299839f
+]]></message>
+              <stack-trace><![CDATA[at WorldSaveTests+<>c__DisplayClass0_0.<MowerTrailerPoseSurvivesSaveLoad>b__0 () [0x001c6] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:42
+at WorldSaveTests.InEmptyScene (System.Action test) [0x0004f] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:248
+at WorldSaveTests.MowerTrailerPoseSurvivesSaveLoad (System.Boolean legacySave) [0x0000c] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:14
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1883" name="MowerTrailerPoseSurvivesSaveLoad(True)" fullname="WorldSaveTests.MowerTrailerPoseSurvivesSaveLoad(True)" methodname="MowerTrailerPoseSurvivesSaveLoad" classname="WorldSaveTests" runstate="Runnable" seed="2011059255" result="Failed" start-time="2026-11-10 07:35:01Z" end-time="2026-11-10 07:35:01Z" duration="0.001520" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: less than 0.00100000005f
+  But was:  43.299839f
+]]></message>
+              <stack-trace><![CDATA[at WorldSaveTests+<>c__DisplayClass0_0.<MowerTrailerPoseSurvivesSaveLoad>b__0 () [0x001c6] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:42
+at WorldSaveTests.InEmptyScene (System.Action test) [0x0004f] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:248
+at WorldSaveTests.MowerTrailerPoseSurvivesSaveLoad (System.Boolean legacySave) [0x0000c] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:14
+]]></stack-trace>
+            </failure>
+            <output><![CDATA[Saving results to: C:/Users/TudorCroitoru/AppData/LocalLow/Harbuz Games/Grain Cleanup Co_\TestResults.xml
+]]></output>
+          </test-case>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
