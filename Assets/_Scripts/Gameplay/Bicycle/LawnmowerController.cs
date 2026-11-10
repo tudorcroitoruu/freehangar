@@ -15,6 +15,9 @@ public sealed class LawnmowerController : MonoBehaviour
     Quaternion steeringRest;
     Vector3 previousPosition;
     float rearAngle;
+    float parkingRestTime;
+    Vector3 parkedHitchPosition;
+    Quaternion parkedHitchRotation;
     readonly RaycastHit[] trailerObstacles = new RaycastHit[24];
     readonly List<Collider> trailerContacts = new List<Collider>();
     readonly List<Collider> mowerContacts = new List<Collider>();
@@ -88,6 +91,8 @@ public sealed class LawnmowerController : MonoBehaviour
             Vector3.Scale(trailerJoint.connectedAnchor, hitchBody.transform.lossyScale);
         Vector3 position = anchor - rotation *
             Vector3.Scale(trailerJoint.anchor, trailerJoint.transform.lossyScale);
+        trailerBody.isKinematic = false;
+        parkingRestTime = 0f;
         trailerBody.position = position;
         trailerBody.rotation = rotation;
         trailerBody.transform.SetPositionAndRotation(position, rotation);
@@ -107,16 +112,32 @@ public sealed class LawnmowerController : MonoBehaviour
         var body = trailerJoint.GetComponent<Rigidbody>();
         if (body == null) return;
         bool parked = !movement.IsRidden && !movement.IsCoasting;
-        if (body.isKinematic == parked) return;
-        if (parked)
+        bool hitchMoved = body.isKinematic &&
+            ((hitchTarget.position - parkedHitchPosition).sqrMagnitude > .000025f ||
+             Quaternion.Angle(hitchTarget.rotation, parkedHitchRotation) > .25f);
+        if (!parked || hitchMoved)
         {
-            body.linearVelocity = Vector3.zero;
-            body.angularVelocity = Vector3.zero;
+            parkingRestTime = 0f;
+            if (body.isKinematic) { body.isKinematic = false; body.WakeUp(); }
+            return;
         }
-        // A joint and wheel friction are not a parking brake. Lock the trailer
-        // while unattended so cargo contacts and slopes cannot make it creep.
-        body.isKinematic = parked;
-        if (!parked) body.WakeUp();
+        if (body.isKinematic) return;
+        // Let the joint and suspension establish ground contact after loading or
+        // dismounting. Freezing immediately can trap the trailer underground or
+        // in the air; copying the hitch's pitch also lifts its distant axle.
+        bool supported = trailerWheels != null && trailerWheels.Length >= 2;
+        if (supported)
+            foreach (var wheel in trailerWheels)
+                if (wheel == null || !wheel.GetGroundHit(out _)) { supported = false; break; }
+        if (!supported || body.linearVelocity.sqrMagnitude > .01f || body.angularVelocity.sqrMagnitude > .01f)
+        { parkingRestTime = 0f; return; }
+        parkingRestTime += Time.fixedDeltaTime;
+        if (parkingRestTime < .5f) return;
+        body.linearVelocity = Vector3.zero;
+        body.angularVelocity = Vector3.zero;
+        body.isKinematic = true;
+        parkedHitchPosition = hitchTarget.position;
+        parkedHitchRotation = hitchTarget.rotation;
     }
     void FixedUpdate() => UpdateHitch();
     public void UpdateHitch()

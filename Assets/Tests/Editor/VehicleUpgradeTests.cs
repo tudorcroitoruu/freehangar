@@ -374,6 +374,13 @@ public class VehicleUpgradeTests
         mower.hitchBody = hitchBody;
         mower.hitchTarget = target.transform;
 
+        // Register the bodies before reading their physics poses. Inactive bodies
+        // retain native poses independently of the staged transform hierarchy.
+        root.SetActive(true);
+        trailerBody.position = trailer.transform.position;
+        hitchBody.position = trailerBody.position + Vector3.forward * jointGap;
+        Physics.SyncTransforms();
+
         Vector3 motion = Vector3.forward * (direction * .2f);
         Assert.That(mower.ConstrainTowMotion(motion), Is.EqualTo(blocked ? Vector3.zero : motion));
     }
@@ -392,6 +399,9 @@ public class VehicleUpgradeTests
 
         mower.ReconnectTrailer();
 
+        root.SetActive(true);
+        Physics.SyncTransforms();
+
         Vector3 trailerAnchor = trailer.position + trailer.rotation *
             Vector3.Scale(mower.trailerJoint.anchor, trailer.transform.lossyScale);
         Assert.Less(Vector3.Distance(trailerAnchor, mower.hitchTarget.position), .001f);
@@ -404,6 +414,54 @@ public class VehicleUpgradeTests
         Assert.IsNotNull(slot);
         Assert.AreSame(rig, VehicleCargoOwner.Resolve(slot));
         Assert.Less(Vector3.Distance(slot.position, mower.transform.position), 8f);
+    }
+
+    [TestCase(0f)]
+    [TestCase(.35f)]
+    public void RestoredTrailerSettlesOnItsWheelsBeforeParking(float hitchLift)
+    {
+        var simulationMode = Physics.simulationMode;
+        try
+        {
+            Physics.simulationMode = SimulationMode.Script;
+            root.SetActive(false);
+            root.transform.position = new Vector3(10000, 10000, 10000);
+            var floor = new GameObject("Trailer ground");
+            floor.transform.SetParent(root.transform, false);
+            floor.transform.localPosition = Vector3.down * .5f;
+            floor.AddComponent<BoxCollider>().size = new Vector3(100, 1, 100);
+            var assembly = Object.Instantiate(Resources.Load<GameObject>("Vehicles/4_Lawnmower_With_Trailer"), root.transform);
+            var mower = assembly.GetComponentInChildren<LawnmowerController>(true);
+            var rig = mower.GetComponent<BicycleController>();
+            typeof(LawnmowerController).GetField("movement", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(mower, rig);
+            root.SetActive(true);
+            Physics.SyncTransforms();
+            mower.ReconnectTrailer();
+            var trailer = mower.trailerJoint.GetComponent<Rigidbody>();
+            Assert.IsFalse(trailer.isKinematic, "Restoration must let the suspension settle before locking the trailer.");
+            mower.hitchTarget.position += Vector3.up * hitchLift;
+            mower.hitchTarget.rotation = Quaternion.Euler(hitchLift > 0f ? 8f : 0f, 0, 0);
+            var physics = Physics.defaultPhysicsScene;
+            for (int i = 0; i < 500; i++)
+            {
+                mower.UpdateHitch();
+                physics.Simulate(Time.fixedDeltaTime);
+            }
+            foreach (var wheel in mower.trailerWheels)
+                Assert.IsTrue(wheel.GetGroundHit(out _), "Both trailer tires must rest on the ground.");
+            Assert.IsTrue(trailer.isKinematic, "The settled trailer must lock while unattended.");
+            float pitch = Mathf.DeltaAngle(0, trailer.rotation.eulerAngles.x);
+            Assert.That(Mathf.Abs(pitch), Is.LessThan(15f), "A modest hitch adjustment must not tip the trailer into the air.");
+            mower.hitchTarget.position += Vector3.up * .05f;
+            mower.UpdateHitch();
+            Assert.IsFalse(trailer.isKinematic, "A later ground correction must release the parking lock to settle again.");
+        }
+        finally
+        {
+            Object.DestroyImmediate(root);
+            Physics.simulationMode = simulationMode;
+        }
     }
 
     [Test]
