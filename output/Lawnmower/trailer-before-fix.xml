@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="46" result="Failed(Child)" total="46" passed="39" failed="7" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:14Z" duration="0,3006542">
+  <test-suite type="TestSuite" id="1000" name="Grain Cleanup Co." fullname="Grain Cleanup Co." runstate="Runnable" testcasecount="739" result="Failed" site="Child" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:14Z" duration="0.300654" total="46" passed="39" failed="7" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1906" name="Assembly-CSharp-Editor.dll" fullname="F:/Projects/freehangar/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="739" result="Failed" site="Child" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:14Z" duration="0.289606" total="46" passed="39" failed="7" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="43512" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestFixture" id="1847" name="VehicleUpgradeTests" fullname="VehicleUpgradeTests" classname="VehicleUpgradeTests" runstate="Runnable" testcasecount="24" result="Failed" site="Child" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:14Z" duration="0.160169" total="24" passed="22" failed="2" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1866" name="DefaultVehicleProfilesAndResourcesAreValid" fullname="VehicleUpgradeTests.DefaultVehicleProfilesAndResourcesAreValid" methodname="DefaultVehicleProfilesAndResourcesAreValid" classname="VehicleUpgradeTests" runstate="Runnable" seed="1805267949" result="Passed" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:13Z" duration="0.065280" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1852" name="DisplayStatsNeverOverrideAuthoredSlotsOrSpeed" fullname="VehicleUpgradeTests.DisplayStatsNeverOverrideAuthoredSlotsOrSpeed" methodname="DisplayStatsNeverOverrideAuthoredSlotsOrSpeed" classname="VehicleUpgradeTests" runstate="Runnable" seed="1200487660" result="Passed" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:13Z" duration="0.005988" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1848" name="EachPurchaseUnlocksExactlyOneNextVehicleAndSurvivesReload" fullname="VehicleUpgradeTests.EachPurchaseUnlocksExactlyOneNextVehicleAndSurvivesReload" methodname="EachPurchaseUnlocksExactlyOneNextVehicleAndSurvivesReload" classname="VehicleUpgradeTests" runstate="Runnable" seed="814926661" result="Passed" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:13Z" duration="0.003816" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1849" name="KeyRequiredNeedsBothMoneyAndMatchingCollectedKey" fullname="VehicleUpgradeTests.KeyRequiredNeedsBothMoneyAndMatchingCollectedKey" methodname="KeyRequiredNeedsBothMoneyAndMatchingCollectedKey" classname="VehicleUpgradeTests" runstate="Runnable" seed="429837606" result="Passed" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:13Z" duration="0.001142" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1872" name="LawnmowerTowLimitUsesPhysicsAnchors" fullname="VehicleUpgradeTests.LawnmowerTowLimitUsesPhysicsAnchors" classname="VehicleUpgradeTests" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:13Z" duration="0.013599" total="4" passed="3" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1868" name="LawnmowerTowLimitUsesPhysicsAnchors(0.52f,0.0f,1.0f,False)" fullname="VehicleUpgradeTests.LawnmowerTowLimitUsesPhysicsAnchors(0.52f,0.0f,1.0f,False)" methodname="LawnmowerTowLimitUsesPhysicsAnchors" classname="VehicleUpgradeTests" runstate="Runnable" seed="1238676290" result="Passed" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:13Z" duration="0.005313" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1869" name="LawnmowerTowLimitUsesPhysicsAnchors(1.3f,0.0f,1.0f,False)" fullname="VehicleUpgradeTests.LawnmowerTowLimitUsesPhysicsAnchors(1.3f,0.0f,1.0f,False)" methodname="LawnmowerTowLimitUsesPhysicsAnchors" classname="VehicleUpgradeTests" runstate="Runnable" seed="966278625" result="Passed" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:13Z" duration="0.000437" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1870" name="LawnmowerTowLimitUsesPhysicsAnchors(0.52f,0.4f,1.0f,True)" fullname="VehicleUpgradeTests.LawnmowerTowLimitUsesPhysicsAnchors(0.52f,0.4f,1.0f,True)" methodname="LawnmowerTowLimitUsesPhysicsAnchors" classname="VehicleUpgradeTests" runstate="Runnable" seed="1396539321" result="Failed" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:13Z" duration="0.005004" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Expected: (0.00, 0.00, 0.00)
+  But was:  (0.00, 0.00, 0.20)
+]]></message>
+              <stack-trace><![CDATA[at VehicleUpgradeTests.LawnmowerTowLimitUsesPhysicsAnchors (System.Single renderLead, System.Single jointGap, System.Single direction, System.Boolean blocked) [0x0014e] in F:\Projects\freehangar\Assets\Tests\Editor\VehicleUpgradeTests.cs:378
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1871" name="LawnmowerTowLimitUsesPhysicsAnchors(0.52f,0.4f,-1.0f,False)" fullname="VehicleUpgradeTests.LawnmowerTowLimitUsesPhysicsAnchors(0.52f,0.4f,-1.0f,False)" methodname="LawnmowerTowLimitUsesPhysicsAnchors" classname="VehicleUpgradeTests" runstate="Runnable" seed="59849100" result="Passed" start-time="2026-11-10 07:42:13Z" end-time="2026-11-10 07:42:13Z" duration="0.000564" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1851" name="LegacyCompletedMiniupgradesRestoreDirectlyToSavedDestination" fullname="VehicleUpgradeTests.LegacyCompletedMiniupgradesRestoreDirectlyToSavedDestination" methodname="LegacyCompletedMiniupgradesRestoreDirectlyToSavedDestination" classname="VehicleUpgradeTests" runstate="Runnable" seed="657066496" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.000976" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1874" name="LoadedCargoCannotPushItsTrailerAndRegainsCollisionWhenUnloaded" fullname="VehicleUpgradeTests.LoadedCargoCannotPushItsTrailerAndRegainsCollisionWhenUnloaded" methodname="LoadedCargoCannotPushItsTrailerAndRegainsCollisionWhenUnloaded" classname="VehicleUpgradeTests" runstate="Runnable" seed="411026697" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.003731" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1860" name="MissingPrefabDoesNotChargeOrUnlockNextVehicle" fullname="VehicleUpgradeTests.MissingPrefabDoesNotChargeOrUnlockNextVehicle" methodname="MissingPrefabDoesNotChargeOrUnlockNextVehicle" classname="VehicleUpgradeTests" runstate="Runnable" seed="861461082" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.003904" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Cannot upgrade vehicle: Resources/Tests/VehiclePrefabThatDoesNotExist must be a prefab containing BicycleController.
+]]></output>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1865" name="MotorollerUpgradeFindsOutsideGroundBeforePurchase" fullname="VehicleUpgradeTests.MotorollerUpgradeFindsOutsideGroundBeforePurchase" classname="VehicleUpgradeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.015965" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1861" name="MotorollerUpgradeFindsOutsideGroundBeforePurchase(False,True,True)" fullname="VehicleUpgradeTests.MotorollerUpgradeFindsOutsideGroundBeforePurchase(False,True,True)" methodname="MotorollerUpgradeFindsOutsideGroundBeforePurchase" classname="VehicleUpgradeTests" runstate="Runnable" seed="851210692" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.010045" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1862" name="MotorollerUpgradeFindsOutsideGroundBeforePurchase(True,True,True)" fullname="VehicleUpgradeTests.MotorollerUpgradeFindsOutsideGroundBeforePurchase(True,True,True)" methodname="MotorollerUpgradeFindsOutsideGroundBeforePurchase" classname="VehicleUpgradeTests" runstate="Runnable" seed="423808674" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.002438" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1863" name="MotorollerUpgradeFindsOutsideGroundBeforePurchase(False,False,True)" fullname="VehicleUpgradeTests.MotorollerUpgradeFindsOutsideGroundBeforePurchase(False,False,True)" methodname="MotorollerUpgradeFindsOutsideGroundBeforePurchase" classname="VehicleUpgradeTests" runstate="Runnable" seed="1781324415" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.001698" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1864" name="MotorollerUpgradeFindsOutsideGroundBeforePurchase(False,False,False)" fullname="VehicleUpgradeTests.MotorollerUpgradeFindsOutsideGroundBeforePurchase(False,False,False)" methodname="MotorollerUpgradeFindsOutsideGroundBeforePurchase" classname="VehicleUpgradeTests" runstate="Runnable" seed="157843894" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.000641" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1873" name="RestoredLawnmowerReconnectsSiblingTrailerAndCargoAtSavedPosition" fullname="VehicleUpgradeTests.RestoredLawnmowerReconnectsSiblingTrailerAndCargoAtSavedPosition" methodname="RestoredLawnmowerReconnectsSiblingTrailerAndCargoAtSavedPosition" classname="VehicleUpgradeTests" runstate="Runnable" seed="667559502" result="Failed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.003968" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: less than 0.00100000005f
+  But was:  860.137085f
+]]></message>
+            <stack-trace><![CDATA[at VehicleUpgradeTests.RestoredLawnmowerReconnectsSiblingTrailerAndCargoAtSavedPosition () [0x000d9] in F:\Projects\freehangar\Assets\Tests\Editor\VehicleUpgradeTests.cs:397
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1858" name="ScreenExplainsWhichPurchaseRequirementsAreMissing" fullname="VehicleUpgradeTests.ScreenExplainsWhichPurchaseRequirementsAreMissing" classname="VehicleUpgradeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.017885" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-case id="1854" name="ScreenExplainsWhichPurchaseRequirementsAreMissing(100,False,&quot;Vehicle key required.&quot;,&quot;&quot;)" fullname="VehicleUpgradeTests.ScreenExplainsWhichPurchaseRequirementsAreMissing(100,False,&quot;Vehicle key required.&quot;,&quot;&quot;)" methodname="ScreenExplainsWhichPurchaseRequirementsAreMissing" classname="VehicleUpgradeTests" runstate="Runnable" seed="1267496302" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.014762" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1855" name="ScreenExplainsWhichPurchaseRequirementsAreMissing(99,False,&quot;Requirements not met.&quot;,&quot;Not enough money and vehicle key missing.&quot;)" fullname="VehicleUpgradeTests.ScreenExplainsWhichPurchaseRequirementsAreMissing(99,False,&quot;Requirements not met.&quot;,&quot;Not enough money and vehicle key missing.&quot;)" methodname="ScreenExplainsWhichPurchaseRequirementsAreMissing" classname="VehicleUpgradeTests" runstate="Runnable" seed="435817961" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.000923" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1856" name="ScreenExplainsWhichPurchaseRequirementsAreMissing(99,True,&quot;Not enough money&quot;,&quot;$ 1&quot;)" fullname="VehicleUpgradeTests.ScreenExplainsWhichPurchaseRequirementsAreMissing(99,True,&quot;Not enough money&quot;,&quot;$ 1&quot;)" methodname="ScreenExplainsWhichPurchaseRequirementsAreMissing" classname="VehicleUpgradeTests" runstate="Runnable" seed="1073050151" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.000538" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+          <test-case id="1857" name="ScreenExplainsWhichPurchaseRequirementsAreMissing(100,True,&quot;&quot;,&quot;&quot;)" fullname="VehicleUpgradeTests.ScreenExplainsWhichPurchaseRequirementsAreMissing(100,True,&quot;&quot;,&quot;&quot;)" methodname="ScreenExplainsWhichPurchaseRequirementsAreMissing" classname="VehicleUpgradeTests" runstate="Runnable" seed="1116839166" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.000597" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1853" name="ScreenShowsCurrentAndNextVehicleSpeedAndSlotsAndBlocksMissingKey" fullname="VehicleUpgradeTests.ScreenShowsCurrentAndNextVehicleSpeedAndSlotsAndBlocksMissingKey" methodname="ScreenShowsCurrentAndNextVehicleSpeedAndSlotsAndBlocksMissingKey" classname="VehicleUpgradeTests" runstate="Runnable" seed="2085084389" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.001648" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1859" name="ScreenShowsTheNextVehiclesKeyAndClearsItWhenNoKeyIsRequiredOrMaxed" fullname="VehicleUpgradeTests.ScreenShowsTheNextVehiclesKeyAndClearsItWhenNoKeyIsRequiredOrMaxed" methodname="ScreenShowsTheNextVehiclesKeyAndClearsItWhenNoKeyIsRequiredOrMaxed" classname="VehicleUpgradeTests" runstate="Runnable" seed="1728346578" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.003842" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1867" name="TrailerVehicleReplacementKeepsTheAssemblyAndCanAdvanceToPickup" fullname="VehicleUpgradeTests.TrailerVehicleReplacementKeepsTheAssemblyAndCanAdvanceToPickup" methodname="TrailerVehicleReplacementKeepsTheAssemblyAndCanAdvanceToPickup" classname="VehicleUpgradeTests" runstate="Runnable" seed="1716826747" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.001765" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1850" name="VoucherPaysPriceButNeverBypassesRequiredKey" fullname="VehicleUpgradeTests.VoucherPaysPriceButNeverBypassesRequiredKey" methodname="VoucherPaysPriceButNeverBypassesRequiredKey" classname="VehicleUpgradeTests" runstate="Runnable" seed="2121028984" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.000294" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1881" name="WorldSaveTests" fullname="WorldSaveTests" classname="WorldSaveTests" runstate="Runnable" testcasecount="22" result="Failed" site="Child" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.119133" total="22" passed="17" failed="5" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1891" name="AmbiguousSceneObjectsAreNotAssignedEachOthersSavedState" fullname="WorldSaveTests.AmbiguousSceneObjectsAreNotAssignedEachOthersSavedState" methodname="AmbiguousSceneObjectsAreNotAssignedEachOthersSavedState" classname="WorldSaveTests" runstate="Runnable" seed="2037009490" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.017910" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saved object is unavailable: scene:/Removed#0/Wheelbarrow#0. Continuing load; its record will be retained.
+]]></output>
+        </test-case>
+        <test-case id="1888" name="CompressedAndLegacySavesPreserveRewardAndWorldTogether" fullname="WorldSaveTests.CompressedAndLegacySavesPreserveRewardAndWorldTogether" methodname="CompressedAndLegacySavesPreserveRewardAndWorldTogether" classname="WorldSaveTests" runstate="Runnable" seed="1832029441" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.006910" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1902" name="ContainerLoadCreditSurvivesRepeatedLoadsAndSaveRestore" fullname="WorldSaveTests.ContainerLoadCreditSurvivesRepeatedLoadsAndSaveRestore" methodname="ContainerLoadCreditSurvivesRepeatedLoadsAndSaveRestore" classname="WorldSaveTests" runstate="Runnable" seed="1266794752" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.002495" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1901" name="ContainerRestoresCropMassAndIdentityWithoutAwardingProgress" fullname="WorldSaveTests.ContainerRestoresCropMassAndIdentityWithoutAwardingProgress" methodname="ContainerRestoresCropMassAndIdentityWithoutAwardingProgress" classname="WorldSaveTests" runstate="Runnable" seed="740861017" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.000433" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1904" name="CutsceneSeekReconstructsCompletedShotsAndStopsAtSavedFraction" fullname="WorldSaveTests.CutsceneSeekReconstructsCompletedShotsAndStopsAtSavedFraction" methodname="CutsceneSeekReconstructsCompletedShotsAndStopsAtSavedFraction" classname="WorldSaveTests" runstate="Runnable" seed="880622183" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.000999" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1903" name="EmptyContainersAndLegacySavesHaveNoLoadCredit" fullname="WorldSaveTests.EmptyContainersAndLegacySavesHaveNoLoadCredit" methodname="EmptyContainersAndLegacySavesHaveNoLoadCredit" classname="WorldSaveTests" runstate="Runnable" seed="2102945397" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.000298" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1886" name="FinishingRunRemovesContinueAndBackupButPreservesSettings" fullname="WorldSaveTests.FinishingRunRemovesContinueAndBackupButPreservesSettings" methodname="FinishingRunRemovesContinueAndBackupButPreservesSettings" classname="WorldSaveTests" runstate="Runnable" seed="1617174245" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.002161" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1900" name="GrainGridAndCropStrataRoundTripWithoutRegrowingMaterial" fullname="WorldSaveTests.GrainGridAndCropStrataRoundTripWithoutRegrowingMaterial" methodname="GrainGridAndCropStrataRoundTripWithoutRegrowingMaterial" classname="WorldSaveTests" runstate="Runnable" seed="2048445407" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.048416" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1882" name="InactiveMowerReconnectsTransformsAtRequestedPose" fullname="WorldSaveTests.InactiveMowerReconnectsTransformsAtRequestedPose" methodname="InactiveMowerReconnectsTransformsAtRequestedPose" classname="WorldSaveTests" runstate="Runnable" seed="1825189318" result="Failed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.001283" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: less than 0.00100000005f
+  But was:  43.299839f
+]]></message>
+            <stack-trace><![CDATA[at WorldSaveTests.InactiveMowerReconnectsTransformsAtRequestedPose () [0x00067] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:21
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1899" name="LegacyCompressedWorldMigratesToNativeNestedLists" fullname="WorldSaveTests.LegacyCompressedWorldMigratesToNativeNestedLists" methodname="LegacyCompressedWorldMigratesToNativeNestedLists" classname="WorldSaveTests" runstate="Runnable" seed="913049139" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.002335" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1890" name="MissingObjectsAndCargoSlotsDoNotAbortOrEraseSaveRecords" fullname="WorldSaveTests.MissingObjectsAndCargoSlotsDoNotAbortOrEraseSaveRecords" methodname="MissingObjectsAndCargoSlotsDoNotAbortOrEraseSaveRecords" classname="WorldSaveTests" runstate="Runnable" seed="48009658" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.005228" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saved object is unavailable: scene:/Removed#0. Continuing load; its record will be retained.
+Saved cargo support is unavailable for scene:/Bag#0. Restored at its saved world position.
+Saved object is unavailable: scene:/Removed#0. Continuing load; its record will be retained.
+Saved cargo support is unavailable for scene:/Bag#0. Restored at its saved world position.
+]]></output>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1885" name="MowerTrailerPoseSurvivesSaveLoad" fullname="WorldSaveTests.MowerTrailerPoseSurvivesSaveLoad" classname="WorldSaveTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.006674" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1883" name="MowerTrailerPoseSurvivesSaveLoad(False)" fullname="WorldSaveTests.MowerTrailerPoseSurvivesSaveLoad(False)" methodname="MowerTrailerPoseSurvivesSaveLoad" classname="WorldSaveTests" runstate="Runnable" seed="527918508" result="Failed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.004208" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Restore the sibling trailer's physics position.
+  Expected: less than 0.00100000005f
+  But was:  0.0604988933f
+]]></message>
+              <stack-trace><![CDATA[at WorldSaveTests+<>c__DisplayClass1_0.<MowerTrailerPoseSurvivesSaveLoad>b__0 () [0x00231] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:65
+at WorldSaveTests.InEmptyScene (System.Action test) [0x0004f] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:266
+at WorldSaveTests.MowerTrailerPoseSurvivesSaveLoad (System.Boolean legacySave) [0x0000c] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:32
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1884" name="MowerTrailerPoseSurvivesSaveLoad(True)" fullname="WorldSaveTests.MowerTrailerPoseSurvivesSaveLoad(True)" methodname="MowerTrailerPoseSurvivesSaveLoad" classname="WorldSaveTests" runstate="Runnable" seed="1664956774" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.001792" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+          </test-case>
+        </test-suite>
+        <test-case id="1898" name="NativePlayerDataRoundTripsNestedVehicleCargo" fullname="WorldSaveTests.NativePlayerDataRoundTripsNestedVehicleCargo" methodname="NativePlayerDataRoundTripsNestedVehicleCargo" classname="WorldSaveTests" runstate="Runnable" seed="1068561326" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.000830" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1896" name="PartiallyBrokenBarrierRestoresHitProgress" fullname="WorldSaveTests.PartiallyBrokenBarrierRestoresHitProgress" methodname="PartiallyBrokenBarrierRestoresHitProgress" classname="WorldSaveTests" runstate="Runnable" seed="468620888" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.002348" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1889" name="RemovedSceneWrapperDoesNotLoseWheelbarrowOrCargo" fullname="WorldSaveTests.RemovedSceneWrapperDoesNotLoseWheelbarrowOrCargo" methodname="RemovedSceneWrapperDoesNotLoseWheelbarrowOrCargo" classname="WorldSaveTests" runstate="Runnable" seed="923368234" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.004102" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1895" name="RestoringSavedInventoryDoesNotApplyTheNewDeliveryLimit" fullname="WorldSaveTests.RestoringSavedInventoryDoesNotApplyTheNewDeliveryLimit" methodname="RestoringSavedInventoryDoesNotApplyTheNewDeliveryLimit" classname="WorldSaveTests" runstate="Runnable" seed="195325358" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.001452" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-suite type="ParameterizedMethod" id="1894" name="SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects" fullname="WorldSaveTests.SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects" classname="WorldSaveTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.007343" total="2" passed="0" failed="2" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-case id="1892" name="SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects(False)" fullname="WorldSaveTests.SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects(False)" methodname="SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects" classname="WorldSaveTests" runstate="Runnable" seed="1011014278" result="Failed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.005357" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Destroyed restored bags must unregister normally.
+  Expected: 2
+  But was:  3
+]]></message>
+              <stack-trace><![CDATA[at WorldSaveTests.SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects (System.Boolean recreate) [0x003b4] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:345
+]]></stack-trace>
+            </failure>
+          </test-case>
+          <test-case id="1893" name="SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects(True)" fullname="WorldSaveTests.SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects(True)" methodname="SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects" classname="WorldSaveTests" runstate="Runnable" seed="1113012253" result="Failed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.001349" asserts="0">
+            <properties>
+              <property name="retryIteration" value="0" />
+              <property name="repeatIteration" value="0" />
+            </properties>
+            <failure>
+              <message><![CDATA[  Destroyed restored bags must unregister normally.
+  Expected: 2
+  But was:  3
+]]></message>
+              <stack-trace><![CDATA[at WorldSaveTests.SavedLooseAndLoadedBagsRegisterWithInventoryForExistingAndRecreatedObjects (System.Boolean recreate) [0x003b4] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:345
+]]></stack-trace>
+            </failure>
+          </test-case>
+        </test-suite>
+        <test-case id="1887" name="SiblingTrailerCargoSaveResolvesBackToItsSlot" fullname="WorldSaveTests.SiblingTrailerCargoSaveResolvesBackToItsSlot" methodname="SiblingTrailerCargoSaveResolvesBackToItsSlot" classname="WorldSaveTests" runstate="Runnable" seed="1656362104" result="Failed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.001554" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: "runtime:cc037e2b9b4b4e30a854f06415e906bd"
+  But was:  null
+]]></message>
+            <stack-trace><![CDATA[at WorldSaveTests.SiblingTrailerCargoSaveResolvesBackToItsSlot () [0x000dc] in F:\Projects\freehangar\Assets\Tests\Editor\WorldSaveTests.cs:130
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1905" name="WorldIdentitySurvivesReparentAndVehicleReplacement" fullname="WorldSaveTests.WorldIdentitySurvivesReparentAndVehicleReplacement" methodname="WorldIdentitySurvivesReparentAndVehicleReplacement" classname="WorldSaveTests" runstate="Runnable" seed="1232028943" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.000396" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1897" name="WorldRoundTripRestoresVehicleCargoAndDoesNotRespawnSoldBag" fullname="WorldSaveTests.WorldRoundTripRestoresVehicleCargoAndDoesNotRespawnSoldBag" methodname="WorldRoundTripRestoresVehicleCargoAndDoesNotRespawnSoldBag" classname="WorldSaveTests" runstate="Runnable" seed="1302302301" result="Passed" start-time="2026-11-10 07:42:14Z" end-time="2026-11-10 07:42:14Z" duration="0.001935" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: C:/Users/TudorCroitoru/AppData/LocalLow/Harbuz Games/Grain Cleanup Co_\TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

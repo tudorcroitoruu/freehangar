@@ -7,6 +7,24 @@ using Object = UnityEngine.Object;
 
 public class WorldSaveTests
 {
+    [Test]
+    public void InactiveMowerReconnectsTransformsAtRequestedPose()
+    {
+        var root = new GameObject("Inactive trailer test");
+        root.SetActive(false);
+        try
+        {
+            var rig = Object.Instantiate(Resources.Load<GameObject>("Vehicles/4_Lawnmower_With_Trailer"), root.transform);
+            var mower = rig.GetComponentInChildren<LawnmowerController>(true);
+            mower.transform.SetPositionAndRotation(new Vector3(40, 3, -20), Quaternion.Euler(0, 125, 0));
+            mower.ReconnectTrailer();
+            Assert.Less(Vector3.Distance(mower.hitchTarget.position, mower.hitchBody.transform.position), .001f);
+            Assert.Less(Vector3.Distance(mower.hitchTarget.position,
+                mower.trailerJoint.transform.TransformPoint(mower.trailerJoint.anchor)), .001f);
+        }
+        finally { Object.DestroyImmediate(root); }
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public void MowerTrailerPoseSurvivesSaveLoad(bool legacySave)

@@ -1,5 +1,20 @@
 # Lawnmower and tow trailer
 
+2026-11-10 trailer save/position correction: WorldSaveRuntime now captures the sibling
+trailer in the existing body list using `@trailer:`. Restore reconnects the hitch before
+applying saved body poses, preserving trailer articulation and cargo placement. Older
+saves without this entry retain the straight-behind fallback. ReconnectTrailer uses
+the requested hitch pose directly, avoiding stale Rigidbody reads on inactive rigs.
+
+Unity 6000.3.20f1 EditMode validation: 41/46 WorldSaveTests and VehicleUpgradeTests
+passed; the five remaining failures also occur with the original source (inactive
+physics/cargo fixtures and inventory unregister checks). The new inactive-hitch and
+saved-articulation tests fail before the fix and pass afterward; legacy-save and repeated
+restore checks pass. Reports: output/Lawnmower/trailer-before-fix.xml and trailer-final.xml.
+Interactive driving was not tested. Manual follow-up: park with a loaded trailer turned
+on a slope, save/continue twice, verify its angle and cargo position, then mount, drive,
+dismount and use vehicle reset; also continue an older save without trailer body data.
+
 Gameplay contains `Lawnmower with trailer - driveable`, saved as `Assets/Models/Lawnmower/Driveable/Lawnmower_With_Trailer.prefab`. The original Lawnmower hierarchy (including Tow_Trailer) is retained inactive. The prepared assembly preserves its placement, materials and LODs. Mower forward is +Z; existing wheel geometry is carried by centered steering/spin pivots.
 
 Controls use PlayerBicycleInteraction: aim and E to mount, W/S drive/reverse, A/D steer, Space brake, mouse look, E to dismount. MotorollerController/BicycleController supply upright arcade movement: 5 m/s forward, 1.5 m/s reverse, 1.8 m/s² acceleration, 6 m/s² braking. There is no stamina boost. Driver view is adjustable in the BicycleController Inspector.
