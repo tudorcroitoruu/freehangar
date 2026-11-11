@@ -74,7 +74,7 @@ QualitySettings:
     skinWeights: 1
     globalTextureMipmapLimit: 2
     textureMipmapLimitSettings: []
-    anisotropicTextures: 2
+    anisotropicTextures: 0
     antiAliasing: 0
     softParticles: 0
     softVegetation: 1
@@ -86,7 +86,7 @@ QualitySettings:
     realtimeGICPUUsage: 100
     adaptiveVsyncExtraA: 0
     adaptiveVsyncExtraB: 0
-    lodBias: 0.6
+    lodBias: 0.5
     meshLodThreshold: 1
     maximumLODLevel: 0
     enableLODCrossFade: 1
