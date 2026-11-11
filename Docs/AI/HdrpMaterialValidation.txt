@@ -1,12 +1,30 @@
 Missing shaders=0, unsupported shaders=0, HDRP shader compile errors=0
 Graphics pipeline: Assets/HDRPDefaultResources/HDRenderPipelineAsset.asset
-Quality PC: Assets/HDRPDefaultResources/HDRenderPipelineAsset.asset
-328	Freehangar/HDRP/Particles Unlit
-283	HDRP/Lit
-37	Skybox/Cubemap
-17	Freehangar/HDRP/Powerbox Unlit
-8	Mobile/Skybox
-4	Skybox/6 Sided
+Quality PC: Assets/Imported/BK/Pure_Common/Settings/URP/URP Asset.asset
+673	Universal Render Pipeline/Lit
+364	Universal Render Pipeline/Unlit
+48	UI/Image Margin Fade
+41	Skybox/Cubemap
+30	Toon/CustomToonGrass
+25	Shader Graphs/Lit
+12	GUI/Text Shader
+9	Mobile/Skybox
+6	Skybox/6 Sided
+6	TextMeshPro/Distance Field
+4	Shader Graphs/UnlitColor
+4	Shader Graphs/UnlitParticles
+4	TextMeshPro/Mobile/Distance Field
 2	Skybox/Procedural
+2	Toon/CustomToon
+2	Toon/CustomToonVegetation
+2	Toon/CustomWaterSimple
+1	HDRP/Lit
+1	HDRP/TerrainLit
+1	UI/Sprite Merge Blend
+1	Universal Render Pipeline/Autodesk Interactive/AutodeskInteractiveTransparent
 1	Custom/Outline Fill
 1	Custom/Outline Mask
+1	TextMeshPro/SRP/TMP_SDF-HDRP LIT
+1	TextMeshPro/SRP/TMP_SDF-HDRP UNLIT
+1	TextMeshPro/SRP/TMP_SDF-URP Lit
+1	TextMeshPro/SRP/TMP_SDF-URP Unlit

@@ -1,0 +1,12 @@
+Toon/CustomToon: supported=True
+Toon/CustomToonGrass: supported=True
+Toon/CustomToonVegetation: supported=True
+Toon/CustomWaterSimple: supported=True
+Freehangar/URP/Tree Cutout Toon: supported=True
+Freehangar/URP/Grain Kernels: supported=True
+PILE Corn pile - scoop with left click Freehangar/URP/Grain Kernels
+PILE Hangar 3 - Almost full grain bank Freehangar/URP/Grain Kernels
+PILE Hangar 5 - Grain bank to entrance Freehangar/URP/Grain Kernels
+PILE Hangar 2 - Almost full grain bank Freehangar/URP/Grain Kernels
+PILE Hangar 4 - Grain bank to entrance Freehangar/URP/Grain Kernels
+Shader errors=0

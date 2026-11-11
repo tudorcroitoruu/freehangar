@@ -1,0 +1,5 @@
+TERRAIN	Assets/Imported/Toon Series/Toon Farm Pack/Terrain/TFP_Terrain_HDRP.mat	Universal Render Pipeline/Terrain/Lit
+TERRAIN	Assets/Imported/BK/PureNature_Oasis/Textures/Surfaces/Layers/Terrain.mat	Universal Render Pipeline/Terrain/Lit
+Remaining incompatible materials=0
+Default pipeline=Assets/Imported/BK/Pure_Common/Settings/URP/URP Asset.asset
+Quality pipeline=Assets/Imported/BK/Pure_Common/Settings/URP/URP Asset.asset

@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: TFP_Atlas_Vegetation_1A - NewMap quality - Tree cutout
-  m_Shader: {fileID: 4800000, guid: 825a6076e8a2dca489465dd431756e0b, type: 3}
+  m_Shader: {fileID: 4800000, guid: d392b9608d0447748a670fe3e5a21686, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -103,7 +103,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaClipping: 1
-    - _AlphaCutoff: 0
+    - _AlphaCutoff: 0.5
     - _BumpScale: 1
     - _Cull: 0
     - _Cutoff: 0.5
