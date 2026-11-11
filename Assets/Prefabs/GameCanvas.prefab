@@ -3773,7 +3773,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Acceleration / Brake
+  m_text: Acceleration
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
   m_sharedMaterial: {fileID: -1400682523365752988, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
@@ -7964,7 +7964,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: W / S
+  m_text: W
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
   m_sharedMaterial: {fileID: -1400682523365752988, guid: fd7581fbb7c43a64592b28c206862f0d, type: 2}
@@ -32363,7 +32363,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: -15, y: 0}
-  m_SizeDelta: {x: 70, y: 35}
+  m_SizeDelta: {x: 35, y: 35}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &839013727749385743
 CanvasRenderer:

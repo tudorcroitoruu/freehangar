@@ -77,12 +77,24 @@ public static class FarmInput
     {
         get
         {
-            float move = Move.y;
+            var movement = Action("Move");
+            float move = movement?.activeControl?.device is Gamepad
+                ? 0f : movement?.ReadValue<Vector2>().y ?? 0f;
             // Reuse the rebindable R2 action only for controllers while riding.
             var attack = Action("Attack");
             float trigger = attack?.activeControl?.device == ActivePad && ActivePad != null
                 ? attack.ReadValue<float>() : 0f;
             return trigger > 0f ? Mathf.Max(move, trigger) : move;
+        }
+    }
+    public static bool VehicleBrake
+    {
+        get
+        {
+            var jump = Action("Jump");
+            var unload = Action("Unload");
+            return (jump?.activeControl?.device is Keyboard && jump.IsPressed()) ||
+                (ActivePad != null && unload?.activeControl?.device == ActivePad && unload.IsPressed());
         }
     }
     public static Vector2 Look

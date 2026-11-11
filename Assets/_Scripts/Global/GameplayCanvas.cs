@@ -79,7 +79,7 @@ public class GameplayCanvas : MonoBehaviour
                     "Sell" => "Secondary",
                     "ClosePopup" => "Back",
                     "TakeInShovel" => "Attack", "ReleaseFromShovel" => "Unload",
-                    "Brake" => "Jump", "MoveFaster" => "Sprint", "ForkliftDrop" => "Cargo",
+                    "Brake" => "Unload", "MoveFaster" => "Sprint", "ForkliftDrop" => "Cargo",
                     "Steer" => "Move", "Pedal" => "Attack", _ => null
                 };
                 if (action == null) continue;
