@@ -17,6 +17,8 @@ public class GlobalManager : MonoBehaviour
     public bool noInternet;
     [Header("Player Data")]
     public bool savesLoaded;
+    public System.Exception StartupError { get; private set; }
+    public bool IsLoadingSave { get; private set; }
     [Header("Gameplay Introduction")]
     [SerializeField, Min(1)] private int introduceInGameplayUntilLevel = 5;
     
@@ -37,14 +39,30 @@ public class GlobalManager : MonoBehaviour
             return;
         }
 
-        await LoadData();
-        savesLoaded = true;
-        await Task.Delay(1);
-        Settings settings = FindAnyObjectByType<Settings>(FindObjectsInactive.Include);
-        if (settings)
+        await LoadStartupData();
+    }
+
+    public async Task LoadStartupData()
+    {
+        if (IsLoadingSave) return;
+        IsLoadingSave = true;
+        savesLoaded = false;
+        StartupError = null;
+        try
         {
-            settings.Init();
+            await LoadData();
+            Settings settings = FindAnyObjectByType<Settings>(FindObjectsInactive.Include);
+            if (settings) settings.Init();
+            savesLoaded = true;
         }
+        catch (System.Exception exception)
+        {
+            SaveSystem.savesLoaded = false;
+            StartupError = exception;
+            Debug.LogError("Startup stopped while loading saved data. Existing saves have not been reset.");
+            Debug.LogException(exception);
+        }
+        finally { IsLoadingSave = false; }
     }
     
     public async Task<Task> LoadData()

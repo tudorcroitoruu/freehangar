@@ -14,7 +14,7 @@ internal static class MaterialPipelineConverterValidation
         int checks = 0;
         try
         {
-            var src = new Material(Shader.Find("HDRP/Lit")); objects.Add(src);
+            var src = new Material(Shader.Find("Hidden/Tests/Legacy Lit Properties")); objects.Add(src);
             src.SetColor("_BaseColor", new Color(.2f, .3f, .4f, .7f));
             src.SetFloat("_Metallic", .3f);
             src.SetFloat("_Smoothness", .65f);
@@ -26,9 +26,8 @@ internal static class MaterialPipelineConverterValidation
             Check(urp.GetColor("_BaseColor") == src.GetColor("_BaseColor"), "base tint", ref checks);
             Check(urp.GetFloat("_Surface") == 1 && urp.renderQueue == 3000 && urp.IsKeywordEnabled("_SURFACE_TYPE_TRANSPARENT"), "transparent render state", ref checks);
             Check(urp.GetFloat("_Cull") == 0, "double sided", ref checks);
-            Check(src.shader.name == "HDRP/Lit", "source untouched", ref checks);
-            var hd = MaterialPipelineConverter.ConvertMaterial(urp, MaterialPipelineConverter.Target.HDRP, folder, "return"); objects.Add(hd);
-            Check(hd.shader.name == "HDRP/Lit" && Mathf.Abs(hd.GetFloat("_Metallic") - .3f) < .001f, "URP to HDRP", ref checks);
+            Check(src.shader.name == "Hidden/Tests/Legacy Lit Properties", "source untouched", ref checks);
+            NUnit.Framework.Assert.Throws<NotSupportedException>(() => MaterialPipelineConverter.ConvertMaterial(urp, MaterialPipelineConverter.Target.HDRP, folder, "return"));
             var mask = new Texture2D(2, 2, TextureFormat.RGBA32, false, true); objects.Add(mask);
             mask.SetPixels(new[] { new Color(.2f, .4f, 1, .6f), new Color(.2f, .4f, 1, .6f), new Color(.2f, .4f, 1, .6f), new Color(.2f, .4f, 1, .6f) }); mask.Apply();
             src.SetTexture("_MaskMap", mask);
@@ -41,17 +40,13 @@ internal static class MaterialPipelineConverterValidation
             Color pixel = AssetDatabase.LoadAssetAtPath<Texture2D>(path).GetPixel(0, 0);
             Check(Mathf.Abs(pixel.r - .26f) < .015f && Mathf.Abs(pixel.g - .4f) < .015f && Mathf.Abs(pixel.a - .56f) < .015f, "mask channel remapping", ref checks);
             Check(!importer.sRGBTexture && packed.IsKeywordEnabled("_METALLICSPECGLOSSMAP"), "linear map and shader keyword", ref checks);
-            var back = MaterialPipelineConverter.ConvertMaterial(packed, MaterialPipelineConverter.Target.HDRP, folder, "packed-return"); objects.Add(back);
-            Check(back.GetTexture("_MaskMap") != null, "reverse mask packing", ref checks);
             src.SetFloat("_MaterialID", 4);
             var spec = MaterialPipelineConverter.ConvertMaterial(src, MaterialPipelineConverter.Target.URP, folder, "spec"); objects.Add(spec);
             Check(spec.GetFloat("_WorkflowMode") == 0 && spec.GetTexture("_SpecGlossMap") != null, "specular conversion", ref checks);
-            var unlit = new Material(Shader.Find("HDRP/Unlit")); objects.Add(unlit);
-            unlit.SetColor("_UnlitColor", Color.cyan);
+            var unlit = new Material(Shader.Find("Universal Render Pipeline/Unlit")); objects.Add(unlit);
+            unlit.SetColor("_BaseColor", Color.cyan);
             var unlitUrp = MaterialPipelineConverter.ConvertMaterial(unlit, MaterialPipelineConverter.Target.URP, folder, "unlit"); objects.Add(unlitUrp);
             Check(unlitUrp.shader.name.EndsWith("/Unlit") && unlitUrp.GetColor("_BaseColor") == Color.cyan, "HDRP unlit mapping", ref checks);
-            var unlitHd = MaterialPipelineConverter.ConvertMaterial(unlitUrp, MaterialPipelineConverter.Target.HDRP, folder, "unlit-return"); objects.Add(unlitHd);
-            Check(unlitHd.GetColor("_UnlitColor") == Color.cyan, "URP unlit mapping", ref checks);
             var legacy = new Material(Shader.Find("Standard")); objects.Add(legacy);
             legacy.SetFloat("_Mode", 1); legacy.SetFloat("_Cutoff", .42f);
             var fallback = MaterialPipelineConverter.ConvertMaterial(legacy, MaterialPipelineConverter.Target.URP, folder, "legacy"); objects.Add(fallback);

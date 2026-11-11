@@ -9,17 +9,17 @@ Shader "Hidden/FreeHangar/CargoPreviewColor"
     }
     SubShader
     {
-        Tags { "RenderPipeline"="HDRenderPipeline" "RenderType"="Opaque" }
+        Tags { "RenderPipeline"="UniversalPipeline" "RenderType"="Opaque" }
         Pass
         {
-            Tags { "LightMode"="ForwardOnly" }
+            Tags { "LightMode"="UniversalForward" }
             Cull Off ZWrite On
             HLSLPROGRAM
             #pragma target 4.5
             #pragma vertex Vert
             #pragma fragment Frag
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             TEXTURE2D(_BaseColorMap); SAMPLER(sampler_BaseColorMap);
             CBUFFER_START(UnityPerMaterial)
                 float4 _BaseColor;

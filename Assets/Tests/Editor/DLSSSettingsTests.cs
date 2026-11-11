@@ -3,7 +3,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
 public class DLSSSettingsTests
@@ -55,15 +55,9 @@ public class DLSSSettingsTests
         Assert.AreEqual("DLSS", rows.GetArrayElementAtIndex(4).objectReferenceValue.name);
         Assert.AreEqual("Quality", rows.GetArrayElementAtIndex(5).objectReferenceValue.name);
         var player = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Player.prefab");
-        var camera = player.GetComponentInChildren<HDAdditionalCameraData>(true);
+        var camera = player.GetComponentInChildren<UniversalAdditionalCameraData>(true);
         Assert.IsNotNull(camera);
-        Assert.IsTrue(camera.allowDynamicResolution);
-        Assert.IsTrue(camera.allowDeepLearningSuperSampling);
-        Assert.IsFalse(camera.deepLearningSuperSamplingUseCustomQualitySettings);
-        var pipeline = AssetDatabase.LoadAssetAtPath<HDRenderPipelineAsset>("Assets/HDRPDefaultResources/HDRenderPipelineAsset.asset");
-        var options = pipeline.currentPlatformRenderPipelineSettings.dynamicResolutionSettings;
-        Assert.IsTrue(options.enabled);
-        CollectionAssert.Contains(options.advancedUpscalerNames, "DLSS");
-        Assert.IsTrue(options.DLSSUseOptimalSettings);
+        Assert.IsFalse(GameSettingsManager.IsDLSSSupported, "This URP project has no DLSS provider.");
+        Assert.IsInstanceOf<UniversalRenderPipelineAsset>(GraphicsSettings.defaultRenderPipeline);
     }
 }

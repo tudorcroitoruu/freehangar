@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal;
 
 public static class HeldToolCameraSetup
 {
@@ -61,15 +61,6 @@ public static class HeldToolCameraSetup
             EditorSceneManager.MarkSceneDirty(player.gameObject.scene);
             return;
         }
-        var hd = go.GetComponent<HDAdditionalCameraData>(); if (hd == null) hd = Undo.AddComponent<HDAdditionalCameraData>(go);
-        hd.clearColorMode = HDAdditionalCameraData.ClearColorMode.None; hd.clearDepth = true;
-        var volume = go.GetComponent<CustomPassVolume>(); if (volume == null) volume = Undo.AddComponent<CustomPassVolume>(go);
-        Undo.RecordObject(volume, "Configure held tool pass");
-        volume.isGlobal = true; volume.injectionPoint = CustomPassInjectionPoint.BeforePostProcess;
-        var pass = volume.customPasses.Find(p => p is HeldToolPass) as HeldToolPass;
-        if (pass == null) { pass = new HeldToolPass(); volume.customPasses.Add(pass); }
-        pass.name = "Held tools over world"; pass.worldCamera = world; pass.toolCamera = camera; pass.toolLayer = mask;
-        EditorUtility.SetDirty(volume);
         driver.ConfigureCameras();
         EditorSceneManager.MarkSceneDirty(player.gameObject.scene);
     }

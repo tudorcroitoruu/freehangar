@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
 public class GameSettingsManager : MonoBehaviour
@@ -44,7 +44,7 @@ public class GameSettingsManager : MonoBehaviour
     [Header("VIDEO - DLSS")]
     [SerializeField] private Toggle dlssToggle;
     [SerializeField] private Text dlssStatusText;
-    public static bool IsDLSSSupported => HDDynamicResolutionPlatformCapabilities.DLSSDetected;
+    public static bool IsDLSSSupported => false;
     private bool displayedDLSSSupport;
 
     [Header("VIDEO - Frame Rate")]
@@ -80,12 +80,12 @@ public class GameSettingsManager : MonoBehaviour
     {
         public string name;
         [Range(0.25f, 1f)] public float renderScale = 1f;
-        [Tooltip("MSAA applies to HDRP cameras using forward rendering.")]
+        [Tooltip("MSAA applies to URP forward rendering.")]
         public MsaaSamples msaa = MsaaSamples.X4;
         [Min(0f)] public float shadowDistance = 60f;
         [Range(256, 4096)] public int shadowResolution = 2048;
         [Range(1, 4)] public int shadowCascades = 2;
-        [Tooltip("Allow ambient occlusion from the scene's HDRP Volumes.")]
+        [Tooltip("Legacy ambient occlusion preference; configured through the URP renderer.")]
         public bool screenSpaceAmbientOcclusion = true;
         [Range(0, 3)] public int textureMipmapLimit;
         [Range(0.1f, 4f)] public float lodBias = 1.5f;
@@ -93,16 +93,11 @@ public class GameSettingsManager : MonoBehaviour
 
     // One runtime instance is reused by every preset and across scene changes.
     // The project asset remains unchanged when testing settings in the Editor.
-    private static HDRenderPipelineAsset runtimePipeline;
+    private static UniversalRenderPipelineAsset runtimePipeline;
     private static RenderPipelineAsset originalQualityPipeline;
     private static int originalTextureMipmapLimit;
     private static float originalLodBias;
-    private static Volume runtimeQualityVolume;
-    private static VolumeProfile runtimeQualityProfile;
-    private static readonly Dictionary<HDAdditionalCameraData, (bool dynamicResolution, bool dlss)> originalDynamicResolutionStates = new();
-    private static bool requestedDLSS, appliedDLSSSupport;
-    private static float activeRenderScale = 1f;
-    public static HDRenderPipelineAsset ActiveRenderPipeline => runtimePipeline;
+    public static UniversalRenderPipelineAsset ActiveRenderPipeline => runtimePipeline;
     private int QualityPresetCount => qualityPresets?.Length ?? 0;
 
 //     [Header("VIDEO - Upscaling")]
@@ -654,7 +649,9 @@ public class GameSettingsManager : MonoBehaviour
     private void SetupDisplays()
     {
         availableDisplays.Clear();
+#if UNITY_STANDALONE || UNITY_EDITOR
         Screen.GetDisplayLayout(availableDisplays);
+#endif
     }
 
     private int FindCurrentDisplayIndex()
@@ -984,7 +981,7 @@ public class GameSettingsManager : MonoBehaviour
     private void ApplyResolution()
     {
         if (displayMovePending) return;
-#if !UNITY_EDITOR
+#if UNITY_STANDALONE && !UNITY_EDITOR
         if (availableDisplays.Count > 0 && settings != null &&
             settings.displayIndex >= 0 && settings.displayIndex < availableDisplays.Count &&
             FindCurrentDisplayIndex() != settings.displayIndex)
@@ -1030,6 +1027,9 @@ public class GameSettingsManager : MonoBehaviour
 
     private void ApplyResolutionNow()
     {
+#if UNITY_SWITCH && !UNITY_EDITOR
+        return; // Console output modes are managed by the platform.
+#else
         if (availableResolutions == null)
             return;
 
@@ -1047,6 +1047,7 @@ public class GameSettingsManager : MonoBehaviour
                 ? FullScreenMode.Windowed
                 : FullScreenMode.FullScreenWindow
         );
+#endif
     }
 
     #endregion
@@ -1085,8 +1086,12 @@ public class GameSettingsManager : MonoBehaviour
 
     private void ApplyVSync()
     {
+#if UNITY_SWITCH && !UNITY_EDITOR
+        QualitySettings.vSyncCount = 1;
+#else
         QualitySettings.vSyncCount =
             settings.vSync ? 1 : 0;
+#endif
 
         ApplyFrameRate();
     }
@@ -1174,31 +1179,11 @@ public class GameSettingsManager : MonoBehaviour
         if (preset == null || !EnsureRuntimePipeline())
             return;
 
-        // HDRP renders in HDR and exposes quality settings through its asset and Volumes.
-        var pipelineSettings = runtimePipeline.currentPlatformRenderPipelineSettings;
-        pipelineSettings.msaaSampleCount = (MSAASamples)(int)preset.msaa;
-        pipelineSettings.supportSSAO = preset.screenSpaceAmbientOcclusion;
-        requestedDLSS = settings.dlss;
-        activeRenderScale = preset.renderScale;
-        appliedDLSSSupport = IsDLSSSupported;
-        pipelineSettings.dynamicResolutionSettings = ConfigureUpscaling(pipelineSettings.dynamicResolutionSettings,
-            activeRenderScale, requestedDLSS, appliedDLSSSupport);
-        var shadows = pipelineSettings.hdShadowInitParams;
-        int shadowResolution = Mathf.NextPowerOfTwo(Mathf.Clamp(preset.shadowResolution, 256, 4096));
-        shadows.maxDirectionalShadowMapResolution = shadowResolution;
-        shadows.shadowResolutionDirectional = new IntScalableSetting(
-            new[] { shadowResolution, shadowResolution, shadowResolution, shadowResolution },
-            ScalableSettingSchemaId.With4Levels);
-        pipelineSettings.hdShadowInitParams = shadows;
-        runtimePipeline.currentPlatformRenderPipelineSettings = pipelineSettings;
-
-        runtimeQualityProfile.TryGet<HDShadowSettings>(out var shadowSettings);
-        shadowSettings.maxShadowDistance.Override(Mathf.Max(0f, preset.shadowDistance));
-        shadowSettings.cascadeShadowSplitCount.Override(Mathf.Clamp(preset.shadowCascades, 1, 4));
-        // When enabled, retain the scene's authored AO intensity.
-        runtimeQualityProfile.TryGet<ScreenSpaceAmbientOcclusion>(out var ambientOcclusion);
-        ambientOcclusion.intensity.value = 0f;
-        ambientOcclusion.intensity.overrideState = !preset.screenSpaceAmbientOcclusion;
+        runtimePipeline.msaaSampleCount = (int)preset.msaa;
+        runtimePipeline.renderScale = Mathf.Clamp(preset.renderScale, .25f, 1f);
+        runtimePipeline.shadowDistance = Mathf.Max(0f, preset.shadowDistance);
+        runtimePipeline.shadowCascadeCount = Mathf.Clamp(preset.shadowCascades, 1, 4);
+        runtimePipeline.mainLightShadowmapResolution = Mathf.NextPowerOfTwo(Mathf.Clamp(preset.shadowResolution, 256, 4096));
         QualitySettings.globalTextureMipmapLimit = Mathf.Clamp(preset.textureMipmapLimit, 0, 3);
         QualitySettings.lodBias = Mathf.Clamp(preset.lodBias, 0.1f, 4f);
     }
@@ -1222,38 +1207,15 @@ public class GameSettingsManager : MonoBehaviour
         return options;
     }
 
-    private static void EnableDynamicResolution(ScriptableRenderContext context, List<Camera> cameras)
-    {
-        // HDRP can finish detecting the GPU after the inactive settings page initializes.
-        if (runtimePipeline && appliedDLSSSupport != IsDLSSSupported)
-        {
-            appliedDLSSSupport = IsDLSSSupported;
-            var pipelineSettings = runtimePipeline.currentPlatformRenderPipelineSettings;
-            pipelineSettings.dynamicResolutionSettings = ConfigureUpscaling(pipelineSettings.dynamicResolutionSettings,
-                activeRenderScale, requestedDLSS, appliedDLSSSupport);
-            runtimePipeline.currentPlatformRenderPipelineSettings = pipelineSettings;
-        }
-        foreach (var camera in cameras)
-        {
-            if (camera.cameraType != CameraType.Game ||
-                !camera.TryGetComponent<HDAdditionalCameraData>(out var cameraData))
-                continue;
-            if (!originalDynamicResolutionStates.ContainsKey(cameraData))
-                originalDynamicResolutionStates.Add(cameraData, (cameraData.allowDynamicResolution, cameraData.allowDeepLearningSuperSampling));
-            cameraData.allowDynamicResolution = true;
-            cameraData.allowDeepLearningSuperSampling = requestedDLSS && appliedDLSSSupport;
-        }
-    }
-
     private bool EnsureRuntimePipeline()
     {
         if (!runtimePipeline)
         {
             var source = (QualitySettings.renderPipeline ? QualitySettings.renderPipeline :
-                GraphicsSettings.defaultRenderPipeline) as HDRenderPipelineAsset;
+                GraphicsSettings.defaultRenderPipeline) as UniversalRenderPipelineAsset;
             if (!source)
             {
-                Debug.LogError("Quality presets require a High Definition Render Pipeline asset.", this);
+                Debug.LogError("Quality presets require a Universal Render Pipeline asset.", this);
                 return false;
             }
 
@@ -1263,18 +1225,6 @@ public class GameSettingsManager : MonoBehaviour
             runtimePipeline = Instantiate(source);
             runtimePipeline.name = source.name + " (Runtime Quality)";
             runtimePipeline.hideFlags = HideFlags.DontSave;
-            var volumeObject = new GameObject("Runtime HDRP Quality") { hideFlags = HideFlags.DontSave };
-            DontDestroyOnLoad(volumeObject);
-            runtimeQualityProfile = ScriptableObject.CreateInstance<VolumeProfile>();
-            runtimeQualityProfile.hideFlags = HideFlags.DontSave;
-            runtimeQualityProfile.Add<HDShadowSettings>();
-            runtimeQualityProfile.Add<ScreenSpaceAmbientOcclusion>();
-            runtimeQualityVolume = volumeObject.AddComponent<Volume>();
-            runtimeQualityVolume.isGlobal = true;
-            runtimeQualityVolume.priority = float.MaxValue;
-            runtimeQualityVolume.sharedProfile = runtimeQualityProfile;
-            RenderPipelineManager.beginContextRendering -= EnableDynamicResolution;
-            RenderPipelineManager.beginContextRendering += EnableDynamicResolution;
             Application.quitting -= ReleaseRuntimePipeline;
             Application.quitting += ReleaseRuntimePipeline;
         }
@@ -1289,28 +1239,6 @@ public class GameSettingsManager : MonoBehaviour
     private static void ReleaseRuntimePipeline()
     {
         Application.quitting -= ReleaseRuntimePipeline;
-        RenderPipelineManager.beginContextRendering -= EnableDynamicResolution;
-        foreach (var entry in originalDynamicResolutionStates)
-        {
-            if (entry.Key)
-            {
-                entry.Key.allowDynamicResolution = entry.Value.dynamicResolution;
-                entry.Key.allowDeepLearningSuperSampling = entry.Value.dlss;
-            }
-        }
-        originalDynamicResolutionStates.Clear();
-        requestedDLSS = appliedDLSSSupport = false;
-        activeRenderScale = 1f;
-        if (runtimeQualityVolume) Destroy(runtimeQualityVolume.gameObject);
-        if (runtimeQualityProfile)
-        {
-            foreach (var component in runtimeQualityProfile.components)
-                if (component) Destroy(component);
-            Destroy(runtimeQualityProfile);
-        }
-        runtimeQualityVolume = null;
-        runtimeQualityProfile = null;
-
         if (!runtimePipeline)
             return;
 
@@ -1319,7 +1247,10 @@ public class GameSettingsManager : MonoBehaviour
 
         QualitySettings.globalTextureMipmapLimit = originalTextureMipmapLimit;
         QualitySettings.lodBias = originalLodBias;
-        Destroy(runtimePipeline);
+        if (Application.isPlaying)
+            Destroy(runtimePipeline);
+        else
+            DestroyImmediate(runtimePipeline);
         runtimePipeline = null;
         originalQualityPipeline = null;
     }

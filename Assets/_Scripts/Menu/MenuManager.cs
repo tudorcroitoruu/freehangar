@@ -236,7 +236,7 @@ public class MenuManager : MonoBehaviour
             }
         }
         lastPopupDirection = direction;
-        if (pad.buttonSouth.wasPressedThisFrame && selectedPopupIndex >= 0)
+        if (MenuPadInput.ConfirmPressed(pad) && selectedPopupIndex >= 0)
         {
             var selected = activePopupButtons[selectedPopupIndex];
             var button = selected != null ? selected.button != null ? selected.button : selected.GetComponent<Button>() : null;

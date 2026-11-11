@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal;
 
 public sealed class VehicleCargoPreview : EditorWindow
 {
@@ -311,15 +311,8 @@ public sealed class VehicleCargoPreview : EditorWindow
         preview.camera.clearFlags=CameraClearFlags.SolidColor;
         preview.camera.backgroundColor=new Color(.12f,.14f,.17f,1);
         preview.ambientColor=new Color(.15f,.15f,.15f,1);
-        var hd=preview.camera.GetComponent<HDAdditionalCameraData>() ?? preview.camera.gameObject.AddComponent<HDAdditionalCameraData>();
-        hd.clearColorMode=HDAdditionalCameraData.ClearColorMode.Color;
-        hd.backgroundColorHDR=preview.camera.backgroundColor;
-        hd.volumeLayerMask=0; // Never inherit Gameplay's sky/exposure volumes.
-        hd.customRenderingSettings=true;
-        hd.renderingPathCustomFrameSettings.SetEnabled(FrameSettingsField.Postprocess,false);
-        hd.renderingPathCustomFrameSettingsOverrideMask.mask[(uint)FrameSettingsField.Postprocess]=true;
-        hd.renderingPathCustomFrameSettings.SetEnabled(FrameSettingsField.ExposureControl,false);
-        hd.renderingPathCustomFrameSettingsOverrideMask.mask[(uint)FrameSettingsField.ExposureControl]=true;
+        var data = preview.camera.GetUniversalAdditionalCameraData();
+        data.renderPostProcessing = false; data.volumeLayerMask = 0;
         preview.lights[0].intensity=1.4f; preview.lights[0].transform.rotation=Quaternion.Euler(40,40,0);
         preview.lights[1].intensity=.7f;
         assembly=new GameObject("Cargo preview"); preview.AddSingleGO(assembly);

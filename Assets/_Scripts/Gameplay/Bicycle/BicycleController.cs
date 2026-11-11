@@ -72,14 +72,14 @@ public sealed class BicycleController : MonoBehaviour, IInteractable
     }
     public void SaveRidingCamera()
     {
-        PlayerPrefs.SetString(CameraSettingsKey, JsonUtility.ToJson(new ViewSettings { offset = ridingCameraOffset, pitch = ridingCameraPitch }));
-        PlayerPrefs.Save();
+        SaveBridge.SetStringPP(CameraSettingsKey, JsonUtility.ToJson(new ViewSettings { offset = ridingCameraOffset, pitch = ridingCameraPitch }));
+        SaveBridge.SaveAllData();
     }
-    public void ClearSavedRidingCamera() { PlayerPrefs.DeleteKey(CameraSettingsKey); PlayerPrefs.Save(); }
+    public void ClearSavedRidingCamera() { SaveBridge.DeleteKeyPP(CameraSettingsKey); SaveBridge.SaveAllData(); }
     void LoadRidingCamera()
     {
-        if (!PlayerPrefs.HasKey(CameraSettingsKey)) return;
-        try { var settings = JsonUtility.FromJson<ViewSettings>(PlayerPrefs.GetString(CameraSettingsKey)); if (settings != null) SetRidingCamera(settings.offset, settings.pitch); }
+        if (!SaveBridge.HasKeyPP(CameraSettingsKey)) return;
+        try { var settings = JsonUtility.FromJson<ViewSettings>(SaveBridge.GetStringPP(CameraSettingsKey)); if (settings != null) SetRidingCamera(settings.offset, settings.pitch); }
         catch (System.ArgumentException) { /* Ignore a malformed local preference and retain the authored view. */ }
     }
     public bool IsRidden { get; private set; }

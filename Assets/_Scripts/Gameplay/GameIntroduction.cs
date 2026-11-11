@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal;
 
 /// <summary>Authored, HUD-free arrival sequence; all temporary state is restored on interruption.</summary>
 [DisallowMultipleComponent]
@@ -167,7 +167,7 @@ public sealed class GameIntroduction : MonoBehaviour
     {
         CurrentShot = "Farm panorama";
         view.transform.SetPositionAndRotation(landscapeStart.position, landscapeStart.rotation);
-        HDCamera.GetOrCreate(view).Reset();
+        view.GetUniversalAdditionalCameraData().resetHistory = true;
         yield return Animate(landscapeSeconds, t => {
             float eased = Mathf.Lerp(.025f, .975f, t);
             view.transform.SetPositionAndRotation(Vector3.Lerp(landscapeStart.position, landscapeEnd.position, eased), Quaternion.Slerp(landscapeStart.rotation, landscapeEnd.rotation, eased));
@@ -183,7 +183,7 @@ public sealed class GameIntroduction : MonoBehaviour
         openingFadeImage.color = Color.black;
         CurrentShot = "Bicycle approach"; SetBicycleShot(.025f);
         GameplayAudio.Instance?.VehicleMoving(bicycle, true);
-        HDCamera.GetOrCreate(view).Reset();
+        view.GetUniversalAdditionalCameraData().resetHistory = true;
         float rideDuration = Mathf.Max(.1f, bicycleSeconds - .8f);
         yield return Animate(rideDuration, t => {
             SetBicycleShot(Mathf.Lerp(.025f, 1f, t));

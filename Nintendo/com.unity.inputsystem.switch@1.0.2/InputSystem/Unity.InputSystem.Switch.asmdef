@@ -1,0 +1,40 @@
+{
+    "name": "Unity.InputSystem.Switch",
+    "rootNamespace": "",
+    "references": [
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [
+        "Editor",
+        "Switch"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "Unity",
+            "expression": "[6000.0.63f1,6000.1.0a1)",
+            "define": "UNITY_INPUTSYSTEM_SWITCH_2SIXAXIS"
+        },
+        {
+            "name": "Unity",
+            "expression": "[6000.3.1f1,6000.4.0a1)",
+            "define": "UNITY_INPUTSYSTEM_SWITCH_2SIXAXIS"
+        },
+        {
+            "name": "Unity",
+            "expression": "6000.4.0a6",
+            "define": "UNITY_INPUTSYSTEM_SWITCH_2SIXAXIS"
+        },
+        {
+            "name": "Unity",
+            "expression": "6000.2.0a4",
+            "define": "UNITY_INPUTSYSTEM_SWITCH_CONTROLLERAPPLET"
+        }
+    ],
+    "noEngineReferences": false
+}

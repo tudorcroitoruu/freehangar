@@ -1,0 +1,43 @@
+Switch startup investigation - 2026-11-11
+
+Reported symptom: loading background appears, but no progress bar or menu.
+Boot waits for GlobalManager.savesLoaded before calling LoadingScene.LoadScene.
+GlobalManager previously let save-load exceptions escape its async Awake, leaving
+that flag false permanently. SaveBridge also initialized outside this error path
+in a BeforeSceneLoad callback.
+
+Confirmed native API misuse: NXSave mounted a user's save archive without first
+ensuring it existed. The installed SDK's fs_SaveData.h explicitly requires the
+archive to exist before MountSaveData. EnsureSaveData creates missing archives
+and leaves existing archives intact. NXSave now checks Ensure before Mount.
+The actual device exception has not been supplied, so the reported device stall
+still needs a first-launch/relaunch check after rebuilding.
+
+SaveBridge now initializes on first access, within startup save loading.
+GlobalManager records startup failures and releases its loading flag. Boot shows
+a save-load error with A/Enter retry instead of silently waiting forever.
+Failed loads are not replaced with an empty save. Bootstrap's initial wait uses
+real time so a stale gameplay time scale cannot prevent startup.
+
+Validation currently blocked: HDRP was removed from Packages/manifest.json while
+19 source files still reference its types. Existing camera/settings/sky code has
+CS0246 errors, plus shader imports reference missing HDRP includes. User asked
+whether to restore the dependency (rendering stays URP) or complete its removal.
+StartupSaveTests adds coverage for a corrupt record: error reported, loading
+state released, success flag false, and original record unchanged. Not yet run.
+
+2026-11-11 follow-up:
+Device log now identifies SaveBridgeStore.Decode Base64 failure as the startup blocker.
+The initial raw-value writer and later Base64 writer both used container version 1.
+Reader accepts both legacy whole-document encodings; writer now emits version 2.
+Newtonsoft reader preserves escaped NULs from legacy JSON; loading does not dirty,
+reset or overwrite the archive. Version 2 remains strict about invalid encoding.
+Ambiguous version 1 documents whose raw values all happen to be valid UTF-8 Base64
+cannot be distinguished perfectly without the original archive. Device retest required.
+15 save bridge checks passed, including actual encrypted/compressed player migration.
+Startup failure and URP quality tests: 2 passed, 0 failed via Unity test runner.
+Switch C# player compilation passed after the decoder change. A new full build and
+device launch are still required; the earlier successful build predates this fix.
+HDRP C# dependencies have been removed/ported to URP; held-camera render validation
+and 13 material converter checks pass. Original optional HDRP assets archived under
+DisabledAssets. Shader audit reported zero errors. Package graph cache was reimported.

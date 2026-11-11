@@ -126,7 +126,7 @@ public sealed class PadMenuCursor : MonoBehaviour
         if (pad == null || (!padInput && !FarmInput.UsingPad)) return;
         var dropdown = root.GetComponentInChildren<TMPro.TMP_Dropdown>();
         var legacy = root.GetComponentInChildren<Dropdown>();
-        if (pad.buttonEast.wasPressedThisFrame && ((dropdown && dropdown.IsExpanded) || (legacy && legacy.transform.Find("Dropdown List"))))
+        if (MenuPadInput.CancelPressed(pad) && ((dropdown && dropdown.IsExpanded) || (legacy && legacy.transform.Find("Dropdown List"))))
         {
             if (dropdown) dropdown.Hide();
             if (legacy) legacy.Hide();
@@ -164,13 +164,13 @@ public sealed class PadMenuCursor : MonoBehaviour
             }
         }
         lastDirection = direction;
-        if (pad.buttonSouth.wasPressedThisFrame)
+        if (MenuPadInput.ConfirmPressed(pad))
             ExecuteEvents.Execute(owner.currentSelectedGameObject, new BaseEventData(owner), ExecuteEvents.submitHandler);
     }
 
     private static bool HasNavigationInput(Gamepad pad) =>
         pad.dpad.ReadValue().sqrMagnitude >= .25f || pad.leftStick.ReadValue().sqrMagnitude >= .25f ||
-        pad.buttonSouth.wasPressedThisFrame || pad.buttonEast.wasPressedThisFrame ||
+        MenuPadInput.ConfirmPressed(pad) || MenuPadInput.CancelPressed(pad) ||
         pad.leftShoulder.wasPressedThisFrame || pad.rightShoulder.wasPressedThisFrame;
     private void Restore() { if (owner) owner.sendNavigationEvents = previousNavigation; owner = null; }
     private void OnDisable() => Restore();

@@ -1,0 +1,1 @@
+PASS: desktop and Nintendo confirm/cancel control mappings. Device button-click test still required.

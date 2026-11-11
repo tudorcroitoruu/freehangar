@@ -1,4 +1,4 @@
-Shader "Freehangar/HDRP/Particles Unlit"
+Shader "Freehangar/URP/Particles Unlit"
 {
     Properties
     {
@@ -27,11 +27,11 @@ Shader "Freehangar/HDRP/Particles Unlit"
     }
     SubShader
     {
-        Tags { "RenderPipeline"="HDRenderPipeline" "Queue"="Transparent" "RenderType"="Transparent" }
+        Tags { "RenderPipeline"="UniversalPipeline" "Queue"="Transparent" "RenderType"="Transparent" }
         Pass
         {
-            Name "ForwardOnly"
-            Tags { "LightMode"="ForwardOnly" }
+            Name "UniversalForward"
+            Tags { "LightMode"="UniversalForward" }
             Blend [_SrcBlend] [_DstBlend]
             BlendOp [_BlendOp]
             Cull [_Cull]
@@ -41,8 +41,8 @@ Shader "Freehangar/HDRP/Particles Unlit"
             #pragma vertex Vert
             #pragma fragment Frag
             #pragma multi_compile_instancing
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);
             TEXTURE2D(_EmissionMap); SAMPLER(sampler_EmissionMap);
             CBUFFER_START(UnityPerMaterial)
@@ -82,7 +82,7 @@ Shader "Freehangar/HDRP/Particles Unlit"
                 if (_EmissionEnabled > 0.5) c.rgb += SAMPLE_TEXTURE2D(_EmissionMap, sampler_EmissionMap, i.uv.xy * _EmissionMap_ST.xy + _EmissionMap_ST.zw).rgb * _EmissionColor.rgb;
                 if (_SoftParticlesEnabled > 0.5)
                 {
-                    float sceneDepth = LinearEyeDepth(LoadCameraDepth(uint2(i.positionCS.xy)), _ZBufferParams);
+                    float sceneDepth = LinearEyeDepth(LoadSceneDepth(uint2(i.positionCS.xy)), _ZBufferParams);
                     c.a *= saturate((sceneDepth - i.blendDepth.y - _SoftParticlesNearFadeDistance) / max(0.0001, _SoftParticlesFarFadeDistance - _SoftParticlesNearFadeDistance));
                 }
                 if (_CameraFadingEnabled > 0.5) c.a *= saturate((i.blendDepth.y - _CameraNearFadeDistance) / max(0.0001, _CameraFarFadeDistance - _CameraNearFadeDistance));

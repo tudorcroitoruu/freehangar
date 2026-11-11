@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEditor;
-using UnityEditor.Rendering.HighDefinition;
+
 using UnityEditor.Rendering.Universal.ShaderGUI;
 using UnityEngine;
 
@@ -31,7 +31,8 @@ internal sealed class MaterialPipelineConverter : EditorWindow
         using (new EditorGUI.DisabledScope(pending != null))
         {
             EditorGUI.BeginChangeCheck();
-            target = (Target)EditorGUILayout.EnumPopup("Convert to", target);
+            target = Target.URP;
+            EditorGUILayout.LabelField("Convert to", "URP");
             selectedOnly = EditorGUILayout.Toggle("Selected assets / folders only", selectedOnly);
             includeCustom = EditorGUILayout.Toggle("Try custom / built-in shaders", includeCustom);
             if (EditorGUI.EndChangeCheck()) candidates.Clear();
@@ -162,7 +163,8 @@ internal sealed class MaterialPipelineConverter : EditorWindow
 
     internal static Material ConvertMaterial(Material src, Target target, string outputFolder, string id)
     {
-        bool hd = target == Target.HDRP;
+        if (target != Target.URP) throw new NotSupportedException("This project supports URP material conversion only.");
+        bool hd = false;
         // These shaders generate their appearance from custom properties. Plain Lit
         // would silently discard crop weights or the tree atlas and render white.
         string customShader = null;
@@ -217,7 +219,7 @@ internal sealed class MaterialPipelineConverter : EditorWindow
                 ConvertMask(src, dst, hd, specular, outputFolder, id);
             }
             dst.renderQueue = transparent ? 3000 : clip ? 2450 : 2000;
-            if (hd) HDShaderUtils.ResetMaterialKeywords(dst);
+            if (hd) throw new NotSupportedException("HDRP conversion is unavailable in this URP project.");
             else BaseShaderGUI.SetMaterialKeywords(dst, unlit ? (Action<Material>)null : LitGUI.SetMaterialKeywords);
             return dst;
         }

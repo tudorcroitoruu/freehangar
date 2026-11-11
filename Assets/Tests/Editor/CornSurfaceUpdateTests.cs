@@ -25,7 +25,7 @@ public class CornSurfaceUpdateTests
         pile = root.AddComponent<GrainPile>();
         Set(pile, "fitToWalls", false); Set(pile, "size", 8f); Set(pile, "resolution", 33);
         surface = root.AddComponent<CornSurfaceKernels>();
-        kernel = new Mesh(); material = new Material(Shader.Find("HDRP/Lit"));
+        kernel = new Mesh(); material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
         Set(surface, "pile", pile); Set(surface, "kernelMesh", kernel); Set(surface, "kernelMaterial", material);
         root.SetActive(true);
         field = Get<GrainHeightField>(pile, "visualField");

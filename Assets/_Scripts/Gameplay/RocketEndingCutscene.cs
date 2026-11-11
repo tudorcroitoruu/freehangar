@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 using TMPro;
@@ -89,7 +89,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         // Reconstruct the preceding camera shots before the sun hold/ending card.
         while (elapsed < target) Advance(Mathf.Min(1f / 60, target - elapsed));
         AudioManager.Instance?.SeekMusic(target);
-        HDCamera.GetOrCreate(view).Reset();
+        view.GetUniversalAdditionalCameraData().resetHistory = true;
     }
     private float earthRadius;
     private bool sunStarted;
@@ -111,8 +111,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         var cameraObject = new GameObject("Ending cinematic camera"); cameraObject.transform.SetParent(staging.transform);
         view = cameraObject.AddComponent<Camera>(); view.CopyFrom(sourceCamera); view.enabled = true;
         view.nearClipPlane = .02f; view.farClipPlane = 3000; view.fieldOfView = 70;
-        var hd = cameraObject.AddComponent<HDAdditionalCameraData>();
-        var sourceHd = sourceCamera.GetComponent<HDAdditionalCameraData>(); if (sourceHd != null) sourceHd.CopyTo(hd);
+        var hd = view.GetUniversalAdditionalCameraData(); var sourceHd = sourceCamera.GetUniversalAdditionalCameraData(); hd.renderPostProcessing = sourceHd.renderPostProcessing; hd.volumeLayerMask = sourceHd.volumeLayerMask;
         cameraObject.AddComponent<AudioListener>();
         var transition = cameraObject.AddComponent<Volume>(); transition.isGlobal = true; transition.priority = 100;
         transitionProfile = ScriptableObject.CreateInstance<VolumeProfile>(); transition.sharedProfile = transitionProfile;
@@ -126,7 +125,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         foreach (var r in earth.GetComponentsInChildren<Renderer>()) radius = Mathf.Max(radius, Mathf.Min(r.bounds.extents.x,r.bounds.extents.y,r.bounds.extents.z));
         earthRadius = radius;
         departure = earth.position + direction * (radius * 1.06f);
-        trailMaterial = new Material(Shader.Find("Freehangar/HDRP/Particles Unlit"));
+        trailMaterial = new Material(Shader.Find("Freehangar/URP/Particles Unlit"));
         trailMaterial.name = "Rocket flight trail";
         trailMaterial.SetColor("_Color", Color.white);
         hero = Spawn(rocketPrefab, "Player rocket", departure, true);
@@ -153,14 +152,13 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         var fill = new GameObject("Cinematic soft fill"); fill.transform.SetParent(staging.transform);
         fill.transform.rotation = Quaternion.LookRotation(-(orientation * new Vector3(1, .1f, 1)).normalized, direction);
         var lamp = fill.AddComponent<Light>(); lamp.type = LightType.Directional;
-        fill.AddComponent<HDAdditionalLightData>(); // Initialize HDRP defaults before setting physical intensity.
         lamp.color = new Color(.4f,.65f,1); lamp.intensity = 2; lamp.shadows = LightShadows.None;
         // HDRI skies have no physical sun disc; keep one at optical infinity along the authored light.
         var disc = GameObject.CreatePrimitive(PrimitiveType.Sphere); disc.name = "Ending sun disc";
         disc.transform.SetParent(staging.transform); disc.transform.localScale = Vector3.one * 30;
         Destroy(disc.GetComponent<Collider>()); sunDisc = disc.transform;
-        sunMaterial = new Material(Shader.Find("HDRP/Unlit")); sunMaterial.name = "Ending sun glow";
-        sunMaterial.SetColor("_UnlitColor",new Color(8,7.8f,7.3f));
+        sunMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit")); sunMaterial.name = "Ending sun glow";
+        sunMaterial.SetColor("_BaseColor",new Color(8,7.8f,7.3f));
         var discRenderer = disc.GetComponent<Renderer>(); discRenderer.sharedMaterial = sunMaterial;
         discRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         var ui = Instantiate(endingUiTemplate, staging.transform);
@@ -170,7 +168,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         continuedText = ui.continuedText;
         friendsText = ui.friendsText;
         continuedText.alpha = friendsText.alpha = 0;
-        HideHud(); Evaluate(0); HDCamera.GetOrCreate(view).Reset(); return true;
+        HideHud(); Evaluate(0); view.GetUniversalAdditionalCameraData().resetHistory = true; return true;
     }
     private Transform Spawn(GameObject prefab,string name,Vector3 position,bool interior)
     {

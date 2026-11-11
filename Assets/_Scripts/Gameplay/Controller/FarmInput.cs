@@ -97,7 +97,7 @@ public static class FarmInput
         }
     }
     public static bool Back => Input.GetKeyDown(KeyCode.Escape) ||
-        (Gamepad.current?.buttonEast.wasPressedThisFrame == true && PadMenuCursor.DropdownClosedFrame != Time.frameCount);
+        (MenuPadInput.CancelPressed(ActivePad ?? Gamepad.current) && PadMenuCursor.DropdownClosedFrame != Time.frameCount);
     public static bool ContextDown(KeyCode key) => key switch
     {
         KeyCode.F => Down("Secondary"), KeyCode.Q => Down("Cargo"),

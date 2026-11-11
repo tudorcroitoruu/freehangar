@@ -25,7 +25,10 @@ Shader "Freehangar/HDRP/Grain Kernels"
     HLSLINCLUDE
     #pragma target 4.5
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
-    #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
+    #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+    #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+    float3 GrainAbsolutePosition(float3 p) { return p; }
+    float3 GrainRelativePosition(float3 p) { return p; }
     CBUFFER_START(UnityPerMaterial)
     float4 _GrainWeightsA, _GrainWeightsB, _GrainWeightsC;
     float _KernelMode, _Brightness, _DetailScale;
@@ -143,7 +146,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
     Varyings Vert(Attributes input)
     {
         Varyings o; UNITY_SETUP_INSTANCE_ID(input); UNITY_TRANSFER_INSTANCE_ID(input, o); UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-        float3 origin = GetAbsolutePositionWS(TransformObjectToWorld(float3(0,0,0)));
+        float3 origin = GrainAbsolutePosition(TransformObjectToWorld(float3(0,0,0)));
         float3 stableSeed = origin;
         #if defined(UNITY_INSTANCING_ENABLED)
         stableSeed = float3(unity_InstanceID, 13, 7);
@@ -179,7 +182,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
             p = radial * shape;
             n = normalize(radial / shape);
         }
-        o.world = GetAbsolutePositionWS(TransformObjectToWorld(p));
+        o.world = GrainAbsolutePosition(TransformObjectToWorld(p));
         o.normalWS = TransformObjectToWorldNormal(n);
         float3 kernelOrigin = origin;
         if (_UsePileSurface > .5 && _KernelMode > .5)
@@ -191,11 +194,11 @@ Shader "Freehangar/HDRP/Grain Kernels"
         }
         if (_KernelMode > .5 && _KernelDistanceFade.y > 0)
         {
-            float viewDistance = length(GetWorldSpaceViewDir(GetCameraRelativePositionWS(kernelOrigin)));
+            float viewDistance = length(GetWorldSpaceViewDir(GrainRelativePosition(kernelOrigin)));
             float detail = 1 - smoothstep(_KernelDistanceFade.x, _KernelDistanceFade.y, viewDistance);
             o.world = kernelOrigin + (o.world - kernelOrigin) * detail;
         }
-        o.positionCS = TransformWorldToHClip(GetCameraRelativePositionWS(o.world));
+        o.positionCS = TransformWorldToHClip(GrainRelativePosition(o.world));
         o.lightmapUV = float4(input.uv1, input.uv2); o.species = t; o.variation = .86 + Hash(stableSeed * 73.3) * .28;
         return o;
     }
@@ -231,7 +234,7 @@ Shader "Freehangar/HDRP/Grain Kernels"
         float4 z = SAMPLE_TEXTURE2D_ARRAY_GRAD(_GrainSurfaceDetail, sampler_GrainSurfaceDetail, uv.xy, type, uvDx.xy, uvDy.xy);
         // Each species stores its baked height in B. A single parallax offset
         // adds close-up depth without ray marching or additional geometry.
-        float3 toCamera = GetWorldSpaceViewDir(GetCameraRelativePositionWS(i.world));
+        float3 toCamera = GetWorldSpaceViewDir(GrainRelativePosition(i.world));
         float depth = _SurfaceHeightStrength * (1 - smoothstep(3, 8, length(toCamera)));
         UNITY_BRANCH
         if (depth > .00001)
@@ -254,6 +257,8 @@ Shader "Freehangar/HDRP/Grain Kernels"
     }
     void TexturedGrainSurface(Varyings i, out float3 color, out float3 normal)
     {
+        color = 0;
+        normal = 0;
         float4 a, b, c;
         GrainWeights(i.world, a, b, c);
         // Derivatives must be evaluated before divergent crop/parallax branches.
@@ -265,8 +270,6 @@ Shader "Freehangar/HDRP/Grain Kernels"
             TexturedGrainSpecies(i, 0, uvDx, uvDy, color, normal);
             return;
         }
-        color = 0;
-        normal = 0;
         // Blend the substrate instead of switching texture slices per tiny XZ cell.
         // This also avoids vertical crop stripes on excavated faces. The separate
         // kernel geometry still selects individual species from these same weights.
@@ -289,94 +292,66 @@ Shader "Freehangar/HDRP/Grain Kernels"
     ENDHLSL
     SubShader
     {
-        Tags { "RenderPipeline"="HDRenderPipeline" "RenderType"="Opaque" "Queue"="Geometry" }
+        Tags { "RenderPipeline"="UniversalPipeline" "RenderType"="Opaque" "Queue"="Geometry" }
         Pass
         {
-            Name "ForwardOnly" Tags { "LightMode"="ForwardOnly" }
-            Cull Back ZWrite Off ZTest Equal
-            Stencil { WriteMask 3 Ref 2 Comp Always Pass Replace }
+            Name "Forward" Tags { "LightMode"="UniversalForwardOnly" }
+            Cull Back ZWrite On ZTest LEqual
             HLSLPROGRAM
             #pragma vertex Vert
-            #pragma fragment FragLit
+            #pragma fragment Frag
             #pragma multi_compile_instancing
-            #pragma instancing_options renderinglayer
             #pragma multi_compile _ LIGHTMAP_ON
-            #pragma multi_compile _ SHADOWS_SHADOWMASK
-            #pragma multi_compile_fragment _ PROBE_VOLUMES_L1 PROBE_VOLUMES_L2
-            #pragma multi_compile_fragment SCREEN_SPACE_SHADOWS_OFF SCREEN_SPACE_SHADOWS_ON
-            #pragma multi_compile_fragment PUNCTUAL_SHADOW_LOW PUNCTUAL_SHADOW_MEDIUM PUNCTUAL_SHADOW_HIGH
-            #pragma multi_compile_fragment DIRECTIONAL_SHADOW_LOW DIRECTIONAL_SHADOW_MEDIUM DIRECTIONAL_SHADOW_HIGH
-            #pragma multi_compile_fragment AREA_SHADOW_MEDIUM AREA_SHADOW_HIGH
-            #pragma multi_compile_fragment USE_FPTL_LIGHTLIST USE_CLUSTERED_LIGHTLIST
-            #ifndef SHADER_STAGE_FRAGMENT
-                #define SHADOW_LOW
-                #define USE_FPTL_LIGHTLIST
-            #endif
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/ShaderPass/ShaderPass.cs.hlsl"
-            #define SHADERPASS SHADERPASS_FORWARD
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Material.hlsl"
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/Lighting.hlsl"
-            #define HAS_LIGHTLOOP
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/LightLoopDef.hlsl"
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Lit/Lit.hlsl"
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/LightLoop.hlsl"
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/BuiltinUtilities.hlsl"
-            float4 FragLit(Varyings i) : SV_Target
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile _ _CLUSTER_LIGHT_LOOP
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fog
+            half4 Frag(Varyings i) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-                float3 positionRWS = GetCameraRelativePositionWS(i.world);
-                PositionInputs pos = GetPositionInput(i.positionCS.xy, _ScreenSize.zw,
-                    i.positionCS.z, i.positionCS.w, positionRWS, uint2(i.positionCS.xy) / GetTileSize());
-                float3 V = GetWorldSpaceNormalizeViewDir(positionRWS);
-                SurfaceData surface;
-                ZERO_INITIALIZE(SurfaceData, surface);
-                surface.materialFeatures = MATERIALFEATUREFLAGS_LIT_STANDARD;
-                surface.baseColor = GrainAlbedo(i);
-                surface.normalWS = normalize(i.normalWS);
-                if (_KernelMode < .5 && _UseSurfaceDetail > .5)
-                    TexturedGrainSurface(i, surface.baseColor, surface.normalWS);
-                surface.geomNormalWS = normalize(i.normalWS);
-                surface.perceptualSmoothness = 0.15;
-                surface.ambientOcclusion = 1;
-                surface.specularOcclusion = 1;
-                BuiltinData builtin;
-                InitBuiltinData(pos, 1, surface.normalWS, -surface.normalWS, float4(i.lightmapUV.xy,0,0), float4(i.lightmapUV.zw,0,0), builtin);
-                PostInitBuiltinData(V, pos, surface, builtin);
-                BSDFData bsdf = ConvertSurfaceDataToBSDFData(i.positionCS.xy, surface);
-                PreLightData preLight = GetPreLightData(V, pos, bsdf);
-                LightLoopOutput lighting;
-                LightLoop(V, pos, preLight, bsdf, builtin, LIGHT_FEATURE_MASK_FLAGS_OPAQUE, lighting);
-                return float4((lighting.diffuseLighting + lighting.specularLighting) * GetCurrentExposureMultiplier(), 1);
+                half3 color = GrainAlbedo(i);
+                float3 normal = normalize(i.normalWS);
+                if (_KernelMode < .5 && _UseSurfaceDetail > .5) TexturedGrainSurface(i, color, normal);
+                InputData data = (InputData)0;
+                data.positionWS = i.world;
+                data.normalWS = normal;
+                data.viewDirectionWS = GetWorldSpaceNormalizeViewDir(i.world);
+                data.shadowCoord = TransformWorldToShadowCoord(i.world);
+                data.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(i.positionCS);
+                data.bakedGI = SAMPLE_GI(i.lightmapUV.xy * unity_LightmapST.xy + unity_LightmapST.zw, SampleSH(normal), normal);
+                data.shadowMask = SAMPLE_SHADOWMASK(i.lightmapUV.xy * unity_LightmapST.xy + unity_LightmapST.zw);
+                SurfaceData surface = (SurfaceData)0;
+                surface.albedo = color; surface.alpha = 1; surface.occlusion = 1;
+                surface.smoothness = .15; surface.normalTS = half3(0,0,1);
+                half4 result = UniversalFragmentPBR(data, surface);
+                result.rgb = MixFog(result.rgb, ComputeFogFactor(TransformWorldToHClip(i.world).z));
+                return result;
             }
             ENDHLSL
         }
         Pass
         {
-            Name "DepthForwardOnly" Tags { "LightMode"="DepthForwardOnly" }
-            Cull Back ZWrite On
-            Stencil { WriteMask 8 Ref 0 Comp Always Pass Replace }
+            Name "DepthOnly" Tags { "LightMode"="DepthOnly" }
+            Cull Back ZWrite On ColorMask R
             HLSLPROGRAM
             #pragma vertex Vert
-            #pragma fragment FragDepth
+            #pragma fragment Depth
             #pragma multi_compile_instancing
-            #pragma instancing_options renderinglayer
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/NormalBuffer.hlsl"
-            float4 FragDepth(Varyings i) : SV_Target
-            {
-                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-                NormalData normal;
-                normal.normalWS = normalize(i.normalWS);
-                if (_KernelMode < .5 && _UseSurfaceDetail > .5)
-                {
-                    float3 unusedColor;
-                    TexturedGrainSurface(i, unusedColor, normal.normalWS);
-                }
-                normal.perceptualRoughness = 0.85;
-                float4 encoded;
-                EncodeIntoNormalBuffer(normal, encoded);
-                return encoded;
-            }
+            half4 Depth(Varyings i) : SV_Target { return 0; }
+            ENDHLSL
+        }
+        Pass
+        {
+            Name "DepthNormals" Tags { "LightMode"="DepthNormalsOnly" }
+            Cull Back ZWrite On
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment Normals
+            #pragma multi_compile_instancing
+            half4 Normals(Varyings i) : SV_Target { return half4(normalize(i.normalWS), 0); }
             ENDHLSL
         }
         Pass
@@ -384,10 +359,27 @@ Shader "Freehangar/HDRP/Grain Kernels"
             Name "ShadowCaster" Tags { "LightMode"="ShadowCaster" }
             Cull Back ZWrite On ColorMask 0
             HLSLPROGRAM
-            #pragma vertex Vert
-            #pragma fragment FragShadow
+            #pragma vertex ShadowVert
+            #pragma fragment Depth
             #pragma multi_compile_instancing
-            float4 FragShadow(Varyings i) : SV_Target { return 0; }
+            #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
+            float3 _LightDirection, _LightPosition;
+            Varyings ShadowVert(Attributes input)
+            {
+                Varyings o = Vert(input);
+                float3 lightDirection = _LightDirection;
+                #if defined(_CASTING_PUNCTUAL_LIGHT_SHADOW)
+                lightDirection = normalize(_LightPosition - o.world);
+                #endif
+                o.positionCS = TransformWorldToHClip(ApplyShadowBias(o.world, normalize(o.normalWS), lightDirection));
+                #if UNITY_REVERSED_Z
+                o.positionCS.z = min(o.positionCS.z, UNITY_NEAR_CLIP_VALUE);
+                #else
+                o.positionCS.z = max(o.positionCS.z, UNITY_NEAR_CLIP_VALUE);
+                #endif
+                return o;
+            }
+            half4 Depth(Varyings i) : SV_Target { return 0; }
             ENDHLSL
         }
     }

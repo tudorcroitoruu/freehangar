@@ -165,7 +165,7 @@ public class Pause : MonoBehaviour
             }
         }
         lastMainDirection = direction;
-        if (pad.buttonSouth.wasPressedThisFrame && selectedMainIndex >= 0)
+        if (MenuPadInput.ConfirmPressed(pad) && selectedMainIndex >= 0)
         {
             var selected = mainScreenButtons[selectedMainIndex];
             var button = selected != null ? selected.button != null ? selected.button : selected.GetComponent<Button>() : null;

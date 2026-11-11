@@ -18,11 +18,11 @@ Shader "Custom/HDRP/Realtime Screen-Space Reflection"
     }
     SubShader
     {
-        Tags { "RenderPipeline"="HDRenderPipeline" "RenderType"="Opaque" "Queue"="Transparent" }
+        Tags { "RenderPipeline"="UniversalPipeline" "RenderType"="Opaque" "Queue"="Transparent" }
         Pass
         {
-            Name "ForwardOnly"
-            Tags { "LightMode"="ForwardOnly" }
+            Name "UniversalForward"
+            Tags { "LightMode"="UniversalForward" }
             Cull Back
             ZWrite On
             ZTest LEqual
@@ -33,9 +33,9 @@ Shader "Custom/HDRP/Realtime Screen-Space Reflection"
             #pragma vertex Vert
             #pragma fragment Frag
             #pragma multi_compile_instancing
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariablesFunctions.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _BaseColor;
@@ -84,8 +84,8 @@ Shader "Custom/HDRP/Realtime Screen-Space Reflection"
                 if (clip.w <= 0) return false;
                 uv = ComputeNormalizedDeviceCoordinatesWithZ(pointWS, UNITY_MATRIX_VP).xy;
                 if (any(uv <= 0) || any(uv >= 1)) return false;
-                uint2 pixel = min((uint2)(uv * _ScreenSize.xy), (uint2)_ScreenSize.xy - 1);
-                float depth = LoadCameraDepth(pixel);
+                uint2 pixel = min((uint2)(uv * _ScaledScreenParams.xy), (uint2)_ScaledScreenParams.xy - 1);
+                float depth = LoadSceneDepth(pixel);
                 // HDRP uses reversed Z; the far clear value denotes sky.
                 if (depth == UNITY_RAW_FAR_CLIP_VALUE) return true;
                 float sceneDepth = LinearEyeDepth(depth, _ZBufferParams);
@@ -143,23 +143,18 @@ Shader "Custom/HDRP/Realtime Screen-Space Reflection"
             {
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-                float3 missColor = _BaseColor.rgb * GetCurrentExposureMultiplier();
-                if (_ColorPyramidLodCount < 1 || _SSRReflectionStrength <= 0) return float4(missColor, 1);
+                float3 missColor = _BaseColor.rgb * 1.0;
+                if (_SSRReflectionStrength <= 0) return float4(missColor, 1);
                 float3 normal = normalize(input.normalWS);
                 float3 view = GetWorldSpaceNormalizeViewDir(input.positionWS);
                 float3 direction = reflect(-view, normal);
                 float2 hitUV;
                 if (!TraceMirror(input.positionWS + normal * max(0, _SSRSurfaceOffset), direction, hitUV)) return float4(missColor, 1);
-                float mip = (1 - saturate(_Smoothness)) * max(0, _ColorPyramidLodCount - 1);
-                float2 uv = hitUV * _RTHandleScaleHistory.xy;
-                float2 texel = _ColorPyramidUvScaleAndLimitCurrentFrame.xy - _ColorPyramidUvScaleAndLimitCurrentFrame.zw;
-                uv = clamp(uv, 0, max(0, _ColorPyramidUvScaleAndLimitCurrentFrame.xy - texel * exp2(1 + mip)));
-                float3 reflected = SAMPLE_TEXTURE2D_X_LOD(_ColorPyramidTexture, s_trilinear_clamp_sampler, uv, mip).rgb;
-                // No Fresnel dimming or projected-color fill: a mirror stays reflective face-on.
+                float3 reflected = SampleSceneColor(hitUV);
                 return float4(lerp(missColor, reflected * _SSRReflectionTint.rgb, saturate(_SSRReflectionStrength)), 1);
             }
             ENDHLSL
         }
     }
-    FallBack "Hidden/HDRP/FallbackError"
+    FallBack Off
 }

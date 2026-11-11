@@ -1,0 +1,14 @@
+Project=E:/Projects/freehangar/Assets; Unity=6000.3.27f1
+Playing=False; pipeline=URP Asset (UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset)
+Build=Switch; result=Succeeded; started=11/11/2026 10:49:44 AM
+Output=C:/Users/TudorCroitoru/Desktop/Grain Cleanup/GCC.nsp
+Included: Assets/Settings/DefaultVolumeProfile.asset
+Included: Assets/Imported/BK/Pure_Common/Settings/URP/URP Asset.asset
+Included: Assets/Imported/BK/Pure_Common/Settings/URP/URP Renderer.asset
+Included: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Included: Assets/Imported/EarthRendering Free/HDRP/Galaxy HDRI.asset
+Included: Assets/Imported/EarthRendering Free/HDRP/Galaxy HDRP Sky.asset
+Log: STRIPPING: Shader Graphs/Lit (BuiltIn Forward pass) (Vertex) - Remaining shader variants = 0/3072 = 0% - Total = 0/3072 = 0%
+Log: STRIPPING: Shader Graphs/Lit (BuiltIn ForwardAdd pass) (Vertex) - Remaining shader variants = 0/4992 = 0% - Total = 0/8064 = 0%
+Log: STRIPPING: Shader Graphs/Lit (BuiltIn Deferred pass) (Vertex) - Remaining shader variants = 0/256 = 0% - Total = 0/8320 = 0%
+Log: STRIPPING: Shader Graphs/Lit (ShadowCaster pass) (Vertex) - Remaining shader variants = 0/4 = 0% - Total = 0/8324 = 0%

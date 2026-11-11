@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal;
 
 public sealed class ItemImageRendererWindow : EditorWindow
 {
@@ -256,11 +256,8 @@ public sealed class ItemImageRendererWindow : EditorWindow
             var bounds = renderers[0].bounds;
             foreach (var renderer in renderers) bounds.Encapsulate(renderer.bounds);
             var camera = preview.camera;
-            var hd = camera.GetComponent<HDAdditionalCameraData>();
-            if (hd == null) hd = camera.gameObject.AddComponent<HDAdditionalCameraData>();
-            hd.clearColorMode = HDAdditionalCameraData.ClearColorMode.Color;
-            hd.antialiasing = HDAdditionalCameraData.AntialiasingMode.None;
-            hd.volumeLayerMask = 1 << 31;
+            var hd = camera.GetUniversalAdditionalCameraData();
+            hd.renderPostProcessing = false; hd.volumeLayerMask = 0;
             camera.orthographic = true;
             camera.aspect = 1;
             camera.nearClipPlane = .01f;
@@ -281,10 +278,9 @@ public sealed class ItemImageRendererWindow : EditorWindow
             for (int i = 0; i < preview.lights.Length; i++)
             {
                 var light = preview.lights[i];
-                if (light.GetComponent<HDAdditionalLightData>() == null) light.gameObject.AddComponent<HDAdditionalLightData>();
                 light.type = LightType.Directional;
                 bool container = entry.category == "Containers";
-                light.intensity = container ? (i == 0 ? 10f : 5f) : (i == 0 ? 30f : 15f);
+                light.intensity = container ? (i == 0 ? 1.4f : .7f) : (i == 0 ? 1.8f : .9f);
                 light.color = container ?
                     (i == 0 ? new Color(1f,.98f,.95f) : new Color(.92f,.96f,1f)) :
                     (i == 0 ? new Color(1,.94f,.84f) : new Color(.75f,.85f,1));
@@ -297,8 +293,7 @@ public sealed class ItemImageRendererWindow : EditorWindow
             preview.AddSingleGO(volumeObject);
             var volume = volumeObject.AddComponent<Volume>(); volume.isGlobal = true; volume.priority = 10000;
             profile = ScriptableObject.CreateInstance<VolumeProfile>(); profile.hideFlags = HideFlags.HideAndDontSave; volume.sharedProfile = profile;
-            var exposure = profile.Add<Exposure>(); exposure.mode.Override(ExposureMode.Fixed); exposure.fixedExposure.Override(9);
-            // Black/white background matting works even when the HDRP buffer does not preserve alpha.
+            // Black/white background matting works even when the URP buffer does not preserve alpha.
             black = Capture(preview, hd, Color.black);
             white = Capture(preview, hd, Color.white);
             var bp = black.GetPixels(); var wp = white.GetPixels();
@@ -307,7 +302,7 @@ public sealed class ItemImageRendererWindow : EditorWindow
             Color plateBlack = bp[0], plateWhite = wp[0];
             Vector3 plateDifference = new Vector3(plateWhite.r-plateBlack.r,plateWhite.g-plateBlack.g,plateWhite.b-plateBlack.b);
             if (Mathf.Max(plateDifference.x,plateDifference.y,plateDifference.z) < .0001f)
-                throw new InvalidOperationException("The preview background did not change. Check HDRP preview rendering support.");
+                throw new InvalidOperationException("The preview background did not change. Check URP preview rendering support.");
             int visiblePixels = 0;
             for (int i = 0; i < pixels.Length; i++)
             {
@@ -342,14 +337,14 @@ public sealed class ItemImageRendererWindow : EditorWindow
         }
     }
 
-    private Texture2D Capture(PreviewRenderUtility preview, HDAdditionalCameraData hd, Color color)
+    private Texture2D Capture(PreviewRenderUtility preview, UniversalAdditionalCameraData hd, Color color)
     {
         var previous = RenderTexture.active;
         bool begun = false;
         try
         {
             preview.BeginPreview(new Rect(0,0,resolution,resolution), GUIStyle.none); begun = true;
-            preview.camera.backgroundColor = color; hd.backgroundColorHDR = color;
+            preview.camera.backgroundColor = color;
             preview.Render(true);
             var texture = preview.EndPreview(); begun = false;
             var target = texture as RenderTexture;

@@ -1,4 +1,4 @@
-﻿//
+//
 //  OutlineMask.shader
 //  QuickOutline
 //
@@ -13,7 +13,7 @@ Shader "Custom/Outline Mask" {
 
   SubShader {
     Tags {
-      "RenderPipeline" = "HDRenderPipeline"
+      "RenderPipeline" = "UniversalPipeline"
       // Render the mask before the fill, within HDRP's transparent range.
       "Queue" = "Transparent+98"
       "RenderType" = "Transparent"
@@ -21,7 +21,7 @@ Shader "Custom/Outline Mask" {
 
     Pass {
       Name "Mask"
-      Tags { "LightMode" = "ForwardOnly" }
+      Tags { "LightMode" = "UniversalForward" }
       Cull Off
       ZTest [_ZTest]
       ZWrite Off
@@ -38,8 +38,8 @@ Shader "Custom/Outline Mask" {
       #pragma vertex Vert
       #pragma fragment Frag
       #pragma multi_compile_instancing
-      #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
-      #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
+      #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+      #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
       struct Attributes { float3 positionOS:POSITION; UNITY_VERTEX_INPUT_INSTANCE_ID };
       struct Varyings { float4 positionCS:SV_POSITION; UNITY_VERTEX_OUTPUT_STEREO };
       Varyings Vert(Attributes i)

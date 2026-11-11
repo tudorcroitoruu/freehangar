@@ -1,0 +1,32 @@
+Switch menu investigation - 2026-11-11
+
+Confirmed input mismatch: MenuManager, Pause and PadMenuCursor hard-coded south
+for confirm and east for cancel. The installed Nintendo Input System package
+maps A to east/Submit and B to south/Cancel. MenuPadInput now selects the proper
+controls for Switch players and Nintendo Pro controllers in the Editor/desktop.
+FarmInput.Back uses the same cancel control and active controller.
+
+Validation: editor compilation and Switch player C# compilation passed. Four
+desktop/Nintendo control mapping assertions passed (output/MenuSwitch/input-tests.txt).
+A synthetic frame-edge/button-click experiment was inconclusive in headless
+Editor execution; it was not retained as a regression test or counted as a pass.
+Actual Nintendo menu button activation/back still needs device verification.
+
+Graphics Settings, quality 0 and the last successful Switch build use the URP
+asset and forward renderer. All three menu camera captures show the scene on
+the Editor's Direct3D11 renderer (output/MenuSwitch/MenuCamera*.png).
+This does not reproduce or prove a fix for the Switch-only blank 3D background.
+The first Switch player rendering error/exception has been requested.
+
+A separate confirmed terrain GUID conflict was repaired. The local
+TFP_Terrain_HDRP material (already using URP Terrain Lit despite its name)
+shared Unity's package TerrainLit material GUID, causing Unity to ignore the
+package material. The local material has a new GUID and its scene references
+were updated. URP global settings still reference Unity's package default.
+Backups are in MaterialConversionBackups/TerrainGuidConflict.
+No scene hierarchy, camera pose or pipeline selection was changed.
+
+Next device checks: rebuild/install; A opens Settings and confirms popups;
+B closes settings/popups; pause and dropdown controls follow the same mapping.
+If 3D remains absent, inspect the first player rendering exception before
+changing render features or shaders speculatively.

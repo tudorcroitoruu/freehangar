@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<NintendoSdkMeta>
+  <Core>
+    <Name>Application</Name>
+    <Is64BitInstruction>True</Is64BitInstruction>
+    <ApplicationId>0x01004b9000490000</ApplicationId>
+    <ProgramIndex>0</ProgramIndex>
+    <MainThreadStackSize>0x00100000</MainThreadStackSize>
+    <ProcessAddressSpace>AddressSpace64Bit</ProcessAddressSpace>
+    <SystemResourceSize>0x01000000</SystemResourceSize>
+  </Core>
+  <Application>
+    <Title>
+      <Language>AmericanEnglish</Language>
+      <Name>DefaultName</Name>
+      <Publisher>DefaultCompany</Publisher>
+    </Title>
+    <Icon>
+      <Language>AmericanEnglish</Language>
+      <IconPath UseEnvironmentVariable="true">C:\Nintendo\Unity6000.3.27_LTS-NXAddon22.2.0-Unity6.3\NintendoSDK\Resources\SpecFiles\NintendoSDK_Application.bmp</IconPath>
+    </Icon>
+    <ReleaseVersion>0</ReleaseVersion>
+    <DisplayVersion>0.1</DisplayVersion>
+    <StartupUserAccount>Required</StartupUserAccount>
+    <UserAccountSwitchLock>Disable</UserAccountSwitchLock>
+    <SupportedLanguage>AmericanEnglish</SupportedLanguage>
+    <Screenshot>Allow</Screenshot>
+    <DataLossConfirmation>None</DataLossConfirmation>
+    <UserAccountSaveDataSize>0x0000000004000000</UserAccountSaveDataSize>
+    <UserAccountSaveDataJournalSize>0x0000000004000000</UserAccountSaveDataJournalSize>
+    <LogoType>LicensedByNintendo</LogoType>
+    <LogoHandling>Auto</LogoHandling>
+    <VideoCapture>Enable</VideoCapture>
+    <RuntimeAddOnContentInstall>Deny</RuntimeAddOnContentInstall>
+    <CrashReport>Allow</CrashReport>
+    <CrashScreenshotForProd>Allow</CrashScreenshotForProd>
+    <CrashScreenshotForDev>Deny</CrashScreenshotForDev>
+    <PlayLogQueryCapability>None</PlayLogQueryCapability>
+    <PlayLogPolicy>Open</PlayLogPolicy>
+    <RuntimeParameterDelivery>Always</RuntimeParameterDelivery>
+    <ContentsAvailabilityTransitionPolicy>Stable</ContentsAvailabilityTransitionPolicy>
+    <HasInGameVoiceChat>False</HasInGameVoiceChat>
+    <AlbumFileExport>Allow</AlbumFileExport>
+    <SuppressForceConsoleMode>False</SuppressForceConsoleMode>
+  </Application>
+</NintendoSdkMeta>

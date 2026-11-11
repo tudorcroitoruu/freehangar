@@ -1,4 +1,4 @@
-﻿//
+//
 //  OutlineFill.shader
 //  QuickOutline
 //
@@ -16,7 +16,7 @@ Shader "Custom/Outline Fill" {
 
   SubShader {
     Tags {
-      "RenderPipeline" = "HDRenderPipeline"
+      "RenderPipeline" = "UniversalPipeline"
       // HDRP's standard transparent range ends at 3100.
       "Queue" = "Transparent+99"
       "RenderType" = "Transparent"
@@ -25,7 +25,7 @@ Shader "Custom/Outline Fill" {
 
     Pass {
       Name "Fill"
-      Tags { "LightMode" = "ForwardOnly" }
+      Tags { "LightMode" = "UniversalForward" }
       Cull Off
       ZTest [_ZTest]
       ZWrite Off
@@ -42,8 +42,8 @@ Shader "Custom/Outline Fill" {
       HLSLPROGRAM
       #pragma target 4.5
       #pragma multi_compile_instancing
-      #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
-      #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
+      #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+      #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
       #pragma vertex vert
       #pragma fragment frag

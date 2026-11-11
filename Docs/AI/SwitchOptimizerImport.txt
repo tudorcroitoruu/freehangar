@@ -1,0 +1,22 @@
+2026-11-11: Switch optimizer import and menu crash follow-up
+
+Source: E:/Projects/Hood-Warfare-2/Assets/Editor/SwitchOptimizationTools.cs.
+Imported into Assets/Editor/SwitchOptimizationTools.cs. Open Tools > Nintendo
+Switch 1 > Optimizer. ASTC world/normal/UI presets, size limits, GPU instancing,
+audit, stop/resume and backups retained. Automatic import changes default off.
+Bulk compression and instancing are available via Apply buttons; not applied by
+this import. Removed Hood Warfare MaskedImage-only test dependency. Added material
+asset backups. Texture overrides affect Switch; material instancing is shared.
+CPU-readable, HDR, data, lightmaps, cube/array and opt-out textures are skipped.
+Backups: Library/SwitchOptimizationBackups. Reports: Temp/switch-*.txt.
+
+Device evidence: startup advanced beyond save load; MenuManager.Awake failed on
+Screen.GetDisplayLayout. Guarded desktop display enumeration/window moves and
+console SetResolution; Switch keeps VSync enabled. OOM followed rising graphics
+memory and native ReflectionProbe.RenderCube/RenderProbeFaces shadow rendering.
+SwitchRenderingStartup disables realtime probes before scene load; baked/custom
+textures remain available. This removes the observed costly rendering path but
+does not prove total texture/mesh memory fits the device. Retest the menu and
+scene transition with device memory counters after a new build. Do not increase
+the shadow atlas merely to silence warnings when memory is already exhausted.
+Validation: Unity refresh RPC timed out after 300 seconds while textures were still importing. First assemblies were produced, but final compilation and optimizer execution checks remain pending after import. No full build or device validation performed for these changes.

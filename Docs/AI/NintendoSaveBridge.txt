@@ -1,0 +1,38 @@
+Nintendo save integration - 2026-11-11
+
+SaveSystem retains its existing compressed/obfuscated player JSON and save keys.
+SaveBridge delegates to PlayerPrefs in the Editor and on desktop. In Switch
+players it stores these values in a versioned UTF-8 JSON container with Base64
+values, using NXSave and the selected user's mounted save archive. No ES3 is used.
+There is no automatic transfer of desktop saves to Nintendo user profiles.
+
+Includes current save, backup, settings, completed-level activity and bicycle
+camera preferences. Existing save entry points now use the bridge. The bridge
+initializes automatically; no scene component needs to be assigned manually.
+Normal native writes are throttled to 15 real-time seconds; a persistent pump
+retries pending changes. Failed writes/commits retain pending data. Background
+and exit callbacks capture live world state and request a forced flush.
+Unreadable/unsupported containers block loading and writing rather than silently
+replacing the original data. Native errors are logged or raised.
+
+The active Application.aarch64.lp64.nmeta override requires a startup user and
+allocates 64 MiB each for user save data and journal; legacy PlayerSettings match.
+This allocation must still be checked against worst-case world save sizes.
+
+Validation: Unity 6000.3.27f1 editor compilation succeeded. Switch player C#
+compilation succeeded against the installed SDK (existing project warnings).
+The standard test-runner request timed out. NintendoSaveValidation.RunFocusedTests
+then directly invoked the NUnit assertions inside Unity: all 12 cases passed.
+Reports: output/SaveSystem/Switch/tests.txt and compilation.txt.
+This is not a full IL2CPP build or a hardware persistence test.
+
+Devkit validation still required:
+1. Launch with a fresh selected user, start a game, change world/player/settings
+   state, save, close from HOME, relaunch and verify Continue restores it.
+2. Make multiple saves less than 15 seconds apart and verify the latest snapshot
+   survives after the retry interval, including when gameplay time is paused.
+3. Verify background/resume and exit immediately after a gameplay change.
+4. Complete a run: Continue/backup should be absent and settings retained.
+5. Launch with a different user and verify independent progress.
+6. Exercise native write failures and maximum-sized worlds; check available
+   archive/journal capacity and Nintendo platform requirements before release.

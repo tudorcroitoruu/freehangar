@@ -13,13 +13,12 @@ Shader "Toon/HDRP Particles"
     }
     SubShader
     {
-        PackageRequirements { "com.unity.render-pipelines.high-definition": "[17.0,18.0]" }
-        Tags { "RenderPipeline"="HDRenderPipeline" "RenderType"="Transparent" "Queue"="Transparent" }
+        Tags { "RenderPipeline"="UniversalPipeline" "RenderType"="Transparent" "Queue"="Transparent" }
         Cull [_Cull]
         HLSLINCLUDE
         #pragma target 4.5
         #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
-        #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
         CBUFFER_START(UnityPerMaterial)
             float4 _BaseMap_ST;
@@ -61,11 +60,10 @@ Shader "Toon/HDRP Particles"
         ENDHLSL
         Pass
         {
-            Name "ForwardOnly"
-            Tags { "LightMode"="ForwardOnly" }
+            Name "UniversalForward"
+            Tags { "LightMode"="UniversalForward" }
             Blend [_SrcBlend] [_DstBlend]
             ZWrite [_ZWrite]
-            Stencil { WriteMask 3 Ref 0 Comp Always Pass Replace }
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment Frag
@@ -74,8 +72,8 @@ Shader "Toon/HDRP Particles"
         }
         Pass
         {
-            Name "DepthForwardOnly"
-            Tags { "LightMode"="DepthForwardOnly" }
+            Name "DepthOnly"
+            Tags { "LightMode"="DepthOnly" }
             ZWrite On
             ColorMask 0
             HLSLPROGRAM

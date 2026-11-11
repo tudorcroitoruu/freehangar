@@ -158,7 +158,14 @@ public sealed class WorldSaveRuntime : MonoBehaviour
         if (instance == null || !instance.ready || instance.restoring || instance.profile != SaveSystem.Data) return;
         SaveSystem.Data.world = instance.Capture();
     }
-    private void OnApplicationQuit() { if (SaveSystem.savesLoaded) SaveSystem.SaveData(); }
+    private void OnApplicationQuit()
+    {
+#if UNITY_SWITCH && !UNITY_EDITOR
+        SaveBridge.SaveOnQuit();
+#else
+        if (SaveSystem.savesLoaded) SaveSystem.SaveData();
+#endif
+    }
     private void OnDestroy() { if (Instance == this) Instance = null; }
 
     public WorldSaveData Capture()

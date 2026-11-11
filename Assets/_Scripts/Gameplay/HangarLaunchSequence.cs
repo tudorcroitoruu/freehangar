@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal;
 
 public sealed class HangarLaunchSequence : MonoBehaviour
 {
@@ -118,7 +118,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         foreach(var canvas in FindObjectsByType<GameplayCanvas>(FindObjectsInactive.Include, FindObjectsSortMode.None)) { hud.Add(canvas); canvas.SetCutsceneHudHidden(this, true); }
         foreach(var sign in GetComponentsInChildren<TextMesh>())if(sign.text.StartsWith("ELECTRICAL"))Hide(sign.gameObject);
         var cameraObject=new GameObject("Electrical room cinematic camera");cinematic=cameraObject.AddComponent<Camera>();cinematic.CopyFrom(original);cinematic.transform.SetPositionAndRotation(original.transform.position,original.transform.rotation);
-        cinematic.nearClipPlane=.03f;var hd=cameraObject.AddComponent<HDAdditionalCameraData>();var originalHD=original.GetComponent<HDAdditionalCameraData>();if(originalHD!=null)originalHD.CopyTo(hd);
+        cinematic.nearClipPlane=.03f;var data=cinematic.GetUniversalAdditionalCameraData(); var sourceData=original.GetUniversalAdditionalCameraData(); data.renderPostProcessing=sourceData.renderPostProcessing; data.volumeLayerMask=sourceData.volumeLayerMask;
         Suspend(original);voice=cameraObject.AddComponent<AudioSource>();voice.spatialBlend=0;voice.playOnAwake=false;CreateOverlay();
         footsteps = cameraObject.AddComponent<AudioSource>(); footsteps.spatialBlend = 0; footsteps.playOnAwake = false;
         voice.outputAudioMixerGroup = SoundManager.CinematicOutput;

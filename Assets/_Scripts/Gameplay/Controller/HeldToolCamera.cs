@@ -1,9 +1,8 @@
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.Rendering.Universal;
 
-/// <summary>URP camera stack / HDRP custom pass with independent held-tool depth.</summary>
+/// <summary>URP camera stack with independent held-tool depth.</summary>
 [ExecuteAlways, DisallowMultipleComponent]
 public sealed class HeldToolCamera : MonoBehaviour
 {
@@ -57,11 +56,9 @@ public sealed class HeldToolCamera : MonoBehaviour
         {
             if (worldUrp != null && worldUrp.renderType == CameraRenderType.Base)
                 worldUrp.cameraStack?.Remove(toolCamera);
-            toolCamera.enabled = false; // HDRP renders explicitly through HeldToolPass.
+            toolCamera.enabled = false;
             toolCamera.nearClipPlane = .01f;
         }
-        var volume = toolCamera.GetComponent<CustomPassVolume>();
-        if (volume != null) volume.enabled = !urp;
         if (urp && scooping) worldCamera.cullingMask |= toolLayer.value;
         else worldCamera.cullingMask &= ~toolLayer.value;
         toolCamera.cullingMask = toolLayer;
@@ -93,50 +90,5 @@ public sealed class HeldToolCamera : MonoBehaviour
     {
         if (camera != worldCamera || toolCamera == null) return;
         ConfigureCameras();
-    }
-}
-
-[System.Serializable]
-public sealed class HeldToolPass : CustomPass
-{
-    private static readonly int AmbientOcclusionTexture = Shader.PropertyToID("_AmbientOcclusionTexture");
-    public Camera worldCamera;
-    public Camera toolCamera;
-    public LayerMask toolLayer;
-    private ShovelTool shovel;
-
-    protected override void AggregateCullingParameters(ref ScriptableCullingParameters parameters, HDCamera camera)
-    {
-        if (camera.camera != worldCamera) return;
-        parameters.cullingMask |= (uint)toolLayer.value;
-        parameters.cullingOptions &= ~CullingOptions.OcclusionCull;
-    }
-
-    protected override void Execute(CustomPassContext ctx)
-    {
-        if (ctx.hdCamera.camera != worldCamera || toolCamera == null) return;
-        // Neither draw path populated the world AO buffer with the shovel's geometry.
-        // Apply the same neutral AO during insertion, or the pile is imprinted on the metal.
-        Texture worldAO = Shader.GetGlobalTexture(AmbientOcclusionTexture);
-        ctx.cmd.SetGlobalTexture(AmbientOcclusionTexture, TextureXR.GetBlackTexture());
-        if (shovel == null) shovel = worldCamera.GetComponentInChildren<ShovelTool>();
-        if (shovel != null && shovel.IsScooping)
-        {
-            // The cutting blade and its load must disappear behind the pile while buried.
-            // Use the world camera's projection with its existing depth for this action.
-            CustomPassUtils.RenderFromCamera(ctx, worldCamera, ctx.cameraColorBuffer,
-                ctx.cameraDepthBuffer, ClearFlag.None, toolLayer,
-                overrideRenderState: new RenderStateBlock(RenderStateMask.Depth)
-                { depthState = new DepthState(true, CompareFunction.LessEqual) });
-        }
-        else
-        {
-            // Only clear the separate tool depth during ordinary carrying/pouring.
-            CustomPassUtils.RenderFromCamera(ctx, toolCamera, ctx.cameraColorBuffer,
-                ctx.customDepthBuffer.Value, ClearFlag.Depth, toolLayer,
-                overrideRenderState: new RenderStateBlock(RenderStateMask.Depth)
-                { depthState = new DepthState(true, CompareFunction.LessEqual) });
-        }
-        if (worldAO != null) ctx.cmd.SetGlobalTexture(AmbientOcclusionTexture, worldAO);
     }
 }

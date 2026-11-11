@@ -6,7 +6,6 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using UnityEngine.Rendering.HighDefinition;
 using Object = UnityEngine.Object;
 
 public static class HeldToolUrpValidation

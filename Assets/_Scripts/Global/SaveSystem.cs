@@ -180,7 +180,7 @@ public static class SaveSystem
     }
 
     static string savePath = "/save";
-    public static bool HasSavedGame => PlayerPrefs.HasKey(savePath);
+    public static bool HasSavedGame => SaveBridge.HasKeyPP(savePath);
     private static bool completedRun;
 
     public static void CompleteRun()
@@ -188,10 +188,10 @@ public static class SaveSystem
         // Invalidate pending background saves before deleting the finished run.
         ++saveRevision;
         completedRun = true;
-        PlayerPrefs.DeleteKey(savePath);
-        PlayerPrefs.DeleteKey(savePath + "_Backup");
+        SaveBridge.DeleteKeyPP(savePath);
+        SaveBridge.DeleteKeyPP(savePath + "_Backup");
         Data = new PlayerData();
-        PlayerPrefs.Save();
+        SaveBridge.SaveAllData();
     }
 
     static int key = 5;
@@ -214,7 +214,7 @@ public static class SaveSystem
         }
         finally { profile.world = world; }
         snapshot.world = world;
-        string previous = PlayerPrefs.GetString(savePath, "");
+        string previous = SaveBridge.GetStringPP(savePath, "");
         MoneyChanged?.Invoke(Money);
         var encoded = await Task.Run(() =>
         {
@@ -228,11 +228,11 @@ public static class SaveSystem
         });
         // A menu/quit save, a new game, or a later goal always wins over old work.
         if (revision != saveRevision || Data != profile || !Application.isPlaying) return;
-        if (encoded.backup != null) PlayerPrefs.SetString(savePath + "_Backup", encoded.backup);
-        PlayerPrefs.SetString(savePath, encoded.current);
-        PlayerPrefs.SetString(savePath + "_Settings", EncryptDecrypt(JsonUtility.ToJson(settingsData)));
-        PlayerPrefs.SetString("levelsCompleted", EncryptDecrypt(JsonUtility.ToJson(activityData)));
-        PlayerPrefs.Save();
+        if (encoded.backup != null) SaveBridge.SetStringPP(savePath + "_Backup", encoded.backup);
+        SaveBridge.SetStringPP(savePath, encoded.current);
+        SaveBridge.SetStringPP(savePath + "_Settings", EncryptDecrypt(JsonUtility.ToJson(settingsData)));
+        SaveBridge.SetStringPP("levelsCompleted", EncryptDecrypt(JsonUtility.ToJson(activityData)));
+        SaveBridge.SaveAllData();
     }
 
     private static string EncodePlayerSave(string json) =>
@@ -262,13 +262,13 @@ public static class SaveSystem
         // Opening the menu or changing settings must not create a resumable game.
         if (!completedRun && (createSave || HasSavedGame || WorldSaveRuntime.Instance != null))
         {
-            if (PlayerPrefs.HasKey(savePath)) PlayerPrefs.SetString(savePath + "_Backup", PlayerPrefs.GetString(savePath));
-            PlayerPrefs.SetString(savePath, EncodePlayerSave(json));
+            if (SaveBridge.HasKeyPP(savePath)) SaveBridge.SetStringPP(savePath + "_Backup", SaveBridge.GetStringPP(savePath));
+            SaveBridge.SetStringPP(savePath, EncodePlayerSave(json));
         }
-        PlayerPrefs.SetString(savePath +"_Settings", EncryptDecrypt(jsonSettings));
-        PlayerPrefs.SetString("levelsCompleted", EncryptDecrypt(jsonActivity));
+        SaveBridge.SetStringPP(savePath +"_Settings", EncryptDecrypt(jsonSettings));
+        SaveBridge.SetStringPP("levelsCompleted", EncryptDecrypt(jsonActivity));
         
-        PlayerPrefs.Save();
+        SaveBridge.SaveAllData();
         MoneyChanged?.Invoke(Money);
     }
 
@@ -321,14 +321,14 @@ public static class SaveSystem
         
         bool newSave = false;
 
-        if (PlayerPrefs.HasKey(savePath))
+        if (SaveBridge.HasKeyPP(savePath))
         {
             try
             {
              //   byte[] source = File.ReadAllBytes(savePath);
-                string json = PlayerPrefs.GetString(savePath);
-                string jsonSettings = PlayerPrefs.GetString(savePath +"_Settings");
-                string jsonActivity = PlayerPrefs.GetString("levelsCompleted");
+                string json = SaveBridge.GetStringPP(savePath);
+                string jsonSettings = SaveBridge.GetStringPP(savePath +"_Settings");
+                string jsonActivity = SaveBridge.GetStringPP("levelsCompleted");
                 
                 Data = DeserializePlayerData(DecodePlayerSave(json));
                 settingsData = JsonUtility.FromJson<SettingsData>(EncryptDecrypt(jsonSettings));
@@ -337,7 +337,7 @@ public static class SaveSystem
             catch
             {
                 // Preserve the previous complete snapshot if the latest write was damaged.
-                string backup = PlayerPrefs.GetString(savePath + "_Backup", "");
+                string backup = SaveBridge.GetStringPP(savePath + "_Backup", "");
                 if (string.IsNullOrEmpty(backup)) throw;
                 Data = DeserializePlayerData(DecodePlayerSave(backup));
                 if (Data == null) throw new InvalidDataException("Both save records are unreadable.");
@@ -354,7 +354,7 @@ public static class SaveSystem
             // Bootstrap also loads data before the menu: initialize defaults without
             // creating a game until New Game is confirmed or gameplay saves progress.
             Data.playerName = "PLAYER_" + Random.Range(1000, 10000);
-            string savedSettings = PlayerPrefs.GetString(savePath + "_Settings", "");
+            string savedSettings = SaveBridge.GetStringPP(savePath + "_Settings", "");
             if (!string.IsNullOrEmpty(savedSettings))
                 settingsData = JsonUtility.FromJson<SettingsData>(EncryptDecrypt(savedSettings));
         }
