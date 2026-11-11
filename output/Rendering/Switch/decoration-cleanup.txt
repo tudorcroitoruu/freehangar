@@ -1,0 +1,6 @@
+Scene backups: DisabledAssets/VegetationBackups/20261111-154529
+Assets/Scenes/Bootstrap.unity: removed 0 inactive decoration objects (0 roots), preserved 0 protected candidates
+Assets/Scenes/LoadingScene.unity: removed 0 inactive decoration objects (0 roots), preserved 0 protected candidates
+Assets/Scenes/Menu.unity: removed 1239 inactive decoration objects (218 roots), preserved 0 protected candidates
+Assets/Scenes/Gameplay.unity: removed 1239 inactive decoration objects (218 roots), preserved 0 protected candidates
+Assets/Scenes/Last Scene.unity: removed 0 inactive decoration objects (0 roots), preserved 0 protected candidates

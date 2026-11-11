@@ -1,0 +1,2 @@
+Assets/Scenes/Menu.unity: 0 inactive matching decoration roots remain after reload
+Assets/Scenes/Gameplay.unity: 0 inactive matching decoration roots remain after reload

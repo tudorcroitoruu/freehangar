@@ -23,10 +23,10 @@ MonoBehaviour:
   m_RequireOpaqueTexture: 1
   m_OpaqueDownsampling: 1
   m_SupportsTerrainHoles: 1
-  m_SupportsHDR: 0
+  m_SupportsHDR: 1
   m_HDRColorBufferPrecision: 0
   m_MSAA: 1
-  m_RenderScale: 0.65
+  m_RenderScale: 0.8
   m_UpscalingFilter: 3
   m_FsrOverrideSharpness: 1
   m_FsrSharpness: 1
@@ -43,7 +43,7 @@ MonoBehaviour:
   m_ProbeVolumeSHBands: 1
   m_MainLightRenderingMode: 1
   m_MainLightShadowsSupported: 1
-  m_MainLightShadowmapResolution: 512
+  m_MainLightShadowmapResolution: 256
   m_AdditionalLightsRenderingMode: 1
   m_AdditionalLightsPerObjectLimit: 2
   m_AdditionalLightShadowsSupported: 0
@@ -54,7 +54,7 @@ MonoBehaviour:
   m_ReflectionProbeBlending: 1
   m_ReflectionProbeBoxProjection: 1
   m_ReflectionProbeAtlas: 1
-  m_ShadowDistance: 20
+  m_ShadowDistance: 15
   m_ShadowCascadeCount: 1
   m_Cascade2Split: 0.33333334
   m_Cascade3Split: {x: 0.1, y: 0.3}
@@ -63,7 +63,7 @@ MonoBehaviour:
   m_ShadowDepthBias: 1
   m_ShadowNormalBias: 1
   m_AnyShadowsSupported: 1
-  m_SoftShadowsSupported: 0
+  m_SoftShadowsSupported: 1
   m_ConservativeEnclosingSphere: 0
   m_NumIterationsEnclosingSphere: 64
   m_SoftShadowQuality: 1
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_StoreActionsOptimization: 0
   m_UseAdaptivePerformance: 0
   m_ColorGradingMode: 0
-  m_ColorGradingLutSize: 32
+  m_ColorGradingLutSize: 16
   m_AllowPostProcessAlphaOutput: 0
   m_UseFastSRGBLinearConversion: 0
   m_SupportDataDrivenLensFlare: 1
