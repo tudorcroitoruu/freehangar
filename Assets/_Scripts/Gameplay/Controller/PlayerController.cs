@@ -143,7 +143,7 @@ public class PlayerController : MonoBehaviour
         if (shovelTool != null) shovelTool.GrainScooped += HandleGrainScooped;
         verticalVelocity = 0f;
         distanceSinceStep = airborneDuration = 0f;
-        SetCursorLocked(true);
+        SetCursorLocked();
     }
 
     private void OnDisable()
@@ -151,13 +151,13 @@ public class PlayerController : MonoBehaviour
         padSprint = false;
         if (shovelTool != null) shovelTool.GrainScooped -= HandleGrainScooped;
         if (shovelTool != null) shovelTool.CancelAction();
-        SetCursorLocked(false);
+        SetCursorLocked();
     }
 
     private void OnApplicationFocus(bool hasFocus)
     {
         if (!hasFocus)
-            SetCursorLocked(false);
+            SetCursorLocked();
     }
 
     private void Update()
@@ -183,12 +183,12 @@ public class PlayerController : MonoBehaviour
             return;
         }
         if (FarmInput.UsingPad && Application.isFocused && !UIPopups.BasePopupUI.HasActivePopup &&
-            Cursor.lockState != CursorLockMode.Locked) SetCursorLocked(true);
+            Cursor.lockState != CursorLockMode.Locked) SetCursorLocked();
         bool wasLocked = Cursor.lockState == CursorLockMode.Locked;
         if (Input.GetKeyDown(KeyCode.Escape))
-            SetCursorLocked(false);
+            SetCursorLocked();
         else if (Input.GetMouseButtonDown(0) && !UIPopups.BasePopupUI.HasActivePopup)
-            SetCursorLocked(true);
+            SetCursorLocked();
 
         bool bicycleInput = Application.isFocused && Time.timeScale > 0 && Cursor.lockState == CursorLockMode.Locked && !UIPopups.BasePopupUI.HasActivePopup;
         if (bicycleInput && interactor != null && interactor.TryAdditionalInput()) return;
@@ -543,9 +543,9 @@ public class PlayerController : MonoBehaviour
         heldInstrument.localRotation = Quaternion.Slerp(heldInstrument.localRotation, rotation, blend);
     }
 
-    private static void SetCursorLocked(bool locked)
+    private static void SetCursorLocked()
     {
-        Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
-        Cursor.visible = !locked;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 }

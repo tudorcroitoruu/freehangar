@@ -8,11 +8,15 @@ public class PlayerInteractorTests
 {
     private readonly List<GameObject> objects = new List<GameObject>();
     private PlayerInteractor interactor;
+    private PlayerData previousData;
+    private readonly List<ScriptableObject> testSettings = new List<ScriptableObject>();
     private readonly Vector3 origin = new Vector3(10000, 10000, 10000);
 
     [SetUp]
     public void SetUp()
     {
+        previousData = SaveSystem.Data;
+        SaveSystem.Data = new PlayerData();
         var actor = Create("Interactor", origin);
         actor.AddComponent<Camera>();
         interactor = actor.AddComponent<PlayerInteractor>();
@@ -25,6 +29,9 @@ public class PlayerInteractorTests
     {
         foreach (var go in objects) Object.DestroyImmediate(go);
         objects.Clear();
+        foreach (var settings in testSettings) Object.DestroyImmediate(settings);
+        testSettings.Clear();
+        SaveSystem.Data = previousData;
     }
 
     [Test]
@@ -39,19 +46,20 @@ public class PlayerInteractorTests
     }
 
     [Test]
-    public void WheelbarrowKeepsEAndAddsASeparateFUpgradeAction()
+    public void WheelbarrowUsesXForUpgradeAndYForPushing()
     {
         var body = Create("Wheelbarrow station", origin + Vector3.forward * 2);
         var wheelbarrow = body.AddComponent<WheelbarrowCargo>();
         var upgrade = body.AddComponent<VehicleUpgradeInteractable>();
+        ConfigureVehicle(body);
         var collider = body.AddComponent<BoxCollider>();
         var menu = Create("Upgrade manager", origin);
         menu.SetActive(false);
         var manager = menu.AddComponent<UpgradeManager>();
         SetField(upgrade, "upgradeManager", manager);
-        Assert.AreSame(wheelbarrow, FindTarget());
-        Assert.IsTrue(wheelbarrow.TryGetPrompt(interactor, out var prompt));
-        object[] args = { wheelbarrow, prompt };
+        Assert.AreSame(upgrade, FindTarget());
+        Assert.IsTrue(upgrade.TryGetPrompt(interactor, out var prompt));
+        object[] args = { upgrade, prompt };
         typeof(PlayerInteractor).GetMethod("AddActions", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(interactor, args);
         prompt = (InteractionPromptData)args[1];
         Assert.AreEqual(KeyCode.E, prompt.InteractionKey);
@@ -72,26 +80,27 @@ public class PlayerInteractorTests
         child.transform.SetParent(body.transform);
         child.AddComponent<BoxCollider>();
         var upgrade = child.AddComponent<VehicleUpgradeInteractable>();
+        ConfigureVehicle(body);
         SetField(upgrade, "targetVehicle", body);
         var menu = Create("Upgrade manager", origin);
         menu.SetActive(false);
         SetField(upgrade, "upgradeManager", menu.AddComponent<UpgradeManager>());
-        Assert.AreSame(wheelbarrow, FindTarget());
-        wheelbarrow.TryGetPrompt(interactor, out var prompt);
-        object[] args = { wheelbarrow, prompt };
+        Assert.AreSame(upgrade, FindTarget());
+        upgrade.TryGetPrompt(interactor, out var prompt);
+        object[] args = { upgrade, prompt };
         typeof(PlayerInteractor).GetMethod("AddActions", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(interactor, args);
         prompt = (InteractionPromptData)args[1];
         Assert.AreEqual(KeyCode.F, prompt.AdditionalActions[0].Key);
     }
 
     [Test]
-    public void StandaloneUpgradeStationUsesFInsteadOfE()
+    public void StandaloneUpgradeStationUsesThePrimaryInteraction()
     {
         var body = Create("Upgrade station", origin + Vector3.forward * 2);
         var station = body.AddComponent<VehicleUpgradeInteractable>();
         body.AddComponent<BoxCollider>();
         Assert.AreSame(station, FindTarget());
-        Assert.AreEqual(KeyCode.F, station.InteractionKey);
+        Assert.AreEqual(KeyCode.E, station.InteractionKey);
     }
 
     [Test]
@@ -275,6 +284,16 @@ public class PlayerInteractorTests
         update.Invoke(shop, null);
         Assert.IsFalse(outline.enabled);
         Assert.AreEqual(origin, actor.transform.position);
+    }
+
+    private void ConfigureVehicle(GameObject body)
+    {
+        var settings = ScriptableObject.CreateInstance<VehicleUpgradeSettings>();
+        settings.vehicles = new[] { new VehicleUpgradeSettings.VehicleType { id = "test-vehicle", slots = 1, movementSpeed = 1f, price = 0 } };
+        testSettings.Add(settings);
+        var vehicle = body.AddComponent<VehicleUpgrade>();
+        SetField(vehicle, "settings", settings);
+        SetField(vehicle, "vehicleId", "test-vehicle");
     }
 
     private void Focus(IInteractable target) =>

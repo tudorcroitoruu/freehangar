@@ -1,0 +1,2 @@
+PASS: actual InteractionPrompt.Show renders X/Y, ZL/ZR and separate action images; hides unavailable images and clears extra rows.
+PASS: saved prefab uses one InteractionImage and Nintendo settings, with no legacy prompt fields.

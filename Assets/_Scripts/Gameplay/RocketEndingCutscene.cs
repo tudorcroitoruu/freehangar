@@ -399,7 +399,7 @@ public sealed class RocketEndingCutscene : MonoBehaviour
         foreach (var canvas in canvases) if (canvas != null) canvas.SetCutsceneHudHidden(this, false);
         behaviours.Clear(); hidden.Clear(); canvases.Clear(); ships.Clear(); shipStarts.Clear();
         shipDirections.Clear(); launchDelays.Clear(); shipSpeeds.Clear();
-        Cursor.lockState = cursorMode; Cursor.visible = cursorVisible;
+        Cursor.lockState = CursorLockMode.Locked; Cursor.visible = false;
         CurrentShot = "Stopped";
     }
     private void OnDisable() => Cancel();

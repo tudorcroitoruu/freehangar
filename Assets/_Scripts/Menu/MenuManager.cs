@@ -30,6 +30,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private string gameplayScene = "Gameplay";
     [SerializeField, Min(0f)] private float minimumLoadingSeconds = 1f;
     private bool transitionRequested;
+    private bool mainScreenWasVisible;
     private int newGamePopupOpenedFrame;
     private SelectedUI[] activePopupButtons;
     private int selectedPopupIndex, popupOpenedFrame, lastPopupDirection;
@@ -272,6 +273,17 @@ public class MenuManager : MonoBehaviour
         if (screen != null && !transform.IsChildOf(screen.transform)) screen.SetActive(active);
     }
 
+    private void LateUpdate()
+    {
+        bool visible = menuScreen != null && menuScreen.activeInHierarchy &&
+            (settingsScreen == null || !settingsScreen.activeInHierarchy) &&
+            (quitGamePopup == null || !quitGamePopup.activeInHierarchy) &&
+            (newGamePopup == null || !newGamePopup.activeInHierarchy);
+        if (visible && !mainScreenWasVisible && !transitionRequested)
+            InitializePopupSelection(menuScreen, ref mainButtons);
+        mainScreenWasVisible = visible;
+    }
+
     private void Update()
     {
         if (transitionRequested || LoadingScreen.isLoadingOn || GameSettingsManager.IsRebindingInputCaptured) return;
@@ -334,9 +346,10 @@ public class MenuManager : MonoBehaviour
     private void OnEnable()
     {
         Instance = this;
+        mainScreenWasVisible = false;
         Time.timeScale = 1f;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         // Reset the page selection when this menu scene opens again.
         SetScreenActive(newGamePopup, false);
         RefreshContinueButtonState();

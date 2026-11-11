@@ -5,7 +5,7 @@ public sealed class CombatToolUpgradeInteractable : MonoBehaviour, IKeyedInterac
 {
     [SerializeField] private PlayerCombatTools.Tool tool;
     [SerializeField] private UpgradeManager manager;
-    public KeyCode InteractionKey => KeyCode.F;
+    public KeyCode InteractionKey => KeyCode.E;
     public WarningType FindWarning => tool == PlayerCombatTools.Tool.Axe ? WarningType.FindAxe : WarningType.FindHammer;
     public bool Found => CombatToolUpgrades.Found(SaveSystem.Data, tool);
 

@@ -244,8 +244,8 @@ public class Pause : MonoBehaviour
         pauseScreen.SetActive(true);
         InitializeMainSelection();
         PauseOnAction?.Invoke();
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void Unpause()
@@ -259,8 +259,8 @@ public class Pause : MonoBehaviour
         AudioListener.pause = previousAudioPaused;
         AudioManager.Instance?.PlayCancel();
         Time.timeScale = previousTimeScale;
-        Cursor.lockState = previousCursorLock;
-        Cursor.visible = previousCursorVisible;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         // A live player's ResumeInput can now restore its normal locked gameplay cursor.
         PauseOffAction?.Invoke();
     }

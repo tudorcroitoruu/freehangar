@@ -14,42 +14,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prompts:
   - control: buttonNorth
-    sprite: {fileID: 21300000, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: f8d5ac9e3d3560b4a90585e4c43b8c86, type: 3}
   - control: buttonSouth
-    sprite: {fileID: 21300002, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 49b7928d35db1d04c8a7bfa13dd5d8ea, type: 3}
   - control: buttonWest
-    sprite: {fileID: 21300004, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: ce03dc82b8cbf3d4e85f3cd8f3b300d0, type: 3}
   - control: buttonEast
-    sprite: {fileID: 21300006, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 7f6bbeb6818e5654aae9886217476e18, type: 3}
   - control: start
-    sprite: {fileID: 21300008, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: b6df8a7c489fde046a8ca23febeb3583, type: 3}
   - control: select
-    sprite: {fileID: 21300010, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 36e896d339355ed47bceae52e9bf4145, type: 3}
   - control: leftShoulder
-    sprite: {fileID: 21300012, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 7648944d683f60449951a8baf5bd8e76, type: 3}
   - control: rightShoulder
-    sprite: {fileID: 21300014, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: d14fc539be8ecff41bb384849fced1aa, type: 3}
   - control: leftTrigger
-    sprite: {fileID: 21300016, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 0af975eedc3ae2c47bde2fe5e79cee52, type: 3}
   - control: rightTrigger
-    sprite: {fileID: 21300018, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: cd2bc52c0ae476e49a6e5917b483f57a, type: 3}
   - control: leftStickPress
-    sprite: {fileID: 21300020, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 7c8e85944315d2c4f947753f62b317a9, type: 3}
   - control: rightStickPress
-    sprite: {fileID: 21300022, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 0699ede4bce096d4c9169a5a606f162d, type: 3}
   - control: leftStick
-    sprite: {fileID: 21300024, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 2e0ec2b5f924c61478078a9063c9068b, type: 3}
   - control: rightStick
-    sprite: {fileID: 21300026, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: c062bb75e93b01e4ba37ae028be918df, type: 3}
   - control: dpad
-    sprite: {fileID: 21300028, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 0d50e2ccad33c554f92e27ae8c57ad28, type: 3}
   - control: dpad/up
-    sprite: {fileID: 21300030, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 38549ac570869ad4da3baa1f5ec481a2, type: 3}
   - control: dpad/down
-    sprite: {fileID: 21300032, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 83066614608d46e4db84b0a913de3df3, type: 3}
   - control: dpad/left
-    sprite: {fileID: 21300034, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: 1a458e21b5df03e4293165958a4f61e3, type: 3}
   - control: dpad/right
-    sprite: {fileID: 21300036, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
-  - control: 
-    sprite: {fileID: 21300038, guid: 756ffc9afe091a1499588bede5dbfe6d, type: 3}
+    sprite: {fileID: 21300000, guid: affb9226b0f35204fbc1068604217ba9, type: 3}
+  - control: home
+    sprite: {fileID: 21300000, guid: 5dc8bda48aae2084c9b8303ade18c175, type: 3}

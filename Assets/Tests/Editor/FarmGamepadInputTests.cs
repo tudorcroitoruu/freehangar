@@ -7,9 +7,9 @@ using UnityEngine.InputSystem.LowLevel;
 public class FarmGamepadInputTests
 {
     [TestCase("buttonNorth")]
-    [TestCase("buttonSouth")]
-    [TestCase("buttonWest")]
     [TestCase("buttonEast")]
+    [TestCase("buttonWest")]
+    [TestCase("buttonSouth")]
     [TestCase("start")]
     [TestCase("select")]
     public void ButtonPromptRendersAsOneSprite(string control)
@@ -55,8 +55,8 @@ public class FarmGamepadInputTests
             Binding("Unload", pad.leftTrigger);
             Binding("Interact", pad.buttonNorth);
             Binding("Secondary", pad.buttonWest);
-            Binding("Jump", pad.buttonSouth);
-            Binding("Crouch", pad.buttonEast);
+            Binding("Jump", pad.buttonEast);
+            Binding("Crouch", pad.buttonSouth);
             Binding("Cargo", pad.rightShoulder);
             Binding("ResetVehicle", pad.leftShoulder);
             Binding("Sprint", pad.leftStickButton);
@@ -85,8 +85,8 @@ public class FarmGamepadInputTests
             }
             Press("Interact", new GamepadState(GamepadButton.North));
             Press("Secondary", new GamepadState(GamepadButton.West));
-            Press("Jump", new GamepadState(GamepadButton.South));
-            Press("Crouch", new GamepadState(GamepadButton.East));
+            Press("Jump", new GamepadState(GamepadButton.East));
+            Press("Crouch", new GamepadState(GamepadButton.South));
             Press("Attack", new GamepadState { rightTrigger = 1 });
             Press("Unload", new GamepadState { leftTrigger = 1 });
             Press("Sprint", new GamepadState(GamepadButton.LeftStick));

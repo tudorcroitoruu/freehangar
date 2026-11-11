@@ -14,96 +14,99 @@ public class GameSettingsManager : MonoBehaviour
 {
     public static GameSettingsManager Instance { get; private set; }
 
-    [Header("Buttons")] 
+    [Header("Buttons")]
     [SerializeField] private SelectedUI[] buttons;
     [SerializeField] private GameObject[] sections;
 
-    [SerializeField] private SelectedUI[] videoSettings;
+//     [SerializeField] private SelectedUI[] videoSettings;
     [SerializeField] private SelectedUI[] audioSettings;
 
-    [SerializeField] private GameObject[] joystickHints;
-    
-    [Header("VIDEO - Resolution")]
-    [SerializeField] private Button previousResolutionButton;
-    [SerializeField] private Button nextResolutionButton;
-    [SerializeField] private Text resolutionValueText;
-
-    [Header("VIDEO - Window Mode")]
-    [SerializeField] private Button previousWindowModeButton;
-    [SerializeField] private Button nextWindowModeButton;
-    [SerializeField] private Text windowModeValueText;
-
-    [Header("VIDEO - Display")]
-    [SerializeField] private Button previousDisplayButton;
-    [SerializeField] private Button nextDisplayButton;
-    [SerializeField] private Text displayValueText;
-
-    [Header("VIDEO - VSync")]
-    [SerializeField] private Toggle vSyncToggle;
-
-    [Header("VIDEO - DLSS")]
-    [SerializeField] private Toggle dlssToggle;
-    [SerializeField] private Text dlssStatusText;
+    // Nintendo: video UI and runtime quality configuration are retained as comments.
+//     [Header("VIDEO - Resolution")]
+//     [SerializeField] private Button previousResolutionButton;
+//     [SerializeField] private Button nextResolutionButton;
+//     [SerializeField] private Text resolutionValueText;
+//
+//     [Header("VIDEO - Window Mode")]
+//     [SerializeField] private Button previousWindowModeButton;
+//     [SerializeField] private Button nextWindowModeButton;
+//     [SerializeField] private Text windowModeValueText;
+//
+//     [Header("VIDEO - Display")]
+//     [SerializeField] private Button previousDisplayButton;
+//     [SerializeField] private Button nextDisplayButton;
+//     [SerializeField] private Text displayValueText;
+//
+//     [Header("VIDEO - VSync")]
+//     [SerializeField] private Toggle vSyncToggle;
+//
+//     [Header("VIDEO - DLSS")]
+//     [SerializeField] private Toggle dlssToggle;
+//     [SerializeField] private Text dlssStatusText;
+//     public static bool IsDLSSSupported => false;
+//     private bool displayedDLSSSupport;
+//
+//     [Header("VIDEO - Frame Rate")]
+//     [SerializeField] private Button previousFrameRateButton;
+//     [SerializeField] private Button nextFrameRateButton;
+//     [SerializeField] private Text frameRateValueText;
+//
+//     [Header("VIDEO - Quality")]
+//     [SerializeField] private Button previousQualityButton;
+//     [SerializeField] private Button nextQualityButton;
+//     [SerializeField] private Text qualityValueText;
+//
+//     [SerializeField] private QualityPreset[] qualityPresets =
+//     {
+//         new() { name = "Low", renderScale = 0.65f, msaa = MsaaSamples.Off,
+//             shadowDistance = 20f, shadowResolution = 512, shadowCascades = 1,
+//             screenSpaceAmbientOcclusion = false, textureMipmapLimit = 2, lodBias = 0.6f },
+//         new() { name = "Medium", renderScale = 0.85f, msaa = MsaaSamples.X2,
+//             shadowDistance = 40f, shadowResolution = 1024, shadowCascades = 2,
+//             screenSpaceAmbientOcclusion = false, textureMipmapLimit = 1, lodBias = 1f },
+//         new() { name = "High", renderScale = 1f, msaa = MsaaSamples.X4,
+//             shadowDistance = 60f, shadowResolution = 2048, shadowCascades = 2,
+//             lodBias = 1.5f },
+//         new() { name = "Ultra", renderScale = 1f, msaa = MsaaSamples.X8,
+//             shadowDistance = 100f, shadowResolution = 4096, shadowCascades = 4,
+//             lodBias = 2f }
+//     };
+//
+//     private enum MsaaSamples { Off = 1, X2 = 2, X4 = 4, X8 = 8 }
+//
+//     [Serializable]
+//     private sealed class QualityPreset
+//     {
+//         public string name;
+//         [Range(0.25f, 1f)] public float renderScale = 1f;
+//         [Tooltip("MSAA applies to URP forward rendering.")]
+//         public MsaaSamples msaa = MsaaSamples.X4;
+//         [Min(0f)] public float shadowDistance = 60f;
+//         [Range(256, 4096)] public int shadowResolution = 2048;
+//         [Range(1, 4)] public int shadowCascades = 2;
+//         [Tooltip("Legacy ambient occlusion preference; configured through the URP renderer.")]
+//         public bool screenSpaceAmbientOcclusion = true;
+//         [Range(0, 3)] public int textureMipmapLimit;
+//         [Range(0.1f, 4f)] public float lodBias = 1.5f;
+//     }
+//
+//     // One runtime instance is reused by every preset and across scene changes.
+//     // The project asset remains unchanged when testing settings in the Editor.
+//     private static UniversalRenderPipelineAsset runtimePipeline;
+//     private static RenderPipelineAsset originalQualityPipeline;
+//     private static int originalTextureMipmapLimit;
+//     private static float originalLodBias;
+//     public static UniversalRenderPipelineAsset ActiveRenderPipeline => runtimePipeline;
+//     private int QualityPresetCount => qualityPresets?.Length ?? 0;
+//
+    // Inert compatibility accessors for desktop-only callers and editor tests.
     public static bool IsDLSSSupported => false;
-    private bool displayedDLSSSupport;
-
-    [Header("VIDEO - Frame Rate")]
-    [SerializeField] private Button previousFrameRateButton;
-    [SerializeField] private Button nextFrameRateButton;
-    [SerializeField] private Text frameRateValueText;
-
-    [Header("VIDEO - Quality")]
-    [SerializeField] private Button previousQualityButton;
-    [SerializeField] private Button nextQualityButton;
-    [SerializeField] private Text qualityValueText;
-
-    [SerializeField] private QualityPreset[] qualityPresets =
-    {
-        new() { name = "Low", renderScale = 0.65f, msaa = MsaaSamples.Off,
-            shadowDistance = 20f, shadowResolution = 512, shadowCascades = 1,
-            screenSpaceAmbientOcclusion = false, textureMipmapLimit = 2, lodBias = 0.6f },
-        new() { name = "Medium", renderScale = 0.85f, msaa = MsaaSamples.X2,
-            shadowDistance = 40f, shadowResolution = 1024, shadowCascades = 2,
-            screenSpaceAmbientOcclusion = false, textureMipmapLimit = 1, lodBias = 1f },
-        new() { name = "High", renderScale = 1f, msaa = MsaaSamples.X4,
-            shadowDistance = 60f, shadowResolution = 2048, shadowCascades = 2,
-            lodBias = 1.5f },
-        new() { name = "Ultra", renderScale = 1f, msaa = MsaaSamples.X8,
-            shadowDistance = 100f, shadowResolution = 4096, shadowCascades = 4,
-            lodBias = 2f }
-    };
-
-    private enum MsaaSamples { Off = 1, X2 = 2, X4 = 4, X8 = 8 }
-
-    [Serializable]
-    private sealed class QualityPreset
-    {
-        public string name;
-        [Range(0.25f, 1f)] public float renderScale = 1f;
-        [Tooltip("MSAA applies to URP forward rendering.")]
-        public MsaaSamples msaa = MsaaSamples.X4;
-        [Min(0f)] public float shadowDistance = 60f;
-        [Range(256, 4096)] public int shadowResolution = 2048;
-        [Range(1, 4)] public int shadowCascades = 2;
-        [Tooltip("Legacy ambient occlusion preference; configured through the URP renderer.")]
-        public bool screenSpaceAmbientOcclusion = true;
-        [Range(0, 3)] public int textureMipmapLimit;
-        [Range(0.1f, 4f)] public float lodBias = 1.5f;
-    }
-
-    // One runtime instance is reused by every preset and across scene changes.
-    // The project asset remains unchanged when testing settings in the Editor.
-    private static UniversalRenderPipelineAsset runtimePipeline;
-    private static RenderPipelineAsset originalQualityPipeline;
-    private static int originalTextureMipmapLimit;
-    private static float originalLodBias;
-    public static UniversalRenderPipelineAsset ActiveRenderPipeline => runtimePipeline;
-    private int QualityPresetCount => qualityPresets?.Length ?? 0;
+    public static UniversalRenderPipelineAsset ActiveRenderPipeline => null;
 
 //     [Header("VIDEO - Upscaling")]
 //     [SerializeField] private TMP_Dropdown upscalingDropdown;
 //     [SerializeField] private TMP_Dropdown dlssQualityDropdown;
-// 
+//
 //     [Header("DLSS Provider")]
 //     [Tooltip("Component that implements IDLSSProvider.")]
 //     [SerializeField] private MonoBehaviour dlssProviderBehaviour;
@@ -124,7 +127,9 @@ public class GameSettingsManager : MonoBehaviour
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Slider sfxSlider;
 
-    [Header("CONTROLS")]
+    [Header("CONTROLS")] 
+    [SerializeField] private ScrollRect controlsScrollRect;
+    [SerializeField, Min(0f)] private float controlsScrollSpeed = 600f;
     [SerializeField] private Slider mouseSensitivitySlider;
     [SerializeField] private Text mouseSensitivityValueText;
     [SerializeField] private InputActionAsset inputActions;
@@ -141,9 +146,9 @@ public class GameSettingsManager : MonoBehaviour
 
     public event Action<float> OnAimSensitivityChanged;
 
-    private Resolution[] availableResolutions;
-    private readonly List<DisplayInfo> availableDisplays = new();
-    private bool displayMovePending;
+//     private Resolution[] availableResolutions;
+//     private readonly List<DisplayInfo> availableDisplays = new();
+//     private bool displayMovePending;
 
 //     private IDLSSProvider dlssProvider;
     private bool initialized;
@@ -151,32 +156,33 @@ public class GameSettingsManager : MonoBehaviour
     private int navigationSection = -1, navigationRow = -1, sectionOpenedFrame;
     private Vector2 lastSettingsDirection;
     private float nextSettingsMoveAt;
-    private SelectedUI[] NavigationRows => navigationSection == 0 ? videoSettings : navigationSection == 1 ? audioSettings : null;
+    // Nintendo prefab contains Audio (0) and Controls (1); the Video page was removed.
+    private SelectedUI[] NavigationRows => navigationSection == 0 ? audioSettings : null;
 
     private SettingsData settings => SaveSystem.settingsData;
 
-    private readonly int[] frameRateValues =
-    {
-        30,
-        60,
-        120,
-        -1
-    };
-
-    private readonly string[] frameRateLabels =
-    {
-        "30",
-        "60",
-        "120",
-        "Unlimited"
-    };
-
-//     private readonly string[] upscalingLabels =
+//     private readonly int[] frameRateValues =
+//     {
+//         30,
+//         60,
+//         120,
+//         -1
+//     };
+//
+//     private readonly string[] frameRateLabels =
+//     {
+//         "30",
+//         "60",
+//         "120",
+//         "Unlimited"
+//     };
+//
+// //     private readonly string[] upscalingLabels =
 //     {
 //         "Off",
 //         "DLSS"
 //     };
-// 
+//
 //     private readonly string[] dlssQualityLabels =
 //     {
 //         "Quality",
@@ -213,18 +219,16 @@ public class GameSettingsManager : MonoBehaviour
     private void OnEnable()
     {
         ConfigurePlatformSections();
-        RefreshJoystickHints();
-        SetRowHoverListeners(videoSettings, true);
+        // SetRowHoverListeners(videoSettings, true);
         SetRowHoverListeners(audioSettings, true);
         ShowSection(0);
     }
 
     private void OnDisable()
     {
-        SetJoystickHints(false);
-        SetRowHoverListeners(videoSettings, false);
+        // SetRowHoverListeners(videoSettings, false);
         SetRowHoverListeners(audioSettings, false);
-        ClearSettingsRows(videoSettings);
+        // ClearSettingsRows(videoSettings);
         ClearSettingsRows(audioSettings);
         navigationRow = -1;
         CancelRebinding();
@@ -233,8 +237,7 @@ public class GameSettingsManager : MonoBehaviour
 
     private void Update()
     {
-        if (initialized && displayedDLSSSupport != IsDLSSSupported) UpdateVideoValues();
-        RefreshJoystickHints();
+        // if (initialized && displayedDLSSSupport != IsDLSSSupported) UpdateVideoValues();
         EnsureInitialSettingsSelection();
         if (rebindOperation != null && Gamepad.current?.startButton.wasPressedThisFrame == true) CancelRebinding();
         if (!initialized || IsRebindingInputCaptured)
@@ -243,16 +246,6 @@ public class GameSettingsManager : MonoBehaviour
         if ((Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame) ||
             Gamepad.current?.selectButton.wasPressedThisFrame == true)
             ResetToDefaults();
-    }
-
-    private void RefreshJoystickHints() => SetJoystickHints(isActiveAndEnabled && Gamepad.all.Count > 0 &&
-        !LoadingScreen.IsLoading && !IsRebindingInputCaptured);
-
-    private void SetJoystickHints(bool visible)
-    {
-        if (joystickHints == null) return;
-        foreach (var hint in joystickHints)
-            if (hint != null && hint.activeSelf != visible) hint.SetActive(visible);
     }
 
     private IEnumerator Start()
@@ -283,7 +276,7 @@ public class GameSettingsManager : MonoBehaviour
 
         RegisterListeners();
         initialized = true;
-        UpdateVideoValues();
+        // UpdateVideoValues();
         UpdateAudioValues();
     }
 
@@ -477,19 +470,23 @@ public class GameSettingsManager : MonoBehaviour
     {
         get
         {
-#if UNITY_SWITCH && !UNITY_EDITOR
-            return 1;
-#else
+// #if UNITY_SWITCH && !UNITY_EDITOR
+//             return 1;
+// #else
             return 0;
-#endif
+// #endif
         }
     }
 
     private void ConfigurePlatformSections()
     {
-        if (FirstSectionIndex == 0) return;
-        if (buttons != null && buttons.Length > 0 && buttons[0]) buttons[0].gameObject.SetActive(false);
-        if (sections != null && sections.Length > 0 && sections[0]) sections[0].SetActive(false);
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (FirstSectionIndex == 0) return;
+//         if (buttons != null && buttons.Length > 0 && buttons[0]) buttons[0].gameObject.SetActive(false);
+//         if (sections != null && sections.Length > 0 && sections[0]) sections[0].SetActive(false);
+//
+
     }
 
     public Transform FirstSectionTab => buttons != null && buttons.Length > FirstSectionIndex && buttons[FirstSectionIndex] ? buttons[FirstSectionIndex].transform : null;
@@ -538,11 +535,11 @@ public class GameSettingsManager : MonoBehaviour
         navigationRow = -1;
         sectionOpenedFrame = Time.frameCount;
         lastSettingsDirection = Vector2.zero;
-        ClearSettingsRows(videoSettings);
+        // ClearSettingsRows(videoSettings);
         ClearSettingsRows(audioSettings);
         var rows = NavigationRows;
         if (rows != null && rows.Length > 0) SelectSettingsRow(0);
-        if (index == 2 && mouseSensitivitySlider != null)
+        if (index == 1 && mouseSensitivitySlider != null)
             EventSystem.current?.SetSelectedGameObject(mouseSensitivitySlider.gameObject);
     }
 
@@ -574,7 +571,7 @@ public class GameSettingsManager : MonoBehaviour
         var rows = NavigationRows;
         if (rows == null || index < 0 || index >= rows.Length || rows[index] == null || !rows[index].isActiveAndEnabled) return false;
         var row = rows[index];
-        ClearSettingsRows(videoSettings, row);
+        // ClearSettingsRows(videoSettings, row);
         ClearSettingsRows(audioSettings, row);
         navigationRow = index;
         row.Select();
@@ -586,7 +583,7 @@ public class GameSettingsManager : MonoBehaviour
     {
         // A child row may not be active yet during its parent's OnEnable.
         // Retry only until a row is selected; preserve later mouse/pad choices.
-        if (navigationRow < 0 && (navigationSection == 0 || navigationSection == 1))
+        if (navigationRow < 0 && navigationSection == 0)
             SelectSettingsRow(0);
     }
 
@@ -599,10 +596,10 @@ public class GameSettingsManager : MonoBehaviour
 
     public bool HandleSettingsInput(Gamepad pad)
     {
-        if (!isActiveAndEnabled || navigationSection < 0 || navigationSection > 2) return false;
+        if (!isActiveAndEnabled || navigationSection < 0 || navigationSection > 1) return false;
         EnsureInitialSettingsSelection();
         var rows = NavigationRows;
-        if (navigationSection < 2 && (rows == null || rows.Length == 0)) return false;
+        if (navigationSection == 0 && (rows == null || rows.Length == 0)) return false;
         if (pad == null || Time.frameCount <= sectionOpenedFrame || IsRebindingInputCaptured || LoadingScreen.IsLoading) return true;
         if (pad.leftShoulder.wasPressedThisFrame || pad.rightShoulder.wasPressedThisFrame)
         {
@@ -610,7 +607,13 @@ public class GameSettingsManager : MonoBehaviour
             return true;
         }
         Vector2 input = pad.dpad.ReadValue();
-        if (input.sqrMagnitude < .25f) input = pad.leftStick.ReadValue();
+        Vector2 stick = pad.leftStick.ReadValue();
+        if (navigationSection == 1)
+        {
+            ScrollControls(stick.y, Time.unscaledDeltaTime);
+            stick.y = 0f;
+        }
+        if (input.sqrMagnitude < .25f) input = stick;
         Vector2 direction = input.sqrMagnitude < .25f ? Vector2.zero :
             Mathf.Abs(input.x) > Mathf.Abs(input.y) ? new Vector2(Mathf.Sign(input.x), 0f) : new Vector2(0f, Mathf.Sign(input.y));
         if (direction != Vector2.zero && (direction != lastSettingsDirection || Time.unscaledTime >= nextSettingsMoveAt))
@@ -631,22 +634,37 @@ public class GameSettingsManager : MonoBehaviour
         return true;
     }
 
+    private void ScrollControls(float vertical, float deltaTime)
+    {
+        if (navigationSection != 1 || controlsScrollRect == null || !controlsScrollRect.isActiveAndEnabled ||
+            !controlsScrollRect.vertical || controlsScrollRect.content == null || Mathf.Abs(vertical) <= .2f || deltaTime <= 0f)
+            return;
+        var viewport = controlsScrollRect.viewport != null ? controlsScrollRect.viewport : controlsScrollRect.GetComponent<RectTransform>();
+        float scrollableHeight = controlsScrollRect.content.rect.height - viewport.rect.height;
+        if (scrollableHeight <= 0f) return;
+        float axis = Mathf.Sign(vertical) * Mathf.InverseLerp(.2f, 1f, Mathf.Abs(vertical));
+        controlsScrollRect.StopMovement();
+        controlsScrollRect.verticalNormalizedPosition = Mathf.Clamp01(controlsScrollRect.verticalNormalizedPosition +
+            axis * controlsScrollSpeed * deltaTime / scrollableHeight);
+    }
+
     private void ChangeSelectedSetting(int direction)
     {
         if (!initialized || settings == null) return;
+        // Video navigation is preserved for the desktop layout.
+        // if (navigationSection == 0)
+        // {
+        //     switch (navigationRow)
+        //     {
+        //         case 0: ChangeWindowMode(); break;
+        //         case 1: ChangeDisplay(direction); break;
+        //         case 2: ChangeResolution(direction); break;
+        //         case 3: OnVSyncChanged(direction > 0); break;
+        //         case 4: OnDLSSChanged(direction > 0); break;
+        //         case 5: ChangeQuality(direction); break;
+        //     }
+        // }
         if (navigationSection == 0)
-        {
-            switch (navigationRow)
-            {
-                case 0: ChangeWindowMode(); break;
-                case 1: ChangeDisplay(direction); break;
-                case 2: ChangeResolution(direction); break;
-                case 3: OnVSyncChanged(direction > 0); break;
-                case 4: OnDLSSChanged(direction > 0); break;
-                case 5: ChangeQuality(direction); break;
-            }
-        }
-        else if (navigationSection == 1)
         {
             switch (navigationRow)
             {
@@ -655,14 +673,14 @@ public class GameSettingsManager : MonoBehaviour
                 case 2: ChangeSFXVolume(direction * VolumeStep); break;
             }
         }
-        else if (navigationSection == 2) ChangeSensitivity(direction * SensitivityStep);
+        else if (navigationSection == 1) ChangeSensitivity(direction * SensitivityStep);
     }
 
     private void SetupUI()
     {
         ConfigurePlatformSections();
-        SetupDisplays();
-        SetupResolutions();
+        // SetupDisplays();
+        // SetupResolutions();
 //         SetupUpscalingDropdown();
 //         SetupDLSSQualityDropdown();
 
@@ -671,123 +689,135 @@ public class GameSettingsManager : MonoBehaviour
 
     private void SetupDisplays()
     {
-        availableDisplays.Clear();
-#if UNITY_STANDALONE || UNITY_EDITOR
-        Screen.GetDisplayLayout(availableDisplays);
-#endif
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         availableDisplays.Clear();
+// #if UNITY_STANDALONE || UNITY_EDITOR
+//         Screen.GetDisplayLayout(availableDisplays);
+// #endif
+//
+
     }
 
     private int FindCurrentDisplayIndex()
     {
-        if (availableDisplays.Count == 0) return 0;
-        DisplayInfo current = Screen.mainWindowDisplayInfo;
-        // DisplayInfo equality includes the native monitor identity, unlike its name/resolution.
-        int index = availableDisplays.FindIndex(display => display.Equals(current));
-        return index >= 0 ? index : 0;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (availableDisplays.Count == 0) return 0;
+//         DisplayInfo current = Screen.mainWindowDisplayInfo;
+//         // DisplayInfo equality includes the native monitor identity, unlike its name/resolution.
+//         int index = availableDisplays.FindIndex(display => display.Equals(current));
+//         return index >= 0 ? index : 0;
+//
+        return 0;
     }
 
     private void SetupResolutions()
     {
-        Resolution[] displayResolutions = Screen.resolutions
-            .GroupBy(r => new
-            {
-                r.width,
-                r.height
-            })
-            .Select(group => group.Last())
-            .OrderBy(r => r.width)
-            .ThenBy(r => r.height)
-            .ToArray();
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         Resolution[] displayResolutions = Screen.resolutions
+//             .GroupBy(r => new
+//             {
+//                 r.width,
+//                 r.height
+//             })
+//             .Select(group => group.Last())
+//             .OrderBy(r => r.width)
+//             .ThenBy(r => r.height)
+//             .ToArray();
+//
+//         Resolution display = Screen.currentResolution;
+//         float displayAspect = display.height > 0
+//             ? (float)display.width / display.height
+//             : (float)Screen.width / Mathf.Max(1, Screen.height);
+//
+//         // FullscreenWindow preserves the desktop aspect. Other aspect ratios
+//         // are letterboxed by the display, even though SetResolution succeeds.
+//         availableResolutions = displayResolutions
+//             .Where(r => r.height > 0 &&
+//                 Mathf.Abs((float)r.width / r.height - displayAspect) < 0.015f)
+//             .ToArray();
+//
+//         if (availableResolutions.Length == 0)
+//         {
+//             availableResolutions = new[]
+//             {
+//                 new Resolution { width = display.width, height = display.height,
+//                     refreshRateRatio = display.refreshRateRatio }
+//             };
+//         }
+//
+//         // Older saves stored only an index into the unfiltered resolution list.
+//         // Migrate that choice before the list changes, then keep dimensions so
+//         // future changes to the OS resolution list do not shift saved choices.
+//         if (settings == null)
+//             return;
+//
+//         int preferredWidth = settings.resolutionWidth;
+//         int preferredHeight = settings.resolutionHeight;
+//         if (preferredWidth <= 0 || preferredHeight <= 0)
+//         {
+//             if (settings.resolutionIndex >= 0 && settings.resolutionIndex < displayResolutions.Length)
+//             {
+//                 preferredWidth = displayResolutions[settings.resolutionIndex].width;
+//                 preferredHeight = displayResolutions[settings.resolutionIndex].height;
+//             }
+//             else
+//             {
+//                 preferredWidth = Screen.width;
+//                 preferredHeight = Screen.height;
+//             }
+//         }
+//
+//         int closestIndex = 0;
+//         float closestDifference = float.MaxValue;
+//         for (int i = 0; i < availableResolutions.Length; i++)
+//         {
+//             Resolution candidate = availableResolutions[i];
+//             float difference =
+//                 Mathf.Abs(candidate.width - preferredWidth) / (float)Mathf.Max(1, preferredWidth) +
+//                 Mathf.Abs(candidate.height - preferredHeight) / (float)Mathf.Max(1, preferredHeight);
+//             if (difference >= closestDifference)
+//                 continue;
+//             closestDifference = difference;
+//             closestIndex = i;
+//         }
+//
+//         Resolution closest = availableResolutions[closestIndex];
+//         if (settings.resolutionIndex != closestIndex ||
+//             settings.resolutionWidth != closest.width ||
+//             settings.resolutionHeight != closest.height)
+//             settingsChanged = true;
+//         settings.resolutionIndex = closestIndex;
+//         settings.resolutionWidth = closest.width;
+//         settings.resolutionHeight = closest.height;
+//
 
-        Resolution display = Screen.currentResolution;
-        float displayAspect = display.height > 0
-            ? (float)display.width / display.height
-            : (float)Screen.width / Mathf.Max(1, Screen.height);
-
-        // FullscreenWindow preserves the desktop aspect. Other aspect ratios
-        // are letterboxed by the display, even though SetResolution succeeds.
-        availableResolutions = displayResolutions
-            .Where(r => r.height > 0 &&
-                Mathf.Abs((float)r.width / r.height - displayAspect) < 0.015f)
-            .ToArray();
-
-        if (availableResolutions.Length == 0)
-        {
-            availableResolutions = new[]
-            {
-                new Resolution { width = display.width, height = display.height,
-                    refreshRateRatio = display.refreshRateRatio }
-            };
-        }
-
-        // Older saves stored only an index into the unfiltered resolution list.
-        // Migrate that choice before the list changes, then keep dimensions so
-        // future changes to the OS resolution list do not shift saved choices.
-        if (settings == null)
-            return;
-
-        int preferredWidth = settings.resolutionWidth;
-        int preferredHeight = settings.resolutionHeight;
-        if (preferredWidth <= 0 || preferredHeight <= 0)
-        {
-            if (settings.resolutionIndex >= 0 && settings.resolutionIndex < displayResolutions.Length)
-            {
-                preferredWidth = displayResolutions[settings.resolutionIndex].width;
-                preferredHeight = displayResolutions[settings.resolutionIndex].height;
-            }
-            else
-            {
-                preferredWidth = Screen.width;
-                preferredHeight = Screen.height;
-            }
-        }
-
-        int closestIndex = 0;
-        float closestDifference = float.MaxValue;
-        for (int i = 0; i < availableResolutions.Length; i++)
-        {
-            Resolution candidate = availableResolutions[i];
-            float difference =
-                Mathf.Abs(candidate.width - preferredWidth) / (float)Mathf.Max(1, preferredWidth) +
-                Mathf.Abs(candidate.height - preferredHeight) / (float)Mathf.Max(1, preferredHeight);
-            if (difference >= closestDifference)
-                continue;
-            closestDifference = difference;
-            closestIndex = i;
-        }
-
-        Resolution closest = availableResolutions[closestIndex];
-        if (settings.resolutionIndex != closestIndex ||
-            settings.resolutionWidth != closest.width ||
-            settings.resolutionHeight != closest.height)
-            settingsChanged = true;
-        settings.resolutionIndex = closestIndex;
-        settings.resolutionWidth = closest.width;
-        settings.resolutionHeight = closest.height;
     }
 
 //     private void SetupUpscalingDropdown()
 //     {
 //         if (upscalingDropdown == null)
 //             return;
-// 
+//
 //         upscalingDropdown.ClearOptions();
 //         upscalingDropdown.AddOptions(
 //             upscalingLabels.ToList()
 //         );
 //     }
-// 
+//
 //     private void SetupDLSSQualityDropdown()
 //     {
 //         if (dlssQualityDropdown == null)
 //             return;
-// 
+//
 //         dlssQualityDropdown.ClearOptions();
 //         dlssQualityDropdown.AddOptions(
 //             dlssQualityLabels.ToList()
 //         );
 //     }
-// 
+//
     private void SetupAudioSliders()
     {
         if (masterSlider != null)
@@ -855,25 +885,25 @@ public class GameSettingsManager : MonoBehaviour
         if (increaseMusicVolumeButton) increaseMusicVolumeButton.onClick.AddListener(IncreaseMusicVolume);
         if (decreaseSFXVolumeButton) decreaseSFXVolumeButton.onClick.AddListener(DecreaseSFXVolume);
         if (increaseSFXVolumeButton) increaseSFXVolumeButton.onClick.AddListener(IncreaseSFXVolume);
-        if (previousResolutionButton) previousResolutionButton.onClick.AddListener(PreviousResolution);
-        if (nextResolutionButton) nextResolutionButton.onClick.AddListener(NextResolution);
-        if (previousWindowModeButton) previousWindowModeButton.onClick.AddListener(PreviousWindowMode);
-        if (nextWindowModeButton) nextWindowModeButton.onClick.AddListener(NextWindowMode);
-        if (previousDisplayButton) previousDisplayButton.onClick.AddListener(PreviousDisplay);
-        if (nextDisplayButton) nextDisplayButton.onClick.AddListener(NextDisplay);
-        if (previousFrameRateButton) previousFrameRateButton.onClick.AddListener(PreviousFrameRate);
-        if (nextFrameRateButton) nextFrameRateButton.onClick.AddListener(NextFrameRate);
-        if (previousQualityButton) previousQualityButton.onClick.AddListener(PreviousQuality);
-        if (nextQualityButton) nextQualityButton.onClick.AddListener(NextQuality);
+//         if (previousResolutionButton) previousResolutionButton.onClick.AddListener(PreviousResolution);
+//         if (nextResolutionButton) nextResolutionButton.onClick.AddListener(NextResolution);
+//         if (previousWindowModeButton) previousWindowModeButton.onClick.AddListener(PreviousWindowMode);
+//         if (nextWindowModeButton) nextWindowModeButton.onClick.AddListener(NextWindowMode);
+//         if (previousDisplayButton) previousDisplayButton.onClick.AddListener(PreviousDisplay);
+//         if (nextDisplayButton) nextDisplayButton.onClick.AddListener(NextDisplay);
+//         if (previousFrameRateButton) previousFrameRateButton.onClick.AddListener(PreviousFrameRate);
+//         if (nextFrameRateButton) nextFrameRateButton.onClick.AddListener(NextFrameRate);
+//         if (previousQualityButton) previousQualityButton.onClick.AddListener(PreviousQuality);
+//         if (nextQualityButton) nextQualityButton.onClick.AddListener(NextQuality);
 
-        if (vSyncToggle) vSyncToggle.onValueChanged.AddListener(OnVSyncChanged);
-        if (dlssToggle) dlssToggle.onValueChanged.AddListener(OnDLSSChanged);
+//         if (vSyncToggle) vSyncToggle.onValueChanged.AddListener(OnVSyncChanged);
+//         if (dlssToggle) dlssToggle.onValueChanged.AddListener(OnDLSSChanged);
 
 //         if (upscalingDropdown != null)
 //             upscalingDropdown.onValueChanged.AddListener(
 //                 OnUpscalingChanged
 //             );
-// 
+//
 //         if (dlssQualityDropdown != null)
 //             dlssQualityDropdown.onValueChanged.AddListener(
 //                 OnDLSSQualityChanged
@@ -883,7 +913,7 @@ public class GameSettingsManager : MonoBehaviour
             masterSlider.onValueChanged.AddListener(
                 OnMasterVolumeChanged
             );
-        
+
         if (musicSlider != null)
             musicSlider.onValueChanged.AddListener(
                 OnMusicVolumeChanged
@@ -908,25 +938,25 @@ public class GameSettingsManager : MonoBehaviour
         if (masterSlider != null)
             masterSlider.onValueChanged.RemoveListener(OnMasterVolumeChanged);
 
-        if (previousResolutionButton) previousResolutionButton.onClick.RemoveListener(PreviousResolution);
-        if (nextResolutionButton) nextResolutionButton.onClick.RemoveListener(NextResolution);
-        if (previousWindowModeButton) previousWindowModeButton.onClick.RemoveListener(PreviousWindowMode);
-        if (nextWindowModeButton) nextWindowModeButton.onClick.RemoveListener(NextWindowMode);
-        if (previousDisplayButton) previousDisplayButton.onClick.RemoveListener(PreviousDisplay);
-        if (nextDisplayButton) nextDisplayButton.onClick.RemoveListener(NextDisplay);
-        if (previousFrameRateButton) previousFrameRateButton.onClick.RemoveListener(PreviousFrameRate);
-        if (nextFrameRateButton) nextFrameRateButton.onClick.RemoveListener(NextFrameRate);
-        if (previousQualityButton) previousQualityButton.onClick.RemoveListener(PreviousQuality);
-        if (nextQualityButton) nextQualityButton.onClick.RemoveListener(NextQuality);
+//         if (previousResolutionButton) previousResolutionButton.onClick.RemoveListener(PreviousResolution);
+//         if (nextResolutionButton) nextResolutionButton.onClick.RemoveListener(NextResolution);
+//         if (previousWindowModeButton) previousWindowModeButton.onClick.RemoveListener(PreviousWindowMode);
+//         if (nextWindowModeButton) nextWindowModeButton.onClick.RemoveListener(NextWindowMode);
+//         if (previousDisplayButton) previousDisplayButton.onClick.RemoveListener(PreviousDisplay);
+//         if (nextDisplayButton) nextDisplayButton.onClick.RemoveListener(NextDisplay);
+//         if (previousFrameRateButton) previousFrameRateButton.onClick.RemoveListener(PreviousFrameRate);
+//         if (nextFrameRateButton) nextFrameRateButton.onClick.RemoveListener(NextFrameRate);
+//         if (previousQualityButton) previousQualityButton.onClick.RemoveListener(PreviousQuality);
+//         if (nextQualityButton) nextQualityButton.onClick.RemoveListener(NextQuality);
 
-        if (vSyncToggle) vSyncToggle.onValueChanged.RemoveListener(OnVSyncChanged);
-        if (dlssToggle) dlssToggle.onValueChanged.RemoveListener(OnDLSSChanged);
+//         if (vSyncToggle) vSyncToggle.onValueChanged.RemoveListener(OnVSyncChanged);
+//         if (dlssToggle) dlssToggle.onValueChanged.RemoveListener(OnDLSSChanged);
 
 //         if (upscalingDropdown != null)
 //             upscalingDropdown.onValueChanged.RemoveListener(
 //                 OnUpscalingChanged
 //             );
-// 
+//
 //         if (dlssQualityDropdown != null)
 //             dlssQualityDropdown.onValueChanged.RemoveListener(
 //                 OnDLSSQualityChanged
@@ -956,15 +986,23 @@ public class GameSettingsManager : MonoBehaviour
 
     private void ChangeDisplay(int direction)
     {
-        if (!initialized || settings == null) return;
-        SetupDisplays();
-        if (availableDisplays.Count < 2) { UpdateVideoValues(); return; }
-        int index = (Mathf.Clamp(settings.displayIndex, 0, availableDisplays.Count - 1) + direction + availableDisplays.Count) % availableDisplays.Count;
-        settings.displayIndex = index;
-        settings.displayName = availableDisplays[index].name;
-        ApplyResolution();
-        UpdateVideoValues();
-        settingsChanged = true;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+// //
+// //         if (!initialized || settings == null) return;
+// //         SetupDisplays();
+// //         if (availableDisplays.Count < 2) { UpdateVideoValues(); return; }
+// //         int index = (Mathf.Clamp(settings.displayIndex, 0, availableDisplays.Count - 1) + direction + availableDisplays.Count) % availableDisplays.Count;
+// //         settings.displayIndex = index;
+// //         settings.displayName = availableDisplays[index].name;
+// //         ApplyResolution();
+// //         UpdateVideoValues();
+// //         settingsChanged = true;
+// //
+//
+//
+
     }
 
     private void ChangeWindowMode()
@@ -973,8 +1011,8 @@ public class GameSettingsManager : MonoBehaviour
             return;
 
         settings.windowModeIndex = 1 - settings.windowModeIndex;
-        ApplyResolution();
-        UpdateVideoValues();
+        // ApplyResolution();
+        // UpdateVideoValues();
         settingsChanged = true;
     }
 
@@ -983,94 +1021,110 @@ public class GameSettingsManager : MonoBehaviour
 
     private void ChangeResolution(int direction)
     {
-        if (!initialized || settings == null || availableResolutions == null || availableResolutions.Length < 2)
-            return;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (!initialized || settings == null || availableResolutions == null || availableResolutions.Length < 2)
+//             return;
+//
+//         OnResolutionChanged((settings.resolutionIndex + direction + availableResolutions.Length) % availableResolutions.Length);
+//
 
-        OnResolutionChanged((settings.resolutionIndex + direction + availableResolutions.Length) % availableResolutions.Length);
     }
 
     private void OnResolutionChanged(int index)
     {
-        settings.resolutionIndex = index;
-        settings.resolutionWidth = availableResolutions[index].width;
-        settings.resolutionHeight = availableResolutions[index].height;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         settings.resolutionIndex = index;
+//         settings.resolutionWidth = availableResolutions[index].width;
+//         settings.resolutionHeight = availableResolutions[index].height;
+//
+//         ApplyResolution();
+//         UpdateVideoValues();
+//
+//         settingsChanged = true;
+//
 
-        ApplyResolution();
-        UpdateVideoValues();
-
-        settingsChanged = true;
     }
 
     private void ApplyResolution()
     {
-        if (displayMovePending) return;
-#if UNITY_STANDALONE && !UNITY_EDITOR
-        if (availableDisplays.Count > 0 && settings != null &&
-            settings.displayIndex >= 0 && settings.displayIndex < availableDisplays.Count &&
-            FindCurrentDisplayIndex() != settings.displayIndex)
-        {
-            displayMovePending = true;
-            int requestedIndex = settings.displayIndex;
-            DisplayInfo target = availableDisplays[requestedIndex];
-            var move = Screen.MoveMainWindowTo(target, Vector2Int.zero);
-            if (move != null)
-            {
-                move.completed += _ =>
-                {
-                    displayMovePending = false;
-                    if (!this || settings == null) return;
-                    SetupDisplays();
-                    if (settings.displayIndex != requestedIndex)
-                    {
-                        // The player selected another display while this move was pending.
-                        SetupResolutions();
-                        ApplyResolution();
-                        UpdateVideoValues();
-                        return;
-                    }
-                    if (FindCurrentDisplayIndex() != requestedIndex)
-                    {
-                        // A removed monitor must not leave the game window off screen.
-                        settings.displayIndex = FindCurrentDisplayIndex();
-                        settings.displayName = availableDisplays.Count > 0
-                            ? availableDisplays[settings.displayIndex].name : null;
-                        settingsChanged = true;
-                    }
-                    SetupResolutions();
-                    ApplyResolutionNow();
-                    UpdateVideoValues();
-                };
-                return;
-            }
-            displayMovePending = false;
-        }
-#endif
-        ApplyResolutionNow();
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (displayMovePending) return;
+// #if UNITY_STANDALONE && !UNITY_EDITOR
+//         if (availableDisplays.Count > 0 && settings != null &&
+//             settings.displayIndex >= 0 && settings.displayIndex < availableDisplays.Count &&
+//             FindCurrentDisplayIndex() != settings.displayIndex)
+//         {
+//             displayMovePending = true;
+//             int requestedIndex = settings.displayIndex;
+//             DisplayInfo target = availableDisplays[requestedIndex];
+//             var move = Screen.MoveMainWindowTo(target, Vector2Int.zero);
+//             if (move != null)
+//             {
+//                 move.completed += _ =>
+//                 {
+//                     displayMovePending = false;
+//                     if (!this || settings == null) return;
+//                     SetupDisplays();
+//                     if (settings.displayIndex != requestedIndex)
+//                     {
+//                         // The player selected another display while this move was pending.
+//                         SetupResolutions();
+//                         ApplyResolution();
+//                         UpdateVideoValues();
+//                         return;
+//                     }
+//                     if (FindCurrentDisplayIndex() != requestedIndex)
+//                     {
+//                         // A removed monitor must not leave the game window off screen.
+//                         settings.displayIndex = FindCurrentDisplayIndex();
+//                         settings.displayName = availableDisplays.Count > 0
+//                             ? availableDisplays[settings.displayIndex].name : null;
+//                         settingsChanged = true;
+//                     }
+//                     SetupResolutions();
+//                     ApplyResolutionNow();
+//                     UpdateVideoValues();
+//                 };
+//                 return;
+//             }
+//             displayMovePending = false;
+//         }
+// #endif
+//         ApplyResolutionNow();
+//
+
     }
 
     private void ApplyResolutionNow()
     {
-#if UNITY_SWITCH && !UNITY_EDITOR
-        return; // Console output modes are managed by the platform.
-#else
-        if (availableResolutions == null)
-            return;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+// #if UNITY_SWITCH && !UNITY_EDITOR
+//         return; // Console output modes are managed by the platform.
+// #else
+//         if (availableResolutions == null)
+//             return;
+//
+//         if (settings.resolutionIndex < 0 ||
+//             settings.resolutionIndex >= availableResolutions.Length)
+//             return;
+//
+//         Resolution resolution =
+//             availableResolutions[settings.resolutionIndex];
+//
+//         Screen.SetResolution(
+//             resolution.width,
+//             resolution.height,
+//             settings.windowModeIndex == 1
+//                 ? FullScreenMode.Windowed
+//                 : FullScreenMode.FullScreenWindow
+//         );
+// #endif
+//
 
-        if (settings.resolutionIndex < 0 ||
-            settings.resolutionIndex >= availableResolutions.Length)
-            return;
-
-        Resolution resolution =
-            availableResolutions[settings.resolutionIndex];
-
-        Screen.SetResolution(
-            resolution.width,
-            resolution.height,
-            settings.windowModeIndex == 1
-                ? FullScreenMode.Windowed
-                : FullScreenMode.FullScreenWindow
-        );
-#endif
     }
 
     #endregion
@@ -1079,16 +1133,20 @@ public class GameSettingsManager : MonoBehaviour
 
     private void OnDLSSChanged(bool enabled)
     {
-        if (!initialized || settings == null || (enabled && !IsDLSSSupported))
-        {
-            UpdateVideoValues();
-            return;
-        }
-        if (settings.dlss == enabled) return;
-        settings.dlss = enabled;
-        ApplyQuality();
-        UpdateVideoValues();
-        settingsChanged = true;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (!initialized || settings == null || (enabled && !IsDLSSSupported))
+//         {
+//             UpdateVideoValues();
+//             return;
+//         }
+//         if (settings.dlss == enabled) return;
+//         settings.dlss = enabled;
+//         ApplyQuality();
+//         UpdateVideoValues();
+//         settingsChanged = true;
+//
+
     }
 
     public void EnableVSync() => OnVSyncChanged(true);
@@ -1096,27 +1154,35 @@ public class GameSettingsManager : MonoBehaviour
 
     private void OnVSyncChanged(bool enabled)
     {
-        if (!initialized || settings == null || settings.vSync == enabled)
-            return;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (!initialized || settings == null || settings.vSync == enabled)
+//             return;
+//
+//         settings.vSync = enabled;
+//
+//         ApplyVSync();
+//         UpdateVideoValues();
+//
+//         settingsChanged = true;
+//
 
-        settings.vSync = enabled;
-
-        ApplyVSync();
-        UpdateVideoValues();
-
-        settingsChanged = true;
     }
 
     private void ApplyVSync()
     {
-#if UNITY_SWITCH && !UNITY_EDITOR
-        QualitySettings.vSyncCount = 2;
-#else
-        QualitySettings.vSyncCount =
-            settings.vSync ? 1 : 0;
-#endif
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+// #if UNITY_SWITCH && !UNITY_EDITOR
+//         QualitySettings.vSyncCount = 2;
+// #else
+//         QualitySettings.vSyncCount =
+//             settings.vSync ? 1 : 0;
+// #endif
+//
+//         ApplyFrameRate();
+//
 
-        ApplyFrameRate();
     }
 
     #endregion
@@ -1128,46 +1194,58 @@ public class GameSettingsManager : MonoBehaviour
 
     private void ChangeFrameRate(int direction)
     {
-        if (!initialized || settings == null)
-            return;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (!initialized || settings == null)
+//             return;
+//
+//         OnFrameRateChanged((settings.frameRateIndex + direction + frameRateValues.Length) % frameRateValues.Length);
+//
 
-        OnFrameRateChanged((settings.frameRateIndex + direction + frameRateValues.Length) % frameRateValues.Length);
     }
 
     private void OnFrameRateChanged(int index)
     {
-        settings.frameRateIndex = index;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         settings.frameRateIndex = index;
+//
+//         ApplyFrameRate();
+//
+//         UpdateVideoValues();
+//         settingsChanged = true;
+//
 
-        ApplyFrameRate();
-
-        UpdateVideoValues();
-        settingsChanged = true;
     }
 
     private void ApplyFrameRate()
     {
-#if UNITY_SWITCH && !UNITY_EDITOR
-        Application.targetFrameRate = 30;
-        QualitySettings.vSyncCount = 2;
-        return;
-#else
-        if (settings.frameRateIndex < 0 ||
-            settings.frameRateIndex >= frameRateValues.Length)
-            return;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+// #if UNITY_SWITCH && !UNITY_EDITOR
+//         Application.targetFrameRate = 30;
+//         QualitySettings.vSyncCount = 2;
+//         return;
+// #else
+//         if (settings.frameRateIndex < 0 ||
+//             settings.frameRateIndex >= frameRateValues.Length)
+//             return;
+//
+//         /*
+//          * When VSync is enabled Unity synchronizes
+//          * rendering to the display refresh rate.
+//          */
+//         if (settings.vSync)
+//         {
+//             Application.targetFrameRate = -1;
+//             return;
+//         }
+//
+//         Application.targetFrameRate =
+//             frameRateValues[settings.frameRateIndex];
+// #endif
+//
 
-        /*
-         * When VSync is enabled Unity synchronizes
-         * rendering to the display refresh rate.
-         */
-        if (settings.vSync)
-        {
-            Application.targetFrameRate = -1;
-            return;
-        }
-
-        Application.targetFrameRate =
-            frameRateValues[settings.frameRateIndex];
-#endif
     }
 
     #endregion
@@ -1179,207 +1257,231 @@ public class GameSettingsManager : MonoBehaviour
 
     private void ChangeQuality(int direction)
     {
-        if (!initialized || settings == null || QualityPresetCount < 2)
-            return;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (!initialized || settings == null || QualityPresetCount < 2)
+//             return;
+//
+//         OnQualityChanged((settings.qualityIndex + direction + QualityPresetCount) % QualityPresetCount);
+//
 
-        OnQualityChanged((settings.qualityIndex + direction + QualityPresetCount) % QualityPresetCount);
     }
 
     private void OnQualityChanged(int index)
     {
-        if (index < 0 || index >= QualityPresetCount)
-            return;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (index < 0 || index >= QualityPresetCount)
+//             return;
+//
+//         settings.qualityIndex = index;
+//
+//         ApplyQuality();
+//
+//         UpdateVideoValues();
+//         settingsChanged = true;
+//
 
-        settings.qualityIndex = index;
-
-        ApplyQuality();
-
-        UpdateVideoValues();
-        settingsChanged = true;
     }
 
     private void ApplyQuality()
     {
-#if UNITY_SWITCH && !UNITY_EDITOR
-        // Use the authored console profile; saved desktop presets must not raise its budget.
-        return;
-#else
-        if (settings.qualityIndex < 0 ||
-            settings.qualityIndex >= QualityPresetCount)
-            return;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+// #if UNITY_SWITCH && !UNITY_EDITOR
+//         // Use the authored console profile; saved desktop presets must not raise its budget.
+//         return;
+// #else
+//         if (settings.qualityIndex < 0 ||
+//             settings.qualityIndex >= QualityPresetCount)
+//             return;
+//
+//         QualityPreset preset = qualityPresets[settings.qualityIndex];
+//         if (preset == null || !EnsureRuntimePipeline())
+//             return;
+//
+//         runtimePipeline.msaaSampleCount = (int)preset.msaa;
+//         runtimePipeline.renderScale = Mathf.Clamp(preset.renderScale, .25f, 1f);
+//         runtimePipeline.shadowDistance = Mathf.Max(0f, preset.shadowDistance);
+//         runtimePipeline.shadowCascadeCount = Mathf.Clamp(preset.shadowCascades, 1, 4);
+//         runtimePipeline.mainLightShadowmapResolution = Mathf.NextPowerOfTwo(Mathf.Clamp(preset.shadowResolution, 256, 4096));
+//         QualitySettings.globalTextureMipmapLimit = Mathf.Clamp(preset.textureMipmapLimit, 0, 3);
+//         QualitySettings.lodBias = Mathf.Clamp(preset.lodBias, 0.1f, 4f);
+// #endif
+//
 
-        QualityPreset preset = qualityPresets[settings.qualityIndex];
-        if (preset == null || !EnsureRuntimePipeline())
-            return;
-
-        runtimePipeline.msaaSampleCount = (int)preset.msaa;
-        runtimePipeline.renderScale = Mathf.Clamp(preset.renderScale, .25f, 1f);
-        runtimePipeline.shadowDistance = Mathf.Max(0f, preset.shadowDistance);
-        runtimePipeline.shadowCascadeCount = Mathf.Clamp(preset.shadowCascades, 1, 4);
-        runtimePipeline.mainLightShadowmapResolution = Mathf.NextPowerOfTwo(Mathf.Clamp(preset.shadowResolution, 256, 4096));
-        QualitySettings.globalTextureMipmapLimit = Mathf.Clamp(preset.textureMipmapLimit, 0, 3);
-        QualitySettings.lodBias = Mathf.Clamp(preset.lodBias, 0.1f, 4f);
-#endif
     }
 
     public static GlobalDynamicResolutionSettings ConfigureUpscaling(GlobalDynamicResolutionSettings options,
         float renderScale, bool requested, bool supported)
     {
-        bool dlss = requested && supported;
-        float percentage = Mathf.Clamp(renderScale, .25f, 1f) * 100f;
-        // Replace nested lists, which can be shared with the authored pipeline asset.
-        options.advancedUpscalerNames = dlss ? new List<string> { "DLSS" } : new List<string>();
-        options.upsampleFilter = DynamicResUpscaleFilter.CatmullRom;
-        options.enabled = dlss || percentage < 100f;
-        options.dynResType = DynamicResolutionType.Software;
-        options.forceResolution = !dlss;
-        options.forcedPercentage = percentage;
-        options.minPercentage = dlss ? 25f : percentage;
-        options.maxPercentage = dlss ? 100f : percentage;
-        options.DLSSUseOptimalSettings = true;
-        options.DLSSPerfQualitySetting = 1; // NVIDIA DLSSQuality.Balanced.
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         bool dlss = requested && supported;
+//         float percentage = Mathf.Clamp(renderScale, .25f, 1f) * 100f;
+//         // Replace nested lists, which can be shared with the authored pipeline asset.
+//         options.advancedUpscalerNames = dlss ? new List<string> { "DLSS" } : new List<string>();
+//         options.upsampleFilter = DynamicResUpscaleFilter.CatmullRom;
+//         options.enabled = dlss || percentage < 100f;
+//         options.dynResType = DynamicResolutionType.Software;
+//         options.forceResolution = !dlss;
+//         options.forcedPercentage = percentage;
+//         options.minPercentage = dlss ? 25f : percentage;
+//         options.maxPercentage = dlss ? 100f : percentage;
+//         options.DLSSUseOptimalSettings = true;
+//         options.DLSSPerfQualitySetting = 1; // NVIDIA DLSSQuality.Balanced.
+//         return options;
+//
         return options;
     }
 
     private bool EnsureRuntimePipeline()
     {
-        if (!runtimePipeline)
-        {
-            var source = (QualitySettings.renderPipeline ? QualitySettings.renderPipeline :
-                GraphicsSettings.defaultRenderPipeline) as UniversalRenderPipelineAsset;
-            if (!source)
-            {
-                Debug.LogError("Quality presets require a Universal Render Pipeline asset.", this);
-                return false;
-            }
-
-            originalQualityPipeline = QualitySettings.renderPipeline;
-            originalTextureMipmapLimit = QualitySettings.globalTextureMipmapLimit;
-            originalLodBias = QualitySettings.lodBias;
-            runtimePipeline = Instantiate(source);
-            runtimePipeline.name = source.name + " (Runtime Quality)";
-            runtimePipeline.hideFlags = HideFlags.DontSave;
-            Application.quitting -= ReleaseRuntimePipeline;
-            Application.quitting += ReleaseRuntimePipeline;
-        }
-
-        if (QualitySettings.renderPipeline != runtimePipeline)
-            QualitySettings.renderPipeline = runtimePipeline;
-
-        return true;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (!runtimePipeline)
+//         {
+//             var source = (QualitySettings.renderPipeline ? QualitySettings.renderPipeline :
+//                 GraphicsSettings.defaultRenderPipeline) as UniversalRenderPipelineAsset;
+//             if (!source)
+//             {
+//                 Debug.LogError("Quality presets require a Universal Render Pipeline asset.", this);
+//                 return false;
+//             }
+//
+//             originalQualityPipeline = QualitySettings.renderPipeline;
+//             originalTextureMipmapLimit = QualitySettings.globalTextureMipmapLimit;
+//             originalLodBias = QualitySettings.lodBias;
+//             runtimePipeline = Instantiate(source);
+//             runtimePipeline.name = source.name + " (Runtime Quality)";
+//             runtimePipeline.hideFlags = HideFlags.DontSave;
+//             Application.quitting -= ReleaseRuntimePipeline;
+//             Application.quitting += ReleaseRuntimePipeline;
+//         }
+//
+//         if (QualitySettings.renderPipeline != runtimePipeline)
+//             QualitySettings.renderPipeline = runtimePipeline;
+//
+//         return true;
+//
+        return false;
     }
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+//     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ReleaseRuntimePipeline()
     {
-        Application.quitting -= ReleaseRuntimePipeline;
-        if (!runtimePipeline)
-            return;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         Application.quitting -= ReleaseRuntimePipeline;
+//         if (!runtimePipeline)
+//             return;
+//
+//         if (QualitySettings.renderPipeline == runtimePipeline)
+//             QualitySettings.renderPipeline = originalQualityPipeline;
+//
+//         QualitySettings.globalTextureMipmapLimit = originalTextureMipmapLimit;
+//         QualitySettings.lodBias = originalLodBias;
+//         if (Application.isPlaying)
+//             Destroy(runtimePipeline);
+//         else
+//             DestroyImmediate(runtimePipeline);
+//         runtimePipeline = null;
+//         originalQualityPipeline = null;
+//
 
-        if (QualitySettings.renderPipeline == runtimePipeline)
-            QualitySettings.renderPipeline = originalQualityPipeline;
-
-        QualitySettings.globalTextureMipmapLimit = originalTextureMipmapLimit;
-        QualitySettings.lodBias = originalLodBias;
-        if (Application.isPlaying)
-            Destroy(runtimePipeline);
-        else
-            DestroyImmediate(runtimePipeline);
-        runtimePipeline = null;
-        originalQualityPipeline = null;
     }
 
     #endregion
 
 //     #region Upscaling
-// 
+//
 //     private void OnUpscalingChanged(int index)
 //     {
 //         settings.upscalingMode =
 //             (UpscalingMode)index;
-// 
+//
 // //         ApplyUpscaling();
-// 
+//
 //         SaveSettings();
 //     }
-// 
+//
 //     private void OnDLSSQualityChanged(int index)
 //     {
 //         settings.dlssQuality =
 //             (DLSSQualityMode)index;
-// 
+//
 // //         ApplyUpscaling();
-// 
+//
 //         SaveSettings();
 //     }
-// 
+//
 //     private void ApplyUpscaling()
 //     {
 //         bool dlssSelected =
 //             settings.upscalingMode ==
 //             UpscalingMode.DLSS;
-// 
+//
 //         UpdateDLSSUIState(dlssSelected);
-// 
+//
 //         if (!dlssSelected)
 //         {
 //             dlssProvider?.DisableDLSS();
 //             return;
 //         }
-// 
+//
 //         if (dlssProvider == null)
 //         {
 //             Debug.LogWarning(
 //                 "DLSS is selected, but no IDLSSProvider " +
 //                 "component is assigned."
 //             );
-// 
+//
 //             return;
 //         }
-// 
+//
 //         if (!dlssProvider.IsSupported())
 //         {
 //             Debug.LogWarning(
 //                 "DLSS is not supported on this system."
 //             );
-// 
+//
 //             settings.upscalingMode =
 //                 UpscalingMode.Off;
-// 
+//
 //             if (upscalingDropdown != null)
 //             {
 //                 upscalingDropdown.SetValueWithoutNotify(
 //                     (int)UpscalingMode.Off
 //                 );
 //             }
-// 
+//
 //             UpdateDLSSUIState(false);
-// 
+//
 //             dlssProvider.DisableDLSS();
-// 
+//
 //             return;
 //         }
-// 
+//
 //         dlssProvider.EnableDLSS(
 //             settings.dlssQuality
 //         );
 //     }
-// 
+//
 //     private void UpdateDLSSUIState(
 //         bool dlssSelected)
 //     {
 //         if (dlssQualityDropdown == null)
 //             return;
-// 
+//
 //         bool supported =
 //             dlssProvider != null &&
 //             dlssProvider.IsSupported();
-// 
+//
 //         dlssQualityDropdown.interactable =
 //             dlssSelected &&
 //             supported;
 //     }
-// 
+//
 //     #endregion
 
     #region Audio
@@ -1458,7 +1560,7 @@ public class GameSettingsManager : MonoBehaviour
 
         settingsChanged = true;
     }
-    
+
     private void OnMusicVolumeChanged(float value)
     {
         settings.musicVolume = Mathf.Clamp01(value);
@@ -1483,7 +1585,7 @@ public class GameSettingsManager : MonoBehaviour
     {
         SoundManager.instance?.VolumeMaster(SoundManager.ToDecibels(settings.masterVolume));
     }
-    
+
     private void ApplyMusicVolume()
     {
         SoundManager.instance?.VolumeMusic(SoundManager.ToDecibels(settings.musicVolume));
@@ -1568,37 +1670,38 @@ public class GameSettingsManager : MonoBehaviour
 
     private SettingsData CreateDefaultSettings()
     {
-        Resolution display = Screen.currentResolution;
-        int displayIndex = Array.FindIndex(availableResolutions,
-            r => r.width == display.width && r.height == display.height);
-        if (displayIndex < 0)
-            displayIndex = FindCurrentResolutionIndex();
-
+//         Resolution display = Screen.currentResolution;
+//         int displayIndex = Array.FindIndex(availableResolutions,
+//             r => r.width == display.width && r.height == display.height);
+//         if (displayIndex < 0)
+//             displayIndex = FindCurrentResolutionIndex();
+//
         return new SettingsData
         {
-            resolutionIndex = displayIndex,
-            resolutionWidth = availableResolutions[displayIndex].width,
-            resolutionHeight = availableResolutions[displayIndex].height,
-            windowModeIndex = 0,
-            displayIndex = FindCurrentDisplayIndex(),
-            displayName = availableDisplays.Count > 0 ? availableDisplays[FindCurrentDisplayIndex()].name : null,
-
-            vSync = false,
-
-            frameRateIndex = 2,
-
-            qualityIndex =
-                Mathf.Max(
-                    0,
-                    QualityPresetCount - 1
-                ),
-
-//             upscalingMode =
-//                 UpscalingMode.Off,
-// 
-//             dlssQuality =
-//                 DLSSQualityMode.Quality,
-
+//             resolutionIndex = displayIndex,
+//             resolutionWidth = availableResolutions[displayIndex].width,
+//             resolutionHeight = availableResolutions[displayIndex].height,
+//             windowModeIndex = 0,
+//             displayIndex = FindCurrentDisplayIndex(),
+//             displayName = availableDisplays.Count > 0 ? availableDisplays[FindCurrentDisplayIndex()].name : null,
+//
+//             vSync = false,
+//
+//             frameRateIndex = 2,
+//
+//             qualityIndex =
+//                 Mathf.Max(
+//                     0,
+//                     QualityPresetCount - 1
+//                 ),
+//
+// //             upscalingMode =
+// //                 UpscalingMode.Off,
+// //
+// //             dlssQuality =
+// //                 DLSSQualityMode.Quality,
+//
+            masterVolume = 1f,
             musicVolume = 1f,
 
             effectsVolume = 1f,
@@ -1609,55 +1712,55 @@ public class GameSettingsManager : MonoBehaviour
 
     private void ValidateSettings()
     {
-        settings.windowModeIndex = Mathf.Clamp(settings.windowModeIndex, 0, 1);
-        if (availableDisplays.Count > 0)
-        {
-            // Keep the saved ordinal when two attached monitors have the same model name.
-            int displayIndex = settings.displayIndex >= 0 && settings.displayIndex < availableDisplays.Count &&
-                availableDisplays[settings.displayIndex].name == settings.displayName ? settings.displayIndex :
-                settings.displayName == null ? FindCurrentDisplayIndex() :
-                availableDisplays.FindIndex(display => display.name == settings.displayName);
-            if (displayIndex < 0) displayIndex = FindCurrentDisplayIndex();
-            if (settings.displayIndex != displayIndex || settings.displayName != availableDisplays[displayIndex].name)
-                settingsChanged = true;
-            settings.displayIndex = displayIndex;
-            settings.displayName = availableDisplays[displayIndex].name;
-        }
-
-        if (settings.resolutionIndex < 0)
-            settings.resolutionIndex = FindCurrentResolutionIndex();
-
-        if (settings.qualityIndex < 0)
-            settings.qualityIndex = Mathf.Max(0, QualityPresetCount - 1);
-
-        if (availableResolutions != null &&
-            availableResolutions.Length > 0)
-        {
-            settings.resolutionIndex =
-                Mathf.Clamp(
-                    settings.resolutionIndex,
-                    0,
-                    availableResolutions.Length - 1
-                );
-        }
-
-        settings.frameRateIndex =
-            Mathf.Clamp(
-                settings.frameRateIndex,
-                0,
-                frameRateValues.Length - 1
-            );
-
-        settings.qualityIndex =
-            Mathf.Clamp(
-                settings.qualityIndex,
-                0,
-                Mathf.Max(
-                    0,
-                    QualityPresetCount - 1
-                )
-            );
-
+//         settings.windowModeIndex = Mathf.Clamp(settings.windowModeIndex, 0, 1);
+//         if (availableDisplays.Count > 0)
+//         {
+//             // Keep the saved ordinal when two attached monitors have the same model name.
+//             int displayIndex = settings.displayIndex >= 0 && settings.displayIndex < availableDisplays.Count &&
+//                 availableDisplays[settings.displayIndex].name == settings.displayName ? settings.displayIndex :
+//                 settings.displayName == null ? FindCurrentDisplayIndex() :
+//                 availableDisplays.FindIndex(display => display.name == settings.displayName);
+//             if (displayIndex < 0) displayIndex = FindCurrentDisplayIndex();
+//             if (settings.displayIndex != displayIndex || settings.displayName != availableDisplays[displayIndex].name)
+//                 settingsChanged = true;
+//             settings.displayIndex = displayIndex;
+//             settings.displayName = availableDisplays[displayIndex].name;
+//         }
+//
+//         if (settings.resolutionIndex < 0)
+//             settings.resolutionIndex = FindCurrentResolutionIndex();
+//
+//         if (settings.qualityIndex < 0)
+//             settings.qualityIndex = Mathf.Max(0, QualityPresetCount - 1);
+//
+//         if (availableResolutions != null &&
+//             availableResolutions.Length > 0)
+//         {
+//             settings.resolutionIndex =
+//                 Mathf.Clamp(
+//                     settings.resolutionIndex,
+//                     0,
+//                     availableResolutions.Length - 1
+//                 );
+//         }
+//
+//         settings.frameRateIndex =
+//             Mathf.Clamp(
+//                 settings.frameRateIndex,
+//                 0,
+//                 frameRateValues.Length - 1
+//             );
+//
+//         settings.qualityIndex =
+//             Mathf.Clamp(
+//                 settings.qualityIndex,
+//                 0,
+//                 Mathf.Max(
+//                     0,
+//                     QualityPresetCount - 1
+//                 )
+//             );
+//
         settings.masterVolume = Mathf.Clamp01(settings.masterVolume);
 
         settings.musicVolume =
@@ -1680,25 +1783,29 @@ public class GameSettingsManager : MonoBehaviour
 
     private int FindCurrentResolutionIndex()
     {
-        if (availableResolutions == null ||
-            availableResolutions.Length == 0)
-            return 0;
-
-        for (int i = 0;
-             i < availableResolutions.Length;
-             i++)
-        {
-            Resolution resolution =
-                availableResolutions[i];
-
-            if (resolution.width == Screen.width &&
-                resolution.height == Screen.height)
-            {
-                return i;
-            }
-        }
-
-        return availableResolutions.Length - 1;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (availableResolutions == null ||
+//             availableResolutions.Length == 0)
+//             return 0;
+//
+//         for (int i = 0;
+//              i < availableResolutions.Length;
+//              i++)
+//         {
+//             Resolution resolution =
+//                 availableResolutions[i];
+//
+//             if (resolution.width == Screen.width &&
+//                 resolution.height == Screen.height)
+//             {
+//                 return i;
+//             }
+//         }
+//
+//         return availableResolutions.Length - 1;
+//
+        return 0;
     }
 
     #endregion
@@ -1707,7 +1814,7 @@ public class GameSettingsManager : MonoBehaviour
 
     private void UpdateUI()
     {
-        UpdateVideoValues();
+        // UpdateVideoValues();
         UpdateAudioValues();
 
 //         if (upscalingDropdown != null)
@@ -1716,7 +1823,7 @@ public class GameSettingsManager : MonoBehaviour
 //                 (int)settings.upscalingMode
 //             );
 //         }
-// 
+//
 //         if (dlssQualityDropdown != null)
 //         {
 //             dlssQualityDropdown.SetValueWithoutNotify(
@@ -1730,7 +1837,7 @@ public class GameSettingsManager : MonoBehaviour
                 settings.masterVolume
             );
         }
-        
+
         if (musicSlider != null)
         {
             musicSlider.SetValueWithoutNotify(
@@ -1755,75 +1862,79 @@ public class GameSettingsManager : MonoBehaviour
 
     private void UpdateVideoValues()
     {
-        if (settings == null)
-            return;
+        // Nintendo: desktop video settings are disabled; original implementation is preserved below.
+//
+//         if (settings == null)
+//             return;
+//
+//         if (vSyncToggle)
+//         {
+//             vSyncToggle.SetIsOnWithoutNotify(settings.vSync);
+//             vSyncToggle.interactable = initialized;
+//         }
+//         displayedDLSSSupport = IsDLSSSupported;
+//         if (dlssToggle)
+//         {
+//             dlssToggle.SetIsOnWithoutNotify(settings.dlss && displayedDLSSSupport);
+//             dlssToggle.interactable = initialized && displayedDLSSSupport;
+//         }
+//         if (dlssStatusText) dlssStatusText.text = !displayedDLSSSupport ? "Requires NVIDIA RTX" : settings.dlss ? "Balanced" : "Off";
+//
+//         int resolutionCount = availableResolutions?.Length ?? 0;
+//         if (resolutionValueText && settings.resolutionIndex >= 0 && settings.resolutionIndex < resolutionCount)
+//         {
+//             Resolution resolution = availableResolutions[settings.resolutionIndex];
+//             resolutionValueText.text = $"{resolution.width} x {resolution.height}";
+//         }
+//
+//         if (windowModeValueText)
+//             windowModeValueText.text = settings.windowModeIndex == 1 ? "Windowed" : "Full Screen";
+//         if (displayValueText)
+//             displayValueText.text = "Display " + (availableDisplays.Count > 0 ? settings.displayIndex + 1 : 1);
+//
+//         if (frameRateValueText && settings.frameRateIndex >= 0 && settings.frameRateIndex < frameRateLabels.Length)
+//             frameRateValueText.text = frameRateLabels[settings.frameRateIndex];
+//
+//         if (qualityValueText)
+//         {
+//             QualityPreset preset = settings.qualityIndex >= 0 && settings.qualityIndex < QualityPresetCount
+//                 ? qualityPresets[settings.qualityIndex] : null;
+//             qualityValueText.text = string.IsNullOrWhiteSpace(preset?.name)
+//                 ? "Unavailable" : preset.name;
+//         }
+//
+//         if (previousResolutionButton) previousResolutionButton.interactable = initialized && resolutionCount > 1;
+//         if (nextResolutionButton) nextResolutionButton.interactable = initialized && resolutionCount > 1;
+//         if (previousWindowModeButton) previousWindowModeButton.interactable = initialized;
+//         if (nextWindowModeButton) nextWindowModeButton.interactable = initialized;
+//         if (previousDisplayButton) previousDisplayButton.interactable = initialized && availableDisplays.Count > 1;
+//         if (nextDisplayButton) nextDisplayButton.interactable = initialized && availableDisplays.Count > 1;
+//         if (previousFrameRateButton) previousFrameRateButton.interactable = initialized && frameRateValues.Length > 1;
+//         if (nextFrameRateButton) nextFrameRateButton.interactable = initialized && frameRateValues.Length > 1;
+//         if (previousQualityButton) previousQualityButton.interactable = initialized && QualityPresetCount > 1;
+//         if (nextQualityButton) nextQualityButton.interactable = initialized && QualityPresetCount > 1;
+// #if UNITY_SWITCH && !UNITY_EDITOR
+//         if (frameRateValueText) frameRateValueText.text = "30 FPS";
+//         if (qualityValueText) qualityValueText.text = "Switch";
+//         if (vSyncToggle) { vSyncToggle.SetIsOnWithoutNotify(true); vSyncToggle.interactable = false; }
+//         foreach (var button in new[] { previousFrameRateButton, nextFrameRateButton,
+//             previousQualityButton, nextQualityButton, previousResolutionButton, nextResolutionButton,
+//             previousWindowModeButton, nextWindowModeButton, previousDisplayButton, nextDisplayButton })
+//             if (button) button.interactable = false;
+// #endif
+//
 
-        if (vSyncToggle)
-        {
-            vSyncToggle.SetIsOnWithoutNotify(settings.vSync);
-            vSyncToggle.interactable = initialized;
-        }
-        displayedDLSSSupport = IsDLSSSupported;
-        if (dlssToggle)
-        {
-            dlssToggle.SetIsOnWithoutNotify(settings.dlss && displayedDLSSSupport);
-            dlssToggle.interactable = initialized && displayedDLSSSupport;
-        }
-        if (dlssStatusText) dlssStatusText.text = !displayedDLSSSupport ? "Requires NVIDIA RTX" : settings.dlss ? "Balanced" : "Off";
-
-        int resolutionCount = availableResolutions?.Length ?? 0;
-        if (resolutionValueText && settings.resolutionIndex >= 0 && settings.resolutionIndex < resolutionCount)
-        {
-            Resolution resolution = availableResolutions[settings.resolutionIndex];
-            resolutionValueText.text = $"{resolution.width} x {resolution.height}";
-        }
-
-        if (windowModeValueText)
-            windowModeValueText.text = settings.windowModeIndex == 1 ? "Windowed" : "Full Screen";
-        if (displayValueText)
-            displayValueText.text = "Display " + (availableDisplays.Count > 0 ? settings.displayIndex + 1 : 1);
-
-        if (frameRateValueText && settings.frameRateIndex >= 0 && settings.frameRateIndex < frameRateLabels.Length)
-            frameRateValueText.text = frameRateLabels[settings.frameRateIndex];
-
-        if (qualityValueText)
-        {
-            QualityPreset preset = settings.qualityIndex >= 0 && settings.qualityIndex < QualityPresetCount
-                ? qualityPresets[settings.qualityIndex] : null;
-            qualityValueText.text = string.IsNullOrWhiteSpace(preset?.name)
-                ? "Unavailable" : preset.name;
-        }
-
-        if (previousResolutionButton) previousResolutionButton.interactable = initialized && resolutionCount > 1;
-        if (nextResolutionButton) nextResolutionButton.interactable = initialized && resolutionCount > 1;
-        if (previousWindowModeButton) previousWindowModeButton.interactable = initialized;
-        if (nextWindowModeButton) nextWindowModeButton.interactable = initialized;
-        if (previousDisplayButton) previousDisplayButton.interactable = initialized && availableDisplays.Count > 1;
-        if (nextDisplayButton) nextDisplayButton.interactable = initialized && availableDisplays.Count > 1;
-        if (previousFrameRateButton) previousFrameRateButton.interactable = initialized && frameRateValues.Length > 1;
-        if (nextFrameRateButton) nextFrameRateButton.interactable = initialized && frameRateValues.Length > 1;
-        if (previousQualityButton) previousQualityButton.interactable = initialized && QualityPresetCount > 1;
-        if (nextQualityButton) nextQualityButton.interactable = initialized && QualityPresetCount > 1;
-#if UNITY_SWITCH && !UNITY_EDITOR
-        if (frameRateValueText) frameRateValueText.text = "30 FPS";
-        if (qualityValueText) qualityValueText.text = "Switch";
-        if (vSyncToggle) { vSyncToggle.SetIsOnWithoutNotify(true); vSyncToggle.interactable = false; }
-        foreach (var button in new[] { previousFrameRateButton, nextFrameRateButton,
-            previousQualityButton, nextQualityButton, previousResolutionButton, nextResolutionButton,
-            previousWindowModeButton, nextWindowModeButton, previousDisplayButton, nextDisplayButton })
-            if (button) button.interactable = false;
-#endif
     }
 
     #region Apply Everything
 
     private void ApplyAllSettings()
     {
-        ApplyResolution();
+        // ApplyResolution();
 
-        ApplyQuality();
+        // ApplyQuality();
 
-        ApplyVSync();
+        // ApplyVSync();
 
 //         ApplyUpscaling();
 
@@ -1847,18 +1958,18 @@ public class GameSettingsManager : MonoBehaviour
 
         SettingsData defaults = CreateDefaultSettings();
         ResetInputBindings();
-        settings.resolutionIndex = defaults.resolutionIndex;
-        settings.resolutionWidth = defaults.resolutionWidth;
-        settings.resolutionHeight = defaults.resolutionHeight;
-        settings.windowModeIndex = defaults.windowModeIndex;
-        settings.displayIndex = defaults.displayIndex;
-        settings.displayName = defaults.displayName;
-        settings.vSync = defaults.vSync;
-        settings.dlss = defaults.dlss;
-        settings.frameRateIndex = defaults.frameRateIndex;
-        settings.qualityIndex = defaults.qualityIndex;
-//         settings.upscalingMode = defaults.upscalingMode;
-//         settings.dlssQuality = defaults.dlssQuality;
+//         settings.resolutionIndex = defaults.resolutionIndex;
+//         settings.resolutionWidth = defaults.resolutionWidth;
+//         settings.resolutionHeight = defaults.resolutionHeight;
+//         settings.windowModeIndex = defaults.windowModeIndex;
+//         settings.displayIndex = defaults.displayIndex;
+//         settings.displayName = defaults.displayName;
+//         settings.vSync = defaults.vSync;
+//         settings.dlss = defaults.dlss;
+//         settings.frameRateIndex = defaults.frameRateIndex;
+//         settings.qualityIndex = defaults.qualityIndex;
+// //         settings.upscalingMode = defaults.upscalingMode;
+// //         settings.dlssQuality = defaults.dlssQuality;
         settings.masterVolume = defaults.masterVolume;
         settings.musicVolume = defaults.musicVolume;
         settings.effectsVolume = defaults.effectsVolume;
@@ -1879,7 +1990,7 @@ public class GameSettingsManager : MonoBehaviour
 //     Off = 0,
 //     DLSS = 1
 // }
-// 
+//
 // public enum DLSSQualityMode
 // {
 //     Quality = 0,
@@ -1887,15 +1998,15 @@ public class GameSettingsManager : MonoBehaviour
 //     Performance = 2,
 //     UltraPerformance = 3
 // }
-// 
+//
 // public interface IDLSSProvider
 // {
 //     bool IsSupported();
-// 
+//
 //     void EnableDLSS(
 //         DLSSQualityMode qualityMode
 //     );
-// 
+//
 //     void DisableDLSS();
 // }
-// 
+//

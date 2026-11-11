@@ -4,7 +4,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class VehicleUpgradeInteractable : MonoBehaviour, IKeyedInteractable
 {
-    public KeyCode InteractionKey => KeyCode.F;
+    public KeyCode InteractionKey => KeyCode.E;
     [SerializeField] private UpgradeManager upgradeManager;
     [SerializeField] private GameObject targetVehicle;
     [SerializeField] private Transform promptAnchor;

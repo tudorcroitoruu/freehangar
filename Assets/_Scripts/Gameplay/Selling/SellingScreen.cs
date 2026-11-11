@@ -57,8 +57,8 @@ public class SellingScreen : MonoBehaviour
         previousCursorLock = Cursor.lockState;
         previousCursorVisible = Cursor.visible;
         cursorCaptured = true;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         if (cancelButton != null) cancelButton.onClick.AddListener(Close);
         if (sellButton != null) sellButton.onClick.AddListener(Sell);
     }
@@ -199,9 +199,8 @@ public class SellingScreen : MonoBehaviour
         if (cursorCaptured)
         {
             cursorCaptured = false;
-            bool restore = Application.isFocused && !UIPopups.BasePopupUI.HasActivePopup;
-            Cursor.lockState = restore ? previousCursorLock : CursorLockMode.None;
-            Cursor.visible = restore ? previousCursorVisible : true;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
         if (cancelButton != null) cancelButton.onClick.RemoveListener(Close);
         if (sellButton != null) sellButton.onClick.RemoveListener(Sell);

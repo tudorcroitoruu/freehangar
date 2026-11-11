@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-/// <summary>Shared screen-space interaction presentation. Keeps existing scene references.</summary>
+/// <summary>Shared screen-space interaction presentation using Nintendo button images.</summary>
 public sealed class InteractionPrompt : MonoBehaviour
 {
     [SerializeField] private RectTransform panel;
@@ -11,16 +11,10 @@ public sealed class InteractionPrompt : MonoBehaviour
     [SerializeField] private Image buttonImageBg;
     [SerializeField] private TMP_Text description;
     [SerializeField] private TMP_Text descriptionTwo;
-    [SerializeField] private TMP_Text keycap;
+    [SerializeField] private GamepadPromptSettings promptSettings;
     [SerializeField] private Sprite axeIcon;
     [SerializeField] private Sprite hammerIcon;
-    private Image keyBackground;
-    private Sprite originalKeySprite;
-    private bool originalKeyAspect;
-    [SerializeField, Tooltip("Right mouse button indicator for pouring (legacy serialized field name).")]
-    private GameObject mouseRight;
-    [SerializeField] private GameObject mouseLeft;
-
+    [SerializeField] private Image interactionImage;
     [SerializeField] private GameObject bagSliderFill;
     [SerializeField] private Image bagFill;
     [SerializeField] private Text bagFillStatus;
@@ -28,9 +22,9 @@ public sealed class InteractionPrompt : MonoBehaviour
     private sealed class ActionRow
     {
         public RectTransform panel;
-        public TMP_Text description, secondaryDescription, key;
-        public Image buttonBackground;
-        public GameObject mouse, progress;
+        public TMP_Text description, secondaryDescription;
+        public Image interactionImage, buttonBackground;
+        public GameObject progress;
         public Image progressFill;
         public Text progressText;
     }
@@ -58,47 +52,25 @@ public sealed class InteractionPrompt : MonoBehaviour
     public void Show(Camera camera, InteractionPromptData data)
     {
         if (data.RequiresFreeHands || Time.timeScale <= 0f || UIPopups.BasePopupUI.HasActivePopup) { Hide(); return; }
-        bool showToolIcon = data.RequiredTool == PlayerCombatTools.Tool.Axe ||
-            data.RequiredTool == PlayerCombatTools.Tool.Hammer;
+        bool showToolIcon = data.RequiredTool == PlayerCombatTools.Tool.Axe || data.RequiredTool == PlayerCombatTools.Tool.Hammer;
         if (!showToolIcon && !data.HasAvailableInput && !data.ShowProgress && !data.ShowWhenUnavailable) { Hide(); return; }
         if (panel == null || canvasRect == null || camera == null || (string.IsNullOrEmpty(data.Action) && !data.ShowProgress)) { Hide(); return; }
         Vector3 screen = camera.WorldToScreenPoint(data.Position);
         if (screen.z <= 0 || screen.x < 0 || screen.x > Screen.width || screen.y < 0 || screen.y > Screen.height) { Hide(); return; }
         if (!panel.gameObject.activeSelf) panel.gameObject.SetActive(true);
-        if (buttonImageBg != null) buttonImageBg.enabled = !FarmInput.UsingPad;
+        if (buttonImageBg != null) buttonImageBg.enabled = false;
         CurrentText = data.Action;
-        if (keyBackground == null && keycap != null)
-        {
-            keyBackground = keycap.transform.parent.GetComponent<Image>();
-            if (keyBackground != null)
-            {
-                originalKeySprite = keyBackground.sprite;
-                originalKeyAspect = keyBackground.preserveAspect;
-            }
-        }
-        if (keyBackground != null)
-        {
-            Sprite icon = data.RequiredTool == PlayerCombatTools.Tool.Axe ? axeIcon :
-                data.RequiredTool == PlayerCombatTools.Tool.Hammer ? hammerIcon : null;
-            keyBackground.sprite = icon != null ? icon : originalKeySprite;
-            keyBackground.preserveAspect = icon != null || originalKeyAspect;
-        }
         if (description != null && description.text != data.Action) description.text = data.Action;
         if (descriptionTwo != null)
         {
             descriptionTwo.text = data.SecondaryDescription ?? "";
             descriptionTwo.gameObject.SetActive(!string.IsNullOrEmpty(data.SecondaryDescription));
         }
-        bool showMouseLeft = !showToolIcon && data.ShowPrimaryButton && data.PrimaryIsAttack;
-        bool padPrimary = !showMouseLeft && FarmInput.UsingPad && data.ShowPrimaryButton;
-        bool showKeyboardKey = !FarmInput.UsingPad && data.ShowKeyboardKey;
-        bool showKey = !showToolIcon && !showMouseLeft && (showKeyboardKey || padPrimary || (data.ShowKey && !data.ShowPrimaryButton));
-        string key = padPrimary ? FarmInput.Label(data.PrimaryIsAttack ? "Attack" : "Unload", "") : KeyLabel(data.InteractionKey);
-        if (keycap != null && showKey) GamepadPromptSprites.SetKeycap(keycap, key);
-        if (keycap != null && keycap.gameObject.activeSelf != showKey) keycap.gameObject.SetActive(showKey);
-        if (mouseLeft != null && mouseLeft.activeSelf != showMouseLeft) mouseLeft.SetActive(showMouseLeft);
-        bool showMouseRight = !showToolIcon && !showMouseLeft && data.ShowPrimaryButton && !padPrimary;
-        if (mouseRight != null && mouseRight.activeSelf != showMouseRight) mouseRight.SetActive(showMouseRight);
+        Sprite icon = data.RequiredTool == PlayerCombatTools.Tool.Axe ? axeIcon :
+            data.RequiredTool == PlayerCombatTools.Tool.Hammer ? hammerIcon :
+            data.ShowPrimaryButton ? ButtonSprite(data.PrimaryIsAttack ? "rightTrigger" : "leftTrigger") :
+            data.ShowKey || data.ShowKeyboardKey ? ButtonSprite(ControlForKey(data.InteractionKey)) : null;
+        SetInteractionImage(interactionImage, icon);
         if (bagSliderFill != null && bagSliderFill.activeSelf != data.ShowProgress) bagSliderFill.SetActive(data.ShowProgress);
         if (bagFill != null) bagFill.fillAmount = Mathf.Clamp01(data.Progress);
         if (bagFillStatus != null && bagFillStatus.text != data.ProgressText) bagFillStatus.text = data.ProgressText;
@@ -114,7 +86,7 @@ public sealed class InteractionPrompt : MonoBehaviour
                 if (row.progress != null) row.progress.SetActive(false);
                 continue;
             }
-            if (row.buttonBackground != null) row.buttonBackground.enabled = !FarmInput.UsingPad;
+            if (row.buttonBackground != null) row.buttonBackground.enabled = false;
             var action = data.AdditionalActions[i];
             if (row.description != null) row.description.text = action.Action;
             if (row.secondaryDescription != null)
@@ -122,13 +94,12 @@ public sealed class InteractionPrompt : MonoBehaviour
                 row.secondaryDescription.text = action.SecondaryDescription ?? "";
                 row.secondaryDescription.gameObject.SetActive(!string.IsNullOrEmpty(action.SecondaryDescription));
             }
-            if (row.key != null) { GamepadPromptSprites.SetKeycap(row.key, KeyLabel(action.Key)); row.key.gameObject.SetActive(true); }
-            if (row.mouse != null) row.mouse.SetActive(false);
+            SetInteractionImage(row.interactionImage, ButtonSprite(ControlForKey(action.Key)));
             if (row.progress != null) row.progress.SetActive(action.ShowProgress);
             if (row.progressFill != null) row.progressFill.fillAmount = Mathf.Clamp01(action.Progress);
             if (row.progressText != null && row.progressText.text != action.ProgressText)
                 row.progressText.text = action.ProgressText ?? "";
-            CurrentText += "\n[" + KeyLabel(action.Key) + "] " + action.Action;
+            CurrentText += "\n" + action.Action;
         }
         RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screen, null, out Vector2 position);
         float rowStep = panel.rect.height + actionRowSpacing;
@@ -141,40 +112,51 @@ public sealed class InteractionPrompt : MonoBehaviour
             actionRows[i].panel.anchoredPosition = panel.anchoredPosition - Vector2.up * ((i + 1) * rowStep);
     }
 
-    private static string KeyLabel(KeyCode key) => FarmInput.KeyLabel(key);
+    private Sprite ButtonSprite(string control)
+    {
+        if (promptSettings == null) promptSettings = Resources.Load<GamepadPromptSettings>("GamepadPromptSettings");
+        if (promptSettings == null || promptSettings.prompts == null || control == null) return null;
+        foreach (var prompt in promptSettings.prompts)
+            if (prompt != null && prompt.control == control) return prompt.sprite;
+        return null;
+    }
+
+    private static string ControlForKey(KeyCode key) => key switch
+    {
+        KeyCode.None or KeyCode.E => "buttonNorth", KeyCode.F => "buttonWest",
+        KeyCode.Q => "rightShoulder", KeyCode.R => "leftShoulder",
+        KeyCode.Alpha1 => "dpad/up", KeyCode.Alpha2 => "dpad/right",
+        KeyCode.Alpha3 => "dpad/down", KeyCode.Alpha4 => "dpad/left",
+        KeyCode.Escape => "buttonSouth", KeyCode.Return => "buttonEast",
+        _ => null
+    };
+
+    private static void SetInteractionImage(Image image, Sprite sprite)
+    {
+        if (image == null) return;
+        image.sprite = sprite;
+        image.preserveAspect = true;
+        image.gameObject.SetActive(sprite != null);
+    }
 
     private void EnsureActionRows(int count)
     {
         while (actionRows.Count < count)
         {
-            // Clone the authored row to preserve its key background, font, and materials.
             var clone = Instantiate(panel, panel.parent);
             clone.name = "Interaction Action " + (actionRows.Count + 2);
             var secondary = CopyOf(descriptionTwo != null ? descriptionTwo.transform : null, panel, clone);
             if (secondary != null) secondary.gameObject.SetActive(false);
             foreach (var controller in clone.GetComponentsInChildren<InteractionPrompt>(true)) controller.enabled = false;
             var row = new ActionRow { panel = clone };
-            var buttonBackground = CopyOf(buttonImageBg != null ? buttonImageBg.transform : null, panel, clone);
-            row.buttonBackground = buttonBackground != null ? buttonBackground.GetComponent<Image>() : null;
+            var background = CopyOf(buttonImageBg != null ? buttonImageBg.transform : null, panel, clone);
+            row.buttonBackground = background != null ? background.GetComponent<Image>() : null;
             row.secondaryDescription = secondary != null ? secondary.GetComponent<TMP_Text>() : null;
             var text = CopyOf(description != null ? description.transform : null, panel, clone);
-            var key = CopyOf(keycap != null ? keycap.transform : null, panel, clone);
-            var mouse = CopyOf(mouseRight != null ? mouseRight.transform : null, panel, clone);
-            var leftMouse = CopyOf(mouseLeft != null ? mouseLeft.transform : null, panel, clone);
-            if (leftMouse != null) leftMouse.gameObject.SetActive(false);
+            var image = CopyOf(interactionImage != null ? interactionImage.transform : null, panel, clone);
             var progress = CopyOf(bagSliderFill != null ? bagSliderFill.transform : null, panel, clone);
             row.description = text != null ? text.GetComponent<TMP_Text>() : null;
-            row.key = key != null ? key.GetComponent<TMP_Text>() : null;
-            if (key != null && keyBackground != null)
-            {
-                var background = key.parent.GetComponent<Image>();
-                if (background != null)
-                {
-                    background.sprite = originalKeySprite;
-                    background.preserveAspect = originalKeyAspect;
-                }
-            }
-            row.mouse = mouse != null ? mouse.gameObject : null;
+            row.interactionImage = image != null ? image.GetComponent<Image>() : null;
             row.progress = progress != null ? progress.gameObject : null;
             var fill = CopyOf(bagFill != null ? bagFill.transform : null, panel, clone);
             var status = CopyOf(bagFillStatus != null ? bagFillStatus.transform : null, panel, clone);
@@ -196,6 +178,7 @@ public sealed class InteractionPrompt : MonoBehaviour
 
     public void Hide()
     {
+        if (interactionImage != null) interactionImage.gameObject.SetActive(false);
         if (bagSliderFill != null) bagSliderFill.SetActive(false);
         if (bagFill != null) bagFill.fillAmount = 0;
         if (bagFillStatus != null) bagFillStatus.text = "";

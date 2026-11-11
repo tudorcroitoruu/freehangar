@@ -63,8 +63,8 @@ public static class MenuSwitchValidation
         var nintendo = InputSystem.AddDevice<SwitchProControllerHID>();
         try
         {
-            NUnit.Framework.Assert.AreSame(desktop.buttonSouth, MenuPadInput.ConfirmButton(desktop));
-            NUnit.Framework.Assert.AreSame(desktop.buttonEast, MenuPadInput.CancelButton(desktop));
+            NUnit.Framework.Assert.AreSame(desktop.buttonEast, MenuPadInput.ConfirmButton(desktop));
+            NUnit.Framework.Assert.AreSame(desktop.buttonSouth, MenuPadInput.CancelButton(desktop));
             NUnit.Framework.Assert.AreSame(nintendo.aButton, MenuPadInput.ConfirmButton(nintendo));
             NUnit.Framework.Assert.AreSame(nintendo.bButton, MenuPadInput.CancelButton(nintendo));
             Directory.CreateDirectory("output/MenuSwitch");

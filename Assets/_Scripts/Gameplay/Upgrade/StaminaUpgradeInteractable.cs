@@ -4,7 +4,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class StaminaUpgradeInteractable : MonoBehaviour, IKeyedInteractable
 {
-    public KeyCode InteractionKey => KeyCode.F;
+    public KeyCode InteractionKey => KeyCode.E;
     [SerializeField] private UpgradeManager upgradeManager;
     [SerializeField] private Transform promptAnchor;
     [SerializeField] private Vector3 promptOffset = Vector3.up * .3f;

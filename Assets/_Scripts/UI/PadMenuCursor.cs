@@ -21,6 +21,11 @@ public sealed class PadMenuCursor : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (Application.isFocused)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
         var selected = EventSystem.current ? EventSystem.current.currentSelectedGameObject : null;
         if (selected == lastSoundSelection) return;
         lastSoundSelection = selected;
@@ -32,6 +37,8 @@ public sealed class PadMenuCursor : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Install()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         DropdownClosedFrame = -1;
         var root = new GameObject("Gamepad UI navigation manager");
         DontDestroyOnLoad(root);
@@ -41,7 +48,7 @@ public sealed class PadMenuCursor : MonoBehaviour
     private void Update()
     {
         var mouse = Mouse.current;
-        bool pointerInput = mouse != null && mouse.layout != "VirtualMouse" && mouse.name != "VirtualMouse" &&
+        bool pointerInput = Cursor.lockState != CursorLockMode.Locked && mouse != null && mouse.layout != "VirtualMouse" && mouse.name != "VirtualMouse" &&
             (mouse.delta.ReadValue().sqrMagnitude > .01f ||
             mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame ||
             mouse.scroll.ReadValue().sqrMagnitude > .01f);

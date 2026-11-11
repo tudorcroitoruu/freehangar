@@ -187,7 +187,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         }
         Target = FindTarget();
         CancelBagHold();
-        return Target != null && KeyFor(Target) == KeyCode.E && Target.TryGetPrompt(this, out var data) && data.ShowKey && Target.TryInteract(this);
+        return TryTargetAction(Target, KeyCode.E);
     }
 
     private void CancelBagHold()
@@ -236,9 +236,9 @@ public sealed class PlayerInteractor : MonoBehaviour
             Bags != null && Bags.CanEmpty(bag)) return true;
         if (!(primary is Component component)) return false;
         foreach (var behaviour in ActionBehaviours(component))
-            if (behaviour != null && behaviour.isActiveAndEnabled && behaviour is IKeyedInteractable action &&
-                action.InteractionKey != KeyCode.E && action.InteractionKey != KeyCode.None && FarmInput.ContextDown(action.InteractionKey))
-                return TryInteract(action.InteractionKey);
+            if (behaviour != null && behaviour.isActiveAndEnabled && behaviour is IInteractable action &&
+                KeyFor(action) != KeyCode.E && KeyFor(action) != KeyCode.None && FarmInput.ContextDown(KeyFor(action)))
+                return TryInteract(KeyFor(action));
         return false;
     }
 
@@ -248,30 +248,52 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (!CanInteract || (Items != null && Items.IsCarrying) || (Bags != null && Bags.IsCarrying)) return false;
         if (PushedWheelbarrow != null) return false;
         var primary = FindTarget();
+        return TryTargetAction(primary, key);
+    }
+
+    private bool TryTargetAction(IInteractable primary, KeyCode key)
+    {
         if (!(primary is Component component)) return false;
         foreach (var behaviour in ActionBehaviours(component))
-            if (behaviour != null && behaviour.isActiveAndEnabled && behaviour is IKeyedInteractable action && action.InteractionKey == key &&
+            if (behaviour != null && behaviour.isActiveAndEnabled && behaviour is IInteractable action && KeyFor(action) == key &&
                 action.TryGetPrompt(this, out var data) && data.ShowKey && !data.RequiresFreeHands)
                 return action.TryInteract(this);
         return false;
     }
 
-    private static KeyCode KeyFor(IInteractable target) => target is IKeyedInteractable action ? action.InteractionKey : KeyCode.E;
+    private KeyCode KeyFor(IInteractable target)
+    {
+        if (target is VehicleUpgradeInteractable upgrade &&
+            (!upgrade.TryGetPrompt(this, out var prompt) || !prompt.ShowKey)) return KeyCode.F;
+        if (target is BicycleController || target is WheelbarrowCargo)
+        {
+            var component = (Component)target;
+            var origin = actionOrigin != null && actionOrigin.IsChildOf(component.transform) ? actionOrigin : component.transform;
+            for (var host = origin; host != null; host = host.parent)
+            {
+                var station = host.GetComponent<VehicleUpgradeInteractable>();
+                if (station != null && station.isActiveAndEnabled && station.TryGetPrompt(this, out var data) && data.ShowKey)
+                    return KeyCode.F;
+                if (host == component.transform) break;
+            }
+        }
+        return target is IKeyedInteractable action ? action.InteractionKey : KeyCode.E;
+    }
 
     private void AddActions(IInteractable primary, ref InteractionPromptData data)
     {
-        if (primary is IKeyedInteractable keyed) data.InteractionKey = keyed.InteractionKey;
+        data.InteractionKey = KeyFor(primary);
         if (!(primary is Component component) || HandsOccupied) return;
         var actions = data.AdditionalActions != null
             ? new List<InteractionPromptAction>(data.AdditionalActions)
             : new List<InteractionPromptAction>();
         foreach (var behaviour in ActionBehaviours(component))
         {
-            if (behaviour == null || !behaviour.isActiveAndEnabled || !(behaviour is IKeyedInteractable action) ||
-                ReferenceEquals(primary, action) || action.InteractionKey == data.InteractionKey ||
+            if (behaviour == null || !behaviour.isActiveAndEnabled || !(behaviour is IInteractable action) ||
+                ReferenceEquals(primary, action) || KeyFor(action) == data.InteractionKey ||
                 !action.TryGetPrompt(this, out var extra) || !extra.ShowKey || extra.RequiresFreeHands) continue;
-            if (actions.Exists(item => item.Key == action.InteractionKey)) continue;
-            actions.Add(new InteractionPromptAction(extra.Action, action.InteractionKey)
+            if (actions.Exists(item => item.Key == KeyFor(action))) continue;
+            actions.Add(new InteractionPromptAction(extra.Action, KeyFor(action))
             {
                 SecondaryDescription = extra.SecondaryDescription
             });
@@ -313,12 +335,20 @@ public sealed class PlayerInteractor : MonoBehaviour
 
     private IEnumerable<MonoBehaviour> ActionBehaviours(Component primary)
     {
-        var origin = actionOrigin != null && actionOrigin.IsChildOf(primary.transform) ? actionOrigin : primary.transform;
+        var root = primary.transform;
+        if (primary is VehicleUpgradeInteractable)
+        {
+            var wheelbarrow = primary.GetComponentInParent<WheelbarrowCargo>();
+            var vehicle = primary.GetComponentInParent<BicycleController>();
+            if (wheelbarrow != null) root = wheelbarrow.transform;
+            else if (vehicle != null) root = vehicle.transform;
+        }
+        var origin = actionOrigin != null && actionOrigin.IsChildOf(root) ? actionOrigin : primary.transform;
         for (var host = origin; host != null; host = host.parent)
         {
             host.GetComponents(actionBehaviours);
             for (int i = 0; i < actionBehaviours.Count; i++) yield return actionBehaviours[i];
-            if (host == primary.transform) yield break;
+            if (host == root) yield break;
         }
     }
 

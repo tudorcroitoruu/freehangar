@@ -315,7 +315,7 @@ public sealed class HangarLaunchSequence : MonoBehaviour
         foreach(var canvas in hud) if(canvas != null) canvas.SetCutsceneHudHidden(this, false);
         hud.Clear();suspended.Clear();hidden.Clear();if(actor!=null)actor.EndDiscovery(this);
         if(cinematic!=null)Destroy(cinematic.gameObject);if(overlay!=null)Destroy(overlay);
-        Cursor.lockState=cursorLock;Cursor.visible=cursorVisible;
+        Cursor.lockState = CursorLockMode.Locked;Cursor.visible = false;
     }
 }
 

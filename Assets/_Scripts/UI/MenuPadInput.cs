@@ -2,7 +2,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.Switch;
 
-// UI semantics differ from physical gameplay button positions on Nintendo pads.
+// This branch uses Nintendo confirm/cancel positions for every controller.
 public static class MenuPadInput
 {
     public static bool UsesNintendoLayout(Gamepad pad)
@@ -13,10 +13,8 @@ public static class MenuPadInput
         return pad is SwitchProController;
 #endif
     }
-    public static ButtonControl ConfirmButton(Gamepad pad) => pad == null ? null :
-        UsesNintendoLayout(pad) ? pad.buttonEast : pad.buttonSouth;
-    public static ButtonControl CancelButton(Gamepad pad) => pad == null ? null :
-        UsesNintendoLayout(pad) ? pad.buttonSouth : pad.buttonEast;
+    public static ButtonControl ConfirmButton(Gamepad pad) => pad?.buttonEast;
+    public static ButtonControl CancelButton(Gamepad pad) => pad?.buttonSouth;
     public static bool ConfirmPressed(Gamepad pad) => ConfirmButton(pad)?.wasPressedThisFrame == true;
     public static bool CancelPressed(Gamepad pad) => CancelButton(pad)?.wasPressedThisFrame == true;
 }

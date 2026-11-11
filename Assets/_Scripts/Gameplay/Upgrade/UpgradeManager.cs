@@ -118,20 +118,20 @@ public class UpgradeManager : MonoBehaviour
         previousCursorLock = Cursor.lockState;
         previousCursorVisible = Cursor.visible;
         cursorCaptured = true;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         if (closeButton != null) closeButton.onClick.AddListener(Close);
     }
 
     private void Update()
     {
         if (!Application.isFocused || UIPopups.BasePopupUI.HasActivePopup) return;
-        HandleInput(FarmInput.Back, FarmInput.Down("Interact") || Input.GetKeyDown(KeyCode.F));
+        HandleInput(FarmInput.Back, FarmInput.Down("Secondary"));
     }
 
     private void HandleInput(bool closePressed, bool upgradePressed)
     {
-        // The E press that opens the screen must not also buy its first upgrade.
+        // Reserve the opening frame before accepting the purchase action.
         if (!IsOpen || Time.frameCount <= openedFrame) return;
         if (closePressed) Close();
         else if (upgradePressed && upgradeShovelScreen != null && upgradeShovelScreen.isActiveAndEnabled)
@@ -159,9 +159,8 @@ public class UpgradeManager : MonoBehaviour
         if (cursorCaptured)
         {
             cursorCaptured = false;
-            bool restore = Application.isFocused && !UIPopups.BasePopupUI.HasActivePopup;
-            Cursor.lockState = restore ? previousCursorLock : CursorLockMode.None;
-            Cursor.visible = restore ? previousCursorVisible : true;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
         if (closeButton != null) closeButton.onClick.RemoveListener(Close);
         ReleaseInput();

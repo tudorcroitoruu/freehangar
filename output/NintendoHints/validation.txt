@@ -1,0 +1,19 @@
+Interact -> buttonNorth
+TakeInShovel -> rightTrigger
+ReleaseFromShovel -> leftTrigger
+GetOff -> buttonNorth
+Brake -> leftTrigger
+Steer -> leftStick
+Pedal -> rightTrigger
+MoveFaster -> leftStickPress
+ForkliftDrop -> rightShoulder
+ForkliftLoadUnload -> buttonWest
+Sell -> buttonWest
+ClosePopup -> buttonSouth
+Upgrade -> buttonNorth
+shovelEquipped -> dpad/up
+axeEquipped -> dpad/right
+hammerEquipped -> dpad/down
+broomEquipped -> dpad/left
+PASS: device refresh preserves all 17 native controller images.
+PASS: 17 saved Nintendo hint sprites resolve after prefab reimport.

@@ -87,7 +87,7 @@ public class CutscenePauseTests
             Assert.IsTrue(secondMarker.activeSelf);
             Set(pause, "mainOpenedFrame", -1);
             pad = InputSystem.AddDevice<Gamepad>();
-            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.South));
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.East));
             InputSystem.Update();
             pause.HandleMainScreenInput(pad);
             Assert.AreEqual(1, secondClicks);

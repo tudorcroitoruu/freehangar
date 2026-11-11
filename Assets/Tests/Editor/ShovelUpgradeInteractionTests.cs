@@ -180,7 +180,7 @@ public class ShovelUpgradeInteractionTests
         var interactor = actor.GetComponent<PlayerInteractor>();
         Assert.IsTrue(interactable.TryGetPrompt(interactor, out var prompt));
         Assert.IsTrue(prompt.ShowKey);
-        Assert.AreEqual(KeyCode.F, prompt.InteractionKey);
+        Assert.AreEqual(KeyCode.E, prompt.InteractionKey);
         Assert.IsTrue(interactable.TryInteract(interactor));
         Assert.IsTrue(manager.IsOpen);
         Assert.IsTrue(screen.isActiveAndEnabled);

@@ -60,95 +60,6 @@ public class GameplayCanvas : MonoBehaviour
     [SerializeField] private TMP_Text leftMouseHintInteraction;
     private BagInteraction playerBags;
     private bool drivingHintsActive;
-    private readonly List<System.Action<bool>> controlHintUpdates = new List<System.Action<bool>>();
-    private int hintDevice = -2;
-
-    private void CacheControlHints()
-    {
-        if (controlHintUpdates.Count != 0) return;
-        var cachedRows = new HashSet<GameObject>();
-        void AddRows(GameObject[] rows)
-        {
-            if (rows == null) return;
-            foreach (var row in rows)
-            {
-                if (!row || !cachedRows.Add(row)) continue;
-                string action = row.name switch
-                {
-                    "Interact" or "GetOff" or "Upgrade" => "Interact",
-                    "Sell" => "Secondary",
-                    "ClosePopup" => "Back",
-                    "TakeInShovel" => "Attack", "ReleaseFromShovel" => "Unload",
-                    "Brake" => "Unload", "MoveFaster" => "Sprint", "ForkliftDrop" => "Cargo",
-                    "Steer" => "Move", "Pedal" => "Attack", _ => null
-                };
-                if (action == null) continue;
-                foreach (var label in row.GetComponentsInChildren<TMP_Text>(true))
-                {
-                    if (label.name != "Button") continue;
-                    string keyboard = label.text;
-                    bool wasActive = label.gameObject.activeSelf;
-                    controlHintUpdates.Add(pad =>
-                    {
-                        label.gameObject.SetActive(pad || wasActive);
-                        GamepadPromptSprites.SetKeycap(label,
-                            pad ? (action == "Back" ? GamepadPromptSprites.Label("buttonEast") ?? "B" :
-                                FarmInput.Label(action, keyboard)) : keyboard);
-                    });
-                }
-                foreach (var icon in row.GetComponentsInChildren<Image>(true))
-                {
-                    if (icon.name != "Image") continue;
-                    bool wasActive = icon.gameObject.activeSelf;
-                    controlHintUpdates.Add(pad => icon.gameObject.SetActive(!pad && wasActive));
-                }
-            }
-        }
-        AddRows(walkingHints); AddRows(drivingHints); AddRows(bicycleHints); AddRows(forkliftHints);
-        AddRows(sellPopupHint); AddRows(upgradePopupHint);
-        void AddTool(SelectedUI tool, string action)
-        {
-            if (!tool) return;
-            var tmpLabel = tool.GetComponentInChildren<TMP_Text>(true);
-            if (tmpLabel)
-            {
-                string keyboardText = tmpLabel.text;
-                Color keyboardColor = tmpLabel.color;
-                controlHintUpdates.Add(pad =>
-                {
-                    tmpLabel.color = pad ? Color.white : keyboardColor;
-                    GamepadPromptSprites.SetKeycap(tmpLabel,
-                        pad ? FarmInput.Label(action, keyboardText) : keyboardText);
-                });
-                return;
-            }
-            var label = tool.GetComponentInChildren<Text>(true);
-            if (!label) return;
-            string keyboard = label.text;
-            // Legacy UI Text cannot render TMP sprite tags. Overlay a sprite-capable label.
-            var iconObject = new GameObject("Controller Button", typeof(RectTransform), typeof(TextMeshProUGUI));
-            iconObject.transform.SetParent(label.transform, false);
-            var iconLabel = iconObject.GetComponent<TextMeshProUGUI>();
-            iconLabel.rectTransform.anchorMin = Vector2.zero;
-            iconLabel.rectTransform.anchorMax = Vector2.one;
-            iconLabel.rectTransform.offsetMin = Vector2.zero;
-            iconLabel.rectTransform.offsetMax = Vector2.zero;
-            iconLabel.alignment = TextAlignmentOptions.Center;
-            iconLabel.fontSize = label.fontSize;
-            iconLabel.color = Color.white;
-            iconLabel.raycastTarget = false;
-            bool wasEnabled = label.enabled;
-            controlHintUpdates.Add(pad =>
-            {
-                label.enabled = !pad && wasEnabled;
-                iconObject.SetActive(pad && wasEnabled);
-                if (pad) GamepadPromptSprites.SetKeycap(iconLabel, FarmInput.Label(action, keyboard));
-            });
-        }
-        AddTool(shovelEquipped, "Previous"); AddTool(axeEquipped, "Next");
-        AddTool(hammerEquipped, "HammerSlot"); AddTool(broomEquipped, "UtilitySlot");
-    }
-    private void InvalidateControlHints() => hintDevice = -2;
 
 
     [Space, Header("Tools Equip Hints")] 
@@ -207,10 +118,7 @@ public class GameplayCanvas : MonoBehaviour
 
     private void OnEnable()
     {
-        CacheControlHints();
-        InvalidateControlHints();
         RefreshPopupHints();
-        GameSettingsManager.InputBindingsChanged += InvalidateControlHints;
         Pause.PauseOnAction += HideHudForPause;
         Pause.PauseOffAction += RestoreHudAfterPause;
         if (Pause.Instance != null && Pause.Instance.paused) HideHudForPause();
@@ -234,7 +142,6 @@ public class GameplayCanvas : MonoBehaviour
     {
         scalingUtilityIcon = false;
         if (broomImage != null) broomImage.rectTransform.localScale = utilityIconScale;
-        GameSettingsManager.InputBindingsChanged -= InvalidateControlHints;
         Pause.PauseOnAction -= HideHudForPause;
         Pause.PauseOffAction -= RestoreHudAfterPause;
         RestoreHudAfterPause();
@@ -286,12 +193,6 @@ public class GameplayCanvas : MonoBehaviour
 
     private void Update()
     {
-        int device = FarmInput.UsingPad ? FarmInput.ActivePad.deviceId : -1;
-        if (device != hintDevice)
-        {
-            hintDevice = device;
-            foreach (var update in controlHintUpdates) update(device != -1);
-        }
         if (warningPopup != null) warningPopup.Tick(Time.deltaTime);
         if (achievementsPopup != null) achievementsPopup.Tick(Time.deltaTime);
         if (!hudHiddenByPause) AnimateMoney(Time.unscaledDeltaTime);

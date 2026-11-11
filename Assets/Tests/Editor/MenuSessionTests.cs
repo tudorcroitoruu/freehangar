@@ -75,13 +75,13 @@ public class MenuSessionTests
     }
 
     [Test]
-    public void OpeningSeparateMenuUnlocksCursorWithoutDisablingSceneObjectsOrPausingAnimations()
+    public void OpeningSeparateMenuKeepsCursorLockedWithoutDisablingSceneObjectsOrPausingAnimations()
     {
         Time.timeScale=0;
         Open();
         Assert.IsTrue(MenuManager.IsMenuOpen);Assert.IsTrue(otherObject.activeSelf);
         Assert.That(Time.timeScale,Is.EqualTo(1f));
-        Assert.That(Cursor.lockState,Is.EqualTo(CursorLockMode.None));Assert.IsTrue(Cursor.visible);
+        Assert.That(Cursor.lockState,Is.EqualTo(CursorLockMode.Locked));Assert.IsFalse(Cursor.visible);
     }
 
     [Test]
@@ -160,7 +160,7 @@ public class MenuSessionTests
         var pad = InputSystem.AddDevice<Gamepad>();
         try
         {
-            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.South));
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.East));
             InputSystem.Update();
             menu.HandleConfirmationInput(pad);
             Assert.AreEqual(0, firstClicks, "The opening press must not confirm the popup.");
@@ -173,7 +173,7 @@ public class MenuSessionTests
             menu.HandleConfirmationInput(pad);
             Assert.IsFalse(firstMarker.activeSelf);
             Assert.IsTrue(secondMarker.activeSelf);
-            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.South));
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.East));
             InputSystem.Update();
             menu.HandleConfirmationInput(pad);
             Assert.AreEqual(0, firstClicks);
@@ -213,7 +213,7 @@ public class MenuSessionTests
         var pad = InputSystem.AddDevice<Gamepad>();
         try
         {
-            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.South));
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.East));
             InputSystem.Update();
             menu.HandleConfirmationInput(pad);
             Assert.AreEqual(0, firstClicks);
@@ -247,7 +247,7 @@ public class MenuSessionTests
         var pad = InputSystem.AddDevice<Gamepad>();
         try
         {
-            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.South));
+            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.East));
             InputSystem.Update();
             menu.HandleConfirmationInput(pad);
             Assert.AreEqual(1, secondClicks);
@@ -271,6 +271,29 @@ public class MenuSessionTests
             Assert.IsFalse(secondMarker.activeSelf);
         }
         finally { InputSystem.RemoveDevice(pad); }
+    }
+
+    [Test]
+    public void ReopeningMainScreenDirectlySelectsFirstButtonWithoutResettingNavigation()
+    {
+        var first = PopupButton(main, "First", out var firstMarker);
+        var second = PopupButton(main, "Second", out var secondMarker);
+        Set("mainButtons", new[] { first, second });
+        Open();
+        void Tick() => typeof(MenuManager).GetMethod("LateUpdate", Private).Invoke(menu, null);
+        Tick();
+        second.OnPointerEnter(null);
+        typeof(MenuManager).GetMethod("SelectPopupButton", Private).Invoke(menu, new object[] { 1 });
+        Tick();
+        Assert.IsFalse(firstMarker.activeSelf);
+        Assert.IsTrue(secondMarker.activeSelf);
+        main.SetActive(false);
+        Tick();
+        main.SetActive(true);
+        Tick();
+        Assert.IsTrue(firstMarker.activeSelf);
+        Assert.IsFalse(secondMarker.activeSelf);
+        Assert.AreEqual(0, typeof(MenuManager).GetField("selectedPopupIndex", Private).GetValue(menu));
     }
 
     [Test]
