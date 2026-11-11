@@ -9,7 +9,7 @@ TerrainLayer:
   m_Name: Original farm layer 4
   m_DiffuseTexture: {fileID: 2800000, guid: 1dcbedb2e6fc35441a554d1c62d55bcf, type: 3}
   m_NormalMapTexture: {fileID: 0}
-  m_MaskMapTexture: {fileID: 0}
+  m_MaskMapTexture: {fileID: 2800000, guid: 1dcbedb2e6fc35441a554d1c62d55bcf, type: 3}
   m_TileSize: {x: 6, y: 6}
   m_TileOffset: {x: 0, y: 0}
   m_Specular: {r: 0, g: 0, b: 0, a: 0}
@@ -19,5 +19,5 @@ TerrainLayer:
   m_DiffuseRemapMin: {x: 0, y: 0, z: 0, w: 0}
   m_DiffuseRemapMax: {x: 1, y: 1, z: 1, w: 1}
   m_MaskMapRemapMin: {x: 0, y: 0, z: 0, w: 0}
-  m_MaskMapRemapMax: {x: 1, y: 1, z: 1, w: 1}
+  m_MaskMapRemapMax: {x: 0.09227872, y: 0.048964202, z: 1, w: 0.020715654}
   m_SmoothnessSource: 1
