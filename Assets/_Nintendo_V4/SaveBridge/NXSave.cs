@@ -11,6 +11,7 @@ public class NXSave : MonoBehaviour
     private const double MinimumDelayBetweenSaves = 15;
     private static bool mounted;
     private static double lastWriteAttempt = double.NegativeInfinity;
+    public static bool CanSave => Time.realtimeSinceStartupAsDouble - lastWriteAttempt >= MinimumDelayBetweenSaves;
 
     public static void Initialize()
     {
@@ -57,6 +58,8 @@ public class NXSave : MonoBehaviour
     public static bool Save(byte[] saveData, bool ignoreFrequencyLimit)
     {
         if (saveData == null) throw new ArgumentNullException(nameof(saveData));
+        if (saveData.LongLength > 32L * 1024 * 1024)
+            throw new InvalidDataException("Save archive exceeds the 32 MiB budget. Existing save has not been overwritten.");
         Initialize();
         double now = Time.realtimeSinceStartupAsDouble;
         if (!ignoreFrequencyLimit && now - lastWriteAttempt < MinimumDelayBetweenSaves) return false;

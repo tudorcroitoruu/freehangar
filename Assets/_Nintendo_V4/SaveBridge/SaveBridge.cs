@@ -107,7 +107,7 @@ public static class SaveBridge
 #if UNITY_SWITCH && !UNITY_EDITOR
         Initialise();
         flushRequested = store.Dirty;
-        if (flushRequested && store.Flush(NXSave.Save, ignoreFrequencyRestrictions)) flushRequested = false;
+        if (flushRequested && (ignoreFrequencyRestrictions || NXSave.CanSave) && store.Flush(NXSave.Save, ignoreFrequencyRestrictions)) flushRequested = false;
 #else
         PlayerPrefs.Save();
 #endif
@@ -115,7 +115,7 @@ public static class SaveBridge
     internal static void FlushPending()
     {
 #if UNITY_SWITCH && !UNITY_EDITOR
-        if (store != null && flushRequested && store.Flush(NXSave.Save, false)) flushRequested = false;
+        if (store != null && flushRequested && NXSave.CanSave && store.Flush(NXSave.Save, false)) flushRequested = false;
 #endif
     }
     public static void SaveOnQuit()

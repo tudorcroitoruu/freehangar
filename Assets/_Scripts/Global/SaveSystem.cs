@@ -202,6 +202,7 @@ public static class SaveSystem
     private static Task goalSaveTask;
     private static bool goalSaveRunning;
     private static bool goalSaveRequested;
+    private static double lastGoalCaptureTime = double.NegativeInfinity;
     public static Task SaveGoalCompletionAsync()
     {
         goalSaveRequested = true;
@@ -219,7 +220,12 @@ public static class SaveSystem
         {
             while (goalSaveRequested)
             {
+#if UNITY_SWITCH && !UNITY_EDITOR
+                double remaining = 30d - (Time.realtimeSinceStartupAsDouble - lastGoalCaptureTime);
+                if (remaining > 0) await Task.Delay((int)(remaining * 1000));
+#endif
                 goalSaveRequested = false;
+                lastGoalCaptureTime = Time.realtimeSinceStartupAsDouble;
                 await SaveGoalSnapshotAsync();
             }
         }
