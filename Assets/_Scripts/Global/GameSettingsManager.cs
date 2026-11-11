@@ -212,6 +212,7 @@ public class GameSettingsManager : MonoBehaviour
 
     private void OnEnable()
     {
+        ConfigurePlatformSections();
         RefreshJoystickHints();
         SetRowHoverListeners(videoSettings, true);
         SetRowHoverListeners(audioSettings, true);
@@ -472,7 +473,26 @@ public class GameSettingsManager : MonoBehaviour
         SaveInputBindings();
     }
 
-    public Transform FirstSectionTab => buttons != null && buttons.Length > 0 && buttons[0] ? buttons[0].transform : null;
+    private static int FirstSectionIndex
+    {
+        get
+        {
+#if UNITY_SWITCH && !UNITY_EDITOR
+            return 1;
+#else
+            return 0;
+#endif
+        }
+    }
+
+    private void ConfigurePlatformSections()
+    {
+        if (FirstSectionIndex == 0) return;
+        if (buttons != null && buttons.Length > 0 && buttons[0]) buttons[0].gameObject.SetActive(false);
+        if (sections != null && sections.Length > 0 && sections[0]) sections[0].SetActive(false);
+    }
+
+    public Transform FirstSectionTab => buttons != null && buttons.Length > FirstSectionIndex && buttons[FirstSectionIndex] ? buttons[FirstSectionIndex].transform : null;
     public Transform LastSectionTab => buttons != null && buttons.Length > 0 && buttons[buttons.Length - 1] ? buttons[buttons.Length - 1].transform : null;
 
     public void CycleSection(int direction)
@@ -484,13 +504,15 @@ public class GameSettingsManager : MonoBehaviour
         for (int step = 1; step <= sections.Length; step++)
         {
             int next = (current + (direction < 0 ? -step : step) + sections.Length) % sections.Length;
-            if (!sections[next]) continue;
+            if (next < FirstSectionIndex || !sections[next]) continue;
             ShowSection(next);
             return;
         }
     }
     public void ShowSection(int index)
     {
+        ConfigurePlatformSections();
+        if (index < FirstSectionIndex) index = FirstSectionIndex;
         if (sections == null || index < 0 || index >= sections.Length || !sections[index])
             return;
 
@@ -638,6 +660,7 @@ public class GameSettingsManager : MonoBehaviour
 
     private void SetupUI()
     {
+        ConfigurePlatformSections();
         SetupDisplays();
         SetupResolutions();
 //         SetupUpscalingDropdown();
@@ -1087,7 +1110,7 @@ public class GameSettingsManager : MonoBehaviour
     private void ApplyVSync()
     {
 #if UNITY_SWITCH && !UNITY_EDITOR
-        QualitySettings.vSyncCount = 1;
+        QualitySettings.vSyncCount = 2;
 #else
         QualitySettings.vSyncCount =
             settings.vSync ? 1 : 0;
@@ -1123,6 +1146,11 @@ public class GameSettingsManager : MonoBehaviour
 
     private void ApplyFrameRate()
     {
+#if UNITY_SWITCH && !UNITY_EDITOR
+        Application.targetFrameRate = 30;
+        QualitySettings.vSyncCount = 2;
+        return;
+#else
         if (settings.frameRateIndex < 0 ||
             settings.frameRateIndex >= frameRateValues.Length)
             return;
@@ -1139,6 +1167,7 @@ public class GameSettingsManager : MonoBehaviour
 
         Application.targetFrameRate =
             frameRateValues[settings.frameRateIndex];
+#endif
     }
 
     #endregion
@@ -1171,6 +1200,10 @@ public class GameSettingsManager : MonoBehaviour
 
     private void ApplyQuality()
     {
+#if UNITY_SWITCH && !UNITY_EDITOR
+        // Use the authored console profile; saved desktop presets must not raise its budget.
+        return;
+#else
         if (settings.qualityIndex < 0 ||
             settings.qualityIndex >= QualityPresetCount)
             return;
@@ -1186,6 +1219,7 @@ public class GameSettingsManager : MonoBehaviour
         runtimePipeline.mainLightShadowmapResolution = Mathf.NextPowerOfTwo(Mathf.Clamp(preset.shadowResolution, 256, 4096));
         QualitySettings.globalTextureMipmapLimit = Mathf.Clamp(preset.textureMipmapLimit, 0, 3);
         QualitySettings.lodBias = Mathf.Clamp(preset.lodBias, 0.1f, 4f);
+#endif
     }
 
     public static GlobalDynamicResolutionSettings ConfigureUpscaling(GlobalDynamicResolutionSettings options,
@@ -1770,6 +1804,15 @@ public class GameSettingsManager : MonoBehaviour
         if (nextFrameRateButton) nextFrameRateButton.interactable = initialized && frameRateValues.Length > 1;
         if (previousQualityButton) previousQualityButton.interactable = initialized && QualityPresetCount > 1;
         if (nextQualityButton) nextQualityButton.interactable = initialized && QualityPresetCount > 1;
+#if UNITY_SWITCH && !UNITY_EDITOR
+        if (frameRateValueText) frameRateValueText.text = "30 FPS";
+        if (qualityValueText) qualityValueText.text = "Switch";
+        if (vSyncToggle) { vSyncToggle.SetIsOnWithoutNotify(true); vSyncToggle.interactable = false; }
+        foreach (var button in new[] { previousFrameRateButton, nextFrameRateButton,
+            previousQualityButton, nextQualityButton, previousResolutionButton, nextResolutionButton,
+            previousWindowModeButton, nextWindowModeButton, previousDisplayButton, nextDisplayButton })
+            if (button) button.interactable = false;
+#endif
     }
 
     #region Apply Everything

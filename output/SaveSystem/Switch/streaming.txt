@@ -1,0 +1,1 @@
+PASS: Unity-compatible profile/world/cargo roundtrip, 262144 height values; gzip 7314 bytes. No uncompressed world JSON is allocated by the production writer.

@@ -46,7 +46,7 @@ MonoBehaviour:
     m_Value: {x: 0.9045977, y: 0.8988036, z: 1, w: -0.26412317}
   midtones:
     m_OverrideState: 1
-    m_Value: {x: 1, y: 1, z: 1, w: -0.029347029}
+    m_Value: {x: 1, y: 1, z: 1, w: 0}
   highlights:
     m_OverrideState: 1
     m_Value: {x: 1, y: 1, z: 1, w: 0.04402055}
@@ -217,12 +217,6 @@ MonoBehaviour:
   m_Name: Gameplay Post
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.VolumeProfile
   components:
-  - {fileID: -3070528273456984286}
-  - {fileID: -962038551617873389}
-  - {fileID: -3087700526579089513}
-  - {fileID: 5677496228326195045}
-  - {fileID: 2999373152396654686}
-  - {fileID: 6232065889691655263}
   - {fileID: 6008537822886767340}
   - {fileID: -7314358434358197039}
   - {fileID: 6264662406367589926}

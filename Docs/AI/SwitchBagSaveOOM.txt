@@ -1,0 +1,20 @@
+2026-11-11 bag/goal autosave OOM
+Device stack: SaveGoalCompletionAsync -> JsonUtility.ToJsonInternal -> 30,515,200
+byte allocation failure. Device had 88-104 MiB free, total approximately 2.81 GiB.
+The failing allocation precedes native save I/O. NXSave uses nn.fs.SaveData.Mount,
+nn.fs.File and FileSystem.Commit within the selected user's datafarm archive.
+
+Replaced full world JsonUtility.ToJson + UTF8 conversion with field-contract JSON
+streaming directly through GZipStream. Existing gzip1 save encoding retained.
+Manual/quit saves share the new writer. Goal saves are coalesced: only one world
+snapshot serialization job runs, with a pending follow-up capturing latest state.
+No save fields are intentionally dropped and no saves are reset.
+Validated normalized Unity JSON equivalence and nested world/bag/cargo fields,
+including 262144 height samples. Existing bridge checks and Switch C# compile pass.
+Device peak memory/IL2CPP serialization still require a new build and bag-placement
+retest. This reduces save allocation spikes; it does not establish adequate total
+scene-memory headroom.
+
+Current authored Switch pipeline has additional-light shadows disabled. Added
+[Switch rendering v2] boot log reporting actual pipeline/quality/scale/shadow flag;
+this distinguishes profile override or outdated build from current settings.

@@ -199,7 +199,34 @@ public static class SaveSystem
     private const string CompressedSavePrefix = "gzip1:";
 
     // Capture Unity objects on the main thread, then serialize an isolated snapshot.
-    public static async Task SaveGoalCompletionAsync()
+    private static Task goalSaveTask;
+    private static bool goalSaveRunning;
+    private static bool goalSaveRequested;
+    public static Task SaveGoalCompletionAsync()
+    {
+        goalSaveRequested = true;
+        if (!goalSaveRunning)
+        {
+            goalSaveRunning = true;
+            goalSaveTask = DrainGoalSaves();
+        }
+        return goalSaveTask ?? Task.CompletedTask;
+    }
+
+    private static async Task DrainGoalSaves()
+    {
+        try
+        {
+            while (goalSaveRequested)
+            {
+                goalSaveRequested = false;
+                await SaveGoalSnapshotAsync();
+            }
+        }
+        finally { goalSaveRunning = false; }
+    }
+
+    private static async Task SaveGoalSnapshotAsync()
     {
         if (Data == null || completedRun) return;
         var profile = Data;
@@ -218,7 +245,7 @@ public static class SaveSystem
         MoneyChanged?.Invoke(Money);
         var encoded = await Task.Run(() =>
         {
-            string current = EncodePlayerSave(JsonUtility.ToJson(snapshot));
+            string current = EncodePlayerSnapshot(snapshot);
             // Compact the previous legacy snapshot too, so the first autosave does
             // not flush another multi-megabyte backup to PlayerPrefs.
             string previousJson = string.IsNullOrEmpty(previous) ? null : EncryptDecrypt(previous);
@@ -238,6 +265,9 @@ public static class SaveSystem
     private static string EncodePlayerSave(string json) =>
         EncryptDecrypt(CompressedSavePrefix + Convert.ToBase64String(CompressString(json)));
 
+    private static string EncodePlayerSnapshot(PlayerData data) =>
+        EncryptDecrypt(CompressedSavePrefix + Convert.ToBase64String(CompressedSaveWriter.Compress(data)));
+
     private static string DecodePlayerSave(string stored)
     {
         string decoded = EncryptDecrypt(stored);
@@ -255,7 +285,6 @@ public static class SaveSystem
     {
         ++saveRevision;
         if (Data == null) return;
-        string json = JsonUtility.ToJson(Data); //Global Data
         string jsonSettings = JsonUtility.ToJson(settingsData); //Settings Data (on new save it willhave same settings)
         string jsonActivity = JsonUtility.ToJson(activityData); //Activity Data (PS5)
         
@@ -263,7 +292,7 @@ public static class SaveSystem
         if (!completedRun && (createSave || HasSavedGame || WorldSaveRuntime.Instance != null))
         {
             if (SaveBridge.HasKeyPP(savePath)) SaveBridge.SetStringPP(savePath + "_Backup", SaveBridge.GetStringPP(savePath));
-            SaveBridge.SetStringPP(savePath, EncodePlayerSave(json));
+            SaveBridge.SetStringPP(savePath, EncodePlayerSnapshot(Data));
         }
         SaveBridge.SetStringPP(savePath +"_Settings", EncryptDecrypt(jsonSettings));
         SaveBridge.SetStringPP("levelsCompleted", EncryptDecrypt(jsonActivity));

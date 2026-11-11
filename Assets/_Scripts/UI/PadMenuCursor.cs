@@ -55,9 +55,10 @@ public sealed class PadMenuCursor : MonoBehaviour
             if (!current.GetComponent<InputField>() && !current.GetComponent<TMPro.TMP_InputField>())
                 events.SetSelectedGameObject(null);
         }
-        var root = Pause.Instance && Pause.Instance.paused ? Pause.Instance.NavigationRoot :
+        var root = UIPopups.BasePopupUI.CurrentPopup ? UIPopups.BasePopupUI.CurrentPopup.transform :
+            Pause.Instance && Pause.Instance.paused ? Pause.Instance.NavigationRoot :
             MenuManager.IsMenuOpen ? MenuManager.Instance.NavigationRoot :
-            UIPopups.BasePopupUI.CurrentPopup ? UIPopups.BasePopupUI.CurrentPopup.transform : null;
+            null;
         Transform navigationRoot = root;
         if (root)
             foreach (var toggle in root.GetComponentsInChildren<Toggle>())
@@ -87,39 +88,37 @@ public sealed class PadMenuCursor : MonoBehaviour
         foreach (var connected in Gamepad.all)
             if (HasNavigationInput(connected)) { pad = connected; break; }
         bool padInput = pad != null && HasNavigationInput(pad);
+        // A newly opened page needs focus even while the connected pad is idle.
+        // A real mouse action in this frame still owns pointer navigation.
+        if (scope != navigationRoot && pad != null && !pointerInput) pointerOwnsFocus = false;
         if (padInput && !pointerInput) pointerOwnsFocus = false;
         owner.sendNavigationEvents = !padInput && !FarmInput.UsingPad && previousNavigation;
-        bool handledSelection = Pause.Instance && Pause.Instance.paused
+        bool handledSelection = !UIPopups.BasePopupUI.CurrentPopup && (Pause.Instance && Pause.Instance.paused
             ? Pause.Instance.HandleMainScreenInput(pad)
-            : MenuManager.IsMenuOpen && MenuManager.Instance.HandleConfirmationInput(pad);
+            : MenuManager.IsMenuOpen && MenuManager.Instance.HandleConfirmationInput(pad));
         var settingsNavigation = root.GetComponentInChildren<GameSettingsManager>();
         if (!handledSelection && settingsNavigation != null)
             handledSelection = settingsNavigation.HandleSettingsInput(pad);
         if (handledSelection)
         {
             owner.sendNavigationEvents = false;
-            scope = root;
+            scope = navigationRoot;
             lastDirection = Vector2.zero;
             return;
         }
         var selected = owner.currentSelectedGameObject ? owner.currentSelectedGameObject.GetComponent<Selectable>() : null;
-        if (scope != root || !selected || !controls.Contains(selected))
+        if (scope != navigationRoot || !selected || !controls.Contains(selected))
         {
-            scope = root;
+            scope = navigationRoot;
             // Mouse hover owns its own visuals. Only controller navigation needs
             // an automatically selected first control.
-            if (pointerOwnsFocus || (!padInput && !FarmInput.UsingPad))
+            if (pointerOwnsFocus || pad == null)
             {
                 lastDirection = Vector2.zero;
                 return;
             }
             // Hierarchy order is stable; Unity's global selectable array is not.
-            foreach (var first in navigationRoot.GetComponentsInChildren<Selectable>())
-                if (controls.Contains(first))
-                {
-                    owner.SetSelectedGameObject(first.gameObject);
-                    break;
-                }
+            SelectFirstControl(owner, navigationRoot);
             lastDirection = Vector2.zero;
             return; // Do not submit the press which opened this screen.
         }
@@ -172,6 +171,19 @@ public sealed class PadMenuCursor : MonoBehaviour
         pad.dpad.ReadValue().sqrMagnitude >= .25f || pad.leftStick.ReadValue().sqrMagnitude >= .25f ||
         MenuPadInput.ConfirmPressed(pad) || MenuPadInput.CancelPressed(pad) ||
         pad.leftShoulder.wasPressedThisFrame || pad.rightShoulder.wasPressedThisFrame;
+
+    public static bool SelectFirstControl(EventSystem events, Transform root)
+    {
+        if (!events || !root) return false;
+        foreach (var control in root.GetComponentsInChildren<Selectable>())
+        {
+            if (!control.IsActive() || !control.IsInteractable()) continue;
+            events.SetSelectedGameObject(control.gameObject);
+            return true;
+        }
+        events.SetSelectedGameObject(null);
+        return false;
+    }
     private void Restore() { if (owner) owner.sendNavigationEvents = previousNavigation; owner = null; }
     private void OnDisable() => Restore();
 }

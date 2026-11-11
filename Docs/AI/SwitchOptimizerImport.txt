@@ -20,3 +20,26 @@ does not prove total texture/mesh memory fits the device. Retest the menu and
 scene transition with device memory counters after a new build. Do not increase
 the shadow atlas merely to silence warnings when memory is already exhausted.
 Validation: Unity refresh RPC timed out after 300 seconds while textures were still importing. First assemblies were produced, but final compilation and optimizer execution checks remain pending after import. No full build or device validation performed for these changes.
+
+Applied follow-up: dedicated Switch quality selected by Nintendo Switch platform
+mapping and before-scene startup. 30 FPS target plus VSync 2; desktop preferences
+cannot override Switch graphics budget. Console UI labels show 30 FPS/Switch and
+unsupported controls are disabled. URP scale .75, HDR/MSAA off, SRP Batcher on,
+1024 single directional cascade/30m, additional shadows off, two pixel lights,
+half-size opaque texture. Texture mip limit 1, LOD .6, upload buffer 8 MiB.
+Switch IL2CPP selected; static batching remains disabled.
+Every scene applies runtime-only terrain density/distance reductions and disables
+realtime probes/non-directional shadows. Desktop scene assets are unchanged.
+Optimizer completed 2205 textures: 0 needed changes, 308 skipped for review;
+eligible textures already match the ASTC presets. No additional materials needed
+instancing changes. Reports copied to output/Rendering/Switch.
+Switch player C# compilation passed. Device 30 FPS stability and peak memory need
+a new build/retest; skipped HDR/lightmap/readable textures may remain expensive.
+
+Latest requested preset: Switch defaults now match Low (renderScale .65,
+main shadow 512/20m, texture mip limit 2, LOD .6). 30 FPS remains enforced.
+Video tab and panel are disabled in Nintendo player builds. ShowSection(0)
+redirects to Audio; section cycling and first-tab navigation skip Video.
+This covers both menu and pause settings through GameSettingsManager.
+Desktop video settings remain available. Stored preference fields retained for
+save compatibility, but are not exposed or applied as Switch quality overrides.

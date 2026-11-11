@@ -1,0 +1,1 @@
+Enabled GPU instancing on 0 compatible material assets. SRP Batcher remains enabled. No renderer.material cloning.

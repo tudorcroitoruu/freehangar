@@ -1,0 +1,1 @@
+Applied Switch quality and dedicated URP pipeline: 30 FPS, Low: 0.65 render scale, HDR off, MSAA off, one 512 shadow cascade at 20m, additional shadows off, two additional lights, half-size opaque texture. Runtime scene constraints enabled.

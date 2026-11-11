@@ -1,0 +1,310 @@
+Complete; processed 2205/2205, changed 0, review 308
+Switch-only texture overrides. Original .meta files backed up under Library/SwitchOptimizationBackups/20261111-135854-894
+REVIEW | Assets/HDRPDefaultResources/Generated/_HairAttenuationUAV.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/HDRPDefaultResources/Generated/_HairAzimuthalScatteringUAV.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/HDRPDefaultResources/Generated/_HairLongitudinalScatteringUAV.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Imported/AllSkyFree/Cartoon Base BlueSky/Sky_Day_BlueSky_Equirect.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/AllSkyFree/Cartoon Base NightSky/Cartoon Base NightSky Equirect.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/AllSkyFree/Cold Night/Cold Night Equirect.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/AllSkyFree/Cold Sunset/Cold Sunset Equirect.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/AllSkyFree/Deep Dusk/Deep Dusk Equirect.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/AllSkyFree/Epic_BlueSunset/Epic_BlueSunset_EquiRect_flat.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/AllSkyFree/Epic_GloriousPink/Epic_GloriousPink_EquiRect.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/AllSkyFree/Night MoonBurst/AllSky_Night_MoonBurst Equirect.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/AllSkyFree/Overcast Low/AllSky_Overcast4_Low.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/AllSkyFree/Space_AnotherPlanet/AllSky_Space_AnotherPlanet Equirect.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Models/Terrains/Oasis Dig 2.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Models/Terrains/Oasis Dig 3.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Models/Terrains/Oasis Dig.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Models/Terrains/Terrain_Oasis.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Day/ReflectionProbe-0.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Day/ReflectionProbe-1.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Day/ReflectionProbe-2.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Day/ReflectionProbe-3.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Day/ReflectionProbe-4.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Day/ReflectionProbe-5.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Night/ReflectionProbe-0.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Night/ReflectionProbe-1.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Night/ReflectionProbe-2.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Night/ReflectionProbe-3.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Night/ReflectionProbe-4.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Scenes/Scene_Oasis_Night/ReflectionProbe-5.exr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Textures/Clouds/NoiseClouds02.png | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/BK/PureNature_Oasis/Textures/Clouds/NoiseClouds04.png | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/EarthRendering Free/HDRP/Galaxy HDRI.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Imported/Polygonmaker/Polygonmaker - Shader/Scene/Source/Skybox.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/Polygonmaker/Polygonmaker - Shader/Textures/ToonCubemap.psd | Cube/array/volume: review separately
+REVIEW | Assets/Imported/Polygonmaker/Wild Life Series/Wild Life - Random Beasts/Scenes/Source/Skybox.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/Toon Series/Toon Farm Pack/Skyboxes/TFP_Skybox_01A/TFP_Skybox_01A_HDRP.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/Toon Series/Toon Farm Pack/Terrain/TFP_Terrain_Data_Deserted_Farm.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Imported/Toon Series/Toon Farm Pack/Terrain/TFP_Terrain_Data_Gardens.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Imported/Toon Series/Toon Farm Pack/Terrain/TFP_Terrain_Data_Hay_Fields.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Imported/Toon Series/Toon Farm Pack/Terrain/TFP_Terrain_Data_Hills.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Imported/Toon Series/Toon Farm Pack/Terrain/TFP_Terrain_Data_Ranch.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Imported/Toon Series/Toon Farm Pack/Textures/LUT/TFP_LUT_Day_1.psd | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/Toon Series/Toon Farm Pack/Textures/LUT/TFP_LUT_Day_2.psd | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/URPLightingBox2/Resources/arrowOff.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/URPLightingBox2/Resources/arrowOn.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/10_473-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/11_492-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/12_501-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/13_503-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/14_509-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/15_514-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/16_515-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/17_516-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/18_518-free-hdri-skies-com.HDR | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/19_519-free-hdri-skies-com.HDR | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/1_251-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/20_521-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/21_542-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/22_249-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/22_249-free-hdri-skies-com.png | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/2_259-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/3_285-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/4_322-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/5_344-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/6_443-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/7_446-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/8_459-free-hdri-skies-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/URPLightingBox2/Skybox/HDRI/9_466-free-hdri-sky-com.hdr | Cube/array/volume: review separately
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-0_comp_dir.exr | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-0_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-10_comp_dir.exr | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-10_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-1_comp_dir.exr | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-1_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-2_comp_dir.exr | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-2_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-3_comp_dir.exr | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-3_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-4_comp_dir.exr | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-4_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-5_comp_dir.exr | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-5_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-6_comp_dir.exr | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-6_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-7_comp_dir.exr | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-7_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-8_comp_dir.exr | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-8_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-9_comp_dir.exr | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/Example_01/Lightmap-9_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Imported/VFX/_Creepy_Cat/3D Cartoon_Explosions_Pack_Vol_1/_ShowRoom/Textures/CreatedCubemap.cubemap | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/LaunchRoom/Temporary original terrain.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/NewMap/FiveHangars/Expanded Farm Terrain.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/NewMap/FiveHangars/FinishedShop/Painted roof panel texture.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/NewMap/FiveHangars/SolidTreeShapes/Solid tree palette.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/NewMap/HangarLamps/WarmLamp_Emission.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/NewMap/Materials/Burlap weave.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/NewMap/Materials/MaizeKernelPattern.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/NewMap/Materials/OakGrain.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/NewMap/Terrain/Before road surface undulations.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/NewMap/Terrain/Before variable road width.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/NewMap/Terrain/NewMapTerrain.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/NewMap/Textures/FineCanvas.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Plugins/Demigiant/DOTween/Editor/Imgs/DOTweenIcon.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DOTween/Editor/Imgs/DOTweenMiniIcon.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DOTween/Editor/Imgs/Footer.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DOTween/Editor/Imgs/Footer_dark.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DOTween/Editor/Imgs/Header.jpg | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/blackSquare.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/blackSquareAlpha10.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/blackSquareAlpha15.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/blackSquareAlpha25.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/blackSquareAlpha50.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/blackSquareAlpha80.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/blueSquare.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/circle.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/circle_dashedBorderEmpty.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/greenSquare.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/grid_bright.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/grid_dark.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alert.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignB.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignBC.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignBL.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignBR.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignCC.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignCL.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignCR.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignHC.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignL.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignR.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignT.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignTC.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignTL.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignTR.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_alignVC.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_camera.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_camera_border.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_cog.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_cog_border.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_comment.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_comment_border.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_delete.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_demigiant.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_distributeHAlignT.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_distributeVAlignL.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_doing.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_end.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_flipV.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_foldout_closed.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_foldout_open.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_heart.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_heart_border.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_light.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_light_border.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_lock.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_lock_open.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_nodeArrow.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_ok.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_optionsDropdown.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_play.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_play_border.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_skull.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_skull_border.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_star.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_star_border.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_todo.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_ui.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_ui_border.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_visibility.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_visibility_off.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/orangeSquare.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_atlas.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_audio.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_bundle.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_cog.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_cross.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_demigiant.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_folder.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_fonts.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_heart.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_materials.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_models.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_particles.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_play.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_prefab.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_scripts.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_shaders.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_skull.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_star.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_terrains.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/project/ico_textures.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/purpleSquare.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/redSquare.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorder.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderAlpha15.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderCurved.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderCurved02.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderCurved02_darkBorders.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderCurvedAlpha.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderCurvedEmpty.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderCurvedEmpty02.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderCurvedEmptyThick.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderCurved_darkBorders.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderCurved_darkBordersAlpha.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderEmpty.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderEmpty01.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderEmpty02.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderEmpty03.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderThickEmpty.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareBorderThickerEmpty.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareCorners03.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/squareCornersEmpty02.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/tileBars_empty.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/tileBars_slanted.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/tileBars_slanted_alpha.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/tileCheckerboard.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/transparentSquare.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteDot.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteDot_darkBorder.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteDot_whiteBorderAlpha.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteSquare.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteSquareAlpha10.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteSquareAlpha15.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteSquareAlpha25.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteSquareAlpha50.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteSquareAlpha80.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteSquareCurved.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteSquareCurved02.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/whiteSquare_fadeOut_bt.png | Editor/package asset
+REVIEW | Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/yellowSquare.png | Editor/package asset
+REVIEW | Assets/Resources/Fonts/Baloo2-Bold.ttf | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Resources/GrainSurfaceDetail.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Samples/Splines/2.9.1/Spline Examples (requires Shader Graph package)/UI Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Scenes/Gameplay/ReflectionProbe-0.exr | Cube/array/volume: review separately
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-0_comp_dir.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-0_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-1_comp_dir.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-1_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-2_comp_dir.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-2_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-3_comp_dir.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-3_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-4_comp_dir.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-4_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-5_comp_dir.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-5_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-6_comp_dir.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-6_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-7_comp_dir.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-7_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-8_comp_dir.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/Lightmap-8_comp_light.exr | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Scenes/Reflection/Reflection/ReflectionProbe-0.exr | Cube/array/volume: review separately
+REVIEW | Assets/Scenes/Reflection/Reflection/ReflectionProbe-1.exr | Cube/array/volume: review separately
+REVIEW | Assets/Shaders/FadeMargin/Noise/ChatGPT Image Jul 18, 2026, 08_25_58 PM.png | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Shaders/FadeMargin/Noise/ChatGPT Image Jul 18, 2026, 08_35_15 PM 1.png | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Shaders/FadeMargin/Noise/ChatGPT Image Jul 18, 2026, 08_35_15 PM.png | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Shaders/FadeMargin/Noise/ChatGPT Image Jul 18, 2026, 08_37_34 PM.png | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Shaders/FadeMargin/Noise/Grayscale Torn Paper Noise Texture.png | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Shaders/FadeMargin/Noise/Misty Grayscale Smoke Frame 1.png | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Shaders/FadeMargin/Noise/Misty Grayscale Smoke Frame.png | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Shaders/FadeMargin/Noise/Monochrome Smoky Vignette Texture.png | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Shaders/FadeMargin/Noise/TornPaperNoise-v1.png | HDR/data/lighting texture: preserve precision
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Fonts/OpenSans-Bold.ttf | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Fonts/OpenSans-Regular.ttf | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/Icons/hns_icon.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/Icons/hns_icon_canvas.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/buttonTexture_DocsOffline.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/buttonTexture_DocsOnline.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_Canvas.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_Documentation.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_Element.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_MapProfile.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_PlayerCamera.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_PlayerController.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_Prefab.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_QuickSetup.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_SceneConfiguration.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_SceneManager.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_Settings.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_System.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/Sickscore Games/HUD-Navigation-System/Resources/Textures/splashTexture_TextureCreator.png | Specialized importer (lightmap, single-channel, cursor, etc.)
+REVIEW | Assets/SimpleFolderIcon/Icons/Default/Default.png | CPU-readable; review pixel-reading code before compression
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/Baloo2-VariableFont_wght SDF.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/Baloo2-VariableFont_wght.ttf | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/static/Baloo2-Bold SDF.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/static/Baloo2-Bold.ttf | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/static/Baloo2-ExtraBold SDF.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/static/Baloo2-ExtraBold.ttf | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/static/Baloo2-Medium SDF.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/static/Baloo2-Medium.ttf | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/static/Baloo2-Regular SDF.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/static/Baloo2-Regular.ttf | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/static/Baloo2-SemiBold SDF.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/Baloo_2/static/Baloo2-SemiBold.ttf | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/LiberationSans.ttf | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Fonts/MAILART_RUBBERSTAMP/MailartRubberstamp-Regular.otf | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset | Not a TextureImporter (generated/embedded asset)
+REVIEW | Assets/Textures/Renders/Items/Vehicles/VehicleKeys_0000_Layer-2.png | CPU-readable; review pixel-reading code before compression
+REVIEW | Assets/Textures/Renders/Items/Vehicles/VehicleKeys_0001_Layer-3.png | CPU-readable; review pixel-reading code before compression
+REVIEW | Assets/Textures/Renders/Items/Vehicles/VehicleKeys_0002_Layer-4.png | CPU-readable; review pixel-reading code before compression
+REVIEW | Assets/Textures/Renders/Items/Vehicles/VehicleKeys_0003_Layer-5.png | CPU-readable; review pixel-reading code before compression
+REVIEW | Assets/Textures/Renders/Items/Vehicles/VehicleKeys_0004_Layer-6.png | CPU-readable; review pixel-reading code before compression
+REVIEW | Assets/Textures/Renders/Items/Vehicles/VehicleKeys_0005_Layer-7.png | CPU-readable; review pixel-reading code before compression
+REVIEW | Assets/Textures/Renders/Items/Vehicles/VehicleKeys_0006_Layer-1.png | CPU-readable; review pixel-reading code before compression
+REVIEW | Assets/_UI/Mouse.png | CPU-readable; review pixel-reading code before compression

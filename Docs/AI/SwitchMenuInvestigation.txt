@@ -30,3 +30,11 @@ Next device checks: rebuild/install; A opens Settings and confirms popups;
 B closes settings/popups; pause and dropdown controls follow the same mapping.
 If 3D remains absent, inspect the first player rendering exception before
 changing render features or shaders speculatively.
+
+Default focus follow-up: shared PadMenuCursor now initializes focus for an idle
+connected controller, tracks dropdown navigation roots, and prioritizes modal
+BasePopupUI over the underlying menu/pause page. Disabled/inactive/noninteractable
+controls are skipped in stable hierarchy order. Page opening cannot submit the
+opening press. Existing authored menu/pause/settings row selection is retained.
+Focused selection checks passed; Switch player C# compilation passed. Hardware
+navigation across every authored popup has not been exercised.

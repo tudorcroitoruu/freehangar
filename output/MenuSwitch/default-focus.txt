@@ -1,0 +1,1 @@
+PASS first usable control, reopening resets focus, disabled/inactive/CanvasGroup controls skipped, empty page clears selection.

@@ -1,0 +1,1 @@
+PASS: dedicated URP settings and isolated scene probe/light/terrain constraints. Switch player scripts compiled. Device FPS and peak memory not measured.
