@@ -35,9 +35,9 @@ public sealed class BagInteraction : MonoBehaviour
     public InteractionPrompt Prompt => GameplayCanvas.Instance != null ? GameplayCanvas.Instance.interactionPrompt : null;
     private bool IsShovelEquipped => GetComponent<PlayerController>() is PlayerController player ?
         player.IsShovelEquipped : shovel != null && shovel.isActiveAndEnabled;
-    public string PromptAction => carried != null ? "Drop" : target == null ? "" : target.IsClosing ? "Closingâ€¦" :
+    public string PromptAction => carried != null ? "Drop" : target == null || target.IsUnderAttack ? "" : target.IsClosing ? "Closingâ€¦" :
         IsShovelEquipped && target.CanHandle && !target.IsFinished ? "Finish" :
-        target.IsUnderAttack ? "Under attack" : target.CanCarry ? $"Take {target.DisplayName}" : target.IsFull ? "Full" : "Fill";
+        target.CanCarry ? $"Take {target.DisplayName}" : target.IsFull ? "Full" : "Fill";
 
     private void LateUpdate() => RestoreShovelIfNeeded();
 
@@ -81,7 +81,7 @@ public sealed class BagInteraction : MonoBehaviour
         data = default;
         if (carried == null) bag = TopCargoBag(bag);
         if (!isActiveAndEnabled || bag == null || !bag.isActiveAndEnabled ||
-            bag.IsClosing || (bag.IsCarried && bag != carried) || (shovel != null && shovel.IsBusy)) return false;
+            bag.IsClosing || bag.IsUnderAttack || (bag.IsCarried && bag != carried) || (shovel != null && shovel.IsBusy)) return false;
         if (carried == null) target = bag;
         Vector3 position = bag.PromptPosition;
         if (bag != carried && bag.GetComponentInParent<WheelbarrowCargo>() != null)
@@ -96,10 +96,9 @@ public sealed class BagInteraction : MonoBehaviour
         bool canFinish = shovelEquipped && bag.CanHandle && !bag.IsFinished;
         bool canCarry = bag.CanCarry || bag == carried;
         bool canPour = shovelEquipped && shovel != null && bag != carried && shovel.CanPourInto(bag);
-        bool underAttack = bag != carried && bag.IsUnderAttack;
-        bool useForklift = bag.IsBigBag && !canCarry && !canPour && !canFinish && !underAttack;
+        bool useForklift = bag.IsBigBag && !canCarry && !canPour && !canFinish;
         string action = canPour ? "Fill" : bag == carried ? "Drop" : canFinish ? "Finish" : canCarry ? $"Take {bag.DisplayName}" :
-            underAttack ? "Under attack" : useForklift ? "" : bag.IsFull ? "Full" : "Fill";
+            useForklift ? "" : bag.IsFull ? "Full" : "Fill";
         data = new InteractionPromptData(position, blocked ? "" : action,
             !canPour && (canFinish || canCarry) && !blocked);
         data.ShowProgress = !blocked && !bag.IsFull;
