@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Settings
   m_EditorClassIdentifier: Wooshii.HierarchyDecorator.Editor::HierarchyDecorator.Settings
   globalData:
-    showActiveToggles: 1
+    showActiveToggles: 0
     activeToggleType: 0
     activeSwiping: 1
     swipeSameState: 1
@@ -5991,5 +5991,197 @@ MonoBehaviour:
         isBuiltIn: 0
         script: {fileID: 11500000, guid: 5281c5f215702cd45a4b90d2c2c24b09, type: 3}
         hasToggle: 1
+      - displayName: CollectablesManager
+        name: CollectablesManager, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: CollectablesManager
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: CollectablesManager
+          m_TextWithWhitespace: "CollectablesManager\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 09c1d874dda041d6a185e79b7f0a1872, type: 3}
+        hasToggle: 1
+      - displayName: HangarGrainVisibility
+        name: HangarGrainVisibility, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: HangarGrainVisibility
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: HangarGrainVisibility
+          m_TextWithWhitespace: "HangarGrainVisibility\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: d9a253d30d787d54ebfbfa43ba2ee128, type: 3}
+        hasToggle: 1
+      - displayName: ShopHighlightArea
+        name: ShopHighlightArea, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: ShopHighlightArea
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: ShopHighlightArea
+          m_TextWithWhitespace: "ShopHighlightArea\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 5d24ba17f1c6f5a4fb4e9f0b91f7321b, type: 3}
+        hasToggle: 1
+      - displayName: HangarLaunchSequence
+        name: HangarLaunchSequence, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: HangarLaunchSequence
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: HangarLaunchSequence
+          m_TextWithWhitespace: "HangarLaunchSequence\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: d0397dfd3909d7b42a811976621667cd, type: 3}
+        hasToggle: 1
+      - displayName: InventoryProduct
+        name: InventoryProduct, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: InventoryProduct
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: InventoryProduct
+          m_TextWithWhitespace: "InventoryProduct\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 38fad36100f55f54e9bc4caa7bd62ba6, type: 3}
+        hasToggle: 1
+      - displayName: ShopProduct
+        name: ShopProduct, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: ShopProduct
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: ShopProduct
+          m_TextWithWhitespace: "ShopProduct\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 19a3bf2781f3960449eb826bf8d16e03, type: 3}
+        hasToggle: 1
+      - displayName: UniversalAdditionalLightData
+        name: UnityEngine.Rendering.Universal.UniversalAdditionalLightData, Unity.RenderPipelines.Universal.Runtime,
+          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: UniversalAdditionalLightData
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: UniversalAdditionalLightData
+          m_TextWithWhitespace: "UniversalAdditionalLightData\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+        hasToggle: 1
+      - displayName: HeldToolCamera
+        name: HeldToolCamera, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: HeldToolCamera
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: HeldToolCamera
+          m_TextWithWhitespace: "HeldToolCamera\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 69a9359cc6527a348a3a9333848fa33c, type: 3}
+        hasToggle: 1
+      - displayName: HNSPlayerCamera
+        name: SickscoreGames.HUDNavigationSystem.HNSPlayerCamera, Assembly-CSharp,
+          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: HNSPlayerCamera
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: HNSPlayerCamera
+          m_TextWithWhitespace: "HNSPlayerCamera\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 15b600b67bb20cb47946eabe54f0ad44, type: 3}
+        hasToggle: 1
+      - displayName: UniversalAdditionalCameraData
+        name: UnityEngine.Rendering.Universal.UniversalAdditionalCameraData, Unity.RenderPipelines.Universal.Runtime,
+          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: UniversalAdditionalCameraData
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: UniversalAdditionalCameraData
+          m_TextWithWhitespace: "UniversalAdditionalCameraData\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+        hasToggle: 1
+      - displayName: ShovelTool
+        name: ShovelTool, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: ShovelTool
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: ShovelTool
+          m_TextWithWhitespace: "ShovelTool\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 6dbe125f3106bb145b414d196f4fab28, type: 3}
+        hasToggle: 1
+      - displayName: HeldGrainToolLevels
+        name: HeldGrainToolLevels, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: HeldGrainToolLevels
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: HeldGrainToolLevels
+          m_TextWithWhitespace: "HeldGrainToolLevels\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: a05791a625ed39945b35d29c9226aecc, type: 3}
+        hasToggle: 1
+      - displayName: CombatToolFinish
+        name: CombatToolFinish, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: CombatToolFinish
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: CombatToolFinish
+          m_TextWithWhitespace: "CombatToolFinish\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 11107784455daad43b0ca781a0c06f0d, type: 3}
+        hasToggle: 1
+      - displayName: HeldShovelPose
+        name: HeldShovelPose, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+        content:
+          m_Text: HeldShovelPose
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: HeldShovelPose
+          m_TextWithWhitespace: "HeldShovelPose\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 37a8afe0a1503bc46a9ca2c18c9b4feb, type: 3}
+        hasToggle: 1
+      - displayName: VacuumTool
+        name: VacuumTool, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        content:
+          m_Text: VacuumTool
+          m_Image: {fileID: -8204150473280056172, guid: 0000000000000000d000000000000000, type: 0}
+          m_Tooltip: VacuumTool
+          m_TextWithWhitespace: "VacuumTool\u200B"
+        shown: 0
+        excluded: 0
+        isBuiltIn: 0
+        script: {fileID: 11500000, guid: 7f19d0d72a4d73e4fbd7b2d780c22c46, type: 3}
+        hasToggle: 1
     unityVersion: 6000.3.20f1
-    unityCount: 391
+    unityCount: 400

@@ -49,13 +49,20 @@ public static class HeldToolCameraSetup
         var camera = go.GetComponent<Camera>(); if (camera == null) camera = Undo.AddComponent<Camera>(go);
         camera.CopyFrom(world); camera.enabled = false; camera.cullingMask = mask; camera.nearClipPlane = .01f;
         camera.clearFlags = CameraClearFlags.Depth; camera.depth = world.depth + 1;
-        var hd = go.GetComponent<HDAdditionalCameraData>(); if (hd == null) hd = Undo.AddComponent<HDAdditionalCameraData>(go);
-        hd.clearColorMode = HDAdditionalCameraData.ClearColorMode.None; hd.clearDepth = true;
         var driver = world.GetComponent<HeldToolCamera>(); if (driver == null) driver = Undo.AddComponent<HeldToolCamera>(world.gameObject);
         var data = new SerializedObject(driver);
         data.FindProperty("worldCamera").objectReferenceValue = world;
         data.FindProperty("toolCamera").objectReferenceValue = camera;
         data.FindProperty("toolLayer").intValue = mask; data.ApplyModifiedProperties();
+        if (UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline is UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset)
+        {
+            driver.ConfigureCameras();
+            EditorUtility.SetDirty(driver);
+            EditorSceneManager.MarkSceneDirty(player.gameObject.scene);
+            return;
+        }
+        var hd = go.GetComponent<HDAdditionalCameraData>(); if (hd == null) hd = Undo.AddComponent<HDAdditionalCameraData>(go);
+        hd.clearColorMode = HDAdditionalCameraData.ClearColorMode.None; hd.clearDepth = true;
         var volume = go.GetComponent<CustomPassVolume>(); if (volume == null) volume = Undo.AddComponent<CustomPassVolume>(go);
         Undo.RecordObject(volume, "Configure held tool pass");
         volume.isGlobal = true; volume.injectionPoint = CustomPassInjectionPoint.BeforePostProcess;
@@ -63,6 +70,7 @@ public static class HeldToolCameraSetup
         if (pass == null) { pass = new HeldToolPass(); volume.customPasses.Add(pass); }
         pass.name = "Held tools over world"; pass.worldCamera = world; pass.toolCamera = camera; pass.toolLayer = mask;
         EditorUtility.SetDirty(volume);
+        driver.ConfigureCameras();
         EditorSceneManager.MarkSceneDirty(player.gameObject.scene);
     }
 }

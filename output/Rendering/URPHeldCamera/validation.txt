@@ -1,0 +1,1 @@
+PASS: camera types, unique stack membership, depth clear, enabled overlay, layer masks, FOV/near plane, rendered overlay and scoop occlusion, return to carrying, disable/reenable cleanup.

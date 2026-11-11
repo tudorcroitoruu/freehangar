@@ -1,5 +1,14 @@
 # Material pipeline converter
 
+2026-11-11 URP held-tool cameras: `HeldToolCamera` now uses a Base/Overlay camera
+stack under URP, saved in `Assets/Resources/Player.prefab`. Carrying clears tool
+depth; scooping temporarily draws HeldTools through the world camera so the pile
+occludes the inserted shovel. Projection and renderer are synchronized; the HDRP
+custom pass is disabled only under URP. Loaded instances were configured without
+saving unrelated scene edits. Compilation, rendered overlay/scooping occlusion,
+return-to-carry and disable/reenable checks passed. The actual player-camera
+capture was visually inspected. Evidence: `output/Rendering/URPHeldCamera`.
+
 2026-11-11 appearance repair supersedes the earlier compatibility-only result:
 URP pipeline tags did not prove shader compilation or correct texture bindings.
 The Toon shaders' hand-added HDRP subshaders polluted URP compilation with HDRP
