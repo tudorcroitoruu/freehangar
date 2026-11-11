@@ -70,7 +70,7 @@ public sealed class PlayerBicycleInteraction : MonoBehaviour
             if (vehicleReset != null) vehicleReset.CancelHold();
             DriveRiding(input ? FarmInput.VehicleThrottle : 0,
                 input ? FarmInput.Move.x : 0,
-                !input || FarmInput.VehicleBrake,
+                !input || FarmInput.VehicleBrake || (FarmInput.VehicleReverse > 0f && bicycle.Speed > 0f),
                 input && (FarmInput.Held("Sprint") || Input.GetKey(KeyCode.RightShift)), Time.deltaTime);
             if (input) { var look = FarmInput.Look; UpdateRidingLook(look.x, look.y, Time.deltaTime); }
             ApplyRidingView();
