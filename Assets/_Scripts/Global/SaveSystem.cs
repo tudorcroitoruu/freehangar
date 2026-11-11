@@ -223,6 +223,7 @@ public static class SaveSystem
 #if UNITY_SWITCH && !UNITY_EDITOR
                 double remaining = 30d - (Time.realtimeSinceStartupAsDouble - lastGoalCaptureTime);
                 if (remaining > 0) await Task.Delay((int)(remaining * 1000));
+                if (!goalSaveRequested || !Application.isPlaying) break;
 #endif
                 goalSaveRequested = false;
                 lastGoalCaptureTime = Time.realtimeSinceStartupAsDouble;
@@ -289,6 +290,7 @@ public static class SaveSystem
 
     internal static void WriteData(bool createSave = false)
     {
+        goalSaveRequested = false; // This newer full save supersedes delayed goal captures.
         ++saveRevision;
         if (Data == null) return;
         string jsonSettings = JsonUtility.ToJson(settingsData); //Settings Data (on new save it willhave same settings)

@@ -1,0 +1,24 @@
+2026-11-11 memory/save follow-up
+Confirmed source issue: SwitchSavePump retries once per second; previously each
+retry called Store.Encode before NXSave rejected it for the 15-second write rate.
+CanSave is now checked before encoding. Goal snapshot capture is throttled to at
+most once per 30 seconds on Switch, coalesces requests, and cancels pending work
+when a newer synchronous save occurs. Forced pause/exit saves remain immediate.
+Archive version 2 encoding now streams JSON, removing the full document string
+and temporary Entry list. Existing saves still round-trip. NXSave rejects writes
+over the requested 32 MiB budget before resizing/replacing the existing file.
+This is an application budget, not a claim of a universal Nintendo save limit.
+
+Removed 1995 inactive visual vegetation objects from Menu and 1995 from Gameplay.
+Exact names: Meadow cell * / TFP_Grass_*. Subtrees with scripts or unknown/missing
+components were preserved. Backup: DisabledAssets/VegetationBackups/20261111-152024.
+Cleaned two stale Last Scene prefab-added-component references to removed HDRP
+light components (verified in original HDRP backup).
+
+Switch surface refresh is capped at 5Hz (previously 10Hz); collider cooking at
+maximum 5Hz. Simulation and grain amounts are unchanged. Test physics/collision
+response and riding on hardware. Screenshot showed 190.1 MiB allocations in one
+frame, GrainPile.RefreshSurface/RefreshCollider and physics baking as contributors;
+this does not establish that the riding crash has been eliminated.
+15 bridge checks and large streaming save compatibility pass. Further on-device
+profiling required for peak RAM, save sizes and source of remaining grain allocations.

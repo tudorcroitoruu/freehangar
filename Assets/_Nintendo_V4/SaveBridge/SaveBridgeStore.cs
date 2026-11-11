@@ -30,11 +30,27 @@ public sealed class SaveBridgeStore
     }
     public void Delete(string key) { if (values.Remove(key)) Dirty = true; }
     public void Clear() { if (values.Count > 0) { values.Clear(); Dirty = true; } }
-    public byte[] Encode() => Encoding.UTF8.GetBytes(JsonUtility.ToJson(new Document
+    public byte[] Encode()
     {
-        format = "FreehangarSaveBridge", version = 2,
-        entries = values.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => new Entry { key = p.Key, value = Convert.ToBase64String(Encoding.UTF8.GetBytes(p.Value)) }).ToList()
-    }));
+        using var buffer = new MemoryStream();
+        using (var text = new StreamWriter(buffer, new UTF8Encoding(false), 4096, true))
+        using (var writer = new JsonTextWriter(text))
+        {
+            writer.WriteStartObject();
+            writer.WritePropertyName("format"); writer.WriteValue("FreehangarSaveBridge");
+            writer.WritePropertyName("version"); writer.WriteValue(2);
+            writer.WritePropertyName("entries"); writer.WriteStartArray();
+            foreach (var pair in values.OrderBy(p => p.Key, StringComparer.Ordinal))
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("key"); writer.WriteValue(pair.Key);
+                writer.WritePropertyName("value"); writer.WriteValue(Convert.ToBase64String(Encoding.UTF8.GetBytes(pair.Value)));
+                writer.WriteEndObject();
+            }
+            writer.WriteEndArray(); writer.WriteEndObject();
+        }
+        return buffer.ToArray();
+    }
     public static SaveBridgeStore Decode(byte[] bytes)
     {
         var store = new SaveBridgeStore();

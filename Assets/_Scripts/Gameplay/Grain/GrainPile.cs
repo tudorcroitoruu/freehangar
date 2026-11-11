@@ -615,7 +615,11 @@ public sealed class GrainPile : MonoBehaviour
     private float surfaceRefreshElapsed;
     // GPU interpolation advances every rendered frame between these snapshots.
     // Rebuilding the full skin at 30 Hz consumed several ms even after a scoop ended.
+#if UNITY_SWITCH && !UNITY_EDITOR
+    private const float SurfaceRefreshInterval = 1f / 5f;
+#else
     private const float SurfaceRefreshInterval = 1f / 10f;
+#endif
     private static readonly int SurfaceBlendId = Shader.PropertyToID("_SurfaceBlend");
     private float surfaceBlend = 1f, surfaceBlendStarted;
     private readonly List<Vector3> blendFromPositions = new List<Vector3>();
@@ -1300,7 +1304,11 @@ public sealed class GrainPile : MonoBehaviour
     private void RefreshCollider()
     {
         using var measurement = ColliderRefreshMarker.Auto();
+#if UNITY_SWITCH && !UNITY_EDITOR
+        nextCollider = Time.time + 1f / Mathf.Clamp(colliderRate, 1f, 5f);
+#else
         nextCollider = Time.time + 1f / colliderRate;
+#endif
         bool animating = settling || visualSettling || surfaceBlend < 1f;
         colliderDirty = animating;
         collisionIndices.Clear(); collisionVertices.Clear();
