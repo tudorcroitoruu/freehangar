@@ -84,7 +84,17 @@ public static class FarmInput
             var attack = Action("Attack");
             float trigger = attack?.activeControl?.device == ActivePad && ActivePad != null
                 ? attack.ReadValue<float>() : 0f;
-            return trigger > 0f ? Mathf.Max(move, trigger) : move;
+            float reverse = VehicleReverse;
+            return reverse > 0f ? -reverse : trigger > 0f ? Mathf.Max(move, trigger) : move;
+        }
+    }
+    public static float VehicleReverse
+    {
+        get
+        {
+            var unload = Action("Unload");
+            return ActivePad != null && unload?.activeControl?.device == ActivePad
+                ? unload.ReadValue<float>() : 0f;
         }
     }
     public static bool VehicleBrake
@@ -92,9 +102,7 @@ public static class FarmInput
         get
         {
             var jump = Action("Jump");
-            var unload = Action("Unload");
-            return (jump?.activeControl?.device is Keyboard && jump.IsPressed()) ||
-                (ActivePad != null && unload?.activeControl?.device == ActivePad && unload.IsPressed());
+            return jump?.activeControl?.device is Keyboard && jump.IsPressed();
         }
     }
     public static Vector2 Look
