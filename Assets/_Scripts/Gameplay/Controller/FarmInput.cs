@@ -105,6 +105,7 @@ public static class FarmInput
             return jump?.activeControl?.device is Keyboard && jump.IsPressed();
         }
     }
+    public static bool LookUsesPad => UsingPad && Action("Look")?.activeControl?.device == ActivePad;
     public static Vector2 Look
     {
         get

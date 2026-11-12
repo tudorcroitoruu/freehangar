@@ -42,6 +42,15 @@ public class PlayerController : MonoBehaviour
     private float grainCameraOffset, grainCameraVelocity;
     private readonly RaycastHit[] grainGroundHits = new RaycastHit[32];
 
+    [Header("Nintendo aim assist")]
+    [SerializeField] private bool nintendoAimAssist = true;
+    [SerializeField, Min(0f)] private float aimAssistRange = 6f;
+    [SerializeField, Range(1f, 25f)] private float aimAssistAngle = 10f;
+    [SerializeField, Min(0f), Tooltip("Maximum automatic turn speed in degrees per second while looking with the stick.")]
+    private float aimAssistSpeed = 30f;
+    private readonly Collider[] aimAssistCandidates = new Collider[128];
+    private readonly RaycastHit[] aimAssistSightHits = new RaycastHit[32];
+
     [Header("Sprint camera motion")]
     [SerializeField, Range(0f, .04f)] private float sprintCameraHeight = .004166667f;
     [SerializeField, Range(0f, 2f)] private float sprintCameraPitch = .15625f;
@@ -455,11 +464,71 @@ public class PlayerController : MonoBehaviour
         }
         targetYaw += lookInput.x * cameraSensitivity;
         cameraRotationX -= lookInput.y * cameraSensitivity;
+        ApplyNintendoAimAssist();
         cameraRotationX = Mathf.Clamp(cameraRotationX, cameraMinAngle, cameraMaxAngle);
         float yaw = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetYaw, ref yawVelocity, lookSmoothTime);
         smoothedPitch = Mathf.SmoothDampAngle(smoothedPitch, cameraRotationX, ref pitchVelocity, lookSmoothTime);
         transform.rotation = Quaternion.Euler(0f, yaw, 0f);
         characterCamera.transform.localRotation = Quaternion.Euler(smoothedPitch, 0f, 0f);
+    }
+
+    private void ApplyNintendoAimAssist()
+    {
+        if (!nintendoAimAssist || !FarmInput.LookUsesPad ||
+            !MenuPadInput.UsesNintendoLayout(FarmInput.ActivePad) || lookInput.sqrMagnitude <= .000001f ||
+            aimAssistRange <= 0f || aimAssistSpeed <= 0f) return;
+
+        Vector3 origin = characterCamera.transform.position;
+        Vector3 forward = Quaternion.Euler(cameraRotationX, targetYaw, 0f) * Vector3.forward;
+        int count = Physics.OverlapSphereNonAlloc(origin, aimAssistRange, aimAssistCandidates,
+            Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide);
+        // A full buffer may omit a closer target; skip assistance rather than pick arbitrarily.
+        if (count == aimAssistCandidates.Length) return;
+        float bestAngle = aimAssistAngle;
+        Vector3 bestDirection = Vector3.zero;
+        for (int i = 0; i < count; i++)
+        {
+            Collider candidate = aimAssistCandidates[i];
+            if (candidate.transform.IsChildOf(transform)) continue;
+            Vector3 direction = candidate.bounds.center - origin;
+            float distance = direction.magnitude;
+            if (distance < .01f || distance > aimAssistRange) continue;
+            float angle = Vector3.Angle(forward, direction);
+            if (angle >= bestAngle) continue;
+
+            var chicken = candidate.GetComponentInParent<FarmChicken>();
+            var pest = candidate.GetComponentInParent<GrainPest>();
+            Transform enemy;
+            if (chicken != null && chicken.isActiveAndEnabled && !chicken.IsDead)
+                enemy = chicken.transform;
+            else if (pest != null && pest.isActiveAndEnabled && pest.Target != null)
+                enemy = pest.transform;
+            else continue;
+
+            int hits = Physics.RaycastNonAlloc(origin, direction / distance, aimAssistSightHits,
+                distance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            bool blocked = hits == aimAssistSightHits.Length;
+            for (int j = 0; j < hits && !blocked; j++)
+            {
+                Transform obstacle = aimAssistSightHits[j].collider.transform;
+                if (!obstacle.IsChildOf(transform) && !obstacle.IsChildOf(enemy)) blocked = true;
+            }
+            if (blocked) continue;
+            bestAngle = angle;
+            bestDirection = direction;
+        }
+        if (bestDirection.sqrMagnitude <= .0001f) return;
+
+        float yaw = Mathf.Atan2(bestDirection.x, bestDirection.z) * Mathf.Rad2Deg;
+        float pitch = -Mathf.Atan2(bestDirection.y,
+            new Vector2(bestDirection.x, bestDirection.z).magnitude) * Mathf.Rad2Deg;
+        Vector2 correction = new Vector2(Mathf.DeltaAngle(targetYaw, yaw),
+            Mathf.Clamp(pitch, cameraMinAngle, cameraMaxAngle) - cameraRotationX);
+        // Ease into the target and cap the total correction so deliberate stick turns can escape.
+        correction *= 1f - Mathf.Exp(-5f * Time.deltaTime);
+        correction = Vector2.ClampMagnitude(correction, aimAssistSpeed * Time.deltaTime);
+        targetYaw += correction.x;
+        cameraRotationX += correction.y;
     }
 
     private void HandleCrouch(bool acceptInput)
