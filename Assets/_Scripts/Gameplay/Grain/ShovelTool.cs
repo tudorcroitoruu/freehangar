@@ -304,9 +304,16 @@ public sealed class ShovelTool : MonoBehaviour
     private void CommitDrop(float maximumKg = float.MaxValue)
     {
         // Follow the growing surface so later portions do not target a point buried inside it.
-        if (dropReceiver != null) targetPoint.y = dropReceiver.SurfaceHeight(targetPoint);
-        if (dropSurface == null || !dropSurface.enabled || !dropSurface.gameObject.activeInHierarchy ||
-            !CanReachPoint(actionCamera, actor, targetPoint, pourReach, dropSurface)) return;
+        if (dropReceiver != null)
+        {
+            if (!dropReceiver.isActiveAndEnabled) return;
+            targetPoint.y = dropReceiver.SurfaceHeight(targetPoint);
+            // Large piles replace their original collider with local sections.
+            // Keep the logical receiver even if a section is rebuilt or disabled.
+            dropSurface = dropReceiver.GetComponent<Collider>();
+        }
+        else if (dropSurface == null || !dropSurface.enabled || !dropSurface.gameObject.activeInHierarchy) return;
+        if (!CanReachPoint(actionCamera, actor, targetPoint, pourReach, dropSurface)) return;
         GrainPile receiver = dropReceiver != null ? dropReceiver : dropSurface.GetComponentInParent<GrainPile>();
         GrainPile source = receiver;
         Vector3 point = targetPoint;
@@ -351,8 +358,16 @@ public sealed class ShovelTool : MonoBehaviour
         int count = Physics.RaycastNonAlloc(camera.transform.position, delta.normalized, hits, delta.magnitude,
             interactionMask, QueryTriggerInteraction.Ignore);
         if (count == hits.Length) return false;
+        var receiverPile = receiver != null ? receiver.GetComponentInParent<GrainPile>() : null;
         for (int i = 0; i < count; i++)
-            if (!hits[i].transform.IsChildOf(player) && hits[i].collider != receiver) return false;
+        {
+            var obstruction = hits[i].collider;
+            if (hits[i].transform.IsChildOf(player) || obstruction == receiver) continue;
+            // All sections belong to the same deforming surface. Its smoothed
+            // collider can remain above the excavated stock during a stroke.
+            if (receiverPile != null && obstruction.GetComponentInParent<GrainPile>() == receiverPile) continue;
+            return false;
+        }
         return true;
     }
 

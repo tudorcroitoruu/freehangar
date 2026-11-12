@@ -337,6 +337,17 @@ public sealed class GrainPile : MonoBehaviour
     public void Initialize()
     {
         if (field != null) return;
+        // Nonserialized caches are lost on an Editor domain reload; their native
+        // generated colliders can survive. Remove only our own transient sections.
+        foreach (var collider in GetComponents<MeshCollider>())
+        {
+            if (collider.hideFlags != HideFlags.DontSave || collider.sharedMesh == null ||
+                collider.sharedMesh.name != "Grain collision section") continue;
+            collider.enabled = false;
+            var orphanMesh = collider.sharedMesh;
+            if (Application.isPlaying) { Destroy(collider); Destroy(orphanMesh); }
+            else { DestroyImmediate(collider); DestroyImmediate(orphanMesh); }
+        }
         Vector3 scale = WorldScale;
         // A height field can bank against a wall, but cannot hang vertically or represent overhangs.
         if (scale.x <= 0 || scale.y <= 0 || scale.z <= 0 || Vector3.Dot(transform.up, Vector3.up) < .9999f)
@@ -926,7 +937,6 @@ public sealed class GrainPile : MonoBehaviour
 
     private void BuildSurfaceDependencies()
     {
-        if (HasClippedSurface) { detailOffsets = null; return; }
         int count = VisualHeightField.Heights.Length;
         detailOffsets = new int[count + 1];
         renderHeightSources = new int[closedSurfaceVertices.Count];
@@ -935,6 +945,7 @@ public sealed class GrainPile : MonoBehaviour
             var d = surfaceDetails[vertex];
             void Sample(HeightSample s) { add(s.a, vertex); add(s.b, vertex); add(s.c, vertex); }
             Sample(d.center); Sample(d.left); Sample(d.right); Sample(d.back); Sample(d.front);
+            if (renderHeightSources[vertex] == -2) Sample(clippedHeightSamples[vertex]);
             if (renderHeightSources[vertex] >= 0) add(renderHeightSources[vertex], vertex);
         }
         System.Action<int, int> countDependency = (sample, vertex) => detailOffsets[sample + 1]++;
@@ -944,7 +955,8 @@ public sealed class GrainPile : MonoBehaviour
             bool top = i < topSurfaceVertexCount || (i - topSurfaceVertexCount) % 4 < 2;
             int x = Mathf.RoundToInt((p.x + field.Size * .5f) / field.Spacing);
             int z = Mathf.RoundToInt((p.z + field.Size * .5f) / field.Spacing);
-            renderHeightSources[i] = top ? z * field.Resolution + x : -1;
+            // Clipped vertices lie between grid points, including the tops of skirts.
+            renderHeightSources[i] = top ? (HasClippedSurface ? -2 : z * field.Resolution + x) : -1;
             Visit(i, countDependency);
         }
         for (int i = 1; i < detailOffsets.Length; i++) detailOffsets[i] += detailOffsets[i - 1];
@@ -958,7 +970,7 @@ public sealed class GrainPile : MonoBehaviour
 
     private bool TryRefreshLocalSurface(GrainHeightField surface)
     {
-        if (HasClippedSurface || detailOffsets == null || surfaceDetailScale != WorldScale ||
+        if (detailOffsets == null || surfaceDetailScale != WorldScale ||
             renderedHeights == null || renderedHeights.Length != surface.Heights.Length ||
             surfaceDetails.Count != blendToPositions.Count || cachedNormalKeys.Count != blendToPositions.Count) return false;
         float inset = .045f / surfaceDetailScale.y;
@@ -988,7 +1000,8 @@ public sealed class GrainPile : MonoBehaviour
             var d = surfaceDetails[vertex];
             var p = blendToPositions[vertex];
             int source = renderHeightSources[vertex];
-            p.y = source >= 0 ? GrainHeightField.RecessedSurfaceHeight(surface.Heights[source], inset) + d.ground : d.ground - inset;
+            p.y = source != -1 ? GrainHeightField.RecessedSurfaceHeight(
+                source >= 0 ? surface.Heights[source] : clippedHeightSamples[vertex].Read(surface.Heights), inset) + d.ground : d.ground - inset;
             float fade = Mathf.SmoothStep(0, 1, Mathf.Clamp01((p.y - d.ground) * scaleY / .18f));
             if (fade > 0)
             {
@@ -1197,6 +1210,7 @@ public sealed class GrainPile : MonoBehaviour
     private readonly List<Vector2Int> clippedEdges = new List<Vector2Int>();
     private int[] clippedRenderMap;
     private readonly List<int> clippedRenderSources = new List<int>();
+    private readonly List<HeightSample> clippedHeightSamples = new List<HeightSample>();
 
     private void CloseClippedEdges()
     {
@@ -1241,8 +1255,11 @@ public sealed class GrainPile : MonoBehaviour
         // samples so deformation, normals and blend uploads run once per point.
         // Triangle coverage and the authoritative collision/stock field stay intact.
         closedSurfaceVertices.Clear(); closedSurfaceUV.Clear();
+        clippedHeightSamples.Clear();
         foreach (int source in clippedRenderSources)
         {
+            boundary.GetHeightBinding(source, out int a, out int b, out int c, out Vector3 weights);
+            clippedHeightSamples.Add(new HeightSample { a = a, b = b, c = c, weights = weights });
             closedSurfaceVertices.Add(boundary.Positions[source]);
             closedSurfaceUV.Add(boundary.UV[source]);
         }
@@ -1279,6 +1296,11 @@ public sealed class GrainPile : MonoBehaviour
         if (Mathf.Max(topA.y - bottomA.y, topB.y - bottomB.y) <= inset) return;
         // Shared corners must coincide to keep the perimeter closed.
         int start = closedSurfaceVertices.Count;
+        if (HasClippedSurface)
+        {
+            clippedHeightSamples.Add(clippedHeightSamples[a]); clippedHeightSamples.Add(clippedHeightSamples[b]);
+            clippedHeightSamples.Add(default); clippedHeightSamples.Add(default);
+        }
         closedSurfaceVertices.Add(topA); closedSurfaceVertices.Add(topB);
         closedSurfaceVertices.Add(bottomA); closedSurfaceVertices.Add(bottomB);
         closedSurfaceUV.Add(closedSurfaceUV[a]); closedSurfaceUV.Add(closedSurfaceUV[b]);
@@ -1332,6 +1354,14 @@ public sealed class GrainPile : MonoBehaviour
                 collisionVertices[i].x != cookedVertices[i].x || collisionVertices[i].z != cookedVertices[i].z;
         for (int i = 0; i < collisionIndices.Count && !changed; i++) changed = collisionIndices[i] != cookedIndices[i];
         if (!changed) return;
+        if (collisionIndices.Count > 4096 * 3)
+        {
+            RefreshCollisionChunks(tolerance);
+            cookedVertices.Clear(); cookedVertices.AddRange(collisionVertices);
+            cookedIndices.Clear(); cookedIndices.AddRange(collisionIndices);
+            return;
+        }
+        ReleaseCollisionChunks();
         meshCollider.sharedMesh = null;
         collisionMesh.Clear();
         collisionMesh.SetVertices(collisionVertices); collisionMesh.SetTriangles(collisionIndices, 0);
@@ -1342,7 +1372,119 @@ public sealed class GrainPile : MonoBehaviour
         cookedIndices.Clear(); cookedIndices.AddRange(collisionIndices);
     }
 
-    private void OnDestroy() => ReleaseMeshes();
+    // Keep the exact skin triangles, but cook only the spatial sections that moved.
+    // Multiple colliders on the pile preserve all existing component-based hit lookup.
+    private sealed class CollisionChunk
+    {
+        public Vector2Int key;
+        public Mesh mesh;
+        public MeshCollider collider;
+        public readonly Dictionary<int, int> sourceMap = new Dictionary<int, int>();
+        public readonly List<int> sources = new List<int>();
+        public readonly List<int> indices = new List<int>();
+        public readonly List<Vector3> vertices = new List<Vector3>();
+        public readonly List<Vector3> cooked = new List<Vector3>();
+        public readonly List<int> cookedTriangles = new List<int>();
+    }
+    private readonly List<CollisionChunk> collisionChunks = new List<CollisionChunk>();
+    private bool destroyingPile;
+
+    private void RefreshCollisionChunks(float tolerance)
+    {
+        bool rebuild = collisionChunks.Count == 0 || cookedIndices.Count != collisionIndices.Count ||
+            cookedVertices.Count != collisionVertices.Count;
+        for (int i = 0; i < collisionIndices.Count && !rebuild; i++)
+            rebuild = cookedIndices[i] != collisionIndices[i];
+        if (rebuild)
+        {
+            var chunks = new Dictionary<Vector2Int, CollisionChunk>();
+            foreach (var existing in collisionChunks)
+            {
+                chunks.Add(existing.key, existing);
+                existing.sourceMap.Clear(); existing.sources.Clear(); existing.indices.Clear(); existing.vertices.Clear();
+            }
+            float sectionSize = field.Spacing * 16f;
+            for (int t = 0; t < collisionIndices.Count; t += 3)
+            {
+                Vector3 center = (collisionVertices[collisionIndices[t]] + collisionVertices[collisionIndices[t + 1]] +
+                    collisionVertices[collisionIndices[t + 2]]) / 3f;
+                var key = new Vector2Int(Mathf.FloorToInt((center.x + field.Size * .5f) / sectionSize),
+                    Mathf.FloorToInt((center.z + field.Size * .5f) / sectionSize));
+                if (!chunks.TryGetValue(key, out var chunk))
+                {
+                    chunk = new CollisionChunk
+                    {
+                        key = key,
+                        mesh = new Mesh { name = "Grain collision section", hideFlags = HideFlags.DontSave },
+                        collider = gameObject.AddComponent<MeshCollider>()
+                    };
+                    chunk.collider.hideFlags = HideFlags.DontSave;
+                    chunk.collider.sharedMaterial = meshCollider.sharedMaterial;
+                    chunk.collider.cookingOptions = meshCollider.cookingOptions;
+                    chunks.Add(key, chunk); collisionChunks.Add(chunk);
+                }
+                for (int corner = 0; corner < 3; corner++)
+                {
+                    int source = collisionIndices[t + corner];
+                    if (!chunk.sourceMap.TryGetValue(source, out int index))
+                    {
+                        index = chunk.sources.Count;
+                        chunk.sourceMap.Add(source, index); chunk.sources.Add(source);
+                        chunk.vertices.Add(collisionVertices[source]);
+                    }
+                    chunk.indices.Add(index);
+                }
+            }
+        }
+        meshCollider.enabled = false;
+        foreach (var chunk in collisionChunks)
+        {
+            bool topologyChanged = chunk.cookedTriangles.Count != chunk.indices.Count || chunk.cooked.Count != chunk.sources.Count;
+            for (int i = 0; i < chunk.indices.Count && !topologyChanged; i++)
+                topologyChanged = chunk.indices[i] != chunk.cookedTriangles[i];
+            bool changed = topologyChanged;
+            for (int i = 0; i < chunk.sources.Count && !changed; i++)
+                changed = (chunk.cooked[i] - collisionVertices[chunk.sources[i]]).sqrMagnitude >= tolerance * tolerance;
+            if (!changed) continue;
+            for (int i = 0; i < chunk.sources.Count; i++) chunk.vertices[i] = collisionVertices[chunk.sources[i]];
+            chunk.collider.sharedMesh = null;
+            if (topologyChanged) chunk.mesh.Clear();
+            chunk.mesh.SetVertices(chunk.vertices);
+            if (topologyChanged) chunk.mesh.SetTriangles(chunk.indices, 0);
+            chunk.mesh.RecalculateBounds();
+            chunk.collider.enabled = chunk.indices.Count > 0;
+            if (chunk.collider.enabled) chunk.collider.sharedMesh = chunk.mesh;
+            chunk.cooked.Clear(); chunk.cooked.AddRange(chunk.vertices);
+            chunk.cookedTriangles.Clear(); chunk.cookedTriangles.AddRange(chunk.indices);
+        }
+    }
+
+    private void ReleaseCollisionChunks()
+    {
+        foreach (var chunk in collisionChunks)
+        {
+            chunk.collider.enabled = false;
+            if (Application.isPlaying) { Destroy(chunk.collider); Destroy(chunk.mesh); }
+            else
+            {
+#if UNITY_EDITOR
+                // The GameObject may already be destroying its components. Defer
+                // component cleanup; the null check also handles whole-object deletion.
+                if (destroyingPile)
+                {
+                    var collider = chunk.collider;
+                    UnityEditor.EditorApplication.delayCall += () => { if (collider != null) DestroyImmediate(collider); };
+                }
+                else
+#endif
+                    DestroyImmediate(chunk.collider);
+                DestroyImmediate(chunk.mesh);
+            }
+        }
+        collisionChunks.Clear();
+    }
+
+    private void OnDestroy() { destroyingPile = true; ReleaseMeshes(); }
 
     private void DetectWalls()
     {
@@ -1352,6 +1494,7 @@ public sealed class GrainPile : MonoBehaviour
 
     private void ReleaseMeshes()
     {
+        ReleaseCollisionChunks();
         spatial?.Dispose(); spatial = null;
         if (mesh != null) { if (Application.isPlaying) Destroy(mesh); else DestroyImmediate(mesh); }
         if (collisionMesh != null) { if (Application.isPlaying) Destroy(collisionMesh); else DestroyImmediate(collisionMesh); }

@@ -157,6 +157,12 @@ public sealed class GrainWallBoundary
         Triangles.Add(Positions.Count); Positions.Add(corner.point); UV.Add(new Vector2(corner.point.x, corner.point.z));
         bindings.Add(new Binding { a = a, b = b, c = c, weights = corner.weights });
     }
+    internal void GetHeightBinding(int index, out int a, out int b, out int c, out Vector3 weights)
+    {
+        var binding = bindings[index];
+        a = binding.a; b = binding.b; c = binding.c; weights = binding.weights;
+    }
+
     public void UpdateHeights(GrainHeightField field, float recess)
     {
         for (int i = 0; i < Positions.Count; i++)

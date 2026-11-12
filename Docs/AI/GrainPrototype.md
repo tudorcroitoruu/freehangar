@@ -1,5 +1,45 @@
 # Grain interaction prototype
 
+## Large clipped pile interaction updates — 2026-11-12
+
+Follow-up: `ShovelTool` now recognizes every collision section of its target pile
+as the same receiver during reach checks. Pouring retains the logical pile even
+when the original collider is disabled or a section is replaced. Previously the
+second pour portion stopped, and the lagging skin could block continued scooping.
+Two regression tests reproduced both failures before the fix and pass afterward;
+the focused large-pile/shovel-upgrade run passes all 40 tests. Real walls still
+block collection. Unity compilation passes.
+
+Wall-clipped and excluded-footprint piles now use the existing local surface
+dependency path, retaining the original clipping barycentric weights so heights
+and normals match full rebuilding. Near-ground topology changes still use the
+full surface path. Mesh uploads and height scans remain pile-wide.
+
+Collision skins above 4,096 triangles are partitioned into 16-grid-cell sections.
+Only sections whose geometry changed are recooked; topology changes repartition
+the triangles while retaining unchanged section meshes. Sections remain on the
+pile GameObject, preserving existing grain interaction lookups. Generated section
+colliders and meshes are released and cleaned up after Editor domain reloads.
+
+Unity 6000.3.27f1 compilation passes. Editor CPU microbenchmark for a single-cell
+edit to a 24 m clipped pile (121-square grid, 30 iterations): surface 4.402 to
+0.620 ms; collision 4.971 to 1.834 ms; steady-state managed allocations 0 B/update.
+This is a synthetic CPU measurement, not an in-game frame-time claim.
+`LargeGrainPileAudit.Run` repeats it without changing saved scene objects.
+
+Regression run: 79 passed, 9 failed; unchanged-code baseline: 77 passed, the same
+9 failed. Both new tests pass: local clipped deformation matches full rebuilding,
+and collision sections match monolithic collision across scooping, clearing and
+refilling. Ray samples avoid exact triangle edges, where PhysX query rounding can
+differ between mesh partitions. Existing exact clipped mesh equivalence tests
+also pass. Reports: `output/GrainPerformance/large-pile-before.txt` and
+`output/GrainPerformance/large-pile.txt`.
+
+Gameplay follow-up: in hangars 2–5 repeatedly scoop and pour at the pile center,
+walls, room exclusions and exposed floor; walk across the edited area, then save
+and reload. Check visual continuity, walking support, crop quantities and frame
+spikes. Actual hangar gameplay and a standalone player build were not measured.
+
 ## Grain lighting correction — 2026-10-28
 
 `GrainKernels.shader` now feeds the existing procedural crop colors into HDRP's
