@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be8d9afada124951ae78863d6d8156cf, type: 3}
   m_Name: SteamAchievementSettings
   m_EditorClassIdentifier: Assembly-CSharp::SteamAchievementSettings
-  appId: 0
+  appId: 5602730
   syncInEditor: 0
   apiNames:
   - ACH_0

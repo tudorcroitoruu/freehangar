@@ -22,6 +22,15 @@ using Steamworks;
 [DisallowMultipleComponent]
 public class SteamManager : MonoBehaviour {
 #if !DISABLESTEAMWORKS
+	// Standalone builds must validate Steam before any scene can start gameplay.
+	// Editor playtesting remains available without a Steam license.
+#if !UNITY_EDITOR
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+	private static void RequireSteamAtStartup() {
+		if (!Initialized) Application.Quit(1);
+	}
+#endif
+
 	protected static bool s_EverInitialized = false;
 
 	protected static SteamManager s_instance;
@@ -78,13 +87,22 @@ public class SteamManager : MonoBehaviour {
 
 		// We want our SteamManager Instance to persist across scenes.
 		DontDestroyOnLoad(gameObject);
+		var achievementSettings = Resources.Load<SteamAchievementSettings>("SteamAchievementSettings");
+#if !UNITY_EDITOR
+		if (achievementSettings == null || !achievementSettings.HasRealAppId) {
+			RejectLaunch("The game's Steam App ID is not configured.");
+			return;
+		}
+#endif
 
 		if (!Packsize.Test()) {
-			Debug.LogError("[Steamworks.NET] Packsize Test returned false, the wrong version of Steamworks.NET is being run in this platform.", this);
+			RejectLaunch("Packsize Test returned false; the Steamworks.NET version is incompatible.");
+			return;
 		}
 
 		if (!DllCheck.Test()) {
-			Debug.LogError("[Steamworks.NET] DllCheck Test returned false, One or more of the Steamworks binaries seems to be the wrong version.", this);
+			RejectLaunch("DllCheck Test returned false; the Steamworks binaries are incompatible.");
+			return;
 		}
 
 		try {
@@ -96,7 +114,6 @@ public class SteamManager : MonoBehaviour {
 			// Once you get a Steam AppID assigned by Valve, you need to replace AppId_t.Invalid with it and
 			// remove steam_appid.txt from the game depot. eg: "(AppId_t)480" or "new AppId_t(480)".
 			// See the Valve documentation for more information: https://partner.steamgames.com/doc/sdk/api#initialization_and_shutdown
-			var achievementSettings = Resources.Load<SteamAchievementSettings>("SteamAchievementSettings");
 			var configuredAppId = achievementSettings != null && achievementSettings.HasRealAppId
 				? new AppId_t(achievementSettings.appId) : AppId_t.Invalid;
 			if (SteamAPI.RestartAppIfNecessary(configuredAppId)) {
@@ -112,6 +129,10 @@ public class SteamManager : MonoBehaviour {
 			Application.Quit();
 			return;
 		}
+		catch (System.Exception e) {
+			RejectLaunch("Steam could not launch the game: " + e.Message);
+			return;
+		}
 
 		// Initializes the Steamworks API.
 		// If this returns false then this indicates one of the following conditions:
@@ -122,14 +143,45 @@ public class SteamManager : MonoBehaviour {
 		// [*] Your App ID is not completely set up, i.e. in Release State: Unavailable, or it's missing default packages.
 		// Valve's documentation for this is located here:
 		// https://partner.steamgames.com/doc/sdk/api#initialization_and_shutdown
-		m_bInitialized = SteamAPI.Init();
+		try {
+			m_bInitialized = SteamAPI.Init();
+		}
+		catch (System.Exception e) {
+			RejectLaunch("Steam initialization failed: " + e.Message);
+			return;
+		}
 		if (!m_bInitialized) {
 			Debug.LogError("[Steamworks.NET] SteamAPI_Init() failed. Refer to Valve's documentation or the comment above this line for more information.", this);
-
+			RejectLaunch("Please launch the game from Steam using an account with a valid license.");
 			return;
 		}
 
 		s_EverInitialized = true;
+#if !UNITY_EDITOR
+		try {
+			// Check the running ID as well: a substituted steam_appid.txt must not
+			// authorize this game using Spacewar or another owned application.
+			if (SteamUtils.GetAppID().m_AppId != achievementSettings.appId ||
+				!SteamApps.BIsSubscribed() ||
+				!SteamApps.BIsSubscribedApp(new AppId_t(achievementSettings.appId))) {
+				RejectLaunch("This Steam account does not have a valid license for this game.");
+			}
+		}
+		catch (System.Exception e) {
+			RejectLaunch("Steam could not verify the game license: " + e.Message);
+		}
+#endif
+	}
+
+	private void RejectLaunch(string reason) {
+		Debug.LogError("[Steamworks.NET] " + reason, this);
+#if !UNITY_EDITOR
+		if (m_bInitialized) {
+			SteamAPI.Shutdown();
+			m_bInitialized = false;
+		}
+		Application.Quit(1);
+#endif
 	}
 
 	// This should only ever get called on first load and after an Assembly reload, You should never Disable the Steamworks Manager yourself.

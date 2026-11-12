@@ -276,3 +276,21 @@ transfer lifts, pulls across and lowers cargo, blocking driving/drop during it.
 E drops forklift cargo; Q exits the forklift. Other vehicles retain E to exit.
 GameCanvas has dedicated forklift hints. Released VehicleCargoPlacement components
 no longer write stale truck poses into cargo saves.
+2026-11-12 Steam launch protection: SteamManager initializes before scene load in
+standalone players and quits on missing configuration, Steam initialization failure,
+running App ID mismatch, or failed Steam subscription checks. Editor playtesting
+is exempt; development players are not. Resources/SteamAchievementSettings shares
+its App ID with achievements; it is currently 0 and needs the real game App ID.
+SteamBuildValidation rejects missing settings, IDs 0/480, DISABLESTEAMWORKS and
+steam_appid.txt anywhere in the build output. Keep the root development file out
+of Steam depots. No online-status requirement is imposed: Steam decides license
+availability, including offline/cached access and authorized sharing. This deters
+ordinary folder copying, not patched binaries or Steam API emulators. No Steam DRM
+wrapping is performed. Unity compilation, the standalone-only code compilation,
+and four EditMode configuration tests passed. Live ownership remains unverified.
+Before shipping, test licensed/unlicensed accounts, Steam closed, Offline Mode,
+a mismatched App ID, and missing native Steam libraries with the real game App ID.
+2026-11-12 Steam configuration follow-up: user supplied App ID 5602730.
+Resources/SteamAchievementSettings and the root development-only steam_appid.txt
+now use 5602730, superseding the unconfigured-ID note above. Live account license
+validation is still unverified; exclude steam_appid.txt from distributed builds.

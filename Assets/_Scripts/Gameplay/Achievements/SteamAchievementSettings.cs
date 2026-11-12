@@ -3,7 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName="Freehangar/Steam Achievements",fileName="SteamAchievementSettings")]
 public sealed class SteamAchievementSettings : ScriptableObject
 {
-    [Tooltip("Set the game's real Steam App ID. Zero keeps Steam syncing disabled; App ID 480 is never used for these achievements.")]
+    [Tooltip("The game's real Steam App ID, shared by achievements and standalone license checks. IDs 0 and 480 block standalone builds; Editor playtesting remains available.")]
     public uint appId;
     [Tooltip("Explicit opt-in for live Steam unlocks during Editor gameplay tests.")]
     public bool syncInEditor;
