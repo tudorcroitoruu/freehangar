@@ -1,0 +1,9 @@
+2026-11-12 shallow pile deformation investigation
+Recorded worst 8 frames: GrainPile.LateUpdate mean 103.16 ms; RefreshSurface 52.81 ms; RefreshCollider 38.10 ms. InteractionPrompt was not the hotspot.
+Reproduction: LargeGrainPileAudit.Run, isolated clipped pile, center height alternating between 0.05 and 0.06 metres, 30 updates, same Editor.
+Before: 24m pile surface 4.459 ms, collision 1.174 ms, 0 managed bytes/update.
+After: 24m pile surface 0.460 ms, collision 1.007 ms, 0 managed bytes/update.
+These are Editor CPU microbenchmarks, not gameplay frame times or a repeat of the recorded spike.
+Fix: use actual empty/nonempty sample transitions instead of a blanket shallow-height rebuild. Clipped samples use their barycentric heights. Rebuilt boundaries invalidate the local path.
+Tests: 82 passed, 9 failed. Original source with the new regression: 81 passed, 10 failed. The extra baseline failure is the new shallow local-update regression. The other nine failures are identical, pre-existing. Unity compilation succeeded.
+Manual gameplay verification remaining: in each unlocked hangar 2-5 repeatedly scoop a shallow edge, pour onto it, and let it settle; capture Main Thread GrainPile.LateUpdate/RefreshSurface/RefreshCollider, check no invisible collision, and confirm collected/deposited mass. Full topology changes still require rebuilding.

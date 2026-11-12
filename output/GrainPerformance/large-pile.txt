@@ -1,3 +1,5 @@
 Local deformation CPU microbenchmark; editor, not gameplay frame times.
-size=6, grid=33, surface=0.083 ms, collision=0.757 ms, allocations=0 B/update
-size=24, grid=121, surface=0.620 ms, collision=1.834 ms, allocations=0 B/update
+size=6, grid=33, surface=0.067 ms, collision=0.509 ms, allocations=0 B/update
+shallow size=6, surface=0.058 ms, collision=0.475 ms, allocations=0 B/update
+size=24, grid=121, surface=0.460 ms, collision=1.076 ms, allocations=0 B/update
+shallow size=24, surface=0.460 ms, collision=1.007 ms, allocations=0 B/update

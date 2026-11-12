@@ -1,0 +1,306 @@
+Grain interaction tests: Failed(Child); passed=81; failed=10
+CornSurfaceUpdateTests.AnimatedSurfaceUploadsEveryHeightEvenWhileKernelWorkIsQueued: Passed
+
+
+CornSurfaceUpdateTests.BroadExcavationHasBoundedWorkAndEventuallyMatchesEveryKernelHeight: Passed
+
+
+CornSurfaceUpdateTests.ClearingAndRefillingQueuedCellsRestoresVisibilityAndCullingBounds: Passed
+
+
+CornSurfaceUpdateTests.SteepExcavationAddsCoverageAndLaterEditsRemoveStaleGrains: Failed
+  Expected: 0.00400000019f +/- 9.99999975E-05f
+  But was:  0.0f
+
+at CornSurfaceUpdateTests.SteepExcavationAddsCoverageAndLaterEditsRemoveStaleGrains () [0x0019c] in E:\Projects\freehangar\Assets\Tests\Editor\CornSurfaceUpdateTests.cs:167
+
+CornSurfaceUpdateTests.TextureOnlyPileDoesNotGenerateOrUpdateKernels: Passed
+
+
+GrainEconomyTests.CachedSurfaceMatchesFreshCalculationAfterExcavation(False): Passed
+
+
+GrainEconomyTests.CachedSurfaceMatchesFreshCalculationAfterExcavation(True): Passed
+
+
+GrainEconomyTests.ChickenDetectsPileEvenWhenGroundRayStartsInsideIt: Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,False): Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,False): Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,False): Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(1.0f,True): Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(10.0f,True): Passed
+
+
+GrainEconomyTests.CollectionConsumesMultipliedStockButFillsOnlyRequestedCargo(200.0f,True): Passed
+
+
+GrainEconomyTests.ColliderFollowsDisplayedSurfaceDuringSettling(False): Passed
+
+
+GrainEconomyTests.ColliderFollowsDisplayedSurfaceDuringSettling(True): Passed
+
+
+GrainEconomyTests.CompatibleShovelScoopStillCollectsGrain: Passed
+
+
+GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(10.0f): Passed
+
+
+GrainEconomyTests.DepositingBackIntoAuthoredStockPreservesRecoverableMass(200.0f): Passed
+
+
+GrainEconomyTests.DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass(False): Failed
+  An exposed edge should slope outward instead of forming a vertical wall.
+  Expected: True
+  But was:  False
+
+at GrainEconomyTests.DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass (System.Boolean clipped) [0x00214] in E:\Projects\freehangar\Assets\Tests\Editor\GrainEconomyTests.cs:501
+
+GrainEconomyTests.DepositOnAuthoredEdgeClosesSurfaceWithoutChangingMass(True): Passed
+
+
+GrainEconomyTests.DroppedCargoIsRecoveredOneForOneEvenWithAnEconomySource: Passed
+
+
+GrainEconomyTests.DroppedGrainFollowsSlopedGroundAndRestoresWithoutAddingMass: Failed
+  Expected: 0.0123224407f +/- 0.002d
+  But was:  -0.0326458439f
+
+at GrainEconomyTests.DroppedGrainFollowsSlopedGroundAndRestoresWithoutAddingMass () [0x0027a] in E:\Projects\freehangar\Assets\Tests\Editor\GrainEconomyTests.cs:538
+
+GrainEconomyTests.EmptyShovelCannotCollectMixedNonSpatialRecipe: Passed
+
+
+GrainEconomyTests.EmptyShovelSelectsOneCropAtMixedBoundary: Passed
+
+
+GrainEconomyTests.ExhaustingStockCannotMintMoreCargoThanItsCollectibleMass: Passed
+
+
+GrainEconomyTests.HangarCleanupClearsOnlyFinalTwoPercent(49.0d,False): Passed
+
+
+GrainEconomyTests.HangarCleanupClearsOnlyFinalTwoPercent(50.0d,True): Failed
+  Expected: True
+  But was:  False
+
+at GrainEconomyTests.HangarCleanupClearsOnlyFinalTwoPercent (System.Double initialMultiplier, System.Boolean expected) [0x00081] in E:\Projects\freehangar\Assets\Tests\Editor\GrainEconomyTests.cs:41
+
+GrainEconomyTests.HangarCleanupClearsOnlyFinalTwoPercent(100.0d,True): Passed
+
+
+GrainEconomyTests.IncompatibleShovelScoopLeavesPileAndCargoUnchanged(False): Passed
+
+
+GrainEconomyTests.IncompatibleShovelScoopLeavesPileAndCargoUnchanged(True): Passed
+
+
+GrainEconomyTests.IncrementalSurfaceMatchesFullRebuildThroughRepeatedDeformation(False): Passed
+
+
+GrainEconomyTests.IncrementalSurfaceMatchesFullRebuildThroughRepeatedDeformation(True): Passed
+
+
+GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(0.0f,1.0f): Passed
+
+
+GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(-10.0f,1.0f): Passed
+
+
+GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.NaN,1.0f): Passed
+
+
+GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(float.PositiveInfinity,1.0f): Passed
+
+
+GrainEconomyTests.InvalidMultipliersCannotProduceNegativeOrInfiniteCargo(100000.0f,10000.0f): Passed
+
+
+GrainEconomyTests.LargerStartingShovelFillsFreeBagInTwoLoadsWithoutLosingTheRemainder: Failed
+  Expected: 10.0f
+  But was:  15.0f
+
+at GrainEconomyTests.LargerStartingShovelFillsFreeBagInTwoLoadsWithoutLosingTheRemainder () [0x0003b] in E:\Projects\freehangar\Assets\Tests\Editor\GrainEconomyTests.cs:686
+
+GrainEconomyTests.LocalAutoSortRaisesSelectedCropWithoutMovingOrLosingStock: Passed
+
+
+GrainEconomyTests.MagnetCollectsEntireMatchingRemainderWithoutHeightRounding(1E-08.0d): Passed
+
+
+GrainEconomyTests.MagnetCollectsEntireMatchingRemainderWithoutHeightRounding(0.02d): Passed
+
+
+GrainEconomyTests.MagnetCutDoesNotImmediatelyRefillDuringSettling: Passed
+
+
+GrainEconomyTests.MagnetExpandsPastEmptyInnerAreaToReachMatchingStock: Passed
+
+
+GrainEconomyTests.MagnetFillsCapacityEvenWithVeryShallowContactDepth: Passed
+
+
+GrainEconomyTests.MagnetSeparatesMatchingCropFromMixedSurfaceAndConservesOtherCrop: Passed
+
+
+GrainEconomyTests.ManualShovelUpgradeLoadsAreTripledWhileVacuumCapacityIsPreserved: Failed
+  Expected: 900
+  But was:  220.0f
+
+at GrainEconomyTests.ManualShovelUpgradeLoadsAreTripledWhileVacuumCapacityIsPreserved () [0x000a2] in E:\Projects\freehangar\Assets\Tests\Editor\GrainEconomyTests.cs:717
+
+GrainEconomyTests.MostlyCornPatchFillsEmptyShovelWithOnlyCornAndLeavesRice: Passed
+
+
+GrainEconomyTests.PouredGrainSettlesAsAMoundWithBareEdgesAndPreservesBothCrops(6.5f): Passed
+
+
+GrainEconomyTests.PouredGrainSettlesAsAMoundWithBareEdgesAndPreservesBothCrops(25.0f): Passed
+
+
+GrainEconomyTests.SavedSpillRepairsGhostHeightsAndCollectsConsecutiveCornLayers: Passed
+
+
+GrainEconomyTests.ScoopCrossingIntoAnotherRecipeLayerDoesNotExcavateEitherLayer: Passed
+
+
+GrainEconomyTests.ScoopDoesNotRemoveGrainOutsideToolRadius(200.0f): Passed
+
+
+GrainEconomyTests.ScoopDoesNotRemoveGrainOutsideToolRadius(900.0f): Passed
+
+
+GrainEconomyTests.ScoopDoesNotRemoveGrainOutsideToolRadius(3000.0f): Passed
+
+
+GrainEconomyTests.SurfaceRefreshTiming(False): Passed
+
+
+GrainEconomyTests.SurfaceRefreshTiming(True): Passed
+
+
+GrainEconomyTests.ThinGrainSkinStaysAboveGround(0.0001f): Passed
+
+
+GrainEconomyTests.ThinGrainSkinStaysAboveGround(0.001f): Passed
+
+
+GrainEconomyTests.ThinGrainSkinStaysAboveGround(0.02f): Passed
+
+
+GrainEconomyTests.ThinGrainSkinStaysAboveGround(0.045f): Passed
+
+
+GrainEconomyTests.ThinRemnantCleanupRemovesStockButKeepsThickerGrain: Passed
+
+
+GrainEconomyTests.ThinRemnantsMergeWithoutLosingEitherCropAndRemainCollectible: Passed
+
+
+GrainInteractionPerformanceTests.ActiveLoadMeshKeepsGeometryAndUpdatesOnlyTheChangedKernel: Failed:Error
+System.NullReferenceException : Object reference not set to an instance of an object
+  at GrainInteractionPerformanceTests.Field[T] (System.Object obj, System.String field) [0x00000] in E:\Projects\freehangar\Assets\Tests\Editor\GrainInteractionPerformanceTests.cs:45
+  at GrainInteractionPerformanceTests.ActiveLoadMeshKeepsGeometryAndUpdatesOnlyTheChangedKernel () [0x0000b] in E:\Projects\freehangar\Assets\Tests\Editor\GrainInteractionPerformanceTests.cs:346
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <16ec009baa7541e7b79bc4548f1d744c>:0
+GrainInteractionPerformanceTests.DistantBatchesKeepDistributedSamplesAndShareSubmissionBuffer: Passed
+
+
+GrainInteractionPerformanceTests.DistantGrainLodHalvesTriangleCountAndHasOutwardFaces: Passed
+
+
+GrainInteractionPerformanceTests.ExcavatedRiceRetainsRiceAppearanceWithoutRetainingStock: Passed
+
+
+GrainInteractionPerformanceTests.ExtraCoverageReusesBuffersWhenKernelCountChanges: Passed
+
+
+GrainInteractionPerformanceTests.FasterPileRefillConservesMassAndMatchesAtThirtyAndOneTwentyFps: Passed
+
+
+GrainInteractionPerformanceTests.LoadCountChangesReuseRetainedVerticesAndUploadNewSlots: Failed:Error
+System.NullReferenceException : Object reference not set to an instance of an object
+  at GrainInteractionPerformanceTests.Field[T] (System.Object obj, System.String field) [0x00000] in E:\Projects\freehangar\Assets\Tests\Editor\GrainInteractionPerformanceTests.cs:45
+  at GrainInteractionPerformanceTests.LoadCountChangesReuseRetainedVerticesAndUploadNewSlots () [0x00042] in E:\Projects\freehangar\Assets\Tests\Editor\GrainInteractionPerformanceTests.cs:369
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <16ec009baa7541e7b79bc4548f1d744c>:0
+GrainInteractionPerformanceTests.LoadedShovelSleepsDuringUniformWalkingButWakesForAccelerationAndTurning: Passed
+
+
+GrainInteractionPerformanceTests.MovingAndRotatingBagReusesBakedSurfaceAndKeepsKernelsAttached: Passed
+
+
+GrainInteractionPerformanceTests.MovingLoadStaysBoundedAtFastAndSlowFrameRates(0.01f): Passed
+
+
+GrainInteractionPerformanceTests.MovingLoadStaysBoundedAtFastAndSlowFrameRates(0.033f): Passed
+
+
+GrainInteractionPerformanceTests.MovingLoadStaysBoundedAtFastAndSlowFrameRates(0.05f): Passed
+
+
+GrainInteractionPerformanceTests.PileVisualTransitionIsGradualAndDoesNotChangeStoredGrain(0.0f,1.0f): Passed
+
+
+GrainInteractionPerformanceTests.PileVisualTransitionIsGradualAndDoesNotChangeStoredGrain(1.0f,0.0f): Passed
+
+
+GrainInteractionPerformanceTests.PileVisualTransitionIsIndependentOfFrameRate: Passed
+
+
+GrainInteractionPerformanceTests.PurePourStreamDoesNotQuerySceneCollidersAndDrainsAfterLanding: Failed:Error
+System.NullReferenceException : Object reference not set to an instance of an object
+  at GrainInteractionPerformanceTests.Field[T] (System.Object obj, System.String field) [0x00000] in E:\Projects\freehangar\Assets\Tests\Editor\GrainInteractionPerformanceTests.cs:45
+  at GrainInteractionPerformanceTests.PurePourStreamDoesNotQuerySceneCollidersAndDrainsAfterLanding () [0x000ad] in E:\Projects\freehangar\Assets\Tests\Editor\GrainInteractionPerformanceTests.cs:385
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <16ec009baa7541e7b79bc4548f1d744c>:0
+GrainInteractionPerformanceTests.ScalingBagStillResamplesItsWorldSpaceKernelDensity: Passed
+
+
+GrainInteractionPerformanceTests.ScoopStopsAtThinSurfaceLayerWithoutRemovingUnderlyingStock: Passed
+
+
+GrainInteractionPerformanceTests.SmallCoveragePatchesShareOneSubmissionBuffer: Passed
+
+
+GrainInteractionPerformanceTests.SpatialSamplingMatchesEveryTriangleReferenceAcrossTheBag(0.2f): Passed
+
+
+GrainInteractionPerformanceTests.SpatialSamplingMatchesEveryTriangleReferenceAcrossTheBag(0.75f): Passed
+
+
+GrainInteractionPerformanceTests.SpatialSamplingMatchesEveryTriangleReferenceAcrossTheBag(1.0f): Passed
+
+
+GrainInteractionPerformanceTests.StandingScoopAcceptsLowAuthoredPileButRejectsObstructionsAndDistance: Passed
+
+
+LargeGrainPileTests.ClippedLocalUpdatesMatchFullRebuildIncludingNormalsAndSkirts(4.0f): Passed
+
+
+LargeGrainPileTests.ClippedLocalUpdatesMatchFullRebuildIncludingNormalsAndSkirts(0.06f): Failed
+  Clipped interior edits must use the local update path.
+  Expected: True
+  But was:  False
+
+at LargeGrainPileTests.ClippedLocalUpdatesMatchFullRebuildIncludingNormalsAndSkirts (System.Single height) [0x00101] in E:\Projects\freehangar\Assets\Tests\Editor\LargeGrainPileTests.cs:96
+
+LargeGrainPileTests.CollisionSectionsPreserveRayHitsAcrossScoopClearAndRefill: Passed
+
+
+LargeGrainPileTests.ShovelKeepsScrapingItsPileSectionsButStillRejectsWalls: Passed
+
+
+LargeGrainPileTests.ShovelPoursEveryBatchIntoSectionedPile: Passed
+
+

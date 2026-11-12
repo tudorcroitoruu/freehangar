@@ -40,6 +40,20 @@ public static class LargeGrainPileAudit
                     collisionMs += (Stopwatch.GetTimestamp() - start) * 1000.0 / Stopwatch.Frequency;
                 }
                 report.AppendLine($"size={size}, grid={field.Resolution}, surface={renderMs/30:F3} ms, collision={collisionMs/30:F3} ms, allocations={(GC.GetAllocatedBytesForCurrentThread()-bytes)/30} B/update");
+                int center = field.Heights.Length / 2;
+                field.Heights[center] = .06f;
+                refresh(); collider();
+                renderMs = collisionMs = 0;
+                bytes = GC.GetAllocatedBytesForCurrentThread();
+                for (int j = 0; j < 30; j++)
+                {
+                    field.Heights[center] = j % 2 == 0 ? .05f : .06f;
+                    long start = Stopwatch.GetTimestamp(); refresh();
+                    renderMs += (Stopwatch.GetTimestamp() - start) * 1000.0 / Stopwatch.Frequency;
+                    start = Stopwatch.GetTimestamp(); collider();
+                    collisionMs += (Stopwatch.GetTimestamp() - start) * 1000.0 / Stopwatch.Frequency;
+                }
+                report.AppendLine($"shallow size={size}, surface={renderMs/30:F3} ms, collision={collisionMs/30:F3} ms, allocations={(GC.GetAllocatedBytesForCurrentThread()-bytes)/30} B/update");
             }
             finally { Object.DestroyImmediate(root); }
         }

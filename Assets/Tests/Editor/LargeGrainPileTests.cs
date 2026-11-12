@@ -80,13 +80,17 @@ public class LargeGrainPileTests
         finally { Object.DestroyImmediate(actor); }
     }
 
-    [Test] public void ClippedLocalUpdatesMatchFullRebuildIncludingNormalsAndSkirts()
+    [TestCase(4f)]
+    [TestCase(.06f)]
+    public void ClippedLocalUpdatesMatchFullRebuildIncludingNormalsAndSkirts(float height)
     {
+        Set("initialHeight", height);
+        pile.RebuildPreview();
         var field = Get<GrainHeightField>("field");
         var visual = Get<GrainHeightField>("visualField");
         foreach (var position in new[] { Vector2.zero, new Vector2(3.1f, 0), new Vector2(7.5f, 1) })
         {
-            field.Scoop(position.x, position.y, .55f, .07f, .04f);
+            field.Scoop(position.x, position.y, .55f, height * .01f, .04f);
             Array.Copy(field.Heights, visual.Heights, field.Heights.Length);
             bool local = (bool)typeof(GrainPile).GetMethod("TryRefreshLocalSurface", Private).Invoke(pile, new object[] { visual });
             Assert.IsTrue(local, "Clipped interior edits must use the local update path.");

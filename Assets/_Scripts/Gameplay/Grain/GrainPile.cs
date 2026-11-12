@@ -974,11 +974,25 @@ public sealed class GrainPile : MonoBehaviour
             renderedHeights == null || renderedHeights.Length != surface.Heights.Length ||
             surfaceDetails.Count != blendToPositions.Count || cachedNormalKeys.Count != blendToPositions.Count) return false;
         float inset = .045f / surfaceDetailScale.y;
-        // Near the ground, triangles and skirt edges can appear/disappear. Use the
-        // full topology path there. Interior deformation retains the exact indices.
-        for (int i = 0; i < renderedHeights.Length; i++)
-            if (renderedHeights[i] != surface.Heights[i] && Mathf.Min(renderedHeights[i], surface.Heights[i]) <= inset * 2f)
-                return false;
+        // Shallow grain still has a visible skin. Rebuild topology only when a
+        // sample actually becomes empty/nonempty, not on every smoothing step
+        // below nine centimetres. Check interpolated wall samples as well: their
+        // threshold can differ from the grid points that contribute to them.
+        if (HasClippedSurface)
+        {
+            if (closedBoundary != boundary || clippedHeightSamples.Count < topSurfaceVertexCount) return false;
+            for (int i = 0; i < topSurfaceVertexCount; i++)
+            {
+                var sample = clippedHeightSamples[i];
+                if ((sample.Read(renderedHeights) > .00001f) !=
+                    (sample.Read(surface.Heights) > .00001f)) return false;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < renderedHeights.Length; i++)
+                if ((renderedHeights[i] > .00001f) != (surface.Heights[i] > .00001f)) return false;
+        }
         System.Array.Clear(changedVertices, 0, changedVertices.Length);
         System.Array.Clear(changedGroups, 0, changedGroups.Length);
         dirtySurfaceVertices.Clear(); dirtySurfaceFaces.Clear(); dirtySurfaceGroups.Clear();
