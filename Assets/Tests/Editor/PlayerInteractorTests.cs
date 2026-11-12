@@ -46,7 +46,7 @@ public class PlayerInteractorTests
     }
 
     [Test]
-    public void WheelbarrowUsesXForUpgradeAndYForPushing()
+    public void WheelbarrowUsesXForPushingAndYForUpgrade()
     {
         var body = Create("Wheelbarrow station", origin + Vector3.forward * 2);
         var wheelbarrow = body.AddComponent<WheelbarrowCargo>();
@@ -57,9 +57,9 @@ public class PlayerInteractorTests
         menu.SetActive(false);
         var manager = menu.AddComponent<UpgradeManager>();
         SetField(upgrade, "upgradeManager", manager);
-        Assert.AreSame(upgrade, FindTarget());
-        Assert.IsTrue(upgrade.TryGetPrompt(interactor, out var prompt));
-        object[] args = { upgrade, prompt };
+        Assert.AreSame(wheelbarrow, FindTarget());
+        Assert.IsTrue(wheelbarrow.TryGetPrompt(interactor, out var prompt));
+        object[] args = { wheelbarrow, prompt };
         typeof(PlayerInteractor).GetMethod("AddActions", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(interactor, args);
         prompt = (InteractionPromptData)args[1];
         Assert.AreEqual(KeyCode.E, prompt.InteractionKey);
@@ -85,22 +85,22 @@ public class PlayerInteractorTests
         var menu = Create("Upgrade manager", origin);
         menu.SetActive(false);
         SetField(upgrade, "upgradeManager", menu.AddComponent<UpgradeManager>());
-        Assert.AreSame(upgrade, FindTarget());
-        upgrade.TryGetPrompt(interactor, out var prompt);
-        object[] args = { upgrade, prompt };
+        Assert.AreSame(wheelbarrow, FindTarget());
+        wheelbarrow.TryGetPrompt(interactor, out var prompt);
+        object[] args = { wheelbarrow, prompt };
         typeof(PlayerInteractor).GetMethod("AddActions", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(interactor, args);
         prompt = (InteractionPromptData)args[1];
         Assert.AreEqual(KeyCode.F, prompt.AdditionalActions[0].Key);
     }
 
     [Test]
-    public void StandaloneUpgradeStationUsesThePrimaryInteraction()
+    public void StandaloneUpgradeStationUsesTheSecondaryInteraction()
     {
         var body = Create("Upgrade station", origin + Vector3.forward * 2);
         var station = body.AddComponent<VehicleUpgradeInteractable>();
         body.AddComponent<BoxCollider>();
         Assert.AreSame(station, FindTarget());
-        Assert.AreEqual(KeyCode.E, station.InteractionKey);
+        Assert.AreEqual(KeyCode.F, station.InteractionKey);
     }
 
     [Test]
@@ -114,6 +114,31 @@ public class PlayerInteractorTests
         var collider = bag.AddComponent<BoxCollider>();
         Assert.IsNull(VehicleUpgradeInteractable.FindForHit(collider, interactor));
         Assert.AreSame(container, FindTarget());
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void VehicleKeysStayFixedRegardlessOfCargo(bool loaded)
+    {
+        var body = Create("Vehicle", origin + Vector3.forward * 2);
+        var bicycle = body.AddComponent<BicycleController>();
+        var upgrade = body.AddComponent<VehicleUpgradeInteractable>();
+        ConfigureVehicle(body);
+        var slot = Create("Cargo slot", body.transform.position);
+        slot.transform.SetParent(body.transform);
+        bicycle.cargoSlots = new[] { slot.transform };
+        if (loaded)
+            Create("Cargo", body.transform.position).transform.SetParent(slot.transform);
+        var menu = Create("Upgrade manager", origin);
+        menu.SetActive(false);
+        SetField(upgrade, "upgradeManager", menu.AddComponent<UpgradeManager>());
+
+        Assert.AreEqual(loaded, body.GetComponent<VehicleUpgrade>().HasCargo);
+        Assert.AreEqual(!loaded, upgrade.TryGetPrompt(interactor, out var prompt));
+        Assert.AreEqual(KeyCode.F, prompt.InteractionKey);
+        var keyFor = typeof(PlayerInteractor).GetMethod("KeyFor", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.AreEqual(KeyCode.E, keyFor.Invoke(interactor, new object[] { bicycle }));
+        Assert.AreEqual(KeyCode.F, keyFor.Invoke(interactor, new object[] { upgrade }));
     }
 
     [Test]

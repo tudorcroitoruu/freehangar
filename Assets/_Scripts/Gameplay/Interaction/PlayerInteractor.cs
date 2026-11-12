@@ -263,20 +263,6 @@ public sealed class PlayerInteractor : MonoBehaviour
 
     private KeyCode KeyFor(IInteractable target)
     {
-        if (target is VehicleUpgradeInteractable upgrade &&
-            (!upgrade.TryGetPrompt(this, out var prompt) || !prompt.ShowKey)) return KeyCode.F;
-        if (target is BicycleController || target is WheelbarrowCargo)
-        {
-            var component = (Component)target;
-            var origin = actionOrigin != null && actionOrigin.IsChildOf(component.transform) ? actionOrigin : component.transform;
-            for (var host = origin; host != null; host = host.parent)
-            {
-                var station = host.GetComponent<VehicleUpgradeInteractable>();
-                if (station != null && station.isActiveAndEnabled && station.TryGetPrompt(this, out var data) && data.ShowKey)
-                    return KeyCode.F;
-                if (host == component.transform) break;
-            }
-        }
         return target is IKeyedInteractable action ? action.InteractionKey : KeyCode.E;
     }
 
