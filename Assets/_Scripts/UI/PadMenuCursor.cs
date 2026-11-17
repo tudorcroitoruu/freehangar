@@ -40,6 +40,7 @@ public sealed class PadMenuCursor : MonoBehaviour
 
     private void Update()
     {
+        if (DemoSession.BlocksInput) { Restore(); if (EventSystem.current) EventSystem.current.sendNavigationEvents = false; return; }
         var mouse = Mouse.current;
         bool pointerInput = mouse != null && mouse.layout != "VirtualMouse" && mouse.name != "VirtualMouse" &&
             (mouse.delta.ReadValue().sqrMagnitude > .01f ||

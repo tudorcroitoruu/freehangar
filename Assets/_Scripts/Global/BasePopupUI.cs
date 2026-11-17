@@ -11,7 +11,7 @@ namespace UIPopups
         private static readonly HashSet<BasePopupUI> activePopups = new HashSet<BasePopupUI>();
 
         public static event Action<bool> AnyPopupVisibilityChanged;
-        public static bool HasActivePopup => activePopups.Count > 0;
+        public static bool HasActivePopup => DemoSession.BlocksInput || activePopups.Count > 0;
         private static int queueBypassDepth;
 
         public static bool HasActivePopupExcept(Predicate<BasePopupUI> ignorePredicate)

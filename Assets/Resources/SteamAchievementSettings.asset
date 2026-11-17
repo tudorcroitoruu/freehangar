@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SteamAchievementSettings
   appId: 5602730
   syncInEditor: 0
+  previewDemoInEditor: 1
   apiNames:
   - ACH_0
   - ACH_1

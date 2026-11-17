@@ -274,6 +274,7 @@ public class MenuManager : MonoBehaviour
 
     private void Update()
     {
+        if (DemoSession.BlocksInput) return;
         if (transitionRequested || LoadingScreen.isLoadingOn || GameSettingsManager.IsRebindingInputCaptured) return;
         if (newGamePopup != null && newGamePopup.activeSelf)
         {
@@ -296,6 +297,7 @@ public class MenuManager : MonoBehaviour
 
     private void BeginGame(bool newGame)
     {
+        if (DemoSession.Expired) { DemoSession.Instance?.ShowOffer(); return; }
         if (transitionRequested || !isActiveAndEnabled) return;
         if (!LoadingScreen.CanLoadScene(gameplayScene)) return;
         var loading = ResolveLoadingScreen();

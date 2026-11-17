@@ -115,7 +115,7 @@ public class SteamManager : MonoBehaviour {
 			// remove steam_appid.txt from the game depot. eg: "(AppId_t)480" or "new AppId_t(480)".
 			// See the Valve documentation for more information: https://partner.steamgames.com/doc/sdk/api#initialization_and_shutdown
 			var configuredAppId = achievementSettings != null && achievementSettings.HasRealAppId
-				? new AppId_t(achievementSettings.appId) : AppId_t.Invalid;
+				? new AppId_t(achievementSettings.RuntimeAppId) : AppId_t.Invalid;
 			if (SteamAPI.RestartAppIfNecessary(configuredAppId)) {
 				Debug.Log("[Steamworks.NET] Shutting down because RestartAppIfNecessary returned true. Steam will restart the application.");
 
@@ -161,9 +161,9 @@ public class SteamManager : MonoBehaviour {
 		try {
 			// Check the running ID as well: a substituted steam_appid.txt must not
 			// authorize this game using Spacewar or another owned application.
-			if (SteamUtils.GetAppID().m_AppId != achievementSettings.appId ||
+			if (SteamUtils.GetAppID().m_AppId != achievementSettings.RuntimeAppId ||
 				!SteamApps.BIsSubscribed() ||
-				!SteamApps.BIsSubscribedApp(new AppId_t(achievementSettings.appId))) {
+				!SteamApps.BIsSubscribedApp(new AppId_t(achievementSettings.RuntimeAppId))) {
 				RejectLaunch("This Steam account does not have a valid license for this game.");
 			}
 		}

@@ -22,6 +22,7 @@ public sealed class SteamAchievementSync : MonoBehaviour
     private void Awake()=>settings=Resources.Load<SteamAchievementSettings>("SteamAchievementSettings");
     private void Update()
     {
+        if(DemoSession.IsDemo) { Status="Demo: Steam achievement uploads disabled"; return; }
         if(settings==null || !settings.HasRealAppId)return;
 #if UNITY_EDITOR
         if(!settings.syncInEditor){Status="Editor Steam syncing disabled (local achievements active)";return;}

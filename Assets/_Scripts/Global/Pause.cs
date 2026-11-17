@@ -75,6 +75,7 @@ public class Pause : MonoBehaviour
 
     private void Update()
     {
+        if (DemoSession.BlocksInput) return;
         if (MenuManager.IsMenuOpen || exitToMenu || restarting || GameSettingsManager.IsRebindingInputCaptured || LoadingScreen.IsLoading ||
             !(FarmInput.Down("Pause") || (paused && FarmInput.Back))) return;
         if (!paused) PauseOn();
@@ -250,7 +251,7 @@ public class Pause : MonoBehaviour
 
     public void Unpause()
     {
-        if (exitToMenu) return;
+        if (exitToMenu || DemoSession.BlocksInput) return;
         bool wasPaused = paused;
         paused = false;
         SetActiveScreen(null);

@@ -1,0 +1,13 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Target Name="IncludeDemoSources" BeforeTargets="CoreCompile">
+<ItemGroup Condition="'$(AssemblyName)' == 'Assembly-CSharp'">
+<Compile Include="$(MSBuildProjectDirectory)\Assets\_Scripts\Global\DemoSession.cs" Exclude="@(Compile)" />
+<Compile Include="$(MSBuildProjectDirectory)\Assets\_Scripts\Global\DemoPopupButtons.cs" Exclude="@(Compile)" />
+</ItemGroup>
+<ItemGroup Condition="'$(AssemblyName)' == 'Assembly-CSharp-Editor'">
+<Compile Include="$(MSBuildProjectDirectory)\Assets\Editor\DemoBuild.cs" Exclude="@(Compile)" />
+</ItemGroup>
+<PropertyGroup><DefineConstants>$(DefineConstants);DEMO_BUILD</DefineConstants></PropertyGroup>
+</Target>
+</Project>
+
